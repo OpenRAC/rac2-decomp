@@ -5,27 +5,27 @@ extern s32 g_flashing_frame;
 /* Scales the level's shared word by the object's own signed halfword, takes it modulo
    sixty and paints the object with 0x80FFFFFF when the remainder is under fifteen and
    with 0x80404040 otherwise; then it sets the sub-object's two flag words. */
-void flashing_update_pal(s32 a0)
+void flashing_update_pal(s32 moby)
 {
-    s32 v1 = g_flashing_frame;
-    s32 d = 50;
-    s32 v0 = *(short *)(a0 + 0xB2);
-    s32 c1 = 0x80404040;
-    s32 t0 = 0x80FFFFFF;
-    s32 a1;
-    s32 a3;
+    s32 counter = g_flashing_frame;
+    s32 period = 50;
+    s32 value = *(short *)(moby + 0xB2);
+    s32 dark_color = 0x80404040;
+    s32 bright_color = 0x80FFFFFF;
+    s32 color;
+    s32 sub_object;
 
-    v1 = v1 + v0;
-    v0 = v1 % d;
-    if (v0 >= 12)
-        a1 = c1;
+    counter = counter + value;
+    value = counter % period;
+    if (value >= 12)
+        color = dark_color;
     else
-        a1 = t0;
-    *(s32 *)(a0 + 0x78) = a1;
-    a3 = *(s32 *)(a0 + 0x68);
-    *(u32 *)(a3 + 0x8C) |= 1;
-    *(u16 *)(a3 + 0x3E) |= 8;
-    *(u8 *)(a0 + 0x30) = 0;
+        color = bright_color;
+    *(s32 *)(moby + 0x78) = color;
+    sub_object = *(s32 *)(moby + 0x68);
+    *(u32 *)(sub_object + 0x8C) |= 1;
+    *(u16 *)(sub_object + 0x3E) |= 8;
+    *(u8 *)(moby + 0x30) = 0;
 }
 
 typedef unsigned int Quad __attribute__((mode(TI)));
@@ -44,7 +44,9 @@ extern void *part_spawn_scaled_smoke_pal(void *, void *, int, void *, int, int);
 extern void FastVecAdd(void *, void *, void *);
 extern void snd_stop_voice(int);
 
-void func_PAL_L17_003A4A28(unsigned char *obj)
+/* Updates the moby that sprays a burst of randomly scattered smoke puffs: it waits, sprays for a
+   while, then stops its sound and starts over (PAL: 50 Hz rates). */
+void part_burst_update_pal(unsigned char *obj)
 {
     float matrix[16];
     Vec position, velocity, step, jitter, random;

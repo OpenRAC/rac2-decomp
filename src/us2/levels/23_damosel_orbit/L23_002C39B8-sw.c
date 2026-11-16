@@ -218,7 +218,8 @@ extern char g_impact_effect_data[] MACRO_ADDR;
 extern void moby_raise_state_to_eight();
 extern void moby_raise_state_to_eight_copy();
 
-void func_US2_L23_002C39B8(void)
+/* Runs the hero state machine for one frame: one big switch on the hero state decides movement and animation (USA v2.00). */
+void hero_l23_update_state_machine_us2(void)
 {
     u8 *entry_object = H(u8 *, 0x2290);
     int entry_substate = H(int, 0x2298);
@@ -250,12 +251,12 @@ void func_US2_L23_002C39B8(void)
             Vec4 output_matrix[4];
         } state_86;
         struct {
-            Vec4 targetPosition;
+            Vec4 target_position;
             Vec4 desired;
             Vec4 offset;
         } state_24;
         struct {
-            Vec4 targetPosition;
+            Vec4 target_position;
             Vec4 relative;
             Vec4 scaled;
             Vec4 delta;
@@ -299,8 +300,8 @@ void func_US2_L23_002C39B8(void)
             Vec4 first;             /* path sample, or the spawned debris origin */
             Vec4 second;            /* second path sample, or the debris velocity */
             union {
-                struct { Vec4 displacement; Vec4 previousStep; } d;
-                struct { Vec4 probeA; Vec4 probeB; } p;
+                struct { Vec4 displacement; Vec4 previous_step; } d;
+                struct { Vec4 probe_a; Vec4 probe_b; } p;
                 unsigned char query[48] __attribute__((aligned(16)));
             } u;
             Vec4 direction;
@@ -337,7 +338,7 @@ void func_US2_L23_002C39B8(void)
             Vec4 second;
         } state_4d;
         struct {
-            Vec4 hitPosition;       /* first vector of a 64-byte contact record */
+            Vec4 hit_position;       /* first vector of a 64-byte contact record */
             Vec4 hit_rest[3];
             Vec4 side;
             Vec4 candidate;
@@ -474,7 +475,7 @@ case 57: case 109: case 111: case 125:
 
 case 0x32: case 0x33: case 0x34:
 {
-    float oldPitch,steer,minimumSteer,pitchChange,controllerScale,rate,maximumInput,steeringLimit;
+    float old_pitch,steer,minimum_steer,pitch_change,controller_scale,rate,maximum_input,steering_limit;
     if (H(u32,0x2294)==0x34) {
         if (H(s32,0x1B8)>70) g_hero_state_machine_word=65535;
         snd_update_slot_object(5,H(void*,0x2290),15);queue_copy_record_by_index(22);
@@ -506,15 +507,15 @@ case 0x32: case 0x33: case 0x34:
     }
     {
         float horizontal=FLD(g_pad_state, float, 0x128), vertical=FLD(g_pad_state, float, 0x12C);
-        maximumInput=horizontal<vertical?vertical:horizontal;
+        maximum_input=horizontal<vertical?vertical:horizontal;
     }
-    steeringLimit=0.011635531f;steeringLimit+=maximumInput*0.008726647f; /* retail max.s, not float-to-int/OR */
+    steering_limit=0.011635531f;steering_limit+=maximum_input*0.008726647f; /* retail max.s, not float-to-int/OR */
     steer=0.0f;
-    minimumSteer=0.2f;
+    minimum_steer=0.2f;
     if ((FLD(g_pad_state, u64, 0x1A0)&0xC0)==0x80 || H(s32,0x2298)==1) {
         steer=FLD(g_pad_state, float, 0x12C)*1.5f;
         if (steer>1.0f) steer=1.0f;
-        if (steer<minimumSteer) steer=minimumSteer;
+        if (steer<minimum_steer) steer=minimum_steer;
         if (FLD(g_pad_state, s32, 0x1DC)!=0x79) {
             ++H(s16,0xA42);H(s16,0xA40)=0;
             steer=(float)H(s16,0xA42)*0.025f+0.5f;
@@ -525,7 +526,7 @@ case 0x32: case 0x33: case 0x34:
     } else if (FLD(g_pad_state, u32, 0x1A0)&0x40) {
         steer=FLD(g_pad_state, float, 0x128)*1.5f;
         if (steer>1.0f) steer=1.0f;
-        if (steer<minimumSteer) steer=minimumSteer;
+        if (steer<minimum_steer) steer=minimum_steer;
         if (FLD(g_pad_state, s32, 0x1DC)!=0x79) {
             H(s16,0xA42)=0;++H(s16,0xA40);
             steer=(float)H(s16,0xA40)*0.025f+0.5f;
@@ -557,9 +558,9 @@ case 0x32: case 0x33: case 0x34:
     if (H(s16,0xA4E)>70) H(s32,0xA50)=0;
     if (FLD(g_pad_state, u32, 0x1A0)&0x80) H(s32,0xA50)=0;
     if (H(u32,0x2294)==0x33) steer=0.0f;
-    oldPitch=H(float,0x94);
-    math_approach_with_velocity(HP(0x94), steer, HP(0xA28), 0.015f, 0.2f, steeringLimit, 0);
-    pitchChange=fast_subtract_rotations(H(float,0x94),oldPitch);
+    old_pitch=H(float,0x94);
+    math_approach_with_velocity(HP(0x94), steer, HP(0xA28), 0.015f, 0.2f, steering_limit, 0);
+    pitch_change=fast_subtract_rotations(H(float,0x94),old_pitch);
     hero_resolve_stick_direction(1.0f, 0);hero_steer_heading(0,0.007f,0.08f,0.087266475f);
     H(float,0xA2C)=H(float,0x1A4);math_fast_float_d(HP(0xA34));
     if (H(s32,0x2298)==1) H(float,0x1B0)=0.10000001f;
@@ -568,13 +569,13 @@ case 0x32: case 0x33: case 0x34:
         else H(float,0x1B0)=0.04666667f;
     }
     else H(float,0x1B0)=0.050000004f;
-    controllerScale=H(float,0x24B8);
-    if (((FLD(g_pad_state, u32, 0x1A0)&0xC0) || H(s32,0x2298)==1) && H(float,0x24B8)<1.0f) controllerScale=1.0f;
+    controller_scale=H(float,0x24B8);
+    if (((FLD(g_pad_state, u32, 0x1A0)&0xC0) || H(s32,0x2298)==1) && H(float,0x24B8)<1.0f) controller_scale=1.0f;
     if (H(float,0x24B8)>0.15f) {
         float minimum=H(u32,0x2294)==0x34?0.4f:0.35f;
-        if (controllerScale<minimum) controllerScale=minimum;
+        if (controller_scale<minimum) controller_scale=minimum;
     }
-    if (H(u32,0x2294)!=0x34 || !(FLD(g_pad_state, u32, 0x1A0)&10)) H(float,0x1B0)*=controllerScale;
+    if (H(u32,0x2294)!=0x34 || !(FLD(g_pad_state, u32, 0x1A0)&10)) H(float,0x1B0)*=controller_scale;
     if (math_fast_float_d(HP(0xA30))) {
 
         int low,high,choice;
@@ -632,16 +633,16 @@ case 0x32: case 0x33: case 0x34:
     }
     math_approach_with_velocity(HP(0x90), rate, HP(0xA24), 0.007f, 0.17f, 0.020362178f, 0);
     cam_set_limits_second(0.009f,0.22f);cam_set_limits_third(0.04f,0.2f);cam_set_limits_fourth(0.02f,0.2f);
-    FLD(g_hero_l23_motion_params, float, 0x114)=pitchChange*47.0f;FLD(g_hero_l23_motion_params, float, 0x118)=rate*1.5f;FLD(g_hero_l23_motion_params, float, 0x110)=rate*1.4f;
+    FLD(g_hero_l23_motion_params, float, 0x114)=pitch_change*47.0f;FLD(g_hero_l23_motion_params, float, 0x118)=rate*1.5f;FLD(g_hero_l23_motion_params, float, 0x110)=rate*1.4f;
     if (FLD(g_hero_l23_motion_params, float, 0x114)>0.8726647f) FLD(g_hero_l23_motion_params, float, 0x114)=0.8726647f;
     else if (FLD(g_hero_l23_motion_params, float, 0x114)< -0.8726647f) FLD(g_hero_l23_motion_params, float, 0x114)=-0.8726647f;
     FLD(g_hero_l23_motion_params, float, 0x364)=0.03f;
     FLD(g_hero_l23_motion_params, float, 0x368)=0.22f;
-    FLD(g_hero_l23_motion_params, float, 0x324)=pitchChange*40.0f;
+    FLD(g_hero_l23_motion_params, float, 0x324)=pitch_change*40.0f;
     FLD(g_hero_l23_motion_params, float, 0x328)=rate*1.1f;
     FLD(g_hero_l23_motion_params, float, 0x414)=0.03f;
     FLD(g_hero_l23_motion_params, float, 0x418)=0.22f;
-    FLD(g_hero_l23_motion_params, float, 0x3D4)=pitchChange*40.0f;
+    FLD(g_hero_l23_motion_params, float, 0x3D4)=pitch_change*40.0f;
     FLD(g_hero_l23_motion_params, float, 0x3D8)=rate*1.1f;
     goto finish;
 }
@@ -830,9 +831,9 @@ case 0x23:
 case 0x24:
 {
 
-    float bearing,firstRoot,secondRoot;
-    qcopy(&workspace.state_24.targetPosition, H(u8*,0xAA4)+0x10);
-    H(float,0xAB0)=fast_vec_dist(HP(0x80),&workspace.state_24.targetPosition);
+    float bearing,first_root,second_root;
+    qcopy(&workspace.state_24.target_position, H(u8*,0xAA4)+0x10);
+    H(float,0xAB0)=fast_vec_dist(HP(0x80),&workspace.state_24.target_position);
     H(float,0xAAC)=60.0f;
     if (H(float,0xAA0)>0.0f) H(float,0xAAC)=H(float,0xAB0)/H(float,0x170);
     if (H(s32,0x2298)==0) {
@@ -844,16 +845,16 @@ case 0x24:
         H(float,0x1A0)=bearing;
         hero_steer_heading(0,0.03f,0.15f,0.12217307f);
     } else if (H(s32,0x2298)==1) ApproachValue(HP(0xAA0),0.0f,0.011666667f);
-    if (math_solve_quadratic(&firstRoot,&secondRoot,-0.0058333334f,H(float,0xAA0),1.9f-H(float,0xAB0))>0 && firstRoot>0.0f) {
+    if (math_solve_quadratic(&first_root,&second_root,-0.0058333334f,H(float,0xAA0),1.9f-H(float,0xAB0))>0 && first_root>0.0f) {
         H(s32,0x2298)=1;
-        H(float,0xAAC)=firstRoot;
+        H(float,0xAAC)=first_root;
     }
     H(u16,0x226)=3;
     if (H(float,0xAAC)<20.0f) H(s32,0xAB4)=1;
     if (H(s32,0xAB4)) StepAngleTowardTarget(HP(0x94),0,0.0f,0.063995413f);
     else {
-        float horizontal=vec_distance_xy(HP(0x80),&workspace.state_24.targetPosition);
-        bearing=mat_fast_helper_a(horizontal,workspace.state_24.targetPosition.z-H(float,0x88));
+        float horizontal=vec_distance_xy(HP(0x80),&workspace.state_24.target_position);
+        bearing=mat_fast_helper_a(horizontal,workspace.state_24.target_position.z-H(float,0x88));
         bearing=FastAddRotations(-bearing,1.5707965f);
         StepAngleTowardTarget(HP(0x94),0,bearing,0.10762865f);
     }
@@ -877,12 +878,12 @@ case 0x25:
     qcopy(&H(Vec4,0xF0), &H(Vec4,0x110));
     FastVecScale(HP(0xF0),HP(0xF0),0.9f);
     H(float,0xF8)-=0.004166667f;
-    qcopy(&workspace.state_25.targetPosition, H(u8*,0xAA4)+0x10);
-    H(float,0xAB0)=fast_vec_dist(HP(0x80),&workspace.state_25.targetPosition);
+    qcopy(&workspace.state_25.target_position, H(u8*,0xAA4)+0x10);
+    H(float,0xAB0)=fast_vec_dist(HP(0x80),&workspace.state_25.target_position);
     FastVecAdd(&workspace.state_25.relative,HP(0x80),HP(0xF0));
-    FastVecSub(&workspace.state_25.delta,&workspace.state_25.relative,&workspace.state_25.targetPosition);
+    FastVecSub(&workspace.state_25.delta,&workspace.state_25.relative,&workspace.state_25.target_position);
     vec_scale_to_length(&workspace.state_25.delta,&workspace.state_25.delta,H(float,0xABC));
-    FastVecAdd(&workspace.state_25.scaled,&workspace.state_25.targetPosition,&workspace.state_25.delta);
+    FastVecAdd(&workspace.state_25.scaled,&workspace.state_25.target_position,&workspace.state_25.delta);
     FastVecSub(HP(0xF0),&workspace.state_25.scaled,HP(0x80));
     goto finish;
 }
@@ -1581,7 +1582,7 @@ case 0x7b:
 case 0x27: case 0x28: case 0x29: case 0x2A: case 0x3E:
 {
 
-    int typeAllowsPose,poseAvailable,heightJump,configuration;
+    int type_allows_pose,pose_available,height_jump,configuration;
     if ((u32)(H(u32,0x2294)-0x28)>=2U && H(u32,0x2294)!=0x3E) snd_update_slot_object(0,H(void*,0x2290),0);
     else {
         int slot=H(s32,0x242C);
@@ -1605,18 +1606,18 @@ case 0x27: case 0x28: case 0x29: case 0x2A: case 0x3E:
         part_spawn_white_flash(&workspace.state_27.first,&workspace.state_27.second,0,-1.0f);
     }
     configuration=FLD(g_item_l23_material_table+g_item_slot_to_record[H(s32,0x1248)]*0xE0, s32, 0x1C);
-    typeAllowsPose=configuration!=0;
-    if (H(s32,0x1248)==13) typeAllowsPose=0;
-    poseAvailable=0;
-    if (typeAllowsPose) poseAvailable=H(u8,0x22BA)!=0;
+    type_allows_pose=configuration!=0;
+    if (H(s32,0x1248)==13) type_allows_pose=0;
+    pose_available=0;
+    if (type_allows_pose) pose_available=H(u8,0x22BA)!=0;
     find_nearest_path_point(H(void*,0x630),HP(0x80),HP(0x5D0),HP(0x634),HP(0x638),H(s32,0x654),999.0f,2.0f,2.5f);
     if (H(s32,0x660))
         find_nearest_path_point(H(void*,0x664),HP(0x80),HP(0x610),HP(0x668),HP(0x66C),H(s32,0x670),999.0f,2.0f,2.5f);
-    heightJump=0;
+    height_jump=0;
     if (H(float,0x31C)>1.0699999f && H(u32,0x2294)!=0x28 && H(u32,0x2294)!=0x3E && !H(s32,0x660))
-        heightJump=H(s32,0x1BC)>30;
-    if (heightJump) ++H(s32,0x6C8); else H(s32,0x6C8)=0;
-    if ((H(s32,0x640) && ++H(s32,0x640)) || heightJump) {
+        height_jump=H(s32,0x1BC)>30;
+    if (height_jump) ++H(s32,0x6C8); else H(s32,0x6C8)=0;
+    if ((H(s32,0x640) && ++H(s32,0x640)) || height_jump) {
         qcopy(&H(Vec4,0xF0), &H(Vec4,0x120));
         if ((u32)(H(u32,0x2294)-0x28)<2U) { ApplyHeroGravityAndJumpMotion();goto finish; }
         if (vec_length_xy(HP(0xF0)) < 0.041666668f) {
@@ -1628,24 +1629,24 @@ case 0x27: case 0x28: case 0x29: case 0x2A: case 0x3E:
 
         goto finish;
     } else {
-        float pathStep=(float)H(s32,0x648);
-        float pathSpeed=H(float,0x644)*pathStep;
-        if (H(u32,0x2294)==0x3E) pathSpeed=H(float,0x69C)*pathStep;
-        Spline_AdvanceByDistance(H(void*,0x630), &workspace.state_27.first, HP(0x634), HP(0x638), pathSpeed, H(s32,0x654));
+        float path_step=(float)H(s32,0x648);
+        float path_speed=H(float,0x644)*path_step;
+        if (H(u32,0x2294)==0x3E) path_speed=H(float,0x69C)*path_step;
+        Spline_AdvanceByDistance(H(void*,0x630), &workspace.state_27.first, HP(0x634), HP(0x638), path_speed, H(s32,0x654));
         if (H(s32,0x660))
-            Spline_AdvanceByDistance(H(void*,0x664), &workspace.state_27.second, HP(0x668), HP(0x66C), pathSpeed, H(s32,0x670));
+            Spline_AdvanceByDistance(H(void*,0x664), &workspace.state_27.second, HP(0x668), HP(0x66C), path_speed, H(s32,0x670));
         if (H(s32,0x1BC)>90) {
-            int segment,hitA,hitB;
+            int segment,hit_a,hit_b;
             float weight,heading;
-            pathSpeed=H(float,0x170);pathSpeed*=30.0f;
-            qcopy(&workspace.state_27.u.p.probeA, &H(Vec4,0x80));
+            path_speed=H(float,0x170);path_speed*=30.0f;
+            qcopy(&workspace.state_27.u.p.probe_a, &H(Vec4,0x80));
             segment=H(s32,0x634);weight=H(float,0x638);
-            hitA=Spline_AdvanceByDistance(H(void*,0x630), &workspace.state_27.u.p.probeA, &segment, &weight, pathSpeed, H(s32,0x654));
-            qcopy(&workspace.state_27.u.p.probeB, &H(Vec4,0x80));
+            hit_a=Spline_AdvanceByDistance(H(void*,0x630), &workspace.state_27.u.p.probe_a, &segment, &weight, path_speed, H(s32,0x654));
+            qcopy(&workspace.state_27.u.p.probe_b, &H(Vec4,0x80));
             segment=H(s32,0x634);weight=H(float,0x638);
-            hitB=Spline_AdvanceByDistance(H(void*,0x630), &workspace.state_27.u.p.probeB, &segment, &weight, pathSpeed+0.1f, H(s32,0x654));
-            if ((!(hitA | hitB) || H(s32,0x654)) && H(u32,0x2294)==0x27) {
-                heading=mat_fast_helper_a(workspace.state_27.u.p.probeB.x-workspace.state_27.u.p.probeA.x,workspace.state_27.u.p.probeB.y-workspace.state_27.u.p.probeA.y);
+            hit_b=Spline_AdvanceByDistance(H(void*,0x630), &workspace.state_27.u.p.probe_b, &segment, &weight, path_speed+0.1f, H(s32,0x654));
+            if ((!(hit_a | hit_b) || H(s32,0x654)) && H(u32,0x2294)==0x27) {
+                heading=mat_fast_helper_a(workspace.state_27.u.p.probe_b.x-workspace.state_27.u.p.probe_a.x,workspace.state_27.u.p.probe_b.y-workspace.state_27.u.p.probe_a.y);
                 heading=fast_subtract_rotations(H(float,0x64C),heading)*0.47f;
                 if (heading>0.78539824f) heading=0.78539824f;
                 if (heading< -0.78539824f) heading=-0.78539824f;
@@ -1658,51 +1659,51 @@ case 0x27: case 0x28: case 0x29: case 0x2A: case 0x3E:
             float horizontal=vec_length_xy(HP(0x110));
             FLD(g_hero_l23_motion_params, float, 0x60)=mat_fast_helper_a(horizontal,H(float,0x118));
         }
-        if (typeAllowsPose) {
+        if (type_allows_pose) {
             u8 *pose_hero=g_hero_state;
-            float poseScale=0.3f;
+            float pose_scale=0.3f;
             cam_set_limits_fourth(0.017f,0.3f);
-            cam_set_limits_second(0.027f,poseScale);
-            cam_set_limits_third(0.027f,poseScale);
+            cam_set_limits_second(0.027f,pose_scale);
+            cam_set_limits_third(0.027f,pose_scale);
             if (FLD(pose_hero,void*,0x6A8)) {
-                float angle,sideScale;
+                float angle,side_scale;
                 FastVecSub(&workspace.state_27.u.d.displacement,FLD(pose_hero,u8*,0x6A8)+0x10,&FLD(pose_hero,u8,0x80));
                 matrix_mul_vec3(&workspace.state_27.u.d.displacement,&workspace.state_27.u.d.displacement,&FLD(pose_hero,u8,0x40));
                 angle=mat_fast_helper_a(workspace.state_27.u.d.displacement.x,workspace.state_27.u.d.displacement.y);
                 if (FLD(pose_hero,u8*,0x2290)[0x42]==0x31) {
-                    angle=fast_subtract_rotations(angle,1.5707965f);sideScale=0.2f;
+                    angle=fast_subtract_rotations(angle,1.5707965f);side_scale=0.2f;
                 } else {
-                    angle=fast_subtract_rotations(angle,-1.5707965f);sideScale=0.5f;
+                    angle=fast_subtract_rotations(angle,-1.5707965f);side_scale=0.5f;
                 }
-                FLD(g_hero_l23_motion_params, float, 0x1C8)=angle*sideScale;
-                FLD(g_hero_l23_motion_params, float, 0x278)=angle*poseScale;
+                FLD(g_hero_l23_motion_params, float, 0x1C8)=angle*side_scale;
+                FLD(g_hero_l23_motion_params, float, 0x278)=angle*pose_scale;
             } else {
                 u8 action=FLD(pose_hero,u8*,0x2290)[0x43];
-                float angularBase,pose;
+                float angular_base,pose;
                 if (action!=0x31 && FLD(pose_hero,u8*,0x2290)[0x43]==0x48) {
-                    poseScale=0.5f;
+                    pose_scale=0.5f;
                     pose=FastAddRotations(0.13962635f,FLD(pose_hero,float,0x6A0));
-                    angularBase=-0.06981318f;
+                    angular_base=-0.06981318f;
                     FLD(g_hero_l23_motion_params, float, 0x278)=pose;
-                    FLD(g_hero_l23_motion_params, float, 0x118)=FastAddRotations(angularBase,FLD(pose_hero,float,0x6A0)*poseScale);
-                    FLD(g_hero_l23_motion_params, float, 0x1C8)=FastAddRotations(angularBase,FLD(pose_hero,float,0x6A0)*poseScale);
+                    FLD(g_hero_l23_motion_params, float, 0x118)=FastAddRotations(angular_base,FLD(pose_hero,float,0x6A0)*pose_scale);
+                    FLD(g_hero_l23_motion_params, float, 0x1C8)=FastAddRotations(angular_base,FLD(pose_hero,float,0x6A0)*pose_scale);
                 } else if (action==0x31 || action==0x47) {
-                    poseScale=0.58823526f;
+                    pose_scale=0.58823526f;
                     pose=FastAddRotations(-0.8203048f,FLD(pose_hero,float,0x6A0));
-                    angularBase=0.73303837f;
+                    angular_base=0.73303837f;
                     FLD(g_hero_l23_motion_params, float, 0x278)=pose;
-                    FLD(g_hero_l23_motion_params, float, 0x118)=FastAddRotations(angularBase,FLD(pose_hero,float,0x6A0)*poseScale);
-                    FLD(g_hero_l23_motion_params, float, 0x1C8)=FastAddRotations(angularBase,FLD(pose_hero,float,0x6A0)*poseScale);
+                    FLD(g_hero_l23_motion_params, float, 0x118)=FastAddRotations(angular_base,FLD(pose_hero,float,0x6A0)*pose_scale);
+                    FLD(g_hero_l23_motion_params, float, 0x1C8)=FastAddRotations(angular_base,FLD(pose_hero,float,0x6A0)*pose_scale);
                 }
             }
         }
         {
-            int nextIndex=path_advance_index(H(void*,0x630),H(s32,0x634),H(s32,0x648),H(s32,0x654));
+            int next_index=path_advance_index(H(void*,0x630),H(s32,0x634),H(s32,0x648),H(s32,0x654));
             float distance;
-            FastVecSub(&workspace.state_27.u.d.displacement,(u8*)H(void*,0x630)+(nextIndex*16+16),&workspace.state_27.first);
+            FastVecSub(&workspace.state_27.u.d.displacement,(u8*)H(void*,0x630)+(next_index*16+16),&workspace.state_27.first);
             distance=FastVecLength(&workspace.state_27.u.d.displacement);
             if (distance<0.001f) {
-                if (H(s32,0x634)==nextIndex) { H(s32,0x640)=1;goto finish; }
+                if (H(s32,0x634)==next_index) { H(s32,0x640)=1;goto finish; }
             } else {
                 H(float,0x64C)=mat_fast_helper_a(workspace.state_27.u.d.displacement.x,workspace.state_27.u.d.displacement.y);
                 H(float,0x650)=mat_fast_helper_a(vec_length_xy(&workspace.state_27.u.d.displacement),workspace.state_27.u.d.displacement.z);
@@ -1725,11 +1726,11 @@ case 0x27: case 0x28: case 0x29: case 0x2A: case 0x3E:
                 fraction=(float)H(s32,0x678)*0.020833334f;
                 FastVecScale(&workspace.state_27.u.d.displacement,&workspace.state_27.u.d.displacement,fraction);
                 fraction=(float)(H(s32,0x678)-1)*0.020833334f;
-                FastVecSub(&workspace.state_27.u.d.previousStep,&workspace.state_27.first,&workspace.state_27.second);
-                FastVecScale(&workspace.state_27.u.d.previousStep,&workspace.state_27.u.d.previousStep,fraction);
-                H(float,0x88)+=workspace.state_27.u.d.displacement.z-workspace.state_27.u.d.previousStep.z;
-                FastVecAdd(&workspace.state_27.u.d.previousStep,&workspace.state_27.second,&workspace.state_27.u.d.displacement);
-                FastVecSub(&workspace.state_27.u.d.displacement,&workspace.state_27.u.d.previousStep,HP(0x80));
+                FastVecSub(&workspace.state_27.u.d.previous_step,&workspace.state_27.first,&workspace.state_27.second);
+                FastVecScale(&workspace.state_27.u.d.previous_step,&workspace.state_27.u.d.previous_step,fraction);
+                H(float,0x88)+=workspace.state_27.u.d.displacement.z-workspace.state_27.u.d.previous_step.z;
+                FastVecAdd(&workspace.state_27.u.d.previous_step,&workspace.state_27.second,&workspace.state_27.u.d.displacement);
+                FastVecSub(&workspace.state_27.u.d.displacement,&workspace.state_27.u.d.previous_step,HP(0x80));
                 H(float,0xF0)=workspace.state_27.u.d.displacement.x;H(float,0xF4)=workspace.state_27.u.d.displacement.y;
                 FastVecSub(&workspace.state_27.u.d.displacement,&workspace.state_27.first,HP(0x5D0));
                 H(float,0x88)+=workspace.state_27.u.d.displacement.z;
@@ -1739,21 +1740,21 @@ case 0x27: case 0x28: case 0x29: case 0x2A: case 0x3E:
                 H(float,0xF0)=workspace.state_27.u.d.displacement.x;
                 H(float,0x88)+=workspace.state_27.u.d.displacement.z;
                 H(float,0xF4)=workspace.state_27.u.d.displacement.y;
-                FastVecSub(&workspace.state_27.u.d.previousStep,HP(0x5D0),HP(0x80));
-                workspace.state_27.u.d.previousStep.z=0.0f;
-                if (FastVecLength(&workspace.state_27.u.d.previousStep)>0.016666668f)
-                    vec_scale_to_length(&workspace.state_27.u.d.previousStep,&workspace.state_27.u.d.previousStep,0.016666668f);
-                H(float,0x80)+=workspace.state_27.u.d.previousStep.x;
-                H(float,0x84)+=workspace.state_27.u.d.previousStep.y;
+                FastVecSub(&workspace.state_27.u.d.previous_step,HP(0x5D0),HP(0x80));
+                workspace.state_27.u.d.previous_step.z=0.0f;
+                if (FastVecLength(&workspace.state_27.u.d.previous_step)>0.016666668f)
+                    vec_scale_to_length(&workspace.state_27.u.d.previous_step,&workspace.state_27.u.d.previous_step,0.016666668f);
+                H(float,0x80)+=workspace.state_27.u.d.previous_step.x;
+                H(float,0x84)+=workspace.state_27.u.d.previous_step.y;
             }
             if (H(u32,0x2294)==0x3E) H(float,0xF8)-=0.006388889f;
             else ApplyHeroGravityAndJumpMotion();
         } else {
-            float steering,slope,speedAdjustment,negativeDistance,distance;
+            float steering,slope,speed_adjustment,negative_distance,distance;
             int segment;float weight;
             H(s32,0x660)=0;
             steering=0.0f;
-            if (H(float,0x24B8)>0.2f && poseAvailable) {
+            if (H(float,0x24B8)>0.2f && pose_available) {
                 hero_resolve_stick_direction(1.0f, 0);
                 steering=fast_subtract_rotations(H(float,0x1A0),H(float,0x64C));
                 if (steering>0.78539824f) steering=0.78539824f;
@@ -1763,28 +1764,28 @@ case 0x27: case 0x28: case 0x29: case 0x2A: case 0x3E:
             math_approach_with_velocity(HP(0x6A0), steering, HP(0x6A4), 0.015f, 0.3f, 0.0f, 0);
             ApproachValue(HP(0x680),0.20000002f,0.004166667f);
             segment=H(s32,0x634);weight=H(float,0x638);
-            qcopy(&workspace.state_27.u.p.probeA, &H(Vec4,0x80));
-            Spline_AdvanceByDistance(H(void*,0x630), &workspace.state_27.u.p.probeA, &segment, &weight, 0.3f, H(s32,0x654));
-            slope=mat_fast_helper_a(vec_distance_xy(HP(0x5D0),&workspace.state_27.u.p.probeA),workspace.state_27.u.p.probeA.z-H(float,0x5D8));
+            qcopy(&workspace.state_27.u.p.probe_a, &H(Vec4,0x80));
+            Spline_AdvanceByDistance(H(void*,0x630), &workspace.state_27.u.p.probe_a, &segment, &weight, 0.3f, H(s32,0x654));
+            slope=mat_fast_helper_a(vec_distance_xy(HP(0x5D0),&workspace.state_27.u.p.probe_a),workspace.state_27.u.p.probe_a.z-H(float,0x5D8));
             if (slope>0.0f) {
-                speedAdjustment=slope*-0.07957746f;
+                speed_adjustment=slope*-0.07957746f;
                 if (slope>0.26179942f) H(s32,0x67C)=0;
                 else if (slope<0.13962635f && H(s32,0x67C)==0) H(s32,0x67C)=-1;
             } else {
-                speedAdjustment=-slope*0.38197184f;
+                speed_adjustment=-slope*0.38197184f;
                 if (slope< -0.19198623f) H(s32,0x67C)=1;
                 else if (slope> -0.122173056f && H(s32,0x67C)==1) H(s32,0x67C)=-1;
             }
-            if (H(float,0x674)<speedAdjustment) ApproachValue(HP(0x674),speedAdjustment,0.0022222223f);
-            else ApproachValue(HP(0x674),speedAdjustment,0.00055555557f);
+            if (H(float,0x674)<speed_adjustment) ApproachValue(HP(0x674),speed_adjustment,0.0022222223f);
+            else ApproachValue(HP(0x674),speed_adjustment,0.00055555557f);
             if (H(float,0x674)>0.20000002f) H(float,0x674)=0.20000002f;
             if (H(float,0x674)< -0.041666668f) H(float,0x674)=-0.041666668f;
             H(float,0x644)=H(float,0x680)+H(float,0x674);
             if (H(float,0x644)<0.0f) H(float,0x644)=0.0f;
             FastVecSub(HP(0xF0),&workspace.state_27.first,HP(0x5D0));
             FastVecSub(&workspace.state_27.u.d.displacement,HP(0x5D0),HP(0x80));
-            negativeDistance=-FastVecLength(&workspace.state_27.u.d.displacement);
-            math_spring_float_to_goal(&negativeDistance,HP(0x6AC),0.0f,0.03f,0.3f,0.116666675f);
+            negative_distance=-FastVecLength(&workspace.state_27.u.d.displacement);
+            math_spring_float_to_goal(&negative_distance,HP(0x6AC),0.0f,0.03f,0.3f,0.116666675f);
             distance=FastVecLength(&workspace.state_27.u.d.displacement);
             if (distance<H(float,0x6AC)) H(float,0x6AC)=distance;
             if (H(float,0x6AC)<distance) vec_scale_to_length(&workspace.state_27.u.d.displacement,&workspace.state_27.u.d.displacement,H(float,0x6AC));
@@ -2374,8 +2375,8 @@ case 0x40: case 0x4C:
         if (math_fabs(H(float,0x1A8))>1.7453294f && H(float,0x24B8)>0.8f) H(u8,0x40F)=1;
     }
     {
-        float firstAngle=ReadPadFloatHistory(0),secondAngle=ReadPadFloatHistory(2);
-        if (FastDiffRots(firstAngle,secondAngle)>2.617994f &&
+        float first_angle=ReadPadFloatHistory(0),second_angle=ReadPadFloatHistory(2);
+        if (FastDiffRots(first_angle,second_angle)>2.617994f &&
             math_fabs(H(float,0x1A8))>1.2217306f && H(float,0x24B8)>0.8f) {
             H(u8,0x40F)=1;H(u8,0x40C)=1;
         }
@@ -2419,8 +2420,8 @@ case 0x49: case 0x4A:
     if (H(u32,0x2294)==0x49) FastVecCross(&workspace.state_49.side,HP(0x2C0),&workspace.state_49.line);
     else FastVecCross(&workspace.state_49.side,&workspace.state_49.line,HP(0x2C0));
     vec_scale_to_length(&workspace.state_49.side,&workspace.state_49.side,0.2f);FastVecAdd(&workspace.state_49.candidate,HP(0x80),&workspace.state_49.side);
-    if (hero_find_ledge_grab(HP(0x80),HP(0x90),0) && hero_find_ledge_grab(&workspace.state_49.candidate,HP(0x90),&workspace.state_49.hitPosition)) {
-        FastVecSub(HP(0xF0),&workspace.state_49.hitPosition,HP(0x80));
+    if (hero_find_ledge_grab(HP(0x80),HP(0x90),0) && hero_find_ledge_grab(&workspace.state_49.candidate,HP(0x90),&workspace.state_49.hit_position)) {
+        FastVecSub(HP(0xF0),&workspace.state_49.hit_position,HP(0x80));
         vec_scale_to_length(HP(0xF0), HP(0xF0), g_hero_push_scale_table[FloatToInt(H(float,0xC38))] * 0.5f); goto finish;
     }
     goto finish;

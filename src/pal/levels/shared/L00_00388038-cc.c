@@ -15,7 +15,8 @@ extern float g_goal_score_spawn_float;
 extern int g_goal_score_state_min;
 extern int g_goal_score_state_max;
 
-void func_PAL_L00_00388038(void *unused, void *source)
+/* Spawns the particles for a goal score: a few sparks flying out from the given position (PAL: 50 Hz timings). */
+void part_spawn_goal_score_pal(void *unused, void *source)
 {
     char buffer[0x20];
     int i;

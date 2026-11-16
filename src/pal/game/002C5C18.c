@@ -9,7 +9,7 @@ extern void part_kill(void *);
 
 /* func_PAL_002C5C18, the PAL copy of func_002C4F08: the same C, where the 0.003f
    fall becomes 0.0043200003f (scaled by 36/25) and the decay above 1.0f is scaled by 1.2f. */
-void func_PAL_002C5C18(char *self)
+void part_update_dragged_falling_pal(char *self)
 {
     char *motion = self + 0x20;
     float len;

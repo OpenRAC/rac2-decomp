@@ -73,7 +73,7 @@ extern float FastAddRotations(float, float);
 extern void *state_get_stored_pointer_value(void);
 extern void level_append_object(void *, void *, int, int);
 extern void moby_reset_action_state(void *);
-extern void func_PAL_L15_0043B0D8(char *);
+extern void gorn_ship_init_pal(char *);
 extern void gorn_ship_update_flight(void *, int);
 extern void ResetGroupToPathStart(void);
 extern void gorn_ship_spawn_damage_effects(void *);
@@ -116,20 +116,21 @@ extern int math_random_int_range(int, int);
 extern int FloatToInt(float);
 extern float IntToFloat(int);
 
-void func_PAL_L15_0043B0D8(char *object)
+/* First-time setup of the Gorn ship: health, joint offsets and the eight manipulators on its parts. */
+void gorn_ship_init_pal(char *object)
 {
     GornOwnerFields *fields = (GornOwnerFields *)object;
     char *state = *(char **)(object + 0x68);
-    char *record;
-    char *a = state + 0x2B0;
-    char *b = state + 0x2F0;
-    char *c = state + 0x330;
-    char *d = state + 0x370;
-    char *e = state + 0x3B0;
-    char *f = state + 0x3F0;
+    char *motion;
+    char *part_a = state + 0x2B0;
+    char *part_b = state + 0x2F0;
+    char *part_c = state + 0x330;
+    char *part_d = state + 0x370;
+    char *part_e = state + 0x3B0;
+    char *part_f = state + 0x3F0;
     char *position = object + 0x10;
-    record = (char *)moby_get_motion_data((unsigned char *)object);
-    *(int *)(record + 0x148) = FloatToInt(150.0f);
+    motion = (char *)moby_get_motion_data((unsigned char *)object);
+    *(int *)(motion + 0x148) = FloatToInt(150.0f);
     moby_init_spawned_sub_object_pal(object, 1);
     GF(0x180) = 150.0f;
     object[0x20] = 1;
@@ -150,21 +151,21 @@ void func_PAL_L15_0043B0D8(char *object)
     moby_transform_joint_point(object, 15, state + 0x340);
     moby_transform_joint_point(object, 17, state + 0x380);
     moby_transform_joint_point(object, 19, state + 0x3C0);
-    FastVecSub(a, a, position);
-    FastVecSub(d, d, position);
-    FastVecSub(d, d, a);
-    FastVecScale(a, a, 1.0f / fields->f[0x2C / 4]);
-    FastVecScale(d, d, 1.0f / fields->f[0x2C / 4]);
-    FastVecSub(b, b, position);
-    FastVecSub(e, e, position);
-    FastVecSub(e, e, b);
-    FastVecScale(b, b, 1.0f / fields->f[0x2C / 4]);
-    FastVecScale(e, e, 1.0f / fields->f[0x2C / 4]);
-    FastVecSub(c, c, position);
-    FastVecSub(f, f, position);
-    FastVecSub(f, f, c);
-    FastVecScale(c, c, 1.0f / fields->f[0x2C / 4]);
-    FastVecScale(f, f, 1.0f / fields->f[0x2C / 4]);
+    FastVecSub(part_a, part_a, position);
+    FastVecSub(part_d, part_d, position);
+    FastVecSub(part_d, part_d, part_a);
+    FastVecScale(part_a, part_a, 1.0f / fields->f[0x2C / 4]);
+    FastVecScale(part_d, part_d, 1.0f / fields->f[0x2C / 4]);
+    FastVecSub(part_b, part_b, position);
+    FastVecSub(part_e, part_e, position);
+    FastVecSub(part_e, part_e, part_b);
+    FastVecScale(part_b, part_b, 1.0f / fields->f[0x2C / 4]);
+    FastVecScale(part_e, part_e, 1.0f / fields->f[0x2C / 4]);
+    FastVecSub(part_c, part_c, position);
+    FastVecSub(part_f, part_f, position);
+    FastVecSub(part_f, part_f, part_c);
+    FastVecScale(part_c, part_c, 1.0f / fields->f[0x2C / 4]);
+    FastVecScale(part_f, part_f, 1.0f / fields->f[0x2C / 4]);
     AttachManipulator((unsigned char *)object, 12, (unsigned char *)(state + 0x460));
     AttachManipulator((unsigned char *)object, 13, (unsigned char *)(state + 0x4A0));
     AttachManipulator((unsigned char *)object, 14, (unsigned char *)(state + 0x4E0));
@@ -235,10 +236,10 @@ extern void math_apply_axis_rotation_to_quat(void *, void *, void *, float);
 extern unsigned char *part_spawn_ground_effect(void *, int, float, float, unsigned int, int, int, void *, int, float);
 
 
-/* The level's id lists: the number of groups, the table of the groups' lists (a pointer, read
-   through $gp in a branch delay slot and as a bare lui/lw elsewhere: `sda` arrays of unknown size
+/* The level's id lists: the number of groups, the table of the groups' lists (part_a pointer, read
+   through $gp in part_a branch delay slot and as part_a bare lui/lw elsewhere: `sda` arrays of unknown size
    give that), the base of the 64-byte records of the first walk, the base of the 32-byte records
-   of the second, and the table that maps a record's byte at +0x1D to a class. */
+   of the second, and the table that maps part_a motion's byte at +0x1D to part_a class. */
 extern int g_gorn_group_count[] __attribute__((sda));
 extern unsigned short **g_gorn_group_paths[] __attribute__((sda));
 extern unsigned char *g_gorn_group_record_base[] __attribute__((sda));

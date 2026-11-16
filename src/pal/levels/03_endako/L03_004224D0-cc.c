@@ -100,19 +100,19 @@ extern L03VoiceState g_music_state;
  * body is byte-identical except that the two `addu` come out (index, base)
  * instead of the retail's (base, index). */
 
-/* walks entity's stream, asking func_002A7820 for the value it stores at +0x2D8
+/* walks moby's stream, asking func_002A7820 for the value it stores at +0x2D8
  * of every record whose halfword at +0xAA is 0xFF3 */
-void func_PAL_L03_004224D0(u8 *entity) {
+void sweeper_bot_reset_delays_pal(u8 *moby) {
     StreamEntry *entry;
-    StreamEntry *p;
+    StreamEntry *cursor;
     u8 *record;
 
-    if (entity[0x21] == 0xFF) return;
-    entry = (StreamEntry *)g_entity_id_lists[entity[0x21]];
+    if (moby[0x21] == 0xFF) return;
+    entry = (StreamEntry *)g_entity_id_lists[moby[0x21]];
     if (entry == 0) return;
-    p = entry;
+    cursor = entry;
     do {
-        record = g_moby_record_base + ((p->raw & 0x7FFF) << 8);
+        record = g_moby_record_base + ((cursor->raw & 0x7FFF) << 8);
         if (*(signed char *)(record + 0x20) >= 0) {
             if (*(short *)(record + 0xAA) == 0xff3) {
                 u8 *owner = *(u8 **)(record + 0x68);
@@ -120,8 +120,8 @@ void func_PAL_L03_004224D0(u8 *entity) {
                 *(int *)(owner + 0x2D8) = (((int)(math_random_int_range(0x28, 0x32)) * 5 + 2) / 6);
             }
         }
-        if ((s16)p->raw < 0) break;
-        p++;
+        if ((s16)cursor->raw < 0) break;
+        cursor++;
     } while (1);
 }
 
@@ -139,7 +139,7 @@ void func_PAL_L03_004224D0(u8 *entity) {
 
 /* func_L03_0041EAE0 lives in L03_0041EAE0-g8.c */
 
-/* re-arms the entity's two channel counters and its 200-second timer */
+/* re-arms the moby's two channel counters and its 200-second timer */
 /* func_L03_0041F048 is defined in L03_0041F048-qcopy-barrier.c. */
 
 /* func_L03_0041F090 lives in L03_003F09C0-g8.c (it reaches D_L03_001B1C00

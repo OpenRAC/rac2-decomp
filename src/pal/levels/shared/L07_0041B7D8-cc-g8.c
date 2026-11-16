@@ -53,14 +53,14 @@ extern int weapon_spend_ammo(int, int);
 extern float math_spring_float_to_goal(float *, float *, float, float, float, float);
 extern int snd_is_voice_playing_for_owner(void *, int);
 extern int PlayMobySound(int, int, void *);
-extern void func_PAL_002A7E68(void *, int, int, int);
+extern void anim_start_blended_pal(void *, int, int, int);
 extern int coll_process_hit(float, void *, int, void *, int);
 extern void FastVecSub(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
 extern void make_hit_descriptor(void *, void *, int, float, void *);
 extern void QueueMobyImpact(void *, void *);
 extern int StartAttachedEffect_pal(void *, int, void *);
-extern s32 func_PAL_L07_002BE8C8(int, int);
+extern s32 hero_l07_enter_state_pal(int, int);
 extern void vec_clear_128(void *);
 extern void matrix_mul_vec3(void *, void *, void *);
 extern void vec_compute_object_to_target(void *, void *, void *, float);
@@ -79,7 +79,7 @@ extern void ref_L07_00416510_00(void);
 #define UP(p,o) (*(unsigned char **)((p)+(o)))
 
 /* Updates the held weapon, target damage requests, sound and beam effects. */
-void func_PAL_L07_0041B7D8(unsigned char *object)
+void UpdateHeldBeamWeapon_pal(unsigned char *object)
 {
     UpdateVector vector, delta;
     UpdateRequest request;
@@ -149,7 +149,7 @@ void func_PAL_L07_0041B7D8(unsigned char *object)
         UI(data, 0x60)++;
         if (!snd_is_voice_playing_for_owner(object, UI(data, 0x38)))
             UI(data, 0x38) = PlayMobySound(0, 4, object);
-        if (object[0x43] != 2) func_PAL_002A7E68(object, 2, 0, 0);
+        if (object[0x43] != 2) anim_start_blended_pal(object, 2, 0, 0);
         count = coll_process_hit(0.5f, data, 16, object, 0);
         if (count > 0) {
             int remaining;
@@ -185,7 +185,7 @@ void func_PAL_L07_0041B7D8(unsigned char *object)
         math_spring_float_to_goal((float *)(data + 0x50), (float *)(data + 0x54), 0.0f, 0.072000004f, 0.012f, 0.15f);
         UI(data, 0x60) = 0;
     }
-    if (g_hero_state.weapon == 1) func_PAL_L07_002BE8C8(0x1D, 1);
+    if (g_hero_state.weapon == 1) hero_l07_enter_state_pal(0x1D, 1);
     moby_transform_joint_to_world(object, 0, data);
     vec_clear_128(&vector);
     vector.f[1] = -1.0f;

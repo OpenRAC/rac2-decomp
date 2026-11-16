@@ -29,27 +29,27 @@ extern s32 coll_test_point(void *, s32, void *, float);
 /* Asks the engine to load voice line idx, from the first table below 20 and the second from 20 up,
    unless a load is active or pending or that line is already the current one. The arms are written
    out: cross-jump merges their stores after allocation, which leaves them before the shared tail. */
-void RequestVoiceLine_pal(u8 *arg, s32 idx)
+void RequestVoiceLine_pal(u8 *moby, s32 idx)
 {
     L16VoiceState *voice = &g_music_state;
-    u8 *s;
+    u8 *state;
 
-    s = *(u8 **)(arg + 0x68);
+    state = *(u8 **)(moby + 0x68);
     if (voice->active == 0) {
-        if (voice->key == -1 && idx != *(s32 *)(s + 0x354)) {
+        if (voice->key == -1 && idx != *(s32 *)(state + 0x354)) {
             if (idx < 20) {
-                s32 v = *(s32 *)(s + (idx << 2) + 0x280);
+                s32 entry = *(s32 *)(state + (idx << 2) + 0x280);
                 voice->selection = 0;
-                voice->key = (v & 0x3FFF) + 0x7D0;
+                voice->key = (entry & 0x3FFF) + 0x7D0;
             } else {
-                s32 v = *(s32 *)(s + ((idx - 20) << 2) + 0x2D0);
+                s32 entry = *(s32 *)(state + ((idx - 20) << 2) + 0x2D0);
                 voice->selection = 0;
-                voice->key = (v & 0x3FFF) + 0x7D0;
+                voice->key = (entry & 0x3FFF) + 0x7D0;
             }
             STUB_printf(g_snivelak_anim_params);
-            *(u8 *)(s + idx + 0x310) = 1;
-            *(s32 *)(s + 0x350) = 0x2EE;
-            *(s32 *)(s + 0x354) = idx;
+            *(u8 *)(state + idx + 0x310) = 1;
+            *(s32 *)(state + 0x350) = 0x2EE;
+            *(s32 *)(state + 0x354) = idx;
         }
     }
 }
@@ -61,30 +61,30 @@ extern void RequestVoiceLine_pal(u8 *, s32);
 
 /* Walks a rotating candidate index over the measured byte table until a free slot
    is found, arms it, and clears the whole window when none is. */
-void snd_play_unplayed_voice_line_pal(u8 *arg, s32 start, s32 end)
+void snd_play_unplayed_voice_line_pal(u8 *moby, s32 start, s32 end)
 {
-    u8 *s3;
-    s32 n;
+    u8 *state;
+    s32 count;
     s32 i;
-    s32 k;
+    s32 index;
 
-    s3 = *(u8 **)(arg + 0x68);
+    state = *(u8 **)(moby + 0x68);
     if (end < start)
         return;
-    n = end - start + 1;
-    k = math_random_int_below(n);
-    for (i = 0; i < n; i++) {
-        u8 *tbl = s3 + 0x310;
+    count = end - start + 1;
+    index = math_random_int_below(count);
+    for (i = 0; i < count; i++) {
+        u8 *played_flags = state + 0x310;
 
-        if (tbl[start + k] == 0) {
-            RequestVoiceLine_pal(arg, start + k);
+        if (played_flags[start + index] == 0) {
+            RequestVoiceLine_pal(moby, start + index);
             return;
         }
-        k = (k + 1) % n;
+        index = (index + 1) % count;
     }
-    for (i = 0; i < n; i++)
-        s3[0x310 + start + i] = 0;
-    RequestVoiceLine_pal(arg, start + k);
+    for (i = 0; i < count; i++)
+        state[0x310 + start + i] = 0;
+    RequestVoiceLine_pal(moby, start + index);
 }
 
 
@@ -100,36 +100,36 @@ extern void SetMobyAndGroupsEnabled(u8 *, s32);
 
 /* Finishes the pending entry (its two saved vectors are copied back), then resets the
    level's handles. */
-void snivelak_finish_boss_intro_state_pal(u8 *arg)
+void snivelak_finish_boss_intro_state_pal(u8 *moby)
 {
-    u8 *s0;
-    s32 a0;
-    u8 *tbl;
+    u8 *state;
+    s32 offset;
+    u8 *beam_table;
 
-    s0 = *(u8 **)(arg + 0x68);
-    if (*(s32 *)(s0 + 0x1BC) != 0) {
-        s32 h = *(s32 *)(s0 + 0x1B0);
-        s32 m = *(s32 *)(s0 + 0x1B4);
+    state = *(u8 **)(moby + 0x68);
+    if (*(s32 *)(state + 0x1BC) != 0) {
+        s32 effect_id = *(s32 *)(state + 0x1B0);
+        s32 effect_arg = *(s32 *)(state + 0x1B4);
 
-        *(s32 *)(s0 + 0x1BC) = 0;
-        part_start_record_effect_by_index_pal(h, m);
-        a0 = *(s32 *)(s0 + 0x1B8) << 7;
-        tbl = g_beam_definition_table[0];
-        qcopy(arg + 0x10, tbl + 0x30 + a0);
-        qcopy(arg + 0xF0, tbl + 0x70 + a0);
-        script_queue_keyed_request(*(s32 *)(s0 + 0x1A4), -1);
+        *(s32 *)(state + 0x1BC) = 0;
+        part_start_record_effect_by_index_pal(effect_id, effect_arg);
+        offset = *(s32 *)(state + 0x1B8) << 7;
+        beam_table = g_beam_definition_table[0];
+        qcopy(moby + 0x10, beam_table + 0x30 + offset);
+        qcopy(moby + 0xF0, beam_table + 0x70 + offset);
+        script_queue_keyed_request(*(s32 *)(state + 0x1A4), -1);
     } else {
-        script_queue_keyed_request(*(s32 *)(s0 + 0x1A4), *(s32 *)(s0 + 0x1AC));
+        script_queue_keyed_request(*(s32 *)(state + 0x1A4), *(s32 *)(state + 0x1AC));
     }
     g_snivelak_boss_state = 1;
-    snivelak_clean_up_arena_mobys(arg);
-    SetMobyAndGroupsEnabled(arg, 1);
-    moby_set_flag_bit(g_moby_instance_table[0] + (*(s32 *)(s0 + 0x190) << 8), 1);
-    level_capture_checkpoint_state(g_beam_definition_table[0] + (*(s32 *)(s0 + 0x198) << 7) + 0x30,
-                  g_beam_definition_table[0] + (*(s32 *)(s0 + 0x198) << 7) + 0x70);
-    snd_play_unplayed_voice_line_pal(arg, 0, 2);
+    snivelak_clean_up_arena_mobys(moby);
+    SetMobyAndGroupsEnabled(moby, 1);
+    moby_set_flag_bit(g_moby_instance_table[0] + (*(s32 *)(state + 0x190) << 8), 1);
+    level_capture_checkpoint_state(g_beam_definition_table[0] + (*(s32 *)(state + 0x198) << 7) + 0x30,
+                  g_beam_definition_table[0] + (*(s32 *)(state + 0x198) << 7) + 0x70);
+    snd_play_unplayed_voice_line_pal(moby, 0, 2);
     MemcardSave(0, -1);
-    moby_set_state(arg, 2, 1);
+    moby_set_state(moby, 2, 1);
 }
 
 
@@ -138,23 +138,24 @@ extern void moby_spin_group_entities(void *, float);
 extern void moby_mark_flag_and_append_to_list(s32);
 extern char g_hero_position[];
 
-void snivelak_clean_up_boss_and_free_pal(char *arg0) {
-    char *s0 = *(char **)(arg0 + 0x68);
+/* Cleans up the boss and its parts when the fight ends, then frees the object. */
+void snivelak_clean_up_boss_and_free_pal(char *moby) {
+    char *state = *(char **)(moby + 0x68);
 
     g_snivelak_boss_state = 2;
-    moby_spin_group_entities(g_moby_instance_table[0] + (*(s32 *)(s0 + 0x190) << 8), 0.0f);
-    part_start_record_effect_by_index_pal(*(s32 *)(s0 + 0x188), *(s32 *)(s0 + 0x18C));
+    moby_spin_group_entities(g_moby_instance_table[0] + (*(s32 *)(state + 0x190) << 8), 0.0f);
+    part_start_record_effect_by_index_pal(*(s32 *)(state + 0x188), *(s32 *)(state + 0x18C));
     level_capture_checkpoint_state(g_hero_position, g_hero_position + 0x10);
     moby_mark_flag_and_append_to_list(0x11);
-    if (*(s32 *)(s0 + 0x1F0) != 0)
-        moby_mark_spawned((void *)*(s32 *)(s0 + 0x1F0));
-    if (*(s32 *)(s0 + 0x238) != 0)
-        moby_mark_spawned((void *)*(s32 *)(s0 + 0x238));
-    if (*(s32 *)(s0 + 0x23C) != 0)
-        moby_mark_spawned((void *)*(s32 *)(s0 + 0x23C));
-    script_queue_keyed_request(*(s32 *)(s0 + 0x1A0), -1);
+    if (*(s32 *)(state + 0x1F0) != 0)
+        moby_mark_spawned((void *)*(s32 *)(state + 0x1F0));
+    if (*(s32 *)(state + 0x238) != 0)
+        moby_mark_spawned((void *)*(s32 *)(state + 0x238));
+    if (*(s32 *)(state + 0x23C) != 0)
+        moby_mark_spawned((void *)*(s32 *)(state + 0x23C));
+    script_queue_keyed_request(*(s32 *)(state + 0x1A0), -1);
     MemcardSave(0, -1);
-    moby_mark_spawned(arg0);
+    moby_mark_spawned(moby);
 }
 
 
@@ -167,7 +168,7 @@ extern float g_scene_origin_transform[];
 extern u16 *g_group_l16_id_lists[];
 extern void quaternion_to_rotation_basis(void *, void *);
 extern void multiply_matrix3x3(void *, void *, void *);
-extern char *func_PAL_0032F3B8(void *, void *, void *, float);
+extern char *part_spawn_blast_effect_moby_pal(void *, void *, void *, float);
 extern int coll_sweep_from_object(void *, void *, s32, s32, s32, s32, float, float, float);
 extern void mat_get_euler_angles(void *, void *);
 extern void vec_random_direction(void *, float, float);
@@ -179,7 +180,7 @@ extern char *cam_moby_create_pal(void *, s32, s32, s32, void *, void *, void *, 
    +0x34, turns its basis by the state's rotation and ages; on a collision record, or past
    90 frames when func_00277258 reports, it runs its impact effects toward D_L16_001B9B00,
    spawns six particles and frees itself. */
-void func_PAL_L16_00418580(u8 *arg)
+void debris_l16_piece_update_pal(u8 *moby)
 {
     float rotation[12];
     float toward[4];
@@ -195,43 +196,43 @@ void func_PAL_L16_00418580(u8 *arg)
     float speed;
     float life;
 
-    state = *(u8 **)(arg + 0x68);
-    switch (arg[0x20]) {
+    state = *(u8 **)(moby + 0x68);
+    switch (moby[0x20]) {
     case 0:
-        FastVecAdd(arg + 0x10, arg + 0x10, state);
-        if (math_fast_float_d(state + 0x30) && !arg[0x31])
-            moby_mark_spawned(arg);
+        FastVecAdd(moby + 0x10, moby + 0x10, state);
+        if (math_fast_float_d(state + 0x30) && !moby[0x31])
+            moby_mark_spawned(moby);
         break;
     case 2:
-        FastVecAdd(arg + 0x10, arg + 0x10, state);
-        basis = arg + 0xC0;
+        FastVecAdd(moby + 0x10, moby + 0x10, state);
+        basis = moby + 0xC0;
         *(float *)(state + 8) -= *(float *)(state + 0x34);
         quaternion_to_rotation_basis(state + 0x20, rotation);
         multiply_matrix3x3(basis, rotation, basis);
         hit = 0;
-        if (part_find_owned_effect_slot(arg, 0x10000, 0))
+        if (part_find_owned_effect_slot(moby, 0x10000, 0))
             hit = 1;
-        age = *(u16 *)(arg + 0x96);
+        age = *(u16 *)(moby + 0x96);
         old = age++;
-        *(u16 *)(arg + 0x96) = age;
-        if (old > 75 && coll_test_point(arg + 0x10, 0, arg, 1.0f))
+        *(u16 *)(moby + 0x96) = age;
+        if (old > 75 && coll_test_point(moby + 0x10, 0, moby, 1.0f))
             hit = 1;
         if (hit) {
-            FastVecSub(toward, g_scene_origin_transform, arg + 0x10);
-            angles = arg + 0xF0;
+            FastVecSub(toward, g_scene_origin_transform, moby + 0x10);
+            angles = moby + 0xF0;
             vec_scale_to_length(toward, toward, 1.0f);
-            func_PAL_0032F3B8(arg, arg + 0x10, toward, 0.0f);
-            coll_sweep_from_object(arg, arg + 0x10, 0x10001, 0, 1, 0, 4.0f, 20.0f, 2.0f);
+            part_spawn_blast_effect_moby_pal(moby, moby + 0x10, toward, 0.0f);
+            coll_sweep_from_object(moby, moby + 0x10, 0x10001, 0, 1, 0, 4.0f, 20.0f, 2.0f);
             mat_get_euler_angles(basis, angles);
             for (i = 0; i < 6; i++) {
                 vec_random_direction(velocity, 0.0f, 0.40000004f);
                 FastVecAdd(velocity, velocity, state);
-                kind = *(s16 *)(arg + 0xAA);
+                kind = *(s16 *)(moby + 0xAA);
                 speed = math_random_float_range(180.0f, 720.0f);
                 life = math_random_float_range(5.0f, 15.0f);
-                cam_moby_create_pal(arg, 2, kind, i, arg + 0x10, arg + 0xF0, velocity, 255, speed, life);
+                cam_moby_create_pal(moby, 2, kind, i, moby + 0x10, moby + 0xF0, velocity, 255, speed, life);
             }
-            moby_mark_spawned(arg);
+            moby_mark_spawned(moby);
         }
         break;
     }

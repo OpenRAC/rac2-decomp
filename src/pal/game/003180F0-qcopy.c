@@ -11,18 +11,19 @@ extern void vec_scale_to_length(void *, void *, float);
 extern int math_random_int_range(int, int);
 extern void gfx_draw_lightning_ribbon(void *, int, void *, int);
 
+/* Builds a 25-point curve with a little random shake and draws it as a lightning bolt (PAL build). */
 void gfx_draw_lightning_bolt_pal(char *object, char *state) {
     CurveVector points[25];
     CurveVector start, end, jitter;
     int i;
-    float t;
+    float fraction;
     for (i = 0; i < 24; i++) {
-        t = IntToFloat(i) / IntToFloat(23);
+        fraction = IntToFloat(i) / IntToFloat(23);
         start.word = *(CurveWord128 *)state;
         end.word = *(CurveWord128 *)(state + 0x10);
         FastVecAdd(&start, &start, state + 0x20);
         FastVecAdd(&end, &end, state + 0x30);
-        vec_catmull_rom(&points[i], state + 0x20, state + 0x30, &start, &end, t);
+        vec_catmull_rom(&points[i], state + 0x20, state + 0x30, &start, &end, fraction);
         jitter.values[3] = 0;
         jitter.values[0] = math_random_float_range(-1.0f, 1.0f);
         jitter.values[1] = math_random_float_range(-1.0f, 1.0f);

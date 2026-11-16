@@ -95,20 +95,20 @@ extern float func_L00_002EDCF0(float);
 extern float FastAddRotations(float,float);
 extern void func_002A0F48(void *);
 extern void FastVecScale(void *,void *,float);
-extern void BindVendorPreviewModel(void),func_PAL_002FC1D0(void);
+extern void BindVendorPreviewModel(void),PrepareVendorSelectionPreview_pal(void);
 extern void menu_dispatch_by_mode_pal(void),shop_dispatch_purchase_confirm_pal(void);
 extern void module_l00_call_handler_with_arg_3(int),module_l00_call_handler_with_arg(int,int),func_L00_0030C710(int);
 extern void level_run_callbacks(void);
 extern s32 UpdateSoundVoices_pal(void);
 #define MF(o) (*(float *)(m + (o)))
 /* Advances the purchase menu and its model previews, then runs the shared update. */
-void func_PAL_L00_003776E8(void)
+void update_purchase_menu_and_preview_pal(void)
 {
-    int i, v;
+    int i, class_id;
     char *m;
     float x, y;
-    double d;
-    float vec[4];
+    double stick_abs;
+    float scaled[4];
 
     ForceClaimNotice(6, 0, 1);
     switch (g_purchase_menu_model[0].f00) {
@@ -131,11 +131,11 @@ void func_PAL_L00_003776E8(void)
         if (g_purchase_menu_model[0].f08) {
             g_purchase_menu_model[0].f08 = 0;
             if (g_purchase_menu_model[0].fa0 >= 0) {
-                v = g_copy_setup_data[0].entries[g_purchase_menu_model[0].fa0].value;
+                class_id = g_copy_setup_data[0].entries[g_purchase_menu_model[0].fa0].value;
                 snd_pump_music_and_disc_read_pal(1);
-                LoadClassIntoFreeCacheSlot(v);
+                LoadClassIntoFreeCacheSlot(class_id);
                 snd_pump_music_and_disc_read_pal(1);
-                SwitchCachedDiscAsset_pal(v);
+                SwitchCachedDiscAsset_pal(class_id);
             } else {
                 g_load_entry_index = -1;
             }
@@ -182,7 +182,7 @@ void func_PAL_L00_003776E8(void)
         }
         if (g_purchase_menu_model[0].f88) {
             for (i = 0; i < g_purchase_menu_model[0].f34; i++) {
-                float stickScale = 0.0033333334f;
+                float stick_scale = 0.0033333334f;
                 m = (char *)g_purchase_menu_model[0].f2c + i * 256;
                 matrix_mul_vec3(m + 16, ((char *)g_purchase_menu_model) + 0xC0, (char *)g_purchase_menu_model[0].f28 + 0xC0);
                 FastVecAdd(m + 16, m + 16, (char *)g_purchase_menu_model[0].f28 + 16);
@@ -194,8 +194,8 @@ void func_PAL_L00_003776E8(void)
                 if (g_purchase_menu_model[0].f50 != 2) {
                     MF(0xF8) = FastAddRotations(MF(0xF8), func_L00_002EDCF0(0.01f));
                 } else {
-                    x = g_pad_state[0].x * stickScale;
-                    y = g_pad_state[0].y * stickScale;
+                    x = g_pad_state[0].x * stick_scale;
+                    y = g_pad_state[0].y * stick_scale;
                     if (g_purchase_menu_model[0].fa4 <= 0) {
                         g_purchase_menu_model[0].fb4 = FastAddRotations(g_purchase_menu_model[0].fb4,
                             (g_purchase_menu_model[0].fa8 - g_purchase_menu_model[0].fb4) * 0.006666667f);
@@ -210,24 +210,24 @@ void func_PAL_L00_003776E8(void)
                     MF(0xF0) = g_purchase_menu_model[0].fb4;
                     MF(0xF4) = g_purchase_menu_model[0].fb8;
                     MF(0xF8) = g_purchase_menu_model[0].fbc;
-                    d = x;
-                    if (d < 0.0)
-                        d = 0.0 - d;
-                    if (d > (double)0.0001f)
+                    stick_abs = x;
+                    if (stick_abs < 0.0)
+                        stick_abs = 0.0 - stick_abs;
+                    if (stick_abs > (double)0.0001f)
                         goto moved;
-                    d = y;
-                    if (d < 0.0)
-                        d = 0.0 - d;
-                    if (d > (double)0.0001f) {
+                    stick_abs = y;
+                    if (stick_abs < 0.0)
+                        stick_abs = 0.0 - stick_abs;
+                    if (stick_abs > (double)0.0001f) {
                     moved:
                         g_purchase_menu_model[0].fa4 = 180;
                     }
                 }
                 func_002A0F48(m);
                 if (g_purchase_menu_model[0].f50 != 2) {
-                    FastVecScale(vec, m, 0.0009765625f);
-                    MF(0x10) += MF(0x10) - vec[0];
-                    MF(0x14) += MF(0x14) - vec[1];
+                    FastVecScale(scaled, m, 0.0009765625f);
+                    MF(0x10) += MF(0x10) - scaled[0];
+                    MF(0x14) += MF(0x14) - scaled[1];
                     func_002A0F48(m);
                 }
             }
@@ -238,7 +238,7 @@ void func_PAL_L00_003776E8(void)
             BindVendorPreviewModel();
         else if (g_purchase_menu_model[0].f90 == 3 && g_purchase_menu_model[0].f84 == 0 &&
                  g_purchase_menu_model[0].f6c == 0)
-            func_PAL_002FC1D0();
+            PrepareVendorSelectionPreview_pal();
         g_purchase_menu_model[0].f04++;
         menu_dispatch_by_mode_pal();
         shop_dispatch_purchase_confirm_pal();
@@ -248,8 +248,8 @@ void func_PAL_L00_003776E8(void)
             module_l00_call_handler_with_arg_3(*(int *)(((char *)g_purchase_menu_model) + 0x140 + g_purchase_menu_model[0].f80 * 24));
             {
                 int selected = *(int *)(((char *)g_purchase_menu_model) + 0x140 + g_purchase_menu_model[0].f80 * 24);
-                unsigned int classIndex = g_item_slot_to_record[selected];
-                module_l00_call_handler_with_arg(((MenuShopClass *)g_weapon_l00_table)[classIndex].value, 8);
+                unsigned int class_index = g_item_slot_to_record[selected];
+                module_l00_call_handler_with_arg(((MenuShopClass *)g_weapon_l00_table)[class_index].value, 8);
             }
         } else {
             module_l00_call_handler_with_arg_3(0);

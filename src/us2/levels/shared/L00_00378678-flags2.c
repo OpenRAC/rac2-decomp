@@ -14,7 +14,8 @@ typedef struct {
 } L00_003781B0_Cell;
 #define L00_003781B0_X ((int)(D_L00_001B25E0 * 312.0f + 0.5f))
 
-void func_US2_L00_00379560(void)
+/* Draws the buy and back button labels depending on the selected item and the player's bolts. */
+void shop_draw_item_purchase_button_labels_us2(void)
 {
     if (g_purchase_menu_model[0x84 / 4] != 0) {
         L00_003781B0_Cell *cell = (L00_003781B0_Cell *)((char *)g_purchase_menu_model + 0x144);

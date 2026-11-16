@@ -3,7 +3,7 @@
 #include "common.h"
 typedef struct {
     char pad0000[0xBF8];
-    char *f0BF8;
+    char *unk_0BF8;
     char pad0BFC[0x1230 - 0xBFC];
     u32 buttons;
     char pad1234[0xC];
@@ -13,7 +13,7 @@ typedef struct {
     char pad1454[0x2294 - 0x1454];
     int level;
     char pad2298[0x22B8 - 0x2298];
-    u8 f22B8;
+    u8 unk_22B8;
     char pad22B9[3];
     u8 busy;
     char pad22BD[0x2534 - 0x22BD];
@@ -28,12 +28,12 @@ extern int g_game_l00_mode;
 extern int g_bouncer_timer;
 typedef struct { char pad00[0x54]; float rate; char pad58[0xE0 - 0x58]; } AimEntry;
 extern AimEntry g_weapon_l00_table[];
-extern s32 func_PAL_L00_002C4480(int a0, int a1);
+extern s32 hero_l00_set_action_pal(int a0, int a1);
 extern void anim_start_blended_with_flags(void *, int, int, int, int);
 extern int math_fast_float_d(int *);
 extern int vec_fast_helper_b(float *);
 extern void cancel_hero_item_animation_pal(void);
-extern void func_PAL_L00_002AF458(void);
+extern void start_equipped_item_animation_pal(void);
 extern int get_ammo(int);
 extern int weapon_spend_ammo(int, int);
 extern int PlayMobySound(int, int, char *);
@@ -52,7 +52,7 @@ extern void moby_draw_attached_effect_pal(void *);
 
 /* Coordinate the multi-object interaction and its repeat/cooldown timers. */
 
-void func_PAL_L00_004026C4(unsigned char *object) {
+void bouncer_update_pal(unsigned char *object) {
     float origin[4];
     float aim[4];
     AimEntry *entry;
@@ -70,7 +70,7 @@ void func_PAL_L00_004026C4(unsigned char *object) {
         *(int *)(state + 0x2C) = 0;
         g_bouncer_timer = 17;
     }
-    if (g_hero_state.level == 1) func_PAL_L00_002C4480(29, 1);
+    if (g_hero_state.level == 1) hero_l00_set_action_pal(29, 1);
     if (object[0x42] == object[0x43] && (object[0x60] & 2)) anim_start_blended_with_flags(object, 1, 0, 2, 0);
     moby_compute_offset_point(object, (char *)origin);
     target = 0;
@@ -101,11 +101,11 @@ void func_PAL_L00_004026C4(unsigned char *object) {
             part_spawn_muzzle_spark_burst_pal(object, origin, aim);
             anim_start_blended_with_flags(object, 2, 0, 2, 0);
             bouncer_spawn_debris((int)object, (int)origin, (int)aim);
-            func_PAL_L00_002AF458();
+            start_equipped_item_animation_pal();
             *(int *)(state + 0x2C) = 13;
             *(int *)(state + 0x28) = slot_copy_records_to_free(&g_bouncer_sound_record);
         }
-        if (!(g_pad_state.held & g_hero_state.buttons) || !get_ammo(-1) || g_hero_state.f22B8 == 0) {
+        if (!(g_pad_state.held & g_hero_state.buttons) || !get_ammo(-1) || g_hero_state.unk_22B8 == 0) {
             handle = *(int *)(state + 0x28);
             if (handle >= 0) {
                 slot_reset_active(handle);

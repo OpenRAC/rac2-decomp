@@ -18,6 +18,8 @@ extern s32 math_random_int_range(s32, s32);
 extern void vec_add_random_offset(f32 *, f32);
 extern void *enemy_spawn_record(void *, void *, void *, void *, int);
 
+/* Spawns one to five spray particles around the moby (PAL), each with a small random offset
+   and a random frame. */
 void part_spawn_particle_burst_pal(char *self) {
     f32 point[4];
     f32 direction[4];

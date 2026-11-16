@@ -30,14 +30,14 @@ extern float g_cutscene_accum_b MACRO_ADDR;
 extern int g_cutscene_frame MACRO_ADDR;
 extern u8 g_particle_effect_template[] MACRO_ADDR;
 extern void anim_start_startup_animations(void);
-extern void func_PAL_002E7270(void *);
+extern void update_equipment_pieces_pal(void *);
 extern void math_store_angle_update_result(char *, float *, int, int, float);
 extern int FastTweenColor(float, int, int);
 extern void math_apply_axis_rotation_to_quat(void *, void *, void *, float);
 extern void vec_build_spherical_offset(float *, float, float, float);
 extern u8 *part_spawn_fading_drift(void *, void *, int, int, int, int, int, float, float, float, int);
 extern u8 *part_spawn_size_changing(void *, void *, int, int, int, int, int, float, float, float, int);
-extern void func_PAL_002BE880(void *, void *, int, int, float, int);
+extern void part_spawn_growing_puff_pal(void *, void *, int, int, float, int);
 extern float math_random_angle(void);
 extern float math_random_float_range(float, float);
 extern int math_random_int_range(int, int);
@@ -47,7 +47,7 @@ extern void FastVecAdd(char *, char *, char *);
 /* func_PAL_L19_002FBA78, the PAL copy of func_L19_002FA1A8: the same C, with
  * the 50 Hz timings and rates, the actor 4000 effect left out in level 51 as
  * in USA v2.00, and PAL's callees. */
-void func_PAL_L19_002FBA78(void)
+void cutscene_l19_update_effects_pal(void)
 {
     Vec position, direction, axis;
     char *actor;
@@ -60,12 +60,12 @@ void func_PAL_L19_002FBA78(void)
         /* Retail makes this test without a null check: it also reads an
          * empty slot. */
         if (*(short *)(actor + 0xaa) == 0xd54)
-            func_PAL_002E7270(actor);
+            update_equipment_pieces_pal(actor);
         if (actor) {
             /* Held in a local: its longer life makes the first loop pass hoist
              * it, ahead of the items pointer. The level's 51 waits for the
              * second pass and lands after that pointer, as in retail. */
-            int id = 4000;
+            int id = MOBY_CLASS_TV_SCREENS;
             if (*(short *)(actor + 0xaa) == id && g_current_map_index != 51 && *(char **)(actor + 0x68))
                 math_store_angle_update_result(actor, (float *)(*(char **)(actor + 0x68) + 0xc), 0x80aaaad2, 0x80396464, 0.07330384f);
         }
@@ -158,16 +158,16 @@ void func_PAL_L19_002FBA78(void)
             }
         }
         if (g_current_map_index == 19 && g_cutscene_l19_state.state == 5 && g_cutscene_l19_state.frame == 1146) {
-            char *burstActor = g_cutscene_l19_state.items[4];
-            int n;
-            for (n = 0; n < 47; n++) {
+            char *burst_actor = g_cutscene_l19_state.items[4];
+            int burst_index;
+            for (burst_index = 0; burst_index < 47; burst_index++) {
                 int color, style, life, red, gray, high;
                 float speed, angle, pitch, radius;
                 radius = math_random_float_range(0.0f, 0.37f);
                 angle = math_random_angle();
                 pitch = math_random_angle();
                 vec_build_spherical_offset(direction.f, radius, angle, pitch);
-                FastVecAdd((char *)&direction, (char *)&direction, burstActor + 0x10);
+                FastVecAdd((char *)&direction, (char *)&direction, burst_actor + 0x10);
                 radius = math_random_float_range(0.0074000005f, 0.028f);
                 angle = math_random_angle();
                 pitch = math_random_angle();
@@ -181,7 +181,7 @@ void func_PAL_L19_002FBA78(void)
                 color = high | gray;
                 style = (gray << 16) | (gray << 8) | gray;
                 life = math_random_int_range(11, 35);
-                func_PAL_002BE880(&direction, &position, color, style, speed, life);
+                part_spawn_growing_puff_pal(&direction, &position, color, style, speed, life);
             }
         }
     }

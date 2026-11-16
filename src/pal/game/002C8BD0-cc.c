@@ -9,7 +9,9 @@ extern int math_random_int_range(int, int);
 extern float math_random_angle(void);
 extern unsigned char *g_part_tex_spinning_spark;
 
-unsigned char *func_PAL_002C8BD0(Quadword *position, Quadword *velocity, int lifetime) {
+/* Spawns a spinning spark particle at position with velocity that lasts lifetime frames
+   (PAL: scaled to 50 Hz). */
+unsigned char *part_spawn_spinning_spark_pal_2(Quadword *position, Quadword *velocity, int lifetime) {
     unsigned char *particle = part_alloc(0x63);
     unsigned char *motion;
     if (particle) {

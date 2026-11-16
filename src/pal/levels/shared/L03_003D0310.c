@@ -10,7 +10,7 @@ typedef float f32;
 extern f32 g_timer_tick_step __attribute__((sda));
 extern u8 *g_moby_record_base __attribute__((sda));
 extern s32 coll_test_point(void *, s32, void *, f32);
-s32 route_check_points(u32 a0, u8 *first, u8 *second);
+s32 route_check_points(u32 moby, u8 *first, u8 *second);
 extern s32 FindRouteNodeIndex(u32, f32 *);
 extern f32 vec_distance_xy(void *, f32 *);
 extern f32 coll_probe_ground_height_below(f32 *, s32, f32);
@@ -31,12 +31,13 @@ s32 route_check_object_points(u8 *, u8 *, u8 *);
 extern s32 math_random_int_below(s32);
 extern f32 g_effect_aim_offset_scale;
 
-void func_PAL_L03_003D0310(u8 *a0) {
-    if (*(u8 *)(a0 + 0x31) == 0)
+/* Updates the Blue Swingshot Target. Once active, it turns two of its rotation values toward their goals. (PAL: 50 Hz turn rates) */
+void blue_swingshot_target_update_pal(u8 *moby) {
+    if (*(u8 *)(moby + 0x31) == 0)
         return;
-    *(f32 *)(a0 + 0xF4) = FastAddRotations(*(f32 *)(a0 + 0xF4),
+    *(f32 *)(moby + 0xF4) = FastAddRotations(*(f32 *)(moby + 0xF4),
                                         0.12566373f);
-    *(f32 *)(a0 + 0xF8) = FastAddRotations(*(f32 *)(a0 + 0xF8),
+    *(f32 *)(moby + 0xF8) = FastAddRotations(*(f32 *)(moby + 0xF8),
                                         0.055850547f);
 }
 

@@ -101,7 +101,7 @@ extern int g_synthenoid_color_alpha __attribute__((sda));
 extern char *kilonoid_spawn(void *, void *);
 extern void snd_stop_voice(int);
 extern int PlayMobySound(int, int, void *);
-extern void func_PAL_002A7E68(void *, int, int,int);
+extern void anim_start_blended_pal(void *, int, int,int);
 extern float math_random_angle(void);
 extern int math_random_int_range(int, int);
 extern float math_random_float_range(float, float);
@@ -110,9 +110,9 @@ extern void FastVecSub(void *, void *,void *);
 extern void FastVecAdd(void *, void *,void *);
 extern void FastVecScale(void *, void *, float);
 extern void synthenoid_compute_orbit_point(void *, void *);
-extern void func_PAL_L00_003EFF80(void *, void *);
-extern void func_PAL_L00_003EFC00(void *, void *);
-extern void func_PAL_L00_003F0390(void *, void *);
+extern void synthenoid_l00_update_movement_pal_2(void *, void *);
+extern void synthenoid_fire_homing_shot_pal(void *, void *);
+extern void synthenoid_emit_exhaust_pal(void *, void *);
 extern int math_fast_float_d(void *);
 extern void moby_mark_spawned(void *);
 extern void vec_transform_or_copy(void *, void *);
@@ -129,7 +129,7 @@ extern void *part_spawn_ground_effect(void *, int, int,int, int, void *, int,flo
 
 /* Update the three object states, emit fading particles, and orient the object
  * from the camera basis and its three stored angles. */
-void func_PAL_L00_003F0458(Object *object)
+void synthenoid_update_pal(Object *object)
 {
     Vec vector, matrix;
     State *state;
@@ -174,7 +174,7 @@ void func_PAL_L00_003F0458(Object *object)
         state->flag = 0;
         state->timer = 0;
         if (object->anim_id)
-            func_PAL_002A7E68(object, 0, 0, 8);
+            anim_start_blended_pal(object, 0, 0, 8);
         object->color = 255;
         object->color2 = 255;
         state->count = 0;
@@ -200,7 +200,7 @@ void func_PAL_L00_003F0458(Object *object)
         Slot *entry;
 
         if ((object->status & 2) && object->anim_id != 1)
-            func_PAL_002A7E68(object, 1, 0, 10);
+            anim_start_blended_pal(object, 1, 0, 10);
         entry = (Slot *)(g_sound_state + state->slot * 112);
         if (entry->owner != object || !entry->active) {
             state->slot = -1;
@@ -234,13 +234,13 @@ void func_PAL_L00_003F0458(Object *object)
         qcopy(&state->last_position, &g_hero_state.player);
         if (state->timer >= 18 && (object->status & 2)) {
             if (object->anim_id != 1)
-                func_PAL_002A7E68(object, 1, 0, ((s32)(math_random_int_range(7, 12)) * 5 + 2) / 6);
+                anim_start_blended_pal(object, 1, 0, ((s32)(math_random_int_range(7, 12)) * 5 + 2) / 6);
             object->anim_speed = math_random_float_range(0.95f, 1.05f);
         }
         if (state->count < state->limit && g_hero_state.phase != 22 &&
             g_hero_state.phase != 20 && !g_hero_state.flag) {
             synthenoid_compute_orbit_point(object, state);
-            func_PAL_L00_003EFF80(object, state);
+            synthenoid_l00_update_movement_pal_2(object, state);
         } else {
             qzero(&state->velocity);
             state->timer = g_synthenoid_fade_frames;
@@ -253,7 +253,7 @@ void func_PAL_L00_003F0458(Object *object)
             PlayMobySound(2, 0, object);
             object->mode = 2;
         }
-        func_PAL_L00_003EFC00(object, state);
+        synthenoid_fire_homing_shot_pal(object, state);
         break;
     }
     case 2:
@@ -319,7 +319,7 @@ void func_PAL_L00_003F0458(Object *object)
         vec_transform_or_copy(&object->position, &object->position);
         if (!g_hero_locked_flag[0])
             part_queue_ground_shadow(object, 0.3f);
-        func_PAL_L00_003F0390(object, state);
+        synthenoid_emit_exhaust_pal(object, state);
     }
     camera = g_hero_state.camera;
     qcopy(&object->axis_x, &camera->axis_x);

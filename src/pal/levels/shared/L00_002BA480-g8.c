@@ -29,6 +29,8 @@ extern int CollLine(void *, void *, int, void *, int);
 extern float fast_vec_dist(void *, void *);
 extern int coll_test_point(void *, int, void *, float);
 
+/* Every third frame, probes the ground ahead of the hero for its slope and the object it stands on;
+   every fifth frame, looks for a ledge in front of the hero and records how far away it is. */
 void hero_probe_ground_and_ledge_pal(void)
 {
     float first[4], second[4], probe[4];

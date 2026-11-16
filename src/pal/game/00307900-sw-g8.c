@@ -7,18 +7,18 @@ typedef struct {
     Vec velocity, initial, previous, next;
     int timer40, field44, effect48;
     short field4c;
-    signed char managerIndex, flightEffect;
+    signed char manager_index, flight_effect;
     int field50;
     char pad54[8];
     int timer5c, field60, field64, field68, slot;
     ProjectileObject *attachment;
-    float attachX, attachY, attachZ;
+    float attach_x, attach_y, attach_z;
 } ProjectileData;
 struct ProjectileObject {
     char pad00[0x10]; Vec position;
     unsigned char state;
     char pad21[2]; unsigned char field23;
-    char *classData;
+    char *class_data;
     char pad28[0xc]; short flags;
     char pad36[0x12]; float playback;
     char pad4c[0x1c]; ProjectileData *data;
@@ -60,9 +60,9 @@ extern void anim_start_blended_with_flags(void *,int,int,int,int);
 extern void table_clear_entry_flag(int);
 extern void FastVecSub(void *,void *,void *),matrix_from_basis_rows(void *,void *),transform_vector(void *,void *,void *);
 extern float moby_get_anim_value(void *);
-extern void megaturret_find_target(void *),megaturret_aim_at_target(void *),func_PAL_00308AB0(void *);
+extern void megaturret_find_target(void *),megaturret_aim_at_target(void *),megaturret_fire_shot_pal(void *);
 extern int part_alloc_effect_slot(void *,int,float,float,float),slot_alloc_for_object(void *,int);
-extern void func_PAL_00308540(void *),func_PAL_003085D8(void *);
+extern void megaturret_update_fall_pal(void *),projectile_apply_random_push_2_pal(void *);
 extern void part_spawn_explosion_with_sparks_pal(void *,void *,int,float,float);
 extern void slot_free(int),slot_list_remove(void *,int),moby_mark_spawned(void *);
 extern void matrix_mul_vec3(void *,void *,void *), part_advance_grow_effect_2(void *);
@@ -73,7 +73,7 @@ extern void gfx_register_overlay_draw_callback(void (*)(void *),void *);
 
 /* The state machine of an object fired at a surface: flies and sweeps for a hit, sticks or
    bursts on what it hit, then follows what it stuck to until it is destroyed. */
-void func_PAL_00307CE8(ProjectileObject *self)
+void megaturret_update_pal(ProjectileObject *self)
 {
     Vec old;
     int filter[2];
@@ -106,7 +106,7 @@ void func_PAL_00307CE8(ProjectileObject *self)
         multiply_matrix3x3(self->transform, matrix, self->transform);
         qcopy(&old, &self->position);
         FastVecAdd(&self->position, &self->position, child);
-        part_steer_effect_direction(child->flightEffect, child, 0);
+        part_steer_effect_direction(child->flight_effect, child, 0);
         vec_add_object_direction_scaled(&self->position, child, g_megaturret_speed * 0.00040000002f);
         vec_transform_or_copy(&self->position, &self->position);
         filter[0] = 0;
@@ -135,9 +135,9 @@ void func_PAL_00307CE8(ProjectileObject *self)
             qzero_nc(child);
             child->attachment = hit;
             if (hit) {
-                child->attachX = hit->position.x;
-                child->attachY = hit->position.y;
-                child->attachZ = hit->position.z;
+                child->attach_x = hit->position.x;
+                child->attach_y = hit->position.y;
+                child->attach_z = hit->position.z;
             }
             result = weapon_get_group(sweep.surface);
             if (result == 2) {
@@ -152,9 +152,9 @@ void func_PAL_00307CE8(ProjectileObject *self)
             } else if (result == 1) {
                 self->state = 8;
             } else {
-                child->managerIndex = slot_list_add(&ref_00306A40_00, self);
+                child->manager_index = slot_list_add(&ref_00306A40_00, self);
                 projectile_cleanup_table_2();
-                if (ref_00306A40_00.active[child->managerIndex]) {
+                if (ref_00306A40_00.active[child->manager_index]) {
                     self->state = 2;
                     snd_play_from_class_bank(1, 0, self, 0x1367);
                     anim_start_blended_with_flags(self, 1, 0, 0, 0);
@@ -162,7 +162,7 @@ void func_PAL_00307CE8(ProjectileObject *self)
                     self->state = 6;
                 }
             }
-            table_clear_entry_flag(child->flightEffect);
+            table_clear_entry_flag(child->flight_effect);
             ref_00306A40_01[child->slot] = g_turret_target_moby;
             if (g_turret_target_moby) {
                 FastVecSub(&relative, &self->position, &g_turret_target_moby->position);
@@ -178,7 +178,7 @@ void func_PAL_00307CE8(ProjectileObject *self)
                     ((float *)row)[2] = relative.z;
                 }
             }
-            self->collision = *(int *)(self->classData + 0x10);
+            self->collision = *(int *)(self->class_data + 0x10);
         } else {
             FastVecScale(child, child, 1.1f);
         }
@@ -194,7 +194,7 @@ void func_PAL_00307CE8(ProjectileObject *self)
         goto attachment;
     case 4:
         megaturret_aim_at_target(self);
-        func_PAL_00308AB0(self);
+        megaturret_fire_shot_pal(self);
     attachment: {
         ProjectileObject *attached = child->attachment;
 
@@ -205,7 +205,7 @@ void func_PAL_00307CE8(ProjectileObject *self)
                 break;
         detached:
             self->collision = 0;
-            child->flightEffect = part_alloc_effect_slot(self, 0, 1.0f, 1.0f, 1.0f);
+            child->flight_effect = part_alloc_effect_slot(self, 0, 1.0f, 1.0f, 1.0f);
             self->state = 1;
             child->attachment = 0;
         }
@@ -219,7 +219,7 @@ void func_PAL_00307CE8(ProjectileObject *self)
         }
         break;
     case 6:
-        if (ref_00306A40_00.active[child->managerIndex]) {
+        if (ref_00306A40_00.active[child->manager_index]) {
             self->state = 2;
             snd_play_from_class_bank(1, 0, self, 0x1367);
             anim_start_blended_with_flags(self, 1, 0, 0, 0);
@@ -227,8 +227,8 @@ void func_PAL_00307CE8(ProjectileObject *self)
         }
         break;
     case 7:
-        func_PAL_00308540(self);
-        func_PAL_003085D8(self);
+        megaturret_update_fall_pal(self);
+        projectile_apply_random_push_2_pal(self);
         break;
     case 8:
         snd_play_from_class_bank(3, 0, self, 0x1367);
@@ -241,8 +241,8 @@ void func_PAL_00307CE8(ProjectileObject *self)
 
         if (child->effect48 != invalid)
             slot_free(child->effect48);
-        if (child->managerIndex != invalid)
-            slot_list_remove(&ref_00306A40_00, child->managerIndex);
+        if (child->manager_index != invalid)
+            slot_list_remove(&ref_00306A40_00, child->manager_index);
         moby_mark_spawned(self);
         return;
     }
@@ -267,7 +267,7 @@ void func_PAL_00307CE8(ProjectileObject *self)
             self->state = 8;
     if (self->state == 3 || self->state == 4) {
         projectile_check_hit_break_2(self);
-        if (!ref_00306A40_00.active[child->managerIndex]) {
+        if (!ref_00306A40_00.active[child->manager_index]) {
             anim_start_blended_with_flags(self, 1, 11, 0, 0);
             self->state = 5;
             self->playback = -1.0f;

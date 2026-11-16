@@ -14,7 +14,7 @@ extern void moby_transform_joint_to_world(char *, int, float *);
 extern void vec_random_direction(float *, float, float);
 extern float math_random_signed_float_range(float, float);
 extern float math_random_float_range(float, float);
-extern char *func_PAL_002BE9A8(float *, float, float, float, int, float *, float, int, int);
+extern char *part_spawn_spinning_spark_pal(float *, float, float, float, int, float *, float, int, int);
 
 /* Steps along the vector at +0xC0, weighted by the walk table at the animation frame, and
    turns toward the target; on frames 5 and 15 it scatters ten dust particles at a joint
@@ -55,7 +55,7 @@ void joba_fighter_walk_dust_pal(char *obj, float *target)
             pos[0] = origin[0] + math_random_signed_float_range(0, 0.3f);
             pos[1] = origin[1] + math_random_signed_float_range(0, 0.3f);
             pos[2] = origin[2] + math_random_signed_float_range(0, 0.3f);
-            particle = func_PAL_002BE9A8(pos, 0, 1.0f, 1.01f, type, velocity, scale, 0x406080, 0);
+            particle = part_spawn_spinning_spark_pal(pos, 0, 1.0f, 1.01f, type, velocity, scale, 0x406080, 0);
             if (particle != 0) {
                 *(short *)(particle + 0xA) = lifetime;
                 particle[3] = 0x44;

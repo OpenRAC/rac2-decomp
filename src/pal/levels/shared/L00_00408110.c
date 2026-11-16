@@ -77,42 +77,42 @@ extern void sheep_add_to_active_list(void *);
 /* func_PAL_L00_00408110, the PAL copy of func_L00_00403730: the same C, with the delay range and
  * the 0x70/0x74 times scaled to 50 Hz, the flags test on self, and mode 2 accepted as well as 1. */
 /* Spawns moby 0xE7D at self's position: random scale, orientation copied from self's matrix or randomised, then starts it in state 4. */
-Moby403730 *func_PAL_L00_00408110(Moby403730 *self) {
+Moby403730 *sheep_spawn_from_object_pal(Moby403730 *self) {
     f32 mtx[16] __attribute__((aligned(16)));
-    Moby403730 *m;
+    Moby403730 *new_moby;
     Vars403730 *vars;
     Link403730 *link;
-    Weapon403730 *w;
+    Weapon403730 *weapon;
     f32 rate;
 
-    m = CreateMoby(0xE7D);
-    if (m != 0) {
-        m->alpha = 0x7F;
-        m->f32 = 0x7F;
-        m->f31 = 1;
-        vars = m->vars;
-        m->scale = math_random_float_range(0.85f, 1.15f);
-        qcopy(m->pos, self->pos);
+    new_moby = CreateMoby(0xE7D);
+    if (new_moby != 0) {
+        new_moby->alpha = 0x7F;
+        new_moby->f32 = 0x7F;
+        new_moby->f31 = 1;
+        vars = new_moby->vars;
+        new_moby->scale = math_random_float_range(0.85f, 1.15f);
+        qcopy(new_moby->pos, self->pos);
         if (g_enemy_ai_frozen[0] != 0 || g_hero_height_zone_active[0] != 0) {
             copy_matrix_rotation(mtx, self->mtx);
-            mat_get_euler_angles(mtx, m->rot);
+            mat_get_euler_angles(mtx, new_moby->rot);
         } else {
-            vec_clear_128(m->rot);
-            m->rot[2] = math_random_angle();
+            vec_clear_128(new_moby->rot);
+            new_moby->rot[2] = math_random_angle();
         }
-        m->state = 0;
+        new_moby->state = 0;
         vars->f56 = 0;
         vars->delay = math_random_int_range(0x64, 0xfa);
         vars->f70 = 500;
         vars->f74 = 25;
         vars->f5C = 0;
         vars->f78 = 0;
-        m->state = 4;
-        sheep_add_to_active_list(m);
-        m->f98 = m->cls->f10;
-        w = &g_weapon_l00_table[g_sheepinator_weapon_index[0]];
+        new_moby->state = 4;
+        sheep_add_to_active_list(new_moby);
+        new_moby->f98 = new_moby->cls->f10;
+        weapon = &g_weapon_l00_table[g_sheepinator_weapon_index[0]];
         rate = 1.0f;
-        if (w->f4 != 0) {
+        if (weapon->f4 != 0) {
             rate = 4.0f;
         }
         vars->rate = rate;
@@ -127,7 +127,7 @@ Moby403730 *func_PAL_L00_00408110(Moby403730 *self) {
         } else {
             moby_mark_spawned(self);
         }
-        func_002A0F48(m);
+        func_002A0F48(new_moby);
     }
-    return m;
+    return new_moby;
 }

@@ -119,6 +119,7 @@ typedef struct {
 } ShopInput_93;
 extern ShopInput_93 F93State __asm__("D_0021F240");
 typedef struct { char pad[0x1C4]; int buttons; } Input_93;
+/* Handles the shop menu buttons: scroll up and down, buy or select, and leave. */
 void UpdateShopMenuInput_pal(void)
 {
     ShopInput_93 *state = &F93State;

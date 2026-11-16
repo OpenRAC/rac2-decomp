@@ -60,7 +60,7 @@ extern void moby_set_byte_on_group(s32, s32);
 extern void help_unlock_entry(s32);
 extern int moby_handle_request_slot_state(s32);
 extern void value_set_entry_by_index_us2(s32, s32);
-extern int func_US2_00289840(s32, s32);
+extern int subtitle_request_voice_line_us2(s32, s32);
 extern void cam_lock_entry(s32);
 extern int MemcardSave(s32, s32);
 extern void moby_mark_spawned(void *);
@@ -205,7 +205,7 @@ void UpdateItemVendorMoby_us2(PurchaseMoby *moby)
                 help_unlock_entry(46);
                 moby_handle_request_slot_state(46);
                 value_set_entry_by_index_us2(0x1226, -1);
-                func_US2_00289840(0x9BC, 19);
+                subtitle_request_voice_line_us2(0x9BC, 19);
                 if (*(s32 *)(state + 0x12C) != -1)
                     cam_lock_entry(*(s32 *)(state + 0x12C));
                 MemcardSave(0, -1);

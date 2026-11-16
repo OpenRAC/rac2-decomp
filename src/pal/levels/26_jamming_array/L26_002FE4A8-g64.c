@@ -21,6 +21,7 @@ extern void matrix_mul_vec3(void *, void *, void *);
 extern void FastVecScale(void *, void *, float);
 extern void FastVecAdd(void *, void *, void *);
 
+/* While the hero part state is in mode 0 or 1, builds the four transformed quad vertices of the part into the level scratch buffer, and clears the output at the end of the sequence (PAL: 50 Hz timer). */
 void UpdateJammingArrayQuadVertices_pal(void) {
     float matrix[12];
     float rotation[12];

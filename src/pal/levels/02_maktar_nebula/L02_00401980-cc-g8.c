@@ -102,8 +102,11 @@ extern void teleporter_bind_captured_object(char *, char *, f32, f32);
         } \
     }
 
-void func_PAL_L02_00401980(char *a0) {
-    char *state = *(char **)(a0 + 0x68);
+/* Tells the arena fighters to attack: for each of two groups of entities, collects those that can
+   still fight and hands them out one at a time to idle attackers, until the challenge record's
+   limit of attackers is reached (PAL copy). */
+void arena_command_group_attacks_pal(char *moby) {
+    char *state = *(char **)(moby + 0x68);
     char *rec = *(char **)(g_arena_challenge_table_2[*(s16 *)(state + 0x120)] + 4)
                 + *(s16 *)(state + 0x122) * 0x14;
     char *buf[16];

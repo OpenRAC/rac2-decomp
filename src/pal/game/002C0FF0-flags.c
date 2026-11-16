@@ -59,6 +59,7 @@ extern void vec_scale_to_length(void *, void *, float);
 /* func_PAL_002C0FF0 uses the quadword-copy profile in 002C02F0-qcopy.c. */
 
 /* Adapted from RAC1 effect_particle_updates.c; measured against RAC2 retail. */
+/* Updates a spark that splits into smoke puffs when its timer ends, bounces off surfaces and fades (PAL: 50 Hz timings). */
 void part_update_splitting_spark_pal(SplitParticle *p) {
     SplitVector v0u;
     SplitVector v1u;

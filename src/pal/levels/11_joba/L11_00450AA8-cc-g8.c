@@ -7,7 +7,7 @@ extern char *g_active_attacker_robot __attribute__((section(".data")));
 typedef int TIAfc8 __attribute__((mode(TI)));
 extern void smasher_robot_update_aim_and_init_pal(char *);
 extern void moby_set_state(char *, int, int);
-extern void func_PAL_002A7E68(char *, int, int, int);
+extern void anim_start_blended_pal(char *, int, int, int);
 extern int math_random_int_below(int);
 extern void FastVecSub(void *, void *, void *);
 extern float vec_get_heading_angle(char *, void *, void *);
@@ -48,6 +48,8 @@ extern void moby_rotate_about_point(char *, void *, float, float, float);
 extern void euler_rotation_basis(void *, void *);
 extern void smasher_robot_finish_frame(char *);
 
+/* Per-frame update of the Joba smasher robot: picks its target, turns and walks toward it per
+   state, attacks, and handles the death launch (PAL: 50 Hz timings). */
 void smasher_robot_update_pal(char *object)
 {
     float target[4], direction[4], matrix[16];
@@ -68,8 +70,8 @@ void smasher_robot_update_pal(char *object)
         if (*(u8 *)(object + 0x95) == 4) {
             moby_set_state(object, 4, 2);
             if (math_random_int_below(2)) {
-                if (*(u8 *)(object + 0x43) != 2) func_PAL_002A7E68(object, 2, 0, 8);
-            } else if (*(u8 *)(object + 0x43) != 3) func_PAL_002A7E68(object, 3, 0, 8);
+                if (*(u8 *)(object + 0x43) != 2) anim_start_blended_pal(object, 2, 0, 8);
+            } else if (*(u8 *)(object + 0x43) != 3) anim_start_blended_pal(object, 3, 0, 8);
         }
     }
     if (*(char **)(state + 0x490)) *(TIAfc8 *)target = *(TIAfc8 *)(*(char **)(state + 0x490) + 0x10);
@@ -87,7 +89,7 @@ void smasher_robot_update_pal(char *object)
     distance = fast_vec_dist(position, target);
     if (*(u8 *)(object + 0x95) == 2) {
         if (flag_set_second_pending(object)) {
-            if (*(u8 *)(object + 0x43) != 10) func_PAL_002A7E68(object, 10, 0, 8);
+            if (*(u8 *)(object + 0x43) != 10) anim_start_blended_pal(object, 10, 0, 8);
             *(u8 *)(object + 0xBC) = 0;
             moby_set_controller_speed_limits(object, 0.0032000002f, 0.080000006f, 0.0016755164f, 0.12566373f);
             smasher_robot_pick_wander_point(object, arena_get_center_point(*(int *)(object + 0xB8)));
@@ -95,19 +97,19 @@ void smasher_robot_update_pal(char *object)
         }
         if (*(u8 *)(object + 0xBC) == 1 && *(u16 *)(object + 0x96) > 250) {
             switch (math_random_int_below(5)) {
-            case 0: if (*(u8 *)(object + 0x43) != 2) func_PAL_002A7E68(object,2,0,8); break;
-            case 1: if (*(u8 *)(object + 0x43) != 3) func_PAL_002A7E68(object,3,0,8); break;
-            case 2: if (*(u8 *)(object + 0x43) != 4) func_PAL_002A7E68(object,4,0,8); break;
-            case 3: if (*(u8 *)(object + 0x43) != 6) func_PAL_002A7E68(object,6,0,8); break;
-            case 4: if (*(u8 *)(object + 0x43) != 7) func_PAL_002A7E68(object,7,0,8); break;
+            case 0: if (*(u8 *)(object + 0x43) != 2) anim_start_blended_pal(object,2,0,8); break;
+            case 1: if (*(u8 *)(object + 0x43) != 3) anim_start_blended_pal(object,3,0,8); break;
+            case 2: if (*(u8 *)(object + 0x43) != 4) anim_start_blended_pal(object,4,0,8); break;
+            case 3: if (*(u8 *)(object + 0x43) != 6) anim_start_blended_pal(object,6,0,8); break;
+            case 4: if (*(u8 *)(object + 0x43) != 7) anim_start_blended_pal(object,7,0,8); break;
             }
             *(u16 *)(object + 0x96) = math_random_int_below(83);
         }
         if (*(short *)(state + 0x4CA)) {
             moby_set_state(object,5,4);
             if (math_random_int_below(2)) {
-                if (*(u8 *)(object + 0x43) != 1) func_PAL_002A7E68(object,1,0,8);
-            } else if (*(u8 *)(object + 0x43) != 5) func_PAL_002A7E68(object,5,0,8);
+                if (*(u8 *)(object + 0x43) != 1) anim_start_blended_pal(object,1,0,8);
+            } else if (*(u8 *)(object + 0x43) != 5) anim_start_blended_pal(object,5,0,8);
         }
         if (difference > 2.792527198791504f) smasher_robot_start_turn_around(object);
         waypoint = state + 0x470;
@@ -119,11 +121,11 @@ void smasher_robot_update_pal(char *object)
     case 3:
         if (flag_set_first_pending(object)) {
             *(u8 *)(object + 0xBC) = 0;
-            if (*(u8 *)(object + 0x43) != 2) func_PAL_002A7E68(object,2,0,0);
+            if (*(u8 *)(object + 0x43) != 2) anim_start_blended_pal(object,2,0,0);
             *(u16 *)(object + 0x96) = 0;
         }
         if (*(u8 *)(object + 0xBC) == 0 && *(short *)(state + 0x4D0) < *(u16 *)(object + 0x96)) {
-            if (*(u8 *)(object + 0x43) != 10) func_PAL_002A7E68(object,10,0,8);
+            if (*(u8 *)(object + 0x43) != 10) anim_start_blended_pal(object,10,0,8);
             *(u8 *)(object + 0xBC) = 1;
         } else if (*(u8 *)(object + 0xBC) == 1) {
             if (arena_is_point_in_polygon(*(int *)(object+0xB8),position)) moby_set_state(object,4,2);
@@ -135,7 +137,7 @@ void smasher_robot_update_pal(char *object)
         break;
     case 6:
         if (flag_set_first_pending(object)) {
-            if (*(u8 *)(object + 0x43) != 9) func_PAL_002A7E68(object,9,0,8);
+            if (*(u8 *)(object + 0x43) != 9) anim_start_blended_pal(object,9,0,8);
             moby_set_controller_speed_limits(object,0.0064000003f,0.16000001f,0.010053098f,1.0053098f);
         }
         moby_step_at_own_position_factor_pal(object,angle);
@@ -143,18 +145,18 @@ void smasher_robot_update_pal(char *object)
         break;
     case 7:
         if (flag_set_first_pending(object)) {
-            if (*(u8 *)(object+0x43)!=10) func_PAL_002A7E68(object,10,0,12);
+            if (*(u8 *)(object+0x43)!=10) anim_start_blended_pal(object,10,0,12);
         }
         if (*(u8 *)(object+0x42)==8 && distance>15.0f) {
-            if (*(u8 *)(object+0x43)!=10) func_PAL_002A7E68(object,10,0,3);
+            if (*(u8 *)(object+0x43)!=10) anim_start_blended_pal(object,10,0,3);
             moby_set_controller_speed_limits(object,0.0064000003f,0.16000001f,0.0016755164f,0.12566373f);
         } else if (*(u8 *)(object+0x42)==10 && distance<7.0f) {
-            if (*(u8 *)(object+0x43)!=8) func_PAL_002A7E68(object,8,0,3);
+            if (*(u8 *)(object+0x43)!=8) anim_start_blended_pal(object,8,0,3);
             moby_set_controller_speed_limits(object,0.0064000003f,0.040000003f,0.0016755164f,0.12566373f);
         }
         if (distance<2.8f && difference<0.3839724659919739f) {
             moby_set_state(object,8,-1);
-            if (*(u8 *)(object+0x43)!=11) func_PAL_002A7E68(object,11,4,2);
+            if (*(u8 *)(object+0x43)!=11) anim_start_blended_pal(object,11,4,2);
             *(int *)(state+0x4B0)=0;
         } else if (distance>2.8f) {
             if (*(short *)(state+0x4D2)) moby_aim_at_target_offset_pal(object,target);
@@ -172,7 +174,7 @@ void smasher_robot_update_pal(char *object)
             *(float *)(state+0x4AC)=8.0f;
             if (g_active_attacker_robot==object) {
                 moby_set_state(object,9,-1);
-                if (*(u8 *)(object+0x43)!=12) func_PAL_002A7E68(object,12,0,6);
+                if (*(u8 *)(object+0x43)!=12) anim_start_blended_pal(object,12,0,6);
             } else moby_set_state(object,7,-1);
         }
         frame=moby_get_anim_value(object);
@@ -209,7 +211,7 @@ void smasher_robot_update_pal(char *object)
             *(int *)(state+0x1A8)=0;
             scale=math_random_float_range(3.0f,5.0f);
             vec_scale_to_length(state+0x1A0,state+0x1A0,scale*0.020000001f);
-            if (*(u8 *)(object+0x43)!=17) func_PAL_002A7E68(object,17,0,25);
+            if (*(u8 *)(object+0x43)!=17) anim_start_blended_pal(object,17,0,25);
             *(short *)(state+0x4D2)=0;
             rotation = (float *)(state + 0x480);
             for (i = 0; i < 3; i++) {

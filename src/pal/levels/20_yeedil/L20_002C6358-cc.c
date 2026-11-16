@@ -5,7 +5,7 @@
 extern char g_hero_state[];
 
 /* EE integer and FP argument banks retain their original order. */
-extern void func_PAL_L20_002C6358(void);
+extern void UpdateYeedilHeroCollisionCapsule_pal(void);
 
 typedef struct {
     unsigned char pad0[440];
@@ -56,20 +56,21 @@ extern float math_spring_float_to_goal(float *, float *, float, float, float, fl
 
 /* func_L20_002C5D00 is defined in L20_002B7A48-g8.c (it reaches data through $gp). */
 
-void func_PAL_L20_002C6358(void)
+/* Grows or shrinks the hero collision capsule toward the size its current pose needs. (PAL: faster approach rate) */
+void UpdateYeedilHeroCollisionCapsule_pal(void)
 {
-    HeroCapsuleState *initial = (HeroCapsuleState *)g_hero_state;
-    switch (initial->vehicle_mode) {
+    HeroCapsuleState *hero = (HeroCapsuleState *)g_hero_state;
+    switch (hero->vehicle_mode) {
     case 1:
-        initial->top_target = 0.5999999642372131f;
-        initial->bottom_target = 0.45000001788139343f;
-        initial->radius_target = 0.3f;
+        hero->top_target = 0.5999999642372131f;
+        hero->bottom_target = 0.45000001788139343f;
+        hero->radius_target = 0.3f;
         break;
     case 0:
     case 4:
-        initial->top_target = 0.8f;
-        initial->bottom_target = 0.7f;
-        initial->radius_target = 0.44999998807907104f;
+        hero->top_target = 0.8f;
+        hero->bottom_target = 0.7f;
+        hero->radius_target = 0.44999998807907104f;
         break;
     }
     if ((*(HeroCapsuleState *)g_hero_state).control_mode == 4) {

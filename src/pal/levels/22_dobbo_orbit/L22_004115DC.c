@@ -25,18 +25,19 @@ extern u8 *g_hero_moby;
 
 /* func_L22_0040D638 lives in L22_00358778-state-g8.c. */
 
-void func_PAL_L22_00412818(s32 a0) {
-    s32 s1 = a0;
-    s32 s0 = *(u32 *)(s1 + 0x68);
+/* Updates a ship enemy: ticks its timers, counts its age, attaches the manipulator and spins its rotation. */
+void l22_manipulator_spin_update_pal(s32 moby_arg) {
+    s32 moby = moby_arg;
+    s32 vars = *(u32 *)(moby + 0x68);
 
-    math_fast_float_d(s0 + 0x258);
-    FastDecTimer(s0 + 0x25C);
-    if (*(u16 *)(s1 + 0x96) <= 0xFFFE)
-        *(u16 *)(s1 + 0x96) = *(u16 *)(s1 + 0x96) + 1;
-    if (*(u8 *)(s0 + 0x211) == 0)
-        AttachManipulator(s1, 7, s0 + 0x210);
-    build_axis_rotation_quaternion(s0 + 0x220, 2, *(f32 *)(s0 + 0x26C));
-    *(f32 *)(s0 + 0x26C) = fast_subtract_rotations(*(f32 *)(s0 + 0x26C), 0.49916422f);
+    math_fast_float_d(vars + 0x258);
+    FastDecTimer(vars + 0x25C);
+    if (*(u16 *)(moby + 0x96) <= 0xFFFE)
+        *(u16 *)(moby + 0x96) = *(u16 *)(moby + 0x96) + 1;
+    if (*(u8 *)(vars + 0x211) == 0)
+        AttachManipulator(moby, 7, vars + 0x210);
+    build_axis_rotation_quaternion(vars + 0x220, 2, *(f32 *)(vars + 0x26C));
+    *(f32 *)(vars + 0x26C) = fast_subtract_rotations(*(f32 *)(vars + 0x26C), 0.49916422f);
 }
 
 
@@ -49,25 +50,26 @@ extern void FastVecSub(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, f32);
 extern void vec_scale_to_length(void *, void *, f32);
 
-void func_PAL_L22_004128B8(u8 *a0, f32 *a1, f32 f12) {
-    f32 vec1[4] __attribute__((aligned(16)));
-    f32 vec2[4] __attribute__((aligned(16)));
-    f32 scale = f12;
+/* Fires two trail effects from the ship's joints 2 and 3 toward a target point. */
+void ship_fire_trail_effects_pal(u8 *ship, f32 *target_pos, f32 scale_arg) {
+    f32 joint_pos[4] __attribute__((aligned(16)));
+    f32 dir[4] __attribute__((aligned(16)));
+    f32 scale = scale_arg;
 
     if (g_space_ship_owner_moby[0] != 0 && *(f32 *)(*(u8 **)(g_space_ship_owner_moby[0] + 0x68) + 0x20) <= 0.0f) {
         return;
     }
-    moby_transform_joint_to_world(a0, 2, vec1);
+    moby_transform_joint_to_world(ship, 2, joint_pos);
     if (scale == 0.0f) {
         scale = g_space_ship_param_y;
     }
-    FastVecSub(vec2, a1, vec1);
-    vec_scale_to_length(vec2, vec2, 0.8000001f);
-    part_spawn_trail_effect_pal(vec1, vec2, &scale);
-    moby_transform_joint_to_world(a0, 3, vec1);
-    FastVecSub(vec2, a1, vec1);
-    vec_scale_to_length(vec2, vec2, 0.8000001f);
-    part_spawn_trail_effect_pal(vec1, vec2, &scale);
+    FastVecSub(dir, target_pos, joint_pos);
+    vec_scale_to_length(dir, dir, 0.8000001f);
+    part_spawn_trail_effect_pal(joint_pos, dir, &scale);
+    moby_transform_joint_to_world(ship, 3, joint_pos);
+    FastVecSub(dir, target_pos, joint_pos);
+    vec_scale_to_length(dir, dir, 0.8000001f);
+    part_spawn_trail_effect_pal(joint_pos, dir, &scale);
 }
 
 
@@ -76,21 +78,22 @@ extern void FastVecAdd(void *, void *, void *);
 extern int moby_check_target_point_from_offset(s32, s32);
 extern void arena_push_point_out(void *, f32);
 
-void func_PAL_L22_004129D8(s32 a0, s32 a1, s32 a2, f32 f12) {
-    u8 buf[0x10];
-    u8 buf2[0x10];
-    f32 v = f12;
+/* Steers a moby toward a target point, optionally keeping the step inside the arena. */
+void moby_steer_toward_point_pal(s32 moby, s32 target, s32 push_out, f32 speed_arg) {
+    u8 step[0x10];
+    u8 next_pos[0x10];
+    f32 speed = speed_arg;
 
-    FastVecSub(buf, (void *)a1, (void *)(a0 + 0x10));
-    v = v * 0.020000001f;
-    vec_scale_to_length(buf, buf, v);
-    if (a2 != 0) {
-        FastVecAdd(buf2, (void *)(a0 + 0x10), buf);
-        arena_push_point_out(buf2, 7.2f);
-        FastVecSub(buf, buf2, (void *)(a0 + 0x10));
-        vec_scale_to_length(buf, buf, v);
+    FastVecSub(step, (void *)target, (void *)(moby + 0x10));
+    speed = speed * 0.020000001f;
+    vec_scale_to_length(step, step, speed);
+    if (push_out != 0) {
+        FastVecAdd(next_pos, (void *)(moby + 0x10), step);
+        arena_push_point_out(next_pos, 7.2f);
+        FastVecSub(step, next_pos, (void *)(moby + 0x10));
+        vec_scale_to_length(step, step, speed);
     }
-    moby_check_target_point_from_offset(a0, a1);
-    moby_copy_vector_to_child(a0, buf);
+    moby_check_target_point_from_offset(moby, target);
+    moby_copy_vector_to_child(moby, step);
 }
 

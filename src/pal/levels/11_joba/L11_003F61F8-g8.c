@@ -1,7 +1,7 @@
 #include "common.h"
 extern void aim_get_target_heading_distances(void *, void *, f32 *, f32 *, f32 *);
 extern void moby_set_state(void *, s32, s32);
-extern void func_PAL_002A7E68(void *, s32, s32, s32);
+extern void anim_start_blended_pal(void *, s32, s32, s32);
 extern s32 flag_set_first_pending(void *);
 extern f32 *arena_get_center_point(s32);
 extern f32 math_signed_triangle_area(void *, void *, void *);
@@ -43,7 +43,7 @@ extern f32 g_joba_height_tolerance __attribute__((sda));
 #define U(p,o) (*(u16 *)((u8 *)(p)+(o)))
 static __inline__ void SetAnimation(u8 *p, s32 animation, s32 mode, s32 blend)
 {
-    if (p[0x43] != animation) func_PAL_002A7E68(p, animation, mode, blend);
+    if (p[0x43] != animation) anim_start_blended_pal(p, animation, mode, blend);
 }
 /* The two 16-bit counters at +0x278 and +0x27A, read as one value. */
 static __inline__ unsigned long CounterPair(u8 *state)
@@ -54,15 +54,15 @@ static __inline__ unsigned long CounterPair(u8 *state)
    and rates are rescaled for 50 Hz. */
 /* State machine: self[0x20] picks the state and self[0xBC] holds the sub-state. Each state's
    setup runs when func_002B3868 reports the object's first pending flag as newly set. */
-void func_PAL_L11_003F61F8(u8 *self) {
+void joba_enemy_update_state_machine_pal(u8 *self) {
     u8 *state = *(u8 **)(self + 0x68);
     u8 query[16] __attribute__((aligned(16)));
     u8 vector[64] __attribute__((aligned(16)));
     u8 matrix[48] __attribute__((aligned(16)));
-    f32 a,b,c;
-    f32 distance, amplitude;
+    f32 heading_a,heading_b,heading_c;
+    f32 anim_value, amplitude;
     f32 *pos;
-    aim_get_target_heading_distances(self,query,&a,&b,&c);
+    aim_get_target_heading_distances(self,query,&heading_a,&heading_b,&heading_c);
     switch (self[0x20]) {
     case 1:
         if (!self[0x42]) U(self,0x34) |= 0x46;
@@ -92,7 +92,7 @@ void func_PAL_L11_003F61F8(u8 *self) {
             }
         }
         if (math_fabs(F(g_hero_l11_state_data,8) - F(self,0x18)) < g_joba_height_tolerance) moby_set_state(self,5,-1);
-        else if (b > g_joba_attack_min_value && b < g_joba_attack_max_value) joba_enemy_choose_attack_state(self);
+        else if (heading_b > g_joba_attack_min_value && heading_b < g_joba_attack_max_value) joba_enemy_choose_attack_state(self);
         break;
     case 5:
         if (flag_set_first_pending(self)) {
@@ -129,8 +129,8 @@ void func_PAL_L11_003F61F8(u8 *self) {
         if (flag_set_first_pending(self)) {
             SetAnimation(self,3,0,8); H(state,0x296)=0; self[0xBC]=0; joba_enemy_set_counters_one(self);
         }
-        distance=moby_get_anim_value(self);
-        if (!self[0xBC] && CounterPair(state)==0x10001 && self[0x42]==3 && distance>30) {
+        anim_value=moby_get_anim_value(self);
+        if (!self[0xBC] && CounterPair(state)==0x10001 && self[0x42]==3 && anim_value>30) {
             joba_enemy_set_counters_two(self); self[0xBC]=1;
         } else if (self[0xBC]==1 && self[0x42]==3 && (self[0x60]&2)) {
             SetAnimation(self,0,0,8); self[0xBC]=2;
@@ -175,8 +175,8 @@ void func_PAL_L11_003F61F8(u8 *self) {
             else self[0xBC]=3;
             if (F(state,0x20)<=0) moby_set_state(self,9,-1);
         }
-        distance=moby_get_anim_value(self);
-        if (self[0xBC]==0 && CounterPair(state)==0x10001 && self[0x42]==7 && distance>32) {
+        anim_value=moby_get_anim_value(self);
+        if (self[0xBC]==0 && CounterPair(state)==0x10001 && self[0x42]==7 && anim_value>32) {
             joba_enemy_set_counters_two(self); self[0xBC]=1;
         } else if (self[0xBC]==1 && self[0x42]==7 && (self[0x60]&2)) {
             SetAnimation(self,0,0,8); self[0xBC]=2;

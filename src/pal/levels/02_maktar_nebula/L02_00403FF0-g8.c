@@ -48,7 +48,7 @@ static __inline__ int scaled_coord(int value, float scale, float half, int activ
    L02_003FF6E8-g8.c) with this release's data and text ids; the first x is taken per language
    from D_PAL_L02_001B14D0. Its data is named D_PAL_L02_<PAL address>: several D_L02_ spellings
    of these addresses already name other data in functions linked into this level. */
-void func_PAL_L02_00403FF0(char *a0) {
+void arena_draw_info_panel_pal(char *moby) {
     char buf1[0x20];
     char buf2[0x70];
     char *state;
@@ -57,9 +57,9 @@ void func_PAL_L02_00403FF0(char *a0) {
     float x, s, half;
     int r0, r1, r2, r3, one;
 
-    arena_draw_menu_help_prompts(a0, 0);
+    arena_draw_menu_help_prompts(moby, 0);
     half = 0.5f;
-    state = *(char **)(a0 + 0x68);
+    state = *(char **)(moby + 0x68);
     text = (char *)GetLocalizedString(0xE6A);
     one = 1;
     s = g_text_l02_layout_scale;
@@ -125,12 +125,12 @@ typedef struct {
     char pad1[0xDB];
 } L02_003FF9A0_Rec;
 extern L02_003FF9A0_Rec g_material_l02_table[];
-extern s32 func_PAL_L00_002C4480(s32, s32);
+extern s32 hero_l00_set_action_pal(s32, s32);
 extern s32 PadPressedWithin(s32, s32, s32 *);
 extern s32 arena_get_challenge_save_index(s32);
 extern s32 flag_is_byte_set(void);
 extern void arena_cancel_challenge_menu_pal(char *);
-extern void func_PAL_L02_00403FF0(char *);
+extern void arena_draw_info_panel_pal(char *);
 extern void gfx_add_draw_callback_first(void *, void *);
 extern const s32 g_actor_idle_message_count_limit __attribute__((sda));
 extern s32 g_actor_message_delay_base __attribute__((sda));
@@ -145,15 +145,15 @@ extern s32 math_fast_float_d(void *);
    D_L02_00264A70 that D_00139568[0x1E] (0x2A) names.  The pick is kept in the state and in
    D_001395B8[0x3C].  Otherwise, when func_L00_0032EF10(0x10, 0x3C, 0) holds, func_PAL_L02_004011D8
    runs; if neither test holds the callback func_PAL_L02_00403FF0 is registered for the object. */
-void func_PAL_L02_004042C0(char *a0) {
-    char *state = *(char **)(a0 + 0x68);
+void menu_select_next_usable_pal(char *moby) {
+    char *state = *(char **)(moby + 0x68);
     s32 i;
     L02_003FF9A0_Rec *r;
 
     if (g_game_mode != 0x6F)
-        func_PAL_L00_002C4480(0x6F, 1);
+        hero_l00_set_action_pal(0x6F, 1);
     if (PadPressedWithin(0x40, 0x32, 0) != 0) {
-        moby_set_state(a0, 7, -1);
+        moby_set_state(moby, 7, -1);
         for (i = *(s16 *)(state + 0x118) + 1; i < 0xE; i++) {
             if (g_game_flag_table[arena_get_challenge_save_index(*(s32 *)(g_arena_challenge_table_2[i] + 8))] == 0)
                 continue;
@@ -174,8 +174,8 @@ void func_PAL_L02_004042C0(char *a0) {
             return;
         }
     } else if (PadPressedWithin(0x10, 0x32, 0) != 0) {
-        arena_cancel_challenge_menu_pal(a0);
+        arena_cancel_challenge_menu_pal(moby);
     } else {
-        gfx_add_draw_callback_first(func_PAL_L02_00403FF0, a0);
+        gfx_add_draw_callback_first(arena_draw_info_panel_pal, moby);
     }
 }

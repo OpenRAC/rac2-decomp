@@ -25,16 +25,17 @@ extern void gfx_wait_for_dma_status_bits(s32);
 extern s32 load_read_disc_with_pause_pal(s32, s32, s32);
 extern void tex_relocate_block(s32, s32, void *, s32);
 
+/* Reads entry n of the disc table into memory and sends it for drawing. */
 void load_disc_table_entry_for_draw_pal(s32 n) {
-    SelectTable *b;
-    s32 h;
+    SelectTable *table;
+    s32 handle;
     g_hero_moby_default.f18 = n;
     gfx_wait_for_dma_status_bits(1);
-    b = &g_copy_setup_data;
-    h = g_disc_table_handles[0];
-    load_read_disc_with_pause_pal(h, b->e[n].a + b->base, b->e[n].b);
+    table = &g_copy_setup_data;
+    handle = g_disc_table_handles[0];
+    load_read_disc_with_pause_pal(handle, table->e[n].a + table->base, table->e[n].b);
     g_tex_draw_packets[0] = g_hero_moby_default.f38;
     g_tex_draw_packets[1] = 0xFFA0000000E0;
     g_tex_draw_packets[2] = 0x40000400004000;
-    tex_relocate_block(h, 0, &g_tex_block_reloc_state, -1);
+    tex_relocate_block(handle, 0, &g_tex_block_reloc_state, -1);
 }

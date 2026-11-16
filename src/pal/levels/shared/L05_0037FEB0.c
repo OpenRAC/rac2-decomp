@@ -16,7 +16,7 @@ extern struct S_L05_002A1800 g_spawn_entry_table[];
 
 extern int table_find_last_used_entry(int);
 
-void func_PAL_L05_0037FEB0(void)
+void table_reset_working_values_pal(void)
 {
     int i;
 

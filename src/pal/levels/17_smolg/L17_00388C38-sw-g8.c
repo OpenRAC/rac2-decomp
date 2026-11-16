@@ -12,8 +12,8 @@ typedef struct {
 typedef struct {
     int path;                    
     int next;                    
-    float chainSpan;             
-    float chainTime;             
+    float chain_span;             
+    float chain_time;             
     float x10;                   
     int x14;                     
     int x18;                     
@@ -23,12 +23,12 @@ typedef struct {
     float x28;                   
     int sound;                   
     int timer;                   
-    int isLinked;                
+    int is_linked;                
 } HazardVars;
 struct Moby {
     u8 pad0[0x10];
     float position[3];           
-    float updateDist;            
+    float update_dist;            
     u8 state;                    
     u8 pad21[0x30 - 0x21];
     u8 x30;                      
@@ -39,7 +39,7 @@ struct Moby {
     u8 pad6C[0x78 - 0x6C];
     int color;                   
     u8 pad7C[0xA8 - 0x7C];
-    u8 impactSlot;               
+    u8 impact_slot;               
     u8 padA9;
     s16 oClass;                  
     u8 padAC[0xB2 - 0xAC];
@@ -84,7 +84,7 @@ extern int flag_set_first_pending(void *);
 extern int math_fast_float_d(int *);
 extern char *SpawnExplosion_pal(void *, float, int, int, int, int, int, int, int, int,
                           int, int, int, float);
-extern void func_PAL_002B15D8(void *, int, void *, float, float, float, float, int);
+extern void part_spawn_masked_debris_pal(void *, int, void *, float, float, float, float, int);
 extern Moby *cam_moby_create_pal(void *, int, int, int, void *, void *, void *, int, float, float);
 extern void part_spawn_scaled_bolts_pal(void *, int, float);
 extern void moby_mark_spawned(void *);
@@ -124,7 +124,7 @@ void UpdatePathHazard_pal(Moby *moby)
     switch (moby->state) {
     case 0:
         vars->sound = -1;
-        vars->isLinked = 0;
+        vars->is_linked = 0;
         if (vars->path == -1 || g_path_l17_table[vars->path]->count < 2) {
             STUB_printf(g_str_hazard_debug_a, moby->oClass, moby->uid);
             STUB_printf(g_str_hazard_debug_b);
@@ -136,17 +136,17 @@ void UpdatePathHazard_pal(Moby *moby)
         {
             int index = vars->next;
             if (index == -1) {
-                vars->chainSpan = 0.0f;
+                vars->chain_span = 0.0f;
             } else {
                 int count = 0;
                 do {
                     index = g_moby_l17_pool[index].vars->next;
                     count++;
                 } while (index != -1);
-                vars->chainSpan = IntToFloat(count);
+                vars->chain_span = IntToFloat(count);
             }
         }
-        vars->chainTime = vars->chainSpan * 4.0f;
+        vars->chain_time = vars->chain_span * 4.0f;
         {
             HazardPath *path = g_path_l17_table[vars->path];
             path->length = fast_vec_dist(path->start, path->end);
@@ -155,7 +155,7 @@ void UpdatePathHazard_pal(Moby *moby)
         vars->x18 = 0;
         if (vars->next != -1) {
             D_L17_001B2C1C_1[0][vars->next].vars->parent = moby;
-            vars->isLinked = 1;
+            vars->is_linked = 1;
             moby_set_state(moby, 3, -1);
         } else {
             moby_set_state(moby, 2, -1);
@@ -164,7 +164,7 @@ void UpdatePathHazard_pal(Moby *moby)
         break;
     case 1:
         PlacePathFollowerChainAtStart_pal(moby);
-        if (g_hazard_linked_flag && !vars->isLinked)
+        if (g_hazard_linked_flag && !vars->is_linked)
             moby->state = 2;
         else
             moby->state = 3;
@@ -174,7 +174,7 @@ void UpdatePathHazard_pal(Moby *moby)
             UpdatePathFollowerChain_pal(moby);
         if (part_find_owned_effect_slot(moby, 0x4010000, 1))
             moby_set_state(moby, 5, -1);
-        moby->impactSlot = 0xFF;
+        moby->impact_slot = 0xFF;
         break;
     case 3:
         if (vars->next != -1) {
@@ -184,7 +184,7 @@ void UpdatePathHazard_pal(Moby *moby)
         }
         if (part_find_owned_effect_slot(moby, 0x4010000, 1))
             moby_set_state(moby, 5, -1);
-        moby->impactSlot = 0xFF;
+        moby->impact_slot = 0xFF;
         break;
     case 4:
         if (flag_set_first_pending(moby))
@@ -198,10 +198,10 @@ void UpdatePathHazard_pal(Moby *moby)
             float *rot;
             float a, b;
             Moby *created;
-            moby->updateDist = 1000000.0f;
+            moby->update_dist = 1000000.0f;
             SpawnExplosion_pal(pos, 10.0f, 0, 10, 10, 10, 10, 20, 0, 1, 0, 0, 0, 20.0f);
             rot = moby->rotation;
-            func_PAL_002B15D8(moby, 11, g_effect_color_params, 3.0f, 6.0f, 3.0f, 6.0f, 255);
+            part_spawn_masked_debris_pal(moby, 11, g_effect_color_params, 3.0f, 6.0f, 3.0f, 6.0f, 255);
             a = math_random_float_range(-10.0f, 10.0f);
             b = math_random_float_range(20.0f, 30.0f);
             created = cam_moby_create_pal(moby, 2, 0x8AD, 2, pos, rot, g_effect_color_params, 255, a, b);
@@ -210,9 +210,9 @@ void UpdatePathHazard_pal(Moby *moby)
             part_spawn_scaled_bolts_pal(moby, 1, 0.0f);
             moby_mark_spawned(moby);
         } else {
-            moby->updateDist = 1000000.0f;
+            moby->update_dist = 1000000.0f;
             SpawnExplosion_pal(moby->position, 3.0f, 0, 10, 10, 10, 10, 20, 0, 1, 0, 0, 0, 20.0f);
-            func_PAL_002B15D8(moby, 31, g_effect_color_params, 3.0f, 6.0f, 3.0f, 6.0f, 255);
+            part_spawn_masked_debris_pal(moby, 31, g_effect_color_params, 3.0f, 6.0f, 3.0f, 6.0f, 255);
             part_spawn_scaled_bolts_pal(moby, 1, 0.0f);
             moby_mark_spawned(moby);
         }

@@ -5,12 +5,12 @@ typedef int EffectQuad __attribute__((mode(TI)));
 typedef struct { unsigned char b[256]; } EffectSlot;
 extern EffectSlot *g_moby_l04_pool;
 extern int g_game_tick_counter __attribute__((section(".data")));
-extern void func_PAL_L04_003FA088(unsigned char *);
+extern void glow_l04_ring_init_pal(unsigned char *);
 extern void *moby_create_at_parent_pose(unsigned char *,void *,float);
 extern float FastAddRotations(float,float);
 extern void math_update_wrapped_angle_offset(void *,void *,void *,float,float,float);
 extern int math_fast_float_d(void *);
-extern void func_PAL_L04_003FA170(void *);
+extern void glow_ring_update_pal(void *);
 #define EFFECT_WORD(p,o) (*(int *)((p)+(o)))
 #define EFFECT_PTR(p,o) (*(unsigned char **)((p)+(o)))
 #define EFFECT_FLOAT(p,o) (*(float *)((p)+(o)))
@@ -18,45 +18,45 @@ extern void func_PAL_L04_003FA170(void *);
 #define EFFECT_QUAD(p,o) (*(EffectQuad *)((p)+(o)))
 
 /* Updates a three-part rotating effect and cycles its highlighted part. */
-void func_PAL_L04_003FA368(unsigned char *m) {
-    unsigned char *s=EFFECT_PTR(m,0x68);
+void rotating_effect_update_pal(unsigned char *moby) {
+    unsigned char *vars=EFFECT_PTR(moby,0x68);
     float delta=0;
-    int mode;
-    if(EFFECT_WORD(s,0x10)!=-1) {
-        if ((unsigned)(g_moby_l04_pool[EFFECT_WORD(s,0x10)].b[0x20]-2)>=2) return;
+    int tick;
+    if(EFFECT_WORD(vars,0x10)!=-1) {
+        if ((unsigned)(g_moby_l04_pool[EFFECT_WORD(vars,0x10)].b[0x20]-2)>=2) return;
     }
-    if(m[0x20]==0) {
-        EFFECT_FLOAT(m,0x18)+=0.5f; EFFECT_FLOAT(s,0x54)=0; EFFECT_WORD(s,0)=0;
-        EFFECT_FLOAT(s,0x58)=EFFECT_FLOAT(m,0x18); m[0x30]=255; EFFECT_FLAGS(m,0x32)=127;
-        EFFECT_FLOAT(m,0x2C)=EFFECT_FLOAT(EFFECT_PTR(m,0x24),0x24);
-        EFFECT_WORD(s,4)=0; EFFECT_WORD(s,8)=0; EFFECT_WORD(s,12)=0;
-        func_PAL_L04_003FA088(m); m[0x20]=1;
+    if(moby[0x20]==0) {
+        EFFECT_FLOAT(moby,0x18)+=0.5f; EFFECT_FLOAT(vars,0x54)=0; EFFECT_WORD(vars,0)=0;
+        EFFECT_FLOAT(vars,0x58)=EFFECT_FLOAT(moby,0x18); moby[0x30]=255; EFFECT_FLAGS(moby,0x32)=127;
+        EFFECT_FLOAT(moby,0x2C)=EFFECT_FLOAT(EFFECT_PTR(moby,0x24),0x24);
+        EFFECT_WORD(vars,4)=0; EFFECT_WORD(vars,8)=0; EFFECT_WORD(vars,12)=0;
+        glow_l04_ring_init_pal(moby); moby[0x20]=1;
     }
-    if(!EFFECT_PTR(s,4))EFFECT_PTR(s,4)=moby_create_at_parent_pose(m,(void *)0xB1C,1.0f);
-    if(!EFFECT_PTR(s,8))EFFECT_PTR(s,8)=moby_create_at_parent_pose(m,(void *)0xB1D,1.0f);
-    if(!EFFECT_PTR(s,12))EFFECT_PTR(s,12)=moby_create_at_parent_pose(m,(void *)0xB1E,1.0f);
-    if(!EFFECT_PTR(s,4)||!EFFECT_PTR(s,8)||!EFFECT_PTR(s,12))return;
-    EFFECT_FLOAT(m,0xF8)=FastAddRotations(EFFECT_FLOAT(m,0xF8),0.062831864f);
-    math_update_wrapped_angle_offset(m,s+0x54,&delta,0.01f,0.12566373f,EFFECT_FLOAT(s,0x58));
-    mode=g_game_tick_counter;
-    EFFECT_QUAD(EFFECT_PTR(s,4),0x10)=EFFECT_QUAD(m,0x10);
-    EFFECT_QUAD(EFFECT_PTR(s,8),0x10)=EFFECT_QUAD(m,0x10);
-    EFFECT_QUAD(EFFECT_PTR(s,12),0x10)=EFFECT_QUAD(m,0x10);
-    EFFECT_QUAD(EFFECT_PTR(s,4),0xF0)=EFFECT_QUAD(m,0xF0);
-    EFFECT_QUAD(EFFECT_PTR(s,8),0xF0)=EFFECT_QUAD(m,0xF0);
-    EFFECT_QUAD(EFFECT_PTR(s,12),0xF0)=EFFECT_QUAD(m,0xF0);
-    switch((mode%50)/12) {
-    case 0: EFFECT_WORD(EFFECT_PTR(s,4),0x78)=0x804040FF;EFFECT_WORD(EFFECT_PTR(s,8),0x78)=0x80000040;EFFECT_WORD(EFFECT_PTR(s,12),0x78)=0x80000040;break;
-    case 1: EFFECT_WORD(EFFECT_PTR(s,4),0x78)=0x80000040;EFFECT_WORD(EFFECT_PTR(s,8),0x78)=0x804040FF;EFFECT_WORD(EFFECT_PTR(s,12),0x78)=0x80000040;break;
-    case 2: EFFECT_WORD(EFFECT_PTR(s,4),0x78)=0x80000040;EFFECT_WORD(EFFECT_PTR(s,8),0x78)=0x80000040;EFFECT_WORD(EFFECT_PTR(s,12),0x78)=0x804040FF;break;
-    case 3: EFFECT_WORD(EFFECT_PTR(s,4),0x78)=0x80000040;EFFECT_WORD(EFFECT_PTR(s,8),0x78)=0x80000040;EFFECT_WORD(EFFECT_PTR(s,12),0x78)=0x80000040;break;
+    if(!EFFECT_PTR(vars,4))EFFECT_PTR(vars,4)=moby_create_at_parent_pose(moby,(void *)0xB1C,1.0f);
+    if(!EFFECT_PTR(vars,8))EFFECT_PTR(vars,8)=moby_create_at_parent_pose(moby,(void *)0xB1D,1.0f);
+    if(!EFFECT_PTR(vars,12))EFFECT_PTR(vars,12)=moby_create_at_parent_pose(moby,(void *)0xB1E,1.0f);
+    if(!EFFECT_PTR(vars,4)||!EFFECT_PTR(vars,8)||!EFFECT_PTR(vars,12))return;
+    EFFECT_FLOAT(moby,0xF8)=FastAddRotations(EFFECT_FLOAT(moby,0xF8),0.062831864f);
+    math_update_wrapped_angle_offset(moby,vars+0x54,&delta,0.01f,0.12566373f,EFFECT_FLOAT(vars,0x58));
+    tick=g_game_tick_counter;
+    EFFECT_QUAD(EFFECT_PTR(vars,4),0x10)=EFFECT_QUAD(moby,0x10);
+    EFFECT_QUAD(EFFECT_PTR(vars,8),0x10)=EFFECT_QUAD(moby,0x10);
+    EFFECT_QUAD(EFFECT_PTR(vars,12),0x10)=EFFECT_QUAD(moby,0x10);
+    EFFECT_QUAD(EFFECT_PTR(vars,4),0xF0)=EFFECT_QUAD(moby,0xF0);
+    EFFECT_QUAD(EFFECT_PTR(vars,8),0xF0)=EFFECT_QUAD(moby,0xF0);
+    EFFECT_QUAD(EFFECT_PTR(vars,12),0xF0)=EFFECT_QUAD(moby,0xF0);
+    switch((tick%50)/12) {
+    case 0: EFFECT_WORD(EFFECT_PTR(vars,4),0x78)=0x804040FF;EFFECT_WORD(EFFECT_PTR(vars,8),0x78)=0x80000040;EFFECT_WORD(EFFECT_PTR(vars,12),0x78)=0x80000040;break;
+    case 1: EFFECT_WORD(EFFECT_PTR(vars,4),0x78)=0x80000040;EFFECT_WORD(EFFECT_PTR(vars,8),0x78)=0x804040FF;EFFECT_WORD(EFFECT_PTR(vars,12),0x78)=0x80000040;break;
+    case 2: EFFECT_WORD(EFFECT_PTR(vars,4),0x78)=0x80000040;EFFECT_WORD(EFFECT_PTR(vars,8),0x78)=0x80000040;EFFECT_WORD(EFFECT_PTR(vars,12),0x78)=0x804040FF;break;
+    case 3: EFFECT_WORD(EFFECT_PTR(vars,4),0x78)=0x80000040;EFFECT_WORD(EFFECT_PTR(vars,8),0x78)=0x80000040;EFFECT_WORD(EFFECT_PTR(vars,12),0x78)=0x80000040;break;
     }
-    if(math_fast_float_d(s)) {
-        EFFECT_FLAGS(m,0x34)&=0xFFBE; EFFECT_FLAGS(EFFECT_PTR(s,4),0x34)&=0xFFBE;
-        EFFECT_FLAGS(EFFECT_PTR(s,8),0x34)&=0xFFBE; EFFECT_FLAGS(EFFECT_PTR(s,12),0x34)&=0xFFBE;
-        func_PAL_L04_003FA170(m);
+    if(math_fast_float_d(vars)) {
+        EFFECT_FLAGS(moby,0x34)&=0xFFBE; EFFECT_FLAGS(EFFECT_PTR(vars,4),0x34)&=0xFFBE;
+        EFFECT_FLAGS(EFFECT_PTR(vars,8),0x34)&=0xFFBE; EFFECT_FLAGS(EFFECT_PTR(vars,12),0x34)&=0xFFBE;
+        glow_ring_update_pal(moby);
     }else{
-        EFFECT_FLAGS(m,0x34)|=0x41; EFFECT_FLAGS(EFFECT_PTR(s,4),0x34)|=0x41;
-        EFFECT_FLAGS(EFFECT_PTR(s,8),0x34)|=0x41; EFFECT_FLAGS(EFFECT_PTR(s,12),0x34)|=0x41;
+        EFFECT_FLAGS(moby,0x34)|=0x41; EFFECT_FLAGS(EFFECT_PTR(vars,4),0x34)|=0x41;
+        EFFECT_FLAGS(EFFECT_PTR(vars,8),0x34)|=0x41; EFFECT_FLAGS(EFFECT_PTR(vars,12),0x34)|=0x41;
     }
 }

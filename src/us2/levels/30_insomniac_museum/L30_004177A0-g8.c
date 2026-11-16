@@ -67,7 +67,8 @@ typedef struct {
     float scroll;
 } BeamState;
 
-void func_US2_L30_004177A0(int unused0, int unused1, int unused2, int unused3,
+/* Draws the projectile beam as scrolling quads along its direction, with a glow at the end (USA v2.00 copy). */
+void museum_projectile_draw_beam_us2(int unused0, int unused1, int unused2, int unused3,
                             int unused4, char *obj)
 {
     RenderQuad quad;

@@ -44,19 +44,19 @@ extern float math_fast_sin_or_cos_b(float);
 extern void vec_clamp_length(float *p, float threshold);
 extern void moby_update_eased_node(void *a0, void *a1, int a2, float f12, float f13);
 extern int math_fast_float_d(void *);
-extern void func_PAL_L04_00410678(Vec *, void *, int, int);
+extern void part_l04_spawn_burst_pal(Vec *, void *, int, int);
 extern void vec_scale_to_length(float *, float *, float);
 extern void mat_aim_with_spring(void *a0, void *a1, void *a2, void *a3, float f1, float f2, float f3);
 extern float FastAddRotations(float, float);
 extern void vec_build_spherical_offset(float *, float, float, float);
-extern int func_PAL_L04_00418180(u8 *, u8 *, u8 *, u8 *, Vec *, Vec *, Vec *, u8 *, int, int *,
+extern int resolve_vehicle_movement_collisions_pal(u8 *, u8 *, u8 *, u8 *, Vec *, Vec *, Vec *, u8 *, int, int *,
                              float, float, float, float, float);
 extern int racer_is_in_jump_window(int a0, int a1, float f12);
 extern void *part_find_owned_effect_slot(void *, int, int);
-extern void func_PAL_002A7E68(void *, int, int, int);
+extern void anim_start_blended_pal(void *, int, int, int);
 extern float math_random_float_range(float, float);
 extern float math_random_angle(void);
-extern u8 *func_PAL_L04_0040B520(u8 *, int, Vec *, u8 *, int, int, float, Vec *, char *, float, char *);
+extern u8 *debris_spawn_pal(u8 *, int, Vec *, u8 *, int, int, float, Vec *, char *, float, char *);
 extern void *SpawnExplosion_pal(void *, int, int, int, int, int, int, int, float, float, int, int, int, int);
 /* Struct views for the rider lookup: retail schedules these loads as struct-field accesses
  * (no alias with the stack slot of `flag`), unlike plain pointer casts. */
@@ -74,7 +74,7 @@ typedef struct { u8 pad[0x164]; TrackTarget *target; } BikeTarget;
  * spawns debris and an explosion.  ref_L04_00400EE0_00 is the link-time level number (4 or 11).
  * object+0x10, bike+0xD0 and bike+0xE0 are written as expressions: retail keeps them in
  * gcse's PRE registers, not in source variables. */
-void func_PAL_L04_00405268(u8 *object, u8 *bike)
+void hoverbike_update_racing_movement_pal(u8 *object, u8 *bike)
 {
     Vec hit, v30, v40, start, v60, delta;
     Vec m[4];
@@ -298,7 +298,7 @@ void func_PAL_L04_00405268(u8 *object, u8 *bike)
                     hit.f[2] = OF(0x18);
                     v30.f[2] = 0.020000001f;
                     FastVecScale(v30.f, v30.f, 0.85f);
-                    func_PAL_L04_00410678(&hit, &v30, 8, 1);
+                    part_l04_spawn_burst_pal(&hit, &v30, 8, 1);
                 }
                 if (bike[0xA4] == 0 && GetCollHitMaterial() != 5) {
                     float sink;
@@ -342,7 +342,7 @@ void func_PAL_L04_00405268(u8 *object, u8 *bike)
     }
     *(Quad *)(bike + 0xE0) = *(Quad *)(bike + 0xD0);
     F(0x154) = F(0xE8);
-    result = func_PAL_L04_00418180(object, object + 0x10, bike + 0xD0, bike + 0xE0, &hit, &v60, &v40, bike + 0x144, 0, &flag,
+    result = resolve_vehicle_movement_collisions_pal(object, object + 0x10, bike + 0xD0, bike + 0xE0, &hit, &v60, &v40, bike + 0x144, 0, &flag,
                                speed, limit, F(0x134), F(0x94), F(0x90));
     if (result != 0 && I(0x244) != 0) FastVecScale((float *)(bike + 0xD0), (float *)(bike + 0xD0), 0.85f);
     if (flag != 0)
@@ -381,12 +381,12 @@ void func_PAL_L04_00405268(u8 *object, u8 *bike)
             } else {
                 S(0x17E) = 25;
                 S(0x17C) = dir;
-                func_PAL_002A7E68(P(0x8C), dir, 3, 2);
+                anim_start_blended_pal(P(0x8C), dir, 3, 2);
             }
         }
         if (hit.f[2] > 0.0f) {
             hit.f[2] = OF(0x18) + 0.05f;
-            func_PAL_L04_00410678(&hit, bike + 0xD0, 4, 0);
+            part_l04_spawn_burst_pal(&hit, bike + 0xD0, 4, 0);
         }
         break;
     }
@@ -401,19 +401,19 @@ void func_PAL_L04_00405268(u8 *object, u8 *bike)
         FastVecScale(v60.f, v60.f, math_random_float_range(0.7f, 1.0f));
         vec_build_spherical_offset(m[1].f, 0.10000001f, math_random_angle(), math_random_float_range(0.785398245f, 1.57079649f));
         add_vectors(m[2].f, m[1].f, v60.f);
-        func_PAL_L04_0040B520(object, 0xB3D, &m[0], object + 0xF0, 0, 0, 0.0f, &m[1], g_effect_default_params, 0.1f, g_effect_default_params);
+        debris_spawn_pal(object, 0xB3D, &m[0], object + 0xF0, 0, 0, 0.0f, &m[1], g_effect_default_params, 0.1f, g_effect_default_params);
         vec_build_spherical_offset(m[1].f, 0.10000001f, math_random_angle(), math_random_float_range(0.785398245f, 1.57079649f));
         add_vectors(m[2].f, m[1].f, v60.f);
-        func_PAL_L04_0040B520(object, 0xB3E, &m[0], object + 0xF0, 0, 0, 0.0f, &m[1], g_effect_default_params, 0.1f, g_effect_default_params);
+        debris_spawn_pal(object, 0xB3E, &m[0], object + 0xF0, 0, 0, 0.0f, &m[1], g_effect_default_params, 0.1f, g_effect_default_params);
         vec_build_spherical_offset(m[1].f, 0.10000001f, math_random_angle(), math_random_float_range(0.785398245f, 1.57079649f));
         add_vectors(m[2].f, m[1].f, v60.f);
-        func_PAL_L04_0040B520(object, 0xB3F, &m[0], object + 0xF0, 0, 0, 0.0f, &m[1], g_effect_default_params, 0.0f, g_effect_default_params);
+        debris_spawn_pal(object, 0xB3F, &m[0], object + 0xF0, 0, 0, 0.0f, &m[1], g_effect_default_params, 0.0f, g_effect_default_params);
         vec_build_spherical_offset(m[1].f, 0.10000001f, math_random_angle(), math_random_float_range(0.785398245f, 1.57079649f));
         add_vectors(m[2].f, m[1].f, v60.f);
-        func_PAL_L04_0040B520(object, 0xB40, &m[0], object + 0xF0, 0, 0, 0.0f, &m[1], g_effect_default_params, 0.1f, g_effect_default_params);
+        debris_spawn_pal(object, 0xB40, &m[0], object + 0xF0, 0, 0, 0.0f, &m[1], g_effect_default_params, 0.1f, g_effect_default_params);
         vec_build_spherical_offset(m[1].f, 0.10000001f, math_random_angle(), math_random_float_range(0.785398245f, 1.57079649f));
         add_vectors(m[2].f, m[1].f, v60.f);
-        func_PAL_L04_0040B520(object, 0xB40, &m[0], object + 0xF0, 0, 0, 0.0f, &m[1], g_effect_default_params, 0.1f, g_effect_default_params);
+        debris_spawn_pal(object, 0xB40, &m[0], object + 0xF0, 0, 0, 0.0f, &m[1], g_effect_default_params, 0.1f, g_effect_default_params);
         *(u16 *)(object + 0x34) = (*(u16 *)(object + 0x34) | 0x41) & 0xFBFF;
         SpawnExplosion_pal(&m[0], 0, 4, 4, 4, 8, 4, 0, 0.42f, 20.0f, 1, 0, 0, 0);
         if (P(0x8C) != 0) *(u16 *)(P(0x8C) + 0x34) |= 0x41;

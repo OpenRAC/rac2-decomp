@@ -48,14 +48,14 @@ extern int g_current_map_index __attribute__((sda));
 /* Drives the prison's help prompts: links the target moby, plays the hints at the trigger zones
    and records which help messages were already shown. */
 /* Read the word at offset 0x 18 through the pointer stored at owner offset 0x 68. */
-unsigned int func_PAL_L14_00418800(unsigned int param_1)
+unsigned int moby_get_owner_vars_word_pal(unsigned int moby)
 {
-    unsigned int inner_ptr;
-    unsigned int result;
+    unsigned int vars;
+    unsigned int value;
 
-    inner_ptr = *(unsigned int *)(param_1 + 0x68);
-    result = *(unsigned int *)(inner_ptr + 0x18);
-    return result;
+    vars = *(unsigned int *)(moby + 0x68);
+    value = *(unsigned int *)(vars + 0x18);
+    return value;
 }
 
 /* Normalises and combines two temporary vectors from a state block, dispatches on the combined result and conditionally scales the output vector. */

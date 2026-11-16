@@ -34,7 +34,7 @@ extern char *g_area_hit_targets[];
 extern WeaponEntry g_weapon_l00_table[];
 extern MuzzleLight g_light_table[];
 
-extern void func_PAL_L00_003AB208(char *);
+extern void lancer_init_pal(char *);
 extern void moby_transform_joint_to_world(void *, int, void *);
 extern void FastVecScale(void *, void *, float);
 extern void FastVecAdd(void *, void *, void *);
@@ -54,11 +54,11 @@ extern float fast_vec_dist(void *, void *);
 extern float math_fabs(float);
 extern float IntToFloat(int);
 extern void anim_start_blended_with_flags(void *, int, int, int, int);
-extern void func_PAL_002A7E68(void *, int, int, int);
-extern s32 func_PAL_L00_002C4480(int, int);
-extern void func_PAL_L00_003AAFC8(char *);
+extern void anim_start_blended_pal(void *, int, int, int);
+extern s32 hero_l00_set_action_pal(int, int);
+extern void EmitParticleTrailLayers_pal(char *);
 extern void part_spawn_line_at_moby_pal(char *);
-extern void func_PAL_L00_002AF458(void);
+extern void start_equipped_item_animation_pal(void);
 extern void cancel_hero_item_animation_pal(void);
 extern int gfx_add_point_light(void *, int, float, float);
 extern int snd_play_from_class_bank(int, int, char *, int);
@@ -77,7 +77,8 @@ extern void matrix_mul_vec3(void *, void *, void *);
 
 #define TYPE(m) (*(short *)((m) + 0xAA))
 
-void func_PAL_L00_003AA2D8(char *moby)
+/* Per-frame update of the lancer: locks onto a target, shows the HUD markers, fires and drives the beam (PAL: 50 Hz timings). */
+void lancer_update_pal(char *moby)
 {
     Vector muzzle, targetPosition, playerPoint, offset, direction;
     char damage[0x30] __attribute__((aligned(16)));
@@ -91,7 +92,7 @@ void func_PAL_L00_003AA2D8(char *moby)
         return;
     if (*(u8 *)(moby + 0x20) == 0) {
         *(u8 *)(moby + 0x20) = 2;
-        func_PAL_L00_003AB208(moby);
+        lancer_init_pal(moby);
     }
     horizontal = g_lancer_horizontal_arc;
     previousRange = g_lancer_range;
@@ -196,7 +197,7 @@ void func_PAL_L00_003AA2D8(char *moby)
     case 1: {
         int ready;
         if (((Hero *)g_hero_state)->i[0x2294 / 4] == 1)
-            func_PAL_L00_002C4480(29, 1);
+            hero_l00_set_action_pal(29, 1);
         ready = 1;
         if (((Hero *)g_hero_state)->i[0x2294 / 4] == 29)
         {
@@ -216,15 +217,15 @@ void func_PAL_L00_003AA2D8(char *moby)
                     g_progress_statistics[33].maximum = ((s32)g_frame_counter * 5 + 2) / 6;
                 g_progress_statistics[33].levels = (g_progress_statistics[33].levels | (1u << g_current_map_index)) | 0x80000000u;
                 if (TYPE(moby) == 0x5D2)
-                    func_PAL_L00_003AAFC8(moby);
+                    EmitParticleTrailLayers_pal(moby);
                 else
                     part_spawn_line_at_moby_pal(moby);
                 if (*(short *)(state + 0x10) == 0) {
-                    func_PAL_L00_002AF458();
+                    start_equipped_item_animation_pal();
                     *(short *)(state + 0x10) = 1;
                 }
                 if (*(u8 *)(moby + 0x43) != 2)
-                    func_PAL_002A7E68(moby, 2, 0, 0);
+                    anim_start_blended_pal(moby, 2, 0, 0);
                 if (*(int *)(state + 0x24) == -1)
                     *(int *)(state + 0x24) = gfx_add_point_light(moby + 0x10, 0, 4.0f, 0.0f);
                 *(int *)(state + 0x28) = 8;

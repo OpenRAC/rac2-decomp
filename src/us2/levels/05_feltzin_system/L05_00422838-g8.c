@@ -29,7 +29,7 @@ extern void UpdateFeltzinMissionReward_us2(char *, int);
 /* func_US2_L05_00422838, the v2.00 copy of func_L05_00420A88: the same C, where the timer arm calls
    func_002AD7B8(6) first, not last, and no longer runs func_L05_004222D8 and func_0029B3E0 under
    the D_L05_001B1350 count. */
-void func_US2_L05_00422838(char *actor)
+void feltzin_mission_one_update_us2(char *actor)
 {
     Vector a;
     Vector b;

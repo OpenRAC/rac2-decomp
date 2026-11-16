@@ -40,20 +40,20 @@ extern void FastVecScale(void *, void *, float);
  * (src/overlays/shared/hero_idle_and_animation.c, GPL-3.0).
  */
 void UpdateHeroGlowAndExtraManipulators_pal(void) {
-    unsigned char *h0, *g, *g2;
+    unsigned char *hero, *g, *g2;
     unsigned char *object;
-    int alpha, k, t3, red, blue, green, g_wave, r_wave, b_wave, period;
+    int alpha, k, amp_int, red, blue, green, g_wave, r_wave, b_wave, period;
     float normalized, wave, amplitude;
     if (g_state_flag_b)
         ApproachValue(&g_glow_scale, 1.8f, 0.05f);
     else
         ApproachValue(&g_glow_scale, 1.0f, 0.05f);
-    h0 = (unsigned char *)&g_hero_state;
-    if ((unsigned int)(h0[0x22B4] - 1) < 2)
-        object = *(unsigned char **)(h0 + 0x2290);
+    hero = (unsigned char *)&g_hero_state;
+    if ((unsigned int)(hero[0x22B4] - 1) < 2)
+        object = *(unsigned char **)(hero + 0x2290);
     else {
-        if (*(short *)(h0 + 0x24FC)) return;
-        object = *(unsigned char **)(h0 + 0x1314);
+        if (*(short *)(hero + 0x24FC)) return;
+        object = *(unsigned char **)(hero + 0x1314);
     }
     if (object == 0) return;
     g = (unsigned char *)&g_hero_state;
@@ -73,10 +73,10 @@ void UpdateHeroGlowAndExtraManipulators_pal(void) {
     blue += b_wave;
     k = FloatToInt(wave * 48.0f);
     g_wave = k + 24;
-    t3 = FloatToInt(amplitude);
+    amp_int = FloatToInt(amplitude);
     green = k + 160;
-    r_wave = t3 + 12;
-    red = t3 + 76;
+    r_wave = amp_int + 12;
+    red = amp_int + 76;
     if (*(short *)(g + 0x20E) != 0) {
         float blend = 1.0f;
         int max = 33;

@@ -51,7 +51,7 @@ extern void UpdateViewContext(void);
 extern void ResetSoundState(void);
 extern void InitFileLoadSystem(void);
 extern void load_clear_class_cache_table(void);
-extern int func_PAL_00131620(void);
+extern int console_get_region_pal(void);
 extern int console_get_region(void);
 extern void mem_clear(void *, int, int);
 extern int func_00126288(void *, int, int, int, int, int, int, int);
@@ -84,7 +84,7 @@ typedef struct {
 } Toc_00290C60;
 extern Toc_00290C60 g_copy_setup_data;
 
-void func_PAL_002914E0(void)
+void InitOnce_pal(void)
 {
     char buffer[2048];
     char *image;
@@ -175,7 +175,7 @@ void func_PAL_002914E0(void)
     ResetSoundState();
     InitFileLoadSystem();
     load_clear_class_cache_table();
-    lang = func_PAL_00131620();
+    lang = console_get_region_pal();
     switch (lang) {
     case 2:
         g_language_settings[4] = 2;
@@ -219,14 +219,16 @@ void func_PAL_002914E0(void)
 
 void gfx_call_sync_helper(void);
 
-void func_PAL_00291A20(void)
+/* Calls cam_init_scene_state, which fills the lighting data block. */
+void gfx_lighting_init_wrapper_pal(void)
 {
   cam_init_scene_state();
   return;
 }
 
 
-void func_PAL_00291A40(void)
+/* Calls gfx_restore_draw_position. */
+void gfx_lighting_wrapper_pal(void)
 {
   gfx_restore_draw_position();
   return;

@@ -15,6 +15,7 @@ extern int module_l00_call_handler_with_arg_12(int);
 extern char *tab_menu_get_selected_entry(int);
 extern void menu_start_action(int);
 
+/* Menu input callback: reports the pending value or 1 for confirm/cancel; otherwise forwards the input flags to a level module handler and, when the 0x40 button is pressed, starts the action of the selected tab menu entry. */
 int pad_update_input_callback_with_request_us2(void)
 {
     int result = 0;

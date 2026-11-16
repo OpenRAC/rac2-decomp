@@ -40,26 +40,26 @@ extern volatile unsigned char g_toggle_option_a __attribute__((sda));
 extern volatile unsigned char g_subtitles_option __attribute__((sda));
 
 /* makes two float-binding calls, then toggles one of two global flag bytes selected by an object field and returns bit 6 of the flag word */
-int menu_handle_page_input_a_us2(char *a0, int a1)
+int menu_handle_page_input_a_us2(char *object, int buttons)
 {
-    char *p = a0 + 8;
-    float *q;
-    int v;
+    char *bar = object + 8;
+    float *vec;
+    int value;
 
-    func_0033AE28_2(p);
-    q = *(float **)(a0 + 732);
-    func_L00_00430948_3(p, q[0], q[1]);
-    if (a1 & 0x1000) {
+    func_0033AE28_2(bar);
+    vec = *(float **)(object + 732);
+    func_L00_00430948_3(bar, vec[0], vec[1]);
+    if (buttons & 0x1000) {
         func_002E5E58_3(3, 0, 0);
-        v = *(int *)(a0 + 728);
-        *(int *)(a0 + 728) = (v + 1) % 2;
-    } else if (a1 & 0x4000) {
+        value = *(int *)(object + 728);
+        *(int *)(object + 728) = (value + 1) % 2;
+    } else if (buttons & 0x4000) {
         func_002E5E58_3(3, 0, 0);
-        v = *(int *)(a0 + 728);
-        *(int *)(a0 + 728) = (v + 1) % 2;
-    } else if (a1 & 0x40) {
+        value = *(int *)(object + 728);
+        *(int *)(object + 728) = (value + 1) % 2;
+    } else if (buttons & 0x40) {
         func_002E5E58_3(4, 0, 0);
-        switch (*(int *)(a0 + 728)) {
+        switch (*(int *)(object + 728)) {
         case 0:
             g_toggle_option_a = g_toggle_option_a == 0;
             break;
@@ -68,7 +68,7 @@ int menu_handle_page_input_a_us2(char *a0, int a1)
             break;
         }
     }
-    return (a1 >> 6) & 1;
+    return (buttons >> 6) & 1;
 }
 
 /* Calls a helper with a pointer to the second 16-byte field of the record and returns the record pointer. */
@@ -85,9 +85,9 @@ extern int snd_play_from_global_bank (int a, int b, int c);
 /* resets a sub-object, applies a two-float transform, and when bit 6 of flags is set and an int field is zero calls a mode setter and toggles a global byte */
 int menu_handle_page_input_b_us2 (char *object, int flags)
 {
-  unsigned char *g = &g_option_flag_a;
+  unsigned char *flag_ptr = &g_option_flag_a;
   float *vec;
-  int discarded;
+  int sound_result;
 
   prompt_bar_update_us2 (object + 8);
   vec = *(float **) (object + 732);
@@ -95,9 +95,9 @@ int menu_handle_page_input_b_us2 (char *object, int flags)
 
   if ((flags & 0x40) && *(int *) (object + 728) == 0)
     {
-      discarded = snd_play_from_global_bank (4, 0, 0);
-      (void) discarded;
-      *g = (*g < 1);
+      sound_result = snd_play_from_global_bank (4, 0, 0);
+      (void) sound_result;
+      *flag_ptr = (*flag_ptr < 1);
     }
 
   return (flags >> 6) & 1;
@@ -118,26 +118,27 @@ extern int Fc558ca70_FUN_002E5E58(int a, int b, int c);
 extern volatile unsigned char Fc558ca70_D_001A7B95 __attribute__((sda));
 extern volatile unsigned char Fc558ca70_D_001A7B94 __attribute__((sda));
 
-int func_US2_L00_004348C8(char *a0, int a1)
+/* Updates the option page, handles left/right and cross presses, and toggles one of two option bytes; returns bit 6 of the buttons. */
+int menu_handle_page_input_c_us2(char *object, int buttons)
 {
-    char *p = a0 + 8;
-    float *q;
-    int v;
+    char *bar = object + 8;
+    float *vec;
+    int value;
 
-    Fc558ca70_FUN_0033AE28(p);
-    q = *(float **)(a0 + 732);
-    Fc558ca70_FUN_0033B018(p, q[0], q[1]);
-    if (a1 & 0x1000) {
+    Fc558ca70_FUN_0033AE28(bar);
+    vec = *(float **)(object + 732);
+    Fc558ca70_FUN_0033B018(bar, vec[0], vec[1]);
+    if (buttons & 0x1000) {
         Fc558ca70_FUN_002E5E58(3, 0, 0);
-        v = *(int *)(a0 + 728);
-        *(int *)(a0 + 728) = (v + 1) % 2;
-    } else if (a1 & 0x4000) {
+        value = *(int *)(object + 728);
+        *(int *)(object + 728) = (value + 1) % 2;
+    } else if (buttons & 0x4000) {
         Fc558ca70_FUN_002E5E58(3, 0, 0);
-        v = *(int *)(a0 + 728);
-        *(int *)(a0 + 728) = (v + 1) % 2;
-    } else if (a1 & 0x40) {
+        value = *(int *)(object + 728);
+        *(int *)(object + 728) = (value + 1) % 2;
+    } else if (buttons & 0x40) {
         Fc558ca70_FUN_002E5E58(4, 0, 0);
-        switch (*(int *)(a0 + 728)) {
+        switch (*(int *)(object + 728)) {
         case 0:
             Fc558ca70_D_001A7B95 = Fc558ca70_D_001A7B95 == 0;
             break;
@@ -146,7 +147,7 @@ int func_US2_L00_004348C8(char *a0, int a1)
             break;
         }
     }
-    return (a1 >> 6) & 1;
+    return (buttons >> 6) & 1;
 }
 
 
@@ -155,7 +156,8 @@ extern int Ffb202470_FUN_0033AB50(char *p);
 /* func_0033B540 is matched in 0033AE20-g8.c (-G8 small data). */
 
 
-char *func_US2_L00_00434B38(char *object)
+/* Calls a helper on the record's second 16-byte field and returns the record pointer. */
+char *menu_l00_init_page_record_g_us2_2(char *object)
 {
     Ffb202470_FUN_0033AB50(object + 8);
     return object;
@@ -166,11 +168,12 @@ extern void F5979c03f_FUN_0033AE28 (char *object);
 extern void F5979c03f_FUN_0033B018 (char *object, float x, float y);
 extern int F5979c03f_FUN_002E5E58 (int a, int b, int c);
 
-int func_US2_L00_00434C98 (char *object, int flags)
+/* Updates the option page and, on a cross press with the selector at zero, plays a sound and toggles an option byte; returns bit 6 of the flags. */
+int menu_handle_page_input_d_us2 (char *object, int flags)
 {
-  unsigned char *g = &g_option_flag_b;
+  unsigned char *flag_ptr = &g_option_flag_b;
   float *vec;
-  int discarded;
+  int sound_result;
 
   F5979c03f_FUN_0033AE28 (object + 8);
   vec = *(float **) (object + 732);
@@ -178,9 +181,9 @@ int func_US2_L00_00434C98 (char *object, int flags)
 
   if ((flags & 0x40) && *(int *) (object + 728) == 0)
     {
-      discarded = F5979c03f_FUN_002E5E58 (4, 0, 0);
-      (void) discarded;
-      *g = (*g < 1);
+      sound_result = F5979c03f_FUN_002E5E58 (4, 0, 0);
+      (void) sound_result;
+      *flag_ptr = (*flag_ptr < 1);
     }
 
   return (flags >> 6) & 1;
@@ -190,7 +193,8 @@ int func_US2_L00_00434C98 (char *object, int flags)
 /* func_0033B540 is matched in 0033AE20-g8.c (-G8 small data). */
 
 
-char *func_US2_L00_00434DE8(char *object)
+/* Calls a helper on the record's second 16-byte field and returns the record pointer. */
+char *menu_l00_init_page_record_h_us2_2(char *object)
 {
     Ffb202470_FUN_0033AB50(object + 8);
     return object;
@@ -198,11 +202,12 @@ char *func_US2_L00_00434DE8(char *object)
 
 
 
-int func_US2_L00_00434F48 (char *object, int flags)
+/* Updates the option page and, on a cross press with the selector at zero, plays a sound and toggles an option byte; returns bit 6 of the flags. */
+int menu_handle_page_input_e_us2 (char *object, int flags)
 {
-  unsigned char *g = &g_option_flag_b;
+  unsigned char *flag_ptr = &g_option_flag_b;
   float *vec;
-  int discarded;
+  int sound_result;
 
   F5979c03f_FUN_0033AE28 (object + 8);
   vec = *(float **) (object + 732);
@@ -210,9 +215,9 @@ int func_US2_L00_00434F48 (char *object, int flags)
 
   if ((flags & 0x40) && *(int *) (object + 728) == 0)
     {
-      discarded = F5979c03f_FUN_002E5E58 (4, 0, 0);
-      (void) discarded;
-      *g = (*g < 1);
+      sound_result = F5979c03f_FUN_002E5E58 (4, 0, 0);
+      (void) sound_result;
+      *flag_ptr = (*flag_ptr < 1);
     }
 
   return (flags >> 6) & 1;
@@ -222,7 +227,8 @@ int func_US2_L00_00434F48 (char *object, int flags)
 /* func_0033B540 is matched in 0033AE20-g8.c (-G8 small data). */
 
 
-char *func_US2_L00_00434FE0(char *object)
+/* Calls a helper on the record's second 16-byte field and returns the record pointer. */
+char *menu_l00_init_page_record_i_us2_2(char *object)
 {
     Ffb202470_FUN_0033AB50(object + 8);
     return object;
@@ -230,11 +236,12 @@ char *func_US2_L00_00434FE0(char *object)
 
 
 
-int func_US2_L00_00435140 (char *object, int flags)
+/* Updates the option page and, on a cross press with the selector at zero, plays a sound and toggles an option byte; returns bit 6 of the flags. */
+int menu_handle_page_input_f_us2 (char *object, int flags)
 {
-  unsigned char *g = &g_option_flag_b;
+  unsigned char *flag_ptr = &g_option_flag_b;
   float *vec;
-  int discarded;
+  int sound_result;
 
   F5979c03f_FUN_0033AE28 (object + 8);
   vec = *(float **) (object + 732);
@@ -242,9 +249,9 @@ int func_US2_L00_00435140 (char *object, int flags)
 
   if ((flags & 0x40) && *(int *) (object + 728) == 0)
     {
-      discarded = F5979c03f_FUN_002E5E58 (4, 0, 0);
-      (void) discarded;
-      *g = (*g < 1);
+      sound_result = F5979c03f_FUN_002E5E58 (4, 0, 0);
+      (void) sound_result;
+      *flag_ptr = (*flag_ptr < 1);
     }
 
   return (flags >> 6) & 1;
@@ -254,7 +261,8 @@ int func_US2_L00_00435140 (char *object, int flags)
 extern void *prompt_bar_destroy_us2(void *);
 extern unsigned long long menu_pass_through_handle(void *);
 
-void *func_US2_L00_004351D8(char *object) {
+/* Destroys the page record and then its second sub-object; returns the object pointer. */
+void *menu_init_two_sub_objects_us2(char *object) {
     prompt_bar_destroy_us2(object + 0x8);
     menu_pass_through_handle(object + 0x2E0);
     return object;
@@ -263,7 +271,8 @@ void *func_US2_L00_004351D8(char *object) {
 
 extern void *cam_init_object_table_d(void *);
 
-void *func_US2_L00_004354E8(char *object) {
+/* Destroys the page record and initializes its second sub-object; returns the object pointer. */
+void *menu_init_two_sub_objects_b_us2(char *object) {
     prompt_bar_destroy_us2(object + 0x8);
     cam_init_object_table_d(object + 0x2E0);
     return object;

@@ -114,16 +114,16 @@ extern void ship_save_transform_state(void);
 extern s32 subtitle_request_voice_line(s32 key, s32 selection);
 extern s32 status_any_record_nonzero(void);
 extern s32 math_fast_float_d(s32 *timer);
-extern void func_PAL_L10_00429880(Moby *moby);
-extern void func_PAL_L10_00429B20(Moby *moby);
-extern void func_PAL_L10_00429D08(Moby *moby);
-extern void func_PAL_L10_00429E20(Moby *moby);
+extern void mission_first_update_pal(Moby *moby);
+extern void mission_second_update_pal(Moby *moby);
+extern void mission_third_update_pal(Moby *moby);
+extern void gate_course_update_pal(Moby *moby);
 extern void level_store_value_pair(s32 a0, void (*callback)(void));
 extern s32 cam_is_mode_active(void);
-extern s32 func_PAL_L10_00426618(void);
-extern void func_PAL_L10_00428C8C(void);
-extern void func_PAL_L10_00428D58(void);
-extern s32 func_PAL_L10_00428E38(Moby *moby, s32 keep);
+extern s32 DrawHrugisMissionHud_pal(void);
+extern void mission_reset_counters_pal(void);
+extern void mission_reset_counters_alt_pal(void);
+extern s32 process_object_collision_damage_pal(Moby *moby, s32 keep);
 
 /* func_PAL_L10_00426194, the PAL copy of func_L10_00421288: the same C, where the
    timers are 50 Hz values, record 1 is set instead of searched for, and
@@ -135,7 +135,7 @@ extern s32 func_PAL_L10_00428E38(Moby *moby, s32 keep);
    after five frames it lets a kind be chosen, queues two subtitles and runs the chosen
    kind's handler. State 3 waits for func_L05_00442860, then counts the round and goes
    back to state 1. */
-void func_PAL_L10_00426194(Moby *moby)
+void UpdateHrugisController_pal(Moby *moby)
 {
     ControllerVars *vars = moby->vars;
     u8 completed0;
@@ -177,9 +177,9 @@ void func_PAL_L10_00426194(Moby *moby)
         g_mission_timer_a = 450;
         g_mission_timer_b = 300;
         g_subtitle_second_queued = 0;
-        g_mission_state.reset = func_PAL_L10_00428C8C;
-        g_mission_state.resetAll = func_PAL_L10_00428D58;
-        g_mission_state.onHit = func_PAL_L10_00428E38;
+        g_mission_state.reset = mission_reset_counters_pal;
+        g_mission_state.resetAll = mission_reset_counters_alt_pal;
+        g_mission_state.onHit = process_object_collision_damage_pal;
         g_mission_state.controller = moby;
         hero_set_state_value_a(1);
         hero_set_state_value_b(0);
@@ -187,8 +187,8 @@ void func_PAL_L10_00426194(Moby *moby)
         completed1 = g_game_flag_table.completions[1];
         completed2 = g_game_flag_table.completions[2];
         completed3 = g_game_flag_table.completions[3];
-        g_mission_reset_callback = func_PAL_L10_00428C8C;
-        g_mission_reset_alt_callback = func_PAL_L10_00428D58;
+        g_mission_reset_callback = mission_reset_counters_pal;
+        g_mission_reset_alt_callback = mission_reset_counters_alt_pal;
         g_mission_completed_first = completed1;
         g_mission_completed_second = completed2;
         g_mission_completed_third = completed3;
@@ -243,21 +243,21 @@ void func_PAL_L10_00426194(Moby *moby)
         if (g_selected_mission_kind != -2 && g_mission_reward_level >= 3) {
             switch (g_selected_mission_kind) {
             case 0:
-                func_PAL_L10_00429880(moby);
+                mission_first_update_pal(moby);
                 break;
             case 1:
-                func_PAL_L10_00429B20(moby);
+                mission_second_update_pal(moby);
                 break;
             case 2:
-                func_PAL_L10_00429D08(moby);
+                mission_third_update_pal(moby);
                 break;
             case 3:
-                func_PAL_L10_00429E20(moby);
+                gate_course_update_pal(moby);
                 break;
             }
         }
         if (g_hud_sprite_table_base && !g_hud_setup_done && !g_reward_active_flag) {
-            level_store_value_pair(0, func_PAL_L10_00426618);
+            level_store_value_pair(0, DrawHrugisMissionHud_pal);
             g_hud_state_flag = 0;
             g_hud_setup_done = 1;
         }

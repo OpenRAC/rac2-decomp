@@ -9,6 +9,7 @@ extern void menu_set_settings(void *, int, int);
 extern void *UpdateMenuListSelection(void *, int);
 extern int menu_get_selected_index(void *);
 
+/* Moves the list menu's child list next to the menu, runs its selection input and stores the selected index. */
 void list_menu_update_from_input_pal(char *self, int arg)
 {
     char *child = self + 0x188;
@@ -29,6 +30,7 @@ extern int menu_get_entry_count(void *);
 extern void object_set_value_float(void *, float);
 extern void list_menu_noop_hook(void *);
 
+/* Positions and scales the list menu's parts from its entry count, handles input and returns the selected index. */
 int list_menu_update_pal(char *self, int arg)
 {
     char *child = self + 0x4C;

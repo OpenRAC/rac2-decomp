@@ -26,7 +26,7 @@ extern char *part_spawn_ground_effect(void *, int, float, float, unsigned int, i
 extern int FloatToInt(float);
 
 /* Spray paired particles perpendicular to the viewing direction. */
-void func_PAL_L00_003A6238(void *position, int count, float brightness)
+void part_l00_spawn_spark_spray_pal(void *position, int count, float brightness)
 {
     float velocity[4], lateral[4], axis[4], projected[4];
     FastVecSub(lateral, g_camera_l00_position, position);

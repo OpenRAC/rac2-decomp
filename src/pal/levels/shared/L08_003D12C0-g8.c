@@ -26,11 +26,11 @@ extern s32 g_current_map_index;
 
 /* Flags the level's object, feeds the camera its aim values and advances the
    counter the aim is scaled by. */
-void cam_update_aim_values_pal(s32 *counter, u8 *arg) {
+void cam_update_aim_values_pal(s32 *counter, u8 *moby) {
     u8 *owner;
-    f32 t, a, b, c;
+    f32 blend, speed_a, speed_b, turn_speed;
 
-    owner = *(u8 **)((u8 *)arg + 0x68);
+    owner = *(u8 **)((u8 *)moby + 0x68);
     if (*(s16 *)((u8 *)g_camera_l08_state_ptr + 0x86) == 0) {
         *(s32 *)((u8 *)*(u8 **)((u8 *)g_camera_l08_state_ptr + 0x70) + 0x250) = 2;
     }
@@ -46,16 +46,16 @@ void cam_update_aim_values_pal(s32 *counter, u8 *arg) {
     follow_camera_set_height(g_aim_camera_height, 0.003f);
     cam_set_lock_flag();
 
-    t = IntToFloat(*counter) / IntToFloat(0x4B);
-    if (t > 1.0f)
-        t = 1.0f;
+    blend = IntToFloat(*counter) / IntToFloat(0x4B);
+    if (blend > 1.0f)
+        blend = 1.0f;
 
-    a = t * 0.985f + 0.015f;
-    b = t * 0.8f + 0.2f;
-    c = t * 0.044999998062849045f + 0.015f;
+    speed_a = blend * 0.985f + 0.015f;
+    speed_b = blend * 0.8f + 0.2f;
+    turn_speed = blend * 0.044999998062849045f + 0.015f;
 
-    cam_set_speeds_if_nonzero(a, b);
-    cam_set_turn_speeds_if_nonzero(c, 0.2f);
+    cam_set_speeds_if_nonzero(speed_a, speed_b);
+    cam_set_turn_speeds_if_nonzero(turn_speed, 0.2f);
     cam_set_snap_flag();
 
     if (*counter < 0x4B)

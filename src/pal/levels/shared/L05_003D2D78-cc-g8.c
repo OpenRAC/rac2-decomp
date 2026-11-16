@@ -12,14 +12,14 @@ extern float math_fabs(float);
 extern int moby_class_id_to_table_index(int);
 extern float FastAddRotations(float, float);
 extern void cam_shake_if_object_near_pal(char *);
-extern int func_PAL_L05_003D3098(char *);
+extern int shot_spawn_impact_bursts_pal(char *);
 extern int snd_play_from_class_bank(int, int, char *, int);
 extern int g_current_map_index;
 extern unsigned char g_map_event_flag_c[1] NOT_SDA;
 extern void func_L05_003CFCF0(char *, int, int);
-void func_PAL_L05_003D2D78(unsigned char *obj)
+void shot_update_pal(unsigned char *obj)
 {
-    char *s = *(char **)(obj + 0x68);
+    char *vars = *(char **)(obj + 0x68);
     int kind;
     switch ((unsigned char)obj[0x20]) {
     case 0:
@@ -27,27 +27,27 @@ void func_PAL_L05_003D2D78(unsigned char *obj)
         moby_randomize_reach_and_angles(obj);
     case 2:
     case 3:
-        FastVecAdd(obj + 0x10, obj + 0x10, s + 0x10);
-        FastVecScale(s + 0x10, s + 0x10, (((g_burst_velocity_scale - 1.0f)) * 1.2f) + 1.0f);
+        FastVecAdd(obj + 0x10, obj + 0x10, vars + 0x10);
+        FastVecScale(vars + 0x10, vars + 0x10, (((g_burst_velocity_scale - 1.0f)) * 1.2f) + 1.0f);
         if ((unsigned char)obj[0x20] != 2) {
-            if (vec_fast_helper_b(s + 0xC) && (unsigned char)obj[0x31] == 0) {
+            if (vec_fast_helper_b(vars + 0xC) && (unsigned char)obj[0x31] == 0) {
                 moby_mark_spawned(obj);
                 return;
             }
         } else {
-            if (math_fabs(*(float *)(s + 0x10)) < 0.01f &&
-                math_fabs(*(float *)(s + 0x14)) < 0.01f &&
-                math_fabs(*(float *)(s + 0x18)) < 0.01f)
+            if (math_fabs(*(float *)(vars + 0x10)) < 0.01f &&
+                math_fabs(*(float *)(vars + 0x14)) < 0.01f &&
+                math_fabs(*(float *)(vars + 0x18)) < 0.01f)
                 obj[0x20] = 1;
         }
     case 1:
         kind = moby_class_id_to_table_index(*(short *)(obj + 0xAA));
         *(float *)(obj + 0x2C) = *(float *)(*(char **)(obj + 0x24) + 0x24) * g_shot_reach_table[kind];
-        *(float *)(obj + 0xF0) = FastAddRotations(*(float *)s, *(float *)(obj + 0xF0));
-        *(float *)(obj + 0xF4) = FastAddRotations(*(float *)(s + 4), *(float *)(obj + 0xF4));
-        *(float *)(obj + 0xF8) = FastAddRotations(*(float *)(s + 8), *(float *)(obj + 0xF8));
+        *(float *)(obj + 0xF0) = FastAddRotations(*(float *)vars, *(float *)(obj + 0xF0));
+        *(float *)(obj + 0xF4) = FastAddRotations(*(float *)(vars + 4), *(float *)(obj + 0xF4));
+        *(float *)(obj + 0xF8) = FastAddRotations(*(float *)(vars + 8), *(float *)(obj + 0xF8));
         cam_shake_if_object_near_pal(obj);
-        if (func_PAL_L05_003D3098(obj) || *(float *)(obj + 0x10) < 2.0f || *(float *)(obj + 0x10) > 1021.0f ||
+        if (shot_spawn_impact_bursts_pal(obj) || *(float *)(obj + 0x10) < 2.0f || *(float *)(obj + 0x10) > 1021.0f ||
             *(float *)(obj + 0x14) < 2.0f || *(float *)(obj + 0x14) > 1021.0f ||
             *(float *)(obj + 0x18) < 2.0f || *(float *)(obj + 0x18) > 1021.0f) {
             if (g_shot_reach_table[kind] >= 5.0f) {

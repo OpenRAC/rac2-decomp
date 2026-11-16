@@ -65,6 +65,7 @@ static __inline__ int screen_coord(int mode, float value, float offset, int one)
     return (int)scaled;
 }
 
+/* Draws the two-line menu panel: a title line, four option labels and, when needed, the extra panel. */
 int menu_draw_two_line_panel_us2(void)
 {
     if (g_menu_data_base) {

@@ -8,7 +8,8 @@ extern float IntToFloat(int);
 extern int FloatToInt(float);
 extern Quad g_lens_flare_quads[4] SDATA(D_L00_001AECC0);
 
-void func_PAL_L00_00390728(char *object)
+/* Fades the object's colour from white toward the base colour as its countdown runs out. */
+void moby_fade_colour_by_countdown_pal(char *object)
 {
     Vector colour;
     char *data = *(char **)(object + 0x68);

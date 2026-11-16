@@ -21,6 +21,7 @@ extern float math_random_signed_float_range(float, float);
 extern int math_random_int_below(int);
 extern Gparticle *part_spawn_gravity_fade(void *, void *, int, unsigned int, int, int, int, float, float, float, int);
 
+/* Spawns eight pairs of grey and blue puffs around a point halfway along the velocity. */
 /* The size is set once ahead of the loop, so gcse's constant propagation writes it directly
  * into both calls and it is not hoisted into a callee-saved register. */
 void SpawnRandomParticlePairs_pal(TI128 *a0, void *velocity)

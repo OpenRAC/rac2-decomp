@@ -21,42 +21,42 @@ extern u8 g_hero_state[];
 
 /* Runs the object's timer down, keeps the shared step counter in step with it, and retires
    the object when the timed effect is over. */
-void joba_enemy_apply_damage_pal(u8 *arg0) {
-    u8 *s0 = arg0;
-    u8 *s1;
-    u8 *s2;
-    u8 *s3;
-    u32 off;
-    f32 f2;
+void joba_enemy_apply_damage_pal(u8 *moby) {
+    u8 *enemy = moby;
+    u8 *vars;
+    u8 *hit_slot;
+    u8 *color_ptr;
+    u32 table_offset;
+    f32 damage;
 
-    if (*(u8 *)(s0 + 0x20) == 0) {
+    if (*(u8 *)(enemy + 0x20) == 0) {
         return;
     }
-    s1 = *(u8 **)(s0 + 0x68);
-    s2 = part_find_owned_effect_slot(s0, 0x10000, 0);
-    f2 = moby_update_aim_target_strength(s0, s2);
-    if (s2 != 0) {
-        if (*(u8 *)(s0 + 0x20) >= 3) {
-            *(f32 *)(s1 + 0x20) = *(f32 *)(s1 + 0x20) - f2;
+    vars = *(u8 **)(enemy + 0x68);
+    hit_slot = part_find_owned_effect_slot(enemy, 0x10000, 0);
+    damage = moby_update_aim_target_strength(enemy, hit_slot);
+    if (hit_slot != 0) {
+        if (*(u8 *)(enemy + 0x20) >= 3) {
+            *(f32 *)(vars + 0x20) = *(f32 *)(vars + 0x20) - damage;
             /* The index is a byte offset into the table: keeping it in a variable leaves
                the constant out of the symbol's address, as the retail has it. */
-            off = *(u8 *)(s1 + 0x37) * 4 + 0xE0;
-            *(s32 *)((u8 *)g_enemy_damage_accum + off) += (s32)(f2 * 32.0f);
-            if (*(f32 *)(s2 + 0x2C) != 0.0f) {
-                s3 = s1 + 0x70;
-                gfx_start_color_fade(s0, s3);
-                if (*(f32 *)(s2 + 0x2C) >= g_joba_damage_threshold || *(f32 *)(s1 + 0x20) <= 0.0f) {
-                    gfx_start_color_fade(s0, s3);
-                    moby_set_state(s0, 8, -1);
+            table_offset = *(u8 *)(vars + 0x37) * 4 + 0xE0;
+            *(s32 *)((u8 *)g_enemy_damage_accum + table_offset) += (s32)(damage * 32.0f);
+            if (*(f32 *)(hit_slot + 0x2C) != 0.0f) {
+                color_ptr = vars + 0x70;
+                gfx_start_color_fade(enemy, color_ptr);
+                if (*(f32 *)(hit_slot + 0x2C) >= g_joba_damage_threshold || *(f32 *)(vars + 0x20) <= 0.0f) {
+                    gfx_start_color_fade(enemy, color_ptr);
+                    moby_set_state(enemy, 8, -1);
                 }
             }
         }
     }
-    *(u8 *)(s0 + 0xA8) = 0xFF;
-    part_spawn_damage_debris(s0, s1 + 0x50, s1 + 0x20);
-    if (*(u8 *)(s0 + 0x20) >= 2 && *(u8 *)(s1 + 0x2E) == 2) {
-        *(s32 *)(s1 + 0x20) = 0;
-        joba_enemy_reset(s0);
+    *(u8 *)(enemy + 0xA8) = 0xFF;
+    part_spawn_damage_debris(enemy, vars + 0x50, vars + 0x20);
+    if (*(u8 *)(enemy + 0x20) >= 2 && *(u8 *)(vars + 0x2E) == 2) {
+        *(s32 *)(vars + 0x20) = 0;
+        joba_enemy_reset(enemy);
     }
-    *(s32 *)(s1 + 0x258) = weapon_select_aim_target(s0, *(s32 *)(s1 + 0x25C), 0, 0, 200.0f, 200.0f);
+    *(s32 *)(vars + 0x258) = weapon_select_aim_target(enemy, *(s32 *)(vars + 0x25C), 0, 0, 200.0f, 200.0f);
 }

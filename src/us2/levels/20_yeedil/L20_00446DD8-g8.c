@@ -33,33 +33,34 @@ typedef struct {
     int callback;
 } YeedilActivation;
 
-void floor_l20_switch_update_us2(unsigned char *object)
+/* Runs the glowing floor switch (moby class 4617). When the hero stands on it, it switches on its linked objects and sets off its event (USA v2.00). */
+void floor_l20_switch_update_us2(unsigned char *moby)
 {
     float point[4] __attribute__((aligned(16)));
-    YeedilActivation *state = *(YeedilActivation **)(object + 0x68);
+    YeedilActivation *vars = *(YeedilActivation **)(moby + 0x68);
     int color;
-    if (!state) return;
-    state->angle = FastAddRotations(state->angle, 0.10471977f);
-    color = FloatToInt((math_fast_sin_or_cos_b(state->angle) * 4.0f - 3.0f) * 128.0f);
+    if (!vars) return;
+    vars->angle = FastAddRotations(vars->angle, 0.10471977f);
+    color = FloatToInt((math_fast_sin_or_cos_b(vars->angle) * 4.0f - 3.0f) * 128.0f);
     if (color > 128) color = 128;
     else if (color < 32) color = 32;
-    if (object[0x20] == 0) {
-        *(unsigned short *)(object + 0x34) |= 0x10;
-        moby_set_state(object, 1, -1);
-    } else if (object[0x20] == 1) {
+    if (moby[0x20] == 0) {
+        *(unsigned short *)(moby + 0x34) |= 0x10;
+        moby_set_state(moby, 1, -1);
+    } else if (moby[0x20] == 1) {
         float distance;
-        moby_transform_joint_to_world((char *)object, 0, (char *)point);
+        moby_transform_joint_to_world((char *)moby, 0, (char *)point);
         distance = vec_distance_xy(g_hero_state.position, point);
-        state->activated = 0;
-        if (g_hero_state.owner == object && g_hero_state.active &&
-            distance < *(float *)(object + 0x2C) * 0.5f / *(float *)(*(char **)(object + 0x24) + 0x24)) {
+        vars->activated = 0;
+        if (g_hero_state.owner == moby && g_hero_state.active &&
+            distance < *(float *)(moby + 0x2C) * 0.5f / *(float *)(*(char **)(moby + 0x24) + 0x24)) {
             int missing = -1;
             int enabled;
             int *entry;
             int remaining;
-            moby_set_state(object, 2, missing);
+            moby_set_state(moby, 2, missing);
             enabled = 1;
-            entry = state->objects;
+            entry = vars->objects;
             for (remaining = 3; remaining >= 0; entry++, remaining--) {
                 int index = *entry;
                 if (index != missing) {
@@ -70,16 +71,16 @@ void floor_l20_switch_update_us2(unsigned char *object)
                     }
                 }
             }
-            moby_mark_table_entry_flagged(state->event);
-            if (state->callback) hero_exit_vehicle_mode_us2(0);
+            moby_mark_table_entry_flagged(vars->event);
+            if (vars->callback) hero_exit_vehicle_mode_us2(0);
         }
-        *(unsigned int *)(object + 0x78) = color | (0x80 << 24);
-    } else if (object[0x20] == 2) {
-        if (!state->activated) state->activated = 1;
+        *(unsigned int *)(moby + 0x78) = color | (0x80 << 24);
+    } else if (moby[0x20] == 2) {
+        if (!vars->activated) vars->activated = 1;
         {
             unsigned int green = (color << 8) | (0x80 << 24);
             unsigned int blue = color << 16;
-            *(unsigned int *)(object + 0x78) = blue | green;
+            *(unsigned int *)(moby + 0x78) = blue | green;
         }
     }
 }

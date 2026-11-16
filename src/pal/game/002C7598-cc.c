@@ -212,29 +212,31 @@ typedef struct {
 } ParticleKeyframes;
 extern int moby_forward_two_values_and_amount(int, int, float);
 
-void func_PAL_002C7598(char *self)
+/* Keyframed particle: moves with drag, then blends its colour and size between the keyframes
+   by elapsed time. (PAL: 1.2f scaled drag) */
+void part_update_keyframed_pal(char *self)
 {
     char *motion = self + 0x20;
-    ParticleKeyframes *control = *(ParticleKeyframes **)(motion + 0x10);
+    ParticleKeyframes *keyframes = *(ParticleKeyframes **)(motion + 0x10);
     short elapsed;
     float duration, factor;
-    func_00282D30_12(motion, motion, (((control->scale - 1.0f)) * 1.2f) + 1.0f);
+    func_00282D30_12(motion, motion, (((keyframes->scale - 1.0f)) * 1.2f) + 1.0f);
     func_00282CC0_17(self + 0x10, self + 0x10, motion);
     *(unsigned char *)(self + 8) += *(unsigned char *)(motion + 0x18);
-    elapsed = control->lifetime - *(short *)(self + 0xA);
-    if (control->times[*(short *)(motion + 0x14) + 1] < elapsed &&
-        *(short *)(motion + 0x14) < control->last_index)
+    elapsed = keyframes->lifetime - *(short *)(self + 0xA);
+    if (keyframes->times[*(short *)(motion + 0x14) + 1] < elapsed &&
+        *(short *)(motion + 0x14) < keyframes->last_index)
         ++*(short *)(motion + 0x14);
-    duration = func_00283CE0_2(control->times[*(short *)(motion + 0x14) + 1] -
-        control->times[*(short *)(motion + 0x14)]);
+    duration = func_00283CE0_2(keyframes->times[*(short *)(motion + 0x14) + 1] -
+        keyframes->times[*(short *)(motion + 0x14)]);
     factor = (float)(elapsed -
-        control->times[*(short *)(motion + 0x14)]) / duration;
+        keyframes->times[*(short *)(motion + 0x14)]) / duration;
     *(int *)(self + 4) = moby_forward_two_values_and_amount(
-        control->colors[*(short *)(motion + 0x14)],
-        control->colors[*(short *)(motion + 0x14) + 1], factor);
+        keyframes->colors[*(short *)(motion + 0x14)],
+        keyframes->colors[*(short *)(motion + 0x14) + 1], factor);
     *(float *)(self + 0xC) =
-        ((float)control->sizes[*(short *)(motion + 0x14)] +
-         factor * (float)(control->sizes[*(short *)(motion + 0x14) + 1] - control->sizes[*(short *)(motion + 0x14)])) * 1000.0f;
+        ((float)keyframes->sizes[*(short *)(motion + 0x14)] +
+         factor * (float)(keyframes->sizes[*(short *)(motion + 0x14) + 1] - keyframes->sizes[*(short *)(motion + 0x14)])) * 1000.0f;
     if (FastDecTimer((short *)(self + 0xA)))
         part_kill(self);
 }

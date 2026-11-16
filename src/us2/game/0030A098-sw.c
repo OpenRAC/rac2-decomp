@@ -43,26 +43,26 @@ typedef struct {
     char pad31[3];
     u16 u34;
     char pad36[0x32];
-    V_4198 *v;
+    V_4198 *vars;
 } O_4198;
 extern G_4198 g_hero_state;
 extern s32 g_pad_pressed_flags;
-extern s32 func_US2_0026F808(s32), math_fast_float_d(void *);
+extern s32 stub_empty_31_us2(s32), math_fast_float_d(void *);
 extern void moby_mark_spawned(void *), gfx_register_overlay_draw_callback(void *, void *);
 extern void draw_joint_aligned_beam_effect(void), beam_spawn_trail_particles(void *);
 
 /* Adapted from RAC1 update_beam_effect_lifecycle (OpenRAC, GPL-3.0). */
-void beam_effect_update_us2(void *p) {
-    O_4198 *o = (O_4198 *)p;
-    V_4198 *v = o->v;
+void beam_effect_update_us2(void *object) {
+    O_4198 *moby = (O_4198 *)object;
+    V_4198 *vars = moby->vars;
     s32 flag = 0;
-    s32 st;
+    s32 hero_move_state;
 
-    if ((&g_hero_state)->i1338 == 3 || func_US2_0026F808(3) == 8) {
-        if (o->state == 1 || o->state == 3) {
-            st = (&g_hero_state)->i2294;
-            if ((u32)(st - 0xB) < 4
-                || (st == 0x1B && ((u8 *)(&g_hero_state)->p2290)[0x42] == ((u8 *)(&g_hero_state)->p2290)[0x43]
+    if ((&g_hero_state)->i1338 == 3 || stub_empty_31_us2(3) == 8) {
+        if (moby->state == 1 || moby->state == 3) {
+            hero_move_state = (&g_hero_state)->i2294;
+            if ((u32)(hero_move_state - 0xB) < 4
+                || (hero_move_state == 0x1B && ((u8 *)(&g_hero_state)->p2290)[0x42] == ((u8 *)(&g_hero_state)->p2290)[0x43]
                     && (&g_hero_state)->fC38 >= 6.0f && (&g_hero_state)->fC38 <= 16.0f)) {
                 if (!(&g_hero_state)->i49E) flag = 1;
             }
@@ -82,70 +82,70 @@ void beam_effect_update_us2(void *p) {
             if ((&g_hero_state)->i2294 == 0x82) flag = 1;
         }
     }
-    switch (o->state) {
+    switch (moby->state) {
     case 0:
-        o->f18 += 0.5f;
-        o->state = 1;
-        o->u30 = 0xFF;
-        o->u34 |= 1;
+        moby->f18 += 0.5f;
+        moby->state = 1;
+        moby->u30 = 0xFF;
+        moby->u34 |= 1;
         break;
     case 1:
-        if ((func_US2_0026F808(3) != 3 && func_US2_0026F808(3) != 8) || !g_hero_state.i1314) {
-            moby_mark_spawned(o);
+        if ((stub_empty_31_us2(3) != 3 && stub_empty_31_us2(3) != 8) || !g_hero_state.i1314) {
+            moby_mark_spawned(moby);
         } else if (flag != 0) {
-            o->state = 2;
-            v->i0 = 2;
-            v->f30 = 0.0125f / 2;
-            v->f34 = 0.2f / 2;
-            v->f38 = 0.05f / 2;
-            v->f3C = 0.025f / 2;
-            v->f20 = 0.0f;
-            v->f24 = 0.0f;
-            v->f28 = 0.0f;
-            v->f2C = 0.0f;
+            moby->state = 2;
+            vars->i0 = 2;
+            vars->f30 = 0.0125f / 2;
+            vars->f34 = 0.2f / 2;
+            vars->f38 = 0.05f / 2;
+            vars->f3C = 0.025f / 2;
+            vars->f20 = 0.0f;
+            vars->f24 = 0.0f;
+            vars->f28 = 0.0f;
+            vars->f2C = 0.0f;
         }
         break;
     case 2:
-        v->f20 += v->f30;
-        v->f24 += v->f34;
-        v->f28 += v->f38;
-        v->f2C += v->f3C;
-        v->i8 = (&g_hero_state)->i1310;
-        gfx_register_overlay_draw_callback(draw_joint_aligned_beam_effect, o);
-        if (math_fast_float_d(v) != 0) {
-            o->state = 3;
-            v->f20 = 0.0125f;
-            v->f24 = 0.2f;
-            v->f28 = 0.05f;
-            v->iC = 0;
-            v->f2C = 0.025f;
+        vars->f20 += vars->f30;
+        vars->f24 += vars->f34;
+        vars->f28 += vars->f38;
+        vars->f2C += vars->f3C;
+        vars->i8 = (&g_hero_state)->i1310;
+        gfx_register_overlay_draw_callback(draw_joint_aligned_beam_effect, moby);
+        if (math_fast_float_d(vars) != 0) {
+            moby->state = 3;
+            vars->f20 = 0.0125f;
+            vars->f24 = 0.2f;
+            vars->f28 = 0.05f;
+            vars->iC = 0;
+            vars->f2C = 0.025f;
         }
         break;
     case 3:
-        v->i8 = (&g_hero_state)->i1310;
-        gfx_register_overlay_draw_callback(draw_joint_aligned_beam_effect, o);
+        vars->i8 = (&g_hero_state)->i1310;
+        gfx_register_overlay_draw_callback(draw_joint_aligned_beam_effect, moby);
         if (flag == 0) {
-            o->state = 4;
-            v->i0 = 8;
-            v->f30 = 0.0125f / 8;
-            v->f34 = 0.2f / 8;
-            v->f38 = 0.05f / 8;
-            v->f3C = 0.025f / 8;
+            moby->state = 4;
+            vars->i0 = 8;
+            vars->f30 = 0.0125f / 8;
+            vars->f34 = 0.2f / 8;
+            vars->f38 = 0.05f / 8;
+            vars->f3C = 0.025f / 8;
         } else {
-            v->f20 = 0.0125f;
-            beam_spawn_trail_particles(o);
+            vars->f20 = 0.0125f;
+            beam_spawn_trail_particles(moby);
         }
         break;
     case 4:
-        if (math_fast_float_d(v) != 0) {
-            o->state = 1;
+        if (math_fast_float_d(vars) != 0) {
+            moby->state = 1;
         } else {
-            v->f20 -= v->f30;
-            v->f24 -= v->f34;
-            v->f28 -= v->f38;
-            v->f2C -= v->f3C;
-            v->i8 = (&g_hero_state)->i1310;
-            gfx_register_overlay_draw_callback(draw_joint_aligned_beam_effect, o);
+            vars->f20 -= vars->f30;
+            vars->f24 -= vars->f34;
+            vars->f28 -= vars->f38;
+            vars->f2C -= vars->f3C;
+            vars->i8 = (&g_hero_state)->i1310;
+            gfx_register_overlay_draw_callback(draw_joint_aligned_beam_effect, moby);
         }
         break;
     }

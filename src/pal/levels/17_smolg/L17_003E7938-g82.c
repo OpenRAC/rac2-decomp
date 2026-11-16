@@ -12,9 +12,9 @@ extern s32 g_hit_burst_piece_table_b __attribute__((sda));
 extern s32 g_hit_burst_piece_table_a __attribute__((sda));
 extern char *g_moby_l17_pool __attribute__((sda));
 typedef int Quad __attribute__((mode(TI)));
-#define I(p,o) (*(int *)((u8 *)(p)+(o)))
-#define H(p,o) (*(short *)((u8 *)(p)+(o)))
-#define F(p,o) (*(float *)((u8 *)(p)+(o)))
+#define I(vars,o) (*(int *)((u8 *)(vars)+(o)))
+#define H(vars,o) (*(short *)((u8 *)(vars)+(o)))
+#define F(vars,o) (*(float *)((u8 *)(vars)+(o)))
 typedef struct {
     s32 i00;
     f32 f04;
@@ -107,10 +107,10 @@ extern float coll_probe_ground_height_below(void *, int, float);
 extern void MoveCtl_Init(void *);
 extern int math_random_int_range(int, int);
 extern void hero_copy_field_to_moby(void *);
-extern void func_PAL_002A7E68(void *, int, int, int);
+extern void anim_start_blended_pal(void *, int, int, int);
 extern float fast_vec_dist(void *, void *);
 extern void moby_update_ground_check(void *);
-extern int func_PAL_002B1A50(void *, void *, int);
+extern int moby_apply_damage_to_object_pal(void *, void *, int);
 extern void moby_l17_set_group_alert_flag(void *);
 extern int weapon_select_aim_target(void *, int, int, int, float, float);
 extern void STUB_printf(void *, ...);
@@ -127,9 +127,9 @@ extern s32 PlayMobySound(s32, s32, void *);
 
 /* Sets the state record up on the first update (the tuning block in field order), then
    handles damage and keeps a target, falling back to D_0018C0B0 when the record has none. */
-void func_PAL_L17_003E89B0(u8 *obj)
+void grulch_init_state_check_hits_pal(u8 *obj)
 {
-    L17Vars *p = *(L17Vars **)(obj + 0x68);
+    L17Vars *vars = *(L17Vars **)(obj + 0x68);
     u8 *hit;
     u8 *target;
     int result;
@@ -142,60 +142,60 @@ void func_PAL_L17_003E89B0(u8 *obj)
         F(obj, 0x18) = ground;
         F(obj, 0x2C) = radius;
         qzero_nc(obj + 0xF0);
-        if (p->i428 != -1) {
-            F(obj, 0x18) = F((u8 *)g_moby_l17_pool + p->i428 * 256, 0x18) + 1.4f;
+        if (vars->i428 != -1) {
+            F(obj, 0x18) = F((u8 *)g_moby_l17_pool + vars->i428 * 256, 0x18) + 1.4f;
             H(obj, 0x34) |= 0x41;
             I(obj, 0x98) = 0;
         }
-        p->i420 = 0;
-        p->i424 = 0;
-        p->b48 = FloatToInt(15.0f);
-        p->b4A = FloatToInt(4.0f);
-        p->b29 = 1;
-        p->b70 = 7;
-        p->iA8 = 3;
-        p->b71 = 9;
-        p->b76 = 12;
-        p->b77 = 15;
-        p->f7C = 0.50000006f;
-        p->f80 = 0.060000002f;
-        p->f84 = 0.0044f;
-        p->f88 = 0.008f;
-        p->f8C = 0.00080000004f;
-        p->f90 = 0.35f;
-        p->f94 = 0.35f;
-        p->f9C = 0.4f;
-        p->bCC = 6;
-        p->bCD = 11;
-        p->bCE = 6;
-        p->bCF = 11;
-        p->bD2 = 6;
-        p->bD3 = 11;
-        MoveCtl_Init(&p->t140);
-        p->t140.f0C = 2.5f;
-        p->t140.f08 = 2.0f;
-        p->t140.i00 = FloatToInt(g_grulch_frame_scalar * 1024.0f);
-        p->t140.f04 = g_grulch_frame_scalar;
-        p->t140.f24 = p->f40C * (0.020000001f);
-        if (p->v3D0.f[3] != 12439.4f) {
-            p->v3D0.q = *(Quad *)(obj + 0x10);
-            p->v3D0.f[3] = 12439.4f;
+        vars->i420 = 0;
+        vars->i424 = 0;
+        vars->b48 = FloatToInt(15.0f);
+        vars->b4A = FloatToInt(4.0f);
+        vars->b29 = 1;
+        vars->b70 = 7;
+        vars->iA8 = 3;
+        vars->b71 = 9;
+        vars->b76 = 12;
+        vars->b77 = 15;
+        vars->f7C = 0.50000006f;
+        vars->f80 = 0.060000002f;
+        vars->f84 = 0.0044f;
+        vars->f88 = 0.008f;
+        vars->f8C = 0.00080000004f;
+        vars->f90 = 0.35f;
+        vars->f94 = 0.35f;
+        vars->f9C = 0.4f;
+        vars->bCC = 6;
+        vars->bCD = 11;
+        vars->bCE = 6;
+        vars->bCF = 11;
+        vars->bD2 = 6;
+        vars->bD3 = 11;
+        MoveCtl_Init(&vars->t140);
+        vars->t140.f0C = 2.5f;
+        vars->t140.f08 = 2.0f;
+        vars->t140.i00 = FloatToInt(g_grulch_frame_scalar * 1024.0f);
+        vars->t140.f04 = g_grulch_frame_scalar;
+        vars->t140.f24 = vars->f40C * (0.020000001f);
+        if (vars->v3D0.f[3] != 12439.4f) {
+            vars->v3D0.q = *(Quad *)(obj + 0x10);
+            vars->v3D0.f[3] = 12439.4f;
         }
-        qcopy_nc(&p->v110, &p->v3D0);
-        p->f120 = 0.5f;
-        p->h400 = math_random_int_range(100, 583);
-        p->i41C = 0;
+        qcopy_nc(&vars->v110, &vars->v3D0);
+        vars->f120 = 0.5f;
+        vars->h400 = math_random_int_range(100, 583);
+        vars->i41C = 0;
         hero_copy_field_to_moby(obj);
-        p->f340 = F(obj, 0x2C);
-        p->f330 = p->f30;
-        p->b28 = 0;
-        p->i418 = 0;
-        p->p310 = g_grulch_init_bytes;
-        p->f430 = (float)p->b34;
+        vars->f340 = F(obj, 0x2C);
+        vars->f330 = vars->f30;
+        vars->b28 = 0;
+        vars->i418 = 0;
+        vars->p310 = g_grulch_init_bytes;
+        vars->f430 = (float)vars->b34;
         moby_set_state(obj, 1, 0);
         if (obj[0x43])
-            func_PAL_002A7E68(obj, 0, 0, 0);
-        p->i450 = p->i428;
+            anim_start_blended_pal(obj, 0, 0, 0);
+        vars->i450 = vars->i428;
     }
     if (obj[0x31] && fast_vec_dist(obj + 0x10, g_tether_origin_pos) < 24.0f) {
         moby_update_ground_check(obj);
@@ -206,19 +206,19 @@ void func_PAL_L17_003E89B0(u8 *obj)
         obj[0x20] = 9;
         obj[0xBC] = 4;
     }
-    result = func_PAL_002B1A50(obj, p->ai, 0);
+    result = moby_apply_damage_to_object_pal(obj, vars->ai, 0);
     if (result) {
         if (result == 5) {
-            p->iF0 = 0;
-            p->fF4 = 1.0053098f;
+            vars->iF0 = 0;
+            vars->fF4 = 1.0053098f;
         }
         moby_l17_set_group_alert_flag(obj);
     }
-    p->h404 = weapon_select_aim_target(obj, -1, 0, 0, 15.0f, 3.0f);
-    target = p->target;
+    vars->h404 = weapon_select_aim_target(obj, -1, 0, 0, 15.0f, 3.0f);
+    target = vars->target;
     if (!target) {
         STUB_printf(g_str_returned_null);
         target = g_hero_moby;
     }
-    p->p408 = target;
+    vars->p408 = target;
 }

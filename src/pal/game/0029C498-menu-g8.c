@@ -9,17 +9,18 @@ extern char *g_resident_data_base MACRO_ADDR;
 extern char *D_001A8CFC_gp SDATA(D_001A8CFC);
 typedef struct { char pad[0x1C0]; int flags; int pad2[2]; int state; } MenuInput;
 extern MenuInput g_pad_state;
-extern void func_PAL_0029C3C0(void), RefreshMissionMenuItems_pal(void);
+extern void menu_update_mission_select_enable_pal(void), RefreshMissionMenuItems_pal(void);
 extern void circle_menu_position_label_pal(void *), circle_menu_set_enabled_pal(void *, int), circle_menu_set_selection_pal(void *, int);
 extern int UpdateDirectionSelection_pal(void *, void *), table_find_last_used_entry(int);
 extern void menu_clear_field_150(void *);
 
-int func_PAL_0029C498(void) {
+/* Updates the mission select menu each frame and returns the chosen mission when the button is released, else -1. */
+int UpdateMissionSelectionMenu_pal(void) {
  int result, changed;
  if (g_mission_menu_depth == 0) return -1;
  if (g_notice_owner != 0) return -1;
  if (D_001A8CFC_gp != 0) {
-  func_PAL_0029C3C0();
+  menu_update_mission_select_enable_pal();
   {
    int enabled = 0;
    switch (g_mission_select_enabled) {

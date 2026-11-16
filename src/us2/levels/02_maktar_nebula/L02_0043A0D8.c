@@ -12,67 +12,68 @@ extern float vec_distance_xy(void *, void *);
 extern void matrix_mul_vec3(void *, void *, void *);
 extern void DrawQuadWithRotatedUVs(void *, int, int, int, int);
 
-void path_draw_nearest_record_quad_us2(u8 *a0) {
-    u8 *st = *(u8 **)(a0 + 0x68);
-    float pt[4] __attribute__((aligned(16)));
-    float tmp[4] __attribute__((aligned(16)));
-    float m[16] __attribute__((aligned(16)));
-    unsigned short *q;
-    u8 *e;
-    u8 *rec;
-    float best;
-    float d;
-    int idx;
-    int bestid;
-    int i;
-    int k;
+/* Draws a textured quad over the closest path record for two spots in set time ranges of the level (USA v1.01: path_draw_nearest_record_quad). */
+void path_draw_nearest_record_quad_us2(u8 *moby) {
+    u8 *vars = *(u8 **)(moby + 0x68);
+    float target[4] __attribute__((aligned(16)));
+    float point[4] __attribute__((aligned(16)));
+    float matrix[16] __attribute__((aligned(16)));
+    unsigned short *list_entry;
+    u8 *entry;
+    u8 *record;
+    float best_dist;
+    float dist;
+    int quad_index;
+    int best_id;
+    int pass;
+    int corner;
 
-    for (i = 0; i < 2; i++) {
-        idx = -1;
-        if (i == 0) {
+    for (pass = 0; pass < 2; pass++) {
+        quad_index = -1;
+        if (pass == 0) {
             if (g_mob_list.timer >= 0x3B6) {
                 if (g_mob_list.timer < 0x547) {
-                    *(TI128 *)tmp = 0;
-                    tmp[0] = 495.0f;
-                    tmp[1] = 587.0f;
-                    tmp[2] = 513.0f;
-                    qcopy(pt, tmp);
-                    idx = 0x3F;
+                    *(TI128 *)point = 0;
+                    point[0] = 495.0f;
+                    point[1] = 587.0f;
+                    point[2] = 513.0f;
+                    qcopy(target, point);
+                    quad_index = 0x3F;
                 }
             }
         }
-        if (i == 1) {
+        if (pass == 1) {
             if (g_mob_list.timer >= 0x4B0) {
                 if (g_mob_list.timer < 0x5DD) {
-                    *(TI128 *)tmp = 0;
-                    tmp[0] = 515.0f;
-                    tmp[1] = 596.0f;
-                    tmp[2] = 512.0f;
-                    qcopy(pt, tmp);
-                    idx = 0x40;
+                    *(TI128 *)point = 0;
+                    point[0] = 515.0f;
+                    point[1] = 596.0f;
+                    point[2] = 512.0f;
+                    qcopy(target, point);
+                    quad_index = 0x40;
                 }
             }
         }
-        if (idx != -1) {
-            bestid = -1;
-            best = 99999.0f;
-            for (q = g_record_lists[*(int *)st];
-                 q != 0 && ((short)q[-1] >= 0 || q == g_record_lists[*(int *)st]) &&
-                 (e = g_record_table + ((*q & 0x7FFF) << 6)) != 0;
-                 q++) {
-                d = vec_distance_xy(e + 0x30, pt);
-                if (d < best) {
-                    best = d;
-                    bestid = *q & 0x7FFF;
+        if (quad_index != -1) {
+            best_id = -1;
+            best_dist = 99999.0f;
+            for (list_entry = g_record_lists[*(int *)vars];
+                 list_entry != 0 && ((short)list_entry[-1] >= 0 || list_entry == g_record_lists[*(int *)vars]) &&
+                 (entry = g_record_table + ((*list_entry & 0x7FFF) << 6)) != 0;
+                 list_entry++) {
+                dist = vec_distance_xy(entry + 0x30, target);
+                if (dist < best_dist) {
+                    best_dist = dist;
+                    best_id = *list_entry & 0x7FFF;
                 }
             }
-            if (bestid != -1) {
-                rec = g_record_table + (bestid << 6);
-                for (k = 0; k < 4; k++) {
-                    matrix_mul_vec3(m + k * 4, g_path_quad_vectors + k * 4, rec);
-                    FastVecAdd(m + k * 4, m + k * 4, rec + 0x30);
+            if (best_id != -1) {
+                record = g_record_table + (best_id << 6);
+                for (corner = 0; corner < 4; corner++) {
+                    matrix_mul_vec3(matrix + corner * 4, g_path_quad_vectors + corner * 4, record);
+                    FastVecAdd(matrix + corner * 4, matrix + corner * 4, record + 0x30);
                 }
-                DrawQuadWithRotatedUVs(m, idx, 2, 0xFF808080, 0);
+                DrawQuadWithRotatedUVs(matrix, quad_index, 2, 0xFF808080, 0);
             }
         }
     }

@@ -76,13 +76,14 @@ extern int text_draw_centered_medium(int, int, u64, char *, int);
 extern char *GetLocalizedString(int);
 extern int sprintf(char *, char *, ...);
 
-int func_PAL_002DE710(char *menu)
+/* Draws the four save slot rows: play time, extra count, score and date, or a message for an empty slot. */
+int save_slot_list_draw_pal(char *menu)
 {
     char text[80];
     SaveRow *record;
     SaveData *context;
     int y, hours, minutes, score, extra, color, i;
-    int digits, value, comma, dx, dy, iconWidth, scoreX;
+    int digits, value, comma, dx, dy, icon_width, score_x;
 
     if (g_save_menu_screen == 10)
         return 2;
@@ -117,7 +118,7 @@ int func_PAL_002DE710(char *menu)
             text_draw_medium(g_save_slot_text_x + (long)(g_save_slot_icon_height + 6), y + g_save_slot_text_y_offset, color, text, -1);
 
             if (record->extra) {
-                int iconRight, extraX;
+                int icon_right, extra_x;
 
                 hud_draw_sprite(GetIconFrame(0xE99D, 4), g_save_slot_text_x + g_save_slot_extra_icon_offset, y + g_save_slot_text_y_offset, g_save_slot_icon_width,
                               g_save_slot_icon_height, 128);
@@ -125,9 +126,9 @@ int func_PAL_002DE710(char *menu)
                 if (extra > 99)
                     extra = 99;
                 sprintf(text, g_str_save_slot_score_fmt, extra);
-                iconRight = g_save_slot_icon_height + 2;
-                extraX = g_save_slot_text_x + iconRight;
-                text_draw_medium((long)extraX + g_save_slot_extra_icon_offset, y + g_save_slot_text_y_offset, color, text, -1);
+                icon_right = g_save_slot_icon_height + 2;
+                extra_x = g_save_slot_text_x + icon_right;
+                text_draw_medium((long)extra_x + g_save_slot_extra_icon_offset, y + g_save_slot_text_y_offset, color, text, -1);
             }
 
             score = record->score;
@@ -136,9 +137,9 @@ int func_PAL_002DE710(char *menu)
             y += g_save_slot_line_height;
             sprintf(text, g_str_save_slot_score_fmt, score);
             hud_draw_sprite(GetIconFrame(0x7567, 0), g_save_slot_text_x + 4, y + g_save_slot_text_y_offset, g_save_slot_icon_width, g_save_slot_icon_height, 128);
-            iconWidth = g_save_slot_icon_height + 6;
-            scoreX = g_save_slot_text_x + iconWidth;
-            text_draw_right_aligned_medium((long)scoreX + g_score_x_offset, y + g_save_slot_text_y_offset, color, text, -1);
+            icon_width = g_save_slot_icon_height + 6;
+            score_x = g_save_slot_text_x + icon_width;
+            text_draw_right_aligned_medium((long)score_x + g_score_x_offset, y + g_save_slot_text_y_offset, color, text, -1);
             digits = 1;
             for (value = score; value >= 10; value /= 10)
                 digits++;

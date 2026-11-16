@@ -39,23 +39,24 @@ extern float math_step_value_toward_target(f32 *, f32 *, f32, f32, f32, f32);
 extern s32 func_2AF870(u8 *);
 extern u8 g_str_rising_platform_sound[];
 
-void func_PAL_L13_00431420(u8 *a0) {
-    u8 *ptr = *(u8 **)(a0 + 0x68);
-    if (a0[0x20] == 0) {
-        *(u16 *)(a0 + 0x34) |= 0x800;
-        *(f32 *)(ptr + 0x8) = *(f32 *)(a0 + 0x18);
-        *(f32 *)(ptr + 0x4) = *(f32 *)(a0 + 0x18) - 6.0f;
-        a0[0x20] = 1;
+/* Platform that sinks 6 units once its trigger moby reaches state 2, with a sound. */
+void rising_l13_platform_update_pal(u8 *moby) {
+    u8 *vars = *(u8 **)(moby + 0x68);
+    if (moby[0x20] == 0) {
+        *(u16 *)(moby + 0x34) |= 0x800;
+        *(f32 *)(vars + 0x8) = *(f32 *)(moby + 0x18);
+        *(f32 *)(vars + 0x4) = *(f32 *)(moby + 0x18) - 6.0f;
+        moby[0x20] = 1;
     }
-    if (a0[0x20] == 1) {
-        u8 v = *((u8 *)g_object_table_base[0] + (*(u32 *)ptr << 8) + 0x20);
-        if (v == 2) {
-            PlayMobySound(0, 0, a0);
-            a0[0x20] = v;
+    if (moby[0x20] == 1) {
+        u8 state_value = *((u8 *)g_object_table_base[0] + (*(u32 *)vars << 8) + 0x20);
+        if (state_value == 2) {
+            PlayMobySound(0, 0, moby);
+            moby[0x20] = state_value;
         }
     }
-    if (a0[0x20] == 2) {
-        math_step_value_toward_target((f32 *)(a0 + 0x18), (f32 *)(ptr + 0xC), *(f32 *)(ptr + 0x4),
+    if (moby[0x20] == 2) {
+        math_step_value_toward_target((f32 *)(moby + 0x18), (f32 *)(vars + 0xC), *(f32 *)(vars + 0x4),
                       0.0024f, 0.0024f, 0.24000001f);
     }
 }
@@ -64,23 +65,24 @@ void func_PAL_L13_00431420(u8 *a0) {
 extern void STUB_printf(u8 *);
 extern void STUB_printf(u8 *);
 
-void func_PAL_L13_00431518(u8 *a0) {
-    u8 *ptr = *(u8 **)(a0 + 0x68);
-    if (a0[0x20] == 0) {
-        *(u16 *)(a0 + 0x34) |= 0x800;
-        *(f32 *)(ptr + 0x8) = *(f32 *)(a0 + 0x18);
-        *(f32 *)(ptr + 0x4) = *(f32 *)(a0 + 0x18) - 6.0f;
-        a0[0x20] = 1;
+/* Platform that sinks 6 units once its trigger moby reaches state 2 (silent variant that only prints). */
+void rising_platform_sound_update_pal(u8 *moby) {
+    u8 *vars = *(u8 **)(moby + 0x68);
+    if (moby[0x20] == 0) {
+        *(u16 *)(moby + 0x34) |= 0x800;
+        *(f32 *)(vars + 0x8) = *(f32 *)(moby + 0x18);
+        *(f32 *)(vars + 0x4) = *(f32 *)(moby + 0x18) - 6.0f;
+        moby[0x20] = 1;
     }
-    if (a0[0x20] == 1) {
-        u8 v = *((u8 *)g_object_table_base[0] + (*(u32 *)ptr << 8) + 0x20);
-        if (v == 2) {
-            a0[0x20] = v;
+    if (moby[0x20] == 1) {
+        u8 state_value = *((u8 *)g_object_table_base[0] + (*(u32 *)vars << 8) + 0x20);
+        if (state_value == 2) {
+            moby[0x20] = state_value;
             STUB_printf(g_str_rising_platform_sound);
         }
     }
-    if (a0[0x20] == 2) {
-        math_step_value_toward_target((f32 *)(a0 + 0x18), (f32 *)(ptr + 0xC), *(f32 *)(ptr + 0x4),
+    if (moby[0x20] == 2) {
+        math_step_value_toward_target((f32 *)(moby + 0x18), (f32 *)(vars + 0xC), *(f32 *)(vars + 0x4),
                     0.0024f, 0.0024f, 0.24000001f);
     }
 }

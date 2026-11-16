@@ -93,6 +93,7 @@ extern void object_copy_vector_to_selected(void *);
 extern void cam_set_state_rotation(void *);
 extern void cam_update_state_us2(void);
 
+/* Opens the vendor screen: clears its state, builds the item list and moves the camera to the vendor (USA v2.00). */
 void OpenVendorMenu_us2(char *moby)
 {
     int mode, v, visible, count;

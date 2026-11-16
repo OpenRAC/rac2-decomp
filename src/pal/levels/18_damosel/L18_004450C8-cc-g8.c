@@ -11,7 +11,7 @@ extern float FastAddRotations(float, float), math_random_float_range(float, floa
 extern int math_random_int_below(int);
 extern void moby_set_state(void *, int, int);
 extern void vec_build_spherical_offset(void *, float, float, float), moby_mark_spawned(void *), value_set_entry_by_index_pal(int, int);
-extern int func_PAL_00289730(int, int);
+extern int subtitle_request_voice_line_pal(int, int);
 extern void *part_spawn_ground_effect(void *, int, int, int, int, void *, float, float, float, int);
 
 /* State 0: unless already collected, spin and emit two particle pairs per frame;
@@ -22,7 +22,7 @@ void ship_part_pickup_update_pal(u8 *obj) {
     float velocity[4] __attribute__((aligned(16)));
     float point[4] __attribute__((aligned(16)));
     u8 *state = *(u8 **)(obj + 0x68);
-    int i, sign, n;
+    int i, sign, parts_left;
     float size, angle, pitch;
     if (obj[0x20] == 0) {
         if (g_game_flag_table[0x86] || g_item_owned_flags[0x37]) {
@@ -62,10 +62,10 @@ void ship_part_pickup_update_pal(u8 *obj) {
         *(u16 *)(obj + 0x96) = timer;
         if (old > 33) {
             value_set_entry_by_index_pal(0x1293, 100);
-            n = g_game_flag_table[0x86] ? 1 : 2;
-            if (g_game_flag_table[0x89]) n--;
-            if (n > 0) func_PAL_00289730(0xa0f, 0x66);
-            else func_PAL_00289730(0xa10, 0x67);
+            parts_left = g_game_flag_table[0x86] ? 1 : 2;
+            if (g_game_flag_table[0x89]) parts_left--;
+            if (parts_left > 0) subtitle_request_voice_line_pal(0xa0f, 0x66);
+            else subtitle_request_voice_line_pal(0xa10, 0x67);
             moby_mark_spawned(obj);
         }
     }

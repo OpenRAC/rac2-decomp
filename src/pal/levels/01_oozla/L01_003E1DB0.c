@@ -16,24 +16,25 @@ extern void value_set_and_smooth(void *, void *, s32, s32, f32);
 extern u8 *g_camera_path_configs __attribute__((sda));
 extern s32 cam_is_hero_in_trigger(void *);
 
-void muckdweller_tick_timers_pal(u8 *a0)
+/* Ticks the Muckdweller's colour fade, age counter and countdown timers (PAL copy). */
+void muckdweller_tick_timers_pal(u8 *moby)
 {
-    u32 v;
-    u8 *p = *(u8 **)(a0 + 0x68);
+    u32 value;
+    u8 *p = *(u8 **)(moby + 0x68);
 
-    gfx_update_color_fade(a0, p + 0x100);
-    v = *(u16 *)(a0 + 0x96);
-    if (v <= 0xFFFE) {
-        *(u16 *)(a0 + 0x96) = v + 1;
+    gfx_update_color_fade(moby, p + 0x100);
+    value = *(u16 *)(moby + 0x96);
+    if (value <= 0xFFFE) {
+        *(u16 *)(moby + 0x96) = value + 1;
     }
     FastDecTimer(p + 0x3D8);
     math_fast_float_d(p + 0x404);
     FastDecTimer(p + 0x3D6);
-    v = *(s16 *)(p + 0x3DA);
-    if (v != 0) {
+    value = *(s16 *)(p + 0x3DA);
+    if (value != 0) {
         *(u16 *)(p + 0x3D6) = 0x12C;
         *(s16 *)(p + 0x3DA) = 0;
     }
-    value_set_and_smooth(a0, p + 0x300, 1, 1, 1.8f);
+    value_set_and_smooth(moby, p + 0x300, 1, 1, 1.8f);
 }
 

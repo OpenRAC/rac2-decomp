@@ -50,39 +50,39 @@ static __inline__ int label_y(void *handle, float value, float scale, float half
     return result;
 }
 
-void func_US2_L02_003C58E0(char *obj) {
+void menu_draw_challenge_us2(char *menu_moby) {
     char *text;
     int state;
-    char *id;
-    int y, on, entry;
-    float one, zero, half, k, s;
+    char *sprite;
+    int sprite_y, active_mode, table_offset;
+    float one, zero, half, base_y, scaled_y;
 
-    entry = 0x8710;
-    k = 203.0f;
+    table_offset = 0x8710;
+    base_y = 203.0f;
     half = 0.5f;
-    on = 1;
-    id = table_find_by_id(g_arena_menu_base + entry, 0x70);
-    y = menu_coord(g_hud_label_scale, k, half, on);
+    active_mode = 1;
+    sprite = table_find_by_id(g_arena_menu_base + table_offset, 0x70);
+    sprite_y = menu_coord(g_hud_label_scale, base_y, half, active_mode);
     one = 1.0f;
     zero = 0.0f;
-    s = (float)y;
-    gfx_draw_scaled_object_two_axes(id, 0x60442D00, 258.0f, s, one, one, zero);
-    gfx_draw_scaled_object_two_axes(table_find_by_id(g_arena_menu_base + entry, 0x6F), 0x60442D00, 258.0f,
-                  (float)menu_coord(g_hud_label_scale, k, half, on), one, one, zero);
-    gfx_draw_scaled_object_two_axes(table_find_by_id(g_arena_menu_base + entry, 0x71), 0x55F0C070, 258.0f,
-                  (float)menu_coord(g_hud_label_scale, k, half, on), one, one, zero);
-    id = table_find_by_id(g_arena_menu_base + entry, 0x72);
-    y = menu_coord(g_hud_label_scale, k, half, on);
-    s = one;
-    gfx_draw_scaled_object_two_axes(id, 0x55F0C070, 258.0f, (float)y, s, s, zero);
+    scaled_y = (float)sprite_y;
+    gfx_draw_scaled_object_two_axes(sprite, 0x60442D00, 258.0f, scaled_y, one, one, zero);
+    gfx_draw_scaled_object_two_axes(table_find_by_id(g_arena_menu_base + table_offset, 0x6F), 0x60442D00, 258.0f,
+                  (float)menu_coord(g_hud_label_scale, base_y, half, active_mode), one, one, zero);
+    gfx_draw_scaled_object_two_axes(table_find_by_id(g_arena_menu_base + table_offset, 0x71), 0x55F0C070, 258.0f,
+                  (float)menu_coord(g_hud_label_scale, base_y, half, active_mode), one, one, zero);
+    sprite = table_find_by_id(g_arena_menu_base + table_offset, 0x72);
+    sprite_y = menu_coord(g_hud_label_scale, base_y, half, active_mode);
+    scaled_y = one;
+    gfx_draw_scaled_object_two_axes(sprite, 0x55F0C070, 258.0f, (float)sprite_y, scaled_y, scaled_y, zero);
     VU1_addGSregister(0x47, 0x5360BUL);
-    state = *(unsigned char *)(obj + 0x20);
+    state = *(unsigned char *)(menu_moby + 0x20);
     if (state == 7) {
         text = GetLocalizedString(0x2DF2);
-        text_draw_centered_large(254, header_y(23.0f, g_hud_label_scale, half, on), 0x88FFFFFF, text, -1);
+        text_draw_centered_large(254, header_y(23.0f, g_hud_label_scale, half, active_mode), 0x88FFFFFF, text, -1);
     } else if (state != 8 && state != 5) {
         text = GetLocalizedString(0x2DF1);
-        text_draw_centered_large(262, header_y(23.0f, g_hud_label_scale, half, on), 0x88FFFFFF, text, -1);
+        text_draw_centered_large(262, header_y(23.0f, g_hud_label_scale, half, active_mode), 0x88FFFFFF, text, -1);
     }
     text = GetLocalizedString(0x2DF0);
     text_draw_centered_large(254, label_y(text, 373.0f, g_hud_label_scale, 0.5f, 1), 0x88FFFFFF, text, -1);

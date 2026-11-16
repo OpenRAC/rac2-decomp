@@ -74,59 +74,59 @@ extern Link403730 *moby_get_private_value_0(void *);
 extern void mat_get_euler_angles(float *, float *);
 extern void sheep_add_to_active_list(void *);
 
-/* func_US2_L00_00404C18, the USA v2.00 copy of func_L00_00403730: the same C, where the flags test reads self and a link already in mode 2 also takes the mode-2 arm. */
-/* Spawns moby 0xE7D at self's position: random scale, orientation copied from self's matrix or randomised, then starts it in state 4. */
-Moby403730 *func_US2_L00_00404C18(Moby403730 *self) {
+/* func_US2_L00_00404C18, the USA v2.00 copy of func_L00_00403730: the same C, where the flags test reads source and a link already in mode 2 also takes the mode-2 arm. */
+/* Spawns moby 0xE7D at source's position: random scale, orientation copied from source's matrix or randomised, then starts it in state 4. */
+Moby403730 *sheep_spawn_from_object_us2(Moby403730 *source) {
     f32 mtx[16] __attribute__((aligned(16)));
-    Moby403730 *m;
+    Moby403730 *sheep;
     Vars403730 *vars;
     Link403730 *link;
-    Weapon403730 *w;
+    Weapon403730 *weapon;
     f32 rate;
 
-    m = CreateMoby(0xE7D);
-    if (m != 0) {
-        m->alpha = 0x7F;
-        m->f32 = 0x7F;
-        m->f31 = 1;
-        vars = m->vars;
-        m->scale = math_random_float_range(0.85f, 1.15f);
-        qcopy(m->pos, self->pos);
+    sheep = CreateMoby(MOBY_CLASS_SHEEP);
+    if (sheep != 0) {
+        sheep->alpha = 0x7F;
+        sheep->f32 = 0x7F;
+        sheep->f31 = 1;
+        vars = sheep->vars;
+        sheep->scale = math_random_float_range(0.85f, 1.15f);
+        qcopy(sheep->pos, source->pos);
         if (g_enemy_ai_frozen[0] != 0 || g_hero_height_zone_active[0] != 0) {
-            copy_matrix_rotation(mtx, self->mtx);
-            mat_get_euler_angles(mtx, m->rot);
+            copy_matrix_rotation(mtx, source->mtx);
+            mat_get_euler_angles(mtx, sheep->rot);
         } else {
-            vec_clear_128(m->rot);
-            m->rot[2] = math_random_angle();
+            vec_clear_128(sheep->rot);
+            sheep->rot[2] = math_random_angle();
         }
-        m->state = 0;
+        sheep->state = 0;
         vars->f56 = 0;
         vars->delay = math_random_int_range(0x78, 0x12C);
         vars->f70 = 600;
         vars->f74 = 30;
         vars->f5C = 0;
         vars->f78 = 0;
-        m->state = 4;
-        sheep_add_to_active_list(m);
-        m->f98 = m->cls->f10;
-        w = &g_weapon_l00_table[g_sheepinator_weapon_index[0]];
+        sheep->state = 4;
+        sheep_add_to_active_list(sheep);
+        sheep->f98 = sheep->cls->f10;
+        weapon = &g_weapon_l00_table[g_sheepinator_weapon_index[0]];
         rate = 1.0f;
-        if (w->f4 != 0) {
+        if (weapon->f4 != 0) {
             rate = 4.0f;
         }
         vars->rate = rate;
         vars->f60 = -1;
-        link = moby_get_private_value_0(self);
+        link = moby_get_private_value_0(source);
         link->f17 = 0x10;
-        if (self->flags & 0x1000) {
-            SetDeathBits(self, 0, 3);
+        if (source->flags & 0x1000) {
+            SetDeathBits(source, 0, 3);
         }
         if ((link != 0 && link->mode == 1) || link->mode == 2) {
             link->mode = 2;
         } else {
-            moby_mark_spawned(self);
+            moby_mark_spawned(source);
         }
-        func_002A0F48(m);
+        func_002A0F48(sheep);
     }
-    return m;
+    return sheep;
 }

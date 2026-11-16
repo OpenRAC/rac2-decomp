@@ -38,25 +38,26 @@ extern char g_sound_state[];
 extern char g_hero_position[];
 extern void snd_stop_voice(int);
 
+/* Runs the Extermibot's electric beam: it charges, shoots out to the target, sticks to what it hits, and then pulls back. It also throws sparks where the beam lands. (PAL: 50 Hz timings) */
 void extermibot_beam_update_pal(u8 *obj) {
- float a[4] __attribute__((aligned(16))),b[4] __attribute__((aligned(16))),v[4] __attribute__((aligned(16)));
+ float beam_start[4] __attribute__((aligned(16))),beam_end[4] __attribute__((aligned(16))),dir[4] __attribute__((aligned(16)));
  struct { float direction[4] __attribute__((aligned(16))); int owner,mode; u8 type,flags;u16 id; float distance;int enabled; } hit;
- u8 *s=P(obj,0x68),*other;float t;
- moby_transform_joint_to_world(P(s,0x7c8),0,a);moby_transform_joint_to_world(P(s,0x7c8),1,b);F(s,0x7e0)=0;
- switch(H(s,0x806)) {
+ u8 *vars=P(obj,0x68),*other;float frac;
+ moby_transform_joint_to_world(P(vars,0x7c8),0,beam_start);moby_transform_joint_to_world(P(vars,0x7c8),1,beam_end);F(vars,0x7e0)=0;
+ switch(H(vars,0x806)) {
  case 0:
-  qcopy(s+0x610,a);qcopy(s+0x620,b);qcopy(s+0x6b0,b);qcopy(s+0x6c0,a);
-  if(I(s,0x7f0)!=-1) {
-   u8 *entry=g_sound_state+I(s,0x7f0)*0x70;
-   if(P(entry,0x88)==obj && entry[0x74])snd_stop_voice(I(s,0x7f0));
+  qcopy(vars+0x610,beam_start);qcopy(vars+0x620,beam_end);qcopy(vars+0x6b0,beam_end);qcopy(vars+0x6c0,beam_start);
+  if(I(vars,0x7f0)!=-1) {
+   u8 *entry=g_sound_state+I(vars,0x7f0)*0x70;
+   if(P(entry,0x88)==obj && entry[0x74])snd_stop_voice(I(vars,0x7f0));
   }
-  I(s,0x7f0)=-1;break;
+  I(vars,0x7f0)=-1;break;
  case 1:
-  qcopy(s+0x610,a);qcopy(s+0x620,b);qcopy(s+0x6b0,b);qcopy(s+0x6c0,a);
-  coll_sweep_from_object(obj,a,0x10001,0,1,0,0.2f,(float)s[0x34],1);
-  if(H(s,0x804)>=6) {
-   u8 *target=s+0x760;
-   u8 *p3=s+0x6a0,*p2=s+0x690,*p1=s+0x680,*p0=s+0x670;
+  qcopy(vars+0x610,beam_start);qcopy(vars+0x620,beam_end);qcopy(vars+0x6b0,beam_end);qcopy(vars+0x6c0,beam_start);
+  coll_sweep_from_object(obj,beam_start,0x10001,0,1,0,0.2f,(float)vars[0x34],1);
+  if(H(vars,0x804)>=6) {
+   u8 *target=vars+0x760;
+   u8 *p3=vars+0x6a0,*p2=vars+0x690,*p1=vars+0x680,*p0=vars+0x670;
    int i;
    for(i=1;i>=0;i--) {
     vec_random_direction(p0,0.2792527f,0.34906593f);
@@ -64,58 +65,58 @@ void extermibot_beam_update_pal(u8 *obj) {
     vec_random_direction(p2,2,5);vec_random_direction(p3,2,5);
     p0+=0xa0;p1+=0xa0;p2+=0xa0;p3+=0xa0;
    }
-   H(s,0x804)=0;H(s,0x806)=2;
-   if(!snd_is_voice_playing_for_owner(obj,I(s,0x7f0)))I(s,0x7f0)=PlayMobySound(1,4,obj);
-   if(P(s,0x7bc))qcopy(target,P(s,0x7bc)+0x10);else qcopy(target,s+0x1f0);
-  } else F(s,0x7e0)=IntToFloat(H(s,0x804))/IntToFloat(5);
+   H(vars,0x804)=0;H(vars,0x806)=2;
+   if(!snd_is_voice_playing_for_owner(obj,I(vars,0x7f0)))I(vars,0x7f0)=PlayMobySound(1,4,obj);
+   if(P(vars,0x7bc))qcopy(target,P(vars,0x7bc)+0x10);else qcopy(target,vars+0x1f0);
+  } else F(vars,0x7e0)=IntToFloat(H(vars,0x804))/IntToFloat(5);
   break;
  case 2:
-  qcopy(s+0x610,a);qcopy(s+0x6b0,b);
-  coll_sweep_from_object(obj,a,0x10001,0,1,0,0.2f,(float)s[0x34],1);
-  if(H(s,0x804)<5) {
-   t=IntToFloat(H(s,0x804))/IntToFloat(4);
-   F(s,0x620)=a[0]+(F(s,0x760)-a[0])*t;
-   F(s,0x624)=a[1]+(F(s,0x764)-a[1])*t;
-   F(s,0x628)=a[2]+(F(s,0x768)-a[2])*t;
-   qcopy(s+0x6c0,s+0x620);
-   FastVecSub(v,s+0x620,s+0x610);vec_scale_to_length(v,v,0.040000003f);
-   make_hit_descriptor(&hit,obj,0x210001,v,(float)s[0x34]);
+  qcopy(vars+0x610,beam_start);qcopy(vars+0x6b0,beam_end);
+  coll_sweep_from_object(obj,beam_start,0x10001,0,1,0,0.2f,(float)vars[0x34],1);
+  if(H(vars,0x804)<5) {
+   frac=IntToFloat(H(vars,0x804))/IntToFloat(4);
+   F(vars,0x620)=beam_start[0]+(F(vars,0x760)-beam_start[0])*frac;
+   F(vars,0x624)=beam_start[1]+(F(vars,0x764)-beam_start[1])*frac;
+   F(vars,0x628)=beam_start[2]+(F(vars,0x768)-beam_start[2])*frac;
+   qcopy(vars+0x6c0,vars+0x620);
+   FastVecSub(dir,vars+0x620,vars+0x610);vec_scale_to_length(dir,dir,0.040000003f);
+   make_hit_descriptor(&hit,obj,0x210001,dir,(float)vars[0x34]);
    hit.type=5;hit.flags=3;hit.id=*(u16 *)(obj+0xaa);
-   if(CollLine(s+0x610,s+0x620,0,obj,&hit)) {
-    part_spawn_large_spark_smoke_pal(s+0x620,15);qcopy(s+0x760,s+0x620);H(s,0x804)=0;
+   if(CollLine(vars+0x610,vars+0x620,0,obj,&hit)) {
+    part_spawn_large_spark_smoke_pal(vars+0x620,15);qcopy(vars+0x760,vars+0x620);H(vars,0x804)=0;
     if(g_hero_ground_hit.object) {
      float *point=g_hero_ground_hit.position;
      u8 *attached;
-     H(s,0x806)=3;attached=g_hero_ground_hit.object;P(s,0x7e4)=attached;
-     qcopy(s+0x620,point);qcopy(s+0x770,attached+0x10);
-    } else H(s,0x806)=4;
+     H(vars,0x806)=3;attached=g_hero_ground_hit.object;P(vars,0x7e4)=attached;
+     qcopy(vars+0x620,point);qcopy(vars+0x770,attached+0x10);
+    } else H(vars,0x806)=4;
    }
-  } else {H(s,0x806)=4;part_spawn_large_spark_smoke_pal(s+0x620,10);}
+  } else {H(vars,0x806)=4;part_spawn_large_spark_smoke_pal(vars+0x620,10);}
   break;
  case 3:
-  qcopy(s+0x610,a);qcopy(s+0x6b0,b);
-  if(H(s,0x804)<43 && (other=P(s,0x7e4)) && other[0x20]!=254 && other[0x20]!=253) {
-   FastVecSub(v,other+0x10,s+0x770);FastVecAdd(s+0x620,s+0x620,v);
-   qcopy(s+0x6c0,s+0x620);qcopy(s+0x770,P(s,0x7e4)+0x10);
-   if((g_frame_l18_counter&15)==(((int)obj>>8)&15))part_spawn_large_spark_smoke_pal(s+0x620,1);
+  qcopy(vars+0x610,beam_start);qcopy(vars+0x6b0,beam_end);
+  if(H(vars,0x804)<43 && (other=P(vars,0x7e4)) && other[0x20]!=254 && other[0x20]!=253) {
+   FastVecSub(dir,other+0x10,vars+0x770);FastVecAdd(vars+0x620,vars+0x620,dir);
+   qcopy(vars+0x6c0,vars+0x620);qcopy(vars+0x770,P(vars,0x7e4)+0x10);
+   if((g_frame_l18_counter&15)==(((int)obj>>8)&15))part_spawn_large_spark_smoke_pal(vars+0x620,1);
   } else {
-   DamoselBeamState *state=(DamoselBeamState *)s;
+   DamoselBeamState *state=(DamoselBeamState *)vars;
    state->attached=0;state->mode=4;state->timer=0;
   }
   break;
  case 4:
-  qcopy(s+0x610,a);qcopy(s+0x6b0,b);
-  if(H(s,0x804)<4) {
-   t=IntToFloat(H(s,0x804))/IntToFloat(4);
-   F(s,0x620)=F(s,0x760)+(a[0]-F(s,0x760))*t;
-   F(s,0x624)=F(s,0x764)+(a[1]-F(s,0x764))*t;
-   F(s,0x628)=F(s,0x768)+(a[2]-F(s,0x768))*t;
-   F(s,0x6c0)=F(s,0x760)+(b[0]-F(s,0x760))*t;
-   F(s,0x6c4)=F(s,0x764)+(b[1]-F(s,0x764))*t;
-   F(s,0x6c8)=F(s,0x768)+(b[2]-F(s,0x768))*t;
+  qcopy(vars+0x610,beam_start);qcopy(vars+0x6b0,beam_end);
+  if(H(vars,0x804)<4) {
+   frac=IntToFloat(H(vars,0x804))/IntToFloat(4);
+   F(vars,0x620)=F(vars,0x760)+(beam_start[0]-F(vars,0x760))*frac;
+   F(vars,0x624)=F(vars,0x764)+(beam_start[1]-F(vars,0x764))*frac;
+   F(vars,0x628)=F(vars,0x768)+(beam_start[2]-F(vars,0x768))*frac;
+   F(vars,0x6c0)=F(vars,0x760)+(beam_end[0]-F(vars,0x760))*frac;
+   F(vars,0x6c4)=F(vars,0x764)+(beam_end[1]-F(vars,0x764))*frac;
+   F(vars,0x6c8)=F(vars,0x768)+(beam_end[2]-F(vars,0x768))*frac;
   } else {
-   H(s,0x804)=0;H(s,0x806)=0;
-   { u8 *p3=s+0x6a0,*p2=s+0x690,*p1=s+0x680,*p0=s+0x670;
+   H(vars,0x804)=0;H(vars,0x806)=0;
+   { u8 *p3=vars+0x6a0,*p2=vars+0x690,*p1=vars+0x680,*p0=vars+0x670;
    int i;
    for(i=1;i>=0;i--) {
     vec_random_direction(p0,0.2792527f,0.34906593f);

@@ -45,57 +45,58 @@ extern int snd_play_from_class_bank(int, int, char *, int);
 extern int coll_sweep_from_object(char *, char *, int, float, float, float, int, int, int);
 extern void FastVecSub(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
-extern char *func_PAL_0032F3B8(char *, char *, char *, float);
+extern char *part_spawn_blast_effect_moby_pal(char *, char *, char *, float);
 extern void homing_bomb_tick_fuse_pal(u8 *a);
-extern void func_PAL_L07_003FB570(u8 *self, float *target);
-extern void func_PAL_L07_003FB6B0(u8 *a0);
+extern void homing_bomb_move_to_target_pal(u8 *self, float *target);
+extern void part_spawn_falling_puff_pal(u8 *a0);
 
-void homing_bomb_update_pal(u8 *a0)
+/* Updates the homing bomb: it flies toward the player and, when it touches something, explodes with a sound and damage, then waits to be reset. */
+void homing_bomb_update_pal(u8 *moby)
 {
-    u8 *state;
-    u8 *p;
-    char *pos;
-    char *tune;
-    f32 dir[4];
-    s32 n, k;
+    u8 *vars;
+    u8 *hit_ptr;
+    char *position;
+    char *tuning;
+    f32 direction[4];
+    s32 hit_count, hit_index;
 
-    state = *(u8 **)(a0 + 0x68);
-    if (a0[0x20] != 1)
-        homing_bomb_tick_fuse_pal(a0);
-    switch (a0[0x20]) {
+    vars = *(u8 **)(moby + 0x68);
+    if (moby[0x20] != 1)
+        homing_bomb_tick_fuse_pal(moby);
+    switch (moby[0x20]) {
     case 2:
-        *(f32 *)(a0 + 0x2C) = *(f32 *)(*(u8 **)(a0 + 0x24) + 0x24) * g_bomb_scale;
-        func_PAL_L07_003FB570(a0, (float *)g_hero_position);
-        func_PAL_L07_003FB6B0(a0);
-        n = coll_process_hit(a0 + 0x10, 0.333f, 0, (char *)a0, 0);
-        if (n > 0) {
-            p = (u8 *)g_hit_object_list;
-            for (k = n; k != 0; k--, p += 4) {
-                u8 *other = *(u8 **)p;
-                if (other == a0)
+        *(f32 *)(moby + 0x2C) = *(f32 *)(*(u8 **)(moby + 0x24) + 0x24) * g_bomb_scale;
+        homing_bomb_move_to_target_pal(moby, (float *)g_hero_position);
+        part_spawn_falling_puff_pal(moby);
+        hit_count = coll_process_hit(moby + 0x10, 0.333f, 0, (char *)moby, 0);
+        if (hit_count > 0) {
+            hit_ptr = (u8 *)g_hit_object_list;
+            for (hit_index = hit_count; hit_index != 0; hit_index--, hit_ptr += 4) {
+                u8 *hit = *(u8 **)hit_ptr;
+                if (hit == moby)
                     continue;
-                if (other != *(u8 **)(a0 + 0xB8))
-                    moby_set_state(a0, 3, -1);
+                if (hit != *(u8 **)(moby + 0xB8))
+                    moby_set_state(moby, 3, -1);
             }
         }
         break;
     case 3:
-        snd_play_from_class_bank(6, 0, (char *)a0, 0xE5F);
-        pos = (char *)a0 + 0x10;
-        coll_sweep_from_object((char *)a0, pos, 0x10000, 6.0f, 5.0f, 1.0f, 0, 1, 0);
-        coll_sweep_from_object((char *)a0, pos, 1, 4.0f, (f32)state[0x34], 1.0f, 0, 1, 0);
-        FastVecSub(dir, g_hero_position_block, pos);
-        vec_scale_to_length(dir, dir, 1.0f);
-        func_PAL_0032F3B8((char *)a0, pos, (char *)dir, 0.0f);
-        tune = g_hero_position_block - 0x140;
-        *(f32 *)(tune + 0x180) = 0.1f;
-        *(s32 *)(tune + 0x188) = 0x4B;
-        *(f32 *)(tune + 0x160) = 0.2f;
-        *(s32 *)(tune + 0x168) = 0x32;
-        *(s32 *)(tune + 0x16C) = 0;
-        *(s32 *)(a0 + 0x98) = 0;
-        *(u16 *)(a0 + 0x34) = (*(u16 *)(a0 + 0x34) | 0x41) & 0xEFFF;
-        moby_set_state(a0, 1, -1);
+        snd_play_from_class_bank(6, 0, (char *)moby, 0xE5F);
+        position = (char *)moby + 0x10;
+        coll_sweep_from_object((char *)moby, position, 0x10000, 6.0f, 5.0f, 1.0f, 0, 1, 0);
+        coll_sweep_from_object((char *)moby, position, 1, 4.0f, (f32)vars[0x34], 1.0f, 0, 1, 0);
+        FastVecSub(direction, g_hero_position_block, position);
+        vec_scale_to_length(direction, direction, 1.0f);
+        part_spawn_blast_effect_moby_pal((char *)moby, position, (char *)direction, 0.0f);
+        tuning = g_hero_position_block - 0x140;
+        *(f32 *)(tuning + 0x180) = 0.1f;
+        *(s32 *)(tuning + 0x188) = 0x4B;
+        *(f32 *)(tuning + 0x160) = 0.2f;
+        *(s32 *)(tuning + 0x168) = 0x32;
+        *(s32 *)(tuning + 0x16C) = 0;
+        *(s32 *)(moby + 0x98) = 0;
+        *(u16 *)(moby + 0x34) = (*(u16 *)(moby + 0x34) | 0x41) & 0xEFFF;
+        moby_set_state(moby, 1, -1);
         break;
     }
 }

@@ -16,7 +16,7 @@ extern void entry_spawn_list_objects_with_flag(u8 *a0, s32 a1);
 extern void func_L05_0037CEE0(u8 *a0, u8 *a1, f32 f12);
 extern void func_L05_0037D608(u8 *a0, u8 *a1, f32 f12);
 extern void UpdateFeltzinMissionReward_us2(u8 *a0, s32 a1);
-extern void func_US2_L05_00422780(u8 *a0, s32 a1);
+extern void feltzin_mission_handle_failure_us2(u8 *a0, s32 a1);
 extern s32 g_feltzin_challenge_active __attribute__((sda));
 extern s32 g_feltzin_mission_index __attribute__((sda));
 typedef struct { s32 count; u8 pad04[12]; s32 active; u8 pad14[24]; s32 reset; } FeltzinState;
@@ -24,9 +24,11 @@ extern u8 g_feltzin_challenge_state[];
 extern u8 g_feltzin_timer[] __attribute__((section(".sdata")));
 extern u8 *g_feltzin_enemy_table;
 
-void feltzin_mission_two_update_us2(u8 *arg0)
+/* Feltzin mission two: spawns this mission's targets on the first frame, then pays the reward
+   once they are done or fails the mission when the timer runs out (USA v2.00). */
+void feltzin_mission_two_update_us2(u8 *actor)
 {
-    u8 *owner = *(u8 **)(arg0 + 0x68);
+    u8 *owner = *(u8 **)(actor + 0x68);
     u8 **list;
     u32 count;
     s32 index;
@@ -63,9 +65,9 @@ void feltzin_mission_two_update_us2(u8 *arg0)
         }
     }
     if (((FeltzinState *)g_feltzin_challenge_state)->active == 0 && g_feltzin_mission_index >= 6) {
-        UpdateFeltzinMissionReward_us2(arg0, 1);
+        UpdateFeltzinMissionReward_us2(actor, 1);
         return;
     }
     if (math_fast_float_d(owner + 0x44) != 0)
-        func_US2_L05_00422780(arg0, 1);
+        feltzin_mission_handle_failure_us2(actor, 1);
 }

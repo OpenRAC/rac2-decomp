@@ -34,27 +34,28 @@ extern void func_PAL_002A0F68(char *);
 extern void func_002A1130(u32 *, u32, long long, u32);
 extern void func_002A0F48(char *);
 
-void menu_attach_slot_packets_pal(char *obj)
+/* Links two menu slots to their picture data so they can be drawn (PAL). */
+void menu_attach_slot_packets_pal(char *menu)
 {
-    char *sub = obj + 0xC00;
-    SlotObject *s = (SlotObject *)sub;
+    char *slot_base = menu + 0xC00;
+    SlotObject *slot = (SlotObject *)slot_base;
 
-    stub_empty_17(sub, 0);
-    func_PAL_002A0F68(sub);
-    if (s->f42 != 0xFF) {
-        EntryTable *table = s->f24;
-        Entry *entry = table->f48[s->f42];
-        u32 *target = (u32 *)((char *)&entry->f1c[entry->f10] + entry->f13 * 4);
-        func_002A1130(target, entry->f1c[s->f40], (long long)obj, table->f08);
-        s->f58 = obj;
+    stub_empty_17(slot_base, 0);
+    func_PAL_002A0F68(slot_base);
+    if (slot->f42 != 0xFF) {
+        EntryTable *entry_table = slot->f24;
+        Entry *slot_entry = entry_table->f48[slot->f42];
+        u32 *packet_dest = (u32 *)((char *)&slot_entry->f1c[slot_entry->f10] + slot_entry->f13 * 4);
+        func_002A1130(packet_dest, slot_entry->f1c[slot->f40], (long long)menu, entry_table->f08);
+        slot->f58 = menu;
     }
-    if (s->f43 != 0xFF) {
-        EntryTable *table = s->f24;
-        Entry *entry = table->f48[s->f43];
-        u32 *target = (u32 *)((char *)&entry->f1c[entry->f10] + entry->f13 * 4);
-        func_002A1130(target, entry->f1c[s->f41], (long long)(obj + 0x600), table->f08);
-        s->f5c = obj + 0x600;
+    if (slot->f43 != 0xFF) {
+        EntryTable *entry_table = slot->f24;
+        Entry *slot_entry = entry_table->f48[slot->f43];
+        u32 *packet_dest = (u32 *)((char *)&slot_entry->f1c[slot_entry->f10] + slot_entry->f13 * 4);
+        func_002A1130(packet_dest, slot_entry->f1c[slot->f41], (long long)(menu + 0x600), entry_table->f08);
+        slot->f5c = menu + 0x600;
     }
-    func_002A0F48(sub);
+    func_002A0F48(slot_base);
 }
 

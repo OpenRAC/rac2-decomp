@@ -1,4 +1,6 @@
 #include "include_asm.h"
+#include "names.h"
 
-void func_PAL_L09_0042E660(void) {
+/* An empty function that does nothing. */
+void level_09_empty_stub_pal(void) {
 }

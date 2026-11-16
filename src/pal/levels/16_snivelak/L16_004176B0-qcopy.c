@@ -22,10 +22,10 @@ extern void transform_vector(void *, void *, void *);
 extern float FastAddRotations(float, float), math_fast_sin_or_cos_a(float), math_fast_sin_or_cos_b(float);
 extern int FloatToInt(float);
 extern void moby_mark_spawned(void *), func_002A0F48(void *);
-extern void func_PAL_L16_00418580(u8 *);
+extern void debris_l16_piece_update_pal(u8 *);
 
 /* Creates an aimed projectile or a random trajectory across the arena. */
-u8 *func_PAL_L16_00418260(u8 *moby, int aimed)
+u8 *snivelak_spawn_rock_projectile_pal(u8 *moby, int aimed)
 {
     float position[4] __attribute__((aligned(16)));
     float target[4] __attribute__((aligned(16)));
@@ -51,7 +51,7 @@ u8 *func_PAL_L16_00418260(u8 *moby, int aimed)
             FastVecScale(motion, target, 1.0f / g_snivelak_rock_flight_time);
             *(int *)(motion + 0x30) = ((s32)(FloatToInt(g_snivelak_rock_flight_time * 1.2f)) * 5 + 2) / 6;
         } else {
-            u8 *scatterState = *(u8 **)(moby + 0x68);
+            u8 *scatter_state = *(u8 **)(moby + 0x68);
             vec_store_helper(position);
             position[0] = math_random_float_range(-1.0f, 1.0f);
             position[2] = math_random_float_range(-1.0f, 1.0f);
@@ -60,10 +60,10 @@ u8 *func_PAL_L16_00418260(u8 *moby, int aimed)
             target[2] = math_random_float_range(-1.0f, 1.0f);
             position[1] = math_random_int_below(2) ? 1.0f : -1.0f;
             target[1] = -position[1];
-            transform_vector(position, position, g_beam_definition_table + *(int *)(scatterState + 0x19c) * 128);
+            transform_vector(position, position, g_beam_definition_table + *(int *)(scatter_state + 0x19c) * 128);
             position[3] = 3.0f;
             if (math_fast_helper_a(position, 255.0f) != -1) { moby_mark_spawned(object); return 0; }
-            transform_vector(target, target, g_beam_definition_table + *(int *)(scatterState + 0x19c) * 128);
+            transform_vector(target, target, g_beam_definition_table + *(int *)(scatter_state + 0x19c) * 128);
             *(BossQuadword *)(object + 0x10) = *(BossQuadword *)position;
             *(BossQuadword *)(motion + 0x10) = *(BossQuadword *)target;
             FastVecSub(motion, target, position);
@@ -71,7 +71,7 @@ u8 *func_PAL_L16_00418260(u8 *moby, int aimed)
             *(int *)(motion + 0x30) = 500;
         }
         *(float *)(object + 0xf8) = mat_fast_helper_a(*(float *)motion, *(float *)(motion + 4));
-        *(void (**)(u8 *))(object + 0x64) = func_PAL_L16_00418580;
+        *(void (**)(u8 *))(object + 0x64) = debris_l16_piece_update_pal;
         func_002A0F48(object);
     }
     return object;

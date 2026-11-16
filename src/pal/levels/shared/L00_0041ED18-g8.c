@@ -9,18 +9,19 @@ extern f32 FastAddRotations(f32, f32);
 extern void moby_mark_spawned(u8 *);
 
 /* Same body as func_L03_0042B930, with this function's own callees. */
-void func_PAL_L00_0041ED18(u8 *a0) {
-    u8 *q = *(u8 **)(a0 + 0x68);
-    u8 *r = *(u8 **)(a0 + 0x24);
+/* Moves and turns a falling piece of debris (moby class 1086), makes it fall faster each frame, and removes it when its time runs out (PAL: 50 Hz gravity). */
+void falling_l00_debris_update_pal(u8 *object) {
+    u8 *vars = *(u8 **)(object + 0x68);
+    u8 *config = *(u8 **)(object + 0x24);
 
-    *(f32 *)(a0 + 0x2C) = *(f32 *)(r + 0x24) * g_moby_hit_radius_scale;
-    *(f32 *)(q + 0x8) = *(f32 *)(q + 0x8) - 0.006f;
-    FastVecAdd(a0 + 0x10, a0 + 0x10, q);
-    FastVecAdd(a0 + 0xF0, a0 + 0xF0, q + 0x10);
-    *(f32 *)(a0 + 0xF0) = FastAddRotations(*(f32 *)(a0 + 0xF0), *(f32 *)(q + 0x10));
-    *(f32 *)(a0 + 0xF4) = FastAddRotations(*(f32 *)(a0 + 0xF4), *(f32 *)(q + 0x14));
-    *(f32 *)(a0 + 0xF8) = FastAddRotations(*(f32 *)(a0 + 0xF8), *(f32 *)(q + 0x18));
-    a0[0xBC] = a0[0xBC] - 1;
-    if (a0[0xBC] == 0)
-        moby_mark_spawned(a0);
+    *(f32 *)(object + 0x2C) = *(f32 *)(config + 0x24) * g_moby_hit_radius_scale;
+    *(f32 *)(vars + 0x8) = *(f32 *)(vars + 0x8) - 0.006f;
+    FastVecAdd(object + 0x10, object + 0x10, vars);
+    FastVecAdd(object + 0xF0, object + 0xF0, vars + 0x10);
+    *(f32 *)(object + 0xF0) = FastAddRotations(*(f32 *)(object + 0xF0), *(f32 *)(vars + 0x10));
+    *(f32 *)(object + 0xF4) = FastAddRotations(*(f32 *)(object + 0xF4), *(f32 *)(vars + 0x14));
+    *(f32 *)(object + 0xF8) = FastAddRotations(*(f32 *)(object + 0xF8), *(f32 *)(vars + 0x18));
+    object[0xBC] = object[0xBC] - 1;
+    if (object[0xBC] == 0)
+        moby_mark_spawned(object);
 }

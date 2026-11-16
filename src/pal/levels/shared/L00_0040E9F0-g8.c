@@ -90,28 +90,28 @@ extern char g_shot_history_points[];
 extern char g_homing_moby_index_list[] MACRO_ADDR;
 
 /* Spawns a projectile (moby 0xED7) from owner at position, aimed at target or along the view. */
-char *func_PAL_L00_0040E9F0(char *owner, void *position, char *target, void *color, float height)
+char *aimed_projectile_spawn_pal(char *owner, void *position, char *target, void *color, float height)
 {
-    Vector aim, offset, tmp1, tmp2, tmp3, tmp4;
-    ProjectileObject *m = (ProjectileObject *)CreateMoby(0xed7);
-    ProjectileState *s;
-    char *hit;
+    Vector aim, offset, side_offset, forward_offset, trace_end, trace_direction;
+    ProjectileObject *projectile = (ProjectileObject *)CreateMoby(0xed7);
+    ProjectileState *state;
+    char *target_vars;
     float scale;
 
-    if (m) {
-        m->alpha = 255;
-        m->enabled = 1;
-        m->status = 0;
-        m->color = 255;
-        m->flags |= 0x100;
-        s = m->state;
-        s->sound = -1;
+    if (projectile) {
+        projectile->alpha = 255;
+        projectile->enabled = 1;
+        projectile->status = 0;
+        projectile->color = 255;
+        projectile->flags |= 0x100;
+        state = projectile->state;
+        state->sound = -1;
         if ((unsigned)g_shot_record_next_index > 32)
             g_shot_record_next_index = 0;
-        s->index = g_shot_record_next_index;
+        state->index = g_shot_record_next_index;
         g_shot_record_next_index = (g_shot_record_next_index + 1) % 32;
         scale = (g_weapon_l00_table + g_targeted_weapon_index)->value * (0.020000001f);
-        qcopy(m->position, position);
+        qcopy(projectile->position, position);
         if (target) {
             FastVecScale(offset, target + 0xe0, height);
             FastVecAdd(aim, target + 0x10, offset);
@@ -120,93 +120,93 @@ char *func_PAL_L00_0040E9F0(char *owner, void *position, char *target, void *col
         }
 
         if (g_hero_state.mode == 29) {
-            qcopy(m->forward, g_cam_follow_matrix[0]);
-            qcopy(m->right, g_cam_follow_matrix[1]);
-            qcopy(m->up, g_cam_follow_matrix[2]);
-            qcopy(m->position, g_camera_l00_position);
+            qcopy(projectile->forward, g_cam_follow_matrix[0]);
+            qcopy(projectile->right, g_cam_follow_matrix[1]);
+            qcopy(projectile->up, g_cam_follow_matrix[2]);
+            qcopy(projectile->position, g_camera_l00_position);
             FastVecScale(offset, g_cam_follow_matrix[2], -0.2f);
-            FastVecAdd(m->position, m->position, offset);
-            FastVecScale(tmp1, g_cam_follow_matrix[1], -0.25f);
-            FastVecAdd(m->position, m->position, tmp1);
-            FastVecScale(tmp2, g_cam_follow_matrix[0], 0.0f);
-            FastVecAdd(m->position, m->position, tmp2);
+            FastVecAdd(projectile->position, projectile->position, offset);
+            FastVecScale(side_offset, g_cam_follow_matrix[1], -0.25f);
+            FastVecAdd(projectile->position, projectile->position, side_offset);
+            FastVecScale(forward_offset, g_cam_follow_matrix[0], 0.0f);
+            FastVecAdd(projectile->position, projectile->position, forward_offset);
             if (target) {
-                FastVecSub(m->forward, aim, m->position);
-                vec_scale_to_length(m->forward, m->forward, 1.0f);
-                FastVecCross(m->right, m->forward, g_hero_state.object + 0xe0);
-                vec_scale_to_length(m->right, m->right, 1.0f);
-                FastVecCross(m->up, m->right, m->forward);
+                FastVecSub(projectile->forward, aim, projectile->position);
+                vec_scale_to_length(projectile->forward, projectile->forward, 1.0f);
+                FastVecCross(projectile->right, projectile->forward, g_hero_state.object + 0xe0);
+                vec_scale_to_length(projectile->right, projectile->right, 1.0f);
+                FastVecCross(projectile->up, projectile->right, projectile->forward);
             } else {
-                FastVecScale(tmp3, g_cam_follow_matrix[0], 30.0f);
-                FastVecAdd(tmp3, g_camera_l00_position, tmp3);
-                if (CollLine(g_camera_l00_position, tmp3, 0, g_hero_state.object, 0))
-                    qcopy(tmp3, g_hero_l00_position);
-                FastVecSub(tmp4, tmp3, m->position);
-                vec_scale_to_length(m->forward, tmp4, 1.0f);
-                FastVecCross(m->right, m->forward, g_hero_state.object + 0xe0);
-                vec_scale_to_length(m->right, m->right, 1.0f);
-                FastVecCross(m->up, m->right, m->forward);
+                FastVecScale(trace_end, g_cam_follow_matrix[0], 30.0f);
+                FastVecAdd(trace_end, g_camera_l00_position, trace_end);
+                if (CollLine(g_camera_l00_position, trace_end, 0, g_hero_state.object, 0))
+                    qcopy(trace_end, g_hero_l00_position);
+                FastVecSub(trace_direction, trace_end, projectile->position);
+                vec_scale_to_length(projectile->forward, trace_direction, 1.0f);
+                FastVecCross(projectile->right, projectile->forward, g_hero_state.object + 0xe0);
+                vec_scale_to_length(projectile->right, projectile->right, 1.0f);
+                FastVecCross(projectile->up, projectile->right, projectile->forward);
             }
         } else if (g_hero_state.orientation == 1) {
-            vec_scale_to_length(m->forward, owner + 0xd0, -1.0f);
-            FastVecScale(m->right, owner + 0xc0, -1.0f);
-            qcopy(m->up, owner + 0xe0);
+            vec_scale_to_length(projectile->forward, owner + 0xd0, -1.0f);
+            FastVecScale(projectile->right, owner + 0xc0, -1.0f);
+            qcopy(projectile->up, owner + 0xe0);
         } else if (target) {
-            FastVecSub(m->forward, aim, m->position);
-            vec_scale_to_length(m->forward, m->forward, 1.0f);
-            FastVecCross(m->right, m->forward, g_hero_state.object + 0xe0);
-            vec_scale_to_length(m->right, m->right, 1.0f);
-            FastVecCross(m->up, m->right, m->forward);
+            FastVecSub(projectile->forward, aim, projectile->position);
+            vec_scale_to_length(projectile->forward, projectile->forward, 1.0f);
+            FastVecCross(projectile->right, projectile->forward, g_hero_state.object + 0xe0);
+            vec_scale_to_length(projectile->right, projectile->right, 1.0f);
+            FastVecCross(projectile->up, projectile->right, projectile->forward);
         } else {
-            qcopy(m->forward, g_hero_state.forward);
-            FastVecCross(m->right, m->forward, g_hero_state.up);
-            vec_scale_to_length(m->right, m->right, 1.0f);
-            FastVecCross(m->up, m->right, m->forward);
+            qcopy(projectile->forward, g_hero_state.forward);
+            FastVecCross(projectile->right, projectile->forward, g_hero_state.up);
+            vec_scale_to_length(projectile->right, projectile->right, 1.0f);
+            FastVecCross(projectile->up, projectile->right, projectile->forward);
         }
-        m->forward[3] = m->right[3] = m->up[3] = 0;
+        projectile->forward[3] = projectile->right[3] = projectile->up[3] = 0;
 
-        s->owner = owner;
-        s->yaw = math_random_float_range(4.0f, 10.0f);
+        state->owner = owner;
+        state->yaw = math_random_float_range(4.0f, 10.0f);
         if (target)
-            s->yaw = 0;
-        s->spin_speed = math_random_signed_float_range(6.0f, 10.0f);
-        s->speed = scale;
-        s->spin = math_random_angle();
-        s->target = 0;
-        s->age = 1;
-        s->homing = 1;
-        qcopy(s->forward, m->forward);
-        qcopy(s->color, color);
+            state->yaw = 0;
+        state->spin_speed = math_random_signed_float_range(6.0f, 10.0f);
+        state->speed = scale;
+        state->spin = math_random_angle();
+        state->target = 0;
+        state->age = 1;
+        state->homing = 1;
+        qcopy(state->forward, projectile->forward);
+        qcopy(state->color, color);
         if (target) {
-            hit = moby_get_private_value_0(target);
-            if (hit) {
-                *(unsigned short *)(hit + 0x1e) |= 0x80;
-                if (*(unsigned char *)(hit + 0xb))
-                    s->homing = 0;
+            target_vars = moby_get_private_value_0(target);
+            if (target_vars) {
+                *(unsigned short *)(target_vars + 0x1e) |= 0x80;
+                if (*(unsigned char *)(target_vars + 0xb))
+                    state->homing = 0;
             }
         }
-        s->life = 250;
+        state->life = 250;
         if (target) {
             float *target_position = (float *)(target + 0x10);
 
-            s->last_target[0] = *(float *)(target + 0x10);
-            s->last_target[1] = target_position[1];
-            s->last_target[2] = target_position[2] + height;
-            s->height = height;
+            state->last_target[0] = *(float *)(target + 0x10);
+            state->last_target[1] = target_position[1];
+            state->last_target[2] = target_position[2] + height;
+            state->height = height;
         }
 
         /* Trace from the owner (at the spawn height) to the spawn point. */
         *(Quadword *)offset = *(Quadword *)(owner + 0x10);
         offset[2] = ((float *)position)[2];
         if (CollLine(offset, position, 0, g_hero_state.object, 0)) {
-            m->hit = 1;
-            qcopy(m->position, g_hero_l00_position);
+            projectile->hit = 1;
+            qcopy(projectile->position, g_hero_l00_position);
         }
-        moby_get_offset_point(m, g_shot_history_points + s->index * 64);
-        func_002A0F48(m);
-        AddMobyToIndexList(m, g_homing_moby_index_list, 31);
-        s->handle = part_alloc_effect_slot(m, 0, 1.0f, 1.0f, 1.0f);
-        m->radius *= 2.5f;
+        moby_get_offset_point(projectile, g_shot_history_points + state->index * 64);
+        func_002A0F48(projectile);
+        AddMobyToIndexList(projectile, g_homing_moby_index_list, 31);
+        state->handle = part_alloc_effect_slot(projectile, 0, 1.0f, 1.0f, 1.0f);
+        projectile->radius *= 2.5f;
     }
-    return (char *)m;
+    return (char *)projectile;
 }

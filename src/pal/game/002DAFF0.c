@@ -11,6 +11,7 @@ typedef struct {
 } Handles_2DCB28;
 extern short snd_pump_music_and_disc_read(int);
 
+/* Resets the object stream handles and selection to -1 and starts a stream step. */
 int menu_stream_handles_reset_pal(Handles_2DCB28 *object) {
     object->first = release_menu_stream_buffer(object->first);
     object->second = release_menu_stream_buffer(object->second);
@@ -39,7 +40,7 @@ extern int g_menu_selection_input_state;
 extern StreamReads2DAD18 g_copy_setup_data;
 extern int load_start_disc_read(int, int, int);
 
-int func_PAL_002DBA38(Handles_2DCB28 *object)
+int menu_stream_reads_update_pal(Handles_2DCB28 *object)
 {
     switch (object->state) {
     case 0:

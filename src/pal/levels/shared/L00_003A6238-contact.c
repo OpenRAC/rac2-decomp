@@ -28,16 +28,16 @@ extern float math_random_angle(void);
 extern float FastAddRotations(float, float);
 extern int FloatToInt(float);
 extern float IntToFloat(int);
-extern char *func_PAL_002BE9A8(void *, float, float, float, int, void *, float, unsigned int, int);
+extern char *part_spawn_spinning_spark_pal(void *, float, float, float, int, void *, float, unsigned int, int);
 extern void FastVecSub(void *, void *, void *);
-extern char *func_PAL_002C23B8(void *, void *, unsigned int, int, int, int, float, float, float, float, float);
+extern char *part_spawn_burst_pal(void *, void *, unsigned int, int, int, int, float, float, float, float, float);
 extern float math_fabs(float);
 extern void math_build_axis_angle_quat(void *, int, float);
 extern void vec_rotate_by_quaternion(void *, void *, void *);
 extern void vec_build_spherical_offset(float *, float, float, float);
 extern int gfx_swap_packed_color_channels(unsigned int, int);
 extern int math_random_int_range(int, int);
-extern char *func_PAL_002BD790(void *, void *, int, int, int, int, int, int, int, float);
+extern char *part_spawn_spark_pal(void *, void *, int, int, int, int, int, int, int, float);
 
 /* Spawn layered particles and two falling streaks at the supplied position. */
 void SpawnLayeredParticleBurst_pal(void *owner, void *position)
@@ -71,7 +71,7 @@ void SpawnLayeredParticleBurst_pal(void *owner, void *position)
         jitter[2] = origin[2] + math_random_signed_float_range(0.0f, 0.3f);
         spin = FloatToInt(math_random_signed_float_range(1.0f, 2.0f));
         size = math_random_float_range(0.2f, 0.75f) * 210000.0f;
-        particle = func_PAL_002BE9A8(jitter, 0.0f, 1.0f, 1.00999999f, spin,
+        particle = part_spawn_spinning_spark_pal(jitter, 0.0f, 1.0f, 1.00999999f, spin,
                                  g_hero_state.motion, size, 0x7F202020, 0);
         if (particle) {
             char *tail = particle + 0x20;
@@ -88,7 +88,7 @@ void SpawnLayeredParticleBurst_pal(void *owner, void *position)
         jitter[2] = origin[2] + math_random_signed_float_range(0.0f, 0.6f);
         size = math_random_float_range(0.2f, 1.75f) * 210000.0f;
         FastVecSub(jitter, jitter, velocity);
-        func_PAL_002C23B8(jitter, velocity, 5, 0x7F, 0x404040, spin,
+        part_spawn_burst_pal(jitter, velocity, 5, 0x7F, 0x404040, spin,
                       size, 500.0f, 0.95f, 0.0f, 0.0f);
         if (math_fabs(angle) > 0.00001f) {
             math_build_axis_angle_quat(rotation, (int)g_hero_state.axis, angle);
@@ -96,22 +96,22 @@ void SpawnLayeredParticleBurst_pal(void *owner, void *position)
         }
     }
     {
-        int streakCount;
+        int streak_count;
         float speed = math_random_float_range(8.0f, 12.0f);
         float scale = 0.5f;
         FastVecScale(base, g_hero_state.axis, speed * (0.020000001f));
-        for (streakCount = 1; streakCount >= 0; streakCount--) {
+        for (streak_count = 1; streak_count >= 0; streak_count--) {
             float cone = math_random_float_range(0.2617994249f, 1.396263599395752f);
             float heading = math_random_angle();
             float length = math_random_float_range(7.0f, 10.5f);
-            int firstColor, secondColor, life;
+            int first_color, second_color, life;
             vec_build_spherical_offset(scatter, scale * (0.020000001f) * length, heading, cone);
             FastVecAdd(scatter, scatter, base);
             scatter[2] += 0.060000002f;
-            firstColor = gfx_swap_packed_color_channels(0x4F007FFF, 0);
-            secondColor = gfx_swap_packed_color_channels(0x1F00007F, 0);
+            first_color = gfx_swap_packed_color_channels(0x4F007FFF, 0);
+            second_color = gfx_swap_packed_color_channels(0x1F00007F, 0);
             life = math_random_int_range(50, 100);
-            func_PAL_002BD790(position, scatter, firstColor, secondColor, life, 1, -1, -1, 0, scale * 40000.0f);
+            part_spawn_spark_pal(position, scatter, first_color, second_color, life, 1, -1, -1, 0, scale * 40000.0f);
         }
     }
 }

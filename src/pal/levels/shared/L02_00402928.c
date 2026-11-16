@@ -4,6 +4,6 @@
 extern unsigned char g_pal_region_mode MACRO_ADDR;
 
 /* func_PAL_L02_00402928, PAL's own: is the language index (the byte D_PAL_001A7C3C) 2 or above? */
-int func_PAL_L02_00402928(void) {
+int pal_language_at_least_two(void) {
     return g_pal_region_mode >= 2;
 }

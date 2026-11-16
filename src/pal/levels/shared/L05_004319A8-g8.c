@@ -20,10 +20,10 @@ extern int g_collectible_flags[] __attribute__((sda));
 extern u8 g_hero_position[];
 extern u8 g_hero_state[];
 extern float math_random_angle(void);
-extern void func_PAL_L01_0039AD60(void *);
+extern void moby_init_randomized_vars_pal(void *);
 extern float math_fast_sin_or_cos_b(float);
 extern float FastAddRotations(float, float);
-extern void func_PAL_L01_0039AE48(void *);
+extern void gold_bolt_glow_rings_update_pal(void *);
 extern int math_random_int_below(int);
 extern void part_spawn_sparkle_drift_pal(void *);
 extern float fast_vec_dist(void *, void *);
@@ -32,15 +32,16 @@ extern int MemcardSave(int, int);
 extern int PlayMobySound(int, int, void *);
 extern void moby_mark_spawned(void *);
 extern void cam_blend_moby_update(void *);
-extern void func_PAL_L01_0039AC80(void *);
-extern void func_PAL_002A7E68(void *, int, int, int);
+extern void gold_bolt_update_pal(void *);
+extern void anim_start_blended_pal(void *, int, int, int);
 extern void set_hero_animation_pal(int, int, float);
 extern int math_fast_float_d(void *);
 extern void hero_reset_position_and_direction_pal(void *, void *, int, int);
 extern void cam_set_mode_state(int);
 typedef union { float f[0x40]; int i[0x40]; s16 h[0x80]; u16 uh[0x80]; } Fields;
 
-void func_PAL_L05_004319A8(u8 *actor)
+/* Updates a spinning collectible: bobs and spins in place, sparkles, and when the hero touches it, records it as taken and saves (PAL). */
+void spinning_collectible_update_pal(u8 *actor)
 {
     u8 *state = *(u8 **)(actor + 0x68);
     int i;
@@ -63,7 +64,7 @@ void func_PAL_L05_004319A8(u8 *actor)
         if (((Fields *)actor)->h[0x32 / 2] < 64)
             ((Fields *)actor)->h[0x32 / 2] = 64;
         actor[0x20] = 1;
-        func_PAL_L01_0039AD60(actor);
+        moby_init_randomized_vars_pal(actor);
         return;
     case 1:
         ((Fields *)actor)->f[0x2C / 4] = *(float *)(*(char **)(actor + 0x24) + 0x24) * g_collectible_speed_scale;
@@ -73,7 +74,7 @@ void func_PAL_L05_004319A8(u8 *actor)
         ((Fields *)actor)->f[0xF4 / 4] = FastAddRotations(((Fields *)actor)->f[0xF4 / 4], g_collectible_spin_y * 0.0003490659f);
         ((Fields *)actor)->f[0xF8 / 4] = FastAddRotations(((Fields *)actor)->f[0xF8 / 4], g_collectible_spin_z * 0.0003490659f);
         ((Fields *)actor)->f[0xFC / 4] = FastAddRotations(((Fields *)actor)->f[0xFC / 4], g_collectible_spin_phase * 0.0003490659f);
-        func_PAL_L01_0039AE48(actor);
+        gold_bolt_glow_rings_update_pal(actor);
         if (math_random_int_below(g_collectible_sparkle_chance) == 0)
             part_spawn_sparkle_drift_pal(actor);
         if (fast_vec_dist(g_pickup_first_moby + 0x10, actor + 0x10) < 1.5f) {
@@ -92,12 +93,12 @@ void func_PAL_L05_004319A8(u8 *actor)
         qcopy(actor + 0x10, g_hero_position);
         qcopy(actor + 0xF0, g_hero_position + 0x10);
         if (actor[0x42] == 1) {
-            func_PAL_L01_0039AC80(actor);
+            gold_bolt_update_pal(actor);
             if (math_random_int_below(10) == 0)
                 part_spawn_sparkle_drift_pal(actor);
             if (actor[0x60] & 2) {
                 if (actor[0x43] != 0)
-                    func_PAL_002A7E68(actor, 0, 0, 0);
+                    anim_start_blended_pal(actor, 0, 0, 0);
                 actor[0x31] = 0;
                 ((Fields *)actor)->uh[0x34 / 2] |= 1;
                 for (i = 3; i >= 0; i--)

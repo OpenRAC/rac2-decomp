@@ -21,15 +21,15 @@ typedef struct L01_003C0760_OBJ {
 
 /* func_PAL_L01_003C45C8, the PAL copy of func_L01_003C0760: the same C, with the stored time
  * scaled for 50 Hz. */
-void func_PAL_L01_003C45C8(L01_003C0760_OBJ *a0)
+void swamp_monster_start_attack_b_pal(L01_003C0760_OBJ *moby)
 {
-    L01_003C0760_OBJ *p = a0;
-    L01_003C0760_OWNED *q = p->f68;
-    int r = math_random_int_range(7, 12);
+    L01_003C0760_OBJ *self = moby;
+    L01_003C0760_OWNED *vars = self->f68;
+    int blend_frames = math_random_int_range(7, 12);
 
-    moby_set_animation_and_speed(p, 8, 0, r);
-    moby_set_state(p, 3, 3);
-    q->f2DC = (g_swamp_monster_attack_b_value * 5 + 2) / 6;
+    moby_set_animation_and_speed(self, 8, 0, blend_frames);
+    moby_set_state(self, 3, 3);
+    vars->f2DC = (g_swamp_monster_attack_b_value * 5 + 2) / 6;
 }
 
 typedef struct L01_003C07C8_OWNED {
@@ -44,15 +44,15 @@ typedef struct L01_003C07C8_OBJ {
 
 /* func_PAL_L01_003C4650, the PAL copy of func_L01_003C07C8: the same C, with the stored time
  * scaled for 50 Hz. */
-void func_PAL_L01_003C4650(L01_003C07C8_OBJ *a0)
+void swamp_monster_start_attack_c_pal(L01_003C07C8_OBJ *moby)
 {
-    L01_003C07C8_OBJ *p = a0;
-    L01_003C07C8_OWNED *q = p->f68;
-    int r = math_random_int_range(9, 11);
+    L01_003C07C8_OBJ *self = moby;
+    L01_003C07C8_OWNED *vars = self->f68;
+    int blend_frames = math_random_int_range(9, 11);
 
-    moby_set_animation_and_speed(p, 13, 0, r);
-    moby_set_state(p, 2, 3);
-    q->f2DA = (g_swamp_monster_attack_c_value * 5 + 2) / 6;
+    moby_set_animation_and_speed(self, 13, 0, blend_frames);
+    moby_set_state(self, 2, 3);
+    vars->f2DA = (g_swamp_monster_attack_c_value * 5 + 2) / 6;
 }
 
 typedef struct L01_003C0830_OWNED {
@@ -69,14 +69,14 @@ typedef struct L01_003C0830_OBJ {
 
 /* func_PAL_L01_003C46D8, the PAL copy of func_L01_003C0830: the same C, with the stored time
  * scaled for 50 Hz. */
-void func_PAL_L01_003C46D8(L01_003C0830_OBJ *a0)
+void swamp_monster_start_grab_attack_pal(L01_003C0830_OBJ *moby)
 {
-    L01_003C0830_OBJ *p = a0;
-    L01_003C0830_OWNED *q = p->f68;
-    int r = math_random_int_range(7, 11);
+    L01_003C0830_OBJ *self = moby;
+    L01_003C0830_OWNED *vars = self->f68;
+    int blend_frames = math_random_int_range(7, 11);
 
-    moby_set_animation_and_speed(p, 14, 0, r);
-    moby_set_state(p, 4, 3);
-    p->f9C = p->f9C | 0x30;
-    q->f2DE = (g_swamp_monster_grab_value * 5 + 2) / 6;
+    moby_set_animation_and_speed(self, 14, 0, blend_frames);
+    moby_set_state(self, 4, 3);
+    self->f9C = self->f9C | 0x30;
+    vars->f2DE = (g_swamp_monster_grab_value * 5 + 2) / 6;
 }

@@ -8,11 +8,12 @@ typedef struct { FRow pos; FRow dir; } LightRec;
 extern float g_quad_uv_rows __attribute__((sda));
 extern LightRec g_light_records[];
 extern int g_ground_shadow_count;
-extern unsigned long func_US2_0027CED8(int);
+extern unsigned long tex_get_effect_descriptor_us2(int);
 extern void vec_scale_to_length(void *, void *, float);
 extern void draw_world_quad(void *, int, int);
-void func_US2_0027D7D0(void) {
-    FRow m[4];
+/* Draws the ground shadow quads: each light record projects a flat quad onto the ground along its direction (USA v2.00: returns early when there are none). */
+void gfx_draw_light_quads_us2(void) {
+    FRow quad[4];
     int colors[4];
     float uv[4][2];
     unsigned long pkt[4];
@@ -23,7 +24,7 @@ void func_US2_0027D7D0(void) {
     if (g_ground_shadow_count == 0) {
         return;
     }
-    pkt[1] = func_US2_0027CED8(0);
+    pkt[1] = tex_get_effect_descriptor_us2(0);
     pkt[2] = 0xFF9000000260;
     pkt[0] = 5;
     pkt[3] = 0x8000000044;
@@ -33,23 +34,23 @@ void func_US2_0027D7D0(void) {
         colors[j] = 0x40808080;
     }
     for (i = 0; i < g_ground_shadow_count; i++) {
-        float s;
+        float scale;
         int k;
 
         qcopy(&dir, &g_light_records[i].dir);
         vec_scale_to_length(&dir, &dir, 1.0f);
-        s = g_light_records[i].pos.v[3];
+        scale = g_light_records[i].pos.v[3];
         for (k = 0; k < 4; k++) {
             float cx = ((FRow *)&g_quad_uv_rows)[k].v[0];
             float vx = dir.v[0];
             float cy = ((FRow *)&g_quad_uv_rows)[k].v[1];
-            float d = cx * vx + cy * dir.v[1];
+            float dot = cx * vx + cy * dir.v[1];
 
-            qcopy(&m[k], &g_light_records[i].pos);
-            m[k].v[0] += (cx - vx * d) * s;
-            m[k].v[1] += (cy - dir.v[1] * d) * s;
-            m[k].v[2] -= dir.v[2] * d * s;
+            qcopy(&quad[k], &g_light_records[i].pos);
+            quad[k].v[0] += (cx - vx * dot) * scale;
+            quad[k].v[1] += (cy - dir.v[1] * dot) * scale;
+            quad[k].v[2] -= dir.v[2] * dot * scale;
         }
-        draw_world_quad(m, 0, 0);
+        draw_world_quad(quad, 0, 0);
     }
 }

@@ -7,7 +7,7 @@ typedef struct {
     u8 pad00[0x34];
     u16 flags;
     u8 pad36[0x68 - 0x36];
-    u32 p68;
+    u32 vars;
     u8 pad6C[0xAA - 0x6C];
     s16 type;
 } MobStruct;
@@ -25,13 +25,13 @@ extern MobListStruct ref_L04_0031D630_00;
 extern int g_current_level MACRO_ADDR;
 
 extern void anim_start_startup_animations(void);
-extern void func_PAL_002E7270(void *mob);
+extern void update_equipment_pieces_pal(void *mob);
 extern void math_store_angle_update_result(void *mob, void *p, s32 a2, s32 a3, f32 alpha);
 
 /* Walks the list of mobs: the ones of type 0xE29 get the 0x800 flag, the ones of type
    0xD54 are handed to func_PAL_002E7270, and the ones of type 0xFA0 with a 0x68 pointer
    get that pointer's block (from +0xC) to func_L00_00326048, unless D_PAL_001A7A78 is 0x33. */
-void func_PAL_L04_0031F198(void) {
+void level_update_mob_list_by_type_pal(void) {
     s32 i;
 
     anim_start_startup_animations();
@@ -43,10 +43,10 @@ void func_PAL_L04_0031F198(void) {
             mob->flags |= 0x800;
         }
         if (mob->type == 0xD54) {
-            func_PAL_002E7270(mob);
+            update_equipment_pieces_pal(mob);
         }
-        if (mob != 0 && mob->type == 0xFA0 && g_current_level != 0x33 && mob->p68 != 0) {
-            math_store_angle_update_result(mob, (void *)((u8 *)mob->p68 + 0xC), 0x80AAAAD2, 0x80396464, 0.07330384f);
+        if (mob != 0 && mob->type == 0xFA0 && g_current_level != 0x33 && mob->vars != 0) {
+            math_store_angle_update_result(mob, (void *)((u8 *)mob->vars + 0xC), 0x80AAAAD2, 0x80396464, 0.07330384f);
         }
     }
 }

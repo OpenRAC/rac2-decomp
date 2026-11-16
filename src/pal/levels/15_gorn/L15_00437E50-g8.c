@@ -12,10 +12,10 @@ extern void FastVecSub(void *, void *, void *), FastVecAdd(void *, void *, void 
 extern void math_l00_interpolate_cubic_vector(void *, void *, void *, void *, void *, float);
 
 /* For each of four channels whose timer expired: rearms it and rebuilds its jittered ten-point curves. */
-void func_PAL_L15_00437E50(void *obj)
+void gorn_channel_curves_rebuild_pal(void *moby)
 {
     GornVector origin, tangent, point;
-    char *state = *(char **)((char *)obj + 0x68);
+    char *state = *(char **)((char *)moby + 0x68);
     int channel;
     for (channel = 0; channel < 4; channel++) {
         if (!FastDecTimer(&g_part_channel_timers[channel]))

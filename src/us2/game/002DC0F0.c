@@ -13,6 +13,7 @@ extern void text_draw_window_small(FontWindow *,unsigned long,char *,int);
 extern void text_draw_small(int,int,unsigned long,char *,int);
 extern void text_draw_right_aligned_small(int,int,unsigned long,char *,int);
 
+/* Draws the cheats menu: each cheat name on the left and its on or off text on the right. */
 int DrawCheatsMenu_us2(struct CheatsMenu *menu) {
     FontWindow text_window;
     short window_fields[12];

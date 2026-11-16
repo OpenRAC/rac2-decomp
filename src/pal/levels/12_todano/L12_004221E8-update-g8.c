@@ -26,14 +26,15 @@ extern s32 flag_set_first_pending(void *), snd_play_from_class_bank(s32, s32, vo
 extern u32 PulseColor(u32, u32, f32);
 typedef struct { u8 pad[0x78]; u32 color; } ColorActor;
 
+/* Moves a platform along its path towards a node, pulses its colour, and carries the hero with it (PAL: 50 Hz timings). */
 void UpdateTodanoPathMover_pal(u8 *self) {
     f32 oldpos[4], oldrot[4], temp[4], delta[4];
-    u8 *st = *(u8 **)(self + 0x68);
+    u8 *vars = *(u8 **)(self + 0x68);
     u16 flag = *(u16 *)(self + 0xb2);
-    s32 c;
+    s32 packed;
     if (g_object_flags.flags[(s16)flag] ||
-        ((c = g_moby_nibble_table[((s16)flag >> 1) + (g_current_map_index << 10)]),
-         (flag & 1) ? ((c >> 4) & 7) : (c & 7))) {
+        ((packed = g_moby_nibble_table[((s16)flag >> 1) + (g_current_map_index << 10)]),
+         (flag & 1) ? ((packed >> 4) & 7) : (packed & 7))) {
         moby_mark_spawned(self);
         return;
     }
@@ -42,27 +43,27 @@ void UpdateTodanoPathMover_pal(u8 *self) {
     switch (self[0x20]) {
     case 0:
         *(u16 *)(self + 0x34) |= 0x1000;
-        *(s32 *)(st + 0xdc) |= 1;
+        *(s32 *)(vars + 0xdc) |= 1;
         self[0x20] = 1;
         g_debris_sound_handle = 0;
         break;
     case 1:
-        pushable_moby_update_pal(self, st + 0x50, 1.5f, 1.5f, 0.1f, *(s32 *)(st + 0xec));
-        if (*(s32 *)(st + 0xe0) != -1) {
-            qcopy(temp, g_path_waypoint_table[*(s32 *)(st + 0xe0)].position);
+        pushable_moby_update_pal(self, vars + 0x50, 1.5f, 1.5f, 0.1f, *(s32 *)(vars + 0xec));
+        if (*(s32 *)(vars + 0xe0) != -1) {
+            qcopy(temp, g_path_waypoint_table[*(s32 *)(vars + 0xe0)].position);
             if (vec_distance_xy(self + 0x10, temp) < 1.0f) {
                 *(u16 *)(self + 0x34) &= 0xefff;
-                *(f32 *)(st + 0xF0) = FastVecLength(st + 0x50);
+                *(f32 *)(vars + 0xF0) = FastVecLength(vars + 0x50);
                 self[0x20] = 2;
             }
         }
         break;
     case 2: {
         f32 angle;
-        FastVecSub(delta, g_path_waypoint_table[*(s32 *)(st + 0xe0)].position, self + 0x10);
+        FastVecSub(delta, g_path_waypoint_table[*(s32 *)(vars + 0xe0)].position, self + 0x10);
         angle = FastVecLength(delta);
-        math_approach_target_with_braking(angle, 0.008f, 0.008f, 0.080000006f, st + 0xF0);
-        vec_scale_to_length(temp, delta, *(f32 *)(st + 0xF0));
+        math_approach_target_with_braking(angle, 0.008f, 0.008f, 0.080000006f, vars + 0xF0);
+        vec_scale_to_length(temp, delta, *(f32 *)(vars + 0xF0));
         FastVecAdd(self + 0x10, self + 0x10, temp);
         if (angle < 0.001f) moby_set_state(self, 3, -1);
         break;
@@ -100,5 +101,5 @@ void UpdateTodanoPathMover_pal(u8 *self) {
         }
     }
     FastVecSub(temp, self + 0x10, oldpos);
-    mat_combine_and_store(st + 0xa0, temp, oldrot, self + 0xF0);
+    mat_combine_and_store(vars + 0xa0, temp, oldrot, self + 0xF0);
 }

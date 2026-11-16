@@ -37,23 +37,24 @@ extern L18_EDE8f32 g_ribbon_emitter_angle_b_deg __attribute__((sda));
 extern L18_EDE8f32 g_ribbon_emitter_spread_a __attribute__((sda));
 extern L18_EDE8f32 g_ribbon_emitter_spread_b __attribute__((sda));
 
-void ribbon_init_emitters_pal(u8 *obj)
+/* Gives each of the two ribbon emitters random directions and a random start offset around the object (PAL). */
+void ribbon_init_emitters_pal(u8 *moby)
 {
-    u8 *state = *(u8 **)(obj + 0x68);
-    L18_EDE8f32 v[4] __attribute__((aligned(16)));
+    u8 *vars = *(u8 **)(moby + 0x68);
+    L18_EDE8f32 offset[4] __attribute__((aligned(16)));
     s32 i;
 
     for (i = 0; i < 2; i++) {
-        u8 *s = state + i * 0xA0;
+        u8 *emitter = vars + i * 0xA0;
 
-        vec_random_direction(s + 0x60, g_ribbon_emitter_angle_a_deg * 0.0003490659f, g_ribbon_emitter_angle_b_deg * 0.0003490659f);
-        vec_random_direction(s + 0x70, g_ribbon_emitter_angle_a_deg * 0.0003490659f, g_ribbon_emitter_angle_b_deg * 0.0003490659f);
-        vec_random_direction(s + 0x80, g_ribbon_emitter_spread_a, g_ribbon_emitter_spread_b);
-        vec_random_direction(s + 0x90, g_ribbon_emitter_spread_a, g_ribbon_emitter_spread_b);
-        qcopy(state, state + 0x140);
-        qcopy(state + 0xA0, state + 0x140);
-        matrix_mul_vec3(v, g_emitter_offset_vectors + math_random_int_below(6) * 16, obj + 0xC0);
-        FastVecAdd(v, obj + 0x10, v);
-        qcopy(state + 0x10, v);
+        vec_random_direction(emitter + 0x60, g_ribbon_emitter_angle_a_deg * 0.0003490659f, g_ribbon_emitter_angle_b_deg * 0.0003490659f);
+        vec_random_direction(emitter + 0x70, g_ribbon_emitter_angle_a_deg * 0.0003490659f, g_ribbon_emitter_angle_b_deg * 0.0003490659f);
+        vec_random_direction(emitter + 0x80, g_ribbon_emitter_spread_a, g_ribbon_emitter_spread_b);
+        vec_random_direction(emitter + 0x90, g_ribbon_emitter_spread_a, g_ribbon_emitter_spread_b);
+        qcopy(vars, vars + 0x140);
+        qcopy(vars + 0xA0, vars + 0x140);
+        matrix_mul_vec3(offset, g_emitter_offset_vectors + math_random_int_below(6) * 16, moby + 0xC0);
+        FastVecAdd(offset, moby + 0x10, offset);
+        qcopy(vars + 0x10, offset);
     }
 }

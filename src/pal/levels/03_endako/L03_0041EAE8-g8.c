@@ -24,51 +24,52 @@ extern void set_moby_color(u8 *a0, s32 a1, s32 a2, s32 a3);
 extern s32 moby_pack_handle(u8 *a0);
 extern void moby_set_light_color(u8 *a0, s32 a1);
 
-void scripted_light_update_pal(u8 *entity) {
-    u8 *state = *(u8 **)(entity + 0x68);
-    s32 old, next, base, rem;
-    s32 arg1, arg2, arg3;
+/* Flashes a scripted light on the target moby during the boss cutscene timeline (PAL). */
+void scripted_light_update_pal(u8 *moby) {
+    u8 *state = *(u8 **)(moby + 0x68);
+    s32 old_count, new_count, rounded, phase;
+    s32 red, green, blue;
 
-    switch (entity[0x20]) {
+    switch (moby[0x20]) {
     case 0:
-        entity[0x30] = 0xFF;
-        entity[0x20] = 1;
+        moby[0x30] = 0xFF;
+        moby[0x20] = 1;
         return;
     case 1: {
-        s32 mode = g_hero_l03_mode;
+        s32 hero_mode = g_hero_l03_mode;
 
-        if (mode == 2) {
+        if (hero_mode == 2) {
             if (g_endako_state.field30 == 5) {
                 if (g_endako_state.field34 < 10) {
                     *(u16 *)(g_endako_state.field194 + 0x7C) = 0x3F;
                 }
             }
             if (g_endako_state.field30 == 7) {
-                u8 *obj = g_endako_state.field190;
+                u8 *target = g_endako_state.field190;
                 if (g_endako_state.field34 < 0x376) goto other;
                 if (g_endako_state.field34 >= 0x3B3) goto other;
-                old = *(s32 *)state;
-                next = old + 1;
-                *(s32 *)state = next;
-                base = (next > -1) ? next : old + 4;
-                base = (base >> 2) << 2;
-                rem = next - base;
-                if (rem < 3) {
-                    arg1 = 0;
-                    arg2 = 0;
-                    arg3 = 0;
+                old_count = *(s32 *)state;
+                new_count = old_count + 1;
+                *(s32 *)state = new_count;
+                rounded = (new_count > -1) ? new_count : old_count + 4;
+                rounded = (rounded >> 2) << 2;
+                phase = new_count - rounded;
+                if (phase < 3) {
+                    red = 0;
+                    green = 0;
+                    blue = 0;
                 } else {
-                    arg1 = 0xB0;
-                    arg2 = 0xB0;
-                    arg3 = 0xF0;
+                    red = 0xB0;
+                    green = 0xB0;
+                    blue = 0xF0;
                 }
-                set_moby_color(obj, arg1, arg2, arg3);
+                set_moby_color(target, red, green, blue);
                 return;
             other:
                 if (g_endako_state.field34 < 0x395) {
-                    *(s32 *)(state + 4) = moby_pack_handle(obj);
+                    *(s32 *)(state + 4) = moby_pack_handle(target);
                 } else {
-                    moby_set_light_color(obj, *(s32 *)(state + 4));
+                    moby_set_light_color(target, *(s32 *)(state + 4));
                 }
             }
         }

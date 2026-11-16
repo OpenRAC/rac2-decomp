@@ -162,7 +162,7 @@ extern unsigned long long load_texture_file(int);
    in the panel, as a black shadow and then in colour one pixel up and left, and return 2
    (1 when the panel's 0x100 flag is clear). Other modes draw the chosen texture and return 16,
    or 1 when flag 4 is set and the chosen row's entry is not available. */
-int func_US2_002DB700(MenuPanel2DA9A8 *menu)
+int menu_panel_draw_us2(MenuPanel2DA9A8 *menu)
 {
     unsigned long long texture;
     unsigned char *text;

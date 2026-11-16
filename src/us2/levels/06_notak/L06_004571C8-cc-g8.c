@@ -59,7 +59,8 @@ typedef struct {
     char dir[0x10];
 } Thing;
 
-void func_US2_L06_004571C8(Thing *m)
+/* Item trigger: waits for the player, then plays the message or gives the reward (USA v2.00). */
+void item_l06_trigger_update_us2(Thing *m)
 {
     TriggerVars *p = m->vars;
     int notify, i, missing, fail;

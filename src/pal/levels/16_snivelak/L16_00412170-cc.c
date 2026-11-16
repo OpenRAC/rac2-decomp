@@ -10,7 +10,7 @@ extern void moby_transform_joint_to_world(void *, int, void *);
 extern void vec_scale_to_length(void *, void *, float);
 
 /* Emits two particle layers from five bones, with velocity chosen by bone group. */
-void func_PAL_L16_00412170(u8 *moby)
+void EmitSnivelakBoneParticles_pal(u8 *moby)
 {
     float position[4] __attribute__((aligned(16)));
     float velocity[4] __attribute__((aligned(16)));

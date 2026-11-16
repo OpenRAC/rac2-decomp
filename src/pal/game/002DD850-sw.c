@@ -30,10 +30,10 @@ extern Dialogue g_music_state;
 extern int fast_decompress_pal(void *, void *);
 extern void relocate_asset_entry_pointers(AnimationClass *, int);
 extern int snd_resume_music_stream(void);
-extern void func_PAL_002A7E68(AnimationMoby *, int, int, int);
+extern void anim_start_blended_pal(AnimationMoby *, int, int, int);
 
 /* Corresponds to RAC1 update_streamed_moby_animation. */
-int func_PAL_002DEEA8(AnimationStream *stream)
+int update_streamed_moby_animation_pal(AnimationStream *stream)
 {
     AnimationMoby *moby;
     u8 *header;
@@ -75,7 +75,7 @@ int func_PAL_002DEEA8(AnimationStream *stream)
             if (dialogue->count >= 6000) return 0;
             moby->counter = 0;
             moby->state++;
-            func_PAL_002A7E68(moby, animation + 1, 0, 20);
+            anim_start_blended_pal(moby, animation + 1, 0, 20);
             break;
         case 1: case 3: case 5:
             if (moby->counter == 0 && moby->primary == moby->secondary) {
@@ -86,7 +86,7 @@ int func_PAL_002DEEA8(AnimationStream *stream)
                 if (moby->state == 1) moby->state = moby->state + 1;
                 else moby->state = 6;
                 moby->counter = 0;
-                func_PAL_002A7E68(moby, 0, 0, 20);
+                anim_start_blended_pal(moby, 0, 0, 20);
             }
             break;
         case 6:

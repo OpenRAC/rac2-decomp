@@ -13,6 +13,7 @@ extern void cam_set_transition_frames(float);
 extern void pad_clear_port_state(void);
 extern float FastAddRotations(float, float);
 
+/* Ends the scene and starts the closing transition (USA v2.00). */
 void scene_end_playback_us2(void) {
     char *p;
     char *scene;

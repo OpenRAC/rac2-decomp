@@ -6,6 +6,7 @@ extern char *g_resident_data_base[] __attribute__((sda));
 extern void *tab_menu_get_selected_value(void *);
 extern char *g_resident_data_base[] __attribute__((sda));
 
+/* Hands the object the text pointer of the selected list entry. */
 int menu_assign_list_text_pointer_us2(char *object) {
     if (g_resident_data_base[0] != 0)
         *(void **)(object + 0x34) = tab_menu_get_selected_value(g_resident_data_base[0] + 0x3C160);

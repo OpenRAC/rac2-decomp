@@ -121,7 +121,7 @@ extern int g_hero_state;
 
 /* Per-state airborne steering; shares the hop-velocity state cases with
    rac1-decomp's hero_update_hop_velocity. */
-void func_PAL_L00_002B6B38(void) {
+void hero_update_airborne_steering_pal(void) {
     float probe_start[4], probe_end[4], yaw, speed, rate;
 
     if ((*(HopPlayer *)&g_hero_state).state == 10) {

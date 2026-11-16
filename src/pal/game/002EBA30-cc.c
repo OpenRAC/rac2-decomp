@@ -100,7 +100,7 @@ extern char g_load_state_block[];
 
 extern void InitMemSlots(), mem_clear(), gfx_init_view_context(), UpdateViewContext(), gfx_reset_packet_buffer();
 extern void FadeToBlack(), UploadTextureImages(), RelocateSkyDefinition(), load_register_class_cache_object(), tex_build_draw_packets();
-extern void mem_fast_helper_b(), mem_fast_helper_c(), func_PAL_0029FA60(), counter_clear_group(), load_init_random_scene();
+extern void mem_fast_helper_b(), mem_fast_helper_c(), moby_init_instance_pal(), counter_clear_group(), load_init_random_scene();
 extern int fast_decompress_pal(), log2dim();
 extern int load_read_disc_sectors_blocking(int, int, int);
 extern int snd_CheckLoadInProgress(int);
@@ -221,7 +221,7 @@ void InitializeLevelRuntime_pal(void)
     p += 0x4000;
     entry = (unsigned char *)g_moby_pool_start;
     g_load_object_cursor = (int)entry;
-    func_PAL_0029FA60(entry, 0);
+    moby_init_instance_pal(entry, 0);
     entry[0x20] = 0xfd;
     g_moby_pool_end = (unsigned char *)g_load_object_cursor + 0x100;
     g_moby_pool_end[0x20] = 0xff;

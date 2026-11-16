@@ -64,6 +64,7 @@ extern void *mpeg_vobuf_get_next_frame(char *);
 extern void mpeg_vobuf_advance_write(u8 *);
 extern void mpeg_build_frame_packet_us2(void *, void *, int, int, int);
 
+/* Runs the MPEG decode loop for a movie object, building frame packets until the stream ends. */
 int mpeg_dec_run_loop_us2(void *p)
 {
     int *object = p;

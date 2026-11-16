@@ -113,96 +113,96 @@ extern void draw_world_quad(void *, void *, s32);
 void gfx_draw_spinning_star_quads_pal(u8 *moby) {
     L23Spin *vars;
     L23Quad pkt;
-    TI16 m[4];
+    TI16 matrix[4];
     TI16 axis[1];
-    TI16 rot[3];
-    float f;
-    float fa;
-    float fb;
-    float fc;
-    float fd;
+    TI16 rot_matrix[3];
+    float wave;
+    float offset_a;
+    float offset_b;
+    float offset_c;
+    float offset_d;
     s32 i;
-    u8 *hero;
+    u8 *boss;
     s32 k;
-    u32 col;
-    s64 reg;
-    s64 tex;
-    float *uvy0;
-    float *uvx0;
+    u32 color;
+    s64 alpha_reg;
+    s64 texture;
+    float *uv_y_start;
+    float *uv_x_start;
 
     if (D_L23_001B1484_2 != 0) {
         vars = *(L23Spin **)(moby + 0x68);
         g_star_quad_scale = g_mothership_scale_factor * 1.1f;
         vars->turn = FastAddRotations(vars->turn, (float)g_spinning_quad_turn_speed * 0.0003490659f);
-        f = math_fast_sin_or_cos_b((float)(*(u16 *)(moby + 0x96) % g_spinning_quad_period) * (1.0f / (float)g_spinning_quad_period) * 3.1415927f);
-        vars->alpha = (s32)(f * g_spinning_quad_alpha_scale);
+        wave = math_fast_sin_or_cos_b((float)(*(u16 *)(moby + 0x96) % g_spinning_quad_period) * (1.0f / (float)g_spinning_quad_period) * 3.1415927f);
+        vars->alpha = (s32)(wave * g_spinning_quad_alpha_scale);
         vars->alpha += g_spinning_quad_alpha_base;
-        reg = g_alpha_blend_a | ((s64)g_alpha_blend_b << 2);
-        reg |= (s64)g_alpha_blend_c << 4;
-        reg |= (s64)g_alpha_blend_d << 6;
-        reg |= (s64)vars->alpha << 32;
-        pkt.tail[3] = reg;
-        tex = GetEffectTextureDescriptor(g_star_effect_texture);
+        alpha_reg = g_alpha_blend_a | ((s64)g_alpha_blend_b << 2);
+        alpha_reg |= (s64)g_alpha_blend_c << 4;
+        alpha_reg |= (s64)g_alpha_blend_d << 6;
+        alpha_reg |= (s64)vars->alpha << 32;
+        pkt.tail[3] = alpha_reg;
+        texture = GetEffectTextureDescriptor(g_star_effect_texture);
         pkt.tail[2] = 0xFF9000000260LL;
-        pkt.tail[1] = tex;
+        pkt.tail[1] = texture;
         pkt.tail[0] = 0;
         VU1_addGSregister(0x47, 0x53001);
-        hero = D_L23_001B1484_2;
-        qcopy_nc(&m[0], hero + 0xC0);
-        qcopy_nc(&m[1], hero + 0xD0);
-        qcopy_nc(&m[2], hero + 0xE0);
-        qcopy(&m[3], hero + 0x10);
-        ((float *)&m[3])[3] = 1.0f;
+        boss = D_L23_001B1484_2;
+        qcopy_nc(&matrix[0], boss + 0xC0);
+        qcopy_nc(&matrix[1], boss + 0xD0);
+        qcopy_nc(&matrix[2], boss + 0xE0);
+        qcopy(&matrix[3], boss + 0x10);
+        ((float *)&matrix[3])[3] = 1.0f;
         qzero_nc(axis);
         ((float *)axis)[2] = vars->turn;
-        euler_rotation_basis(rot, axis);
-        multiply_matrix3x3(m, m, rot);
+        euler_rotation_basis(rot_matrix, axis);
+        multiply_matrix3x3(matrix, matrix, rot_matrix);
         if (g_boss_fight_timer == 0) {
-            col = (vars->alpha << 24) + (g_trail_color_start & 0xFFFFFF);
-            pkt.col[3] = col;
-            pkt.col[2] = col;
-            pkt.col[1] = col;
-            pkt.col[0] = col;
+            color = (vars->alpha << 24) + (g_trail_color_start & 0xFFFFFF);
+            pkt.col[3] = color;
+            pkt.col[2] = color;
+            pkt.col[1] = color;
+            pkt.col[0] = color;
         } else {
-            col = (vars->alpha << 24) + (g_trail_color_end & 0xFFFFFF);
-            pkt.col[3] = col;
-            pkt.col[2] = col;
-            pkt.col[1] = col;
-            pkt.col[0] = col;
+            color = (vars->alpha << 24) + (g_trail_color_end & 0xFFFFFF);
+            pkt.col[3] = color;
+            pkt.col[2] = color;
+            pkt.col[1] = color;
+            pkt.col[0] = color;
         }
-        for (i = 0, uvx0 = &pkt.uv[0][0], uvy0 = &pkt.uv[0][1]; i < 0x48; i++) {
-            L23Corner (*tab)[4] = g_star_quad_corners;
-            L23Corner *e = tab[i];
-            float *uvy = uvy0;
-            float *uvx = uvx0;
+        for (i = 0, uv_x_start = &pkt.uv[0][0], uv_y_start = &pkt.uv[0][1]; i < 0x48; i++) {
+            L23Corner (*corner_table)[4] = g_star_quad_corners;
+            L23Corner *corner = corner_table[i];
+            float *uv_y = uv_y_start;
+            float *uv_x = uv_x_start;
             TI16 *pos = pkt.pos;
 
             for (k = 3; k >= 0; k--) {
-                s32 b = e->b;
+                s32 uv_index = corner->b;
 
-                FastVecScale(pos, &g_star_quad_vertices[e->a], g_star_quad_scale);
+                FastVecScale(pos, &g_star_quad_vertices[corner->a], g_star_quad_scale);
                 vars->spin = FastAddRotations(vars->spin, g_star_spin_speed * 0.0003490659f);
                 math_fast_float_g(vars->spin);
                 if (g_boss_fight_timer == 0) {
-                    fa = math_fast_sin_or_cos_a(vars->spin) * g_star_offset_a;
-                    fb = math_fast_sin_or_cos_b(vars->spin) * g_star_offset_b;
-                    fc = math_fast_sin_or_cos_a(vars->spin) * g_star_offset_c;
-                    fd = math_fast_sin_or_cos_b(vars->spin) * g_star_offset_d;
+                    offset_a = math_fast_sin_or_cos_a(vars->spin) * g_star_offset_a;
+                    offset_b = math_fast_sin_or_cos_b(vars->spin) * g_star_offset_b;
+                    offset_c = math_fast_sin_or_cos_a(vars->spin) * g_star_offset_c;
+                    offset_d = math_fast_sin_or_cos_b(vars->spin) * g_star_offset_d;
                 } else {
-                    fa = math_fast_sin_or_cos_a(vars->spin) * g_star_offset_e;
-                    fb = math_fast_sin_or_cos_b(vars->spin) * g_star_offset_f;
-                    fc = math_fast_sin_or_cos_a(vars->spin) * g_star_offset_g;
-                    fd = math_fast_sin_or_cos_b(vars->spin) * g_star_offset_h;
+                    offset_a = math_fast_sin_or_cos_a(vars->spin) * g_star_offset_e;
+                    offset_b = math_fast_sin_or_cos_b(vars->spin) * g_star_offset_f;
+                    offset_c = math_fast_sin_or_cos_a(vars->spin) * g_star_offset_g;
+                    offset_d = math_fast_sin_or_cos_b(vars->spin) * g_star_offset_h;
                 }
-                f = math_random_float_range(g_star_size_min, g_star_size_max);
-                *uvx = (g_star_quad_uvs[b][0] * fa + fb) * f;
-                *uvy = g_star_quad_uvs[b][1] * fc + fd;
+                wave = math_random_float_range(g_star_size_min, g_star_size_max);
+                *uv_x = (g_star_quad_uvs[uv_index][0] * offset_a + offset_b) * wave;
+                *uv_y = g_star_quad_uvs[uv_index][1] * offset_c + offset_d;
                 pos++;
-                e++;
-                uvx += 2;
-                uvy += 2;
+                corner++;
+                uv_x += 2;
+                uv_y += 2;
             }
-            draw_world_quad(&pkt, m, 0);
+            draw_world_quad(&pkt, matrix, 0);
         }
     }
 }

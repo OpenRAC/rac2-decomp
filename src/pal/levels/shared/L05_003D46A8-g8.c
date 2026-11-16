@@ -12,7 +12,8 @@ extern float g_projectile_range_alt __attribute__((sda));
 extern float g_projectile_scale_a __attribute__((sda));
 extern float g_projectile_scale_b __attribute__((sda));
 
-unsigned char *func_PAL_L05_003D46A8(void *position, void *direction, int value, char *owner, int kind)
+/* Creates a shot at a position flying in a direction, with a speed and lifetime based on its kind (PAL: 50 Hz speed). */
+unsigned char *feltzin_shot_create_pal(void *position, void *direction, int value, char *owner, int kind)
 {
     unsigned char *object;
     char *state;

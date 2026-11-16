@@ -8,7 +8,8 @@ extern void moby_transform_joint_to_world(char *, int, void *);
 extern float IntToFloat(int);
 extern char *part_spawn_scaling(void *, void *, int, int, int, int, int, int);
 
-void func_PAL_L09_0040E1C0(char *obj)
+/* Throws red and white sparks out of the object as it dies (PAL: 50 Hz speeds). */
+void part_spawn_death_sparks_pal(char *obj)
 {
     float pos[3];
     float vel[3];

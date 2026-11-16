@@ -1,6 +1,6 @@
 #include "names.h"
 /* func_PAL_L18_0043C3F4, the PAL copy of func_L18_00437190: the same C at 50 Hz. The particle lifetime
-   120 becomes 100, written in its arm; the tuning counts go through ((x) * 5 + 2) / 6; the speed step
+   120 becomes 100, written in its arm; the tuning counts go through ((radius) * 5 + 2) / 6; the speed step
    D_L18_001B1918 is scaled by 1.2f; 0.016666668f becomes 0.020000001f and the spin clamp follows.
    func_002BDCE8 becomes func_PAL_002BE9A8, func_L18_00437BA8 becomes func_PAL_L18_0043CE90 and
    func_002ABBB8 becomes func_PAL_002AC718. */
@@ -19,7 +19,7 @@ extern float math_random_float_range(float,float);
 extern void LerpVector4(void *,void *,void *,float);
 typedef struct { int pad0; int flags; u8 pad8[2]; u8 alpha; u8 lifetime; } ParticleRender;
 typedef struct { u8 pad0[0xa]; s16 lifetime; u8 padc[0x14]; ParticleRender render; } Particle;
-extern Particle *func_PAL_002BE9A8(void *,float,float,float,float,int,void *,int,int);
+extern Particle *part_spawn_spinning_spark_pal(void *,float,float,float,float,int,void *,int,int);
 extern int CollLine(void *,void *,int,void *,int);
 extern int coll_test_point(void *,int,void *,float);
 extern void vec_scale_to_length(char *,char *,float);
@@ -29,7 +29,7 @@ extern float vec_length_xy(void *);
 extern void vec_fast_normalize_helper(void *,void *,float);
 extern int FloatToInt(float);
 extern int math_fast_float_d(void *);
-extern void func_PAL_L18_0043CE90(void *,int);
+extern void part_l18_spawn_ring_of_sparks_pal(void *,int);
 extern void SpawnExplosionEffects_pal(void *,void *,void *,float,float,int,int,int,float,float,float,float,int,float,int,int,int,int,int);
 extern void moby_mark_spawned(void *);
 extern int coll_process_hit(void *,int,void *,int,float);
@@ -71,14 +71,15 @@ static inline float clamp_speed(float speed, float low, float high) {
     if(speed>high) speed=high;
     return speed;
 }
-void func_PAL_L18_0043C3F4(u8 *obj) {
+/* Updates the bouncing fireball: it flies and bounces off walls leaving sparks, then slides, explodes and hurts what is nearby (PAL: 50 Hz timings). */
+void fireball_update_pal(u8 *obj) {
     float delta[4] __attribute__((aligned(16)));
     float pos[4] __attribute__((aligned(16)));
     float temp[4] __attribute__((aligned(16)));
     u8 *st=OBJ->p[0x1a], *p, *other;
     u8 **targets;
-    int i, n, mode=obj[0x20], amount, r,g,b;
-    float t, x, minimum;
+    int i, hit_count, mode=obj[0x20], amount, r,g,b;
+    float color_scale, radius, minimum;
     switch(mode) {
     case 0: case 1:
         if(flag_set_first_pending(obj)) PlayMobySound(1,0,obj);
@@ -99,7 +100,7 @@ void func_PAL_L18_0043C3F4(u8 *obj) {
                 denominator=IntToFloat((g_fireball_lifetime_frames*5+2)/6);
                 ratio=(float)STATE->h[0x14]; ratio/=denominator;
                 random=math_random_float_range(0.9f,1.0f);
-                spark=func_PAL_002BE9A8(pos,g_fireball_spark_size,1,1,random*(g_fireball_spark_speed_min+(g_fireball_spark_speed_max-g_fireball_spark_speed_min)*ratio),amount,&g_default_quad,g_fireball_spark_lifetime,0);
+                spark=part_spawn_spinning_spark_pal(pos,g_fireball_spark_size,1,1,random*(g_fireball_spark_speed_min+(g_fireball_spark_speed_max-g_fireball_spark_speed_min)*ratio),amount,&g_default_quad,g_fireball_spark_lifetime,0);
                 if(spark) { ParticleRender *particle; spark->lifetime=100; particle=&spark->render; particle->flags=2; particle->alpha=127; particle->lifetime=*(u8 *)&spark->lifetime; }
             }
         }
@@ -139,9 +140,9 @@ bounce_done:
         break;
     case 2:
         { typedef struct { float a,b,c; } Triple; *(Triple *)delta=*(Triple *)g_fireball_delta_vector; }
-        t=(float)STATE->i[0x8]*STATE->f[0xb];
-        r=FloatToInt((delta[0]-255.0f)*t+255.0f);
-        g=FloatToInt(delta[1]*t); b=FloatToInt(delta[2]*t);
+        color_scale=(float)STATE->i[0x8]*STATE->f[0xb];
+        r=FloatToInt((delta[0]-255.0f)*color_scale+255.0f);
+        g=FloatToInt(delta[1]*color_scale); b=FloatToInt(delta[2]*color_scale);
         {u32 color=(u32)b<<16; color|=0xff000000; color|=g<<8; color|=r; OBJ->i[0x1e]=color;}
         {float speed=STATE->f[0x7]*((g_fireball_speed_scale-1.0f)*1.2f+1.0f);
         minimum=g_fireball_min_speed*0.020000001f;
@@ -153,20 +154,20 @@ bounce_done:
         break;
     case 3:
         if(flag_set_first_pending(obj)) {
-            func_PAL_L18_0043CE90(obj+0x10,g_fireball_ring_spark_count);
+            part_l18_spawn_ring_of_sparks_pal(obj+0x10,g_fireball_ring_spark_count);
             SpawnExplosionEffects_pal(obj,st+0x10,obj+0x10,0,0,3,3,5,1,0.2f,9,1,-1,0,1,1,-1,0,0x810001);
             PlayMobySound(0,0,obj);
         }
         else {
         if(((g_fireball_grow_frames+g_fireball_fade_frames)*5+2)/6<OBJ->u[0x4b]) {moby_mark_spawned(obj);return;}
-        x=g_fireball_radius;
-        if(OBJ->u[0x4b]<(g_fireball_grow_frames*5+2)/6) x=x*(float)OBJ->u[0x4b]/(float)((g_fireball_grow_frames*5+2)/6);
-        n=coll_process_hit(obj+0x10,0,obj,0,x);
-        if(!n) break;
-        if(n>0) {
+        radius=g_fireball_radius;
+        if(OBJ->u[0x4b]<(g_fireball_grow_frames*5+2)/6) radius=radius*(float)OBJ->u[0x4b]/(float)((g_fireball_grow_frames*5+2)/6);
+        hit_count=coll_process_hit(obj+0x10,0,obj,0,radius);
+        if(!hit_count) break;
+        if(hit_count>0) {
         int remaining;
         targets=g_nearby_hit_targets;
-        remaining=n;
+        remaining=hit_count;
         do {
             u8 *other=*targets;
             int valid=0;

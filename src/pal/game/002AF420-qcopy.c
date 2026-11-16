@@ -23,10 +23,10 @@ extern GameState_189E20 g_hero_state;
    and applies the result to the object's 0x24 field, either from the target position or from
    the hero position. The unit needs -frac2-qcopy -frac2-qcopy-barrier so the 16-byte copy
    reaches addiu/lq/sq, and -g for the two nops in front of the division. */
-void moby_wander_around_home_point_pal(char *a0, char *a1, float a2, float a3)
+void moby_wander_around_home_point_pal(char *moby, char *home, float speed, float max_step)
 {
-    char *obj = a0;
-    char *st = a1;
+    char *obj = moby;
+    char *st = home;
     V4_002AE8C0 *pos;
     float v[4];
     float f;
@@ -46,7 +46,7 @@ void moby_wander_around_home_point_pal(char *a0, char *a1, float a2, float a3)
     *(V4_002AE8C0 *)v = *pos;
     v[0] = v[0] + math_fast_sin_or_cos_a(*(float *)(obj + 0xF8)) * *(float *)(st + 0x14);
     v[1] = v[1] + math_fast_sin_or_cos_b(*(float *)(obj + 0xF8)) * *(float *)(st + 0x14);
-    r = moby_move_over_ground(obj, (char *)pos, v, 0, a2, *(float *)(st + 0x10), a3, 0.52359885f);
+    r = moby_move_over_ground(obj, (char *)pos, v, 0, speed, *(float *)(st + 0x10), max_step, 0.52359885f);
     *(float *)(obj + 0x18) = coll_probe_ground_height_below((char *)pos, 0, 0.5f);
     f = vec_distance_xy((char *)pos, st);
     if (r == 0 || *(float *)(st + 0x1C) < f) {

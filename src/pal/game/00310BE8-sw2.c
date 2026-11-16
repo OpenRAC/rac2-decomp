@@ -24,18 +24,19 @@ extern float FastVecLength(void *);
 extern float fast_vec_dist(void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
 extern void moby_transform_joint_to_world(void *, int, void *);
-extern void func_PAL_002A7E68(void *, int, int, int);
+extern void anim_start_blended_pal(void *, int, int, int);
 extern int PlayMobySound(int, int, char *);
 extern s32 swingshot_hook_spawn_pal(s32 arg0, f32 fparg0);
 extern void gfx_draw_wavy_link_strip(char *);
 
+/* Updates the Swingshot each frame. Its hook follows the hero's target, flies out to it, pulls the hero along, and lets go when the swing ends (PAL build). */
 void swingshot_update_pal(u8 *self)
 {
     FollowVars *data;
     u8 *vars;
     f32 dist;
-    f32 v1[4];
-    f32 v2[4];
+    f32 delta[4];
+    f32 hit_pos[4];
 
     if (((Hero *)g_hero_state)->i[0x2294 / 4] == 1)
         stub_empty_9_pal(0x1D, 1);
@@ -63,7 +64,7 @@ have:
     case 1:
         if (self[0x60] & 2) {
             if (self[0x43] != 1)
-                func_PAL_002A7E68(self, 1, 0, 8);
+                anim_start_blended_pal(self, 1, 0, 8);
             self[0x20] = 1;
         }
         if (data->target != 0) {
@@ -81,7 +82,7 @@ have:
                 data->f18 = 0.0f;
                 *(f32 *)(vars + 4) = 0.96000004f;
                 if (self[0x43] != 3)
-                    func_PAL_002A7E68(self, 3, 0, 8);
+                    anim_start_blended_pal(self, 3, 0, 8);
                 PlayMobySound(0, 0, (char *)self);
                 self[0x20] = 2;
             }
@@ -92,7 +93,7 @@ have:
                 data->f18 = 0.0f;
                 *(f32 *)(vars + 4) = 0.96000004f;
                 if (self[0x43] != 3)
-                    func_PAL_002A7E68(self, 3, 0, 8);
+                    anim_start_blended_pal(self, 3, 0, 8);
                 PlayMobySound(0, 0, (char *)self);
                 self[0x20] = 0xF;
             }
@@ -107,7 +108,7 @@ have:
                 data->f1C = 1.0f;
                 data->f18 = 0.0f;
                 if (self[0x43] != 3)
-                    func_PAL_002A7E68(self, 3, 0, 8);
+                    anim_start_blended_pal(self, 3, 0, 8);
                 PlayMobySound(0, 0, (char *)self);
                 self[0x20] = 9;
             }
@@ -116,8 +117,8 @@ have:
     case 2:
         gfx_register_world_draw_callback(gfx_draw_wavy_link_strip, (char *)self);
         if ((self[0x60] & 2) && self[0x43] != 4)
-            func_PAL_002A7E68(self, 4, 0, 8);
-        FastVecSub(v1, ((Hero *)g_hero_state)->ptr[0xAA4 / 4] + 0x10, data->target + 0x10);
+            anim_start_blended_pal(self, 4, 0, 8);
+        FastVecSub(delta, ((Hero *)g_hero_state)->ptr[0xAA4 / 4] + 0x10, data->target + 0x10);
         dist = *(f32 *)(vars + 4);
         dist += FastVecLength(&((Hero *)g_hero_state)->b[0x150]);
         if (((Hero *)g_hero_state)->i[0x229C / 4] == 0xF) {
@@ -125,9 +126,9 @@ have:
         } else if ((((Hero *)g_hero_state)->i[0x22A4 / 4] == 4 || ((Hero *)g_hero_state)->i[0x22A4 / 4] == 2) && ((Hero *)g_hero_state)->f[0x31C / 4] > 2.0f) {
             dist = 0.96000004f;
         }
-        qcopy(v2, &((Hero *)g_hero_state)->q[0x80 / 16]);
-        v2[2] += 0.5f;
-        if (CollLine(v2, ((Hero *)g_hero_state)->ptr[0xAA4 / 4] + 0x10, 2, 0, 0) != 0) {
+        qcopy(hit_pos, &((Hero *)g_hero_state)->q[0x80 / 16]);
+        hit_pos[2] += 0.5f;
+        if (CollLine(hit_pos, ((Hero *)g_hero_state)->ptr[0xAA4 / 4] + 0x10, 2, 0, 0) != 0) {
             if (((Hero *)g_hero_state)->f[0x31C / 4] > 0.5f) {
                 stub_empty_9_pal(6, 1);
             } else {
@@ -136,8 +137,8 @@ have:
             }
             self[0x20] = 6;
         } else if (dist < fast_vec_dist(data->target + 0x10, ((Hero *)g_hero_state)->ptr[0xAA4 / 4] + 0x10)) {
-            vec_scale_to_length(v1, v1, dist);
-            FastVecAdd(data->target + 0x10, data->target + 0x10, v1);
+            vec_scale_to_length(delta, delta, dist);
+            FastVecAdd(data->target + 0x10, data->target + 0x10, delta);
         } else {
             qcopy(data->target + 0x10, ((Hero *)g_hero_state)->ptr[0xAA4 / 4] + 0x10);
             self[0x20] = 3;
@@ -150,10 +151,10 @@ have:
         self[0x20] = 4;
         break;
     case 4:
-        moby_transform_joint_to_world(self, 0, v1);
-        qcopy(v1, &((Hero *)g_hero_state)->q[0x80 / 16]);
-        v1[2] += 0.5f;
-        if (CollLine(v1, ((Hero *)g_hero_state)->ptr[0xAA4 / 4] + 0x10, 2, 0, 0) != 0) {
+        moby_transform_joint_to_world(self, 0, delta);
+        qcopy(delta, &((Hero *)g_hero_state)->q[0x80 / 16]);
+        delta[2] += 0.5f;
+        if (CollLine(delta, ((Hero *)g_hero_state)->ptr[0xAA4 / 4] + 0x10, 2, 0, 0) != 0) {
             if (((Hero *)g_hero_state)->h[0x34E / 2] != 0) {
                 stub_empty_9_pal(6, 1);
             } else {
@@ -162,7 +163,7 @@ have:
             self[0x20] = 6;
         } else {
             if ((self[0x60] & 2) && self[0x43] != 4)
-                func_PAL_002A7E68(self, 4, 0, 8);
+                anim_start_blended_pal(self, 4, 0, 8);
             gfx_register_world_draw_callback(gfx_draw_wavy_link_strip, (char *)self);
             data->f20 = data->f20 * 0.88f;
             data->f18 = data->f18 + 0.6981318f;
@@ -193,7 +194,7 @@ have:
     case 5:
         qcopy(data->target + 0x10, ((Hero *)g_hero_state)->ptr[0xAA4 / 4] + 0x10);
         if ((self[0x60] & 2) && self[0x43] != 4)
-            func_PAL_002A7E68(self, 4, 0, 8);
+            anim_start_blended_pal(self, 4, 0, 8);
         data->f20 = data->f20 * 0.88f;
         data->f18 = data->f18 + 0.6981318f;
         gfx_register_world_draw_callback(gfx_draw_wavy_link_strip, (char *)self);
@@ -206,29 +207,29 @@ have:
         self[0x20] = 7;
         break;
     case 7:
-        moby_transform_joint_to_world(self, 0, v2);
-        FastVecSub(v1, v2, data->target + 0x10);
+        moby_transform_joint_to_world(self, 0, hit_pos);
+        FastVecSub(delta, hit_pos, data->target + 0x10);
         dist = *(f32 *)(vars + 4);
         dist += FastVecLength(&((Hero *)g_hero_state)->b[0x150]);
-        if (dist < fast_vec_dist(data->target + 0x10, v2)) {
-            vec_scale_to_length(v1, v1, dist);
-            FastVecAdd(data->target + 0x10, data->target + 0x10, v1);
+        if (dist < fast_vec_dist(data->target + 0x10, hit_pos)) {
+            vec_scale_to_length(delta, delta, dist);
+            FastVecAdd(data->target + 0x10, data->target + 0x10, delta);
             gfx_register_world_draw_callback(gfx_draw_wavy_link_strip, (char *)self);
         } else {
-            qcopy(data->target + 0x10, v2);
+            qcopy(data->target + 0x10, hit_pos);
             if (self[0x43] != 1)
-                func_PAL_002A7E68(self, 1, 0, 8);
+                anim_start_blended_pal(self, 1, 0, 8);
             self[0x20] = 1;
         }
         break;
     case 9:
         gfx_register_world_draw_callback(gfx_draw_wavy_link_strip, (char *)self);
         if ((self[0x60] & 2) && self[0x43] != 4)
-            func_PAL_002A7E68(self, 4, 0, 8);
-        FastVecSub(v1, ((Hero *)g_hero_state)->ptr[0xAD4 / 4] + 0x10, data->target + 0x10);
-        if (*(f32 *)(vars + 4) < FastVecLength(v1)) {
-            vec_scale_to_length(v1, v1, *(f32 *)(vars + 4));
-            FastVecAdd(data->target + 0x10, data->target + 0x10, v1);
+            anim_start_blended_pal(self, 4, 0, 8);
+        FastVecSub(delta, ((Hero *)g_hero_state)->ptr[0xAD4 / 4] + 0x10, data->target + 0x10);
+        if (*(f32 *)(vars + 4) < FastVecLength(delta)) {
+            vec_scale_to_length(delta, delta, *(f32 *)(vars + 4));
+            FastVecAdd(data->target + 0x10, data->target + 0x10, delta);
         } else {
             qcopy(data->target + 0x10, ((Hero *)g_hero_state)->ptr[0xAD4 / 4] + 0x10);
             self[0x20] = 0xB;
@@ -241,7 +242,7 @@ have:
         break;
     case 11:
         if ((self[0x60] & 2) && self[0x43] != 4)
-            func_PAL_002A7E68(self, 4, 0, 8);
+            anim_start_blended_pal(self, 4, 0, 8);
         gfx_register_world_draw_callback(gfx_draw_wavy_link_strip, (char *)self);
         data->f20 = data->f20 * 0.27999997f;
         data->f18 = data->f18 + 0.6981318f;
@@ -254,7 +255,7 @@ have:
         if (((Hero *)g_hero_state)->ptr[0xAD4 / 4] != 0)
             qcopy(data->target + 0x10, ((Hero *)g_hero_state)->ptr[0xAD4 / 4] + 0x10);
         if ((self[0x60] & 2) && self[0x43] != 4)
-            func_PAL_002A7E68(self, 4, 0, 8);
+            anim_start_blended_pal(self, 4, 0, 8);
         data->f20 = data->f20 * 0.27999997f;
         data->f18 = data->f18 + 0.6981318f;
         gfx_register_world_draw_callback(gfx_draw_wavy_link_strip, (char *)self);
@@ -263,24 +264,24 @@ have:
         break;
     case 13:
         if ((self[0x60] & 2) && self[0x43] != 4)
-            func_PAL_002A7E68(self, 4, 0, 8);
+            anim_start_blended_pal(self, 4, 0, 8);
         gfx_register_world_draw_callback(gfx_draw_wavy_link_strip, (char *)self);
         *(f32 *)(vars + 4) = 1.6000001f;
         self[0x20] = 0xE;
         break;
     case 14:
         if ((self[0x60] & 2) && self[0x43] != 4)
-            func_PAL_002A7E68(self, 4, 0, 8);
-        moby_transform_joint_to_world(self, 0, v2);
-        FastVecSub(v1, v2, data->target + 0x10);
-        if (*(f32 *)(vars + 4) < fast_vec_dist(data->target + 0x10, v2)) {
-            vec_scale_to_length(v1, v1, *(f32 *)(vars + 4));
-            FastVecAdd(data->target + 0x10, data->target + 0x10, v1);
+            anim_start_blended_pal(self, 4, 0, 8);
+        moby_transform_joint_to_world(self, 0, hit_pos);
+        FastVecSub(delta, hit_pos, data->target + 0x10);
+        if (*(f32 *)(vars + 4) < fast_vec_dist(data->target + 0x10, hit_pos)) {
+            vec_scale_to_length(delta, delta, *(f32 *)(vars + 4));
+            FastVecAdd(data->target + 0x10, data->target + 0x10, delta);
             gfx_register_world_draw_callback(gfx_draw_wavy_link_strip, (char *)self);
         } else {
-            qcopy(data->target + 0x10, v2);
+            qcopy(data->target + 0x10, hit_pos);
             if (self[0x43] != 1)
-                func_PAL_002A7E68(self, 1, 0, 8);
+                anim_start_blended_pal(self, 1, 0, 8);
             self[0x20] = 1;
         }
         if (((Hero *)g_hero_state)->i[0x2294 / 4] == 0x2B && vars != 0) {
@@ -289,17 +290,17 @@ have:
             data->f20 = 0.0f;
             data->f18 = 0.0f;
             if (self[0x43] != 3)
-                func_PAL_002A7E68(self, 3, 0, 8);
+                anim_start_blended_pal(self, 3, 0, 8);
             self[0x20] = 9;
         }
         break;
     case 15:
         gfx_register_world_draw_callback(gfx_draw_wavy_link_strip, (char *)self);
         if ((self[0x60] & 2) && self[0x43] != 4)
-            func_PAL_002A7E68(self, 4, 0, 8);
-        qcopy(v1, &((Hero *)g_hero_state)->q[0x80 / 16]);
-        v1[2] += 0.5f;
-        if (CollLine(v1, ((Hero *)g_hero_state)->ptr[0xB10 / 4] + 0x10, 2, 0, 0) != 0) {
+            anim_start_blended_pal(self, 4, 0, 8);
+        qcopy(delta, &((Hero *)g_hero_state)->q[0x80 / 16]);
+        delta[2] += 0.5f;
+        if (CollLine(delta, ((Hero *)g_hero_state)->ptr[0xB10 / 4] + 0x10, 2, 0, 0) != 0) {
             if (((Hero *)g_hero_state)->f[0x31C / 4] > 0.5f) {
                 stub_empty_9_pal(6, 1);
             } else {
@@ -308,10 +309,10 @@ have:
             }
             self[0x20] = 0x13;
         } else {
-            FastVecSub(v2, ((Hero *)g_hero_state)->ptr[0xB10 / 4] + 0x10, data->target + 0x10);
-            if (*(f32 *)(vars + 4) < FastVecLength(v2)) {
-                vec_scale_to_length(v2, v2, *(f32 *)(vars + 4));
-                FastVecAdd(data->target + 0x10, data->target + 0x10, v2);
+            FastVecSub(hit_pos, ((Hero *)g_hero_state)->ptr[0xB10 / 4] + 0x10, data->target + 0x10);
+            if (*(f32 *)(vars + 4) < FastVecLength(hit_pos)) {
+                vec_scale_to_length(hit_pos, hit_pos, *(f32 *)(vars + 4));
+                FastVecAdd(data->target + 0x10, data->target + 0x10, hit_pos);
             } else {
                 qcopy(data->target + 0x10, ((Hero *)g_hero_state)->ptr[0xB10 / 4] + 0x10);
                 self[0x20] = 0x11;
@@ -325,7 +326,7 @@ have:
         break;
     case 17:
         if ((self[0x60] & 2) && self[0x43] != 4)
-            func_PAL_002A7E68(self, 4, 0, 8);
+            anim_start_blended_pal(self, 4, 0, 8);
         gfx_register_world_draw_callback(gfx_draw_wavy_link_strip, (char *)self);
         data->f20 = data->f20 * 0.27999997f;
         data->f18 = data->f18 + 0.6981318f;
@@ -338,7 +339,7 @@ have:
         if (((Hero *)g_hero_state)->ptr[0xB10 / 4] != 0)
             qcopy(data->target + 0x10, ((Hero *)g_hero_state)->ptr[0xB10 / 4] + 0x10);
         if ((self[0x60] & 2) && self[0x43] != 4)
-            func_PAL_002A7E68(self, 4, 0, 8);
+            anim_start_blended_pal(self, 4, 0, 8);
         data->f20 = data->f20 * 0.27999997f;
         data->f18 = data->f18 + 0.6981318f;
         gfx_register_world_draw_callback(gfx_draw_wavy_link_strip, (char *)self);
@@ -347,24 +348,24 @@ have:
         break;
     case 19:
         if ((self[0x60] & 2) && self[0x43] != 4)
-            func_PAL_002A7E68(self, 4, 0, 8);
+            anim_start_blended_pal(self, 4, 0, 8);
         gfx_register_world_draw_callback(gfx_draw_wavy_link_strip, (char *)self);
         *(f32 *)(vars + 4) = 1.6000001f;
         self[0x20] = 0x14;
         break;
     case 20:
         if ((self[0x60] & 2) && self[0x43] != 4)
-            func_PAL_002A7E68(self, 4, 0, 8);
-        moby_transform_joint_to_world(self, 0, v2);
-        FastVecSub(v1, v2, data->target + 0x10);
-        if (*(f32 *)(vars + 4) < fast_vec_dist(data->target + 0x10, v2)) {
-            vec_scale_to_length(v1, v1, *(f32 *)(vars + 4));
-            FastVecAdd(data->target + 0x10, data->target + 0x10, v1);
+            anim_start_blended_pal(self, 4, 0, 8);
+        moby_transform_joint_to_world(self, 0, hit_pos);
+        FastVecSub(delta, hit_pos, data->target + 0x10);
+        if (*(f32 *)(vars + 4) < fast_vec_dist(data->target + 0x10, hit_pos)) {
+            vec_scale_to_length(delta, delta, *(f32 *)(vars + 4));
+            FastVecAdd(data->target + 0x10, data->target + 0x10, delta);
             gfx_register_world_draw_callback(gfx_draw_wavy_link_strip, (char *)self);
         } else {
-            qcopy(data->target + 0x10, v2);
+            qcopy(data->target + 0x10, hit_pos);
             if (self[0x43] != 1)
-                func_PAL_002A7E68(self, 1, 0, 8);
+                anim_start_blended_pal(self, 1, 0, 8);
             self[0x20] = 1;
         }
         if (((Hero *)g_hero_state)->i[0x229C / 4] == 0x21 && vars != 0) {
@@ -373,7 +374,7 @@ have:
             data->f20 = 0.0f;
             data->f18 = 0.0f;
             if (self[0x43] != 3)
-                func_PAL_002A7E68(self, 3, 0, 8);
+                anim_start_blended_pal(self, 3, 0, 8);
             self[0x20] = 0xF;
         }
         break;

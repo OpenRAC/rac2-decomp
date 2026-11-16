@@ -31,7 +31,7 @@ typedef struct {
     u8 pad40[0x4c];
     int flags8c;
     UpdateVector origin;
-    float a0, a4, a8, ac;
+    float angle_a, angle_b, sway_angle_a, sway_angle_b;
     int b0, b4, b8;
 } UpdateState;
 typedef struct {
@@ -45,125 +45,127 @@ typedef struct {
     u8 pad6c[0x84];
     UpdateVector rotation;
 } UpdateObject;
-void func_PAL_L17_003CBDF4(UpdateObject *o)
+/* Tilting platform (PAL: 50 Hz timings): bobs and sways, and once the player stands on it,
+   shakes, then tilts over and drops away, and finally swings back to its place. */
+void tilting_platform_update_pal(UpdateObject *obj)
 {
     float oldpos[4] __attribute__((aligned(16)));
     float pos[4] __attribute__((aligned(16)));
     float oldrot[4] __attribute__((aligned(16)));
     float rot[4] __attribute__((aligned(16)));
-    UpdateState *s;
+    UpdateState *state;
     float first_rate;
     float rate_scale = 0.0003490659f;
     first_rate=360.0f/g_tilt_platform_period;
-    *(Quad *)oldpos=o->position.q;
-    *(Quad *)oldrot=o->rotation.q;
-    s=o->state;
-    s->flags8c|=1;
-    s->flags3e|=8;
-    o->flags34|=0x20;
-    math_update_wrapped_angle_offset(o,&s->a0,&s->a4,g_tilt_platform_amplitude,first_rate*rate_scale,-1.0f);
-    moby_scale_owner_words_by_angles(o,&s->a8,&s->ac,g_tilt_platform_sway_amp,(360.0f/g_tilt_platform_sway_period)*rate_scale,(360.0f/g_tilt_platform_tilt_period)*rate_scale);
-    switch(o->mode) {
+    *(Quad *)oldpos=obj->position.q;
+    *(Quad *)oldrot=obj->rotation.q;
+    state=obj->state;
+    state->flags8c|=1;
+    state->flags3e|=8;
+    obj->flags34|=0x20;
+    math_update_wrapped_angle_offset(obj,&state->angle_a,&state->angle_b,g_tilt_platform_amplitude,first_rate*rate_scale,-1.0f);
+    moby_scale_owner_words_by_angles(obj,&state->sway_angle_a,&state->sway_angle_b,g_tilt_platform_sway_amp,(360.0f/g_tilt_platform_sway_period)*rate_scale,(360.0f/g_tilt_platform_tilt_period)*rate_scale);
+    switch(obj->mode) {
     case 0:
-        s->origin.q=*(Quad *)oldpos;
-        o->mode=1;
+        state->origin.q=*(Quad *)oldpos;
+        obj->mode=1;
         break;
     case 1:
-        if(hero_is_current_selected_id(o)) {
-            moby_set_state(o,2,-1);
-            s->b0=FloatToInt((g_tilt_platform_hold_seconds*300.0f+2.0f)*0.16666667f);
+        if(hero_is_current_selected_id(obj)) {
+            moby_set_state(obj,2,-1);
+            state->b0=FloatToInt((g_tilt_platform_hold_seconds*300.0f+2.0f)*0.16666667f);
         }
         break;
     case 2: {
         float t;
-        if(flag_set_first_pending(o))PlayMobySound(0,0,o);
-        if(s->b0==50)PlayMobySound(0,0,o);
-        if(math_fast_float_d(&s->b0)) {
-            s->b4=FloatToInt((g_tilt_platform_tilt_seconds*300.0f+2.0f)*0.16666667f);
-            o->mode=3;
+        if(flag_set_first_pending(obj))PlayMobySound(0,0,obj);
+        if(state->b0==50)PlayMobySound(0,0,obj);
+        if(math_fast_float_d(&state->b0)) {
+            state->b4=FloatToInt((g_tilt_platform_tilt_seconds*300.0f+2.0f)*0.16666667f);
+            obj->mode=3;
         } else {
-            rot[0]=math_fast_sin_or_cos_b(math_wrap_angle_to_pi(IntToFloat(s->b0)*0.75f))*0.017453294f;
-            rot[1]=math_fast_sin_or_cos_a(math_wrap_angle_to_pi(IntToFloat(s->b0)*0.89f))*0.017453294f;
-            if((float)s->b4>(g_tilt_platform_hold_seconds*300.0f+2.0f)*0.16666667f-25.0f) {
-                t=IntToFloat(s->b0)/((g_tilt_platform_hold_seconds*300.0f+2.0f)*0.16666667f-25.333334f);
-                o->rotation.f[0]=o->rotation.f[0]*t+rot[0]*(1.0f-t);
-                o->rotation.f[1]=o->rotation.f[1]*t+rot[1]*(1.0f-t);
+            rot[0]=math_fast_sin_or_cos_b(math_wrap_angle_to_pi(IntToFloat(state->b0)*0.75f))*0.017453294f;
+            rot[1]=math_fast_sin_or_cos_a(math_wrap_angle_to_pi(IntToFloat(state->b0)*0.89f))*0.017453294f;
+            if((float)state->b4>(g_tilt_platform_hold_seconds*300.0f+2.0f)*0.16666667f-25.0f) {
+                t=IntToFloat(state->b0)/((g_tilt_platform_hold_seconds*300.0f+2.0f)*0.16666667f-25.333334f);
+                obj->rotation.f[0]=obj->rotation.f[0]*t+rot[0]*(1.0f-t);
+                obj->rotation.f[1]=obj->rotation.f[1]*t+rot[1]*(1.0f-t);
             } else {
-                o->rotation.f[1]=rot[1];
-                o->rotation.f[0]=rot[0];
+                obj->rotation.f[1]=rot[1];
+                obj->rotation.f[0]=rot[0];
             }
         }
         break;
     }
     case 3: {
         float t,f,b,ax,ay;
-        t=IntToFloat(s->b4)/((g_tilt_platform_tilt_seconds*300.0f+2.0f)*0.16666667f);
+        t=IntToFloat(state->b4)/((g_tilt_platform_tilt_seconds*300.0f+2.0f)*0.16666667f);
         f=(1.0f-t)*g_tilt_platform_scale_a;
-        o->rotation.f[1]=0;
-        o->rotation.f[0]=(1.0f-t)*1.57079649f;
-        ax=math_fast_sin_or_cos_a(FastAddRotations(1.57079649f,o->rotation.f[2]));
-        b=math_fast_sin_or_cos_b(o->rotation.f[0]);
+        obj->rotation.f[1]=0;
+        obj->rotation.f[0]=(1.0f-t)*1.57079649f;
+        ax=math_fast_sin_or_cos_a(FastAddRotations(1.57079649f,obj->rotation.f[2]));
+        b=math_fast_sin_or_cos_b(obj->rotation.f[0]);
         ax*=f*b;
-        o->position.f[0]=ax;
-        ay=math_fast_sin_or_cos_b(FastAddRotations(1.57079649f,o->rotation.f[2]));
-        b=math_fast_sin_or_cos_b(o->rotation.f[0]);
+        obj->position.f[0]=ax;
+        ay=math_fast_sin_or_cos_b(FastAddRotations(1.57079649f,obj->rotation.f[2]));
+        b=math_fast_sin_or_cos_b(obj->rotation.f[0]);
         ay*=f*b;
-        o->position.f[1]=ay;
-        o->position.f[2]=0;
-        o->position.f[0]+=s->origin.f[0];
-        ay+=s->origin.f[1];
-        o->position.f[1]=ay;
-        f*=math_fast_sin_or_cos_a(o->rotation.f[0]);
-        o->position.f[2]=s->origin.f[2]-f;
-        o->position.f[2]-=math_fast_sin_or_cos_a(t*1.57079649f)*g_tilt_platform_drop_height;
-        s->flags8c&=~1;
-        s->flags3e&=~8;
-        o->flags34&=~0x20;
-        if(math_fast_float_d(&s->b4)) {
-            o->mode=4;
-            s->b8=FloatToInt((g_tilt_platform_return_seconds*300.0f+2.0f)*0.16666667f);
+        obj->position.f[1]=ay;
+        obj->position.f[2]=0;
+        obj->position.f[0]+=state->origin.f[0];
+        ay+=state->origin.f[1];
+        obj->position.f[1]=ay;
+        f*=math_fast_sin_or_cos_a(obj->rotation.f[0]);
+        obj->position.f[2]=state->origin.f[2]-f;
+        obj->position.f[2]-=math_fast_sin_or_cos_a(t*1.57079649f)*g_tilt_platform_drop_height;
+        state->flags8c&=~1;
+        state->flags3e&=~8;
+        obj->flags34&=~0x20;
+        if(math_fast_float_d(&state->b4)) {
+            obj->mode=4;
+            state->b8=FloatToInt((g_tilt_platform_return_seconds*300.0f+2.0f)*0.16666667f);
         }
         break;
     }
     case 4: {
         float t,f,b,c,ax,ay;
-        t=IntToFloat(s->b8)/((g_tilt_platform_return_seconds*300.0f+2.0f)*0.16666667f);
-        *(Quad *)rot=o->rotation.q;
+        t=IntToFloat(state->b8)/((g_tilt_platform_return_seconds*300.0f+2.0f)*0.16666667f);
+        *(Quad *)rot=obj->rotation.q;
         c=1.0f-t;
         f=(1.0f-c)*g_tilt_platform_scale_a;
-        o->rotation.f[0]=math_fast_float_g((rot[0]*c+c*4.71238947f)+1.57079649f);
-        o->rotation.f[1]=rot[1]*c;
-        ax=math_fast_sin_or_cos_a(FastAddRotations(1.57079649f,o->rotation.f[2]));
-        b=math_fast_sin_or_cos_b(o->rotation.f[0]);
+        obj->rotation.f[0]=math_fast_float_g((rot[0]*c+c*4.71238947f)+1.57079649f);
+        obj->rotation.f[1]=rot[1]*c;
+        ax=math_fast_sin_or_cos_a(FastAddRotations(1.57079649f,obj->rotation.f[2]));
+        b=math_fast_sin_or_cos_b(obj->rotation.f[0]);
         ax*=f*b;
-        o->position.f[0]=ax;
-        ay=math_fast_sin_or_cos_b(FastAddRotations(1.57079649f,o->rotation.f[2]));
-        b=math_fast_sin_or_cos_b(o->rotation.f[0]);
+        obj->position.f[0]=ax;
+        ay=math_fast_sin_or_cos_b(FastAddRotations(1.57079649f,obj->rotation.f[2]));
+        b=math_fast_sin_or_cos_b(obj->rotation.f[0]);
         ay*=f*b;
-        o->position.f[1]=ay;
-        o->position.f[2]=0;
-        o->position.f[0]+=s->origin.f[0];
-        ay+=s->origin.f[1];
-        o->position.f[1]=ay;
-        f*=math_fast_sin_or_cos_a(o->rotation.f[0]);
-        o->position.f[2]=s->origin.f[2]-f;
-        o->position.f[2]-=math_fast_sin_or_cos_a(c*1.57079649f)*g_tilt_platform_drop_height;
-        s->flags8c&=~1;
-        s->flags3e&=~8;
-        o->flags34&=~0x20;
-        if(math_fast_float_d(&s->b8)) {
-            o->mode=1;
+        obj->position.f[1]=ay;
+        obj->position.f[2]=0;
+        obj->position.f[0]+=state->origin.f[0];
+        ay+=state->origin.f[1];
+        obj->position.f[1]=ay;
+        f*=math_fast_sin_or_cos_a(obj->rotation.f[0]);
+        obj->position.f[2]=state->origin.f[2]-f;
+        obj->position.f[2]-=math_fast_sin_or_cos_a(c*1.57079649f)*g_tilt_platform_drop_height;
+        state->flags8c&=~1;
+        state->flags3e&=~8;
+        obj->flags34&=~0x20;
+        if(math_fast_float_d(&state->b8)) {
+            obj->mode=1;
             {
-                Quad home = s->origin.q;
-                o->rotation.q=*(Quad *)rot;
-                o->position.q=home;
+                Quad home = state->origin.q;
+                obj->rotation.q=*(Quad *)rot;
+                obj->position.q=home;
             }
         }
         break;
     }
     }
-    if(o->mode<3) {
-        FastVecSub(pos,&o->position,oldpos);
-        mat_combine_and_store((u8 *)s+0x50,pos,oldrot,&o->rotation);
+    if(obj->mode<3) {
+        FastVecSub(pos,&obj->position,oldpos);
+        mat_combine_and_store((u8 *)state+0x50,pos,oldrot,&obj->rotation);
     }
 }

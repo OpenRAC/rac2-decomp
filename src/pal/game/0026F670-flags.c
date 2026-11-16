@@ -1,4 +1,6 @@
 #include "include_asm.h"
+#include "names.h"
 
-void func_PAL_0026F678(void) {
+/* Empty stub (PAL copy of stub_empty_31). */
+void stub_empty_31_pal(void) {
 }

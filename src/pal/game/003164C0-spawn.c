@@ -24,6 +24,7 @@ extern float math_random_float_range(float lo, float hi);
 extern int g_game_time;
 extern void func_002A0F48(void *moby);
 
+/* Creates a thrown item moby at the position, with random spin speeds (PAL build). */
 unsigned char *thrown_item_spawn_pal(int owner, void *pos) {
     unsigned char *obj = (unsigned char *)CreateMoby(0x81F);
     Vars003158A8 *data;

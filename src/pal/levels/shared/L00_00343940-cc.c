@@ -22,7 +22,7 @@ extern void FastVecAdd(void *, const void *, const void *);
 extern void moby_get_facing_direction(void *, void *);
 extern void FastVecScale(void *, const void *, float);
 
-unsigned char *func_PAL_L00_00343940(ParticleOwner *owner, Quadword *position,
+unsigned char *part_spawn_owner_forward_pal(ParticleOwner *owner, Quadword *position,
                               int flags, int minimum, int maximum, float scale) {
     union { Quadword q; float f[4]; } direction;
     unsigned char *particle = part_alloc(0x6E);

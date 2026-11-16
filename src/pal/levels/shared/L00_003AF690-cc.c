@@ -62,16 +62,16 @@ extern void table_clear_entry_flag(int);
 extern void part_steer_effect_direction(int, void *, int);
 extern void vec_transform_or_copy(void *, void *);
 extern void homing_shot_spawn_explosion_pal(char *, void *, char *);
-extern void func_PAL_L00_003B0230(char *, void *);
+extern void part_emit_shot_trail_pal(char *, void *);
 extern void moby_transform_offset_to_world(char *, void *);
 extern void shot_save_trail_transform(void);
 extern int StartAttachedEffect_pal(void *, int, int);
-extern char *func_PAL_0032F3B8(char *, char *, void *, float);
+extern char *part_spawn_blast_effect_moby_pal(char *, char *, void *, float);
 
 /* A homing shot: follows its target (turning at most as far as its speed allows), records
    its path, tests the step for a hit and explodes on contact, out of the arena or too far
    from the hero. */
-void func_PAL_L00_003AF690(char *object)
+void homing_l00_shot_update_pal(char *object)
 {
     Vector start;
     Vector forward;
@@ -212,7 +212,7 @@ void func_PAL_L00_003AF690(char *object)
     if (++*(unsigned char *)(state + 0x27) >= 4) {
         ref_L00_003ABEC0_00(shot_save_trail_transform, object);
     }
-    func_PAL_L00_003B0230(object, start);
+    part_emit_shot_trail_pal(object, start);
     qcopy(lead, object + 0x10);
     FastVecScale(offset, forward, -0.25f);
     FastVecAdd(offset, object + 0x10, offset);
@@ -282,7 +282,7 @@ checked:
         if (bounce) {
             spin = coll_probe_ground_height_below(object + 0x10, 0, 0.5f);
         }
-        func_PAL_0032F3B8(object, object + 0x10, normal, spin);
+        part_spawn_blast_effect_moby_pal(object, object + 0x10, normal, spin);
         homing_shot_spawn_explosion_pal(object, up, owner);
     }
     RemoveMobyFromIndexList(object, g_homing_moby_index_list);

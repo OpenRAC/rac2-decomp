@@ -18,12 +18,12 @@ typedef struct {
 extern HeroModes g_hero_state;
 extern u8 g_moby_nibble_table[];
 /* Player stats: the pending bolt credit at +0x1C. */
-typedef struct { u8 pad0[0x1C]; int pendingBolts; } PlayerStats;
+typedef struct { u8 pad0[0x1C]; int pending_bolts; } PlayerStats;
 extern PlayerStats g_player_stats MACRO_ADDR;
 extern u8 g_item_enabled_flags[] MACRO_ADDR;
 extern int g_warp_triggered_flags[] MACRO_ADDR;
-extern void func_PAL_002A7E68(void *, int, int, int);
-extern void func_PAL_L19_004289C0(void *);
+extern void anim_start_blended_pal(void *, int, int, int);
+extern void EmitGrelbinGlowSprites_pal(void *);
 extern float vec_distance_xy(void *, void *);
 extern float math_fabs(float);
 extern float vec_length_xy(void *);
@@ -36,78 +36,79 @@ extern int snd_play_from_global_bank(int, int, void *);
 extern int text_sum_subtitle_lengths(void);
 extern void value_set_entry_by_index_pal(int, int);
 
-void func_PAL_L19_00428CC0(u8 *object)
+/* A pickup that floats until the hero is close, then flies to the hero, shrinks, and adds a bolt when it arrives. (PAL version) */
+void UpdateHomingCollectible_pal(u8 *moby)
 {
     float direction[4] __attribute__((aligned(16)));
-    u8 *state = *(u8 **)(object + 0x68);
+    u8 *vars = *(u8 **)(moby + 0x68);
     float distance, movement, threshold;
-    switch (object[0x20]) {
+    switch (moby[0x20]) {
     case 0:
-        object[0x23] = 0x80;
-        *(u32 *)(object + 0x78) = 0xFFAAAAAA;
-        *(u16 *)(object + 0x34) |= 0x800;
-        object[0x20] = 1;
-        if (object[0x43]) func_PAL_002A7E68(object, 0, 0, 0);
+        moby[0x23] = 0x80;
+        *(u32 *)(moby + 0x78) = 0xFFAAAAAA;
+        *(u16 *)(moby + 0x34) |= 0x800;
+        moby[0x20] = 1;
+        if (moby[0x43]) anim_start_blended_pal(moby, 0, 0, 0);
         break;
     case 1:
-        if (vec_distance_xy(object + 0x10, g_hero_position) < g_warp_trigger_radius &&
-            math_fabs(*(float *)(object + 0x18) - *(float *)(g_hero_position + 8)) < g_warp_trigger_height_range) {
-            *(float *)state = g_warp_trigger_reset_value;
-            if (object[0x43] != 1) func_PAL_002A7E68(object, 1, 0, 20);
-            *(float *)(object + 0x48) = *(float *)state + *(float *)state;
-            object[0x20] = 2;
+        if (vec_distance_xy(moby + 0x10, g_hero_position) < g_warp_trigger_radius &&
+            math_fabs(*(float *)(moby + 0x18) - *(float *)(g_hero_position + 8)) < g_warp_trigger_height_range) {
+            *(float *)vars = g_warp_trigger_reset_value;
+            if (moby[0x43] != 1) anim_start_blended_pal(moby, 1, 0, 20);
+            *(float *)(moby + 0x48) = *(float *)vars + *(float *)vars;
+            moby[0x20] = 2;
         }
-        if (object[0x31]) func_PAL_L19_004289C0(object);
+        if (moby[0x31]) EmitGrelbinGlowSprites_pal(moby);
         break;
     case 2:
-        if (object[0x43] != 1) func_PAL_002A7E68(object, 1, 0, 20);
-        *(float *)state += (1.0f - *(float *)state) * g_warp_trigger_blend_rate;
-        *(float *)(object + 0x48) = *(float *)state + *(float *)state;
-        FastVecSub(direction, g_hero_position, object + 0x10);
+        if (moby[0x43] != 1) anim_start_blended_pal(moby, 1, 0, 20);
+        *(float *)vars += (1.0f - *(float *)vars) * g_warp_trigger_blend_rate;
+        *(float *)(moby + 0x48) = *(float *)vars + *(float *)vars;
+        FastVecSub(direction, g_hero_position, moby + 0x10);
         direction[2] += 0.6f;
         distance = vec_length_xy(direction);
         threshold = 0.12f;
         if (*(int *)(g_hero_position + 0x2214) != 0x31)
-            movement = g_warp_trigger_speed_in * (*(float *)state * 0.020000001f);
+            movement = g_warp_trigger_speed_in * (*(float *)vars * 0.020000001f);
         else {
-            movement = g_warp_trigger_speed_out * (*(float *)state * 0.020000001f);
+            movement = g_warp_trigger_speed_out * (*(float *)vars * 0.020000001f);
             threshold = 0.8f;
         }
         vec_fast_divide_helper(direction, direction, movement);
-        FastVecAdd(object + 0x10, object + 0x10, direction);
-        if (*(float *)(object + 0x2C) > 0.1f || distance < threshold || distance < movement)
-            *(float *)(object + 0x2C) -= g_warp_trigger_lift_rate * ((*(float *)(*(u8 **)(object + 0x24) + 0x24)) * 1.2f);
+        FastVecAdd(moby + 0x10, moby + 0x10, direction);
+        if (*(float *)(moby + 0x2C) > 0.1f || distance < threshold || distance < movement)
+            *(float *)(moby + 0x2C) -= g_warp_trigger_lift_rate * ((*(float *)(*(u8 **)(moby + 0x24) + 0x24)) * 1.2f);
         if ((distance < movement &&
-             *(float *)(object + 0x2C) < *(float *)(*(u8 **)(object + 0x24) + 0x24) * 0.01f) ||
+             *(float *)(moby + 0x2C) < *(float *)(*(u8 **)(moby + 0x24) + 0x24) * 0.01f) ||
             g_hero_state.mode == 0x14 || g_hero_state.mode == 0x19 ||
             g_hero_state.state == 0x39 || g_hero_state.state == 0x6F) {
-            if (*(u8 **)(state + 4)) {
-                u8 *linked = *(u8 **)(state + 4);
-                int h = *(unsigned short *)(linked + 0xB2);
-                if (h & 1) {
-                    unsigned char *e = &g_moby_nibble_table[((short)h >> 1) + (g_current_map_index[0] << 10)];
-                    if (((*e >> 4) & 7) != 7) {
-                        *e += 0x10;
+            if (*(u8 **)(vars + 4)) {
+                u8 *linked = *(u8 **)(vars + 4);
+                int uid = *(unsigned short *)(linked + 0xB2);
+                if (uid & 1) {
+                    unsigned char *nibble_ptr = &g_moby_nibble_table[((short)uid >> 1) + (g_current_map_index[0] << 10)];
+                    if (((*nibble_ptr >> 4) & 7) != 7) {
+                        *nibble_ptr += 0x10;
                     }
                 } else {
-                    unsigned char *e = &g_moby_nibble_table[((short)h >> 1) + (g_current_map_index[0] << 10)];
-                    if ((*e & 7) != 7) {
-                        *e += 1;
+                    unsigned char *nibble_ptr = &g_moby_nibble_table[((short)uid >> 1) + (g_current_map_index[0] << 10)];
+                    if ((*nibble_ptr & 7) != 7) {
+                        *nibble_ptr += 1;
                     }
                 }
-                moby_mark_spawned(*(u8 **)(state + 4));
+                moby_mark_spawned(*(u8 **)(vars + 4));
             }
-            g_player_stats.pendingBolts++;
-            snd_play_from_class_bank(3, 0, object, 0x11C7);
-            moby_mark_spawned(object);
+            g_player_stats.pending_bolts++;
+            snd_play_from_class_bank(3, 0, moby, 0x11C7);
+            moby_mark_spawned(moby);
             if (!text_sum_subtitle_lengths() && !g_item_enabled_flags[6]) {
                 g_item_enabled_flags[6] = 1;
                 snd_play_from_global_bank(1, 0, 0);
                 value_set_entry_by_index_pal(0x1233, -1);
                 g_warp_triggered_flags[0] = 1;
             }
-            moby_mark_spawned(object);
-        } else func_PAL_L19_004289C0(object);
+            moby_mark_spawned(moby);
+        } else EmitGrelbinGlowSprites_pal(moby);
         break;
     }
 }

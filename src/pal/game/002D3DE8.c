@@ -12,6 +12,7 @@ extern CallbackState g_pause_menu_state;
 extern int g_menu_input_flags;
 extern int func_0029C760(int);
 
+/* Handles input on the first menu page: closes or refuses on cancel, otherwise passes the buttons on. */
 int menu_page_update_pal(void) {
     int result = 0;
     int flags = g_menu_input_flags;
@@ -42,6 +43,7 @@ extern void SetupGifPaging(long arg0);
 extern void func_0029C7A0(void);
 extern void SetupGifPaging(long param_1);
 
+/* Draws the third menu page between the GIF paging calls. */
 unsigned long long menu_page_draw_3_pal(void)
 {
     SetupGifPaging(0);
@@ -52,6 +54,7 @@ unsigned long long menu_page_draw_3_pal(void)
 
 extern int func_0029C7D0(int);
 
+/* Handles input on the second menu page: closes or refuses on cancel, otherwise passes the buttons on. */
 int menu_page_update_2_pal(void) {
     int result = 0;
     int flags = g_menu_input_flags;
@@ -76,6 +79,7 @@ return_value:
 
 extern void func_0029C810(void);
 
+/* Draws the fourth menu page between the GIF paging calls. */
 int menu_page_draw_4_pal(void) {
     SetupGifPaging(0);
     func_0029C810();
@@ -85,6 +89,7 @@ int menu_page_draw_4_pal(void) {
 
 extern int func_0029CA00(int);
 
+/* Handles input on the third menu page: closes or refuses on cancel, otherwise passes the buttons on. */
 int menu_page_update_3_pal(void) {
     int result = 0;
     int flags = g_menu_input_flags;
@@ -109,6 +114,7 @@ return_value:
 
 extern void func_0029CA40(void);
 
+/* Draws the fifth menu page between the GIF paging calls. */
 int menu_page_draw_5_pal(void) {
     SetupGifPaging(0);
     func_0029CA40();
@@ -118,6 +124,7 @@ int menu_page_draw_5_pal(void) {
 
 extern int func_0029C990(int);
 
+/* Handles input on the fourth menu page: closes or refuses on cancel, otherwise passes the buttons on. */
 int menu_page_update_4_pal(void) {
     int result = 0;
     int flags = g_menu_input_flags;
@@ -142,6 +149,7 @@ return_value:
 
 extern void func_0029C9D0(void);
 
+/* Draws the sixth menu page between the GIF paging calls. */
 int menu_page_draw_6_pal(void) {
     SetupGifPaging(0);
     func_0029C9D0();

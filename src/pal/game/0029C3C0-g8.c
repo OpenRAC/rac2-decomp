@@ -13,7 +13,8 @@ extern void circle_menu_init_entries_pal(void *,void *,void *);
 extern void circle_menu_set_radius_pal(void *,float);
 extern void circle_menu_set_selection_pal(void *,int);
 
-void func_PAL_0029C3C0(void) {
+/* Turns the mission select menu on or off to match the current mode, setting up the circle menu when it turns on. */
+void menu_update_mission_select_enable_pal(void) {
  int enabled;
  if (g_resident_data_base[0] != 0) {
   enabled=0;

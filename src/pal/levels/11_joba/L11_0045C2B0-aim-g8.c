@@ -9,7 +9,7 @@ typedef struct {
 } Entity;
 typedef struct {
     u8 pad000[0x134];
-    float turnRate;
+    float turn_rate;
     u8 pad138[0x244 - 0x138];
     s32 group;
 } AimState;
@@ -49,7 +49,7 @@ s32 joba_turn_toward_group_entity_pal(AimObject *obj)
     float vec[4];
     u16 *ids;
     Entity *entity;
-    float savedTurnRate;
+    float saved_turn_rate;
     float angle;
     float turn;
 
@@ -91,10 +91,10 @@ s32 joba_turn_toward_group_entity_pal(AimObject *obj)
                       fast_subtract_rotations(obj->heading, angle) >= 0.0f ? -turn : turn);
         FastVecAdd(vec, vec, entity->position);
 
-        savedTurnRate = state->turnRate;
-        state->turnRate = 0.0001f;
+        saved_turn_rate = state->turn_rate;
+        state->turn_rate = 0.0001f;
         joba_fighter_walk_dust_pal(obj, vec);
-        state->turnRate = savedTurnRate;
+        state->turn_rate = saved_turn_rate;
         return 1;
     }
     return 0;

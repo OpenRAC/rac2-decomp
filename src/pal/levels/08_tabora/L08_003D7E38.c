@@ -1,30 +1,31 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern void func_PAL_002B15D8(void *, int, void *, int, float, float, float, float);
+extern void part_spawn_masked_debris_pal(void *, int, void *, int, float, float, float, float);
 extern void moby_mark_spawned(void *);
 typedef union {
     int q __attribute__((mode(TI)));
     float f[4];
 } Quad __attribute__((aligned(16)));
 
-void func_PAL_L08_003D7E38(unsigned char *a0) {
-    int v1 = a0[0x20];
-    Quad local;
+/* Waits for a trigger and then bursts out a small puff of debris and removes the object. */
+void puff_update_pal(unsigned char *moby) {
+    int state = moby[0x20];
+    Quad puff;
 
-    switch (v1) {
+    switch (state) {
     case 0:
-        a0[0x20] = 1;
+        moby[0x20] = 1;
         break;
     case 1:
-        if (a0[0xBC] != 0)
-            a0[0x20] = 2;
+        if (moby[0xBC] != 0)
+            moby[0x20] = 2;
         break;
     case 2:
-        qzero(&local);
-        local.f[2] = 0.18f;
-        func_PAL_002B15D8(a0, 0x7F, &local, 0xFF, 3.0f, 6.0f, 3.0f, 6.0f);
-        moby_mark_spawned(a0);
+        qzero(&puff);
+        puff.f[2] = 0.18f;
+        part_spawn_masked_debris_pal(moby, 0x7F, &puff, 0xFF, 3.0f, 6.0f, 3.0f, 6.0f);
+        moby_mark_spawned(moby);
         break;
     }
 }

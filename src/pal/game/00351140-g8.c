@@ -10,7 +10,8 @@ extern void ChangeThreadPriority(int, int);
 extern int mpeg_start_player(void *, void *, int);
 extern int read_mpeg(void *, void *, void *);
 
-int mpeg_play_movie_2_pal(void *first, void *second, char *pool, char *state, int mode, int volume)
+/* Plays a full-motion video: sets up the player, plays the stream until it ends or is skipped, then cleans up. Returns 1 if the player skipped it (PAL). */
+int mpeg_play_movie_2_pal(void *stream_source, void *source_mode, char *pool, char *state, int mode, int volume)
 {
     int result = 0;
     ref_L00_0034EF58_01[0] = pool;
@@ -18,7 +19,7 @@ int mpeg_play_movie_2_pal(void *first, void *second, char *pool, char *state, in
     STUB_printf(ref_L00_0034EF58_00, 0x38cac0);
     BuildAspectBlitStrips(volume, volume);
     ChangeThreadPriority(GetThreadId(), 1);
-    if (mpeg_start_player(first, second, mode)) {
+    if (mpeg_start_player(stream_source, source_mode, mode)) {
         result = read_mpeg(g_movie_player_state[0] + 0xd9048, g_movie_player_state[0], g_movie_player_state[0] + 0xd9040);
     }
     mpeg_shutdown_player();

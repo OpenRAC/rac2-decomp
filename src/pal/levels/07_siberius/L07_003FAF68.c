@@ -10,28 +10,29 @@ extern void moby_set_state(u8 *, int, int);
 extern u8 *SpawnExplosion_pal(void *, int, int, int, int, int, int, int, float, float, int, int, int, void *);
 extern void anim_start_immediate(void *, int, int);
 
-void fuse_tick_explode_pal(u8 *self)
+/* Counts the object's fuse down. When it runs out the object explodes with a sound and effect and resets. */
+void fuse_tick_explode_pal(u8 *moby)
 {
-    u8 *state = *(u8 **)(self + 0x68);
+    u8 *vars = *(u8 **)(moby + 0x68);
     float position[4] __attribute__((aligned(16)));
     float zero = 0.0f;
-    float step = moby_update_aim_target_strength_pal(self, part_find_owned_effect_slot(self, 0x10000, 0));
+    float step = moby_update_aim_target_strength_pal(moby, part_find_owned_effect_slot(moby, 0x10000, 0));
     u16 flags;
-    ApproachValue((float *)(state + 0x20), zero, step);
-    if (*(float *)(state + 0x20) <= zero) {
-        SetDeathBits_pal(self, 0, 3);
-        PlayMobySound(1, 0, (char *)self);
-        moby_set_state(self, 1, -1);
-        flags = *(u16 *)(self + 0x34);
-        self[0xA8] = 255;
+    ApproachValue((float *)(vars + 0x20), zero, step);
+    if (*(float *)(vars + 0x20) <= zero) {
+        SetDeathBits_pal(moby, 0, 3);
+        PlayMobySound(1, 0, (char *)moby);
+        moby_set_state(moby, 1, -1);
+        flags = *(u16 *)(moby + 0x34);
+        moby[0xA8] = 255;
         flags |= 0x41;
-        *(u32 *)(self + 0x98) = 0;
+        *(u32 *)(moby + 0x98) = 0;
         flags &= 0xEFFF;
-        *(u16 *)(self + 0x34) = flags;
-        qcopy(position, self + 0x10);
+        *(u16 *)(moby + 0x34) = flags;
+        qcopy(position, moby + 0x10);
         position[2] += 0.5f;
-        SpawnExplosion_pal(self + 0x10, 0, 0, 0, 0, 10, 20, 0, 1.0f, 20.0f, 1, 0, 0, 0);
-        anim_start_immediate(self, 2, 0);
+        SpawnExplosion_pal(moby + 0x10, 0, 0, 0, 0, 10, 20, 0, 1.0f, 20.0f, 1, 0, 0, 0);
+        anim_start_immediate(moby, 2, 0);
     }
 }
 

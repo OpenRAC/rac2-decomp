@@ -19,18 +19,19 @@ extern float math_random_angle(void);
 extern void gfx_draw_billboard_quad(void *, int, unsigned int, int, float, float, float);
 extern void lightning_bolt_build_jittered_pal(char *object, char *state);
 
-void lightning_arcs_update_owned_pal(char *a0)
+/* Redraws each lightning arc owned by this object and adds glow sprites while the arc is idle. */
+void lightning_arcs_update_owned_pal(char *moby)
 {
-    Ent_411F48 *e;
+    Ent_411F48 *entry;
     int i;
 
     for (i = 0; i < 0x30; i++) {
-        e = &ref_L00_00411F48_00[i];
-        if (e->sub.owner == a0) {
-            lightning_bolt_build_jittered_pal(a0, (char *)e);
-            if (e->sub.busy == 0) {
-                gfx_draw_billboard_quad(&e->sub, 0x31, (math_random_int_range(0x50, 0x60) << 24) | 0x103080, 1, 0.5f, 0.1f, math_random_angle());
-                gfx_draw_billboard_quad(&e->sub, 0x31, (math_random_int_range(0x50, 0x60) << 24) | 0xFFFFFF, 1, 0.5f, 0.1f, math_random_angle());
+        entry = &ref_L00_00411F48_00[i];
+        if (entry->sub.owner == moby) {
+            lightning_bolt_build_jittered_pal(moby, (char *)entry);
+            if (entry->sub.busy == 0) {
+                gfx_draw_billboard_quad(&entry->sub, 0x31, (math_random_int_range(0x50, 0x60) << 24) | 0x103080, 1, 0.5f, 0.1f, math_random_angle());
+                gfx_draw_billboard_quad(&entry->sub, 0x31, (math_random_int_range(0x50, 0x60) << 24) | 0xFFFFFF, 1, 0.5f, 0.1f, math_random_angle());
             }
         }
     }

@@ -2,7 +2,7 @@
 
 #include "common.h"
 extern void moby_set_state(void *, int, int);
-extern void func_PAL_L02_003CDF48(char *);
+extern void spawn_effect_particle_ring_pal(char *);
 extern void moby_position_effect_children(char *);
 extern float ApproachValue(float *, float, float);
 extern void moby_set_light_color(void *, int);
@@ -34,7 +34,7 @@ void UpdateTimedChildEffects_pal(char *obj)
             goto cleanup;
         if (*(int *)(sub + 4) == 0) {
             *(int *)(sub + 4) = 1;
-            func_PAL_L02_003CDF48(obj);
+            spawn_effect_particle_ring_pal(obj);
         }
         moby_position_effect_children(obj);
         ApproachValue((float *)(sub + 12), one, g_glow_approach_rate[0] * (0.020000001f));

@@ -15,30 +15,30 @@ void part_l00_spawn_spark_pairs_pal(float *position, int count)
 {
     float dir[4];
     float save[4];
-    float f20;
-    float f21;
-    float f22;
+    float pitch;
+    float yaw;
+    float scale;
     int sign;
     int i;
-    float *sv;
+    float *save_ptr;
 
     if (count > 0) {
         i = count;
-        sv = save;
+        save_ptr = save;
         do {
-            f22 = math_random_float_range(0.1f, 2.0f);
+            scale = math_random_float_range(0.1f, 2.0f);
             sign = math_random_int_below(2);
             if (sign == 0)
                 sign = sign - 1;
-            f21 = math_random_angle();
-            f20 = math_random_float_range(0.349065899848938f, 1.5358898639678955f);
-            vec_build_spherical_offset(dir, math_random_float_range(0.05f, 0.1f), f21, f20);
-            *(Quad *)sv = *(Quad *)position;
+            yaw = math_random_angle();
+            pitch = math_random_float_range(0.349065899848938f, 1.5358898639678955f);
+            vec_build_spherical_offset(dir, math_random_float_range(0.05f, 0.1f), yaw, pitch);
+            *(Quad *)save_ptr = *(Quad *)position;
             position[0] = position[0] + math_random_signed_float_range(0.0f, 0.15f);
             position[1] = position[1] + math_random_signed_float_range(0.0f, 0.15f);
             position[2] = position[2] + math_random_signed_float_range(0.0f, 0.15f);
-            part_spawn_ground_effect(position, 0x19, 0x7F207F7F, 0, sign, dir, f22 * 0.1f, f22, 0.003f, 0);
-            part_spawn_ground_effect(position, 0x19, 0x7F7F7F7F, 1, -sign, dir, f22 * 0.07f, f22 * 0.7f, 0.003f, 0);
+            part_spawn_ground_effect(position, 0x19, 0x7F207F7F, 0, sign, dir, scale * 0.1f, scale, 0.003f, 0);
+            part_spawn_ground_effect(position, 0x19, 0x7F7F7F7F, 1, -sign, dir, scale * 0.07f, scale * 0.7f, 0.003f, 0);
         } while (--i != 0);
     }
 }

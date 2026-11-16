@@ -25,6 +25,7 @@ extern void DoGifPaging(void);
 extern void text_draw_window_medium(TextBox_002D99E8 *, int, signed char *, int);
 extern void DrawMenuCheckBox(int, int, int);
 
+/* Draws a scrolling list of checkable entries, one checkbox per row, highlighting the selected one. */
 int DrawMenuCheckList_us2(Menu_002D99E8 *menu)
 {
     TextBox_002D99E8 draw, initial;

@@ -4,17 +4,17 @@
 extern int D_L00_001A904C_1 __attribute__((sda));
 extern int D_L00_001A904C_2 __attribute__((sda));
 extern void item_menu_draw(int);
-extern int func_PAL_00343928(int, int);
-extern int func_PAL_003457F0(int, int);
+extern int tab_menu_update_pal(int, int);
+extern int item_menu_update_pal(int, int);
 
 /* func_PAL_L00_0030F488, the PAL copy of func_L00_0030D638: the same C, where the field offset
  * becomes 0x3C210 and the callee is PAL's own. */
-int func_PAL_L00_0030F488(int a0)
+int module_l00_call_handler_with_arg_13_pal(int argument)
 {
-    int v = D_L00_001A904C_1;
+    int value = D_L00_001A904C_1;
 
-    if (v != 0) {
-        return func_PAL_00343928(v + 0x3C210, a0);
+    if (value != 0) {
+        return tab_menu_update_pal(value + 0x3C210, argument);
     }
     return 0;
 }
@@ -31,12 +31,12 @@ void module_l00_call_handler_14_pal(void)
 
 /* func_PAL_L00_0030F4F8, the PAL copy of func_L00_0030D6A8: the same C, where the field offset
  * becomes 0x3C530 and the callee is PAL's own. */
-int func_PAL_L00_0030F4F8(int a0)
+int module_l00_call_handler_with_arg_14_pal(int argument)
 {
-    int v = D_L00_001A904C_1;
+    int value = D_L00_001A904C_1;
 
-    if (v != 0) {
-        return func_PAL_003457F0(v + 0x3C530, a0);
+    if (value != 0) {
+        return item_menu_update_pal(value + 0x3C530, argument);
     }
     return 0;
 }

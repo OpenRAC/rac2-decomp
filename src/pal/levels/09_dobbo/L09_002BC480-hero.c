@@ -75,7 +75,7 @@ extern f32 math_approach_with_velocity(s32, f32, s32, f32, f32, f32, s32);
 extern s32 moby_is_in_special_class_range(s32);
 extern void vec_clamp_length(s32, f32);
 extern void vec_build_spherical_offset(s32, f32, f32, f32);
-extern void *func_PAL_002C0428(s32, s32, f32, f32);
+extern void *part_spawn_bubble_pal(s32, s32, f32, f32);
 extern void snd_stop_voice(s32);
 extern void RippleDisturb(s32, s32, void *, f32, f32, f32, f32);
 extern void pad_clamp_stick_to_unit_range(s32, s32, f32);
@@ -95,7 +95,7 @@ extern void cam_set_limits_fourth(f32, f32);
 extern void ProbeHeroAirborneWallContact_pal(void);
 extern s32 ProbeLedgeGrab_pal(s32, s32, s32);
 extern s32 hero_slot_item_id(s32);
-extern void func_PAL_L00_002B34C0(void);
+extern void hero_update_turn_from_anim_pal(void);
 extern s32 math_is_below_plane_within_depth(f32);
 extern void hero_resolve_stick_direction(f32, s32);
 extern void hero_update_target_speed_pal(void);
@@ -108,9 +108,9 @@ extern void hero_set_push_direction(s32);
 extern void hero_cancel_velocity_into_wall_pal(void);
 extern void hero_build_move_impulse(f32, f32);
 extern f32 hero_get_speed_along_forward(s32);
-extern void func_PAL_L01_002B6870(f32);
-extern void func_PAL_L00_002B6488(void);
-extern void func_PAL_L07_002B5728(void);
+extern void hero_approach_velocity_pal(f32);
+extern void ApplyHeroGravityAndJumpMotion_pal(void);
+extern void UpdateHeroVelocityForStateWithYawSpring_pal(void);
 extern void hero_l00_select_aim_target(f32, f32, f32);
 extern void hero_apply_mode_pose_offsets_pal(void);
 extern void UpdateHeroLeanAndSwayParameters(void);
@@ -121,9 +121,9 @@ extern void snd_update_slot_object(s32, s32, s32);
 extern void hero_try_surface_push_response(f32, f32, f32);
 extern void part_emit_effects_at_nearby_mobys_pal(s32, s32);
 extern void part_emit_hero_radial_particles_pal(void);
-extern void func_PAL_L00_002BA480(void);
+extern void hero_setup_attached_object_transform_pal(void);
 extern void hero_update_height_offset_pal(void);
-extern s32 func_PAL_L00_002CB2C8(void);
+extern s32 hero_try_start_grab_pal(void);
 extern void set_hero_animation_pal(s32, s32, f32);
 extern void hero_apply_mode_transform(s32, s32, f32);
 extern void hero_build_relative_point(s32, s32, f32, f32, f32);
@@ -148,10 +148,11 @@ extern void UpdateHeroAimTarget(f32, f32, f32);
 extern s32 hero_get_weapon_anim_id(s32);
 extern void ClipHeroVelocityAgainstWall_pal(s32);
 extern char g_impact_effect_data[] MACRO_ADDR;
-extern void func_PAL_L00_0038C620();
+extern void moby_l00_raise_state_to_8();
 extern void moby_raise_state_to_eight_copy();
 
-void func_PAL_L09_002BC480(void) {
+/* Runs every frame for the player and handles whatever the current action is (walking, jumping, swinging, gliding and so on) (PAL: 50 Hz timings). */
+void hero_l09_update_state_machine_pal(void) {
     f32 speed62;
     s32 lim67;
     s32 *cnt32;
@@ -561,7 +562,7 @@ void func_PAL_L09_002BC480(void) {
             }
         }
         if (((Hero *)g_hero_state)->u[0x2294/4] == 3) {
-            if (func_PAL_L00_002CB2C8() != 0) {
+            if (hero_try_start_grab_pal() != 0) {
                 break;
             }
         }
@@ -835,7 +836,7 @@ void func_PAL_L09_002BC480(void) {
             vec_scale_to_length((s32) ((TI128*)v20), (s32) ((TI128*)v20), 0.030000001f);
             FastVecAdd((s32) ((TI128*)v10), (s32) ((TI128*)v10), (s32) ((TI128*)v20));
             v10[2] += 0.040000003f;
-            func_PAL_002C0428((s32)((TI128*)v0), (s32) ((TI128*)v10), 25200.0f, -1.0f);
+            part_spawn_bubble_pal((s32)((TI128*)v0), (s32) ((TI128*)v10), 25200.0f, -1.0f);
             if ((f32) math_random_int_below(0x64) < 40.0f) {
                 var_a0_4 = 3;
                 var_a1_2 = 0x9;
@@ -862,7 +863,7 @@ void func_PAL_L09_002BC480(void) {
                             qcopy(v10, &((Hero *)g_hero_state)->q[0x110/16]);
                             vec_add_offset((s32) ((TI128*)v10), (s32) ((TI128*)v10), -0.015000001f, ((Hero *)g_hero_state)->f[0x98/4], ((Hero *)g_hero_state)->f[0x94/4]);
                             ((Hero *)g_hero_state)->h[0xA38/2] = FloatToInt((0.14000002f - ((Hero *)g_hero_state)->f[0x1B4/4]) * 28.571424f);
-                            func_PAL_002C0428((s32)((TI128*)v0), (s32) ((TI128*)v10), math_random_float_range(6300.0f, 9450.0f), -1.0f);
+                            part_spawn_bubble_pal((s32)((TI128*)v0), (s32) ((TI128*)v10), math_random_float_range(6300.0f, 9450.0f), -1.0f);
                         }
                     }
                 }
@@ -954,7 +955,7 @@ block_198:
             vec_scale_to_length((s32) ((TI128*)v20), (s32) ((TI128*)v20), 0.030000001f);
             FastVecAdd((s32) ((TI128*)v10), (s32) ((TI128*)v10), (s32) ((TI128*)v20));
             v10[2] += 0.040000003f;
-            func_PAL_002C0428((s32)((TI128*)v0), (s32) ((TI128*)v10), 25200.0f, -1.0f);
+            part_spawn_bubble_pal((s32)((TI128*)v0), (s32) ((TI128*)v10), 25200.0f, -1.0f);
             temp_v1_14 = M2C_FIELD(temp_s2, s32* , 0x1B8);
             if (temp_v1_14 < 0x21) {
                 lim67 = 5;
@@ -1433,7 +1434,7 @@ block_224:
         }
         if ((((Hero *)g_hero_state)->i[0xC2C/4] == 0) && (M2C_FIELD(((Hero *)g_hero_state)->ptr[0x2290/4], u8* , 0x43) == 0x1A) && (math_is_below_plane_within_depth(33.0f) != 0)) {
             if (((Hero *)g_hero_state)->u[0x2294/4] == 0x15) {
-                func_PAL_L00_002BA480();
+                hero_setup_attached_object_transform_pal();
             }
         }
         hero_approach_speed(0.014800001f, 0.0112000005f);
@@ -1740,7 +1741,7 @@ block_224:
         }
         var_f20_7 = 1.0f;
         if (((Hero *)g_hero_state)->h[0x1454/2] != 0) {
-            func_PAL_L00_002B34C0();
+            hero_update_turn_from_anim_pal();
         } else {
             ((Hero *)g_hero_state)->f[0x1458/4] = (f32) ((Hero *)g_hero_state)->f[0x98/4];
             qcopy(&((Hero *)g_hero_state)->q[0x1440/16], &((Hero *)g_hero_state)->q[0x0/16]);
@@ -1898,7 +1899,7 @@ block_224:
     case 0x76:                                      /* switch 1 */
         ((Hero *)g_hero_state)->f[0x1A0/4] = ((Hero *)g_hero_state)->f[0x32C/4];
         ((Hero *)g_hero_state)->f[0x1B0/4] = 0.11000001f;
-        func_PAL_L01_002B6870(0.010000001f);
+        hero_approach_velocity_pal(0.010000001f);
         hero_apply_mode_transform((s32) (((void*)g_hero_state) + 0xF0), (s32) ((void*)g_hero_state) + 0x130, 0.0072000003f);
         break;
     case 0x6:                                       /* switch 1 */
@@ -1918,7 +1919,7 @@ block_224:
         }
         hero_update_target_speed_pal();
         if (((Hero *)g_hero_state)->h[0x1E0/2] == 0) {
-            func_PAL_L07_002B5728();
+            UpdateHeroVelocityForStateWithYawSpring_pal();
         }
         var_s1_5 = ((void*)g_hero_state) + 0xF0;
         hero_apply_mode_pose_offsets_pal();
@@ -1990,7 +1991,7 @@ block_224:
         if (((Hero *)g_hero_state)->f[0x24B8/4] < 0.2f) {
             var_f12_19 = 0.00080000004f;
         }
-        func_PAL_L01_002B6870(var_f12_19);
+        hero_approach_velocity_pal(var_f12_19);
         break;
     case 0x8:                                       /* switch 1 */
         if (hero_slot_item_id(3) == 2) {
@@ -2141,7 +2142,7 @@ block_224:
                 }
             }
         } else {
-            func_PAL_L07_002B5728();
+            UpdateHeroVelocityForStateWithYawSpring_pal();
             if (((Hero *)g_hero_state)->u[0x2294/4] == 0x12) {
                 temp_s0_8 = ((void*)g_hero_state) + 0xF0;
                 var_f0_11 = vec_length_xy((s32) temp_s0_8);
@@ -2200,7 +2201,7 @@ block_224:
         if ((((Hero *)g_hero_state)->u[0x2294/4] == 0x38) && (((Hero *)g_hero_state)->b[0x49E] == 0) && (((Hero *)g_hero_state)->f[0xF8/4] > 0.030000001f)) {
             EmitHeroTimedEffects_pal();
         }
-        func_PAL_L00_002B6488();
+        ApplyHeroGravityAndJumpMotion_pal();
         ProbeHeroAirborneWallContact_pal();
         break;
     case 0x16:                                      /* switch 1 */
@@ -2280,7 +2281,7 @@ block_224:
                         part_queue_impact_effect(m, (s32) ((Hero *)g_hero_state)->ptr[0x2290/4], 0x10000, (s32) (((void*)g_hero_state) + 0xE0), (s32) g_impact_effect_data, 100.0f);
                         break;
                     case 0x1366:
-                        func_PAL_L00_0038C620();
+                        moby_l00_raise_state_to_8();
                         break;
                     case 0x1367:
                         moby_raise_state_to_eight_copy();

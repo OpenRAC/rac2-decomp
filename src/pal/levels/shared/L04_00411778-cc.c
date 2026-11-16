@@ -30,17 +30,19 @@ extern void gfx_l04_draw_billboard_sprite(void *, int, unsigned int, int, float,
 /* Integer and float arguments keep their order within each EE register bank. */
 extern void gfx_draw_flash_quad(void *, int, int, float, float, float, float, float);
 
+/* Draws the pulsing glow sphere around the bike: a colour-cycling textured sphere, three spinning
+   billboard rings and a flash quad on top. alpha is -1 for full opacity (PAL). */
 /* This unit is built with -g: retail's nops before the two latitude divisions
  * are the assembler's div.s floor after a line label, so keep one statement per
  * line. rows and cols must stay variables: as constants the loops' zero-trip
  * tests fold before gcse, which then hoists the vertex addresses into spill
  * slots. t is one local on purpose: its use in the inner loop, where $f12 is
  * already loaded for the next call, keeps it out of $f12 at the blend calls. */
-void func_PAL_L04_00411778(unsigned char *m, int alpha)
+void draw_pulsing_glow_sphere_pal(unsigned char *moby, int alpha)
 {
     B1202Packet packet;
     float matrix[4][4] __attribute__((aligned(16)));
-    unsigned char *p = *(unsigned char **)(m + 0x68);
+    unsigned char *vars = *(unsigned char **)(moby + 0x68);
     float t, offset, lat0, lat1, lon0, lon1, u0, v0, v1, cos0, cos1;
     unsigned int color, a, c;
     int i, j;
@@ -57,8 +59,8 @@ void func_PAL_L04_00411778(unsigned char *m, int alpha)
         color = FastTweenColor(0x1fb43264, ((unsigned int)alpha << 24) | 0x502800, t);
     }
     offset = fast_fmod(IntToFloat(g_game_tick_counter[0]), 25.333334f) * 0.039473683f;
-    euler_to_matrix(matrix, m + 0xf0);
-    *(B1202Quad *)(matrix[3]) = *(B1202Quad *)(m + 0x10);
+    euler_to_matrix(matrix, moby + 0xf0);
+    *(B1202Quad *)(matrix[3]) = *(B1202Quad *)(moby + 0x10);
     vec_scale_to_length(matrix[0], matrix[0], 0.4f);
     vec_scale_to_length(matrix[1], matrix[1], 0.35f);
     vec_scale_to_length(matrix[2], matrix[2], 0.35f);
@@ -101,23 +103,23 @@ void func_PAL_L04_00411778(unsigned char *m, int alpha)
             draw_world_quad(&packet, matrix, 0);
         }
     }
-    *(float *)(p + 0x4b4) = FastAddRotations(*(float *)(p + 0x4b4), 0.01f);
-    *(float *)(p + 0x4b8) = FastAddRotations(*(float *)(p + 0x4b8), -0.007f);
-    *(float *)(p + 0x4bc) = FastAddRotations(*(float *)(p + 0x4bc), 0.007f);
-    *(float *)(p + 0x4c0) = FastAddRotations(*(float *)(p + 0x4c0), *(float *)(p + 0x30c) * 0.1f);
+    *(float *)(vars + 0x4b4) = FastAddRotations(*(float *)(vars + 0x4b4), 0.01f);
+    *(float *)(vars + 0x4b8) = FastAddRotations(*(float *)(vars + 0x4b8), -0.007f);
+    *(float *)(vars + 0x4bc) = FastAddRotations(*(float *)(vars + 0x4bc), 0.007f);
+    *(float *)(vars + 0x4c0) = FastAddRotations(*(float *)(vars + 0x4c0), *(float *)(vars + 0x30c) * 0.1f);
     if (alpha == -1) {
-        gfx_l04_draw_billboard_sprite(m + 0x10, *(int *)(p + 0x648), 0x0fc8c8c8, 1, 0.495f, 0.35f, *(float *)(p + 0x4b4), *(float *)(m + 0xf4));
-        gfx_l04_draw_billboard_sprite(m + 0x10, *(int *)(p + 0x648), 0x0fc8c8c8, 1, 0.495f, 0.35f, *(float *)(p + 0x4b8), *(float *)(m + 0xf4));
-        gfx_l04_draw_billboard_sprite(m + 0x10, 54, 0x28969600, 1, 0.385f, 0.35f, *(float *)(p + 0x4bc), *(float *)(m + 0xf4));
+        gfx_l04_draw_billboard_sprite(moby + 0x10, *(int *)(vars + 0x648), 0x0fc8c8c8, 1, 0.495f, 0.35f, *(float *)(vars + 0x4b4), *(float *)(moby + 0xf4));
+        gfx_l04_draw_billboard_sprite(moby + 0x10, *(int *)(vars + 0x648), 0x0fc8c8c8, 1, 0.495f, 0.35f, *(float *)(vars + 0x4b8), *(float *)(moby + 0xf4));
+        gfx_l04_draw_billboard_sprite(moby + 0x10, 54, 0x28969600, 1, 0.385f, 0.35f, *(float *)(vars + 0x4bc), *(float *)(moby + 0xf4));
     } else {
         if (alpha < 0) {
             alpha = 0;
         }
         a = (unsigned int)alpha << 24;
         c = a | 0xc8c8c8;
-        gfx_l04_draw_billboard_sprite(m + 0x10, *(int *)(p + 0x648), c, 1, 0.495f, 0.35f, *(float *)(p + 0x4b4), *(float *)(m + 0xf4));
-        gfx_l04_draw_billboard_sprite(m + 0x10, *(int *)(p + 0x648), c, 1, 0.495f, 0.35f, *(float *)(p + 0x4b8), *(float *)(m + 0xf4));
-        gfx_l04_draw_billboard_sprite(m + 0x10, 54, a | 0x969600, 1, 0.385f, 0.35f, *(float *)(p + 0x4bc), *(float *)(m + 0xf4));
+        gfx_l04_draw_billboard_sprite(moby + 0x10, *(int *)(vars + 0x648), c, 1, 0.495f, 0.35f, *(float *)(vars + 0x4b4), *(float *)(moby + 0xf4));
+        gfx_l04_draw_billboard_sprite(moby + 0x10, *(int *)(vars + 0x648), c, 1, 0.495f, 0.35f, *(float *)(vars + 0x4b8), *(float *)(moby + 0xf4));
+        gfx_l04_draw_billboard_sprite(moby + 0x10, 54, a | 0x969600, 1, 0.385f, 0.35f, *(float *)(vars + 0x4bc), *(float *)(moby + 0xf4));
     }
-    gfx_draw_flash_quad(m + 0x10, *(int *)(p + 0x644), 0, 0.32f, 0.5f, *(float *)(p + 0x4c0), 0.0f, 0.0f);
+    gfx_draw_flash_quad(moby + 0x10, *(int *)(vars + 0x644), 0, 0.32f, 0.5f, *(float *)(vars + 0x4c0), 0.0f, 0.0f);
 }

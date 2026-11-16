@@ -14,7 +14,8 @@ extern int save_count_nonzero_flags(void);
 extern int level_get_resident_byte(void);
 extern void value_set_entry_by_index_pal(int, int);
 
-void func_PAL_L00_002B20F8(void)
+/* Once the wait timer ends, picks a voice line to play from the current progress step, then restarts the timer (PAL: other call ids, 250 instead of 300). */
+void hero_play_voice_line_for_progress_pal(void)
 {
     int count;
     int selector;

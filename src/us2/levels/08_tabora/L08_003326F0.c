@@ -5,7 +5,8 @@
 extern float moby_get_anim_value(void *);
 extern float math_round_to_decimal_places(int, float);
 
-int func_US2_L08_003326F0(char *object, float threshold)
+/* Tells whether the animation value has reached the threshold but is still within half a step of it (USA v2.00). */
+int math_is_value_within_half_step_us2(char *object, float threshold)
 {
     float current = math_round_to_decimal_places(4, moby_get_anim_value(object));
     float difference = current - threshold;

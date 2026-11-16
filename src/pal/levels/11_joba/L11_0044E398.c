@@ -6,16 +6,17 @@ extern void func_32C700();
 extern s32 func_441868(s32 a0, s32 a1);
 extern s32 func_33C800(char *a0, s32 a1, s32 a2, s32 a3, float f12, float f13);
 
-void security_robot_play_idle_pal(char *a0)
+/* Starts the idle animation: one pose while the robot holds an item, another without. */
+void security_robot_play_idle_pal(char *object)
 {
-    if (*(s32 *)(*(char **)(a0 + 0x68) + 0x354) != 0) {
-        func_32C9E0(a0, 4, 2);
-        if (*(u8 *)(a0 + 0x43) != 0)
-            func_32C700(a0, 0, 0, 0x8);
+    if (*(s32 *)(*(char **)(object + 0x68) + 0x354) != 0) {
+        func_32C9E0(object, 4, 2);
+        if (*(u8 *)(object + 0x43) != 0)
+            func_32C700(object, 0, 0, 0x8);
     } else {
-        func_32C9E0(a0, 5, 2);
-        if (*(u8 *)(a0 + 0x43) != 1)
-            func_32C700(a0, 1, 0, 0x8);
+        func_32C9E0(object, 5, 2);
+        if (*(u8 *)(object + 0x43) != 1)
+            func_32C700(object, 1, 0, 0x8);
     }
 }
 
@@ -28,7 +29,7 @@ extern float FastDiffRots(float, float);
 extern float fast_vec_dist(void *, void *);
 extern int math_random_int_below(int);
 extern void moby_set_state(char *, int, int);
-extern void func_PAL_002A7E68(char *, int, int, int);
+extern void anim_start_blended_pal(char *, int, int, int);
 extern char g_hero_position[];
 
 /* Picks the attack variant the actor plays against its target: the aim vector comes from the
@@ -61,15 +62,15 @@ int security_robot_try_start_attack_pal(char *object)
             if (math_random_int_below(4) == 0) {
                 moby_set_state(object, 0xC, 5);
                 if (*(unsigned char *)(object + 0x43) != 7)
-                    func_PAL_002A7E68(object, 7, 0, 0x8);
+                    anim_start_blended_pal(object, 7, 0, 0x8);
             } else if (*(int *)(state + 0x354) != 0) {
                 moby_set_state(object, 0xE, 6);
                 if (*(unsigned char *)(object + 0x43) != 9)
-                    func_PAL_002A7E68(object, 9, 8, 0xC);
+                    anim_start_blended_pal(object, 9, 8, 0xC);
             } else {
                 moby_set_state(object, 0xD, 6);
                 if (*(unsigned char *)(object + 0x43) != 8)
-                    func_PAL_002A7E68(object, 8, 8, 0xC);
+                    anim_start_blended_pal(object, 8, 8, 0xC);
             }
             return 1;
         }

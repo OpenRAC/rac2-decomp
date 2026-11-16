@@ -79,9 +79,10 @@ static __inline__ int label_y(void *handle, float value, float scale, float half
                       (f32)label_y(sprite, (f32)(y), D_L25_001B2904, 0.5f, 1), scale, alpha, angle); \
     }
 
-void hud_draw_fading_icon_pairs_pal(s32 first, s32 second, s32 third, s32 fourth)
+/* Draws the HUD icon pairs: the first, the timed pair (faded in and out over its first and last ten frames), and two more. */
+void hud_draw_fading_icon_pairs_pal(s32 show_first, s32 show_second, s32 show_third, s32 show_fourth)
 {
-    u8 *state = *(u8 **)(g_mission_moby + 0x68);
+    u8 *vars = *(u8 **)(g_mission_moby + 0x68);
     f32 fade;
     void *sprite;
     char text[128];
@@ -93,22 +94,22 @@ void hud_draw_fading_icon_pairs_pal(s32 first, s32 second, s32 third, s32 fourth
     }
     if (g_hud_l25_resource_base == 0)
         return;
-    if (first) {
+    if (show_first) {
         HUD_SPRITE(0xBD, 0x60442D00, g_hud_icon_pair_x, g_hud_icon_pair_y, -1.0f, 1.0f, 0.0f);
         HUD_SPRITE(0xBE, 0x55F0C070, g_hud_icon_pair_x, g_hud_icon_pair_y, -1.0f, 1.0f, 0.0f);
     }
-    if (second && g_mission_last_map_index < g_current_map_index[3]) {
-        if (math_fast_float_d(state + 0x30) == 0) {
-            if (*(s32 *)(state + 0x30) >= 291) {
-                fade = IntToFloat(250 - *(s32 *)(state + 0x30)) * 0.1f;
+    if (show_second && g_mission_last_map_index < g_current_map_index[3]) {
+        if (math_fast_float_d(vars + 0x30) == 0) {
+            if (*(s32 *)(vars + 0x30) >= 291) {
+                fade = IntToFloat(250 - *(s32 *)(vars + 0x30)) * 0.1f;
                 if (fade > 1.0f)
                     fade = 1.0f;
                 else if (fade < 0.0f)
                     fade = 0.0f;
                 HUD_SPRITE(0xBF, 0x60442D00, g_hud_icon_pair_x_second, g_hud_icon_pair_y_second, fade, fade, 0.0f);
                 HUD_SPRITE(0xC0, 0x55F0C070, g_hud_icon_pair_x_second, g_hud_icon_pair_y_second, fade, fade, 0.0f);
-            } else if (*(s32 *)(state + 0x30) < 10) {
-                fade = IntToFloat(*(s32 *)(state + 0x30)) * 0.1f;
+            } else if (*(s32 *)(vars + 0x30) < 10) {
+                fade = IntToFloat(*(s32 *)(vars + 0x30)) * 0.1f;
                 if (fade > 1.0f)
                     fade = 1.0f;
                 else if (fade < 0.0f)
@@ -116,7 +117,7 @@ void hud_draw_fading_icon_pairs_pal(s32 first, s32 second, s32 third, s32 fourth
                 HUD_SPRITE(0xBF, 0x60442D00, g_hud_icon_pair_x_second, g_hud_icon_pair_y_second, fade, fade, 0.0f);
                 HUD_SPRITE(0xC0, 0x55F0C070, g_hud_icon_pair_x_second, g_hud_icon_pair_y_second, fade, fade, 0.0f);
             } else {
-                s32 textX;
+                s32 text_x;
 
                 HUD_SPRITE(0xBF, 0x60442D00, g_hud_icon_pair_x_second, g_hud_icon_pair_y_second, 1.0f, 1.0f, 0.0f);
                 HUD_SPRITE(0xC0, 0x55F0C070, g_hud_icon_pair_x_second, g_hud_icon_pair_y_second, 1.0f, 1.0f, 0.0f);
@@ -124,20 +125,20 @@ void hud_draw_fading_icon_pairs_pal(s32 first, s32 second, s32 third, s32 fourth
                 hud_draw_sprite_gradient(GetIconFrame(0xEAA2, 3), g_hud_icon_pair_x_second - 51,
                               screen_coord(g_hud_l25_layout_mode, (f32)(g_hud_icon_pair_y_second - 13), 1.0f), 28, 28, &color);
                 sprintf(text, g_str_hud_map_index_format, g_current_map_index[3]);
-                textX = g_hud_icon_pair_x_second + 5;
-                text_draw_medium(textX, label_y((void *)textX, (f32)(g_hud_icon_pair_y_second + 2), g_hud_screen_scale, 0.5f, 1),
+                text_x = g_hud_icon_pair_x_second + 5;
+                text_draw_medium(text_x, label_y((void *)text_x, (f32)(g_hud_icon_pair_y_second + 2), g_hud_screen_scale, 0.5f, 1),
                               0x80808080, text, 128);
             }
         } else {
             g_mission_last_map_index = g_current_map_index[3];
-            *(s32 *)(state + 0x30) = 250;
+            *(s32 *)(vars + 0x30) = 250;
         }
     }
-    if (third) {
+    if (show_third) {
         HUD_SPRITE(0xC1, 0x60442D00, g_hud_text_x_left, g_hud_text_y_left, 1.1f, 1.0f, 0.0f);
         HUD_SPRITE(0xC2, 0x55F0C070, g_hud_text_x_left, g_hud_text_y_left, 1.1f, 1.0f, 0.0f);
     }
-    if (fourth) {
+    if (show_fourth) {
         HUD_SPRITE(0xC1, 0x60442D00, g_hud_text_x_right, g_hud_text_y_right, 1.1f, 1.0f, 0.0f);
         HUD_SPRITE(0xC2, 0x55F0C070, g_hud_text_x_right, g_hud_text_y_right, 1.1f, 1.0f, 0.0f);
     }

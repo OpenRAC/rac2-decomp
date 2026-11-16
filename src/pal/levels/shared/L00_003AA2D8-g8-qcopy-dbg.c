@@ -24,14 +24,14 @@ extern char *level_get_slot_body(int, int);
 extern void cam_compute_view_direction(char *, char *, int);
 extern void FastVecScale(void *, void *, float);
 extern void moby_build_axis_vectors(char *, char *);
-extern void func_PAL_L00_003AC5A8(void *);
+extern void trail_store_sample_pal(void *);
 extern float FastVecLength(void *);
 extern void vec_scale_to_length(void *, void *, float);
 extern void FastVecAdd(void *, void *, void *);
 extern int beam_test_segment_hit_pal(char *, void *);
 
 /* Spawn and configure one moving beam effect. */
-char *func_PAL_L00_003AB368(void *position, void *velocity, int handle, int mode)
+char *beam_spawn_moving_pal(void *position, void *velocity, int handle, int mode)
 {
     float normal[4], previous[4];
     char *moby;
@@ -61,7 +61,7 @@ char *func_PAL_L00_003AB368(void *position, void *velocity, int handle, int mode
             g_beam_spawn_slot_counter = 0;
         state->slot = g_beam_spawn_slot_counter;
         g_beam_spawn_slot_counter = (int)(g_beam_spawn_slot_counter + 1) % 3;
-        func_PAL_L00_003AC5A8(moby);
+        trail_store_sample_pal(moby);
         if (mode == 1) {
             qcopy(&state->origin, g_camera_l00_position);
             vec_scale_to_length(&state->velocity, g_camera_l00_position + 0x230, FastVecLength(velocity));

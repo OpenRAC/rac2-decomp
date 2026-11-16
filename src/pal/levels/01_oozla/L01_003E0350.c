@@ -18,33 +18,33 @@ extern s32 func_001163B0(void);
 extern s32 FloatToInt(f32);
 extern u8 *part_spawn_trail(void *, void *, void *, u32, u32, s32, s32, s32, s32);
 
-void func_PAL_L01_003E0710(u8 *obj, s32 skip) {
+void muckdweller_fire_spit_shot_pal(u8 *moby, s32 skip) {
     f32 pos[4] __attribute__((aligned(16)));
     f32 end[4] __attribute__((aligned(16)));
-    f32 tmp[4] __attribute__((aligned(16)));
+    f32 offset[4] __attribute__((aligned(16)));
     f32 velocity[4] __attribute__((aligned(16)));
     f32 acceleration[4] __attribute__((aligned(16)));
-    f32 particlePos[4] __attribute__((aligned(16)));
-    u8 *state = *(u8 **)(obj + 0x68);
+    f32 particle_pos[4] __attribute__((aligned(16)));
+    u8 *state = *(u8 **)(moby + 0x68);
     f32 angle, yaw, distance, height;
     u8 *particle;
 
-    distance = vec_distance_xy(obj + 0x10, *(u8 **)(state + 0x2F0) + 0x10);
-    height = *(f32 *)(*(u8 **)(state + 0x2F0) + 0x18) - *(f32 *)(obj + 0x18);
-    angle = fast_subtract_rotations(mat_fast_helper_a(distance, height), *(f32 *)(obj + 0xF4));
+    distance = vec_distance_xy(moby + 0x10, *(u8 **)(state + 0x2F0) + 0x10);
+    height = *(f32 *)(*(u8 **)(state + 0x2F0) + 0x18) - *(f32 *)(moby + 0x18);
+    angle = fast_subtract_rotations(mat_fast_helper_a(distance, height), *(f32 *)(moby + 0xF4));
     if (angle > 0.3490659f) angle = 0.3490659f;
     else if (angle < -0.3490659f) angle = -0.3490659f;
-    angle = FastAddRotations(angle, *(f32 *)(obj + 0xF4));
-    yaw = *(f32 *)(obj + 0xF8);
+    angle = FastAddRotations(angle, *(f32 *)(moby + 0xF4));
+    yaw = *(f32 *)(moby + 0xF8);
 
-    moby_transform_joint_to_world(obj, 0, pos);
-    vec_scale_to_length(tmp, obj + 0xC0, -0.4f);
-    FastVecAdd(pos, pos, tmp);
-    vec_scale_to_length(tmp, obj + 0xE0, 0.3f);
-    FastVecAdd(pos, pos, tmp);
+    moby_transform_joint_to_world(moby, 0, pos);
+    vec_scale_to_length(offset, moby + 0xC0, -0.4f);
+    FastVecAdd(pos, pos, offset);
+    vec_scale_to_length(offset, moby + 0xE0, 0.3f);
+    FastVecAdd(pos, pos, offset);
 
     if (*(s16 *)(*(u8 **)(state + 0x2F0) + 0xAA) == 0xB1A) {
-        coll_sweep_from_object(obj, pos, 1.0f, 0x4000001, (f32)state[0x34], 1.0f, 0, 1, 0);
+        coll_sweep_from_object(moby, pos, 1.0f, 0x4000001, (f32)state[0x34], 1.0f, 0, 1, 0);
         return;
     }
 
@@ -59,8 +59,8 @@ void func_PAL_L01_003E0710(u8 *obj, s32 skip) {
         }
         vec_build_spherical_offset(end, *(f32 *)(state + 0x3F4), yaw, angle);
         FastVecAdd(end, end, pos);
-        coll_cast_object_line(obj, pos, end, (f32)state[0x34], 0x4000001, 1.0f, 0, 1, 0);
-        coll_sweep_from_object(obj, end, 0.3f, 0x4000001, (f32)state[0x34], 1.0f, 0, 1, 0);
+        coll_cast_object_line(moby, pos, end, (f32)state[0x34], 0x4000001, 1.0f, 0, 1, 0);
+        coll_sweep_from_object(moby, end, 0.3f, 0x4000001, (f32)state[0x34], 1.0f, 0, 1, 0);
     }
     if (skip) return;
 
@@ -79,10 +79,10 @@ void func_PAL_L01_003E0710(u8 *obj, s32 skip) {
                 color1 = 0x30304020;
                 color2 = 0x30304020;
             }
-            qcopy(particlePos, pos);
-            particlePos[0] += math_random_float_range(-0.18f, 0.18f);
-            particlePos[1] += math_random_float_range(-0.18f, 0.18f);
-            particlePos[2] += math_random_float_range(-0.18f, 0.18f);
+            qcopy(particle_pos, pos);
+            particle_pos[0] += math_random_float_range(-0.18f, 0.18f);
+            particle_pos[1] += math_random_float_range(-0.18f, 0.18f);
+            particle_pos[2] += math_random_float_range(-0.18f, 0.18f);
             vec_build_spherical_offset(velocity, 0.18f, yaw, angle);
             velocity[2] += math_random_float_range(0.009000001f, 0.011000001f);
             vec_build_spherical_offset(acceleration, 0.010000001f,
@@ -91,7 +91,7 @@ void func_PAL_L01_003E0710(u8 *obj, s32 skip) {
             life = FloatToInt((math_random_float_range(2.0f, 4.0f) * 5.0f + 2.0f) * 0.16666667f);
             size = FloatToInt((math_random_float_range(20.0f, 24.0f) * 5.0f + 2.0f) * 0.16666667f);
             duration = FloatToInt((math_random_float_range(30.0f, 36.0f) * 5.0f + 2.0f) * 0.16666667f);
-            spawned = part_spawn_trail(particlePos, velocity, acceleration, color1, color2,
+            spawned = part_spawn_trail(particle_pos, velocity, acceleration, color1, color2,
                                     life, size, duration, -1);
             if (spawned) {
                 if (!*(u8 **)(state + 0x3F0)) *(u8 **)(state + 0x3F0) = spawned;
@@ -114,10 +114,10 @@ void func_PAL_L01_003E0710(u8 *obj, s32 skip) {
                 color1 = 0x80306000;
                 color2 = 0x30304000;
             }
-            qcopy(particlePos, pos);
-            particlePos[0] += math_random_float_range(-0.24f, 0.24f);
-            particlePos[1] += math_random_float_range(-0.24f, 0.24f);
-            particlePos[2] += math_random_float_range(-0.24f, 0.24f);
+            qcopy(particle_pos, pos);
+            particle_pos[0] += math_random_float_range(-0.24f, 0.24f);
+            particle_pos[1] += math_random_float_range(-0.24f, 0.24f);
+            particle_pos[2] += math_random_float_range(-0.24f, 0.24f);
             vec_build_spherical_offset(velocity, 0.20000002f,
                           FastAddRotations(yaw, math_random_float_range(-18.0f, 18.0f) * 0.017453294f), angle);
             velocity[2] += math_random_float_range(0.007f, 0.015000001f);
@@ -127,7 +127,7 @@ void func_PAL_L01_003E0710(u8 *obj, s32 skip) {
             life = FloatToInt((math_random_float_range(2.0f, 4.0f) * 5.0f + 2.0f) * 0.16666667f);
             size = FloatToInt((math_random_float_range(20.0f, 24.0f) * 5.0f + 2.0f) * 0.16666667f);
             duration = FloatToInt((math_random_float_range(100.0f, 120.00001f) * 5.0f + 2.0f) * 0.16666667f);
-            spawned = part_spawn_trail(particlePos, velocity, acceleration, color1, color2,
+            spawned = part_spawn_trail(particle_pos, velocity, acceleration, color1, color2,
                                     life, size, duration, -1);
             if (spawned && variant) spawned[3] = 0x48;
         }

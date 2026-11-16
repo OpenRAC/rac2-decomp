@@ -14,7 +14,7 @@ extern void part_spawn_masked_debris(char *, int, char *, float, float, float, f
 
 /* func_US2_L02_003D39E0, the USA v2.00 copy of func_L02_003D2488: the same C, plus clearing
    bit 0x1000 of the halfword at +0x34. */
-void func_US2_L02_003D39E0(char *self, int flag1, int flag2) {
+void armed_enemy_drop_held_and_reset_us2(char *self, int flag1, int flag2) {
     char *state = *(char **)(self + 0x68);
     float vec[4];
 

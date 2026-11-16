@@ -23,8 +23,8 @@ extern void chainblade_draw_blade_flares(char *);
 
 /* Advances the actor's step counter until the float at +0x20 no longer lies below the share
    (3 - step) / 3 of the count at +0x24, then latches the done flag; once only. */
-int func_PAL_L02_003D8D80(char *arg0) {
-    char *state = *(char **)(arg0 + 0x68);
+int chainblade_should_take_off_pal(char *self) {
+    char *state = *(char **)(self + 0x68);
     short timer = *(short *)(state + 0x32E);
     int delta;
 
@@ -52,23 +52,23 @@ int func_PAL_L02_003D8D80(char *arg0) {
 
 /* func_L02_003D5748 is defined in L02_003D5748-g8-dbg.c. */
 
-void chainblade_free_chain_links(char *arg0);
+void chainblade_free_chain_links(char *self);
 
 /* func_L02_003D5CF0 is matched in L02_003D5CF0.c (built with -frac2-qcopy -frac2-qcopy-barrier). */
 
-void chainblade_free_effect_trail(char *arg0);
+void chainblade_free_effect_trail(char *self);
 
 /* func_L02_003D5E40 is matched in L02_003D5E40-g8.c. */
 
 /* func_L02_003D5F50 is defined in L02_003D26B0-g8.c. */
 
-void chainblade_draw_glows(char *arg0);
+void chainblade_draw_glows(char *self);
 
-void chainblade_draw_arm_glows(char *arg0);
+void chainblade_draw_arm_glows(char *self);
 
 /* func_L02_003D6388 is matched in L02_003D6388-g8.c (built with -frac2-qcopy -frac2-qcopy-barrier). */
 
-void chainblade_draw_blade_flares(char *arg0);
+void chainblade_draw_blade_flares(char *self);
 
 /* func_L02_003D6570 is matched in L02_003D6570-g8.c (built with -frac2-qcopy -frac2-qcopy-barrier). */
 

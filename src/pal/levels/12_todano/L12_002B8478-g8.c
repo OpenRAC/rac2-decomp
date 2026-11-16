@@ -22,38 +22,38 @@ extern L12_002FFF88_STATE g_trail_slice_state;
 void todano_build_trail_slice_meshes_pal(void)
 {
     int index;
-    void *obj;
-    float scale;
-    char *q;
+    void *screen;
+    float mesh_scale;
+    char *source;
     int i;
-    int off;
+    int offset;
 
     if (g_current_map_index != 12)
         return;
 
-    obj = 0;
+    screen = 0;
     index = -1;
     if (g_trail_slice_state.mode < 2) {
-        obj = tv_screen_find_nearest(0.0f, 0.0f, 0.0f);
+        screen = tv_screen_find_nearest(0.0f, 0.0f, 0.0f);
         index = 2;
     }
-    if (index != -1 && obj != 0) {
+    if (index != -1 && screen != 0) {
         if (g_trail_slice_state.entries[index] != 0) {
-            char *d = obj + 0x10;
-            char *c = obj + 0xC0;
+            char *position = screen + 0x10;
+            char *basis = screen + 0xC0;
             g_trail_slice_state.mesh = (int)g_trail_slice_mesh;
-            q = (char *)&g_trail_slice_source;
-            off = 0x20;
+            source = (char *)&g_trail_slice_source;
+            offset = 0x20;
             i = 3;
-            scale = *(float *)(obj + 0x2C) / *(float *)(*(int *)(obj + 0x24) + 0x24);
+            mesh_scale = *(float *)(screen + 0x2C) / *(float *)(*(int *)(screen + 0x24) + 0x24);
             for (; i >= 0; i--) {
-                matrix_mul_vec3((char *)(g_trail_slice_state.mesh + off), q, c);
-                FastVecScale((char *)(g_trail_slice_state.mesh + off),
-                              (char *)(g_trail_slice_state.mesh + off), scale);
-                FastVecAdd((char *)(g_trail_slice_state.mesh + off),
-                              (char *)(g_trail_slice_state.mesh + off), d);
-                off += 0x10;
-                q += 0x10;
+                matrix_mul_vec3((char *)(g_trail_slice_state.mesh + offset), source, basis);
+                FastVecScale((char *)(g_trail_slice_state.mesh + offset),
+                              (char *)(g_trail_slice_state.mesh + offset), mesh_scale);
+                FastVecAdd((char *)(g_trail_slice_state.mesh + offset),
+                              (char *)(g_trail_slice_state.mesh + offset), position);
+                offset += 0x10;
+                source += 0x10;
             }
             *(int *)(g_trail_slice_state.mesh + 0x68) = g_trail_slice_state.entries[index];
         }

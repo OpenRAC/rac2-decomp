@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef struct {
     char pad[0x30];
@@ -9,7 +10,8 @@ typedef struct {
 extern PhaseEntry *ref_L09_003F65E0_00;
 extern PhaseEntry *ref_L09_003F65E0_01 __attribute__((sda));
 
-void func_PAL_L09_003FAE98(char *object) {
+/* Scrolls the texture offsets of a shared texture entry while the speeds are above zero (PAL: 50 Hz timings). */
+void scrolling_l09_texture_update_pal(char *object) {
     char *state = *(char **)(object + 0x68);
 
     switch (*(unsigned char *)(object + 0x20)) {

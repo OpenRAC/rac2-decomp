@@ -40,7 +40,7 @@ extern int GetCollHitMaterial(void);
 extern int snd_is_voice_playing_for_owner(void *, int);
 extern void snd_stop_voice(int);
 extern int PlayMobySound(int, int, void *);
-extern void func_PAL_L04_00417CB0(u8 *, u8 *);
+extern void hoverbike_update_route_steering_pal(u8 *, u8 *);
 extern void pad_clamp_stick_to_unit_range(void *, void *, float);
 extern float FastAddRotations(float, float);
 extern float mat_fast_helper_a(float, float);
@@ -57,7 +57,7 @@ extern float math_fast_sin_or_cos_a(float);
 extern float math_fast_sin_or_cos_b(float);
 extern int math_random_int_below(int);
 extern int FloatToInt(float);
-extern void *func_PAL_L04_00364B90(void *, void *, u32, float);
+extern void *part_spawn_sparkle_pal(void *, void *, u32, float);
 extern void * part_spawn_drifting(void *, int, int, float, float);
 extern float math_spring_float_to_goal(float *, float *, float, float, float, float);
 extern float math_lerp_float(float, float, float);
@@ -67,28 +67,28 @@ extern void vec_clamp_length(float *, float);
 extern void vec_scale_to_length(float *, float *, float);
 extern int math_fast_float_d(void *);
 extern void bike_compute_target_height_pal(u8 *, u8 *, float, float, float, float, float);
-extern void func_PAL_L04_00410488(Vec *, Vec *, int, u8 *, float);
-extern void func_PAL_L04_00410678(Vec *, Vec *, int, int);
+extern void part_spawn_spark_and_smoke_burst_pal(Vec *, Vec *, int, u8 *, float);
+extern void part_l04_spawn_burst_pal(Vec *, Vec *, int, int);
 extern void mat_aim_with_spring(void *, void *, void *, void *, float, float, float);
 extern void math_step_angle_offset(void *, void *, float, float);
-extern int func_PAL_L04_00418180(u8 *, u8 *, u8 *, u8 *, Vec *, Vec *, u8 *, int *, int, int *,
+extern int resolve_vehicle_movement_collisions_pal(u8 *, u8 *, u8 *, u8 *, Vec *, Vec *, u8 *, int *, int, int *,
                              float, float, float, float, float);
-extern void func_PAL_002A7E68(void *, int, int, int);
+extern void anim_start_blended_pal(void *, int, int, int);
 extern void racer_release_sound_handles(u8 *, u8 *);
 extern int queue_copy_record_by_index(int);
 extern void * SpawnExplosion_pal(void *, int, int, int, int, int, int, int, float, float, int, int, int, int);
 extern void level_release_slot_list(void *);
 extern float math_random_angle(void);
-extern void * func_PAL_L04_0040B520(u8 *, int, Vec *, u8 *, int, int, Vec *, char *, char *, float, float);
+extern void * debris_spawn_pal(u8 *, int, Vec *, u8 *, int, int, Vec *, char *, char *, float, float);
 extern int CollLine(void *, void *, int, void *, int);
 extern float vec_length_xy(void *);
 extern float fast_subtract_rotations(float, float);
 extern float FastDiffRots(float, float);
 extern float FastVecLength(void *);
 extern void Hero_ProbeGround(Quad);
-typedef struct { u8 pad000[0x1A0]; float heading; u8 pad1A4[0x24B8 - 0x1A4]; float turnScale; } L04_HoverHero;
-typedef struct { u8 pad000[0x158]; float f158; u8 pad15C[4]; float f160; u8 pad164[4]; int f168; int f16C;
-                 u8 pad170[0x10]; float f180; u8 pad184[4]; int f188; } L04_HoverCfg;
+typedef struct { u8 pad000[0x1A0]; float heading; u8 pad1A4[0x24B8 - 0x1A4]; float turn_scale; } L04_HoverHero;
+typedef struct { u8 pad000[0x158]; float unk_158; u8 pad15C[4]; float unk_160; u8 pad164[4]; int unk_168; int unk_16C;
+                 u8 pad170[0x10]; float unk_180; u8 pad184[4]; int unk_188; } L04_HoverCfg;
 typedef struct { u8 pad00[0x40]; float v[4]; } L04_HoverTarget;
 #define I(o) (*(s32 *)(st + (o)))
 #define F(o) (*(float *)(st + (o)))
@@ -97,12 +97,12 @@ typedef struct { u8 pad00[0x40]; float v[4]; } L04_HoverTarget;
 #define OF(o) (*(float *)(object + (o)))
 #define SND_STOP(field) { int h = I(field); if (h != -1) { u8 *e = D_00188660 + h * 0x70; if (*(u8 **)(e + 0x88) == object && e[0x74] != 0) func_002E59F8(h); } I(field) = -1; }
 
-#define SPAWN(id, a, b) { float r = func_002A7940(); func_002AF000(dir->f, 0.10000001f, r, func_002A7878(0.78539824f, 1.5707965f)); func_00282CD8(&v80, dir, &v50); func_PAL_L04_0040B520(object, id, (Vec *)(object + 0x10), object + 0xF0, 0, 0, dir, tag, tag, a, b); }
+#define SPAWN(id, a, b) { float r = func_002A7940(); func_002AF000(dir->f, 0.10000001f, r, func_002A7878(0.78539824f, 1.5707965f)); func_00282CD8(&vec_80, dir, &vec_50); func_PAL_L04_0040B520(object, id, (Vec *)(object + 0x10), object + 0xF0, 0, 0, dir, tag, tag, a, b); }
 
 /* Hover board physics for the rider: steering, speed, landing and crash handling. */
-void func_PAL_L04_00418DE8(u8 *object, u8 *st)
+void hoverboard_update_rider_physics_pal(u8 *object, u8 *st)
 {
-    Vec v20, v30, v40, v50, start, v70, v80, v90, vA0, vB0, vC0, vD0, vE0, vF0;
+    Vec vec_20, vec_30, vec_40, vec_50, start, vec_70, vec_80, vec_90, vec_A0, vec_B0, vec_C0, vec_D0, vec_E0, vec_F0;
     int flag, flag2, idle, dbg;
     float ground, height, limit, speed, grip, factor, damping, x;
 
@@ -113,12 +113,12 @@ void func_PAL_L04_00418DE8(u8 *object, u8 *st)
     if ((GetCollHitMaterial() != 0 || S(0x274) != 0) && snd_is_voice_playing_for_owner(object, I(0x3BC)) != 0) {
         SND_STOP(0x3BC)
     }
-    if (object[0x20] == 3) func_PAL_L04_00417CB0(object, st);
+    if (object[0x20] == 3) hoverbike_update_route_steering_pal(object, st);
     if (object[0xBC] == 5) {
         if (object[0x20] != 3) {
-            pad_clamp_stick_to_unit_range(&v20, st + 0x2C0, 0.1728f);
-            g_hoverboard_rotation = FastAddRotations(((L04_HoverCfg *)g_hover_config)->f158,
-                                       mat_fast_helper_a(math_fabs(v20.f[1]), v20.f[0]));
+            pad_clamp_stick_to_unit_range(&vec_20, st + 0x2C0, 0.1728f);
+            g_hoverboard_rotation = FastAddRotations(((L04_HoverCfg *)g_hover_config)->unk_158,
+                                       mat_fast_helper_a(math_fabs(vec_20.f[1]), vec_20.f[0]));
         } else {
             float t = mat_fast_helper_a(F(0x6A0) - OF(0x10), F(0x6A4) - OF(0x14));
             ((L04_HoverHero *)g_hero_state)->heading = t;
@@ -130,55 +130,55 @@ void func_PAL_L04_00418DE8(u8 *object, u8 *st)
             ApproachValue((float *)(st + 0x30C), 0.060000002f, 0.0044f);
         } else {
             if (GetCollHitMaterial() == 0 && S(0x274) == 0) {
-                u8 *s0;
+                u8 *axis_ptr;
                 float yaw, z;
                 if (F(0x30C) > 0.23000002f) {
                     idle = 0;
                     ApproachValue((float *)(st + 0x30C), 0.23000002f, 0.0046f);
                 }
                 I(0x278) = 0;
-                FastVecScale(&v70, (object + 0xC0), 0.95f);
-                s0 = object + 0xD0;
-                FastVecScale(&v80, s0, 0.45f);
-                FastVecScale(&v90, s0, -0.45f);
-                moby_transform_joint_to_world(object, 0, &vA0);
-                FastVecAdd(&vA0, &vA0, &v70);
-                FastVecAdd(&vA0, &vA0, &v80);
+                FastVecScale(&vec_70, (object + 0xC0), 0.95f);
+                axis_ptr = object + 0xD0;
+                FastVecScale(&vec_80, axis_ptr, 0.45f);
+                FastVecScale(&vec_90, axis_ptr, -0.45f);
+                moby_transform_joint_to_world(object, 0, &vec_A0);
+                FastVecAdd(&vec_A0, &vec_A0, &vec_70);
+                FastVecAdd(&vec_A0, &vec_A0, &vec_80);
                 z = ground - 0.25f;
-                vA0.f[2] = ground;
-                part_spawn_impact_smoke_and_sparks(&vA0, 1, 0, z, F(0x30C));
-                moby_transform_joint_to_world(object, 1, &vB0);
-                FastVecAdd(&vB0, &vB0, &v70);
-                FastVecAdd(&vB0, &vB0, &v90);
-                vB0.f[2] = ground;
-                part_spawn_impact_smoke_and_sparks(&vB0, 1, 0, z, F(0x30C));
-                qcopy(&vD0, &vB0);
-                qcopy(&vE0, &vA0);
+                vec_A0.f[2] = ground;
+                part_spawn_impact_smoke_and_sparks(&vec_A0, 1, 0, z, F(0x30C));
+                moby_transform_joint_to_world(object, 1, &vec_B0);
+                FastVecAdd(&vec_B0, &vec_B0, &vec_70);
+                FastVecAdd(&vec_B0, &vec_B0, &vec_90);
+                vec_B0.f[2] = ground;
+                part_spawn_impact_smoke_and_sparks(&vec_B0, 1, 0, z, F(0x30C));
+                qcopy(&vec_D0, &vec_B0);
+                qcopy(&vec_E0, &vec_A0);
                 yaw = OF(0xF8);
-                vC0.f[0] = math_fast_sin_or_cos_a(yaw) * math_random_float_range(0.038000003f, 0.080000006f);
-                vC0.f[1] = math_fast_sin_or_cos_b(yaw) * math_random_float_range(0.038000003f, 0.080000006f);
-                vC0.f[2] = F(0x30C) * 0.5f;
+                vec_C0.f[0] = math_fast_sin_or_cos_a(yaw) * math_random_float_range(0.038000003f, 0.080000006f);
+                vec_C0.f[1] = math_fast_sin_or_cos_b(yaw) * math_random_float_range(0.038000003f, 0.080000006f);
+                vec_C0.f[2] = F(0x30C) * 0.5f;
                 if (math_random_int_below(FloatToInt(1.0f / F(0x30C)) - 1) == 0) {
                     if (F(0x30C) >= 0.1f) {
-                        func_PAL_L04_00364B90(&vD0, &vC0, 0x40, 0.6f);
-                        FastVecScale(&v70, (object + 0xC0), -0.4f);
-                        FastVecAdd(&vD0, &vD0, &v70);
-                        func_PAL_L04_00364B90(&vD0, &vC0, 0x40, 0.7f);
-                        FastVecAdd(&vD0, &vD0, &v70);
-                        func_PAL_L04_00364B90(&vD0, &vC0, 0x40, 0.8f);
-                        func_PAL_L04_00364B90(&vE0, &vC0, 0x40, 0.6f);
-                        FastVecScale(&v70, (object + 0xC0), -0.4f);
-                        FastVecAdd(&vE0, &vE0, &v70);
-                        func_PAL_L04_00364B90(&vE0, &vC0, 0x40, 0.7f);
-                        FastVecAdd(&vE0, &vE0, &v70);
-                        func_PAL_L04_00364B90(&vE0, &vC0, 0x40, 0.8f);
+                        part_spawn_sparkle_pal(&vec_D0, &vec_C0, 0x40, 0.6f);
+                        FastVecScale(&vec_70, (object + 0xC0), -0.4f);
+                        FastVecAdd(&vec_D0, &vec_D0, &vec_70);
+                        part_spawn_sparkle_pal(&vec_D0, &vec_C0, 0x40, 0.7f);
+                        FastVecAdd(&vec_D0, &vec_D0, &vec_70);
+                        part_spawn_sparkle_pal(&vec_D0, &vec_C0, 0x40, 0.8f);
+                        part_spawn_sparkle_pal(&vec_E0, &vec_C0, 0x40, 0.6f);
+                        FastVecScale(&vec_70, (object + 0xC0), -0.4f);
+                        FastVecAdd(&vec_E0, &vec_E0, &vec_70);
+                        part_spawn_sparkle_pal(&vec_E0, &vec_C0, 0x40, 0.7f);
+                        FastVecAdd(&vec_E0, &vec_E0, &vec_70);
+                        part_spawn_sparkle_pal(&vec_E0, &vec_C0, 0x40, 0.8f);
                     }
                 }
                 if (F(0x30C) <= 0.1f && math_random_int_below(2) == 0) {
-                    FastVecScale(&v70, (object + 0xC0), 0.5f);
-                    FastVecAdd(&vF0, (object + 0x10), &v70);
-                    vF0.f[2] = ground;
-                    part_spawn_drifting(&vF0, 0, 0x40645050, 0.8f, 14700.0f);
+                    FastVecScale(&vec_70, (object + 0xC0), 0.5f);
+                    FastVecAdd(&vec_F0, (object + 0x10), &vec_70);
+                    vec_F0.f[2] = ground;
+                    part_spawn_drifting(&vec_F0, 0, 0x40645050, 0.8f, 14700.0f);
                 }
                 if (snd_is_voice_playing_for_owner(object, I(0x3BC)) == 0 && object[0x20] != 3) {
                     I(0x3BC) = PlayMobySound(0x10, 4, object);
@@ -225,37 +225,37 @@ void func_PAL_L04_00418DE8(u8 *object, u8 *st)
     }
     damping = factor * damping;
     if (object[0xBC] == 5) {
-        if (object[0x20] != 3) limit = limit * ((L04_HoverHero *)g_hero_state)->turnScale;
+        if (object[0x20] != 3) limit = limit * ((L04_HoverHero *)g_hero_state)->turn_scale;
         if (limit < 3.4906592e-05f) limit = 3.4906592e-05f;
         math_approach_with_velocity((float *)(object + 0xF8), ((L04_HoverHero *)g_hero_state)->heading, (float *)(st + 0x308), damping, 0.43200004f, limit, 0);
     }
     if (g_race_bike_mode != 0) {
         if (I(0x64C) != 0 && I(0x71C) != 0) {
-            FastVecScale(&v20, st + 0x2F0, (float)I(0x64C) * 0.030303031f);
-            FastVecSub((st + 0x290), (st + 0x290), &v20);
+            FastVecScale(&vec_20, st + 0x2F0, (float)I(0x64C) * 0.030303031f);
+            FastVecSub((st + 0x290), (st + 0x290), &vec_20);
             I(0x71C) = 0;
         }
-        vec_build_spherical_offset(v20.f, speed, OF(0xF8), 0.0f);
-        FastVecScale(&v20, &v20, 0.025f);
-        FastVecAdd((st + 0x290), (st + 0x290), &v20);
+        vec_build_spherical_offset(vec_20.f, speed, OF(0xF8), 0.0f);
+        FastVecScale(&vec_20, &vec_20, 0.025f);
+        FastVecAdd((st + 0x290), (st + 0x290), &vec_20);
         vec_clamp_length((float *)(st + 0x290), speed);
     } else {
         vec_build_spherical_offset((float *)(st + 0x290), speed, OF(0xF8), 0.0f);
         vec_clamp_length((float *)(st + 0x290), speed);
-        qcopy(&v20, object + 0xD0);
-        vec_scale_to_length(v20.f, v20.f, F(0x30C) * (F(0x308) * -1.75f));
-        FastVecAdd((st + 0x290), (st + 0x290), &v20);
+        qcopy(&vec_20, object + 0xD0);
+        vec_scale_to_length(vec_20.f, vec_20.f, F(0x30C) * (F(0x308) * -1.75f));
+        FastVecAdd((st + 0x290), (st + 0x290), &vec_20);
     }
     if (math_fast_float_d(st + 0x64C) == 0) {
         extern int g_hoverboard_debug_flag;
-        FastVecScale(&v20, st + 0x2F0, (float)I(0x64C) * 0.030303031f);
-        FastVecAdd((st + 0x290), (st + 0x290), &v20);
+        FastVecScale(&vec_20, st + 0x2F0, (float)I(0x64C) * 0.030303031f);
+        FastVecAdd((st + 0x290), (st + 0x290), &vec_20);
         I(0x71C) = 1;
         dbg = g_hoverboard_debug_flag;
     } else {
         dbg = g_hoverboard_debug_flag;
     }
-    if (dbg != 0) qcopy(&g_hover_debug_quad, &v20);
+    if (dbg != 0) qcopy(&g_hover_debug_quad, &vec_20);
     bike_compute_target_height_pal(object, st, height, 0.2f, 0.23f, 12.0f, 0.1f);
     if (height > 0.44f) {
         S(0x274) = 1;
@@ -263,14 +263,14 @@ void func_PAL_L04_00418DE8(u8 *object, u8 *st)
     } else {
         if (S(0x274) != 0 && S(0x276) >= 11 && F(0x358) < 0.0f && GetCollHitMaterial() != 0) {
             if (S(0x276) >= 38) {
-                FastVecScale(&v30, (st + 0x2A0), 0.75f);
-                add_vectors(&v70, &v30, (object + 0x10));
-                v40.q = *(Quad *)(st + 0x2A0);
-                v30.f[2] = OF(0x18);
-                v40.f[2] = 0.020000001f;
-                FastVecScale(&v40, &v40, 0.85f);
-                func_PAL_L04_00410488(&v30, &v40, 0, object, F(0x30C));
-                func_PAL_L04_00410678(&v30, &v40, 8, 1);
+                FastVecScale(&vec_30, (st + 0x2A0), 0.75f);
+                add_vectors(&vec_70, &vec_30, (object + 0x10));
+                vec_40.q = *(Quad *)(st + 0x2A0);
+                vec_30.f[2] = OF(0x18);
+                vec_40.f[2] = 0.020000001f;
+                FastVecScale(&vec_40, &vec_40, 0.85f);
+                part_spawn_spark_and_smoke_burst_pal(&vec_30, &vec_40, 0, object, F(0x30C));
+                part_l04_spawn_burst_pal(&vec_30, &vec_40, 8, 1);
                 if (object[0x20] != 3) {
                     SND_STOP(0x328)
                     I(0x328) = PlayMobySound(4, 4, object);
@@ -312,7 +312,7 @@ void func_PAL_L04_00418DE8(u8 *object, u8 *st)
     *(Quad *)(st + 0x2A0) = *(Quad *)(st + 0x290);
     F(0x358) = F(0x2A8);
     {
-    int result = func_PAL_L04_00418180(object, (object + 0x10), (st + 0x290), (st + 0x2A0), &v30, &v50, (st + 0x2B0), &flag, 1, &flag2,
+    int result = resolve_vehicle_movement_collisions_pal(object, (object + 0x10), (st + 0x290), (st + 0x2A0), &vec_30, &vec_50, (st + 0x2B0), &flag, 1, &flag2,
                                    F(0x30C) + F(0x27C), F(0x280), 0.20000002f, F(0x24), F(0x20));
     if (result != 0) {
         if (g_race_bike_mode != 0) FastVecScale((st + 0x290), (st + 0x290), 0.85f);
@@ -324,7 +324,7 @@ void func_PAL_L04_00418DE8(u8 *object, u8 *st)
         case 1:
             if (I(0x1DC) != -1) {
                 u8 *target = g_moby_l04_pool + (I(0x1DC) << 8);
-                float a = fast_subtract_rotations(OF(0xF8), mat_fast_helper_a(v30.f[0] - OF(0x10), v30.f[1] - OF(0x14)));
+                float a = fast_subtract_rotations(OF(0xF8), mat_fast_helper_a(vec_30.f[0] - OF(0x10), vec_30.f[1] - OF(0x14)));
                 int dir;
                 if (a > 0.52359885f && a < 2.617994f) {
                     dir = 3;
@@ -337,7 +337,7 @@ void func_PAL_L04_00418DE8(u8 *object, u8 *st)
                 } else {
                     I(0x36C) = 25;
                     S(0x34A) = dir;
-                    func_PAL_002A7E68(target, dir, 3, 2);
+                    anim_start_blended_pal(target, dir, 3, 2);
                 }
             }
             switch (flag) {
@@ -372,8 +372,8 @@ void func_PAL_L04_00418DE8(u8 *object, u8 *st)
                 if (I(0x4D8) == 0) F(0x30C) = F(0x30C) * 0.25f;
                 break;
             }
-            v30.f[2] = OF(0x18) + 0.05f;
-            func_PAL_L04_00410488(&v30, (Vec *)(st + 0x290), flag, object, F(0x30C));
+            vec_30.f[2] = OF(0x18) + 0.05f;
+            part_spawn_spark_and_smoke_burst_pal(&vec_30, (Vec *)(st + 0x290), flag, object, F(0x30C));
             break;
         case 2:
             if (I(0x4D8) == 0) {
@@ -381,12 +381,12 @@ void func_PAL_L04_00418DE8(u8 *object, u8 *st)
                     char *tag;
                     Vec *dir;
                     racer_release_sound_handles(object, st);
-                    ((L04_HoverCfg *)g_hover_config)->f188 = 0x4b;
-                    ((L04_HoverCfg *)g_hover_config)->f168 = 0x32;
-                    ((L04_HoverCfg *)g_hover_config)->f160 = 0.2f;
-                    ((L04_HoverCfg *)g_hover_config)->f180 = 0.1f;
+                    ((L04_HoverCfg *)g_hover_config)->unk_188 = 0x4b;
+                    ((L04_HoverCfg *)g_hover_config)->unk_168 = 0x32;
+                    ((L04_HoverCfg *)g_hover_config)->unk_160 = 0.2f;
+                    ((L04_HoverCfg *)g_hover_config)->unk_180 = 0.1f;
                     tag = g_effect_default_params;
-                    ((L04_HoverCfg *)g_hover_config)->f16C = 0;
+                    ((L04_HoverCfg *)g_hover_config)->unk_16C = 0;
                     queue_copy_record_by_index(0x1C);
                     SpawnExplosion_pal((object + 0x10), 1, 0x19, 0x14, 0x14, 0x14, 0x2D, 1, 0.666f, 20.0f, 1, 1, 0, 0);
                     level_release_slot_list(st + 0x4E0);
@@ -394,27 +394,27 @@ void func_PAL_L04_00418DE8(u8 *object, u8 *st)
                     object[0xBC] = 6;
                     *(u16 *)(object + 0x34) = (*(u16 *)(object + 0x34) | 0x41) & 0xFBFF;
                     *(s16 *)(object + 0x96) = 0x53;
-                    FastVecScale(&v50, &v50, math_random_float_range(0.1f, 0.2f));
-                    dir = &v70;
+                    FastVecScale(&vec_50, &vec_50, math_random_float_range(0.1f, 0.2f));
+                    dir = &vec_70;
                     SPAWN(0xB3D, 0.0f, 0.05f)
                     SPAWN(0xB3E, 0.0f, 0.05f)
                     SPAWN(0xB3F, 0.0f, 0.0f)
                     SPAWN(0xB40, 0.0f, 0.05f)
                     SPAWN(0xB40, 0.0f, 0.05f)
                     if (I(0x1DC) != -1) {
-                        v90.q = *(Quad *)(object + 0x10);
-                        v90.f[2] = v90.f[2] + 0.25f;
-                        v80.f[0] = math_fast_sin_or_cos_a(OF(0xF8));
-                        v80.f[1] = math_fast_sin_or_cos_b(OF(0xF8));
-                        v80.f[2] = 0.0f;
-                        add_vectors(&vA0, &v80, &v90);
-                        if (CollLine(&v90, &v80, 2, 0, 0) != 0) {
+                        vec_90.q = *(Quad *)(object + 0x10);
+                        vec_90.f[2] = vec_90.f[2] + 0.25f;
+                        vec_80.f[0] = math_fast_sin_or_cos_a(OF(0xF8));
+                        vec_80.f[1] = math_fast_sin_or_cos_b(OF(0xF8));
+                        vec_80.f[2] = 0.0f;
+                        add_vectors(&vec_A0, &vec_80, &vec_90);
+                        if (CollLine(&vec_90, &vec_80, 2, 0, 0) != 0) {
                             if (GetCollHitMaterial() != result) {
                                 L04_HoverTarget *hit = (L04_HoverTarget *)g_hover_target_buffer;
-                                float f20;
+                                float hit_angle;
                                 x = mat_fast_helper_a(hit->v[2], vec_length_xy(hit->v));
-                                f20 = FastAddRotations(mat_fast_helper_a(hit->v[0], hit->v[1]), 3.1415927f);
-                                FastDiffRots(mat_fast_helper_a(v80.f[0], v80.f[1]), f20);
+                                hit_angle = FastAddRotations(mat_fast_helper_a(hit->v[0], hit->v[1]), 3.1415927f);
+                                FastDiffRots(mat_fast_helper_a(vec_80.f[0], vec_80.f[1]), hit_angle);
                                 if (x > 1.2217306f) height = 0.0f;
                             }
                         }
@@ -427,9 +427,9 @@ void func_PAL_L04_00418DE8(u8 *object, u8 *st)
         I(0x750) = 0;
     }
     }
-    FastVecSub(&v20, &start, (object + 0x10));
-    v20.i[2] = 0;
-    F(0x280) = FastVecLength(&v20);
+    FastVecSub(&vec_20, &start, (object + 0x10));
+    vec_20.i[2] = 0;
+    F(0x280) = FastVecLength(&vec_20);
     if (F(0x280) < 0.01f) I(0x750) = I(0x750) + 1;
     {
         Quad q = *(Quad *)(object + 0x10);

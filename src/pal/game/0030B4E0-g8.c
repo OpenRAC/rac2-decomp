@@ -28,7 +28,8 @@ extern Vec g_tether_chain_positions[];
 extern Vec g_tether_chain_offsets[];
 extern int g_tether_chain_heights[];
 extern int g_tether_chain_mirror_heights[];
-void func_PAL_0030B4E0(char *obj) {
+/* Resets the twenty beam chain points to a straight line when the beam starts (PAL copy). */
+void initialize_electric_water_bolt_effect_pal(char *obj) {
     Vec delta, step;
     Vec *state = *(Vec **)(obj + 0x68);
     int i;

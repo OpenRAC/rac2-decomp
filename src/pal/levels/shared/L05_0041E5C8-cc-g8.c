@@ -24,7 +24,7 @@ extern float vec_distance_xy(void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
 extern int CollLine(void *, void *, int, void *, void *);
 extern int GetCollHitMaterial(void);
-extern void func_PAL_L05_0041EC50(void *, int, u32, void *);
+extern void part_spawn_sprite_pair_burst_pal(void *, int, u32, void *);
 extern float coll_project_point_on_segment(void *, void *, void *, void *);
 extern void lerp_vector(void *, void *, void *, float);
 extern void FastVecSub(void *, void *, void *);
@@ -38,7 +38,8 @@ extern char g_projectile_target_pos[], g_hero_l05_state[];
 extern u8 *g_nearby_l05_mobys[];
 extern float g_equipment_trigger_radius __attribute__((sda));
 
-void func_PAL_L05_0041E5C8(u8 *actor)
+/* Updates the shot: moves it, removes it when it leaves the world or expires, tests for hits on the hero and other objects, and queues its draw callback. */
+void UpdateFeltzinProjectile_pal(u8 *actor)
 {
     Vector previous;
     Impact impact __attribute__((aligned(16)));
@@ -87,7 +88,7 @@ void func_PAL_L05_0041E5C8(u8 *actor)
     if (CollLine(&previous, actor + 0x10, 0, *(void **)(state + 4), &impact) != 0 &&
         GetCollHitMaterial() != 6) {
         snd_play_from_class_bank(7, 0, (char *)actor, 0xFBF);
-        func_PAL_L05_0041EC50(g_projectile_target_pos, 20, *(u32 *)(state + 0x24), actor);
+        part_spawn_sprite_pair_burst_pal(g_projectile_target_pos, 20, *(u32 *)(state + 0x24), actor);
         moby_mark_spawned(actor);
         return;
     }
@@ -101,7 +102,7 @@ void func_PAL_L05_0041E5C8(u8 *actor)
                 *(int *)(camera + 0x168) = 25;
                 *(float *)(camera + 0x160) = 0.05f;
             }
-            func_PAL_L05_0041EC50(&point, 20, *(u32 *)(state + 0x24), actor);
+            part_spawn_sprite_pair_burst_pal(&point, 20, *(u32 *)(state + 0x24), actor);
             moby_mark_spawned(actor);
             return;
         }
@@ -119,7 +120,7 @@ destroy:
             FastVecSub(&delta, g_nearby_l05_mobys[i] + 0x10, &closest);
             if (FastVecLength(&delta) < *(float *)(state + 0x3C)) {
                 snd_play_from_class_bank(7, 0, (char *)actor, 0xFBF);
-                func_PAL_L05_0041EC50(&closest, 20, *(u32 *)(state + 0x24), actor);
+                part_spawn_sprite_pair_burst_pal(&closest, 20, *(u32 *)(state + 0x24), actor);
                 QueueMobyImpact(g_nearby_l05_mobys[i], &impact);
                 goto destroy;
             }

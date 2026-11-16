@@ -10,7 +10,7 @@ extern float mat_fast_helper_a(float,float);
 extern float fast_subtract_rotations(float,float);
 extern float math_random_float_range(float,float);
 extern int math_random_int_below(int);
-extern void func_PAL_002A7E68(void *, s32, s32, s32);
+extern void anim_start_blended_pal(void *, s32, s32, s32);
 typedef struct UpdateVars {
     u8 pad[0x100];
     float direction[4];
@@ -66,8 +66,9 @@ static __inline__ void TurnJoint(void *self, void *joint, int index, float rate,
     moby_update_eased_node(self,joint,index,rate*1.44f,damping*1.44f);
 }
 
-void func_PAL_L12_003B8918(u8 *self) {
-    UpdateVars *v = *(UpdateVars **)(self + 0x68);
+/* Updates the item trade NPC: creates its partner object, offers the trade and hands over the item, and turns its head and joints toward the hero or random directions (PAL: 50 Hz timers). */
+void todano_item_trade_npc_update_pal(u8 *moby) {
+    UpdateVars *vars = *(UpdateVars **)(moby + 0x68);
     float target[4] __attribute__((aligned(16)));
     float position[4] __attribute__((aligned(16)));
     float delta[4] __attribute__((aligned(16)));
@@ -75,163 +76,163 @@ void func_PAL_L12_003B8918(u8 *self) {
     float rate, damping;
     int active;
     u8 *partner;
-    moby_reset_matching_effects(self);
-    switch (self[0x20]) {
+    moby_reset_matching_effects(moby);
+    switch (moby[0x20]) {
     case 0:
         if (!g_item_owned_flags[7]) {
             partner = CreateMoby(0x127B);
-            v->partner = partner;
+            vars->partner = partner;
             if (partner) {
-                *(u16 *)(partner+0x32) = *(u16 *)(self+0x32);
-                v->partner[0x30] = self[0x30];
-                *(u64 *)(v->partner+0x38) = *(u64 *)(self+0x38);
-                *(u32 *)(v->partner+0x78) = *(u32 *)(self+0x78);
-                v->partner[0x31] = 1;
-                func_002A0F48(v->partner);
-                if (g_object_state_flags_f & 0x200000) moby_set_state(self,2,-1);
-                else moby_set_state(self,1,-1);
+                *(u16 *)(partner+0x32) = *(u16 *)(moby+0x32);
+                vars->partner[0x30] = moby[0x30];
+                *(u64 *)(vars->partner+0x38) = *(u64 *)(moby+0x38);
+                *(u32 *)(vars->partner+0x78) = *(u32 *)(moby+0x78);
+                vars->partner[0x31] = 1;
+                func_002A0F48(vars->partner);
+                if (g_object_state_flags_f & 0x200000) moby_set_state(moby,2,-1);
+                else moby_set_state(moby,1,-1);
             }
-            moby_reset_vars_defaults(self);
+            moby_reset_vars_defaults(moby);
         } else {
-            moby_mark_spawned(self);
+            moby_mark_spawned(moby);
             return;
         }
         break;
     case 1:
-        if (hero_is_reachable_for_count(self,10,2.5f)) {
-            level_apply_index_for_key(self);
+        if (hero_is_reachable_for_count(moby,10,2.5f)) {
+            level_apply_index_for_key(moby);
             if (req_push_queue(g_requirement_queue,0x75)) {
                 req_launch_queued(g_requirement_queue);
-                moby_set_state(self,2,-1);
+                moby_set_state(moby,2,-1);
             }
         }
         break;
     case 2:
         g_glow_resize_flags[1] = 1;
         if (g_partner_mode_words[1] == 2) {
-            self[0x31] = 0;
+            moby[0x31] = 0;
             {
-                u16 flags = *(u16 *)(self+0x34) | 1;
-                int partnerMode = g_partner_mode_words[1];
-                *(u16 *)(self+0x34) = flags;
-                if (partnerMode == 2) {
-                    *(u16 *)(v->partner+0x34) |= 1;
-                    v->partner[0x31] = 0;
+                u16 flags = *(u16 *)(moby+0x34) | 1;
+                int partner_mode = g_partner_mode_words[1];
+                *(u16 *)(moby+0x34) = flags;
+                if (partner_mode == 2) {
+                    *(u16 *)(vars->partner+0x34) |= 1;
+                    vars->partner[0x31] = 0;
                 }
             }
         }
         if (!game_is_either_mode_two()) {
             g_glow_resize_flags[1] = 0;
-            self[0x31] = 1;
-            *(u16 *)(self+0x34) &= ~1;
-            *(u16 *)(v->partner+0x34) &= ~1;
-            v->partner[0x31] = 1;
-            if (g_item_owned_flags[0x31]) moby_set_state(self,4,-1);
-            else moby_set_state(self,3,-1);
+            moby[0x31] = 1;
+            *(u16 *)(moby+0x34) &= ~1;
+            *(u16 *)(vars->partner+0x34) &= ~1;
+            vars->partner[0x31] = 1;
+            if (g_item_owned_flags[0x31]) moby_set_state(moby,4,-1);
+            else moby_set_state(moby,3,-1);
         }
         break;
     case 3:
-        if (g_item_owned_flags[0x31]) moby_set_state(self,4,-1);
-        else if (hero_is_reachable_for_count(self,10,2.5f)) {
+        if (g_item_owned_flags[0x31]) moby_set_state(moby,4,-1);
+        else if (hero_is_reachable_for_count(moby,10,2.5f)) {
             level_l00_call_module_handler_with_arg_9_pal(GetLocalizedString(0x1325),2);
-            level_apply_index_for_key(self);
+            level_apply_index_for_key(moby);
         }
         break;
     case 4:
-        if (!g_item_owned_flags[0x31]) moby_set_state(self,3,-1);
-        else if (hero_is_reachable_for_count(self,10,2.5f)) {
+        if (!g_item_owned_flags[0x31]) moby_set_state(moby,3,-1);
+        else if (hero_is_reachable_for_count(moby,10,2.5f)) {
             text_print_localized_formatted(0x1326,-1);
-            level_apply_index_for_key(self);
+            level_apply_index_for_key(moby);
             if ((g_pad_held_flags & 0x10) && req_push_queue(g_requirement_queue,0x76)) {
                 req_launch_queued(g_requirement_queue);
-                moby_set_state(self,5,-1);
+                moby_set_state(moby,5,-1);
             }
         }
         break;
     case 5:
         g_glow_resize_flags[1] = 1;
         if (g_partner_mode_words[1] == 2) {
-            self[0x31] = 0;
+            moby[0x31] = 0;
             {
-                u16 flags = *(u16 *)(self+0x34) | 1;
-                int partnerMode = g_partner_mode_words[1];
-                *(u16 *)(self+0x34) = flags;
-                if (partnerMode == 2) {
-                    *(u16 *)(v->partner+0x34) |= 1;
-                    v->partner[0x31] = 0;
+                u16 flags = *(u16 *)(moby+0x34) | 1;
+                int partner_mode = g_partner_mode_words[1];
+                *(u16 *)(moby+0x34) = flags;
+                if (partner_mode == 2) {
+                    *(u16 *)(vars->partner+0x34) |= 1;
+                    vars->partner[0x31] = 0;
                 }
             }
         }
         if (!game_is_either_mode_two()) {
             g_glow_resize_flags[1] = 0;
-            self[0x31] = 1;
-            *(u16 *)(self+0x34) &= ~1;
-            moby_mark_spawned(v->partner);
-            v->partner = 0;
-            if (self[0x21] != 0xFF) moby_set_byte_on_group(self[0x21],1);
+            moby[0x31] = 1;
+            *(u16 *)(moby+0x34) &= ~1;
+            moby_mark_spawned(vars->partner);
+            vars->partner = 0;
+            if (moby[0x21] != 0xFF) moby_set_byte_on_group(moby[0x21],1);
             if (!g_item_owned_flags[7]) {
                 g_item_owned_flags[0x31] = 0;
                 g_item_owned_flags[0x69] = 0;
                 help_unlock_entry(7);
                 value_set_entry_by_index_pal(0x1245,-1);
                 MemcardSave(0,-1);
-                moby_mark_spawned(self);
+                moby_mark_spawned(moby);
                 return;
             }
         }
         break;
     }
-    if (self[0x20] != 0) {
-        if (self[0x43] < 2 && math_fast_float_d(&v->timer11C)) {
-            v->timer11C = FloatToInt(((math_random_float_range(1200.0f,2400.0f)) * 5.0f + 2.0f) * 0.16666667f);
-            if (self[0x43] != 2) func_PAL_002A7E68(self,2,0,8);
+    if (moby[0x20] != 0) {
+        if (moby[0x43] < 2 && math_fast_float_d(&vars->timer11C)) {
+            vars->timer11C = FloatToInt(((math_random_float_range(1200.0f,2400.0f)) * 5.0f + 2.0f) * 0.16666667f);
+            if (moby[0x43] != 2) anim_start_blended_pal(moby,2,0,8);
         }
-        else if ((self[0x60] & 2) && self[0x43] == math_random_int_below(2))
-            func_PAL_002A7E68(self,math_random_int_below(2)==0,0,8);
+        else if ((moby[0x60] & 2) && moby[0x43] == math_random_int_below(2))
+            anim_start_blended_pal(moby,math_random_int_below(2)==0,0,8);
     }
     rate = 0.02f;
     damping = 0.3f;
     active = 0;
-    if (self[0x43] == 0 || self[0x43] == 2) {
+    if (moby[0x43] == 0 || moby[0x43] == 2) {
         active = 1;
-        if (vec_distance_xy(self+0x10,g_hero_state.pos) < 8.0f &&
-            FastDiffRots(*(float *)(self+0xF8),mat_fast_helper_a(g_hero_state.target[0]-*(float *)(self+0x10),g_hero_state.target[1]-*(float *)(self+0x14))) < 1.5707964897155762f) {
-                if (FastVecLength(g_hero_state.velocity) > 0.01f) v->timer114 = 100;
-                else math_fast_float_d(&v->timer114);
-        } else if (v->timer114) {
-            v->timer114 = 0;
-            qcopy(v->direction,g_hero_state.target);
+        if (vec_distance_xy(moby+0x10,g_hero_state.pos) < 8.0f &&
+            FastDiffRots(*(float *)(moby+0xF8),mat_fast_helper_a(g_hero_state.target[0]-*(float *)(moby+0x10),g_hero_state.target[1]-*(float *)(moby+0x14))) < 1.5707964897155762f) {
+                if (FastVecLength(g_hero_state.velocity) > 0.01f) vars->timer114 = 100;
+                else math_fast_float_d(&vars->timer114);
+        } else if (vars->timer114) {
+            vars->timer114 = 0;
+            qcopy(vars->direction,g_hero_state.target);
         }
-        if (math_fast_float_d(&v->timer118)) {
-            float randomTurn;
-            v->timer118 = FloatToInt(((math_random_float_range(180.0f,300.0f)) * 5.0f + 2.0f) * 0.16666667f);
-            randomTurn = FastAddRotations(*(float *)(self+0xF8),math_random_float_range(-90.0f,90.0f)*0.01745329424738884f);
+        if (math_fast_float_d(&vars->timer118)) {
+            float random_turn;
+            vars->timer118 = FloatToInt(((math_random_float_range(180.0f,300.0f)) * 5.0f + 2.0f) * 0.16666667f);
+            random_turn = FastAddRotations(*(float *)(moby+0xF8),math_random_float_range(-90.0f,90.0f)*0.01745329424738884f);
             pitch = math_random_float_range(0.0f,30.0f)*0.01745329424738884f;
-            vec_build_spherical_offset(v->direction,6.0f,randomTurn,pitch);
-            FastVecAdd(v->direction,v->direction,self+0x10);
+            vec_build_spherical_offset(vars->direction,6.0f,random_turn,pitch);
+            FastVecAdd(vars->direction,vars->direction,moby+0x10);
         }
-        if (v->timer114) {
+        if (vars->timer114) {
             qcopy(target,g_hero_state.target);
             rate = 0.04f;
             damping = 0.3f;
-        } else qcopy(target,v->direction);
+        } else qcopy(target,vars->direction);
     }
     if (active) {
-        qcopy(position,self+0x10);
+        qcopy(position,moby+0x10);
         position[2] += 2.0f;
         FastVecSub(delta,target,position);
-        turn = fast_subtract_rotations(mat_fast_helper_a(delta[0],delta[1]),*(float *)(self+0xF8));
+        turn = fast_subtract_rotations(mat_fast_helper_a(delta[0],delta[1]),*(float *)(moby+0xF8));
         pitch = -mat_fast_helper_a(vec_length_xy(delta),delta[2]);
         if (turn > 1.5707964897155762f) turn = 1.5707964897155762f;
         else if (turn < -1.5707964897155762f) turn = -1.5707964897155762f;
         if (pitch > 0.523598849773407f) pitch = 0.523598849773407f;
         else if (pitch < -0.523598849773407f) pitch = -0.523598849773407f;
-        *(float *)((u8 *)v+0x64) = pitch;
-        *(float *)((u8 *)v+0x68) = turn*0.6f;
-        *(float *)((u8 *)v+0xE8) = turn*0.4f;
+        *(float *)((u8 *)vars+0x64) = pitch;
+        *(float *)((u8 *)vars+0x68) = turn*0.6f;
+        *(float *)((u8 *)vars+0xE8) = turn*0.4f;
     }
-    if (g_unlocked_item_flags) *(float *)((u8 *)v+0x70) = 2.75f;
-    TurnJoint(self,v,0,rate,damping);
-    TurnJoint(self,(u8 *)v+0x80,1,rate,damping);
-    if (v->partner) moby_copy_joint_transform_to_object(self,v->partner,2,0);
+    if (g_unlocked_item_flags) *(float *)((u8 *)vars+0x70) = 2.75f;
+    TurnJoint(moby,vars,0,rate,damping);
+    TurnJoint(moby,(u8 *)vars+0x80,1,rate,damping);
+    if (vars->partner) moby_copy_joint_transform_to_object(moby,vars->partner,2,0);
 }

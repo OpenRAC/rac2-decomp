@@ -22,10 +22,11 @@ extern int FastTweenColor(int, int, float);
 extern int FloatToInt(float);
 extern void *part_spawn_trail(void *, void *, void *, int, int, int, int, int, int);
 
-void func_PAL_L08_00427A58(char *arg0, char *arg1) {
-    float a[4];
-    float b[4];
-    float c[4];
+/* Shoots a shower of small yellow sparks out of a point, moving along with the given speed (PAL: 50 Hz timings). */
+void part_l08_spawn_spark_shower_pal(char *moby, char *base_velocity) {
+    float position[4];
+    float velocity[4];
+    float acceleration[4];
     int n;
     int i;
     float angle;
@@ -33,21 +34,21 @@ void func_PAL_L08_00427A58(char *arg0, char *arg1) {
     float z;
     int col1;
     int col2;
-    char *src = arg0 + 0x10;
+    char *src = moby + 0x10;
 
     for (n = 0; n < 20; n++) {
-        *(TI128 *)a = *(TI128 *)src;
-        vec_add_random_offset(a, 0.25f);
-        a[2] += 0.25f;
+        *(TI128 *)position = *(TI128 *)src;
+        vec_add_random_offset(position, 0.25f);
+        position[2] += 0.25f;
         angle = math_random_angle();
         r = math_random_float_range(1.0f, 8.0f);
         z = math_random_float_range(2.0f, 6.0f);
-        FastVecScale(b, arg1, math_random_float_range(0.0f, 0.0f) * 0.020000001f);
-        b[0] += math_fast_sin_or_cos_a(angle) * 0.020000001f * r;
-        b[1] += math_fast_sin_or_cos_b(angle) * 0.020000001f * r;
-        b[2] += z * 0.020000001f;
-        *(TI128 *)c = *(TI128 *)b;
-        c[2] -= 0.2f;
+        FastVecScale(velocity, base_velocity, math_random_float_range(0.0f, 0.0f) * 0.020000001f);
+        velocity[0] += math_fast_sin_or_cos_a(angle) * 0.020000001f * r;
+        velocity[1] += math_fast_sin_or_cos_b(angle) * 0.020000001f * r;
+        velocity[2] += z * 0.020000001f;
+        *(TI128 *)acceleration = *(TI128 *)velocity;
+        acceleration[2] -= 0.2f;
         for (i = 0; i < 10; i++) {
             float w = 0.125f;
             float v = 1.0f;
@@ -55,13 +56,13 @@ void func_PAL_L08_00427A58(char *arg0, char *arg1) {
             float u = 0.065f;
             float k = math_random_float_range(0.5f, 1.5f);
 
-            b[3] = k * w;
-            c[3] = k * u;
-            vec_add_random_offset(a, w);
-            vec_add_random_offset(c, 0.010000001f);
+            velocity[3] = k * w;
+            acceleration[3] = k * u;
+            vec_add_random_offset(position, w);
+            vec_add_random_offset(acceleration, 0.010000001f);
             col1 = FastTweenColor(0x8000EEEE, 0x8000FF90, math_random_float_range(0.0f, v));
             col2 = FastTweenColor(0xFFEE, 0xFFEE, math_random_float_range(0.0f, v));
-            part_spawn_trail(a, b, c, col1, col2, ((s32)(10) * 5 + 2) / 6, ((s32)(30) * 5 + 2) / 6, FloatToInt((math_random_float_range(m, 25.0f) * m + 2.0f) * 0.16666667f), -1);
+            part_spawn_trail(position, velocity, acceleration, col1, col2, ((s32)(10) * 5 + 2) / 6, ((s32)(30) * 5 + 2) / 6, FloatToInt((math_random_float_range(m, 25.0f) * m + 2.0f) * 0.16666667f), -1);
         }
     }
 }

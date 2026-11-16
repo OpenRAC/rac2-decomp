@@ -31,8 +31,8 @@ extern void func_2A7740(void);
 extern void func_2AB028(void);
 extern void part_spawn_effect_from_record(int a0);
 extern void hero_update_items_and_flags(void);
-extern void func_US2_L00_002B2408(void);
-extern void func_US2_L00_002B22D0(void);
+extern void hero_update_zapper_us2(void);
+extern void hero_play_collection_voice_line_us2(void);
 extern void hero_update_items_frame(void);
 extern int hero_is_action_allowed(void);
 extern void func_2A9520(void);
@@ -47,10 +47,11 @@ extern void func_30F444(int a0);
 extern void weapon_update_equipped_effect(void);
 extern void func_2AB328(void);
 
-void func_US2_L01_002A8D48(void) {
+/* Per-frame game update for the hero and level (v2.00: pad input is masked while the hero timer runs). */
+void game_update_frame_us2(void) {
     char *pad;
     char *player;
-    char *p;
+    char *hero;
     int held;
     int pressed;
     int timer;
@@ -73,10 +74,10 @@ void func_US2_L01_002A8D48(void) {
     if (timer == 0)
         masked_pressed = *(int *)(pad + 0x1A4);
     *(int *)(pad + 0x1A4) = masked_pressed;
-    p = g_hero_state;
-    *(short *)(p + 0x2162) = 0;
-    *(short *)(p + 0x2160) = 0;
-    if (*(unsigned char *)(p + 0x22B4) != 0) {
+    hero = g_hero_state;
+    *(short *)(hero + 0x2162) = 0;
+    *(short *)(hero + 0x2160) = 0;
+    if (*(unsigned char *)(hero + 0x22B4) != 0) {
         hero_update_subsystems();
         *(int *)(pad + 0x1A0) = held;
         *(int *)(pad + 0x1A4) = pressed;
@@ -85,10 +86,10 @@ void func_US2_L01_002A8D48(void) {
     func_2C7CA8();
     UpdateHeroInputAndHistory();
     hero_read_input_command_flags();
-    ProbeLedgeGrab(p + 0x80, p + 0x90, p + 0x550);
+    ProbeLedgeGrab(hero + 0x80, hero + 0x90, hero + 0x550);
     hero_l01_update_state_transitions_us2();
     if (g_hero_l01_control_mode == 2 || g_hero_l01_control_mode == 6) {
-        if (*(unsigned char *)(p + 0x22B5) != 0)
+        if (*(unsigned char *)(hero + 0x22B5) != 0)
             func_2C8628();
         else
             hero_clear_objects_flag_bit();
@@ -100,7 +101,7 @@ void func_US2_L01_002A8D48(void) {
         return;
     }
     func_2AEB80();
-    if (*(unsigned char *)(p + 0x22B4) != 0) {
+    if (*(unsigned char *)(hero + 0x22B4) != 0) {
         *(int *)(pad + 0x1A0) = held;
         *(int *)(pad + 0x1A4) = pressed;
         return;
@@ -118,8 +119,8 @@ void func_US2_L01_002A8D48(void) {
     func_2AB028();
     part_spawn_effect_from_record(0);
     hero_update_items_and_flags();
-    func_US2_L00_002B2408();
-    func_US2_L00_002B22D0();
+    hero_update_zapper_us2();
+    hero_play_collection_voice_line_us2();
     hero_update_items_frame();
     {
         char *q = g_hero_state;

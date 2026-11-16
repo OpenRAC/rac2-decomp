@@ -10,20 +10,21 @@ extern s32 FastTweenColor(s32, s32, f32);
 extern void moby_sync_level_setting(void *);
 extern void set_moby_color(void *, s32, s32, s32);
 
-void func_PAL_L12_003AA3F0(u8 *object)
+/* Fades the colour of a decorative object back and forth between two colours with a sine wave, and sets its light level. */
+void color_l12_fade_update_pal(u8 *moby)
 {
-    u8 *state = *(u8 **)(object + 0x68);
-    switch (object[0x20]) {
+    u8 *vars = *(u8 **)(moby + 0x68);
+    switch (moby[0x20]) {
     case 0:
-        *(f32 *)state *= 0.017453294f;
-        object[0x20] = 1;
+        *(f32 *)vars *= 0.017453294f;
+        moby[0x20] = 1;
         break;
     case 1: {
         s32 color, alpha;
         s32 r, g, b;
         u32 packed;
-        *(f32 *)state = FastAddRotations(*(f32 *)state, g_fade_speed * 0.0003490659f);
-        color = FastTweenColor(g_fade_color_a, g_fade_color_b, math_fast_sin_or_cos_b(*(f32 *)state) * 0.5f + 0.5f);
+        *(f32 *)vars = FastAddRotations(*(f32 *)vars, g_fade_speed * 0.0003490659f);
+        color = FastTweenColor(g_fade_color_a, g_fade_color_b, math_fast_sin_or_cos_b(*(f32 *)vars) * 0.5f + 0.5f);
         b = (color >> 16) & 255;
         g = (color >> 8) & 255;
         r = color & 255;
@@ -33,9 +34,9 @@ void func_PAL_L12_003AA3F0(u8 *object)
         packed |= b << 16;
         packed |= g << 8;
         packed |= r;
-        *(u32 *)(state + 4) = packed;
-        moby_sync_level_setting(object);
-        set_moby_color(object, color & 255, (color >> 16) & 255, (u32)color >> 24);
+        *(u32 *)(vars + 4) = packed;
+        moby_sync_level_setting(moby);
+        set_moby_color(moby, color & 255, (color >> 16) & 255, (u32)color >> 24);
         break;
     }
     }

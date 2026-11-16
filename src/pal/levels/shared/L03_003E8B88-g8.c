@@ -14,26 +14,26 @@ extern int ref_L01_0031BC68_00(int, int, f32);
 
 /* Eases the record's own rate by the shared factor and hands the state the
    shared lookup asks for. */
-void path_puzzle_update_glow_color_pal(u8 *a0) {
-    u8 *rec = *(u8 **)(a0 + 0x68);
-    u32 c[2];
-    f32 f13;
-    f32 r;
+void path_puzzle_update_glow_color_pal(u8 *moby) {
+    u8 *vars = *(u8 **)(moby + 0x68);
+    u32 colors[2];
+    f32 ease_rate;
+    f32 angle;
 
-    if (a0[0x20] == 5 || *(short *)(rec + 0x6A) == 0) {
-        c[0] = g_path_puzzle_glow_color_a;
-        c[1] = g_path_puzzle_glow_color_b;
-        f13 = g_path_puzzle_glow_ease_rate_a * 0.0003490659f;
-    } else if (*(short *)(rec + 0x68) != 0) {
-        c[0] = g_path_puzzle_glow_color_c;
-        c[1] = g_path_puzzle_glow_color_d;
-        f13 = g_path_puzzle_glow_ease_rate_b * 0.0003490659f;
+    if (moby[0x20] == 5 || *(short *)(vars + 0x6A) == 0) {
+        colors[0] = g_path_puzzle_glow_color_a;
+        colors[1] = g_path_puzzle_glow_color_b;
+        ease_rate = g_path_puzzle_glow_ease_rate_a * 0.0003490659f;
+    } else if (*(short *)(vars + 0x68) != 0) {
+        colors[0] = g_path_puzzle_glow_color_c;
+        colors[1] = g_path_puzzle_glow_color_d;
+        ease_rate = g_path_puzzle_glow_ease_rate_b * 0.0003490659f;
     } else {
-        c[0] = g_path_puzzle_glow_color_e;
-        c[1] = g_path_puzzle_glow_color_f;
-        f13 = g_path_puzzle_glow_ease_rate_b * 0.0003490659f;
+        colors[0] = g_path_puzzle_glow_color_e;
+        colors[1] = g_path_puzzle_glow_color_f;
+        ease_rate = g_path_puzzle_glow_ease_rate_b * 0.0003490659f;
     }
-    r = FastAddRotations(*(f32 *)(rec + 0x78), f13);
-    *(f32 *)(rec + 0x78) = r;
-    *(u32 *)(a0 + 0x78) = ref_L01_0031BC68_00(c[0], c[1], r);
+    angle = FastAddRotations(*(f32 *)(vars + 0x78), ease_rate);
+    *(f32 *)(vars + 0x78) = angle;
+    *(u32 *)(moby + 0x78) = ref_L01_0031BC68_00(colors[0], colors[1], angle);
 }

@@ -45,83 +45,84 @@ extern void part_spawn_random_direction_effect(void *, float, float);
 typedef struct { unsigned char pad[0x80]; Vec position; unsigned char gap[0x2200]; unsigned char *moby; } HeroView;
 extern HeroView g_hero_state;
 
-void flying_l22_enemy_update_us2(unsigned char *obj) {
+/* Per-frame update of a flying enemy. It chases and attacks the hero, dodges, and breaks off with a burst when it hits something (USA v2.00). */
+void flying_l22_enemy_update_us2(unsigned char *enemy) {
     Vec delta, temp, push, old, posx, negx, posy, negy, offset, scatter;
-    unsigned char *ctx = *(unsigned char **)(obj + 0x68);
+    unsigned char *vars = *(unsigned char **)(enemy + 0x68);
     unsigned char *hit, *part;
     int collision, facing, visible, flags, i, choice;
     float distance;
-    flying_enemy_update_states(obj);
+    flying_enemy_update_states(enemy);
     if (!g_space_ship_owner_moby[0]) return;
     collision = 0; facing = 0; distance = 0.0f; visible = 0;
-    if (obj[0x20] != 6 && obj[0x95] != 5) {
-        if (fast_vec_dist(g_space_ship_owner_moby[0] + 0x10, obj + 0x10) < g_flyer_near_distance) {
+    if (enemy[0x20] != 6 && enemy[0x95] != 5) {
+        if (fast_vec_dist(g_space_ship_owner_moby[0] + 0x10, enemy + 0x10) < g_flyer_near_distance) {
             collision = 1;
-            moby_set_state(obj, 5, 3);
+            moby_set_state(enemy, 5, 3);
         }
-        FastVecSub(&delta, (&g_hero_state.position), obj + 0x10);
-        if (moby_measure_step_angle(obj, &delta, 0) <= 0.785398185f) facing = 1;
-        if (WalkPathIsClear(g_space_ship_owner_moby[0], (&g_hero_state.position), obj + 0x10)) visible = 1;
-        distance = fast_vec_dist((&g_hero_state.position), obj + 0x10);
-        if (gravity_get_center_distance(obj + 0x10) - g_planet_radius > 9.19999981f) {
-            qcopy(&temp, obj + 0x10);
+        FastVecSub(&delta, (&g_hero_state.position), enemy + 0x10);
+        if (moby_measure_step_angle(enemy, &delta, 0) <= 0.785398185f) facing = 1;
+        if (WalkPathIsClear(g_space_ship_owner_moby[0], (&g_hero_state.position), enemy + 0x10)) visible = 1;
+        distance = fast_vec_dist((&g_hero_state.position), enemy + 0x10);
+        if (gravity_get_center_distance(enemy + 0x10) - g_planet_radius > 9.19999981f) {
+            qcopy(&temp, enemy + 0x10);
             arena_push_point_out(&temp, 2.0f);
-            if (coll_test_point(&temp, 0, obj, 5.0f) && (hit = g_collision_l22_hit) && *(short *)(hit + 0xAA) == 0xDCE) {
+            if (coll_test_point(&temp, 0, enemy, 5.0f) && (hit = g_collision_l22_hit) && *(short *)(hit + 0xAA) == 0xDCE) {
                 SpawnExplosion(hit + 0x10, 0, 0x19, 0x14, 0x14, 0xA, 0xF, 1, 1, 0, 0, 0, 1.5f, 20.0f);
                 moby_mark_spawned(hit);
             }
         }
     }
-    switch (obj[0x95]) {
+    switch (enemy[0x95]) {
         case 0:
-            if (flag_set_second_pending(obj) && obj[0x43] != 1) anim_start_blended(obj, 1, 0, 20);
+            if (flag_set_second_pending(enemy) && enemy[0x43] != 1) anim_start_blended(enemy, 1, 0, 20);
             if (g_space_ship_timer[0]) break;
             if (visible && distance < 40.0f) {
-                moby_set_state(obj, 3, 1);
-                if (*(int *)(ctx + 0x258) < 300) *(int *)(ctx + 0x258) = math_random_int_range(480, 600);
-            } else if (obj[0x31] && distance < 80.0f) {
-                moby_l22_steer_toward_target(obj, ctx + 0x2A0, 1, g_flyer_steer_turn_a);
-            } else moby_call_with_zero_vector(obj);
+                moby_set_state(enemy, 3, 1);
+                if (*(int *)(vars + 0x258) < 300) *(int *)(vars + 0x258) = math_random_int_range(480, 600);
+            } else if (enemy[0x31] && distance < 80.0f) {
+                moby_l22_steer_toward_target(enemy, vars + 0x2A0, 1, g_flyer_steer_turn_a);
+            } else moby_call_with_zero_vector(enemy);
             break;
         case 1:
-            if (flag_set_second_pending(obj) && obj[0x43] != 1) anim_start_blended(obj, 1, 0, 20);
-            if (!*(int *)(ctx + 0x258)) {
-                moby_set_state(obj, 2, 0);
+            if (flag_set_second_pending(enemy) && enemy[0x43] != 1) anim_start_blended(enemy, 1, 0, 20);
+            if (!*(int *)(vars + 0x258)) {
+                moby_set_state(enemy, 2, 0);
             } else if (visible && facing && distance < 30.0f) {
-                moby_set_state(obj, 4, 2);
-                moby_call_with_zero_vector(obj);
-            } else moby_l22_steer_toward_target(obj, (&g_hero_state.position), 1, g_flyer_steer_turn_c);
+                moby_set_state(enemy, 4, 2);
+                moby_call_with_zero_vector(enemy);
+            } else moby_l22_steer_toward_target(enemy, (&g_hero_state.position), 1, g_flyer_steer_turn_c);
             break;
         case 2:
-            if (facing || flag_set_second_pending(obj)) {
-                if (obj[0x43] != 3) anim_start_blended(obj, 3, 0, 10);
-                *(float *)(obj + 0x48) = g_space_ship_param_w;
-            } else if ((obj[0x60] & 2) && obj[0x43] == 3) anim_start_blended(obj, 1, 0, 10);
+            if (facing || flag_set_second_pending(enemy)) {
+                if (enemy[0x43] != 3) anim_start_blended(enemy, 3, 0, 10);
+                *(float *)(enemy + 0x48) = g_space_ship_param_w;
+            } else if ((enemy[0x60] & 2) && enemy[0x43] == 3) anim_start_blended(enemy, 1, 0, 10);
             if (!visible || distance > 50.0f) {
-                moby_set_state(obj, 2, 0);
-                *(int *)(ctx + 0x258) = 0;
-            } else if (distance > 20.0f) moby_l22_steer_toward_target(obj, (&g_hero_state.position), 1, g_flyer_steer_turn_c);
-            else moby_check_target_point_from_offset(obj, (&g_hero_state.position));
+                moby_set_state(enemy, 2, 0);
+                *(int *)(vars + 0x258) = 0;
+            } else if (distance > 20.0f) moby_l22_steer_toward_target(enemy, (&g_hero_state.position), 1, g_flyer_steer_turn_c);
+            else moby_check_target_point_from_offset(enemy, (&g_hero_state.position));
             break;
         case 3:
-            flags = moby_dispatch_action_by_kind(obj, ctx + 0x140);
+            flags = moby_dispatch_action_by_kind(enemy, vars + 0x140);
             if ((flags & 1) || collision) {
                 Vec *saved_position;
                 snd_start_in_slot(17, 0, 0);
-                if (*(void **)(ctx + 0x38) == g_hero_state.moby && moby_is_counter_below_limit()) stored_object_forward((&g_hero_state.position), 0);
+                if (*(void **)(vars + 0x38) == g_hero_state.moby && moby_is_counter_below_limit()) stored_object_forward((&g_hero_state.position), 0);
                 for (i = 0; i < 5; i++) {
                     vec_random_direction(&delta, g_flyer_wander_min * 0.0166666675f, g_flyer_wander_max * 0.0166666675f);
                     delta.f[2] = math_fabs(delta.f[2]) * g_flyer_wander_z_scale;
-                    matrix_mul_vec3(&delta, &delta, obj + 0xC0);
-                    part = cam_moby_create(obj, 1, *(short *)(obj + 0xAA), i, obj + 0x10, obj + 0xF0, &delta, 255, 30.0f, 15.0f);
+                    matrix_mul_vec3(&delta, &delta, enemy + 0xC0);
+                    part = cam_moby_create(enemy, 1, *(short *)(enemy + 0xAA), i, enemy + 0x10, enemy + 0xF0, &delta, 255, 30.0f, 15.0f);
                     *(void **)(part + 0x64) = moby_fade_out_update;
                 }
                 FastVecSub(&temp, g_tether_origin, &delta);
                 vec_scale_to_length(&temp, &temp, 1.0f);
-                SpawnExplosion(obj + 0x10, 0, 25, 20, 20, 10, 15, 1, 1, 0, 0, 0, 1.5f, 20.0f);
-                *(short *)(ctx + 0x178) = 0;
-                *(int *)(obj + 0x98) = *(int *)(*(char **)(obj + 0x24) + 0x10);
-                *(float *)(ctx + 0x20) = *(short *)(ctx + 0x24);
+                SpawnExplosion(enemy + 0x10, 0, 25, 20, 20, 10, 15, 1, 1, 0, 0, 0, 1.5f, 20.0f);
+                *(short *)(vars + 0x178) = 0;
+                *(int *)(enemy + 0x98) = *(int *)(*(char **)(enemy + 0x24) + 0x10);
+                *(float *)(vars + 0x20) = *(short *)(vars + 0x24);
                 saved_position = &old;
                 /* This fresh scratch vector is consumed through calls; no C field
                  * access depends on moving across its copy. */
@@ -151,54 +152,54 @@ void flying_l22_enemy_update_us2(unsigned char *obj) {
                 }
                 FastVecAdd(&push, &push, &offset);
                 FastVecAdd(&push, &push, saved_position);
-                lane_find_nearest_point(g_space_ship_owner_moby[0], obj + 0x10, &push, 1);
-                arena_push_point_out(obj + 0x10, 7.19999981f);
-                if (coll_test_point(obj + 0x10, 1, 0, 3.0f) && *(short *)(g_collision_l22_hit + 0xAA) == 0xEDD && g_collision_l22_hit[0x20] != 6) {
-                    FastVecScale(&scatter, obj + 0xC0 + math_random_int_below(2) * 16,
+                lane_find_nearest_point(g_space_ship_owner_moby[0], enemy + 0x10, &push, 1);
+                arena_push_point_out(enemy + 0x10, 7.19999981f);
+                if (coll_test_point(enemy + 0x10, 1, 0, 3.0f) && *(short *)(g_collision_l22_hit + 0xAA) == 0xEDD && g_collision_l22_hit[0x20] != 6) {
+                    FastVecScale(&scatter, enemy + 0xC0 + math_random_int_below(2) * 16,
                                   2.0f * (math_random_int_below(2) ? g_enemy_random_scale : -g_enemy_random_scale));
-                    FastVecAdd(obj + 0x10, obj + 0x10, &scatter);
-                    arena_push_point_out(obj + 0x10, 7.19999981f);
+                    FastVecAdd(enemy + 0x10, enemy + 0x10, &scatter);
+                    arena_push_point_out(enemy + 0x10, 7.19999981f);
                 }
-                qcopy(ctx + 0x2A0, obj + 0x10);
-                moby_set_state(obj, 2, 0);
+                qcopy(vars + 0x2A0, enemy + 0x10);
+                moby_set_state(enemy, 2, 0);
             } else if (flags & 2) {
-                moby_set_state(obj, 3, 1);
-                *(int *)(ctx + 0x258) = math_random_int_range(580, 600);
+                moby_set_state(enemy, 3, 1);
+                *(int *)(vars + 0x258) = math_random_int_range(580, 600);
             }
             break;
         case 4: case 5: break;
         }
-    switch (obj[0x20]) {
+    switch (enemy[0x20]) {
     case 2: case 3: case 5: case 6: break;
     case 4:
-        if (math_is_value_within_step_us2(obj, 1.5f)) part_spawn_joint_trails(obj, g_hero_target_point, 0.0f);
+        if (math_is_value_within_step_us2(enemy, 1.5f)) part_spawn_joint_trails(enemy, g_hero_target_point, 0.0f);
         break;
     case 9:
-        qcopy(&delta, obj + 0x10);
+        qcopy(&delta, enemy + 0x10);
         arena_push_point_out(&delta, 7.19999981f);
-        if (*(unsigned short *)(obj + 0x96) >= 61 && !(*(unsigned short *)(obj + 0x96) & 63)) part_spawn_joint_trails(obj, ctx + 0x2A0, 50.0f);
-        if (fast_vec_dist(obj + 0x10, &delta) < 0.1f) {
-            moby_set_state(obj, 2, 0);
-            *(int *)(ctx + 0x88) &= ~0x10;
-        } else moby_l22_steer_toward_target(obj, &delta, 0, g_flyer_steer_turn_b);
+        if (*(unsigned short *)(enemy + 0x96) >= 61 && !(*(unsigned short *)(enemy + 0x96) & 63)) part_spawn_joint_trails(enemy, vars + 0x2A0, 50.0f);
+        if (fast_vec_dist(enemy + 0x10, &delta) < 0.1f) {
+            moby_set_state(enemy, 2, 0);
+            *(int *)(vars + 0x88) &= ~0x10;
+        } else moby_l22_steer_toward_target(enemy, &delta, 0, g_flyer_steer_turn_b);
         break;
     case 7:
-        if ((*(unsigned short *)(obj + 0x96) & 7) == 7) {
-            qcopy(&delta, *(void **)(ctx + 0x2B0));
-            vec_scale_to_length(&delta, &delta, *(float *)(ctx + 0x2B4));
+        if ((*(unsigned short *)(enemy + 0x96) & 7) == 7) {
+            qcopy(&delta, *(void **)(vars + 0x2B0));
+            vec_scale_to_length(&delta, &delta, *(float *)(vars + 0x2B4));
             FastVecAdd(&delta, (&g_hero_state.position), &delta);
             arena_push_point_out(&delta, 7.19999981f);
-            qcopy(ctx + 0x2A0, &delta);
+            qcopy(vars + 0x2A0, &delta);
         }
-        if (*(unsigned short *)(obj + 0x96) >= 61 && !(*(unsigned short *)(obj + 0x96) & 511)) part_spawn_joint_trails(obj, ctx + 0x2A0, 50.0f);
-        if (fast_vec_dist(obj + 0x10, ctx + 0x2A0) < 2.0f || fast_vec_dist(obj + 0x10, (&g_hero_state.position)) < 20.0f) {
-            moby_set_state(obj, 9, 5);
-            *(int *)(ctx + 0x280) = 0;
-        } else moby_l22_steer_toward_target(obj, ctx + 0x2A0, 0, g_flyer_steer_turn_c);
+        if (*(unsigned short *)(enemy + 0x96) >= 61 && !(*(unsigned short *)(enemy + 0x96) & 511)) part_spawn_joint_trails(enemy, vars + 0x2A0, 50.0f);
+        if (fast_vec_dist(enemy + 0x10, vars + 0x2A0) < 2.0f || fast_vec_dist(enemy + 0x10, (&g_hero_state.position)) < 20.0f) {
+            moby_set_state(enemy, 9, 5);
+            *(int *)(vars + 0x280) = 0;
+        } else moby_l22_steer_toward_target(enemy, vars + 0x2A0, 0, g_flyer_steer_turn_c);
         break;
     case 8: {
         float min, max;
-        *(float *)(ctx + 0x2B4) = math_random_float_range(0.0f, 15.0f) + 10.0f;
+        *(float *)(vars + 0x2B4) = math_random_float_range(0.0f, 15.0f) + 10.0f;
         choice = math_random_int_below(4);
         switch (choice) {
         case 0: qcopy(&temp, g_hero_state.moby + 0xD0); FastVecScale(&temp, &temp, -1.0f); break;
@@ -207,22 +208,22 @@ void flying_l22_enemy_update_us2(unsigned char *obj) {
         case 3: qcopy(&temp, g_hero_state.moby + 0xC0); break;
         }
         min = g_flyer_range_min; max = g_flyer_range_max;
-        *(void **)(ctx + 0x2B0) = g_hero_state.moby + 0xC0;
+        *(void **)(vars + 0x2B0) = g_hero_state.moby + 0xC0;
         FastVecScale(&delta, &temp, math_random_float_range(min, max));
         FastVecAdd(&delta, &delta, (&g_hero_state.position));
         part_spawn_random_direction_effect(&push, 0.1f, g_flyer_range_min * 0.333333343f);
         FastVecAdd(&delta, &delta, &push);
-        qcopy(obj + 0x10, &delta);
-        qcopy(&old, *(void **)(ctx + 0x2B0));
-        vec_scale_to_length(&old, &old, *(float *)(ctx + 0x2B4));
+        qcopy(enemy + 0x10, &delta);
+        qcopy(&old, *(void **)(vars + 0x2B0));
+        vec_scale_to_length(&old, &old, *(float *)(vars + 0x2B4));
         FastVecAdd(&old, (&g_hero_state.position), &old);
         arena_push_point_out(&old, 7.19999981f);
-        qcopy(ctx + 0x2A0, &old);
-        moby_set_state(obj, 7, 5);
-        *(int *)(ctx + 0x28C) = 0;
-        *(int *)(ctx + 0x88) |= 0x10;
+        qcopy(vars + 0x2A0, &old);
+        moby_set_state(enemy, 7, 5);
+        *(int *)(vars + 0x28C) = 0;
+        *(int *)(vars + 0x88) |= 0x10;
         break;
     }
     }
-    flyer_update_timers_anim(obj);
+    flyer_update_timers_anim(enemy);
 }

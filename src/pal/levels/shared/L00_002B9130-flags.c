@@ -10,6 +10,7 @@ extern void hero_rotate_matrix(float, float, float);
 extern float math_approach_with_velocity(float *position, float target, float *velocity,
                           float acceleration, float damping, float limit, int direction);
 
+/* Eases the hero's lean back toward upright in most states, or runs the full lean update in modes 1 and 2. */
 void hero_ease_lean_to_upright_pal(void)
 {
     char *base = (char *)&D_00189E20_5;

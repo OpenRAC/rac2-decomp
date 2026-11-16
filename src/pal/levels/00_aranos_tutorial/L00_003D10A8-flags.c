@@ -39,69 +39,70 @@ extern void vec_build_spherical_offset(void *, float, float, float);
 extern void *part_spawn_ground_effect(void *, int, int, int, int, void *, float, float, float, int);
 extern void snd_stop_voice(int);
 
-void func_PAL_L00_003D10A8(unsigned char *obj) {
+/* Moves a ring of light along its heading and resets it after a while, and sprays sparks when the player is close (PAL). */
+void ring_of_light_update_pal(unsigned char *moby) {
     struct {
         Vec offset, direction, rotated, position;
     } frame;
-    char *ctx = *(char **)(obj + 0x68);
-    char *p;
+    char *vars = *(char **)(moby + 0x68);
+    char *ring_point;
     int i, handle, sign;
     int particle_count;
     char *camera;
     SoundSlot *sound;
     float angle, step, size, yaw, pitch, speed;
 
-    if ((unsigned char)obj[0x20] == 0) {
-        *(float *)(obj + 0x18) += 1.5f;
-        *(int *)(ctx + 0x200) = 0;
-        qcopy(ctx + 0x210, obj + 0x10);
-        *(int *)(ctx + 0x204) = 0;
+    if ((unsigned char)moby[0x20] == 0) {
+        *(float *)(moby + 0x18) += 1.5f;
+        *(int *)(vars + 0x200) = 0;
+        qcopy(vars + 0x210, moby + 0x10);
+        *(int *)(vars + 0x204) = 0;
         frame.offset.q = 0;
         frame.offset.f[3] = 1.0f;
         frame.offset.f[2] = 3.0f;
-        frame.direction.f[0] = math_fast_sin_or_cos_a(*(float *)(obj + 0xF8));
-        frame.direction.f[1] = math_fast_sin_or_cos_b(*(float *)(obj + 0xF8));
+        frame.direction.f[0] = math_fast_sin_or_cos_a(*(float *)(moby + 0xF8));
+        frame.direction.f[1] = math_fast_sin_or_cos_b(*(float *)(moby + 0xF8));
         angle = 0.0f;
         frame.direction.f[3] = 1.0f;
         frame.direction.f[2] = angle;
         step = 6.283186f / (IntToFloat(9) - 1.0f);
-        p = ctx;
+        ring_point = vars;
         i = 8;
         do {
             math_build_axis_angle_quat(&frame.rotated, &frame.direction, angle);
             angle += step;
             --i;
-            vec_rotate_by_quaternion(p, &frame.offset, &frame.rotated);
-            FastVecAdd(p, p, obj + 0x10);
-            *(float *)(p + 0xC) = 0.6f;
-            p += 0x10;
+            vec_rotate_by_quaternion(ring_point, &frame.offset, &frame.rotated);
+            FastVecAdd(ring_point, ring_point, moby + 0x10);
+            *(float *)(ring_point + 0xC) = 0.6f;
+            ring_point += 0x10;
         } while (i >= 0);
-        obj[0x20] = 1;
+        moby[0x20] = 1;
     }
-    if ((unsigned char)obj[0x20] == 1 && math_fast_float_d((int *)(ctx + 0x208))) {
-        obj[0x20] = 2;
+    if ((unsigned char)moby[0x20] == 1 && math_fast_float_d((int *)(vars + 0x208))) {
+        moby[0x20] = 2;
     }
-    if ((unsigned char)obj[0x20] == 2) {
-        frame.offset.f[0] = math_fast_sin_or_cos_a(*(float *)(obj + 0xF8)) * 0.10000001f;
-        frame.offset.f[1] = math_fast_sin_or_cos_b(*(float *)(obj + 0xF8)) * 0.10000001f;
+    if ((unsigned char)moby[0x20] == 2) {
+        frame.offset.f[0] = math_fast_sin_or_cos_a(*(float *)(moby + 0xF8)) * 0.10000001f;
+        frame.offset.f[1] = math_fast_sin_or_cos_b(*(float *)(moby + 0xF8)) * 0.10000001f;
         frame.offset.f[2] = 0.0f;
-        FastVecAdd(obj + 0x10, &frame.offset, obj + 0x10);
-        if (++*(int *)(ctx + 0x204) > 0x1B0) {
-            *(int *)(ctx + 0x204) = 0;
-            qcopy(obj + 0x10, ctx + 0x210);
+        FastVecAdd(moby + 0x10, &frame.offset, moby + 0x10);
+        if (++*(int *)(vars + 0x204) > 0x1B0) {
+            *(int *)(vars + 0x204) = 0;
+            qcopy(moby + 0x10, vars + 0x210);
         }
-        if (IsPointInCuboid(&g_hero_position, *(int *)(ctx + 0x220))) {
-            gfx_add_draw_callback_first(gfx_draw_scrolling_rings, obj);
+        if (IsPointInCuboid(&g_hero_position, *(int *)(vars + 0x220))) {
+            gfx_add_draw_callback_first(gfx_draw_scrolling_rings, moby);
         }
     }
     camera = (char *)&g_hero_position;
-    if (IsPointInCuboid(camera, *(int *)(ctx + 0x20C))) {
+    if (IsPointInCuboid(camera, *(int *)(vars + 0x20C))) {
         qcopy(&frame.offset, &g_hero_position);
         frame.offset.f[2] += 0.75f;
         camera -= 0x80;
         if (coll_test_point(&frame.offset, 2, *(char **)(camera + 0x2290), 0.5f)) {
-            if (!snd_is_voice_playing_for_owner(g_hero_moby, *(int *)(ctx + 0x224))) {
-                *(int *)(ctx + 0x224) = snd_start_in_slot(0x18, 4, g_hero_moby);
+            if (!snd_is_voice_playing_for_owner(g_hero_moby, *(int *)(vars + 0x224))) {
+                *(int *)(vars + 0x224) = snd_start_in_slot(0x18, 4, g_hero_moby);
             }
             qcopy(&frame.position, &g_hero_l00_position);
             particle_count = 0;
@@ -126,22 +127,22 @@ void func_PAL_L00_003D10A8(unsigned char *obj) {
             return;
         }
         /* Stop the sound if it is still the player's. Written out on each path: jump2 merges their tails. */
-        handle = *(int *)(ctx + 0x224);
+        handle = *(int *)(vars + 0x224);
         if (handle != -1) {
             sound = &g_sound_state[handle];
             if (sound[1].object == *(char **)(camera + 0x2290) && sound[1].active) {
                 snd_stop_voice(handle);
             }
         }
-        *(int *)(ctx + 0x224) = -1;
+        *(int *)(vars + 0x224) = -1;
     } else {
-        handle = *(int *)(ctx + 0x224);
+        handle = *(int *)(vars + 0x224);
         if (handle != -1) {
             sound = &g_sound_state[handle];
             if (sound[1].object == *(char **)(camera + 0x2210) && sound[1].active) {
                 snd_stop_voice(handle);
             }
         }
-        *(int *)(ctx + 0x224) = -1;
+        *(int *)(vars + 0x224) = -1;
     }
 }

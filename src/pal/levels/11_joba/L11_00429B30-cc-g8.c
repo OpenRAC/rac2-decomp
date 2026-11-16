@@ -27,7 +27,7 @@ extern int math_random_int_below(int);
 extern void moby_set_flag_bit(unsigned char *, int);
 extern void moby_set_controller_speed_limits(unsigned char *, float, float, float, float);
 extern void moby_set_state(unsigned char *, int, int);
-extern void func_PAL_002A7E68(void *, int, int, int);
+extern void anim_start_blended_pal(void *, int, int, int);
 extern char *CreateMoby(int);
 extern void func_002A0F48(void *);
 extern void moby_copy_joint_transform_to_object(void *, void *, int, int);
@@ -35,10 +35,10 @@ extern float fast_vec_dist(void *, void *);
 extern void moby_update_ground_check(void *);
 extern void moby_mark_spawned(void *);
 extern void part_spawn_explosion_with_sparks_pal(void *, void *, int, float, float);
-extern int func_PAL_002B1A50(void *, void *, int);
+extern int moby_apply_damage_to_object_pal(void *, void *, int);
 extern void moby_transform_joint_to_world(char *, int, char *);
 extern void part_l04_spawn_spinning_pairs_pal(void *, int);
-extern void func_PAL_002AC290(int, char *);
+extern void gfx_start_color_fade_pal(int, char *);
 extern void tribesman_alert_group(void *);
 extern int moby_count_group_not_in_state(int, int);
 extern int hero_check_distance_zones(void *, int *, int, int, void *, float, float);
@@ -76,7 +76,7 @@ static inline int rider_kind(char *moby)
 }
 
 /* Initializes the rider, maintains its linked objects and handles damage/removal. */
-int func_PAL_L11_00429B30(unsigned char *object)
+int joba_rider_update_pal(unsigned char *object)
 {
     Vector hit_position;
     char *state = POINTER(object, 0x68);
@@ -187,23 +187,23 @@ int func_PAL_L11_00429B30(unsigned char *object)
             }
         } else {
             moby_set_state(object, 4, 0);
-            if (BYTE(object, 0x43) != 0x24) func_PAL_002A7E68(object, 0x24, 0, 0);
+            if (BYTE(object, 0x43) != 0x24) anim_start_blended_pal(object, 0x24, 0, 0);
             kind = WORD(state, 0x540);
             if (kind == 1) {
                 POINTER(state, 0x55c) = g_moby_l11_table + WORD(state, 0x544) * 0x100;
                 moby_set_state(object, 5, 0);
-                if (BYTE(object, 0x43) != 0x1c) func_PAL_002A7E68(object, 0x1c, 0, 0);
+                if (BYTE(object, 0x43) != 0x1c) anim_start_blended_pal(object, 0x1c, 0, 0);
             } else if (kind == 2) {
                 POINTER(state, 0x55c) = g_moby_l11_table + WORD(state, 0x544) * 0x100;
                 moby_set_state(object, 5, 0);
-                if (BYTE(object, 0x43) != 0x1e) func_PAL_002A7E68(object, 0x1e, 5, 0);
+                if (BYTE(object, 0x43) != 0x1e) anim_start_blended_pal(object, 0x1e, 5, 0);
             } else if (kind == 3) {
                 unsigned short *ids;
                 char *candidate;
                 ids = g_group_id_lists[BYTE(object, 0x21)];
                 for (;;) {
                     candidate = moby_at(group_entry_id(ids));
-                    if (moby_state(candidate) >= 0 && moby_class(candidate) == 0xcf5 &&
+                    if (moby_state(candidate) >= 0 && moby_class(candidate) == MOBY_CLASS_JOBA_TRIBESMAN &&
                         rider_kind(candidate) == 1) {
                         POINTER(state, 0x55c) = candidate;
                         break;
@@ -212,10 +212,10 @@ int func_PAL_L11_00429B30(unsigned char *object)
                     ++ids;
                 }
                 moby_set_state(object, 5, 0);
-                if (BYTE(object, 0x43) != 0x1e) func_PAL_002A7E68(object, 0x1e, 0, 0);
+                if (BYTE(object, 0x43) != 0x1e) anim_start_blended_pal(object, 0x1e, 0, 0);
             } else if (WORD(state, 0x54c) != -1) {
                 moby_set_state(object, 0xe, 0);
-                if (BYTE(object, 0x43) != 0x10) func_PAL_002A7E68(object, 0x10, 0, 0);
+                if (BYTE(object, 0x43) != 0x10) anim_start_blended_pal(object, 0x10, 0, 0);
                 if (WORD(state, 0x578) != 0) moby_set_state(object, 0xf, 0);
             }
             POINTER(state, 0x29c) = CreateMoby(0x9ac);
@@ -265,7 +265,7 @@ int func_PAL_L11_00429B30(unsigned char *object)
             char *damaged = (char *)(g_moby_l11_table + WORD(state, 0x548) * 0x100);
             if (BYTE(damaged, 0x20) != 5) {
                 BYTE(damaged, 0x20) = 4;
-                func_PAL_002A7E68(damaged, 0, 0, 4);
+                anim_start_blended_pal(damaged, 0, 0, 4);
                 REAL(damaged, 0x48) = 1.0f;
                 REAL(object, 0x48) = 1.0f;
                 BYTE(object, 0xbc) = 0;
@@ -282,19 +282,19 @@ int func_PAL_L11_00429B30(unsigned char *object)
         }
         WORD(state, 0x290) = 0;
     }
-    result = func_PAL_002B1A50(object, state + 0x60, WORD(state, 0x290));
+    result = moby_apply_damage_to_object_pal(object, state + 0x60, WORD(state, 0x290));
     if (result != 0) {
         char *attacker = POINTER(state, 0x38);
         if (attacker != 0) {
             kind = HALF(attacker, 0xaa);
-            if (kind != 0x47 && kind != 0xdd9 && kind != 0xd1b && kind != 0xce7 && kind != 0xd07 && kind != 0)
+            if (kind != 0x47 && kind != 0xdd9 && kind != 0xd1b && kind != 0xce7 && kind != MOBY_CLASS_JOBIAN_SAUR_BEAST && kind != 0)
                 g_enemy_spawn_enabled = 0;
         }
         if (BYTE(object, 0xbc) == 1 && result != 1) {
             char *damaged = (char *)(g_moby_l11_table + WORD(state, 0x548) * 0x100);
             if (BYTE(damaged, 0x20) != 5) {
                 BYTE(damaged, 0x20) = 4;
-                func_PAL_002A7E68(damaged, 0, 0, 4);
+                anim_start_blended_pal(damaged, 0, 0, 4);
                 REAL(damaged, 0x48) = 1.0f;
                 REAL(object, 0x48) = 1.0f;
                 BYTE(object, 0xbc) = 0;
@@ -316,7 +316,7 @@ int func_PAL_L11_00429B30(unsigned char *object)
         }
         WORD(state, 0x290) = 0;
         BYTE(state, 0x57) = 0xd2;
-        func_PAL_002AC290((int)object, state + 0x50);
+        gfx_start_color_fade_pal((int)object, state + 0x50);
         if (BYTE(object, 0x95) != 2) tribesman_alert_group(object);
         if ((unsigned int)(result - 4) < 2 && g_tribe_group_limit >= BYTE(object, 0x21) &&
             moby_count_group_not_in_state(BYTE(object, 0x21), -1) >= 2) {
@@ -327,7 +327,7 @@ int func_PAL_L11_00429B30(unsigned char *object)
                 char *candidate;
                 id = *ids;
                 candidate = (char *)(g_moby_l11_table + (id & 0x7fff) * 0x100);
-                if (HALF(candidate, 0xaa) == 0xcf5 && WORD(POINTER(candidate, 0x68), 0x294) == 0) {
+                if (HALF(candidate, 0xaa) == MOBY_CLASS_JOBA_TRIBESMAN && WORD(POINTER(candidate, 0x68), 0x294) == 0) {
                     WORD(POINTER(candidate, 0x68), 0x294) = 1;
                     break;
                 }
@@ -349,7 +349,7 @@ int func_PAL_L11_00429B30(unsigned char *object)
     altitude = coll_probe_ground_height_below(((char *)object + 0x10), 0, 0.5f);
     if (REAL(object, 0x18) - altitude > 20.0f && altitude < REAL(object, 0x18) && BYTE(object, 0x95) != 5) {
         moby_set_state(object, 0x25, 9);
-        if (BYTE(object, 0x43) != 0x23) func_PAL_002A7E68(object, 0x23, 0, 8);
+        if (BYTE(object, 0x43) != 0x23) anim_start_blended_pal(object, 0x23, 0, 8);
     }
     if (REAL(object, 0x18) < 75.0f && g_arena_progress_level >= 6) {
         SetDeathBits_pal(object, 0, 3);

@@ -5,7 +5,7 @@
 typedef int Vector __attribute__((mode(TI)));
 extern float g_l11_gate_local_offset[4] __attribute__((sda));
 extern void moby_set_state(char *, int, int);
-extern void func_PAL_002A7E68(char *, int, int, int);
+extern void anim_start_blended_pal(char *, int, int, int);
 extern void vec_scale_to_length(void *, void *, float);
 extern void FastVecAdd(void *, void *, void *);
 extern char *CreateMoby(int);
@@ -16,14 +16,16 @@ extern void mat_normalize_columns(void *);
 extern void func_002A10E8(char *);
 extern int flag_set_first_pending(char *);
 extern int FastDecTimer(void *);
-extern void func_PAL_L11_0041C088(char *);
+extern void joba_place_child_mobys_pal(char *);
 
 typedef struct { char pad[0x48]; float f48; } Obj48;
 extern int g_l11_gate_open_timer_init __attribute__((sda));
 extern float g_l11_gate_slide_distance __attribute__((sda));
 extern int g_l11_gate_slide_frame_count __attribute__((sda));
 
-void func_PAL_L11_0041BA00(char *self) {
+/* Runs a sliding gate with a child part attached to it: it plays open and close animations,
+   moves a little, and keeps the child part in place on it (PAL: 50 Hz timings). */
+void sliding_l11_gate_update_pal(char *self) {
     float offset[4] __attribute__((aligned(16)));
     /* Separate initial and final query events use four measured local vectors. */
     float updated[4] __attribute__((aligned(16)));
@@ -40,7 +42,7 @@ void func_PAL_L11_0041BA00(char *self) {
         *(int *)(state + 0x14) = 0;
         *(int *)(state + 0x18) = 0;
         moby_set_state(self, 2, -1);
-        if (*(unsigned char *)(self + 0x43) != 0) func_PAL_002A7E68(self, 0, 0, 0);
+        if (*(unsigned char *)(self + 0x43) != 0) anim_start_blended_pal(self, 0, 0, 0);
         ((Obj48 *)self)->f48 = 0.0f;
         vec_scale_to_length(updated, self + 0xD0, g_l11_gate_slide_distance);
         FastVecAdd(self + 0x10, self + 0x10, updated);
@@ -99,8 +101,8 @@ void func_PAL_L11_0041BA00(char *self) {
     case 4:
         moby_set_state(self, 5, -1);
         ((Obj48 *)self)->f48 = 1.0f;
-        if (*(unsigned char *)(self + 0x43) != 1) func_PAL_002A7E68(self, 1, 0, 0);
-        func_PAL_L11_0041C088(self);
+        if (*(unsigned char *)(self + 0x43) != 1) anim_start_blended_pal(self, 1, 0, 0);
+        joba_place_child_mobys_pal(self);
         break;
     case 5:
         if (*(unsigned char *)(self + 0x60) & 2) {
@@ -112,7 +114,7 @@ void func_PAL_L11_0041BA00(char *self) {
     case 6:
         if (!*(short *)(state + 0x20)) {
         ((Obj48 *)self)->f48 = 1.0f;
-        if (*(unsigned char *)(self + 0x43) != 2) func_PAL_002A7E68(self, 2, 0, 0);
+        if (*(unsigned char *)(self + 0x43) != 2) anim_start_blended_pal(self, 2, 0, 0);
         moby_set_state(self, 7, -1);
         } else {
             FastDecTimer(state + 0x20);
@@ -120,7 +122,7 @@ void func_PAL_L11_0041BA00(char *self) {
         break;
     case 7:
         if (*(unsigned char *)(self + 0x60) & 2) {
-            if (*(unsigned char *)(self + 0x43) != 3) func_PAL_002A7E68(self, 3, 0, 0);
+            if (*(unsigned char *)(self + 0x43) != 3) anim_start_blended_pal(self, 3, 0, 0);
             moby_set_state(self, 1, -1);
         }
         break;

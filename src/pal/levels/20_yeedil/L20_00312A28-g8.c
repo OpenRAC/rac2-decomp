@@ -72,7 +72,8 @@ extern char *part_spawn_blast_effect_moby(void *,void *,void *,float);
 extern void EmitScaledObjectParticles(void *);
 extern void *SpawnExplosion(void *,int,int,int,int,int,int,int,float,float,int,int,int,int);
 
-void func_PAL_L20_00312A28(void *incoming)
+/* Runs the Yeedil level script each frame. It tweaks some objects in the level and moves the camera for the cutscene steps. (PAL: 50 Hz timings) */
+void level_script_update_pal(void *incoming)
 {
     int lower, upper;
     void *target;
@@ -87,12 +88,12 @@ void func_PAL_L20_00312A28(void *incoming)
         for (i = 0; i < g_yeedil_state_prefix.count; ++i) {
             u8 *object;
             object = g_yeedil_state_prefix.refs.objects[i];
-            if (object && *(s16 *)(object+0xAA) == 0xE29)
+            if (object && *(s16 *)(object+0xAA) == 0xE29 /* moby class 3625 */)
                 *(u16 *)(object+0x34) |= 0x800;
-            if (*(s16 *)(object+0xAA) == 0xD54)
+            if (*(s16 *)(object+0xAA) == 0xD54 /* moby class 3412 */)
                 UpdateEquipmentPieces(object);
             if (object) {
-                int wanted = 0xFA0;
+                int wanted = MOBY_CLASS_TV_SCREENS;
                 if (*(s16 *)(object+0xAA) == wanted && g_current_map_index != 0x33 && *(void **)(object+0x68))
                     math_store_angle_update_result((char *)object,(float *)(*(u8 **)(object+0x68)+0xC),
                                       0x80AAAAD2,0x80396464,0.07330384f);
@@ -161,10 +162,10 @@ void func_PAL_L20_00312A28(void *incoming)
                 u16 word;
                 object = g_yeedil_state_prefix.refs.objects[i];
                 word = *(u16 *)(object+0xAA);
-                if ((u32)(word-0xD0E) < 2) {
-                    *(u16 *)(object+0x7C) = word = (s16)word == 0xD0F ? 15 : 0x3FF;
+                if ((u32)(word-MOBY_CLASS_MEGACORP_TROOPER_TORSO) < 2) {
+                    *(u16 *)(object+0x7C) = word = (s16)word == MOBY_CLASS_MEGACORP_TROOPER_LEGS ? 15 : 0x3FF;
                 }
-                if (*(s16 *)(object+0xAA) == 0xCE0) {
+                if (*(s16 *)(object+0xAA) == 0xCE0 /* moby class 3296 */) {
                     /* Set ahead of the load: with the division in the loop only its
                      * longer life lets loop.c move it out in the first pass. */
                     int wanted = 3;

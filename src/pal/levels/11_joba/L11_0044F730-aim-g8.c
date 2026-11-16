@@ -36,6 +36,7 @@ extern void math_apply_axis_rotation_to_quat(void *, void *, void *, float);
 extern int moby_l01_turn_toward_target_pal(void *, void *);
 extern int moby_get_busy_flag(void *);
 
+/* Turns the object toward a nearby group entity inside its aiming cone; returns 1 when it did. */
 s32 AimAtGroupEntityInCone_pal(AimObject *obj)
 {
     AimState *state = *(AimState **)((u8 *)obj + 0x68);

@@ -7,44 +7,45 @@
 
 extern char g_hero_state[];
 extern unsigned char g_level_status_byte MACRO_ADDR;
-extern void vec_clear_128(float *buf);
-extern float FastVecLength(float *buf);
+extern void vec_clear_128(float *stick);
+extern float FastVecLength(float *stick);
 extern float g_stick_length MACRO_ADDR;
 
-void func_US2_00330BE8(char *obj)
+/* Reads the pad stick, negates and clamps it to the unit range and stores its length (v2.00 copy). */
+void pad_read_clamped_stick_us2(char *moby)
 {
-    float buf[2];
-    char *e = *(char **)(obj + 104);
-    float a, b, x;
+    float stick[2];
+    char *vars = *(char **)(moby + 104);
+    float stick_x, stick_y, clamped_y;
 
     if (g_level_status_byte != 0) {
-        char *d = g_hero_state;
-        *(float *)(e + 84) = *(float *)(d + 8112);
+        char *hero = g_hero_state;
+        *(float *)(vars + 84) = *(float *)(hero + 8112);
     } else {
-        char *d = g_hero_state;
-        *(float *)(e + 84) = -*(float *)(d + 8112);
+        char *hero = g_hero_state;
+        *(float *)(vars + 84) = -*(float *)(hero + 8112);
     }
     {
-        char *d = g_hero_state;
-        a = *(float *)(e + 84);
-        b = -*(float *)(d + 8116);
+        char *hero = g_hero_state;
+        stick_x = *(float *)(vars + 84);
+        stick_y = -*(float *)(hero + 8116);
     }
-    *(float *)(e + 80) = b;
+    *(float *)(vars + 80) = stick_y;
 
-    if (a > 1.0f) {
-        *(float *)(e + 84) = 1.0f;
-    } else if (a < -1.0f) {
-        *(float *)(e + 84) = -1.0f;
+    if (stick_x > 1.0f) {
+        *(float *)(vars + 84) = 1.0f;
+    } else if (stick_x < -1.0f) {
+        *(float *)(vars + 84) = -1.0f;
     }
 
-    x = *(float *)(e + 80);
-    if (x > 1.0f) {
-        *(float *)(e + 80) = 1.0f;
-    } else if (x < -1.0f) {
-        *(float *)(e + 80) = -1.0f;
+    clamped_y = *(float *)(vars + 80);
+    if (clamped_y > 1.0f) {
+        *(float *)(vars + 80) = 1.0f;
+    } else if (clamped_y < -1.0f) {
+        *(float *)(vars + 80) = -1.0f;
     }
-    vec_clear_128(buf);
-    buf[0] = *(float *)(e + 80);
-    buf[1] = *(float *)(e + 84);
-    g_stick_length = FastVecLength(buf);
+    vec_clear_128(stick);
+    stick[0] = *(float *)(vars + 80);
+    stick[1] = *(float *)(vars + 84);
+    g_stick_length = FastVecLength(stick);
 }

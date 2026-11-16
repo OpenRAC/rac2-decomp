@@ -12,17 +12,17 @@ extern char *GetLocalizedString(int);
 extern void hud_set_widget_field_b(void *, unsigned int);
 extern void object_set_value_float(void *, float);
 
-void func_PAL_00343690(char *self, int idx)
+void tab_menu_switch_tab_pal(char *self, int idx)
 {
     float *records;
-    float f;
+    float scale;
     unsigned char *child;
     if ((unsigned int)idx > 2) return;
     *(int *)(self + 0x1C4) = ((int *)&g_tab_menu_tab_values)[idx];
     *(int *)(self + 0x1C8) = (int)(g_tab_menu_records + idx * 0x20);
     *(int *)(self + 0x1CC) = (idx == 0) ? 7 : ((idx == 1) ? 7 : 6);
-    if (idx == 2) f = 2.0f;
-    else f = 0.0f;
+    if (idx == 2) scale = 2.0f;
+    else scale = 0.0f;
     child = (unsigned char *)self + 0x238;
     {
         int *p = (int *)(self + idx * 4);
@@ -31,8 +31,8 @@ void func_PAL_00343690(char *self, int idx)
     records = (idx == 0) ? *(float **)(self + 0x310) : ((idx == 1) ? *(float **)(self + 0x314) : *(float **)(self + 0x318));
     menu_set_entry_table_pal(child, records);
     hud_set_widget_field_b(self + 0x1D0, GetLocalizedString((idx == 0) ? 0xb66 : ((idx == 1) ? 0xb67 : 0x1110)));
-    object_set_value_float(self, f);
-    object_set_value_float(self + 0x4C, f);
-    object_set_value_float(self + 0xE4, f);
+    object_set_value_float(self, scale);
+    object_set_value_float(self + 0x4C, scale);
+    object_set_value_float(self + 0xE4, scale);
     *(int *)(self + 0x31c) = idx;
 }

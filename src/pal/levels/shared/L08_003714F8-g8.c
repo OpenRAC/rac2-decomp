@@ -25,6 +25,7 @@ extern void matrix_mul_vec3(void *, void *, void *);
 extern void FastVecAdd(void *, void *, void *);
 extern void draw_world_quad(void *, void *, int);
 
+/* Draws a soft shadow square on the ground under an object, fading it with distance and during the end-of-level fade. */
 void gfx_draw_ground_shadow_pal(char *object)
 {
     float projected[4];

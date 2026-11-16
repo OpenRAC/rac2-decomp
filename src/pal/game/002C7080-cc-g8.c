@@ -9,7 +9,7 @@ extern float math_random_float_range(float, float);
 extern int math_random_int_below(int);
 extern float IntToFloat(int);
 extern void *part_spawn_drifting(char *, int, int, float, float);
-extern void *func_PAL_002C0838(char *, char *, int, int);
+extern void *part_spawn_spark_2_pal(char *, char *, int, int);
 
 #ifndef RAC2_T_V4_G8
 #define RAC2_T_V4_G8
@@ -22,40 +22,40 @@ extern float math_random_float_range(float, float);
    object's vector is copied out and its fourth word cleared, the colour and
    the counter byte are rebuilt, and the object is finally handed to the
    helper twice when the motion is below the limit. */
-void func_PAL_002C7080(char *self)
+void part_update_spark_emitting_pal(char *self)
 {
-    char *s0 = self;
-    char *s1 = self + 0x20;
-    char *s2 = self + 0x10;
-    V4_G8 buf;
-    float f0;
-    float f1;
-    float f2;
-    float f3;
+    char *part = self;
+    char *state = self + 0x20;
+    char *position = self + 0x10;
+    V4_G8 velocity;
+    float temp;
+    float pull;
+    float new_fall;
+    float new_growth;
 
-    f0 = math_random_float_range(-g_spark_random_range, g_spark_random_range);
-    f1 = ((g_spark_pull_base + f0) * 1.44f);
-    f3 = *(float *)(s1 + 0x10) + 0.0075f;
-    f2 = *(float *)(s1 + 8) - f1;
-    f0 = *(float *)(s1 + 0x14) * f3 * 210000.0f;
-    *(float *)(s1 + 0x10) = f3;
-    *(float *)(s1 + 8) = f2;
-    buf = *(V4_G8 *)(s0 + 0x20);
-    *(float *)(s0 + 0xC) = f0;
-    ((int *)&buf)[3] = 0;
-    IntToFloat(*(short *)(s0 + 0xA));
-    *(unsigned int *)(s0 + 4) = 0x55503020;
-    *(unsigned char *)(s0 + 8) = *(unsigned char *)(s0 + 8) + *(unsigned char *)(s1 + 0x1A);
-    FastVecAdd(s2, s2, (char *)&buf);
-    if (*(float *)(s0 + 0x18) <= *(float *)(s1 + 0x1C)) {
+    temp = math_random_float_range(-g_spark_random_range, g_spark_random_range);
+    pull = ((g_spark_pull_base + temp) * 1.44f);
+    new_growth = *(float *)(state + 0x10) + 0.0075f;
+    new_fall = *(float *)(state + 8) - pull;
+    temp = *(float *)(state + 0x14) * new_growth * 210000.0f;
+    *(float *)(state + 0x10) = new_growth;
+    *(float *)(state + 8) = new_fall;
+    velocity = *(V4_G8 *)(part + 0x20);
+    *(float *)(part + 0xC) = temp;
+    ((int *)&velocity)[3] = 0;
+    IntToFloat(*(short *)(part + 0xA));
+    *(unsigned int *)(part + 4) = 0x55503020;
+    *(unsigned char *)(part + 8) = *(unsigned char *)(part + 8) + *(unsigned char *)(state + 0x1A);
+    FastVecAdd(position, position, (char *)&velocity);
+    if (*(float *)(part + 0x18) <= *(float *)(state + 0x1C)) {
         if (math_random_int_below(6) == 1)
-            part_spawn_drifting(s2, 0, -1, 0.4f, 210000.0f * 0.15f);
+            part_spawn_drifting(position, 0, -1, 0.4f, 210000.0f * 0.15f);
     }
     if (math_random_int_below(6) == 1) {
-        if (*(short *)(s1 + 0x18) >= 0x32)
-            func_PAL_002C0838(s0 + 0x10, (char *)&buf, 1, 0x11);
+        if (*(short *)(state + 0x18) >= 0x32)
+            part_spawn_spark_2_pal(part + 0x10, (char *)&velocity, 1, 0x11);
     }
-    *(unsigned short *)(s1 + 0x18) = *(unsigned short *)(s1 + 0x18) + 1;
-    if (FastDecTimer((short *)(s0 + 0xA)) != 0)
-        part_kill(s0);
+    *(unsigned short *)(state + 0x18) = *(unsigned short *)(state + 0x18) + 1;
+    if (FastDecTimer((short *)(part + 0xA)) != 0)
+        part_kill(part);
 }

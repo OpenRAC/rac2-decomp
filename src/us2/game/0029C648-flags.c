@@ -1,4 +1,6 @@
 #include "include_asm.h"
+#include "names.h"
 
-void func_US2_0029CF08(void) {
+/* Empty function. */
+void hud_empty_hook_us2(void) {
 }

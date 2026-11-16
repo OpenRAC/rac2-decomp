@@ -25,7 +25,7 @@ extern int FloatToInt(float);
 extern void FastVecAdd(void *,void *,void *);
 
 /* Emit paired particles, choosing an outward or target-directed trajectory. */
-void func_PAL_L02_00426DF8(void *origin,int count,int inner)
+void part_spawn_impact_particles_pal(void *origin,int count,int inner)
 {
     float velocity[4] __attribute__((aligned(16)));
     float position[4] __attribute__((aligned(16)));

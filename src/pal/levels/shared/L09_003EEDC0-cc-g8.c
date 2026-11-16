@@ -82,7 +82,7 @@ typedef struct {
    The store order is the one sched1 (stores ending a constant's life first) and sched2
    (stores with more dependants first, 0x50 being the 34th memory reference) turn into
    retail's sequence. */
-void func_PAL_L09_003EEDC0(char *object) {
+void walker_init_pal(char *object) {
     DobboMoverState *state = *(DobboMoverState **)(object + 0x68);
     char *pos = object + 0x10;
     int entry;

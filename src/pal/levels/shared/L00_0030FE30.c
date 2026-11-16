@@ -3,7 +3,8 @@
 
 extern int D_L00_001A904C_2 __attribute__((sda));
 
-void func_PAL_L00_0030FE30(void)
+/* Draws the bound module's menu with button prompts (PAL). */
+void level_l00_menu_draw_with_prompts_pal(void)
 {
     int value = D_L00_001A904C_2;
 

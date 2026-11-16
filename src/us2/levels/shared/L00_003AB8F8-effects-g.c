@@ -16,37 +16,38 @@ extern void get_moby_color(void *,int *,int *,int *);
 extern void FastVecCross(void *,void *,void *);
 extern void anim_start_immediate(void *,int,int);
 extern int part_alloc_effect_slot(void *,float,float,float,int);
-char *func_US2_L00_003AB8F8(void *position,void *velocity,void *unused,void *owner,int value)
+/* Creates the owned seeker effect moby (class 0xD01) at a position with a velocity, timed from the weapon table (US2: the mode is a fifth argument). */
+char *effect_spawn_owned_moby_us2(void *position,void *velocity,void *unused,void *owner,int mode)
 {
  float axis[4];
- int r,g,b;
- char *m=CreateMoby(0xD01),*d;
+ int red,green,blue;
+ char *effect=CreateMoby(0xD01),*vars;
  float duration, inverse, denominator;
  int ticks;
- if(m) {
- FIELD_U8(m,0x30)=255; FIELD_S16(m,0x32)=255; FIELD_U8(m,0x31)=1; FIELD_U8(m,0x20)=0;
- d=*(char **)(m+0x68);
+ if(effect) {
+ FIELD_U8(effect,0x30)=255; FIELD_S16(effect,0x32)=255; FIELD_U8(effect,0x31)=1; FIELD_U8(effect,0x20)=0;
+ vars=*(char **)(effect+0x68);
  denominator=((EffectTiming *)((char *)g_weapon_l00_table+g_seeker_weapon_index*sizeof(EffectTiming)))->scale*(1.0f/60.0f);
  duration=40.0f/denominator;
  ticks=FloatToInt(duration);
  inverse=1.0f/duration;
- FIELD_S32(d,0x74)=(int)owner; FIELD_S32(d,0x14)=0;FIELD_S32(d,0x30)=0; FIELD_S32(d,0x24)=0;FIELD_S32(d,0x28)=0;FIELD_S32(d,0x2C)=0;
- FIELD_S32(d,0x78)=value; FIELD_F32(d,0x20)=3.141592741f;FIELD_S16(d,0x18)=ticks;FIELD_F32(d,0x34)=inverse;
- FIELD_S16(d,0x1A)=math_random_int_below(255);
- FIELD_S32(d,0x3C)=0;FIELD_S32(d,0x1C)=0;FIELD_S32(d,0x7C)=0;FIELD_S32(d,0x58)=0;FIELD_F32(d,0x50)=0.5f;FIELD_S32(d,0x5C)=-1;
- get_moby_color(m,&r,&g,&b);
- FIELD_S32(d,0x38)=(b<<16)|(g<<8)|r;
- FIELD_F32(m,0x2C)*=1.5f;
- qcopy(m+0x10,position);
- qcopy(d,velocity);
- FIELD_S16(m,0x34)|=0x100;
- cam_compute_view_direction(m+0x10,axis,1);
- vec_scale_to_length(m+0xC0,d,1.0f);
- FastVecCross(m+0xD0,m+0xC0,axis);
- vec_scale_to_length(m+0xD0,m+0xD0,1.0f);
- FastVecCross(m+0xE0,m+0xD0,m+0xC0);
- anim_start_immediate(m,2,0);
- FIELD_S32(d,0x70)=part_alloc_effect_slot(m,1.0f,1.0f,1.0f,0);
+ FIELD_S32(vars,0x74)=(int)owner; FIELD_S32(vars,0x14)=0;FIELD_S32(vars,0x30)=0; FIELD_S32(vars,0x24)=0;FIELD_S32(vars,0x28)=0;FIELD_S32(vars,0x2C)=0;
+ FIELD_S32(vars,0x78)=mode; FIELD_F32(vars,0x20)=3.141592741f;FIELD_S16(vars,0x18)=ticks;FIELD_F32(vars,0x34)=inverse;
+ FIELD_S16(vars,0x1A)=math_random_int_below(255);
+ FIELD_S32(vars,0x3C)=0;FIELD_S32(vars,0x1C)=0;FIELD_S32(vars,0x7C)=0;FIELD_S32(vars,0x58)=0;FIELD_F32(vars,0x50)=0.5f;FIELD_S32(vars,0x5C)=-1;
+ get_moby_color(effect,&red,&green,&blue);
+ FIELD_S32(vars,0x38)=(blue<<16)|(green<<8)|red;
+ FIELD_F32(effect,0x2C)*=1.5f;
+ qcopy(effect+0x10,position);
+ qcopy(vars,velocity);
+ FIELD_S16(effect,0x34)|=0x100;
+ cam_compute_view_direction(effect+0x10,axis,1);
+ vec_scale_to_length(effect+0xC0,vars,1.0f);
+ FastVecCross(effect+0xD0,effect+0xC0,axis);
+ vec_scale_to_length(effect+0xD0,effect+0xD0,1.0f);
+ FastVecCross(effect+0xE0,effect+0xD0,effect+0xC0);
+ anim_start_immediate(effect,2,0);
+ FIELD_S32(vars,0x70)=part_alloc_effect_slot(effect,1.0f,1.0f,1.0f,0);
  }
- return m;
+ return effect;
 }

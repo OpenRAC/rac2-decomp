@@ -45,7 +45,7 @@ extern char *part_find_owned_effect_slot(char *,int,int);
 extern void gfx_start_color_fade(char *,void *), gfx_update_color_fade(char *,void *);
 extern float vec_length_xy(void *), func_002A0558(char *,char *), FastAddRotations(float,float), math_fast_sin_or_cos_b(float), fast_vec_dist(void *,void *);
 extern int TryClaimNotice(int,int,int), math_random_int_below(int), flag_set_first_pending(char *);
-extern int func_US2_L00_002C4560(int,int);
+extern int hero_l00_change_action_us2(int,int);
 extern void UpdateHoverVehicleMotion(char *,int), set_hero_animation(int,int,float), moby_mark_in_range(char *);
 extern void moby_set_state(char *,int,int), moby_update_ground_check(char *), gfx_add_draw_callback_third(void (*)(char *),void *);
 extern void moby_transform_joint_to_world(char *,int,void *);
@@ -54,7 +54,7 @@ extern void moby_scale_owner_words_by_angles(char *,void *,void *,float,float,fl
 extern void *memcpy(void *,const void *,unsigned int);
 typedef struct {
  float velocity[4]; char pad10[16]; float pitch,yaw,roll,pad2C;
- float spawn[4]; char pad40[8]; float phase, bob, yawRate, pitchRate, height, pad5C, health;
+ float spawn[4]; char pad40[8]; float phase, bob, yaw_rate, pitch_rate, height, pad5C, health;
  int classIndex; union { float throttle; int bits; } power;
  char pad6C[2]; unsigned char hitTimer; char pad6F[0x80-0x6F];
  unsigned char flash[16]; char *lastHit; int flags, alpha, count;
@@ -68,7 +68,7 @@ typedef struct {
 } MuseumVehicle;
 /* dead-test helper allowed by owner ruling (master precedent).
  * As in label_y, the dead test preserves a block until reload; flow2 removes it.
- * The returned health is always the level's initial vehicle health. */
+ * The returned health is always the level'vars initial vehicle health. */
 static __inline__ float initial_health(void)
 {
     float health;
@@ -78,30 +78,31 @@ static __inline__ float initial_health(void)
     return health;
 }
 
+/* Updates the museum hover vehicle (moby class 3887): damage, health, steering, bobbing and its states. */
 void MuseumVehicleUpdate_us2(MuseumVehicle *obj) {
-    VehicleVars *s; char *hit;
+    VehicleVars *vars; char *hit;
 
     char activate;
-    float k, scaled, rollRate, yawRate, pitchRate, bob;
+    float angle_scale, scaled, roll_rate, yaw_rate, pitch_rate, bob;
     unsigned int pos[4] __attribute__((aligned(16)));
-    s=obj->vars;
+    vars=obj->vars;
     if (obj->state) {
-        obj->position[2]=s->height;
+        obj->position[2]=vars->height;
         hit=part_find_owned_effect_slot(obj,1,0);
         if (hit && P(hit,0x20) && *(short *)(P(hit,0x20)+0xAA)!=0xF2F && *(short *)(P(hit,0x20)+0xAA)!=0x942) {
-            if (*(short *)(P(hit,0x20)+0xAA)!=0xFFF && (P(hit,0x20)!=s->lastHit || !s->hitTimer)) {
-                B(s,0x87)=0xD2;B(s,0x88)=0xD2;B(s,0x89)=0xD2;
-                gfx_start_color_fade(obj,&s->flash);
-                s->health-=F(hit,0x2C);
-                g_hero_state.health=s->health;
-                if (s->health<=0.0f) obj->state=5;
-                s->lastHit=P(hit,0x20);
-                s->hitTimer=g_vehicle_hit_timer_reset;
+            if (*(short *)(P(hit,0x20)+0xAA)!=MOBY_CLASS_MUTANT_SANDFLY && (P(hit,0x20)!=vars->lastHit || !vars->hitTimer)) {
+                B(vars,0x87)=0xD2;B(vars,0x88)=0xD2;B(vars,0x89)=0xD2;
+                gfx_start_color_fade(obj,&vars->flash);
+                vars->health-=F(hit,0x2C);
+                g_hero_state.health=vars->health;
+                if (vars->health<=0.0f) obj->state=5;
+                vars->lastHit=P(hit,0x20);
+                vars->hitTimer=g_vehicle_hit_timer_reset;
             }
         }
         obj->hitFlag=0xFF;
-    } else s->height=obj->position[2];
-    gfx_update_color_fade(obj,&s->flash);
+    } else vars->height=obj->position[2];
+    gfx_update_color_fade(obj,&vars->flash);
 
     obj->damage=F(obj->classData,0x24)*g_vehicle_damage_scale;
     if (g_hero_state.vehicle==obj) g_hero_state.healthPercent=(int)(g_hero_state.health/g_vehicle_max_health*200.0f);
@@ -109,41 +110,41 @@ void MuseumVehicleUpdate_us2(MuseumVehicle *obj) {
     switch (obj->state) {
     case 0: {
         char *palette; int copied;
-        palette=g_class_palette_data+((PaletteRow *)((s->classIndex+g_effect_texture_offset)*16+(char *)g_palette_row_table))->offset*16;
+        palette=g_class_palette_data+((PaletteRow *)((vars->classIndex+g_effect_texture_offset)*16+(char *)g_palette_row_table))->offset*16;
         g_gauge_palette_ptr=palette;copied=g_gauge_palette_loaded;
-        s->alpha=255; s->flags=0;
+        vars->alpha=255; vars->flags=0;
         if (!copied) memcpy(g_palette_copy,palette,0x400);
         g_gauge_palette_loaded=1;
-        qcopy(&s->spawn,obj->position); qzero_nc(s);
-        g_hero_state.maxHealth=g_hero_state.health=s->health=initial_health();
+        qcopy(&vars->spawn,obj->position); qzero_nc(vars);
+        g_hero_state.maxHealth=g_hero_state.health=vars->health=initial_health();
         obj->state=1;
-        s->power.bits=0;s->count=0;
+        vars->power.bits=0;vars->count=0;
         break; }
     case 1:
-        if (vec_length_xy(s)>0.004166667f) UpdateHoverVehicleMotion(obj,0);
+        if (vec_length_xy(vars)>0.004166667f) UpdateHoverVehicleMotion(obj,0);
         if (g_hero_state.state==28 || g_hero_state.state==22 || g_hero_state.state==57 || g_hero_state.state==111 ||
             g_hero_state.mode==2 || g_hero_state.mode==4 || g_hero_state.mode==3 || g_hero_state.mode>=13 ||
             g_hero_state.mode==7 || g_hero_state.mode==10 || g_hero_state.mode==16 || g_hero_state.mode==5 || g_hero_state.state==98 ||
             g_hero_state.heroHealth<=0 || g_museum_effect_mode || !g_hero_state.groundFlag) break;
-        if (g_hero_state.ground && (*(short *)(g_hero_state.ground+0xAA)==0x13E || *(short *)(g_hero_state.ground+0xAA)==0x46F)) break;
+        if (g_hero_state.ground && (*(short *)(g_hero_state.ground+0xAA)==0x13E || *(short *)(g_hero_state.ground+0xAA)==MOBY_CLASS_TELEPORTER)) break;
         if (func_002A0558(obj,g_hero_state.hero)<g_vehicle_near_distance && g_hero_state.state!=49) {
             int v=TryClaimNotice(7,0x12ea,1)!=0;
             if (g_pad_state.pressed&16) activate=v;
         }
         if (activate) {
-            func_US2_L00_002C4560(49,0);set_hero_animation(g_vehicle_animation_id,0,15.0f);
+            hero_l00_change_action_us2(49,0);set_hero_animation(g_vehicle_animation_id,0,15.0f);
             qcopy(g_hero_state.rotation,obj->rotation);qcopy(g_hero_state.position,obj->position);
             g_hero_state.vehicle=obj;obj->state=3;obj->flags=0;I(g_hero_state.hero,0x9C)=-1;
         }
         break;
     case 3:
         if (g_pad_state.held&4) {
-            s->power.throttle-=g_vehicle_throttle_decay;
+            vars->power.throttle-=g_vehicle_throttle_decay;
             if (!math_random_int_below(9) || (g_pad_state.pressed&4)) moby_mark_in_range(obj);
-        } else s->power.throttle+=g_vehicle_throttle_gain;
+        } else vars->power.throttle+=g_vehicle_throttle_gain;
         if (g_vehicle_prev_animation_id!=g_vehicle_animation_id && g_vehicle_animation_id!=-1) set_hero_animation(g_vehicle_animation_id,0,15.0f);
         UpdateHoverVehicleMotion(obj,1);
-        if (s->power.throttle>1.0f) s->power.throttle=1.0f; else if (s->power.throttle<0.0f) s->power.throttle=0.0f;
+        if (vars->power.throttle>1.0f) vars->power.throttle=1.0f; else if (vars->power.throttle<0.0f) vars->power.throttle=0.0f;
         if (g_hero_state.vehicle==obj) {
             if (g_pad_state.pressed&16) moby_set_state(obj,4,-1);
             qcopy(g_hero_state.copyD0,g_hero_state.copyE0);
@@ -151,7 +152,7 @@ void MuseumVehicleUpdate_us2(MuseumVehicle *obj) {
         break;
     case 4:
         if (flag_set_first_pending(obj)) {
-            g_hero_state.cameraX=0;g_hero_state.cameraY=-1.0f;func_US2_L00_002C4560(11,1);
+            g_hero_state.cameraX=0;g_hero_state.cameraY=-1.0f;hero_l00_change_action_us2(11,1);
             g_hero_state.vehicle=0;g_hero_state.vehicleId=-1;
         }
         obj->flags=0;I(g_hero_state.hero,0x9C)=0;UpdateHoverVehicleMotion(obj,0);
@@ -161,22 +162,22 @@ void MuseumVehicleUpdate_us2(MuseumVehicle *obj) {
     case 6: break;
     case 5:
         obj->flags=I(obj->classData,0x10);I(g_hero_state.hero,0x9C)=0;
-        func_US2_L00_002C4560(0,1);moby_transform_joint_to_world(obj,0,pos);
-        SpawnExplosionEffects(obj,s,pos,0.0f,0.0f,10,3,16,4.0f,2.0f,9.0f,1.0f,-1,15.0f,1,1,-1,0,0x810001);
-        qcopy(obj->position,&s->spawn);g_hero_state.vehicleId=-1;g_hero_state.vehicle=0;obj->state=0;
+        hero_l00_change_action_us2(0,1);moby_transform_joint_to_world(obj,0,pos);
+        SpawnExplosionEffects(obj,vars,pos,0.0f,0.0f,10,3,16,4.0f,2.0f,9.0f,1.0f,-1,15.0f,1,1,-1,0,0x810001);
+        qcopy(obj->position,&vars->spawn);g_hero_state.vehicleId=-1;g_hero_state.vehicle=0;obj->state=0;
         break;
     }
-    scaled=s->power.throttle;
-    k=0.00029088824f;
-    scaled=g_vehicle_scale_factor*(scaled*k);
-    s->height=obj->position[2];
-    s->phase=FastAddRotations(s->phase,scaled);
-    bob=math_fast_sin_or_cos_b(s->phase)*g_vehicle_l30_bob_amplitude_2*s->power.throttle;
-    rollRate=g_vehicle_roll_rate; yawRate=g_vehicle_yaw_rate; pitchRate=g_vehicle_pitch_rate;
-    s->bob=bob;
-    obj->position[2]+=s->bob*s->power.throttle;
-    moby_scale_owner_words_by_angles(obj,&s->yawRate,&s->pitchRate,rollRate*0.017453294f,yawRate*(s->power.throttle*k),pitchRate*(s->power.throttle*k));
-    obj->rotation[2]=s->roll;obj->rotation[0]=FastAddRotations(obj->rotation[0],s->pitch);obj->rotation[1]=FastAddRotations(obj->rotation[1],s->yaw);
+    scaled=vars->power.throttle;
+    angle_scale=0.00029088824f;
+    scaled=g_vehicle_scale_factor*(scaled*angle_scale);
+    vars->height=obj->position[2];
+    vars->phase=FastAddRotations(vars->phase,scaled);
+    bob=math_fast_sin_or_cos_b(vars->phase)*g_vehicle_l30_bob_amplitude_2*vars->power.throttle;
+    roll_rate=g_vehicle_roll_rate; yaw_rate=g_vehicle_yaw_rate; pitch_rate=g_vehicle_pitch_rate;
+    vars->bob=bob;
+    obj->position[2]+=vars->bob*vars->power.throttle;
+    moby_scale_owner_words_by_angles(obj,&vars->yaw_rate,&vars->pitch_rate,roll_rate*0.017453294f,yaw_rate*(vars->power.throttle*angle_scale),pitch_rate*(vars->power.throttle*angle_scale));
+    obj->rotation[2]=vars->roll;obj->rotation[0]=FastAddRotations(obj->rotation[0],vars->pitch);obj->rotation[1]=FastAddRotations(obj->rotation[1],vars->yaw);
     if (obj->state==3) {moby_transform_joint_to_world(obj,(int)g_vehicle_joint_index,g_hero_state.position);{char *h=(char *)&g_hero_state;F(h,0x88)+=g_vehicle_hero_height_offset;}qcopy(g_hero_state.rotation,obj->rotation);
         gfx_add_draw_callback_third(DrawMuseumStatusGauge,obj);
     }

@@ -44,7 +44,7 @@ extern EffectAngles g_effect_angles;
 extern EffectMaterialSelector g_item_slot_to_record;
 extern EffectMaterialEntry g_weapon_l00_table[];
 extern int g_effect_moby_count __attribute__((sda));
-extern char *func_PAL_L00_003BEE68(EffectObject *);
+extern char *spark_move_projectile_pal(EffectObject *);
 extern void vec_scale_to_length(void *, void *, float);
 extern void make_hit_descriptor(void *, void *, int, float, void *);
 extern void QueueMobyImpact(void *, void *);
@@ -62,7 +62,7 @@ extern void vec_clear_128(void *);
 extern void *part_spawn_ground_effect(void *, float, float, int, unsigned int, int, int,
                           void *, float, int);
 extern void moby_get_facing_direction(void *, void *);
-extern void func_PAL_L00_003C11A0(void *, void *, int, int);
+extern void part_l00_spawn_spark_burst_2_pal(void *, void *, int, int);
 extern void table_clear_entry_flag(int);
 extern void pair_clear_owner_key_entries(void *);
 extern void gfx_free_point_light(int);
@@ -73,7 +73,7 @@ extern void ref_L00_003BAC30_00(void *, EffectObject *);
 extern void spark_draw_projectile_pal(void *);
 
 /* Updates motion and hits, then shrinks, emits particles and releases resources. */
-void func_PAL_L00_003BE89C(EffectObject *self)
+void update_l00_moving_effect_state_pal(EffectObject *self)
 {
     EffectAngles angles;
     char *hits[16];
@@ -94,7 +94,7 @@ void func_PAL_L00_003BE89C(EffectObject *self)
     case 0:
     case 1:
         state->intensity += (0.6f - state->intensity) * 0.125f;
-        result = func_PAL_L00_003BEE68(self);
+        result = spark_move_projectile_pal(self);
         if (result) {
             qcopy(vector, state);
             vec_scale_to_length(vector, vector, 0.040000003f);
@@ -123,7 +123,7 @@ void func_PAL_L00_003BE89C(EffectObject *self)
         }
         break;
     case 2:
-        func_PAL_L00_003BEE68(self);
+        spark_move_projectile_pal(self);
         ratio = IntToFloat(state->timer) / IntToFloat(40);
         state->intensity = ratio * 0.5900000333786011f + 0.01f;
         self->position[0] += math_random_float_range(-0.1f, 0.1f);
@@ -138,8 +138,8 @@ void func_PAL_L00_003BE89C(EffectObject *self)
     case 3:
         if (state->f54 == 0 && state->f58 == 0) {
             moby_get_facing_direction(self->position, &packet);
-            func_PAL_L00_003C11A0(self->position, &packet, 6, 0x72FF);
-            func_PAL_L00_003C11A0(self->position, &packet, 6, 0xFF0000);
+            part_l00_spawn_spark_burst_2_pal(self->position, &packet, 6, 0x72FF);
+            part_l00_spawn_spark_burst_2_pal(self->position, &packet, 6, 0xFF0000);
             table_clear_entry_flag(state->f50);
             pair_clear_owner_key_entries(self);
             handle = state->light_index;

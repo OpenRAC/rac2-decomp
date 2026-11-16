@@ -37,8 +37,8 @@ extern void vec_rotate_by_quaternion(void *,void *,void *);
 extern float math_random_signed_float_range(float,float);
 extern int FloatToInt(float);
 extern void FastVecSub(void *,void *,void *);
-extern char *func_PAL_002C23B8(void *,void *,int,int,int,int,float,float,float,float,float);
-void func_PAL_L00_003CD388(char *object)
+extern char *part_spawn_burst_pal(void *,void *,int,int,int,int,float,float,float,float,float);
+void weapon_spawn_muzzle_burst_pal(char *object)
 {
     BurstVec matrix, start, saved, position, velocity, local, temp, offset;
     float angle, speed, life;
@@ -97,7 +97,7 @@ void func_PAL_L00_003CD388(char *object)
         temp.z=position.z+math_random_signed_float_range(0.0f,g_muzzle_burst_jitter);
         life=math_random_float_range(g_muzzle_burst_life_min,g_muzzle_burst_life_max)*210000.0f;
         FastVecSub(&temp,&temp,&velocity);
-        p=func_PAL_002C23B8(&temp,&velocity,kind,g_muzzle_burst_count,0x505050,mode,life,g_muzzle_burst_size,g_muzzle_burst_param,0.0f,0.0f);
+        p=part_spawn_burst_pal(&temp,&velocity,kind,g_muzzle_burst_count,0x505050,mode,life,g_muzzle_burst_size,g_muzzle_burst_param,0.0f,0.0f);
         if(p) p[2]=g_effect_definitions.burstColors[1];
         if(math_fabs(angle)>0.00001f) {
             math_build_axis_angle_quat(&matrix,g_hero_matrix,angle);

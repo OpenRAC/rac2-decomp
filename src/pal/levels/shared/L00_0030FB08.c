@@ -2,16 +2,16 @@
 #include "names.h"
 
 extern int D_L00_001A904C_2 __attribute__((sda));
-extern int func_PAL_00341C18(int, int);
+extern int radial_menu_update_pal(int, int);
 
 /* func_PAL_L00_0030FB08, the PAL copy of func_L00_0030DCB8: the same C, where 0x3A388 becomes 0x3A570
    and the callee is PAL's own func_PAL_00341C18. */
-int func_PAL_L00_0030FB08(int argument)
+int level_l00_call_module_handler_with_arg_8_pal(int argument)
 {
     int value = D_L00_001A904C_2;
 
     if (value != 0)
-        return func_PAL_00341C18(value + 0x3A570, argument);
+        return radial_menu_update_pal(value + 0x3A570, argument);
     return 0;
 }
 

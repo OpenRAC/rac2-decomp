@@ -8,6 +8,8 @@ extern void *cam_alloc_override_slot_pal(int);
 extern void cam_end_override(void *);
 extern void field_override_apply_fields(char *);
 
+/* Starts the settings override when the player gets close and its condition is met, and undoes it
+ * again when the condition stops being true. (PAL) */
 void field_override_update_pal(char *object)
 {
     char *state = *(char **)(object + 0x68);

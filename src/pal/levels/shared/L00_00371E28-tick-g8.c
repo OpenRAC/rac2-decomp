@@ -48,9 +48,9 @@ extern int level_get_flag_b(void);
 extern int request_begin_slot(int, int, int, int, int);
 /* The neighbouring stub in most programs; another function in six of them. */
 extern unsigned int ref_L00_0036F488_00(void);
-extern int func_PAL_L00_0030BA48(void);
+extern int level_get_return_value_pal(void);
 extern int func_PAL_00299538(void);
-extern int func_PAL_L00_002D6E48(void);
+extern int level_is_mode_98_to_100_pal(void);
 extern int level_is_mode_in_set(void);
 extern int level_run_mode_update_zero(void);
 extern int level_is_tracked_object_of_selected_class(int);
@@ -59,7 +59,7 @@ extern void level_update_countdown_state_machine(void);
 extern int PadPressedWithin(int, int, int *);
 extern void hud_request_open(void);
 extern int hud_is_open_done(void);
-extern void func_PAL_L00_002CB5E8(void);
+extern void hero_update_button_hold_timers_pal(void);
 extern int level_is_counter_positive(void);
 extern int level_get_setting_value(void);
 extern void level_set_global_setting_value(int);
@@ -81,20 +81,22 @@ extern void UpdateLightingEnvironment(void);
 extern void gfx_compute_light_direction(void);
 extern int hud_update_record_timers_pal(int);
 extern void level_run_callbacks(void);
-extern void func_PAL_00289AA8(void);
+extern void subtitle_update_state_machine_pal(void);
 extern void game_update_idle_frame_counters_pal(void);
 
-void func_PAL_L00_00371E28(void)
+/* Per-frame level update: checks the pause, map and HUD requests from the pad, then runs the
+   usual per-frame update passes. */
+void level_update_game_frame_input_pal(void)
 {
     int blocked;
     int special;
 
     if (level_get_flag_b() && !request_begin_slot(4, 1, 1, 0, 0))
         return;
-    if (func_PAL_L00_0030BA48() && !g_game_l00_mode && (g_save_menu_flags & 0x600)
+    if (level_get_return_value_pal() && !g_game_l00_mode && (g_save_menu_flags & 0x600)
         && !request_begin_slot(4, 1, 1, 0, 0))
         return;
-    if (func_PAL_00299538() && !g_game_l00_mode && func_PAL_L00_0030BA48()
+    if (func_PAL_00299538() && !g_game_l00_mode && level_get_return_value_pal()
         && !request_begin_slot(4, 1, 1, 0, 0))
         return;
     if (ref_L00_0036F488_00())
@@ -115,13 +117,13 @@ void func_PAL_L00_00371E28(void)
     level_update_countdown_state_machine();
 
     if (PadPressedWithin(16, ((s32)g_pad_press_window * 5 + 2) / 6, 0) && g_pad_hold_frame_count >= 8) {
-        if (((Hero *)g_hero_state)->state != 0x6F && !func_PAL_L00_002D6E48() && ((Hero *)g_hero_state)->mode != 2 && ((Hero *)g_hero_state)->state != 0x31 && blocked
+        if (((Hero *)g_hero_state)->state != 0x6F && !level_is_mode_98_to_100_pal() && ((Hero *)g_hero_state)->mode != 2 && ((Hero *)g_hero_state)->state != 0x31 && blocked
             && ((Hero *)g_hero_state)->state != 0x1C && !g_game_l00_mode && g_hero_scalar_transition_value < 0.2f
             && ((Hero *)g_hero_state)->f22B4 < 2 && !g_input_block_flag && g_language_settings[3]) {
             hud_request_open();
             if (hud_is_open_done()) {
                 if (((Hero *)g_hero_state)->f22B4 != 1)
-                    func_PAL_L00_002CB5E8();
+                    hero_update_button_hold_timers_pal();
                 if (!request_begin_slot(4, 1, 7, 0, 0))
                     return;
             }
@@ -132,7 +134,7 @@ void func_PAL_L00_00371E28(void)
         if ((((PadState *)g_pad_state)->pressed & 0x800) || g_pad_device_idle_flag) {
             if (g_pad_hold_frame_count < 8)
                 goto normal;
-            if (((Hero *)g_hero_state)->state != 0x6F && !func_PAL_L00_002D6E48()
+            if (((Hero *)g_hero_state)->state != 0x6F && !level_is_mode_98_to_100_pal()
                 && (((Hero *)g_hero_state)->mode != 2 || ((Hero *)g_hero_state)->submode == 10)) {
                 if (!blocked || g_game_l00_mode)
                     goto second;
@@ -146,7 +148,7 @@ void func_PAL_L00_00371E28(void)
     }
 second:
     if (g_pad_hold_frame_count >= 8 && (((PadState *)g_pad_state)->pressed & 0x500)) {
-        if (((Hero *)g_hero_state)->f229C != 22 && ((Hero *)g_hero_state)->state != 0x6F && !func_PAL_L00_002D6E48() && blocked
+        if (((Hero *)g_hero_state)->f229C != 22 && ((Hero *)g_hero_state)->state != 0x6F && !level_is_mode_98_to_100_pal() && blocked
             && ((Hero *)g_hero_state)->state != 0x1C
             && !g_game_l00_mode) {
             if (level_is_mode_in_set()) {
@@ -202,7 +204,7 @@ normal:
         gfx_compute_light_direction();
         hud_update_record_timers_pal(1);
         level_run_callbacks();
-        func_PAL_00289AA8();
+        subtitle_update_state_machine_pal();
         game_update_idle_frame_counters_pal();
     }
 }

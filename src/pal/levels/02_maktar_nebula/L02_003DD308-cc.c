@@ -12,14 +12,14 @@ extern void mem_clear(void *, int, int);
 extern void brawler_switch_off_actor(char *);
 extern void *part_find_owned_effect_slot(char *, int, int);
 extern float moby_update_aim_target_strength_pal(char *, void *);
-extern void func_PAL_002AC290(int, char *);
+extern void gfx_start_color_fade_pal(int, char *);
 extern void moby_set_state(char *, int, int);
 extern void moby_copy_joint_transform_to_object(char *, char *, int, int);
 extern int weapon_select_aim_target(char *, int, int, int, float, float);
 extern void chainblade_advance_health_phase(char *);
 extern void arena_set_current_boss(void *, void *);
-extern void func_PAL_L02_003DD890(char *);
-extern void func_PAL_L02_003DDFD0(char *);
+extern void walker_boss_update_movement_shake_pal(char *);
+extern void twin_muzzle_turret_update_pal(char *);
 
 /* Field-at-use prefix only; the full state allocation is not inferred. */
 struct InitPrefix {
@@ -30,7 +30,8 @@ struct InitPrefix {
     u8 reserved8C[0x98]; float blend; u8 reserved128[0x11]; u8 active;
 };
 
-void func_PAL_L02_003DD308(char *self) {
+/* Sets up a Maktar walker boss on its first frame, then handles damage taken, its health, and hit reactions every frame. */
+void walker_boss_update_damage_pal(char *self) {
     char *state = *(char **)(self + 0x68);
     char *entry;
     char *part;
@@ -86,7 +87,7 @@ void func_PAL_L02_003DD308(char *self) {
             *(float *)(state + 0x20) -= amount;
             { int at = *(unsigned char *)(state + 0x37) * 4 + 0xE0; *(int *)((char *)g_boss_damage_totals + at) += (int)(amount * 32.0f); }
             if (*(short *)(state + 0x140) == 0)
-                func_PAL_002AC290((int)self, state + 0x140);
+                gfx_start_color_fade_pal((int)self, state + 0x140);
             if (amount > 3.0f && *(unsigned char *)(self + 0x20) == 6 && *(unsigned char *)(self + 0x42) == 7) {
                 *(short *)(state + 0x28A) = *(unsigned char *)(self + 0x20);
                 attacker = (char *)((*(int *)(*(char **)(self + 0x68) + 0x244) << 8) + D_L02_001B359C_1[0]);
@@ -122,6 +123,6 @@ void func_PAL_L02_003DD308(char *self) {
         }
         brawler_switch_off_actor(self);
     }
-    func_PAL_L02_003DD890(self);
-    func_PAL_L02_003DDFD0(self);
+    walker_boss_update_movement_shake_pal(self);
+    twin_muzzle_turret_update_pal(self);
 }

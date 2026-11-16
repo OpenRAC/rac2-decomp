@@ -57,7 +57,8 @@ static __inline__ int label_y(void *handle, float value, float scale, float half
     return result;
 }
 
-void func_PAL_L04_0041B850(void) {
+/* Draws the race timer box with the elapsed time from the 50 Hz frame counter (PAL). */
+void draw_race_timer_hud_pal(void) {
     float s;
     int x1, y1, x4, active;
     float fx, fy;

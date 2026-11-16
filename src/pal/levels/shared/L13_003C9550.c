@@ -10,62 +10,62 @@ extern int IsPointInCuboid(void *, int);
 extern int flag_set_first_pending(char *);
 extern void cam_lock_entry(int);
 extern int ForceClaimNotice(int, int, int);
-extern int func_PAL_L13_002CF0A0(int, int);
+extern int hero_set_action_state_pal(int, int);
 extern float FastAddRotations(float, float);
 
 /* State 0 opens the trigger; state 1 reacts to the hero being on the object, or being in state
  * 0x82 inside its cuboid. Then pulses the object's colour, in the channel the flag selects. */
-void func_PAL_L13_003C9550(char *obj)
+void warp_ring_trigger_update_pal(char *moby)
 {
-    char *rig = *(char **)(obj + 0x68);
+    char *vars = *(char **)(moby + 0x68);
     char *hero, *other;
-    int word, level, glow;
+    int cam_id, cuboid, alpha;
     float turn, pulse;
 
-    switch (*(unsigned char *)(obj + 0x20)) {
+    switch (*(unsigned char *)(moby + 0x20)) {
     case 0:
-        *(unsigned short *)(obj + 0x34) |= 0x10;
-        moby_set_state(obj, 1, -1);
+        *(unsigned short *)(moby + 0x34) |= 0x10;
+        moby_set_state(moby, 1, -1);
         break;
     case 1:
-        if (flag_set_first_pending(obj) != 0) {
-            word = *(int *)rig;
-            if (word != -1) {
-                cam_lock_entry(word);
-                *(int *)rig = -1;
+        if (flag_set_first_pending(moby) != 0) {
+            cam_id = *(int *)vars;
+            if (cam_id != -1) {
+                cam_lock_entry(cam_id);
+                *(int *)vars = -1;
             }
         }
         hero = g_hero_state;
-        if (*(char **)(hero + 0x33C) == obj && *(int *)(hero + 0x340) != 0) {
+        if (*(char **)(hero + 0x33C) == moby && *(int *)(hero + 0x340) != 0) {
             if (g_unlocked_item_flags[0xC0] != 0) {
                 ForceClaimNotice(0xC, 0x1349, 1);
                 *(short *)(hero + 0x1F2) = 0x8;
-                turn = *(float *)(rig + 0xC);
+                turn = *(float *)(vars + 0xC);
                 if (turn != 0.0f)
                     *(float *)(hero + 0x5B8) = turn;
             }
         } else {
             other = g_hero_state;
             if (*(int *)(other + 0x2294) == 0x82) {
-                level = *(int *)(rig + 8);
-                if (level >= 0 && IsPointInCuboid(other + 0x80, level) != 0)
-                    func_PAL_L13_002CF0A0(6, 1);
+                cuboid = *(int *)(vars + 8);
+                if (cuboid >= 0 && IsPointInCuboid(other + 0x80, cuboid) != 0)
+                    hero_set_action_state_pal(6, 1);
             }
         }
         break;
     }
-    if (*(unsigned char *)(obj + 0x31) != 0) {
-        pulse = FastAddRotations(*(float *)(rig + 4), 0.12566373f);
-        *(float *)(rig + 4) = pulse;
-        glow = FloatToInt(math_fast_sin_or_cos_b(pulse) * 128.0f);
-        if (glow > 0x80)
-            glow = 0x80;
-        else if (glow < 0x20)
-            glow = 0x20;
+    if (*(unsigned char *)(moby + 0x31) != 0) {
+        pulse = FastAddRotations(*(float *)(vars + 4), 0.12566373f);
+        *(float *)(vars + 4) = pulse;
+        alpha = FloatToInt(math_fast_sin_or_cos_b(pulse) * 128.0f);
+        if (alpha > 0x80)
+            alpha = 0x80;
+        else if (alpha < 0x20)
+            alpha = 0x20;
         if (g_unlocked_item_flags[0xC0] != 0)
-            *(int *)(obj + 0x78) = (glow << 8) | 0x80000000;
+            *(int *)(moby + 0x78) = (alpha << 8) | 0x80000000;
         else
-            *(int *)(obj + 0x78) = glow | 0x80000000;
+            *(int *)(moby + 0x78) = alpha | 0x80000000;
     }
 }
 

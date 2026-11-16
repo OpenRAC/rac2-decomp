@@ -6,6 +6,7 @@ extern char *CreateMoby(int);
 extern float math_random_signed_float_range(float, float);
 extern void func_002A0F48(void *);
 
+/* Creates a small flying object (class 3031) at a given place, with a random spin. */
 char *part_spawn_flying_chunk_a_pal(int id, void *data, void *source)
 {
     char *self = CreateMoby(0xBD7);

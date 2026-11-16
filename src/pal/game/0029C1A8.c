@@ -3,6 +3,7 @@
 typedef struct { int a; int b; } Pair;
 typedef struct { char pad[0x7AC8]; Pair pair[2]; } State;
 extern char *g_resident_data_base __attribute__((sda));
+/* Clears entry 0 or 1 of the level object table. */
 void level_clear_table_entry_pal(int index)
 {
     if ((unsigned int)index < 2) {

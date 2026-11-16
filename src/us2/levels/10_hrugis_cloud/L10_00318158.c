@@ -9,7 +9,7 @@
 extern void FastVecSub(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
 extern void anim_start_startup_animations(void);
-extern void func_US2_002E72D8(char *);
+extern void UpdateEquipmentPieces_us2(char *);
 extern void math_store_angle_update_result(char *, char *, int, int, float);
 extern void vec_fast_to_int_helper(char *, char *);
 extern void quaternion_to_rotation_basis(char *, char *);
@@ -31,7 +31,7 @@ extern Scene10 g_scene_marker_state;
 extern char g_scene_spark_table[];
 extern int g_current_map_index __attribute__((sda));
 
-void func_US2_L10_00318158(void)
+void hrugis_update_scene_effects_us2(void)
 {
     float pos[4] __attribute__((aligned(16)));
     union {
@@ -45,9 +45,9 @@ void func_US2_L10_00318158(void)
         char *current = g_scene_marker_state.objects[i];
         if (current && *(short *)(current + 0xAA) == 0xE29)
             *(unsigned short *)(current + 0x34) |= 0x800;
-        if (*(short *)(current + 0xAA) == 0xD54) func_US2_002E72D8(current);
+        if (*(short *)(current + 0xAA) == 0xD54) UpdateEquipmentPieces_us2(current);
         if (current) {
-            int class_id = 0xFA0;
+            int class_id = MOBY_CLASS_TV_SCREENS;
             if (*(short *)(current + 0xAA) == class_id && g_current_map_index != 0x33) {
                 char *state = *(char **)(current + 0x68);
                 if (state) math_store_angle_update_result(current, state + 0xC, 0x80AAAAD2, 0x80396464, 0.06108653545379639f);

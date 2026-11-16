@@ -48,7 +48,7 @@ extern int g_ship_record_word __attribute__((sda));
 extern int math_fast_float_d(void *);
 extern int coll_test_point(void *, int, void *, float);
 extern void hero_apply_damage_pal(float);
-extern void func_PAL_L05_004485A0(void *);
+extern void ship_start_record_playback_pal(void *);
 extern void FastVecSub(void *, void *, void *);
 extern void FastVecAdd(void *, void *, void *);
 extern void FastVecScale(void *, void *, float);
@@ -70,7 +70,7 @@ extern void part_spawn_impact_trail(void *);
 
 /* Sweeps the linked moby's movement in short steps, resolving contacts and
  * producing impact damage, recoil and a deferred collision trail. */
-void func_PAL_L05_0044B738(char *obj, void *target)
+void ResolveLinkedMobyMovementCollisions_pal(char *obj, void *target)
 {
     float delta[4] __attribute__((aligned(16)));
     float step[4] __attribute__((aligned(16)));
@@ -94,7 +94,7 @@ void func_PAL_L05_0044B738(char *obj, void *target)
         g_collision_l05_result.object &&
         *(short *)(g_collision_l05_result.object + 0xAA) == 0xF86) {
         hero_apply_damage_pal(1000);
-        func_PAL_L05_004485A0(obj);
+        ship_start_record_playback_pal(obj);
         return;
     }
     FastVecSub(delta, moby->position, target);
@@ -183,7 +183,7 @@ void func_PAL_L05_0044B738(char *obj, void *target)
         direction = dir;
 impact:
         if (math_fabs(FastVecDot(direction, moby->forward)) > 0.75f) {
-            func_PAL_L05_004485A0(obj);
+            ship_start_record_playback_pal(obj);
             continue;
         }
         FastVecScale(g_collision_l05_result.position, direction, g_ship_beam_step_distance);
@@ -208,6 +208,6 @@ impact:
         }
         gfx_add_draw_callback_third(part_spawn_impact_trail, moby);
         if (fast_vec_dist(target, moby->position) < 0.1f)
-            func_PAL_L05_004485A0(obj);
+            ship_start_record_playback_pal(obj);
     }
 }

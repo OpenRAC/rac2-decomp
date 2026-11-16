@@ -30,12 +30,12 @@ extern int map_screen_update_layout_pal(int, int);
 
 /* func_PAL_L00_0030F2C8, the PAL copy of func_L00_0030D478: the same C, where the offset 0x3B490
  * becomes 0x3B7A8 and the callee func_0033B540 becomes func_PAL_0033D468. */
-int func_PAL_L00_0030F2C8(int a0)
+int module_l00_call_handler_with_arg_9_pal(int argument)
 {
-    int v = D_L00_001A904C_2;
+    int value = D_L00_001A904C_2;
 
-    if (v != 0) {
-        return map_screen_update_layout_pal(v + 0x3B7A8, a0);
+    if (value != 0) {
+        return map_screen_update_layout_pal(value + 0x3B7A8, argument);
     }
     return 0;
 }

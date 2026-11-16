@@ -78,7 +78,7 @@ extern void part_spawn_pool_particle(void *);
    also carves the 64 particle records (D_L00_001B2AD4) and 12 trail records (D_L00_001B2AD8)
    out of the owner's pvars + 8 buffer and clears them; each call then seeds 20 particles
    through func_L00_003CB538. */
-L00PoolMoby *func_PAL_L00_003CF868(L00PoolMoby *owner, int value, void *position, void *direction)
+L00PoolMoby *SpawnParticlePoolMoby_pal(L00PoolMoby *owner, int value, void *position, void *direction)
 {
     char saved[16] __attribute__((aligned(16)));
     L00PoolMoby *object;

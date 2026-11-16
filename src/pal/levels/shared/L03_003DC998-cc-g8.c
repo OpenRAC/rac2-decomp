@@ -28,7 +28,7 @@ struct Moby {
     u8 pad61[7];
     void *vars;
     u8 pad6C[0x3E];
-    s16 objectClass;
+    s16 object_class;
     u8 padAC[0xC];
     Moby *owner;
     u8 padBC[4];
@@ -69,7 +69,7 @@ extern u8 g_charge_sound_records[];
 extern u8 g_default_vector[] __attribute__((sda));
 
 extern int vec_fast_helper_b(void *);
-extern int func_PAL_L03_002C7068(int, int);
+extern int hero_l03_enter_state_pal(int, int);
 extern int math_fast_float_d(void *);
 extern void FastVecScale(void *, void *, float);
 extern void FastVecAdd(void *, void *, void *);
@@ -81,17 +81,17 @@ extern float fast_vec_dist(void *, void *);
 extern float math_fabs(float);
 extern void hud_add_moby_marker(void *, float, unsigned int, void *, int, float, int, float, int);
 extern int get_ammo(int);
-extern void func_PAL_L00_002AF458(void);
+extern void start_equipped_item_animation_pal(void);
 extern int coll_process_hit(float, void *, int, void *, void *);
 extern int moby_is_in_special_class_range(void *);
 extern int PlayMobySound(int, int, void *);
-extern void func_PAL_L00_003CD388(void *);
+extern void weapon_spawn_muzzle_burst_pal(void *);
 extern void anim_start_blended_with_flags(void *, int, int, int, int);
 extern int slot_copy_records_to_free(void *);
 extern void matrix_mul_vec3(void *, void *, void *);
 extern char *pair_choose_owner_for_key(void *, void *, int, int *, int);
 extern void KeyOwnerTableInsert(void *, void *, int);
-extern Moby *func_PAL_L00_0040E9F0(void *, void *, void *, void *, float, float, float, float);
+extern Moby *aimed_projectile_spawn_pal(void *, void *, void *, void *, float, float, float, float);
 extern int weapon_spend_ammo(int, int);
 extern void slot_reset_active(int);
 extern void cancel_hero_item_animation_pal(void);
@@ -106,7 +106,8 @@ static __inline__ void MarkTarget(void *moby, float alpha, unsigned int color, v
     hud_add_moby_marker(moby, alpha, color, position, kind, a, b, c, d);
 }
 
-void func_PAL_L03_003DC998(Moby *moby)
+/* Updates the lock-on weapon moby: gathers the mobys in a cone ahead of it, marks them, fires a shot at the target with a cooldown from the weapon table and sets a muzzle light. (PAL) */
+void update_lock_on_weapon_l03_pal(Moby *moby)
 {
     Vars *vars = moby->vars;
     Vector direction, origin, aim;
@@ -128,7 +129,7 @@ void func_PAL_L03_003DC998(Moby *moby)
     }
     vec_fast_helper_b(vars);
     if (((Hero *)g_hero_state)->i[0x2294 / 4] == 1)
-        func_PAL_L03_002C7068(0x1D, 1);
+        hero_l03_enter_state_pal(0x1D, 1);
     ready = 1;
     if (((Hero *)g_hero_state)->i[0x2294 / 4] == 0x1D) {
         if (math_fast_float_d(&((Hero *)g_hero_state)->i[0x2534 / 4]) == 0)
@@ -188,7 +189,7 @@ void func_PAL_L03_003DC998(Moby *moby)
             float *info;
             Moby *shot;
 
-            func_PAL_L00_002AF458();
+            start_equipped_item_animation_pal();
             FastVecScale(start, &moby->forward, -1.0f);
             FastVecAdd(start, start, &moby->position);
             FastVecScale(step, &moby->right, 0.275f);
@@ -200,7 +201,7 @@ void func_PAL_L03_003DC998(Moby *moby)
                     float *hp = (float *)moby_get_private_value_0(hit);
 
                     if (hit->alive != 0 && hit->health > 0 && hit != 0 && hit->state != 0xFE && hit->state != 0xFD &&
-                        hit->objectClass != 0xC87 && hit->objectClass != 0xECC && hp != 0 &&
+                        hit->object_class != 0xC87 /* moby class 3207 */ && hit->object_class != 0xECC /* moby class 3788 */ && hp != 0 &&
                         (*hp > 0.0f || moby_is_in_special_class_range(hit) != 0) && (hit->model == 0 || hit->model->kind != 5)) {
                         target = g_collision_result.hit;
                         vars->target = target;
@@ -211,7 +212,7 @@ void func_PAL_L03_003DC998(Moby *moby)
             strength = 0.0f;
             PlayMobySound(1, 0, moby);
             vars->timer = 0xc;
-            func_PAL_L00_003CD388(moby);
+            weapon_spawn_muzzle_burst_pal(moby);
             anim_start_blended_with_flags(moby, 2, 0, 1, 0);
             moby->scale = 0.9f;
             vars->sound = slot_copy_records_to_free(g_charge_sound_records);
@@ -236,9 +237,9 @@ void func_PAL_L03_003DC998(Moby *moby)
                 strength = info[4];
         fire:
             if (((Hero *)g_hero_state)->ptr[0xBF8 / 4] != 0)
-                shot = func_PAL_L00_0040E9F0(moby, muzzle, ((Hero *)g_hero_state)->ptr[0xBF8 / 4], g_default_vector, strength, 2.0f, 5.0f, 0.6f);
+                shot = aimed_projectile_spawn_pal(moby, muzzle, ((Hero *)g_hero_state)->ptr[0xBF8 / 4], g_default_vector, strength, 2.0f, 5.0f, 0.6f);
             else
-                shot = func_PAL_L00_0040E9F0(moby, muzzle, target, g_default_vector, strength, 2.0f, 5.0f, 0.6f);
+                shot = aimed_projectile_spawn_pal(moby, muzzle, target, g_default_vector, strength, 2.0f, 5.0f, 0.6f);
             if (shot != 0)
                 shot->owner = moby;
             weapon_spend_ammo(-1, 1);
@@ -268,7 +269,7 @@ void func_PAL_L03_003DC998(Moby *moby)
             goto done;
     }
     if (vars->timer > 0) {
-        float red, green, blue, t;
+        float red, green, blue, fade;
         Vec spot, flash, offset;
 
         if (vars->timer >= 0xb) {
@@ -276,17 +277,17 @@ void func_PAL_L03_003DC998(Moby *moby)
 
             red = IntToFloat(0xc - vars->timer) * scale;
             green = IntToFloat(0xc - vars->timer) * (scale * 0.8f);
-            t = IntToFloat(0xc - vars->timer);
+            fade = IntToFloat(0xc - vars->timer);
             scale *= 0.5f;
-            blue = t * scale;
+            blue = fade * scale;
         } else {
             float scale = 1.0f / IntToFloat(0xa);
 
             red = IntToFloat(vars->timer) * scale;
             green = IntToFloat(vars->timer) * (scale * 0.8f);
-            t = IntToFloat(vars->timer);
+            fade = IntToFloat(vars->timer);
             scale *= 0.5f;
-            blue = t * scale;
+            blue = fade * scale;
         }
         if (((Hero *)g_hero_state)->h[0x24EC / 2] != 0) {
             FastVecScale(flash, &moby->forward, -1.0f);

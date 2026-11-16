@@ -38,15 +38,15 @@ static __inline__ void vzero(float *v) {
 /* A museum dust burst in the style of func_L08_00424FF8: the moby's own vector at vars
    joins the velocity, scaled in z. Own unit for -g: its line label gives the pre-div.s
    nop pair. */
-void func_PAL_L30_004106D0(char *m, void *position, int count,
-                      float speed, float rise, float maxRadius, float minRadius,
-                      float size, float endSize)
+void part_spawn_museum_dust_burst_pal(char *moby, void *position, int count,
+                      float speed, float rise, float max_radius, float min_radius,
+                      float size, float end_size)
 {
     float offset[4], velocity[4], accel[4], motion[4];
     int start, end;
-    int a, b, c;
+    int life_a, life_b, life_c;
     char *particle;
-    char *vars = *(char **)(m + 0x68);
+    char *vars = *(char **)(moby + 0x68);
 
     if (g_current_map_index == 21 || g_current_map_index == 30) {
         start = 0x30301010;
@@ -64,14 +64,14 @@ void func_PAL_L30_004106D0(char *m, void *position, int count,
         for (i = 0; i < count; i++) {
             float x, y;
             x = math_fast_sin_or_cos_a(math_random_float_range(-3.1415927410125732f, 3.1415927410125732f));
-            offset[0] = x * math_random_float_range(minRadius, maxRadius);
+            offset[0] = x * math_random_float_range(min_radius, max_radius);
             y = math_fast_sin_or_cos_b(math_random_float_range(-3.1415927410125732f, 3.1415927410125732f));
-            y *= math_random_float_range(minRadius, maxRadius);
+            y *= math_random_float_range(min_radius, max_radius);
             offset[1] = y;
             offset[2] = 0;
-            matrix_mul_vec3(offset, offset, m + 0xC0);
+            matrix_mul_vec3(offset, offset, moby + 0xC0);
             {
-                float range = speed * ((maxRadius - FastVecLength(offset)) * 0.020000001f) / maxRadius;
+                float range = speed * ((max_radius - FastVecLength(offset)) * 0.020000001f) / max_radius;
                 vec_scale_to_length(velocity, offset, math_random_float_range(range / g_museum_dust_range_divisor[0], range));
             }
             qcopy(motion, vars);
@@ -82,11 +82,11 @@ void func_PAL_L30_004106D0(char *m, void *position, int count,
             FastVecAdd(offset, offset, position);
             offset[2] += g_museum_dust_offset_z[0];
             velocity[3] = size;
-            accel[3] = endSize;
-            a = FloatToInt((math_random_float_range(g_museum_dust_range_a_min[0], g_museum_dust_range_a_max[0]) * 5.0f + 2.0f) * 0.16666667f);
-            b = FloatToInt((math_random_float_range(g_museum_dust_range_b_min[0], g_museum_dust_range_b_max[0]) * 5.0f + 2.0f) * 0.16666667f);
-            c = FloatToInt((math_random_float_range(g_museum_dust_range_c_min[0], g_museum_dust_range_c_max[0]) * 5.0f + 2.0f) * 0.16666667f);
-            particle = part_spawn_trail(offset, velocity, accel, start, end, a, b, c, -1);
+            accel[3] = end_size;
+            life_a = FloatToInt((math_random_float_range(g_museum_dust_range_a_min[0], g_museum_dust_range_a_max[0]) * 5.0f + 2.0f) * 0.16666667f);
+            life_b = FloatToInt((math_random_float_range(g_museum_dust_range_b_min[0], g_museum_dust_range_b_max[0]) * 5.0f + 2.0f) * 0.16666667f);
+            life_c = FloatToInt((math_random_float_range(g_museum_dust_range_c_min[0], g_museum_dust_range_c_max[0]) * 5.0f + 2.0f) * 0.16666667f);
+            particle = part_spawn_trail(offset, velocity, accel, start, end, life_a, life_b, life_c, -1);
             if (particle && (func_001163B0() & 1))
                 particle[3] = 0x48;
         }

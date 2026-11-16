@@ -2,7 +2,7 @@
  * sections (ties, shrubs, mobys, moby groups, paths, occlusion) into the aligned level
  * heap and returns the heap cursor. RAC1 counterpart: load_level_gameplay
  * (rac1-decomp src/overlays/shared/level_gameplay_loading.c), whose source shapes
- * this follows: the function-scope scratch int `tmp`, sequential record reads through
+ * this follows: the function-scope scratch int `scratch`, sequential record reads through
  * char pointers, and header words read as ints (RAC1 reads them as struct members).
  * The section-8 records are copied by an explicit goto loop: a do loop has its four
  * cursor advances turned into address givs by this cc1 (docs/COMPILER-NOTES.md).
@@ -315,7 +315,7 @@ extern float IntToFloat(int);
 extern void shrub_process_render_data(void *);
 extern void resolve_lookup_record(void *);
 extern int level_get_difficulty_scaled(int);
-extern void func_PAL_0029FA60(void *, int);
+extern void moby_init_instance_pal(void *, int);
 extern float coll_probe_ground_height_below(void *, int, float);
 extern void func_002A0F48(void *);
 extern void gfx_pack_render_command_fields(void *, u64, u64, u64, u64);
@@ -328,7 +328,7 @@ extern void SetupLevelCameras(void);
 extern void cam_update_state_pal(void);
 extern void pad_clear_port_state(void);
 extern void level_init_object_tables(void);
-extern void func_PAL_L00_00369AF8(void);
+extern void menu_reset_state_pal(void);
 extern void level_clear_slot_table(void);
 extern void level_l00_clear_counter_list(void);
 extern void level_l00_clear_counter_list_2(void);
@@ -338,13 +338,15 @@ extern void sheep_clear_active_list(void);
 extern void cam_set_transition_frames(float);
 extern void pickup_update_interactive(unsigned char *);
 
-char *func_PAL_L00_003021B0(int reload)
+/* Loads a level: reads and unpacks the level file, then relocates its sections (ties, shrubs, mobys,
+   moby groups, paths, occlusion and more) into the level heap and returns the heap cursor (PAL). */
+char *LoadLevelData_pal(int reload)
 {
     char *hdr = g_level_load_context.data;
     char *heap = g_level_load_context.heap;
-    float *startPos;
+    float *start_pos;
     short *idx = g_moby_index_table; /* moby index by file order, rebuilt at each use */
-    int tmp; /* scratch int: section 0x44's data base, a group's offset and end flag in the group loop */
+    int scratch; /* scratch int: section 0x44's data base, a group's offset and end flag in the group loop */
     char *p;
 
     if (!reload) {
@@ -402,7 +404,7 @@ char *func_PAL_L00_003021B0(int reload)
         g_level_float_param_second = *(float *)(p + 0xC);
         g_level_float_param_third = 1.0f;
     }
-    startPos = (float *)(p + 0x10);
+    start_pos = (float *)(p + 0x10);
     p += 0x20;
     g_hero_moby_default.i40 = *(int *)p;
     g_hero_moby_default.i44 = *(int *)(p + 4);
@@ -799,7 +801,7 @@ char *func_PAL_L00_003021B0(int reload)
         heap += n << 2;
         heap = ALIGN64_00618(heap);
         s += n;
-        tmp = (int)heap;
+        scratch = (int)heap;
         heap += size;
         heap = ALIGN64_00618(heap);
         if (n) {
@@ -808,14 +810,14 @@ char *func_PAL_L00_003021B0(int reload)
             for (i = 0; i < n; i++) {
                 if (offs[i] != -1) {
                     g_level_reloc_record.i20 = i + 1;
-                    ((int *)g_level_reloc_record.p1C)[i] = tmp + offs[i];
+                    ((int *)g_level_reloc_record.p1C)[i] = scratch + offs[i];
                 } else {
                     ((int *)g_level_reloc_record.p1C)[i] = 0;
                 }
             }
         }
         if (size)
-            mem_fast_helper_c((char *)tmp, (char *)(((int)s + 0xF) & ~0xF), size);
+            mem_fast_helper_c((char *)scratch, (char *)(((int)s + 0xF) & ~0xF), size);
     }
 
     /* section 8: 32-byte records */
@@ -1015,7 +1017,7 @@ char *func_PAL_L00_003021B0(int reload)
 
                 idx[i] = count;
                 m = g_moby_array_base[0] + count;
-                func_PAL_0029FA60(m, *(int *)p);
+                moby_init_instance_pal(m, *(int *)p);
                 p += 4;
                 m->hB2 = uid;
                 m->bB0 = cls;
@@ -1087,7 +1089,7 @@ char *func_PAL_L00_003021B0(int reload)
             int total = (count + n2) << 8;
 
             g_moby_list_tail = tail;
-            func_PAL_0029FA60(tail, 0);
+            moby_init_instance_pal(tail, 0);
             heap += total;
             tail->state = 0xFD;
             g_moby_array_end_sentinel = g_moby_list_tail + 1;
@@ -1217,9 +1219,9 @@ char *func_PAL_L00_003021B0(int reload)
             mem_fast_helper_c(base, q, size);
         mem_clear(g_turn_state_table, 0, 0x3C0);
         for (i = 0; i < n; i++, offs++) {
-            tmp = *offs;
-            if (tmp >= 0) {
-                int g = (int)(base + tmp);
+            scratch = *offs;
+            if (scratch >= 0) {
+                int g = (int)(base + scratch);
                 unsigned short *src;
                 short *dst;
 
@@ -1231,14 +1233,14 @@ char *func_PAL_L00_003021B0(int reload)
                     int id = *src;
                     short t;
 
-                    tmp = *(short *)src;
+                    scratch = *(short *)src;
                     g = (id & 0x7FFF) << 1; /* the entry's slot in the moby index, in two steps */
                     g += (int)idx;
-                    tmp &= 0x8000;
+                    scratch &= 0x8000;
                     t = *(short *)g;
                     if (t >= 0)
                         *dst++ = t;
-                    if (tmp) {
+                    if (scratch) {
                         if (g_turn_state_table[i] < (int)dst)
                             dst[-1] |= 0x8000;
                         else
@@ -1246,7 +1248,7 @@ char *func_PAL_L00_003021B0(int reload)
                         break;
                     }
                     src++;
-                } while (!tmp);
+                } while (!scratch);
             }
         }
     }
@@ -1466,13 +1468,13 @@ char *func_PAL_L00_003021B0(int reload)
 
     if (g_current_map_index >= 0) {
         g_hero_moby_default.hero = 0;
-        if (0.0f < startPos[0]) {
+        if (0.0f < start_pos[0]) {
             Moby00618 *m = CreateMoby(0xD54);
 
-            m->pos.f[0] = startPos[0];
-            m->pos.f[1] = startPos[1];
-            m->pos.f[2] = startPos[2];
-            m->rot[2] = startPos[3];
+            m->pos.f[0] = start_pos[0];
+            m->pos.f[1] = start_pos[1];
+            m->pos.f[2] = start_pos[2];
+            m->rot[2] = start_pos[3];
             m->h32 = 0xFF;
             m->b30 = 0x10;
             m->i64 = (int)pickup_update_interactive;
@@ -1730,7 +1732,7 @@ char *func_PAL_L00_003021B0(int reload)
     cam_update_state_pal();
     pad_clear_port_state();
     level_init_object_tables();
-    func_PAL_L00_00369AF8();
+    menu_reset_state_pal();
     level_clear_slot_table();
     level_l00_clear_counter_list();
     level_l00_clear_counter_list_2();

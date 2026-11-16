@@ -151,45 +151,45 @@ extern f32 fast_vec_dist(void *, void *);
 extern void hero_reset_position_and_direction_pal(void *, void *, s32, s32);
 extern void state_set_flag_one(void);
 extern void subtitle_begin_close(void);
-extern void func_PAL_L01_002EBFB8(s32, s32, s32, s32, s32);
+extern void trigger_subtitle_in_cuboid_pal(s32, s32, s32, s32, s32);
 extern void hud_queue_hint_message(s32, s32);
-extern s32 func_PAL_00289730(s32, s32);
+extern s32 subtitle_request_voice_line_pal(s32, s32);
 extern s32 snd_resume_music_stream(void);
 /* Each frame: tests the hero's position against the cuboids listed in the moby's pvars (IsPointInCuboid)
    and, from those and the saved counters, starts the numbered messages and scene dialogues. */
-void func_PAL_L01_003ED6B0(HintMoby *obj) {
-    OozlaHints *s = obj->pvars;
-    HintMoby *p;
-    s32 t, i, found;
+void hint_message_controller_update_pal(HintMoby *moby) {
+    OozlaHints *vars = moby->pvars;
+    HintMoby *scan_moby;
+    s32 swap, i, in_dialogue_area;
 
-    if (!obj->state) {
-        obj->alpha = 255;
-        obj->state = 1;
-        s->messageTimer = 17;
-        s->messageActive = 0;
-        s->counter = 0;
-        s->initialProgress = g_subtitle_history.fc0 | g_item_owned_flags[0x24];
-        s->dialogueIndex = 0;
-        s->departed = 0;
-        s->lastDialogue = -1;
-        s->dialogueTimer = 50;
+    if (!moby->state) {
+        moby->alpha = 255;
+        moby->state = 1;
+        vars->messageTimer = 17;
+        vars->messageActive = 0;
+        vars->counter = 0;
+        vars->initialProgress = g_subtitle_history.fc0 | g_item_owned_flags[0x24];
+        vars->dialogueIndex = 0;
+        vars->departed = 0;
+        vars->lastDialogue = -1;
+        vars->dialogueTimer = 50;
         if (!math_random_int_below(1)) {
-            t = s->dialogues[1];
-            s->dialogues[1] = s->dialogues[3];
-            s->dialogues[3] = t;
+            swap = vars->dialogues[1];
+            vars->dialogues[1] = vars->dialogues[3];
+            vars->dialogues[3] = swap;
         }
         if (g_item_owned_flags[0x24])
-            s->initialFlag = 1;
+            vars->initialFlag = 1;
         else
-            s->initialFlag = 0;
-        if (g_item_owned_flags[0x2e] && !g_game_flag_table.flag9b && s->cameraIndex != -1) {
-            u8 *camera = g_swamp_patrol_positions + (s->cameraIndex << 7);
+            vars->initialFlag = 0;
+        if (g_item_owned_flags[0x2e] && !g_game_flag_table.flag9b && vars->cameraIndex != -1) {
+            u8 *camera = g_swamp_patrol_positions + (vars->cameraIndex << 7);
             hero_reset_position_and_direction_pal(camera + 0x30, camera + 0x70, 0, 1);
             state_set_flag_one();
         }
     }
-    if (s->objectIndex != -1) {
-        HintMoby *door = (HintMoby *)(g_moby_l01_table + (s->objectIndex << 8));
+    if (vars->objectIndex != -1) {
+        HintMoby *door = (HintMoby *)(g_moby_l01_table + (vars->objectIndex << 8));
         if (door) {
             HintMoby *child = *(HintMoby **)((u8 *)door->pvars + 0xc);
             if (!g_item_owned_flags[0x13]) {
@@ -211,23 +211,23 @@ void func_PAL_L01_003ED6B0(HintMoby *obj) {
     }
     if ((!g_progress_statistics.f6c || (u32)(((s32)g_frame_counter * 5 + 2) / 6 - g_progress_statistics.f70) > 90000U) &&
         ((g_subtitle_history.f98 & (1U << g_current_map_index)) < 1U))
-        func_PAL_00289730(0x9b5, 12);
-    if (!g_subtitle_history.f9c && IsPointInCuboid(g_hero_state.position, s->area[0]) && !g_progress_statistics.fc)
-        func_PAL_00289730(0x9b6, 13);
-    if (IsPointInCuboid(g_hero_state.position, s->area[1]) && !g_subtitle_history.fa8)
-        func_PAL_00289730(0x9b7, 14);
-    if (IsPointInCuboid(g_hero_state.position, s->area[2])) {
-        if (s->messageActive)
+        subtitle_request_voice_line_pal(0x9b5, 12);
+    if (!g_subtitle_history.f9c && IsPointInCuboid(g_hero_state.position, vars->area[0]) && !g_progress_statistics.fc)
+        subtitle_request_voice_line_pal(0x9b6, 13);
+    if (IsPointInCuboid(g_hero_state.position, vars->area[1]) && !g_subtitle_history.fa8)
+        subtitle_request_voice_line_pal(0x9b7, 14);
+    if (IsPointInCuboid(g_hero_state.position, vars->area[2])) {
+        if (vars->messageActive)
             subtitle_begin_close();
-        s->messageActive = 0;
+        vars->messageActive = 0;
     }
-    if (IsPointInCuboid(g_hero_state.position, s->area[4]))
+    if (IsPointInCuboid(g_hero_state.position, vars->area[4]))
         g_subtitle_history.fc0 = 0xffff;
-    if (g_item_owned_flags[0x24] && IsPointInCuboid(g_hero_state.position, s->repeatArea) && !g_subtitle_history.fc0) {
+    if (g_item_owned_flags[0x24] && IsPointInCuboid(g_hero_state.position, vars->repeatArea) && !g_subtitle_history.fc0) {
         if (g_subtitle_history.fc4 + g_subtitle_history.fc2 >= ((s32)g_frame_counter * 5 + 2) / 6 - 2U) {
             g_subtitle_history.fc2++;
             if (g_subtitle_history.fc2 >= 150) {
-                func_PAL_00289730(0x9b9, 16);
+                subtitle_request_voice_line_pal(0x9b9, 16);
                 g_subtitle_history.fc2 = 0;
             }
         } else {
@@ -236,80 +236,80 @@ void func_PAL_L01_003ED6B0(HintMoby *obj) {
             g_subtitle_history.fc2 = 0;
         }
     }
-    if (g_item_owned_flags[0x2e] && IsPointInCuboid(g_hero_state.position, s->lateArea) &&
+    if (g_item_owned_flags[0x2e] && IsPointInCuboid(g_hero_state.position, vars->lateArea) &&
         (u32)(((s32)g_frame_counter * 5 + 2) / 6 - g_subtitle_history.fe8) > 3000U)
-        func_PAL_00289730(0x9bc, 19);
-    if (IsPointInCuboid(g_hero_state.position, s->completeArea0) ||
-        IsPointInCuboid(g_hero_state.position, s->completeArea1)) {
+        subtitle_request_voice_line_pal(0x9bc, 19);
+    if (IsPointInCuboid(g_hero_state.position, vars->completeArea0) ||
+        IsPointInCuboid(g_hero_state.position, vars->completeArea1)) {
         g_game_flag_table.flag9b = 1;
         g_subtitle_history.fe4 = 0xffff;
     }
-    if (!g_subtitle_history.fb4 && IsPointInCuboid(g_hero_state.position, s->area[3]) && g_progress_statistics.f18c < 100)
-        func_PAL_00289730(0x9b8, 15);
-    if (!g_subtitle_history.fcc && IsPointInCuboid(g_hero_state.position, s->area[5]) && g_progress_statistics.f198 < 3)
-        func_PAL_00289730(0x9ba, 17);
-    if (!g_subtitle_history.fd8 && IsPointInCuboid(g_hero_state.position, s->area[6]) && !g_progress_statistics.f0)
-        func_PAL_00289730(0x9bb, 18);
-    if (g_hero_state.weapon == 0x39 && IsPointInCuboid(g_hero_state.position, s->weaponArea) &&
+    if (!g_subtitle_history.fb4 && IsPointInCuboid(g_hero_state.position, vars->area[3]) && g_progress_statistics.f18c < 100)
+        subtitle_request_voice_line_pal(0x9b8, 15);
+    if (!g_subtitle_history.fcc && IsPointInCuboid(g_hero_state.position, vars->area[5]) && g_progress_statistics.f198 < 3)
+        subtitle_request_voice_line_pal(0x9ba, 17);
+    if (!g_subtitle_history.fd8 && IsPointInCuboid(g_hero_state.position, vars->area[6]) && !g_progress_statistics.f0)
+        subtitle_request_voice_line_pal(0x9bb, 18);
+    if (g_hero_state.weapon == 0x39 && IsPointInCuboid(g_hero_state.position, vars->weaponArea) &&
         !g_subtitle_history.f2b8 && !g_game_flag_table.flags7b.bits.bit1)
         g_progress_statistics.f1bc = 0;
-    if (IsPointInCuboid(g_hero_state.position, s->weaponArea) &&
+    if (IsPointInCuboid(g_hero_state.position, vars->weaponArea) &&
         (!g_progress_statistics.f1bc || (u32)(((s32)g_frame_counter * 5 + 2) / 6 - g_progress_statistics.f1c0) > 60000U) &&
         g_hero_state.weapon != 0x6f && g_hero_state.weapon != 0x39 &&
-        ((g_game_flag_table.flags7b.value ^ 1) & 1) && math_fast_float_d(&s->messageTimer) &&
+        ((g_game_flag_table.flags7b.value ^ 1) & 1) && math_fast_float_d(&vars->messageTimer) &&
         g_subtitle_history.f2c0 >= 0)
-        func_PAL_00289730(0x9e3, 0x3a);
-    if (IsPointInCuboid(g_hero_state.position, s->weaponArea) && g_hero_state.field220)
+        subtitle_request_voice_line_pal(0x9e3, 0x3a);
+    if (IsPointInCuboid(g_hero_state.position, vars->weaponArea) && g_hero_state.field220)
         g_game_flag_table.flags7b.bits.bit1 = 1;
-    if (IsPointInCuboid(g_hero_state.position, s->exitArea))
+    if (IsPointInCuboid(g_hero_state.position, vars->exitArea))
         g_game_flag_table.flags7b.bits.bit0 = 1;
-    if (!IsPointInCuboid(g_hero_state.position, s->departureArea))
-        s->departed = 1;
-    if (!g_map_visited_flags[2] && s->departed)
-        func_PAL_L01_002EBFB8(0x9e4, 0x3b, 1, s->messageArg, -1);
+    if (!IsPointInCuboid(g_hero_state.position, vars->departureArea))
+        vars->departed = 1;
+    if (!g_map_visited_flags[2] && vars->departed)
+        trigger_subtitle_in_cuboid_pal(0x9e4, 0x3b, 1, vars->messageArg, -1);
     if (!g_subtitle_history.f48) {
-        for (p = g_hint_moby_list; p; p = p->next) {
-            if (p->oClass == 0x326 && fast_vec_dist(p->position, g_hero_state.position) < 10.0f &&
+        for (scan_moby = g_hint_moby_list; scan_moby; scan_moby = scan_moby->next) {
+            if (scan_moby->oClass == 0x326 && fast_vec_dist(scan_moby->position, g_hero_state.position) < 10.0f &&
                 !g_hint_scene.key0 && g_hint_scene.key == -1 && !g_subtitle_history.f48 &&
-                !moby_is_state_one(p)) {
+                !moby_is_state_one(scan_moby)) {
                 if (g_hero_state.field24cc < g_player_stats)
-                    func_PAL_00289730(0x9af, 6);
-                else if (fast_vec_dist(p->position, g_hero_state.position) < 1.0f && !g_subtitle_history.f2e8)
-                    func_PAL_00289730(0x9e7, 0x3e);
+                    subtitle_request_voice_line_pal(0x9af, 6);
+                else if (fast_vec_dist(scan_moby->position, g_hero_state.position) < 1.0f && !g_subtitle_history.f2e8)
+                    subtitle_request_voice_line_pal(0x9e7, 0x3e);
             }
         }
     }
     if (level_get_table_entry_short(3) == 2 && level_get_table_entry_short(1) != 2 && !(g_game_flag_table.flags75 & 2) &&
-        IsPointInCuboid(g_hero_state.position, s->missionArea)) {
+        IsPointInCuboid(g_hero_state.position, vars->missionArea)) {
         g_game_flag_table.flags75 |= 2;
         hud_queue_hint_message(0xa3c, 0x93);
     }
     for (i = 0; i < 11; i++) {
-        if (IsPointInCuboid(g_hero_state.position, s->dialogueAreas[i]))
+        if (IsPointInCuboid(g_hero_state.position, vars->dialogueAreas[i]))
             break;
     }
-    found = i < 11;
-    if (IsPointInCuboid(g_hero_state.position, s->specialArea)) {
-        if (s->lastDialogue != 4 && !g_music_state.busy && g_music_state.key == -1) {
-            s32 key = s->specialDialogue;
+    in_dialogue_area = i < 11;
+    if (IsPointInCuboid(g_hero_state.position, vars->specialArea)) {
+        if (vars->lastDialogue != 4 && !g_music_state.busy && g_music_state.key == -1) {
+            s32 key = vars->specialDialogue;
             g_music_state.selection = 0;
             g_music_state.key = (key & 0x3fff) + 2000;
-            s->lastDialogue = 4;
-            s->dialogueTimer = 1500;
-            s->dialogueActive = 1;
+            vars->lastDialogue = 4;
+            vars->dialogueTimer = 1500;
+            vars->dialogueActive = 1;
         }
-    } else if (found && !g_music_state.busy && g_music_state.key == -1 && g_hero_state.weapon != 0x6f &&
-               math_fast_float_d(&s->dialogueTimer)) {
-        s32 key = s->dialogues[s->dialogueIndex];
+    } else if (in_dialogue_area && !g_music_state.busy && g_music_state.key == -1 && g_hero_state.weapon != 0x6f &&
+               math_fast_float_d(&vars->dialogueTimer)) {
+        s32 key = vars->dialogues[vars->dialogueIndex];
         g_music_state.selection = 0;
         g_music_state.key = (key & 0x3fff) + 2000;
-        s->lastDialogue = s->dialogues[s->dialogueIndex];
-        s->dialogueIndex = (s->dialogueIndex + 1) & 3;
-        s->dialogueTimer = 1500;
-        s->dialogueActive = 1;
+        vars->lastDialogue = vars->dialogues[vars->dialogueIndex];
+        vars->dialogueIndex = (vars->dialogueIndex + 1) & 3;
+        vars->dialogueTimer = 1500;
+        vars->dialogueActive = 1;
     }
-    if (s->dialogueActive == 1 && g_music_state.state == 3 && g_music_state.id < 6000) {
+    if (vars->dialogueActive == 1 && g_music_state.state == 3 && g_music_state.id < 6000) {
         snd_resume_music_stream();
-        s->dialogueActive = 0;
+        vars->dialogueActive = 0;
     }
 }

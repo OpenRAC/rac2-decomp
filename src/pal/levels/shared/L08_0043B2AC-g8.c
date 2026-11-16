@@ -20,22 +20,22 @@ extern float mat_fast_helper_a(float, float);
 extern float FastAddRotations(float, float);
 
 /* Interpolates an object between two points and turns it toward its target. */
-void func_PAL_L08_0043B2AC(u8 *self)
+void target_l08_follower_update_pal(u8 *moby)
 {
     float base[4] __attribute__((aligned(16)));
     float endpoint[4] __attribute__((aligned(16)));
     float delta[4] __attribute__((aligned(16)));
-    u8 *vars = *(u8 **)(self+0x68);
+    u8 *vars = *(u8 **)(moby+0x68);
     u8 *target;
     float distance;
     float limit, scale;
     int result;
-    *(float *)(self+0x2C) = *(float *)(*(u8 **)(self+0x24)+0x24) *
+    *(float *)(moby+0x2C) = *(float *)(*(u8 **)(moby+0x24)+0x24) *
         (g_attached_effect_scale + (g_follower_scale_max-g_attached_effect_scale)* *(float *)(vars+0x18));
-    self[0x23] = g_follower_moby_flag;
+    moby[0x23] = g_follower_moby_flag;
     target = *(u8 **)(vars+0x10);
     if (!target || target[0x20]==0xFE || target[0x20]==0xFD) {
-        moby_mark_spawned(self);
+        moby_mark_spawned(moby);
         return;
     }
     distance = vec_distance_xy(target+0x10, vars);
@@ -49,7 +49,7 @@ void func_PAL_L08_0043B2AC(u8 *self)
     delta[2] = g_follower_delta_z;
     matrix_mul_vec3(delta,delta,g_hero_l08_matrix);
     FastVecAdd(endpoint,delta,g_hero_l08_matrix-140);
-    if (distance < g_follower_near_distance) UpdateNearestTarget(self,vars);
+    if (distance < g_follower_near_distance) UpdateNearestTarget(moby,vars);
     if (distance < g_follower_target_range && (result > 0 || distance < g_hud_l08_bar_threshold[0]))
         *(float *)(vars+0x18) += g_follower_scale_step * 1.2f;
     else *(float *)(vars+0x18) -= g_follower_scale_step * 1.2f;
@@ -57,11 +57,11 @@ void func_PAL_L08_0043B2AC(u8 *self)
     else if (*(float *)(vars+0x18)<0.0f) *(float *)(vars+0x18)=0.0f;
     FastVecSub(delta,base,endpoint);
     FastVecScale(delta,delta,*(float *)(vars+0x18));
-    FastVecAdd(self+0x10,endpoint,delta);
-    *(float *)(self+0xF8) = mat_fast_helper_a(*(float *)vars-*(float *)(self+0x10),*(float *)(vars+4)-*(float *)(self+0x14));
-    distance = vec_distance_xy(self+0x10,vars);
-    distance = mat_fast_helper_a(distance,*(float *)(vars+8)-*(float *)(self+0x18));
+    FastVecAdd(moby+0x10,endpoint,delta);
+    *(float *)(moby+0xF8) = mat_fast_helper_a(*(float *)vars-*(float *)(moby+0x10),*(float *)(vars+4)-*(float *)(moby+0x14));
+    distance = vec_distance_xy(moby+0x10,vars);
+    distance = mat_fast_helper_a(distance,*(float *)(vars+8)-*(float *)(moby+0x18));
     scale = g_follower_angle_degrees*0.0003490659f;
-    *(float *)(self+0xF4) = -distance;
-    *(float *)(self+0xF0) = FastAddRotations(*(float *)(self+0xF0),scale);
+    *(float *)(moby+0xF4) = -distance;
+    *(float *)(moby+0xF0) = FastAddRotations(*(float *)(moby+0xF0),scale);
 }

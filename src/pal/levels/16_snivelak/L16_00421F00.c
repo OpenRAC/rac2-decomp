@@ -24,15 +24,16 @@ extern void DrawBeamQuads(void *);
 extern void make_hit_descriptor(char *,int,int,float,Quad16 *);
 extern int CollLine(void *,void *,int,void *,void *);
 extern float math_closest_point_on_segment(void *,void *,void *,void *);
-extern void func_PAL_L00_003E38E8(int,int);
-extern void func_PAL_L00_004071F0(char *,int);
+extern void tracked_moby_set_state_pal(int,int);
+extern void global_object_start_pal(char *,int);
 
+/* Swings a laser beam between two points, plays its sound, and hurts whatever the beam touches (PAL: 50 Hz rates). */
 void sweeping_laser_update_pal(char *object)
 {
     LaserWorkspace local;
     char *state=*(char **)(object+0x68);
     char *target;
-    char *sound,*sound2,*sound4;
+    char *hit_voice,*voice_b,*voice_a;
     int handle;
     switch(*(unsigned char *)(object+0x20)) {
     case 0:
@@ -47,14 +48,14 @@ void sweeping_laser_update_pal(char *object)
         moby_set_state((unsigned char *)object,1,-1);
         break;
     case 1:
-        sound4=g_sound_state+0x70**(int *)(state+0x24);
-        if((*(char **)(sound4+0x88))!=object || (*(unsigned char *)(sound4+0x74))==0) *(int *)(state+0x24)=snd_play_from_class_bank(0,4,object,0x113a);
+        voice_a=g_sound_state+0x70**(int *)(state+0x24);
+        if((*(char **)(voice_a+0x88))!=object || (*(unsigned char *)(voice_a+0x74))==0) *(int *)(state+0x24)=snd_play_from_class_bank(0,4,object,0x113a);
         vec_spring_to_target(object+0x10,state+0x10,state+0x20,0.0016000001f,0.0032000002f,0.080000006f);
         if(vec_distance_xy(object+0x10,state+0x10)<0.040000003f) moby_set_state((unsigned char *)object,2,-1);
         break;
     case 2:
-        sound2=g_sound_state+0x70**(int *)(state+0x24);
-        if((*(char **)(sound2+0x88))!=object || (*(unsigned char *)(sound2+0x74))==0) *(int *)(state+0x24)=snd_play_from_class_bank(0,4,object,0x113a);
+        voice_b=g_sound_state+0x70**(int *)(state+0x24);
+        if((*(char **)(voice_b+0x88))!=object || (*(unsigned char *)(voice_b+0x74))==0) *(int *)(state+0x24)=snd_play_from_class_bank(0,4,object,0x113a);
         vec_spring_to_target(object+0x10,state,state+0x20,0.0016000001f,0.0032000002f,0.080000006f);
         if(vec_distance_xy(object+0x10,state)<0.040000003f) moby_set_state((unsigned char *)object,1,-1);
         break;
@@ -69,8 +70,8 @@ void sweeping_laser_update_pal(char *object)
     if(CollLine(object+0x10,((float *)&local.beam),0,object,&local.request)!=0 && g_aim_target_moby==g_hero_moby) {
         handle=*(int *)(state+0x28);
         if(handle!=-1) {
-            sound=g_sound_state+handle*0x70;
-            if((*(char **)(sound+0x88))==object && (*(unsigned char *)(sound+0x74))!=0) goto sound_ready;
+            hit_voice=g_sound_state+handle*0x70;
+            if((*(char **)(hit_voice+0x88))==object && (*(unsigned char *)(hit_voice+0x74))!=0) goto sound_ready;
         }
         *(int *)(state+0x28)=snd_play_from_class_bank(1,0,object,0x113a);
     }
@@ -80,9 +81,9 @@ sound_ready:
     if(target!=0) {
         math_closest_point_on_segment(&local.closest,object+0x10,((float *)&local.beam),target+0x10);
         if(vec_distance_xy(&local.closest,target+0x10)<0.15f) {
-            if(*(short *)(target+0xaa)==0xb58) {
-                if(*(unsigned char *)(target+0x20)!=5) func_PAL_L00_003E38E8(1,2);
-            } else if(*(unsigned char *)(target+0x20)!=5) func_PAL_L00_004071F0((char *)1,2);
+            if(*(short *)(target+0xaa)==MOBY_CLASS_SPIDER_BOT) {
+                if(*(unsigned char *)(target+0x20)!=5) tracked_moby_set_state_pal(1,2);
+            } else if(*(unsigned char *)(target+0x20)!=5) global_object_start_pal((char *)1,2);
         }
     }
 }

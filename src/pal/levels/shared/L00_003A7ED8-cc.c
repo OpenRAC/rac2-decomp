@@ -60,11 +60,11 @@ extern MuzzleLight g_light_table[];
 extern WeaponEntry g_weapon_table_2[];
 extern u8 g_minirocket_sound_records[];
 
-extern void func_PAL_L00_003A77D8(void *);
+extern void EmitLayeredSparks_pal(void *);
 extern int vec_fast_helper_b(void *);
-extern int func_PAL_L00_002C4480(int, int);
+extern int hero_l00_set_action_pal(int, int);
 extern void anim_start_blended_with_flags(void *, int, int, int, int);
-extern void func_PAL_002A7E68(void *, int, int, int);
+extern void anim_start_blended_pal(void *, int, int, int);
 extern int get_ammo(int);
 extern int weapon_spend_ammo(int, int);
 extern void hud_add_moby_marker(void *, float, unsigned int, void *, int, float, int, float, int);
@@ -80,10 +80,10 @@ extern int math_fast_float_d(int *);
 extern int FastDecTimer(short *);
 extern int PlayMobySound(int, int, void *);
 extern int coll_process_hit(float, void *, int, void *, void *);
-extern void func_PAL_L00_003A7A68(Moby *);
+extern void part_spawn_fragment_fan_and_smoke_pal(Moby *);
 extern void weapon_spawn_muzzle_effect_pal(Moby *);
 extern void set_hero_animation_pal(int, int, float);
-extern void func_PAL_L00_002AF458(void);
+extern void start_equipped_item_animation_pal(void);
 extern void slot_reset_active(int);
 extern int slot_copy_records_to_free(void *);
 extern void moby_transform_joint_to_world(void *, int, void *);
@@ -92,7 +92,7 @@ extern void gfx_free_point_light(int);
 
 
 /* Acquires a stable target, fires and drives the short muzzle light. */
-void func_PAL_L00_003A7ED8(Moby *moby)
+void minirocket_tube_update_pal(Moby *moby)
 {
     TurretVars *vars = moby->vars;
     Vector direction, origin, aim, muzzle, offset, lift;
@@ -110,10 +110,10 @@ void func_PAL_L00_003A7ED8(Moby *moby)
         vars->candidate = 0;
         vars->aiming = 0;
     }
-    func_PAL_L00_003A77D8(moby);
+    EmitLayeredSparks_pal(moby);
     vec_fast_helper_b(vars);
     if (((Hero *)g_hero_state)->i[0x2294 / 4] == 1)
-        func_PAL_L00_002C4480(0x1D, 1);
+        hero_l00_set_action_pal(0x1D, 1);
     if (moby->animation == moby->nextAnimation && (moby->flags & 2))
         anim_start_blended_with_flags(moby, 1, 0, 2, 0);
     if (((Hero *)g_hero_state)->i[0x1450 / 4] != 0)
@@ -199,7 +199,7 @@ void func_PAL_L00_003A7ED8(Moby *moby)
     if (g_game_l00_mode != 2 && vars->cooldown == 0.0f && ((Hero *)g_hero_state)->b[0x22BC] == 0 && moby->animation < 2 &&
         (g_pad_state[0x1A0 / 4] & ((Hero *)g_hero_state)->u[0x1230 / 4]) && ((Hero *)g_hero_state)->i[0x1240 / 4] >= 19 && ready) {
         if (moby->nextAnimation == 0)
-            func_PAL_002A7E68(moby, 1, 0, 3);
+            anim_start_blended_pal(moby, 1, 0, 3);
         if (weapon_spend_ammo(-1, 1)) {
             g_minirocket_fire_held = 1;
             if (candidate == 0) {
@@ -241,13 +241,13 @@ void func_PAL_L00_003A7ED8(Moby *moby)
             }
             PlayMobySound(0, 0, moby);
             vars->flash = 12;
-            func_PAL_L00_003A7A68(moby);
+            part_spawn_fragment_fan_and_smoke_pal(moby);
             weapon_spawn_muzzle_effect_pal(moby);
             if (((Hero *)g_hero_state)->i[0x229C / 4] == 0 || (((Hero *)g_hero_state)->i[0x2294 / 4] == 2 && ((Hero *)g_hero_state)->f[0x24B8 / 4] < 0.7f))
                 set_hero_animation_pal(0x36, 1, 8.0f);
             else
-                func_PAL_L00_002AF458();
-            func_PAL_002A7E68(moby, 2, 0, 0);
+                start_equipped_item_animation_pal();
+            anim_start_blended_pal(moby, 2, 0, 0);
             vars->sound = slot_copy_records_to_free(g_minirocket_sound_records);
             {
                 WeaponEntry *weapon = g_weapon_table_2 + g_item_slot_to_record[0x1B];

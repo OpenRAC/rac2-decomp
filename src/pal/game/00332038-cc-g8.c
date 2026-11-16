@@ -38,7 +38,7 @@ extern void multiply_matrix3x3(void *, void *, void *);
    third row (+0xE0) follows the mean normal of the kept points and eases
    the position (+0x10) toward their centre along D_001B2830. Without any
    hit it sets state 4 and a velocity along the first row. */
-void func_PAL_00332038(char *object)
+void vehicle_settle_on_ground_pal(char *object)
 {
     float (*probes)[4] = g_vehicle_probe_vectors_b;
     float edges[8][4];

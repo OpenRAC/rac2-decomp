@@ -16,8 +16,9 @@ extern void vec_clear_128(void *);
 extern int FastTweenColor(int, int, float);
 extern void *part_spawn_trail(void *, void *, void *, int, int, int, int, int, int);
 
-void func_PAL_L00_002ED7E8(char *object, void *positionOffset, void *velocityOffset,
-                     int count, int palette, float positionSpread, float velocitySpread,
+/* Spawns a burst of sparks around an object, with colours picked by the palette number (PAL: 50 Hz timings). */
+void part_l00_spawn_spark_burst_pal(char *object, void *position_offset, void *velocity_offset,
+                     int count, int palette, float position_spread, float velocity_spread,
                      float width, float gravity, float duration)
 {
     BurstVector position, velocity, endpoint;
@@ -28,11 +29,11 @@ void func_PAL_L00_002ED7E8(char *object, void *positionOffset, void *velocityOff
     gravity *= 0.00040000002f;
     palette &= 0xFF;
     for (i = 0; i < count; i++) {
-        vec_random_direction(&position, 0.0f, positionSpread);
-        FastVecAdd(&position, &position, positionOffset);
+        vec_random_direction(&position, 0.0f, position_spread);
+        FastVecAdd(&position, &position, position_offset);
         vec_local_offset_to_world(object, &position, position.x, position.y, position.z);
-        vec_random_direction(&velocity, 0.0f, velocitySpread);
-        FastVecAdd(&velocity, &velocity, velocityOffset);
+        vec_random_direction(&velocity, 0.0f, velocity_spread);
+        FastVecAdd(&velocity, &velocity, velocity_offset);
         matrix_mul_vec3(&velocity, &velocity, object + 0xC0);
         scale = duration * math_random_float_range(0.5f, 1.5f);
         small = (scale * 50.0f + 2.0f) * 0.16666667f;

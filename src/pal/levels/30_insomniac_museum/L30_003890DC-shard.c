@@ -26,7 +26,8 @@ extern int FastDecTimer(void *);
 extern void moby_mark_spawned(void *);
 extern void part_queue_ground_shadow(void *, float);
 
-void func_PAL_L30_003B71B8(char *obj)
+/* Moves a museum shard along its direction, explodes it and damages things around it when it hits something, leaves the level box or runs out of life, and queues its ground shadow (PAL version). */
+void museum_shard_update_pal(char *obj)
 {
     Shard_3B3158 *st;
     V4_3B3158 from, dir, at;

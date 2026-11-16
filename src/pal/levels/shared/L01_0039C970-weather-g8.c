@@ -33,7 +33,7 @@ extern char g_level_origin_vec[];
 typedef struct { WeatherQuad vec; } WeatherWind;
 extern WeatherWind g_falling_l01_part_gravity __attribute__((sda));
 extern int moby_is_in_selected_zone(void *);
-extern void func_PAL_L01_0039C7E8(int);
+extern void part_pick_random_wind_and_count_pal(int);
 extern int vec_fast_helper_b(void *);
 extern void FastVecSub(void *, void *, void *);
 extern float vec_length_xy(void *);
@@ -49,14 +49,15 @@ extern void SpawnSpanParticle(void *, int, float, void *);
 extern void part_l01_spawn_burst_2_pal(void *, int, void *, float);
 
 
-void func_PAL_L01_0039C970(char *m)
+/* Spawns the falling rain or snow particles around the hero and the ground impacts, and follows the wind (PAL: 50 Hz speeds). */
+void update_weather_particles_pal(char *moby)
 {
     float pos[4], delta[4], origin[4], velocity[4], velocity2[4];
     int special, extras, count, i, level;
     float falloff, speed, minimum, jitter;
-    char *p;
+    char *vars;
 
-    if (!moby_is_in_selected_zone(m + 0x10))
+    if (!moby_is_in_selected_zone(moby + 0x10))
         return;
     g_weather_hero_ptr = g_weather_saved_word;
     level = g_current_map_index[0];
@@ -77,18 +78,18 @@ void func_PAL_L01_0039C970(char *m)
     }
     if (g_weather_min_override >= 0.0f)
         minimum = g_weather_min_override;
-    p = *(char **)(m + 0x68);
-    switch (*(unsigned char *)(m + 0x20)) {
+    vars = *(char **)(moby + 0x68);
+    switch (*(unsigned char *)(moby + 0x20)) {
     case 0:
-        *(unsigned char *)(m + 0x20) = 2;
-        *(unsigned char *)(m + 0x30) = 255;
-        func_PAL_L01_0039C7E8(special);
+        *(unsigned char *)(moby + 0x20) = 2;
+        *(unsigned char *)(moby + 0x30) = 255;
+        part_pick_random_wind_and_count_pal(special);
         goto finish;
     case 2: {
         float x, y, scale, z, top;
         if (vec_fast_helper_b(g_wind_change_delay))
-            func_PAL_L01_0039C7E8(special);
-        FastVecSub(delta, g_level_origin_vec, p + 0x30);
+            part_pick_random_wind_and_count_pal(special);
+        FastVecSub(delta, g_level_origin_vec, vars + 0x30);
         g_falling_l01_part_gravity.vec = *(WeatherQuad *)(delta);
         x = g_breakable_alpha_check_a[0] - g_weather_fade_start;
         y = g_breakable_alpha_check_b[0] - g_weather_blend_start;
@@ -200,6 +201,6 @@ void func_PAL_L01_0039C970(char *m)
         }
     }
 finish:
-    p += 0x30;
-    *(WeatherQuad *)(p) = *(WeatherQuad *)(g_level_origin_vec);
+    vars += 0x30;
+    *(WeatherQuad *)(vars) = *(WeatherQuad *)(g_level_origin_vec);
 }

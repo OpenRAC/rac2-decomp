@@ -34,61 +34,62 @@ typedef struct {
 } L07Obj;
 extern void vec_fast_to_int_helper(void *src, Vec2 *dst);
 extern void quaternion_to_rotation_basis(Vec2 *src, Vec2 *dst);
-extern void matrix_mul_vec3(Vec2 *out, Vec2 *in, Vec2 *mat);
+extern void matrix_mul_vec3(Vec2 *out, Vec2 *in, Vec2 *rotation);
 extern void FastVecScale(Vec2 *out, Vec2 *in, f32 scale);
 extern void FastVecAdd(Vec2 *out, Vec2 *in, Vec2 *add);
 
+/* Places four marker points around the level object, scaled and turned to match the object it follows. */
 void moby_build_followed_points_pal(void) {
-    Vec2 mat[3];
-    Vec2 buf[3];
-    void *obj;
-    int idx;
+    Vec2 rotation[3];
+    Vec2 quat[3];
+    void *followed_obj;
+    int slot_index;
     f32 scale;
-    L07Mat *g;
-    Vec2 *p;
-    Vec2 *q;
+    L07Mat *points_matrix;
+    Vec2 *point;
+    Vec2 *base_point;
     int i;
 
     if (g_current_map_index != 7)
         return;
 
-    obj = 0;
-    idx = -1;
+    followed_obj = 0;
+    slot_index = -1;
     switch (g_followed_points_state.type) {
     case 2:
-        obj = g_followed_points_state.obj;
-        idx = 2;
+        followed_obj = g_followed_points_state.obj;
+        slot_index = 2;
         break;
     case 3:
-        obj = g_followed_points_state.obj;
-        idx = 2;
+        followed_obj = g_followed_points_state.obj;
+        slot_index = 2;
         break;
     }
-    if (idx == -1)
+    if (slot_index == -1)
         goto end;
-    if (obj == 0)
+    if (followed_obj == 0)
         goto end;
-    if (g_followed_points_state.slot[idx] == 0)
+    if (g_followed_points_state.slot[slot_index] == 0)
         goto end;
 
-    g = &g_followed_points_matrix;
-    g_followed_points_state.f50 = g;
-    p = &g->m[0];
-    q = (Vec2 *)&g_followed_point_vec;
+    points_matrix = &g_followed_points_matrix;
+    g_followed_points_state.f50 = points_matrix;
+    point = &points_matrix->m[0];
+    base_point = (Vec2 *)&g_followed_point_vec;
 
-    vec_fast_to_int_helper((u8 *)((L07Obj *)obj)->f58 + 0x10, buf);
-    quaternion_to_rotation_basis(buf, mat);
-    scale = ((L07Obj *)obj)->f2C / *(f32 *)((u8 *)((L07Obj *)obj)->f24 + 0x24);
+    vec_fast_to_int_helper((u8 *)((L07Obj *)followed_obj)->f58 + 0x10, quat);
+    quaternion_to_rotation_basis(quat, rotation);
+    scale = ((L07Obj *)followed_obj)->f2C / *(f32 *)((u8 *)((L07Obj *)followed_obj)->f24 + 0x24);
 
     for (i = 0; i < 4; i++) {
-        matrix_mul_vec3(p, q, mat);
-        FastVecScale(p, p, scale);
-        FastVecAdd(p, p, (Vec2 *)((u8 *)obj + 0x10));
-        p++;
-        q++;
+        matrix_mul_vec3(point, base_point, rotation);
+        FastVecScale(point, point, scale);
+        FastVecAdd(point, point, (Vec2 *)((u8 *)followed_obj + 0x10));
+        point++;
+        base_point++;
     }
 
-    ((L07Mat *)g_followed_points_state.f50)->f68 = g_followed_points_state.slot[idx];
+    ((L07Mat *)g_followed_points_state.f50)->f68 = g_followed_points_state.slot[slot_index];
 
 end:
     if (g_followed_points_state.type == 2) {

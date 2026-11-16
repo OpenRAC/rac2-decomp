@@ -96,14 +96,14 @@ extern void multiply_matrix3x3(void *, void *, void *);
 extern int vec_fast_helper_d(void *, void *);
 typedef int PickupVectorBits __attribute__((mode(TI)));
 
-/* Award ammo on collection, then move and rotate the pickup into the hero. */
-void func_US2_00320A20(PickupObject *object)
+/* Updates a weapon ammo pickup: awards the ammo when the hero is in reach, then pulls the pickup into the hero (USA v2.00). */
+void UpdateWeaponAmmoPickup_us2(PickupObject *object)
 {
     float old[4], move[4], delta[4], angle[4];
     float before[4], after[4], offset[4], pivot[4], rotation[12];
-    float speed, time, target;
+    float speed, frames_left, target;
     PickupData *data = object->data;
-    char *heroPos;
+    char *hero_pos;
     int i, changed, allow, item, previous, count;
 
     switch (object->state) {
@@ -177,29 +177,29 @@ void func_US2_00320A20(PickupObject *object)
         break;
     case 2:
         /* The hero's basis vectors lie at fixed offsets around its position. */
-        heroPos = g_hero_state + 0x80;
-        FastVecSub(old, object->pos, heroPos);
-        matrix_mul_vec3(old, old, heroPos - 0x40);
+        hero_pos = g_hero_state + 0x80;
+        FastVecSub(old, object->pos, hero_pos);
+        matrix_mul_vec3(old, old, hero_pos - 0x40);
         target = 8.0f;
         if (old[2] > 0.0f)
             target = 0.0f;
         ApproachValue(&data->pull, target, 0.0066666668f);
-        vec_scale_to_length(move, heroPos - 0x60, data->pull);
+        vec_scale_to_length(move, hero_pos - 0x60, data->pull);
         FastVecAdd(object->pos, object->pos, move);
-        FastVecAdd(object->pos, object->pos, heroPos + 0xD0);
+        FastVecAdd(object->pos, object->pos, hero_pos + 0xD0);
         speed = FastVecLength(data);
         ApproachValue(&speed, 1.0666667f, 0.0066666668f);
-        FastVecSub(delta, heroPos + 0x60, object->pos);
-        time = FastVecLength(delta) / speed;
-        if (time < 30.0f)
+        FastVecSub(delta, hero_pos + 0x60, object->pos);
+        frames_left = FastVecLength(delta) / speed;
+        if (frames_left < 30.0f)
             ApproachValue(&object->lifetime, 0.0f, object->def->fadeRate * (1.0f / 30.0f));
-        if (object->lifetime == 0.0f || time <= 1.0f) {
+        if (object->lifetime == 0.0f || frames_left <= 1.0f) {
             moby_mark_spawned(object);
             return;
         }
         vec_scale_to_length(data, delta, speed);
         FastVecAdd(object->pos, object->pos, data);
-        FastVecCross(angle, heroPos - 0x60, data);
+        FastVecCross(angle, hero_pos - 0x60, data);
         vec_set_direction_with_complement(angle, angle, 0.087266475f);
         *(PickupVectorBits *)pivot = 0;
         pivot[2] = 0.3f;

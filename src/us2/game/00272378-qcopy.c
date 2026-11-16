@@ -19,29 +19,30 @@ extern void cam_update_grounded(void);
 extern void gfx_blend_fog_from_cam_region(void *);
 extern void cam_update_fov_transition(void);
 
+/* Updates the camera state each frame: copies the target object's vectors into it and rebuilds its derived vectors. */
 void cam_update_state_us2(void) {
-    char *d = g_active_camera;
-    char *obj;
+    char *cam = g_active_camera;
+    char *target;
     char *p;
     char *q;
     char *r;
 
-    *(int *)(d + 0x404) = *(int *)(d + 0x404) + 1;
+    *(int *)(cam + 0x404) = *(int *)(cam + 0x404) + 1;
     cam_update_scalar_transition();
     cam_update_second_scalar_transition();
     cam_select_coll_masks();
     cam_update_follow_hero();
     cam_update_active();
-    obj = *(char **)(d + 0x190);
-    if ((unsigned)(*(unsigned short *)(d + 0x290) - 1) < 2)
-        cam_begin_mode_change(*(void **)(d + 0x194));
-    if (*(short *)(d + 0x290) == 3) {
-        moby_test_and_snapshot(obj);
+    target = *(char **)(cam + 0x190);
+    if ((unsigned)(*(unsigned short *)(cam + 0x290) - 1) < 2)
+        cam_begin_mode_change(*(void **)(cam + 0x194));
+    if (*(short *)(cam + 0x290) == 3) {
+        moby_test_and_snapshot(target);
     } else {
-        qcopy(d + 0x140, obj + 0x30);
-        qcopy(d + 0x370, obj);
-        qcopy(d + 0x380, obj + 0x10);
-        qcopy(d + 0x390, obj + 0x20);
+        qcopy(cam + 0x140, target + 0x30);
+        qcopy(cam + 0x370, target);
+        qcopy(cam + 0x380, target + 0x10);
+        qcopy(cam + 0x390, target + 0x20);
     }
     if (stub_empty_22()) {
         p = g_active_camera + 0x140;

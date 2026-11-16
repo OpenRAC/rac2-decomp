@@ -11,25 +11,26 @@ extern void moby_mark_spawned(void *);
 extern int g_oozla_intro_timer;
 extern int ref_L01_00412E00_00 __attribute__((sda));
 
-void triggered_flash_update_pal(unsigned char *a0) {
-    unsigned char *s1 = *(unsigned char **)(a0 + 0x68);
+/* Breakable flash object: waits for a hit, then bursts into pieces and removes itself (PAL copy). */
+void triggered_flash_update_pal(unsigned char *moby) {
+    unsigned char *vars = *(unsigned char **)(moby + 0x68);
 
-    switch (a0[0x20]) {
+    switch (moby[0x20]) {
     case 0:
         ref_L01_00412E00_00 = ref_L01_00412E00_00 + 1;
-        moby_set_state(a0, 1, -1);
+        moby_set_state(moby, 1, -1);
         break;
     case 1:
-        if (part_find_owned_effect_slot(a0, 0x04010000, 0) != 0 && *(int *)s1 == 0) {
+        if (part_find_owned_effect_slot(moby, 0x04010000, 0) != 0 && *(int *)vars == 0) {
             ref_L01_00412E00_00 = g_oozla_intro_timer - 1;
-            moby_set_state(a0, 2, -1);
+            moby_set_state(moby, 2, -1);
         }
-        a0[0xA8] = 0xFF;
+        moby[0xA8] = 0xFF;
         break;
     case 2:
-        part_explode_object_into_pieces_pal(a0, &g_fade_in_param_a, &g_fade_in_param_b, &g_fade_in_param_c, 0xFFFF, 0, -1, 0,
+        part_explode_object_into_pieces_pal(moby, &g_fade_in_param_a, &g_fade_in_param_b, &g_fade_in_param_c, 0xFFFF, 0, -1, 0,
                     0xFFFF, 0xFF, 0);
-        moby_mark_spawned(a0);
+        moby_mark_spawned(moby);
         break;
     }
 }

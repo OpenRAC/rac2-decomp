@@ -6,7 +6,7 @@ typedef struct {
     short action;
     int value;
     short text2;
-    unsigned short fadeTimer;
+    unsigned short fade_timer;
 } ListEntry;
 typedef struct {
     u8 pad00[8];
@@ -58,7 +58,7 @@ typedef struct {
     u8 pad0BC[0xA0];
     int state;
     int pad160;
-    int pendingState;
+    int pending_state;
 } MemoryCardState;
 typedef struct {
     int sector;
@@ -69,7 +69,7 @@ typedef struct {
     StreamEntry *entries;
     int flags;
     u8 pad38[8];
-    int *languageBase;
+    int *language_base;
     int state;
     int buffer[2];
     int loaded[2];
@@ -140,7 +140,7 @@ static inline void loadEntry(MenuStream *stream, int index, int slot)
 
 /* Picks the resource to show from the screen's flags, then streams it into the two buffers
  * and unpacks it. Adapted from RAC1 src/game/pause.c, update_menu_resource_stream (GPL-3.0). */
-int func_PAL_002DB044(MenuStream *stream)
+int UpdateMenuResourceStream_pal(MenuStream *stream)
 {
     int flags;
     int index;
@@ -169,7 +169,7 @@ int func_PAL_002DB044(MenuStream *stream)
             index = 0;
         if (index >= 5)
             index = 4;
-        if (card->state < 3 && card->pendingState < 0 && menus->age >= 11) {
+        if (card->state < 3 && card->pending_state < 0 && menus->age >= 11) {
             if (stream->state == -1)
                 stream->state = 0;
             index = card->slots[index].resource;
@@ -190,7 +190,7 @@ int func_PAL_002DB044(MenuStream *stream)
         index = (stream->frames / 250) % 19;
     } else if (flags & 0x1000) {
         offsets = g_language_offsets;
-        index = *stream->languageBase + offsets.values[g_is_pal_video.language];
+        index = *stream->language_base + offsets.values[g_is_pal_video.language];
     } else {
         MenuScreen *list = g_active_menu_object->focus;
         ListEntry *entries = list->data.list.entries;

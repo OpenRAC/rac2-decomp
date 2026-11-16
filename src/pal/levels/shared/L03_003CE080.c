@@ -5,6 +5,7 @@ extern void moby_set_state(u8 *, s32, s32);
 extern s32 flag_is_third_pending_set(u8 *);
 extern f32 math_step_value_toward_target(void *, void *, f32, f32, f32, f32);
 
+/* Updates a rising object (moby class 2401 or 3719). It grows in, plays an animation, then floats up to its top height and marks itself finished. (PAL: 50 Hz rise rates) */
 void rising_moby_update_pal(u8 *object)
 {
     u8 *vars = *(u8 **)(object + 0x68);

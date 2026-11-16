@@ -35,28 +35,28 @@ extern u8 *D_L03_001B2A1C_tbl[] __asm__("D_L03_001B2A1C") __attribute__((sda));
 
 /* Picks the actor's next motion slot: case 0 draws a random turn rate, case 1
    re-checks the 0x70-stride table entry before refreshing the aim. */
-void func_PAL_L03_003CFE58(char *a0)
+void ant_ring_update_pal(char *moby)
 {
-    char *s0 = a0;
-    char *s1 = *(char **)(s0 + 0x68);
+    char *obj = moby;
+    char *vars = *(char **)(obj + 0x68);
 
-    switch (*(u8 *)(s0 + 0x20)) {
+    switch (*(u8 *)(obj + 0x20)) {
     case 0:
-        moby_set_state(s0, 1, -1);
-        *(f32 *)(s1 + 4) = math_random_signed_float_range(60.0f, 90.0f) * 0.0003490659f;
-        *(s32 *)(s1 + 8) = -1;
+        moby_set_state(obj, 1, -1);
+        *(f32 *)(vars + 4) = math_random_signed_float_range(60.0f, 90.0f) * 0.0003490659f;
+        *(s32 *)(vars + 8) = -1;
         break;
     case 1: {
-        s32 v = *(s32 *)s1;
+        s32 has_sound = *(s32 *)vars;
 
-        if (v != 0) {
-            char *p = g_sound_l03_slot_table + *(s32 *)(s1 + 8) * 0x70;
+        if (has_sound != 0) {
+            char *slot = g_sound_l03_slot_table + *(s32 *)(vars + 8) * 0x70;
 
-            if (*(char **)(p + 0x88) != s0 || *(u8 *)(p + 0x74) == 0)
-                *(s32 *)(s1 + 8) = PlayMobySound(0, 4, s0);
+            if (*(char **)(slot + 0x88) != obj || *(u8 *)(slot + 0x74) == 0)
+                *(s32 *)(vars + 8) = PlayMobySound(0, 4, obj);
         }
-        *(f32 *)(s0 + 0xF8) = FastAddRotations(*(f32 *)(s0 + 0xF8),
-            *(f32 *)(s1 + 4));
+        *(f32 *)(obj + 0xF8) = FastAddRotations(*(f32 *)(obj + 0xF8),
+            *(f32 *)(vars + 4));
         break;
     }
     }

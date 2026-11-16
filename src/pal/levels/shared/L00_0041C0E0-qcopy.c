@@ -17,36 +17,37 @@ extern void beam_glow_sprites_update_owned_pal(char *);
 extern void moby_mark_spawned(char *);
 extern void ref_L00_004170A8_00(void (*)(char *), char *);
 
+/* Updates the spark effect object (moby class 5022). Each frame it picks a random spot nearby for a new spark, and when its time is up it frees all the sparks and removes itself. */
 void spark_l00_effect_update_pal(char *object)
 {
     char *state = *(char **)(object + 0x68);
-    V4_L00_004170A8 local;
-    float a, b;
+    V4_L00_004170A8 end_point;
+    float azimuth, elevation;
     int i;
-    char *p;
+    char *record;
     if (math_fast_float_d(state) == 0) {
         if (*(int *)(state + 4) == 0)
             part_emit_spark_burst_at_moby_pal(object);
         if (*(int *)(state + 4) == 0) {
-            a = math_random_angle();
-            b = math_random_angle();
-            vec_build_spherical_offset(&local, 7.0f, a, b);
+            azimuth = math_random_angle();
+            elevation = math_random_angle();
+            vec_build_spherical_offset(&end_point, 7.0f, azimuth, elevation);
         } else {
-            a = math_random_angle();
-            b = math_random_angle();
-            vec_build_spherical_offset(&local, 5.0f, a, b);
+            azimuth = math_random_angle();
+            elevation = math_random_angle();
+            vec_build_spherical_offset(&end_point, 5.0f, azimuth, elevation);
         }
-        FastVecAdd(&local, &local, object + 0x10);
-        if (CollLine(object + 0x10, &local, 0, object, 0) != 0)
-            local = g_hero_l00_position;
-        spark_record_claim_pal(object, &local, 17);
+        FastVecAdd(&end_point, &end_point, object + 0x10);
+        if (CollLine(object + 0x10, &end_point, 0, object, 0) != 0)
+            end_point = g_hero_l00_position;
+        spark_record_claim_pal(object, &end_point, 17);
         spark_records_update(object);
         ref_L00_004170A8_00(beam_glow_sprites_update_owned_pal, object);
     } else {
-        p = g_spark_l00_records;
-        p += 0x106C;
-        for (i = 23; i >= 0; --i, p -= 0xB0)
-            *(int *)p = 0;
+        record = g_spark_l00_records;
+        record += 0x106C;
+        for (i = 23; i >= 0; --i, record -= 0xB0)
+            *(int *)record = 0;
         if (*(int *)(state + 4) == 0)
             part_spawn_drifting_particles_pal(object);
         moby_mark_spawned(object);
@@ -62,6 +63,7 @@ extern int math_random_int_range(int, int);
 extern void ref_L00_00417868_00(void *, void *, void *, void *, void *, float);
 extern void ref_L00_00417868_01(void *, int, void *, int);
 
+/* Builds a jagged lightning bolt of 25 points between two ends, with small random wobble, and draws it (PAL: lower threshold, 8). */
 void lightning_bolt_build_jittered_b_pal(char *object, char *state) {
     CurveVector points[25];
     CurveVector start, end, jitter;

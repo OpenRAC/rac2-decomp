@@ -4,7 +4,8 @@
 extern int g_menu_mode __attribute__((sda));
 extern int g_level_return_value __attribute__((sda));
 
-int func_PAL_L00_0030BA48(void) {
+/* Returns the level return value. */
+int level_get_return_value_pal(void) {
     return g_level_return_value;
 }
 
@@ -18,7 +19,8 @@ extern unsigned char g_save_name_data[];
 extern unsigned char g_save_name_format[];
 extern char *strncpy(void *, int, int);
 
-void func_PAL_L00_0030BA80(unsigned char *source)
+/* Builds the save file names from the disc's region code and serial characters. */
+void save_build_file_names_pal(unsigned char *source)
 {
     int i;
     int value = source[0x12];

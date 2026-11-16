@@ -107,7 +107,7 @@ extern void initialize_moby_animation_blend(void *, HeldAnimationSlot *, int, in
 /* advances the held-item slots (following the item's held animation, fading the weight in, or out
  * after a cancel and releasing the slot at zero), then rebuilds the hero's held-pose basis: from
  * the rail angles or look target in control mode 15, otherwise from the moby's matrix */
-void func_PAL_L00_002AF750(void)
+void update_hero_held_items_and_orientation_pal(void)
 {
     HeldAnimationHero *owner = &g_hero_state;
     int i;

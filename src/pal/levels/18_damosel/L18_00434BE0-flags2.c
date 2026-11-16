@@ -18,8 +18,9 @@ extern void part_spawn_small_spark_smoke_pal(void *,int);
 extern float fast_vec_dist(void *,void *);
 extern float g_camera_l18_position[];
 extern void moby_update_ground_check(void *);
-extern void func_PAL_002B14F8(void *,float *,float,int,int);
+extern void value_set_and_smooth_pal(void *,float *,float,int,int);
 
+/* Updates the Extermibot every frame: counts time, keeps the torso and beam parts attached to the body, draws its electric beam, and puffs smoke when the torso is gone. (PAL version) */
 void extermibot_update_parts_pal(unsigned char *object)
 {
     float position[4] __attribute__((aligned(16)));
@@ -76,6 +77,6 @@ void extermibot_update_parts_pal(unsigned char *object)
         void *child=*(void **)(state+0x7C4);
         *(short *)(state+0x808)=0;
         if(child)
-            func_PAL_002B14F8(child,(float *)(state+0x810),2.5f,5,1);
+            value_set_and_smooth_pal(child,(float *)(state+0x810),2.5f,5,1);
     }
 }

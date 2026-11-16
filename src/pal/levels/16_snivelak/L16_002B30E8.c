@@ -66,12 +66,13 @@ extern void FastVecSub(void *, void *, void *);
 extern float FastVecLength(void *);
 extern void vec_scale_to_length(void *, void *, float);
 
+/* Pushes the hero out of nearby collision and returns -1 if that moved the hero too far (PAL). */
 int hero_l16_push_out_of_collision_pal(int mode)
 {
     Vec previous;
     Vec offset, displacement;
     float extent;
-    int facingUp, iteration, hit;
+    int facing_up, iteration, hit;
 
     if (PLAYER->collision_off_frames) return 1;
     qcopy(&previous, &PLAYER->position);
@@ -80,8 +81,8 @@ int hero_l16_push_out_of_collision_pal(int mode)
         hero_check_timed_condition();
         PLAYER->path_constrain_pending = 0;
     }
-    facingUp = 0;
-    if (FastVecDot(&PLAYER->basis, &PLAYER->up) > -0.92f) facingUp = 1;
+    facing_up = 0;
+    if (FastVecDot(&PLAYER->basis, &PLAYER->up) > -0.92f) facing_up = 1;
     switch (PLAYER->control_mode) {
     case 17:
         break;
@@ -91,7 +92,7 @@ int hero_l16_push_out_of_collision_pal(int mode)
         matrix_mul_vec3(&offset, &offset, PLAYER->moby + 0xc0);
         break;
     default:
-        if (PLAYER->gravity_mode || PLAYER->timer || facingUp) {
+        if (PLAYER->gravity_mode || PLAYER->timer || facing_up) {
             if (PLAYER->state == 2) {
                 cam_offset_point_in_view_space((Quad *)&offset, (Quad *)&offset, 5.0f);
             } else if (PLAYER->gravity_mode == 1 || PLAYER->timer) {
@@ -112,7 +113,7 @@ int hero_l16_push_out_of_collision_pal(int mode)
             if (!coll_test_point(0.54f, &PLAYER->position, 0x324, PLAYER->moby)) break;
         } else {
             PlayerView *player = PLAYER;
-            if (player->gravity_mode || facingUp) {
+            if (player->gravity_mode || facing_up) {
                 hit = coll_test_point(player->capsule_radius, &player->position, 0x324, player->moby);
                 if (!player->locked)
                     hit |= coll_process_triangles(&player->position, player->capsule_radius);

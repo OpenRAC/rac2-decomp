@@ -8,12 +8,12 @@ extern float math_random_float_range(float a, float b);
 extern char *moby_get_motion_data(char *object);
 extern void *state_get_stored_pointer_value(char *object);
 extern void level_append_object(char *object, int a1, int a2, int a3);
-extern void func_PAL_002A7E68(char *object, int a1, int a2, int a3);
-extern void func_PAL_L05_0037E8E0(char *object);
+extern void anim_start_blended_pal(char *object, int a1, int a2, int a3);
+extern void follower_l05_update_pal(char *object);
 extern int moby_process_collision_hit(char *object, int a1, int a2, int a3);
 extern void moby_check_player_in_view_and_range(char *object, int a1, float a2);
 extern int moby_can_take_next_step(char *object);
-extern void func_PAL_L05_0037DE20(char *object);
+extern void follower_start_wander_pal(char *object);
 extern int math_fast_float_d(char *block);
 extern int math_fast_helper_a(char *buf, float value);
 extern void gfx_add_draw_callback_third(void *fn, char *object);
@@ -36,7 +36,7 @@ extern void feltzin_enemy_init_position_fast_pal(char *obj);
 void feltzin_enemy_c_update_pal(char *object)
 {
     char *state = *(char **)(object + 0x68);
-    Target05 *r;
+    Target05 *motion;
     Vec buf;
 
     if (*(unsigned char *)(object + 0x20) == 0) {
@@ -44,44 +44,44 @@ void feltzin_enemy_c_update_pal(char *object)
         if (state_get_stored_pointer_value(object) == 0)
             return;
         feltzin_enemy_init_position_fast_pal(object);
-        func_PAL_002A7E68(object, 1, 0, 0);
+        anim_start_blended_pal(object, 1, 0, 0);
         vec_clear_128((char *)&buf);
         *(float *)(object + 0x48) = math_random_float_range(0.9f, 1.1f);
         if (*(int *)(state + 0x264) != 0) {
             char *base;
-            int *p;
+            int *rec_owner;
             int i;
 
             level_append_object(object, 0, 0, 0);
             base = g_beam_owned_records;
-            p = (int *)(base + 0x27F0);
+            rec_owner = (int *)(base + 0x27F0);
             i = 0x7F;
             do {
-                *p = 0;
-                p -= 0x14;
+                *rec_owner = 0;
+                rec_owner -= 0x14;
                 i--;
             } while (i >= 0);
         }
         return;
     }
-    r = (Target05 *)moby_get_motion_data(object);
-    if (r->mode == 0)
+    motion = (Target05 *)moby_get_motion_data(object);
+    if (motion->mode == 0)
         return;
     {
         int one = 1;
 
-        func_PAL_L05_0037E8E0(object);
+        follower_l05_update_pal(object);
         moby_process_collision_hit(object, 0, 0, 0);
         moby_check_player_in_view_and_range(object, one, 64.0f);
-        if (r->mode == one) {
+        if (motion->mode == one) {
             if (*(int *)(state + 0x260) != -1) {
-                r->has_target = 1;
-                r->target = g_feltzin_target_mobys + *(int *)(state + 0x260) * 256;
+                motion->has_target = 1;
+                motion->target = g_feltzin_target_mobys + *(int *)(state + 0x260) * 256;
             }
-            if (r->x108 != 0 && r->x104 != 0)
+            if (motion->x108 != 0 && motion->x104 != 0)
                 beam_fire_burst_pal(object);
             if (moby_can_take_next_step(object) != 0)
-                func_PAL_L05_0037DE20(object);
+                follower_start_wander_pal(object);
             math_fast_float_d(state + 0x268);
             qcopy(&buf, object + 0x10);
             buf.f[3] = *(float *)(object + 0xC) * 0.00097656f;

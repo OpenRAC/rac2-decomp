@@ -19,7 +19,9 @@ extern void cam_compute_offset(void *,int,float);
 #define F651(p,o) (*(float *)((p)+(o)))
 #define I651(p,o) (*(int *)((p)+(o)))
 #define B651(p,o) (*(unsigned char *)((p)+(o)))
-void func_PAL_00336710(char *obj, void *out)
+/* Updates the camera pivot offset for the object, blending between the camera, hero and state
+ * vectors by the pivot state (PAL: 50 Hz timings). */
+void cam_update_pivot_state_pal(char *obj, void *out)
 {
     V651 base, temp;
 
@@ -27,7 +29,7 @@ void func_PAL_00336710(char *obj, void *out)
     char *state = *(char **)(obj+0x70)+0x60;
     char *axis;
     int mode, blocked;
-    float f;
+    float factor;
     if (g_hero_state.h348 || g_ground_check_inhibit || (H651(state,0xEE) && g_hero_state.h34E)) {
         H651(state,0xEC)=12;
         B651(state,0xD6)=1;
@@ -46,14 +48,14 @@ void func_PAL_00336710(char *obj, void *out)
             axis=cam+0x30;
             if ((unsigned)(mode-5)<3 || mode==3)
                 cam_compute_offset(state+0x30,1,g_cam_pivot_offset_scale*0.5f);
-            f=IntToFloat(H651(state,0xD8))/IntToFloat(12);
-            H651(state,0xD8)=FloatToInt(IntToFloat(H651(state,0xEC))*f);
+            factor=IntToFloat(H651(state,0xD8))/IntToFloat(12);
+            H651(state,0xD8)=FloatToInt(IntToFloat(H651(state,0xEC))*factor);
             H651(state,0xEE)=2;
         } else {
             axis=cam+0x30;
             if (H651(state,0xEE)>=2) {
-            f=FastVecDot(state,axis);
-            FastVecScale(state+0x10,axis,f);
+            factor=FastVecDot(state,axis);
+            FastVecScale(state+0x10,axis,factor);
             qcopy(state+0x20,state+0x10);
             mode=B651(state,0xC4);
             axis=cam+0x30;
@@ -70,12 +72,12 @@ void func_PAL_00336710(char *obj, void *out)
         FastVecScale(out,axis,FastVecDot(axis,state+0x60));
         qcopy(state+0x10,out);
         if (B651(state,0xC4)!=11) {
-            char *p;
+            char *timer_state;
             B651(state,0xC4)=11;
             qcopy(obj+0x40,obj);
-            p=*(char **)(obj+0x70)+0x20;
-            H651(p,0)=((s32)(g_cam_pivot_mode_value) * 5 + 2) / 6;
-            F651(p,0x24)=1.0f/IntToFloat(H651(p,0));
+            timer_state=*(char **)(obj+0x70)+0x20;
+            H651(timer_state,0)=((s32)(g_cam_pivot_mode_value) * 5 + 2) / 6;
+            F651(timer_state,0x24)=1.0f/IntToFloat(H651(timer_state,0));
         }
         return;
     }
@@ -91,13 +93,13 @@ void func_PAL_00336710(char *obj, void *out)
         if (g_hero_state.h34C && (!g_hero_state.b49E || g_hero_state.h4AE>=16)) blocked=1;
         else if (cam_resolve_position(&temp,1)!=1) blocked=1;
         else {
-            f=FastVecDot(&temp,axis);
-            if (f<FastVecLength(state+0x10)) blocked=1;
+            factor=FastVecDot(&temp,axis);
+            if (factor<FastVecLength(state+0x10)) blocked=1;
         }
         if (blocked) {
             qcopy(out,state+0x10);
-            f=FastVecDot(&base,axis);
-            FastVecScale(&temp,axis,f);
+            factor=FastVecDot(&base,axis);
+            FastVecScale(&temp,axis,factor);
             FastVecSub(state,&base,&temp);
         } else {
             cam_resolve_position(&temp,1);
@@ -112,8 +114,8 @@ void func_PAL_00336710(char *obj, void *out)
             qcopy(state+0x30,state+0x10); B651(state,0xD7)=1;
         }
         qcopy(out,state+0x10);
-        f=FastVecDot(&base,axis);
-        FastVecScale(&temp,axis,f);
+        factor=FastVecDot(&base,axis);
+        FastVecScale(&temp,axis,factor);
         FastVecSub(state,&base,&temp);
         if (FastDecTimer(state+0xD4)) {
             if (B651(state,0xC4)==9) {
@@ -132,8 +134,8 @@ void func_PAL_00336710(char *obj, void *out)
         break;
     case 8:
         qcopy(out,state+0x10);
-        f=FastVecDot(&base,axis);
-        FastVecScale(&temp,axis,f);
+        factor=FastVecDot(&base,axis);
+        FastVecScale(&temp,axis,factor);
         FastVecSub(state,&base,&temp);
         break;
     case 9: case 10:

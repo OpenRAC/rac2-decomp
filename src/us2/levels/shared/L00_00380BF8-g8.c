@@ -6,6 +6,7 @@ extern unsigned int g_screen_overlay_color;
 extern short g_screen_overlay_active;
 extern void func_002E5C40(void);
 
+/* Resets the screen overlay and sets its colour from the active flag. */
 void gfx_reset_screen_overlay_us2(void)
 {
     func_002F0538(0);

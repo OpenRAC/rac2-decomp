@@ -13,30 +13,31 @@ extern void cam_set_transition_frames(float);
 extern void pad_clear_port_state(void);
 extern float FastAddRotations(float, float);
 
+/* Ends the scene and starts the closing transition. */
 void scene_end_playback_pal(void) {
-    char *p;
-    char *scene;
-    float v[4] __attribute__((aligned(16)));
+    char *state;
+    char *mode_block;
+    float pose[4] __attribute__((aligned(16)));
 
     music_Unpause();
-    p = g_hero_state;
-    p[0x22B5] = 0;
+    state = g_hero_state;
+    state[0x22B5] = 0;
     stub_empty_5_pal();
-    scene = g_hero_moby_default;
-    if (*(short *)(scene + 0x2A) != 0) {
+    mode_block = g_hero_moby_default;
+    if (*(short *)(mode_block + 0x2A) != 0) {
         stub_empty_10(1);
-        p[0x22B5] = 0;
+        state[0x22B5] = 0;
         stub_empty_5_pal();
         stub_empty_19_pal();
         cam_set_transition_frames(7.0f);
         pad_clear_port_state();
     } else {
-        p = scene + 0x80;
-        *(TI128 *)v = *(TI128 *)p;
-        v[2] = FastAddRotations(v[2], -2.3f);
-        scene += 0x70;
-        stub_empty_15(scene, v, 0, 1);
-        stub_empty_15(scene, p, 0, 0);
+        state = mode_block + 0x80;
+        *(TI128 *)pose = *(TI128 *)state;
+        pose[2] = FastAddRotations(pose[2], -2.3f);
+        mode_block += 0x70;
+        stub_empty_15(mode_block, pose, 0, 1);
+        stub_empty_15(mode_block, state, 0, 0);
         cam_set_transition_frames(7.0f);
         pad_clear_port_state();
     }

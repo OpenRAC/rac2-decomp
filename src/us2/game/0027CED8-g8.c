@@ -39,7 +39,7 @@ extern char ref_0027C878_07[];
 /* Incremental descriptor construction follows RAC1 draw.c (GPL-3.0).
  * Resolve a cached texture descriptor, allocating VRAM and queuing its upload
  * when necessary. Negative identifiers select the render-target descriptors. */
-TextureBits func_US2_0027CED8(int id)
+TextureBits tex_get_effect_descriptor_us2(int id)
 {
     if (id < 0) {
         if (id == -5)

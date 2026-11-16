@@ -9,7 +9,7 @@ extern int math_random_int_below(int);
 extern void *part_spawn_trail(void *, void *, void *, int, int, int, int, int, int);
 
 /* Two puffs at the object's offset point, each with a small random drift and growth. */
-void func_PAL_002E9F58(char *object)
+void ship_spawn_exhaust_puffs_pal(char *object)
 {
     f32 position[3] __attribute__((aligned(16)));
     f32 from[3] __attribute__((aligned(16)));

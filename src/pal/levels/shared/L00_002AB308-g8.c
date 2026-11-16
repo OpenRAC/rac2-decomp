@@ -60,6 +60,7 @@ extern void cam_set_limits_fourth(float, float);
 extern void cam_set_limits_second(float, float);
 extern int hero_slot_item_id(int);
 
+/* Picks new random head and body turn targets while the hero stands idle, and eases toward them (PAL). */
 void UpdateHeroPitchAndYawEasingTargets_pal(void)
 {
     float x;

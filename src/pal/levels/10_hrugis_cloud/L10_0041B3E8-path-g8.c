@@ -20,25 +20,26 @@ extern u8 g_mission_state[];
 extern f32 g_child_curve_distance NOT_SDA;
 extern s32 g_boss_flag_a __attribute__((sda));
 
+/* Spawns a child on the curve point nearest the boss and sets up the curve points it will follow (PAL copy of hrugis_launch_child_on_curve). */
 void hrugis_launch_child_on_curve_pal(u8 *obj) {
     f32 up[4] __attribute__((aligned(16)));
     f32 delta[4] __attribute__((aligned(16)));
     f32 scaled[4] __attribute__((aligned(16)));
     f32 closest[4] __attribute__((aligned(16)));
     f32 correction[4] __attribute__((aligned(16)));
-    u8 *s = *(u8 **)(obj + 0x68);
-    u8 *best, *p, *target, *childpos;
+    u8 *vars = *(u8 **)(obj + 0x68);
+    u8 *best, *p, *target, *child_pos;
     s32 *index;
     f32 distance, d, scale;
     s32 i;
     *(TI128 *)up = 0;
     up[2] = 1.0f;
-    if (((HrugisPathState *)s)->child) return;
+    if (((HrugisPathState *)vars)->child) return;
     p = SpawnFreeLevelObjectById_pal(0xF8D, 1);
-    ((HrugisPathState *)s)->child = p;
+    ((HrugisPathState *)vars)->child = p;
     distance = g_child_curve_distance;
     best = 0;
-    for (index = (s32 *)(s + 0x2A0), i = 3; i >= 0; i--, index++) {
+    for (index = (s32 *)(vars + 0x2A0), i = 3; i >= 0; i--, index++) {
         p = g_curve_point_records + *index * 128;
         d = fast_vec_dist(p + 0x30, obj + 0x10);
         if (d < distance) {
@@ -48,38 +49,38 @@ void hrugis_launch_child_on_curve_pal(u8 *obj) {
     }
     if (!best) return;
     target = g_curve_point_records + *(s32 *)g_mission_state * 128;
-    childpos = ((HrugisPathState *)s)->child + 0x10;
-    qcopy(childpos, best + 0x30);
-    FastVecSub(delta, target + 0x30, childpos);
+    child_pos = ((HrugisPathState *)vars)->child + 0x10;
+    qcopy(child_pos, best + 0x30);
+    FastVecSub(delta, target + 0x30, child_pos);
     delta[3] = 0;
-    vec_scale_to_length(((HrugisPathState *)s)->child + 0xC0, delta, 1.0f);
-    FastVecCross(((HrugisPathState *)s)->child + 0xD0, ((HrugisPathState *)s)->child + 0xC0, up);
-    *(s32 *)(((HrugisPathState *)s)->child + 0xDC) = 0;
-    vec_scale_to_length(((HrugisPathState *)s)->child + 0xD0, ((HrugisPathState *)s)->child + 0xD0, 1.0f);
-    FastVecCross(((HrugisPathState *)s)->child + 0xE0, ((HrugisPathState *)s)->child + 0xD0, ((HrugisPathState *)s)->child + 0xC0);
-    *(s32 *)(((HrugisPathState *)s)->child + 0xEC) = 0;
+    vec_scale_to_length(((HrugisPathState *)vars)->child + 0xC0, delta, 1.0f);
+    FastVecCross(((HrugisPathState *)vars)->child + 0xD0, ((HrugisPathState *)vars)->child + 0xC0, up);
+    *(s32 *)(((HrugisPathState *)vars)->child + 0xDC) = 0;
+    vec_scale_to_length(((HrugisPathState *)vars)->child + 0xD0, ((HrugisPathState *)vars)->child + 0xD0, 1.0f);
+    FastVecCross(((HrugisPathState *)vars)->child + 0xE0, ((HrugisPathState *)vars)->child + 0xD0, ((HrugisPathState *)vars)->child + 0xC0);
+    *(s32 *)(((HrugisPathState *)vars)->child + 0xEC) = 0;
     /* Retail keeps the saved position pointer live across these copies. */
-    qcopy_nc(s + 0x260, ((HrugisPathState *)s)->child + 0x10);
-    qcopy_nc(s + 0x270, obj + 0x10);
-    d = fast_vec_dist(s + 0x260, s + 0x270);
+    qcopy_nc(vars + 0x260, ((HrugisPathState *)vars)->child + 0x10);
+    qcopy_nc(vars + 0x270, obj + 0x10);
+    d = fast_vec_dist(vars + 0x260, vars + 0x270);
     scale = math_ease_out_quad(d * 0.001953129889f) * 160.0f;
     vec_scale_to_length(scaled, delta, scale);
-    FastVecAdd(s + 0x280, scaled, s + 0x260);
-    math_closest_point_on_segment(closest, s + 0x260, s + 0x270, s + 0x280);
-    FastVecSub(correction, s + 0x280, closest);
+    FastVecAdd(vars + 0x280, scaled, vars + 0x260);
+    math_closest_point_on_segment(closest, vars + 0x260, vars + 0x270, vars + 0x280);
+    FastVecSub(correction, vars + 0x280, closest);
     FastVecScale(correction, correction, -1.0f);
-    FastVecAdd(s + 0x280, closest, correction);
-    FastVecSub(delta, target + 0x30, s + 0x270);
+    FastVecAdd(vars + 0x280, closest, correction);
+    FastVecSub(delta, target + 0x30, vars + 0x270);
     vec_scale_to_length(scaled, delta, scale);
-    FastVecAdd(s + 0x290, scaled, s + 0x270);
-    math_closest_point_on_segment(closest, s + 0x260, s + 0x270, s + 0x290);
-    FastVecSub(correction, s + 0x290, closest);
+    FastVecAdd(vars + 0x290, scaled, vars + 0x270);
+    math_closest_point_on_segment(closest, vars + 0x260, vars + 0x270, vars + 0x290);
+    FastVecSub(correction, vars + 0x290, closest);
     FastVecScale(correction, correction, -1.0f);
-    FastVecAdd(s + 0x290, closest, correction);
-    FastVecSub(delta, s + 0x260, s + 0x270);
+    FastVecAdd(vars + 0x290, closest, correction);
+    FastVecSub(delta, vars + 0x260, vars + 0x270);
     vec_scale_to_length(scaled, delta, 8.0f);
-    FastVecAdd(s + 0x270, scaled, s + 0x270);
-    *(s32 *)(s + 0x2D4) = 0;
-    *(f32 *)(s + 0x2D8) = 0.013962637f;
+    FastVecAdd(vars + 0x270, scaled, vars + 0x270);
+    *(s32 *)(vars + 0x2D4) = 0;
+    *(f32 *)(vars + 0x2D8) = 0.013962637f;
     g_boss_flag_a = 1;
 }

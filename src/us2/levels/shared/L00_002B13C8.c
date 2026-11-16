@@ -63,7 +63,7 @@ extern void anim_start_blended(void *, int, int, int);
 #define ITEM_ENTRY(id) (*(ItemClass *)(D_00139568[(id)] * sizeof(ItemClass) + (u8 *)D_L00_00262570))
 
 /* Applies the hero's pending item request for equipment slot SLOT. */
-void func_US2_L00_002B13C8(int slot) {
+void hero_update_item_slot_us2(int slot) {
     Vector point;
     int changed, keepHelmet, keepSuit, combo, sound, cur, disabled;
     u8 *pose;

@@ -62,6 +62,7 @@ extern struct {
     float scale1[3];
 } D_L00_0025BE10;
 
+/* Puts each item the hero carries on the right body joint every frame, and makes the glow on one of them. */
 void update_hero_item_mobys_pal(int value)
 {
     union {

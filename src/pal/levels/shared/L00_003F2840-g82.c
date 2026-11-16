@@ -33,7 +33,7 @@ extern void CalculateAimedLaunchVelocity(void *, void *, void *, int, float, flo
 extern int coll_trace_projectile_to_impact_pal(void *, void *, void *, void *, void *, int, int, float);
 extern void cancel_hero_item_animation_pal(void);
 extern int weapon_spend_ammo(int, int);
-extern void func_PAL_L00_002AF458(void);
+extern void start_equipped_item_animation_pal(void);
 extern int slot_copy_records_to_free(struct Rac2Native_5f824a0e369ccf7b_src_record *);
 extern int PlayMobySound(int, int, char *);
 extern char *gravity_bomb_spawn_projectile_pal(int, char *, char *);
@@ -43,6 +43,7 @@ extern int vec_fast_helper_b(void *);
 extern void weapon_draw_aim_effect_pal(void *);
 extern void ref_L00_003EE4C0_00(void (*)(void *), void *);
 
+/* Updates the Gravity Bomb launcher held by the hero: it picks an aim target, and when fire is pressed it launches a bomb and starts the cooldown (PAL: 50 Hz). */
 void gravity_bomb_launcher_update_pal(unsigned char *object) {
     unsigned char *state = *(unsigned char **)(object + 0x68);
     unsigned char *target;
@@ -87,14 +88,14 @@ void gravity_bomb_launcher_update_pal(unsigned char *object) {
         if (*(float *)(state + 0x20) == 0.0f && !H->b[0x22BC] && (PAD->u[0x1A0 / 4] & H->u[0x1230 / 4]) && allowed && H->i[0x1240 / 4] >= 19) {
             if (weapon_spend_ammo(-1, 1)) {
                 g_gravity_bomb_fire_held = 1;
-                func_PAL_L00_002AF458();
+                start_equipped_item_animation_pal();
                 *(int *)(state + 0x2C) = slot_copy_records_to_free(g_gravity_bomb_sound_records);
                 anim_start_blended_with_flags(object, 2, 0, 2, 0);
                 gravity_bomb_spawn_projectile_pal((int)object, (char *)&position, (char *)&config);
                 PlayMobySound(0, 0, (char *)object);
                 {
-                AimTuning *tu = &g_weapon_l00_table[g_gravity_bomb_weapon_index[0]];
-                *(float *)(state + 0x20) = 1.0f / tu->cooldown;
+                AimTuning *tuning = &g_weapon_l00_table[g_gravity_bomb_weapon_index[0]];
+                *(float *)(state + 0x20) = 1.0f / tuning->cooldown;
             }
             } else if ((PAD->u[0x1A4 / 4] & H->u[0x1230 / 4]) || g_gravity_bomb_fire_held == 1) {
                 PlayMobySound(1, 0, (char *)object);

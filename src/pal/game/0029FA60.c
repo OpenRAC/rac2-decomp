@@ -84,7 +84,7 @@ extern u8 *g_moby_pool_start __attribute__((sda));
 extern void mem_clear(void *, int, int);
 extern void update_moby_animation_state(u8 *);
 
-void func_PAL_0029FA60(void *object, int classId)
+void moby_init_instance_pal(void *object, int classId)
 {
     InitialMoby *m = object;
     u8 slot;

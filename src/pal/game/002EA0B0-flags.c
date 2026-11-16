@@ -20,34 +20,34 @@ typedef struct {
     float position[4];
     unsigned char status;
     char pad21[3];
-    PlaybackClass *classData;
+    PlaybackClass *class_data;
     char pad28[0xA];
-    short drawDistance;
+    short draw_distance;
     unsigned short flags;
     char pad36[2];
-    unsigned long long colorData;
-    unsigned char frame, nextFrame;
+    unsigned long long color_data;
+    unsigned char frame, next_frame;
     char pad42[2];
-    float animTime;
+    float anim_time;
     char pad48[0x10];
-    char *joints, *previousJoints;
-    unsigned char pad60, animId, opacity, mobyState;
+    char *joints, *previous_joints;
+    unsigned char pad60, anim_id, opacity, moby_state;
     char pad64[4];
     char *keys;
     char pad6C[3];
-    unsigned char shadowRange;
+    unsigned char shadow_range;
     char pad70[8];
     unsigned int color;
     char pad7C[0x19];
-    unsigned char effectOpacity;
+    unsigned char effect_opacity;
     char pad96[2];
-    int updateState;
+    int update_state;
     char pad9C[0xE];
-    short classId;
+    short class_id;
     char padAC[6];
-    short partFlags;
+    short part_flags;
     char padB4[8];
-    unsigned char effectScale;
+    unsigned char effect_scale;
     char padBD[3];
     float matrix[12];
     float rotation[4];
@@ -63,17 +63,17 @@ typedef struct {
     short mode, frame;
     short unused24, skip;
     char pad28[0x18];
-    int curveIndex, cameraStart, cameraEnd;
-    float progress, speed, length, cameraBlend, cameraVelocity;
+    int curve_index, camera_start, camera_end;
+    float progress, speed, length, camera_blend, camera_velocity;
     char pad60[0xC];
-    int fadeStart;
+    int fade_start;
     char pad70[0x20];
-    float startPosition[4], endPosition[4], startRotation[4], endRotation[4];
+    float start_position[4], end_position[4], start_rotation[4], end_rotation[4];
 } PlaybackState;
 typedef struct {
     char pad00[0x30];
-    int selected, frame, streamFrame, chunk;
-    short endFrame, unused42, objectCount;
+    int selected, frame, stream_frame, chunk;
+    short end_frame, unused42, object_count;
     char pad46[0x22];
     char *keys;
     char pad6C[0x120];
@@ -85,14 +85,14 @@ typedef struct { char pad[0x1A4]; unsigned int pressed; } PlaybackController;
 extern PlaybackController g_pad_state;
 typedef struct {
     char pad00[0x24];
-    int requestedFrame, requestFlags;
+    int requested_frame, request_flags;
     char pad2C[0x40];
-    short streamPosition;
+    short stream_position;
     char pad6E[4];
     short mode;
 } PlaybackStream;
 extern PlaybackStream g_music_state;
-typedef struct { char pad[0xB0]; float fieldOfView; } PlaybackScreen;
+typedef struct { char pad[0xB0]; float field_of_view; } PlaybackScreen;
 extern PlaybackScreen g_view_params;
 typedef struct {
     char pad00[0x140];
@@ -160,7 +160,8 @@ extern void ship_draw_engine_flames(void *), cam_update_state(void), UpdateLight
 extern void gfx_compute_light_direction(void), game_update_idle_frame_counters(void);
 extern int transition_update_scene(void);
 
-int func_PAL_002EA0B0(void)
+/* Updates the playback scene (the intro flight and the cutscenes that follow) by one frame: moves the objects and camera, handles skipping and fades, and starts the closing transition when it is over (PAL: 50 Hz frame counts). */
+int update_playback_scene_pal(void)
 {
     float matrix[16] __attribute__((aligned(16)));
     float point[4] __attribute__((aligned(16)));
@@ -177,20 +178,20 @@ int func_PAL_002EA0B0(void)
         snd_run_callbacks();
         stub_empty_3();
         part_update_all();
-        (&g_scene_playback_state)->streamFrame++;
+        (&g_scene_playback_state)->stream_frame++;
         (&g_scene_playback_state)->frame++;
         {
-            int skipIndex, advance, chunkLength;
-            for (skipIndex=0; W(g_scene_skip_table,(&g_scene_playback_state)->selected*32 + skipIndex*8)>=0; skipIndex++) {
-                if ((&g_scene_playback_state)->frame==(W(g_scene_skip_table,(&g_scene_playback_state)->selected*32 + skipIndex*8)*5+2)/6) {
-                    advance=(W(g_scene_skip_table,(&g_scene_playback_state)->selected*32 + skipIndex*8+4)*5+2)/6;
-                    chunkLength=g_is_pal_video ? 80 : 96;
+            int skip_index, advance, chunk_length;
+            for (skip_index=0; W(g_scene_skip_table,(&g_scene_playback_state)->selected*32 + skip_index*8)>=0; skip_index++) {
+                if ((&g_scene_playback_state)->frame==(W(g_scene_skip_table,(&g_scene_playback_state)->selected*32 + skip_index*8)*5+2)/6) {
+                    advance=(W(g_scene_skip_table,(&g_scene_playback_state)->selected*32 + skip_index*8+4)*5+2)/6;
+                    chunk_length=g_is_pal_video ? 80 : 96;
                     (&g_scene_playback_state)->frame+=advance;
-                    (&g_scene_playback_state)->streamFrame+=advance;
-                    if ((&g_scene_playback_state)->streamFrame>=chunkLength) {
-                        (&g_scene_playback_state)->chunk=(&g_scene_playback_state)->frame/chunkLength;
+                    (&g_scene_playback_state)->stream_frame+=advance;
+                    if ((&g_scene_playback_state)->stream_frame>=chunk_length) {
+                        (&g_scene_playback_state)->chunk=(&g_scene_playback_state)->frame/chunk_length;
                         load_select_segment_update_world((&g_scene_playback_state)->chunk);
-                        (&g_scene_playback_state)->streamFrame=(&g_scene_playback_state)->frame%chunkLength;
+                        (&g_scene_playback_state)->stream_frame=(&g_scene_playback_state)->frame%chunk_length;
                     }
                     break;
                 }
@@ -202,46 +203,46 @@ int func_PAL_002EA0B0(void)
         int limit, skip;
         limit=g_is_pal_video ? 80 : 96;
         skip=(&g_hero_moby_default)->skip;
-        if ((g_pad_state.pressed&0x9FF) && (&g_scene_playback_state)->frame>=11 && g_screen_fade==0.0f && (&g_scene_playback_state)->frame<(&g_scene_playback_state)->endFrame-25) skip=1;
+        if ((g_pad_state.pressed&0x9FF) && (&g_scene_playback_state)->frame>=11 && g_screen_fade==0.0f && (&g_scene_playback_state)->frame<(&g_scene_playback_state)->end_frame-25) skip=1;
         if (skip) {
             if ((unsigned short)((unsigned short)g_music_state.mode-6)>=2) g_music_state.mode=5;
             if ((&g_hero_moby_default)->mode==0) {
-                (&g_scene_playback_state)->frame=(&g_scene_playback_state)->endFrame-25;
+                (&g_scene_playback_state)->frame=(&g_scene_playback_state)->end_frame-25;
                 (&g_scene_playback_state)->chunk=(&g_scene_playback_state)->frame/limit;
                 load_select_segment_update_world((&g_scene_playback_state)->chunk);
-                (&g_scene_playback_state)->streamFrame=(&g_scene_playback_state)->frame%limit;
+                (&g_scene_playback_state)->stream_frame=(&g_scene_playback_state)->frame%limit;
                 if ((&g_hero_moby_default)->skip) (&g_hero_moby_default)->skip=0;
                 else FadeToBlack(4);
                 g_screen_fade=1.0f;
             } else {
                 if ((&g_hero_moby_default)->skip) (&g_hero_moby_default)->skip=0;
-                if ((&g_scene_playback_state)->frame<5) (&g_hero_moby_default)->fadeStart=-5;
-                else (&g_hero_moby_default)->fadeStart=(&g_scene_playback_state)->frame-1;
+                if ((&g_scene_playback_state)->frame<5) (&g_hero_moby_default)->fade_start=-5;
+                else (&g_hero_moby_default)->fade_start=(&g_scene_playback_state)->frame-1;
             }
         }
         }
         if ((&g_hero_moby_default)->mode==3) {
             int j;
-            j=(&g_hero_moby_default)->fadeStart;
-            if (j==0) j=(&g_scene_playback_state)->endFrame-6;
+            j=(&g_hero_moby_default)->fade_start;
+            if (j==0) j=(&g_scene_playback_state)->end_frame-6;
             if ((&g_scene_playback_state)->frame>=j) {
                 g_screen_fade=((&g_scene_playback_state)->frame-j)*0.2f;
-                if (g_screen_fade>1.0f) (&g_scene_playback_state)->frame=(&g_scene_playback_state)->endFrame;
+                if (g_screen_fade>1.0f) (&g_scene_playback_state)->frame=(&g_scene_playback_state)->end_frame;
                 if (g_screen_fade>1.0f) g_screen_fade=1.0f;
             }
         }
-        if ((&g_scene_playback_state)->frame>=(&g_scene_playback_state)->endFrame) {
+        if ((&g_scene_playback_state)->frame>=(&g_scene_playback_state)->end_frame) {
             if ((unsigned short)((unsigned short)g_music_state.mode-6)>=2) g_music_state.mode=5;
             gfx_select_packet_buffer_setup();
-            g_view_params.fieldOfView=0.62f;
+            g_view_params.field_of_view=0.62f;
             UpdateViewContext();
             {
-                int cleanupIndex;
-                for (cleanupIndex=0;cleanupIndex<(&g_scene_playback_state)->objectCount;cleanupIndex++) {
-                    PlaybackMoby *object=(&g_scene_playback_state)->objects[cleanupIndex];
+                int cleanup_index;
+                for (cleanup_index=0;cleanup_index<(&g_scene_playback_state)->object_count;cleanup_index++) {
+                    PlaybackMoby *object=(&g_scene_playback_state)->objects[cleanup_index];
                     if (object) {
-                        object->classData->count--;
-                        object->classData->slots[object->classData->count]=0;
+                        object->class_data->count--;
+                        object->class_data->slots[object->class_data->count]=0;
                         moby_mark_spawned(object);
                     }
                     if ((&g_hero_moby_default)->extra) moby_mark_spawned((&g_hero_moby_default)->extra);
@@ -249,8 +250,8 @@ int func_PAL_002EA0B0(void)
             }
             (&g_hero_moby_default)->object->flags&=0xFFFE;
             {
-                int resetIndex;
-                for (resetIndex=0;g_equipment_pieces[resetIndex];resetIndex++) if (g_equipment_pieces[resetIndex]->mobyState) g_equipment_pieces[resetIndex]->mobyState=8;
+                int reset_index;
+                for (reset_index=0;g_equipment_pieces[reset_index];reset_index++) if (g_equipment_pieces[reset_index]->moby_state) g_equipment_pieces[reset_index]->moby_state=8;
             }
             {
                 char *p;
@@ -263,8 +264,8 @@ int func_PAL_002EA0B0(void)
             } else request_end_slot(0,0);
         } else {
             {
-                int chunkLength=g_is_pal_video ? 80 : 96;
-                if ((&g_scene_playback_state)->streamFrame>=chunkLength) {
+                int chunk_length=g_is_pal_video ? 80 : 96;
+                if ((&g_scene_playback_state)->stream_frame>=chunk_length) {
                     (&g_scene_playback_state)->chunk++;
                     load_select_segment_update_world((&g_scene_playback_state)->chunk);
                 }
@@ -279,10 +280,10 @@ int func_PAL_002EA0B0(void)
             char *key, *rotation;
             int last, i;
             float angle;
-            key=(&g_scene_playback_state)->keys+(&g_scene_playback_state)->streamFrame*32;
+            key=(&g_scene_playback_state)->keys+(&g_scene_playback_state)->stream_frame*32;
             last=B(key,0xC);
             rotation=key+0x10;
-            g_view_params.fieldOfView=F(rotation,0xC);
+            g_view_params.field_of_view=F(rotation,0xC);
             UpdateViewContext();
             qcopy(g_active_camera.position,key);
             transform_vector(g_active_camera.position,g_active_camera.position,matrix);
@@ -296,51 +297,51 @@ int func_PAL_002EA0B0(void)
             g_active_camera.forward[1]=-temp[9]; g_active_camera.right[1]=-temp[1]; g_active_camera.up[1]=temp[5];
             g_active_camera.forward[2]=-temp[10]; g_active_camera.right[2]=-temp[2]; g_active_camera.up[2]=temp[6];
             {
-                for (i=0;i<(&g_scene_playback_state)->objectCount;i++) {
+                for (i=0;i<(&g_scene_playback_state)->object_count;i++) {
                     char *p;
                     PlaybackMoby *object=(&g_scene_playback_state)->objects[i];
-                    int half=(&g_scene_playback_state)->streamFrame>>1;
+                    int half=(&g_scene_playback_state)->stream_frame>>1;
                     object->frame=half;
-                    object->nextFrame=half+1;
+                    object->next_frame=half+1;
                     update_moby_animation_state(object);
-                    object->animTime=IntToFloat((&g_scene_playback_state)->streamFrame&1)*0.5f;
-                    if (last && ((&g_scene_playback_state)->streamFrame&1)) object->animTime=1.0f;
+                    object->anim_time=IntToFloat((&g_scene_playback_state)->stream_frame&1)*0.5f;
+                    if (last && ((&g_scene_playback_state)->stream_frame&1)) object->anim_time=1.0f;
                     p=object->keys;
-                    FastVecScale(temp,p+object->frame*16,1.0f-object->animTime);
-                    FastVecScale(temp+4,p+object->nextFrame*16,object->animTime);
+                    FastVecScale(temp,p+object->frame*16,1.0f-object->anim_time);
+                    FastVecScale(temp+4,p+object->next_frame*16,object->anim_time);
                     FastVecAdd(object->position,temp,temp+4);
                     transform_vector(object->position,object->position,matrix);
                     FastVecAdd(object->position,object->position,point);
                     object->rotation[2]=(&g_hero_moby_default)->object->rotation[2];
-                    object->animId=255;
+                    object->anim_id=255;
                     func_002A0F48(object);
-                    if (object->classId==0) {
-                        object->shadowRange=0;
+                    if (object->class_id==0) {
+                        object->shadow_range=0;
                         if ((&g_hero_moby_default)->mode==0) {
-                            if ((&g_scene_playback_state)->frame<73) object->shadowRange=24;
+                            if ((&g_scene_playback_state)->frame<73) object->shadow_range=24;
                         } else {
-                            if ((&g_scene_playback_state)->frame>=143) object->shadowRange=24;
+                            if ((&g_scene_playback_state)->frame>=143) object->shadow_range=24;
                         }
-                    } else if (object->classId==10) {
-                        object->shadowRange=0;
-                        if ((&g_hero_moby_default)->mode==0) { if ((&g_scene_playback_state)->frame<279) object->shadowRange=24; }
-                        else if ((&g_scene_playback_state)->frame>=174) object->shadowRange=24;
+                    } else if (object->class_id==10) {
+                        object->shadow_range=0;
+                        if ((&g_hero_moby_default)->mode==0) { if ((&g_scene_playback_state)->frame<279) object->shadow_range=24; }
+                        else if ((&g_scene_playback_state)->frame>=174) object->shadow_range=24;
                     }
-                    if (object->shadowRange) moby_run_ground_check(object);
-                    if (object->classId==10) stub_empty_18(object);
-                    if (object->classId==0) stub_empty_17(object,0);
-                    if (object->classId==0xD54) {
+                    if (object->shadow_range) moby_run_ground_check(object);
+                    if (object->class_id==10) stub_empty_18(object);
+                    if (object->class_id==0) stub_empty_17(object,0);
+                    if (object->class_id==0xD54) {
                         PlaybackMoby *p;
                         int j, cast;
-                        object->mobyState=4;
+                        object->moby_state=4;
                         UpdateEquipmentPieces(object);
                         if (!g_transition_effect_list || H(g_transition_effect_list,0xAA)==0xD54) gfx_register_overlay_draw_callback(render_environment_mapped_object,object);
                         gfx_register_world_draw_callback(gfx_draw_ground_shadow,object);
                         p=0;
                         j=H(g_robot_part_ids_c,((g_equipment_bits[0]>>3)&2));
                         for(cast=0;g_equipment_pieces[cast];cast++) {
-                            if(g_equipment_pieces[cast]->mobyState>=5) g_equipment_pieces[cast]->mobyState=4;
-                            if(j==g_equipment_pieces[cast]->classId) {p=g_equipment_pieces[cast];break;}
+                            if(g_equipment_pieces[cast]->moby_state>=5) g_equipment_pieces[cast]->moby_state=4;
+                            if(j==g_equipment_pieces[cast]->class_id) {p=g_equipment_pieces[cast];break;}
                         }
                         if(p) {
                             if((&g_hero_moby_default)->mode==0) {
@@ -352,8 +353,8 @@ int func_PAL_002EA0B0(void)
                                     if(color<0) color=0;
                                     p->color=color | (color<<8) | (color<<16);
                                     if((&g_scene_playback_state)->frame>((420-offset)*5+2)/6) {
-                                        object->effectScale=(int)(((&g_scene_playback_state)->frame-((420.0f-offset)*5.0f+2.0f)*0.16666667f)*1.44f);
-                                        object->partFlags=0;
+                                        object->effect_scale=(int)(((&g_scene_playback_state)->frame-((420.0f-offset)*5.0f+2.0f)*0.16666667f)*1.44f);
+                                        object->part_flags=0;
                                         gfx_register_world_draw_callback(part_draw_glow_quads,object);
                                     }
                                     if((&g_scene_playback_state)->frame>((464-offset)*5+2)/6) {
@@ -394,51 +395,51 @@ int func_PAL_002EA0B0(void)
         if ((&g_hero_moby_default)->frame==0) {
             music_Pause(0);
             snd_pump_music_and_disc_read(0);
-            g_music_state.requestedFrame=0x138E;
-            g_music_state.requestFlags=0;
-            while (g_music_state.mode!=3 || g_music_state.streamPosition>=6000) {
+            g_music_state.requested_frame=0x138E;
+            g_music_state.request_flags=0;
+            while (g_music_state.mode!=3 || g_music_state.stream_position>=6000) {
                 UpdateSoundVoices();
                 sceGsSyncV(0);
             }
             snd_resume_music_stream();
             (&g_hero_moby_default)->object->opacity=255;
-            (&g_hero_moby_default)->object->updateState=0;
-            if ((&g_hero_moby_default)->curveIndex>=0) {
+            (&g_hero_moby_default)->object->update_state=0;
+            if ((&g_hero_moby_default)->curve_index>=0) {
                 char *global;
                 (&g_hero_moby_default)->hero=CreateMoby(0);
                 global=g_hero_state;
-                (&g_hero_moby_default)->hero->drawDistance=0x1FF;
+                (&g_hero_moby_default)->hero->draw_distance=0x1FF;
                 (&g_hero_moby_default)->hero->opacity=255;
-                (&g_hero_moby_default)->hero->updateState=0;
+                (&g_hero_moby_default)->hero->update_state=0;
                 (&g_hero_moby_default)->hero->flags|=6;
-                (&g_hero_moby_default)->hero->colorData=*(unsigned long long *)(P(global,0x2290)+0x38);
+                (&g_hero_moby_default)->hero->color_data=*(unsigned long long *)(P(global,0x2290)+0x38);
                 if (B(g_hero_class_slot_flags,0)!=255 && H(global,0x24FC)==0) {
                     (&g_hero_moby_default)->companion=CreateMoby(10);
-                    (&g_hero_moby_default)->companion->drawDistance=0x1FF;
+                    (&g_hero_moby_default)->companion->draw_distance=0x1FF;
                     (&g_hero_moby_default)->companion->opacity=255;
-                    (&g_hero_moby_default)->companion->updateState=0;
+                    (&g_hero_moby_default)->companion->update_state=0;
                     (&g_hero_moby_default)->companion->flags|=6;
-                    (&g_hero_moby_default)->companion->colorData=*(unsigned long long *)(P(global,0x2290)+0x38);
+                    (&g_hero_moby_default)->companion->color_data=*(unsigned long long *)(P(global,0x2290)+0x38);
                 } else (&g_hero_moby_default)->companion=0;
             }
             SetCamera5Pose(g_active_camera.position,g_active_camera.rotation,1,0,0);
-            (&g_hero_moby_default)->cameraBlend=0;
-            (&g_hero_moby_default)->cameraVelocity=0;
-            if ((&g_hero_moby_default)->curveIndex>=0) {
+            (&g_hero_moby_default)->camera_blend=0;
+            (&g_hero_moby_default)->camera_velocity=0;
+            if ((&g_hero_moby_default)->curve_index>=0) {
                 char *curve;
                 float maximum, angle, factor;
-                curve=(char *)g_path_table[(&g_hero_moby_default)->curveIndex];
-                maximum=(&g_hero_moby_default)->cameraBlend;
+                curve=(char *)g_path_table[(&g_hero_moby_default)->curve_index];
+                maximum=(&g_hero_moby_default)->camera_blend;
                 {
-                    int pathIndex;
-                    for (pathIndex=1;pathIndex<W(curve,0)-1;pathIndex++) {
-                        char *point=curve+pathIndex*16;
+                    int path_index;
+                    for (path_index=1;path_index<W(curve,0)-1;path_index++) {
+                        char *point=curve+path_index*16;
                         {
-                            char *previous=curve+(pathIndex-1)*16;
+                            char *previous=curve+(path_index-1)*16;
                             angle=mat_fast_helper_a(F(point,0x10)-F(previous,0x10),F(point,0x14)-F(previous,0x14));
                         }
                         {
-                            char *next=curve+(pathIndex+1)*16;
+                            char *next=curve+(path_index+1)*16;
                             factor=mat_fast_helper_a(F(next,0x10)-F(point,0x10),F(next,0x14)-F(point,0x14));
                         }
                         F(point,0x1C)=fast_subtract_rotations(angle,factor);
@@ -462,41 +463,41 @@ int func_PAL_002EA0B0(void)
                     F(last,0x1C)=angle;
                 }
                 {
-                    int scaleIndex;
-                    for(scaleIndex=0;scaleIndex<W(curve,0);scaleIndex++) F(curve+scaleIndex*16,0x1C)*=factor;
+                    int scale_index;
+                    for(scale_index=0;scale_index<W(curve,0);scale_index++) F(curve+scale_index*16,0x1C)*=factor;
                 }
                 {
-                    int rampIndex;
-                    for(rampIndex=0;rampIndex<20;rampIndex++) F(curve+rampIndex*16,0x1C)=F(curve+rampIndex*16,0x1C)*0.05f*rampIndex;
+                    int ramp_index;
+                    for(ramp_index=0;ramp_index<20;ramp_index++) F(curve+ramp_index*16,0x1C)=F(curve+ramp_index*16,0x1C)*0.05f*ramp_index;
                 }
                 (&g_hero_moby_default)->length=fast_vec_dist(curve+0x10,curve+0x20);
                 (&g_hero_moby_default)->progress=0;
                 (&g_hero_moby_default)->speed=0;
                 /* These copies do not overlap the state pointer/length fields. */
-                qcopy_nc((&g_hero_moby_default)->startPosition,(&g_hero_moby_default)->object->position);
-                qcopy_nc((&g_hero_moby_default)->endPosition,curve+0x10);
-                qcopy_nc((&g_hero_moby_default)->startRotation,(&g_hero_moby_default)->object->rotation);
-                (&g_hero_moby_default)->endRotation[0]=F(curve,0x1C);
+                qcopy_nc((&g_hero_moby_default)->start_position,(&g_hero_moby_default)->object->position);
+                qcopy_nc((&g_hero_moby_default)->end_position,curve+0x10);
+                qcopy_nc((&g_hero_moby_default)->start_rotation,(&g_hero_moby_default)->object->rotation);
+                (&g_hero_moby_default)->end_rotation[0]=F(curve,0x1C);
                 angle=vec_distance_xy(curve+0x20,curve+0x10);
-                (&g_hero_moby_default)->endRotation[1]=mat_fast_helper_a(angle,F(curve,0x18)-F(curve,0x28));
-                (&g_hero_moby_default)->endRotation[2]=mat_fast_helper_a(F(curve,0x20)-F(curve,0x10),F(curve,0x24)-F(curve,0x14));
+                (&g_hero_moby_default)->end_rotation[1]=mat_fast_helper_a(angle,F(curve,0x18)-F(curve,0x28));
+                (&g_hero_moby_default)->end_rotation[2]=mat_fast_helper_a(F(curve,0x20)-F(curve,0x10),F(curve,0x24)-F(curve,0x14));
             }
         }
-        if ((&g_hero_moby_default)->cameraStart>=0 && (&g_hero_moby_default)->cameraEnd>=0) {
+        if ((&g_hero_moby_default)->camera_start>=0 && (&g_hero_moby_default)->camera_end>=0) {
             float angle;
-            math_step_value_toward_target(&(&g_hero_moby_default)->cameraBlend,&(&g_hero_moby_default)->cameraVelocity,1.0f,0.00026640002f,0.00026640002f,0.010000001f);
-            lerp_vector(matrix,g_vec_record_table[0]+(&g_hero_moby_default)->cameraStart*128+0x30,g_vec_record_table[0]+(&g_hero_moby_default)->cameraEnd*128+0x30,(&g_hero_moby_default)->cameraBlend);
+            math_step_value_toward_target(&(&g_hero_moby_default)->camera_blend,&(&g_hero_moby_default)->camera_velocity,1.0f,0.00026640002f,0.00026640002f,0.010000001f);
+            lerp_vector(matrix,g_vec_record_table[0]+(&g_hero_moby_default)->camera_start*128+0x30,g_vec_record_table[0]+(&g_hero_moby_default)->camera_end*128+0x30,(&g_hero_moby_default)->camera_blend);
             vec_clear_128(matrix+4);
-            angle=fast_subtract_rotations(F(g_vec_record_table[0]+(&g_hero_moby_default)->cameraEnd*128,0x74),F(g_vec_record_table[0]+(&g_hero_moby_default)->cameraStart*128,0x74));
-            matrix[5]=angle*(&g_hero_moby_default)->cameraBlend;
-            matrix[5]=FastAddRotations(F(g_vec_record_table[0]+(&g_hero_moby_default)->cameraStart*128,0x74),matrix[5]);
-            angle=fast_subtract_rotations(F(g_vec_record_table[0]+(&g_hero_moby_default)->cameraEnd*128,0x78),F(g_vec_record_table[0]+(&g_hero_moby_default)->cameraStart*128,0x78));
-            matrix[6]=angle*(&g_hero_moby_default)->cameraBlend;
-            matrix[6]=FastAddRotations(F(g_vec_record_table[0]+(&g_hero_moby_default)->cameraStart*128,0x78),matrix[6]);
+            angle=fast_subtract_rotations(F(g_vec_record_table[0]+(&g_hero_moby_default)->camera_end*128,0x74),F(g_vec_record_table[0]+(&g_hero_moby_default)->camera_start*128,0x74));
+            matrix[5]=angle*(&g_hero_moby_default)->camera_blend;
+            matrix[5]=FastAddRotations(F(g_vec_record_table[0]+(&g_hero_moby_default)->camera_start*128,0x74),matrix[5]);
+            angle=fast_subtract_rotations(F(g_vec_record_table[0]+(&g_hero_moby_default)->camera_end*128,0x78),F(g_vec_record_table[0]+(&g_hero_moby_default)->camera_start*128,0x78));
+            matrix[6]=angle*(&g_hero_moby_default)->camera_blend;
+            matrix[6]=FastAddRotations(F(g_vec_record_table[0]+(&g_hero_moby_default)->camera_start*128,0x78),matrix[6]);
             object_copy_vector_to_selected(matrix);
             cam_set_state_rotation(matrix+4);
         }
-        if ((&g_hero_moby_default)->curveIndex>=0) {
+        if ((&g_hero_moby_default)->curve_index>=0) {
             char *p;
             PlaybackBones *bones;
             int *table;
@@ -506,12 +507,12 @@ int func_PAL_002EA0B0(void)
                 factor=IntToFloat(75);
                 blend=(1.0f-math_fast_sin_or_cos_a(angle*(3.1415927f/factor)))*0.5f;
                 if((&g_hero_moby_default)->frame>=75) blend=1.0f;
-                lerp_vector((&g_hero_moby_default)->object->position,(&g_hero_moby_default)->startPosition,(&g_hero_moby_default)->endPosition,blend);
-                (&g_hero_moby_default)->object->rotation[0]=(&g_hero_moby_default)->endRotation[0]*blend;
-                angle=fast_subtract_rotations((&g_hero_moby_default)->endRotation[1],(&g_hero_moby_default)->startRotation[1]);
-                (&g_hero_moby_default)->object->rotation[1]=FastAddRotations((&g_hero_moby_default)->startRotation[1],angle*blend);
-                angle=fast_subtract_rotations((&g_hero_moby_default)->endRotation[2],(&g_hero_moby_default)->startRotation[2]);
-                (&g_hero_moby_default)->object->rotation[2]=FastAddRotations((&g_hero_moby_default)->startRotation[2],angle*blend);
+                lerp_vector((&g_hero_moby_default)->object->position,(&g_hero_moby_default)->start_position,(&g_hero_moby_default)->end_position,blend);
+                (&g_hero_moby_default)->object->rotation[0]=(&g_hero_moby_default)->end_rotation[0]*blend;
+                angle=fast_subtract_rotations((&g_hero_moby_default)->end_rotation[1],(&g_hero_moby_default)->start_rotation[1]);
+                (&g_hero_moby_default)->object->rotation[1]=FastAddRotations((&g_hero_moby_default)->start_rotation[1],angle*blend);
+                angle=fast_subtract_rotations((&g_hero_moby_default)->end_rotation[2],(&g_hero_moby_default)->start_rotation[2]);
+                (&g_hero_moby_default)->object->rotation[2]=FastAddRotations((&g_hero_moby_default)->start_rotation[2],angle*blend);
                 euler_to_matrix(matrix,(&g_hero_moby_default)->object->rotation);
                 copy_matrix3x4((&g_hero_moby_default)->object->matrix,matrix);
                 func_002A10E8((&g_hero_moby_default)->object);
@@ -519,12 +520,12 @@ int func_PAL_002EA0B0(void)
                     g_screen_fade-=0.125f;
                     if(g_screen_fade<0.0f) g_screen_fade=0.0f;
                 }
-                (&g_hero_moby_default)->object->effectOpacity=(unsigned short)(&g_hero_moby_default)->frame>>2;
+                (&g_hero_moby_default)->object->effect_opacity=(unsigned short)(&g_hero_moby_default)->frame>>2;
                 if(blend<1.0f) part_spawn_object_sparks((&g_hero_moby_default)->object,-0.075f);
             } else {
                 PlaybackCurve *curve;
                 float step;
-                curve=g_path_table[(&g_hero_moby_default)->curveIndex];
+                curve=g_path_table[(&g_hero_moby_default)->curve_index];
                 (&g_hero_moby_default)->speed+=0.8f;
                 if((&g_hero_moby_default)->speed>100.0f) (&g_hero_moby_default)->speed=100.0f;
                 if((g_pad_state.pressed&0x50) && g_screen_fade<0.1f) g_screen_fade=0.1f;
@@ -534,7 +535,7 @@ int func_PAL_002EA0B0(void)
                     g_screen_fade+=0.1f;
                     if(g_screen_fade>1.0f) g_screen_fade=1.0f;
                 }
-                if((&g_hero_moby_default)->object->effectOpacity<160) (&g_hero_moby_default)->object->effectOpacity+=8;
+                if((&g_hero_moby_default)->object->effect_opacity<160) (&g_hero_moby_default)->object->effect_opacity+=8;
                 (&g_hero_moby_default)->progress+=step;
                 ship_spawn_exhaust_puffs((&g_hero_moby_default)->object);
                 if((&g_hero_moby_default)->progress>(float)(curve->count-1) || g_screen_fade>=1.0f) g_frontend_done_flag=1;
@@ -550,12 +551,12 @@ int func_PAL_002EA0B0(void)
             matrix_mul_vec3((&g_hero_moby_default)->hero->position,g_hero_attach_offset,(&g_hero_moby_default)->object->matrix);
             FastVecAdd((&g_hero_moby_default)->hero->position,(&g_hero_moby_default)->hero->position,(&g_hero_moby_default)->object->position);
             func_002A0F48((&g_hero_moby_default)->hero);
-            p=(&g_hero_moby_default)->hero->classData;
+            p=(&g_hero_moby_default)->hero->class_data;
             bones=(PlaybackBones *)P(p,0x48);
             table=&bones->a1C[bones->n10];
             func_002A1130(table+bones->n13,bones->a1C[0],g_hero_joint_buffer,B(p,8));
             (&g_hero_moby_default)->hero->joints=g_hero_joint_buffer;
-            (&g_hero_moby_default)->hero->previousJoints=g_hero_joint_buffer;
+            (&g_hero_moby_default)->hero->previous_joints=g_hero_joint_buffer;
             if((&g_hero_moby_default)->companion) {
                 qcopy_nc((&g_hero_moby_default)->companion->rotation,(&g_hero_moby_default)->object->rotation);
                 matrix_mul_vec3((&g_hero_moby_default)->companion->position,g_companion_attach_offset,(&g_hero_moby_default)->object->matrix);

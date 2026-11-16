@@ -8,6 +8,7 @@ extern void SetupGifPaging(long arg0);
 extern void SetupGifPaging(long param_1);
 extern void func_0029CC20(void);
 
+/* Draws a menu page through the paging helper. */
 int menu_draw_page_style_b_us2(void) {
     SetupGifPaging(0);
     func_0029CC20();

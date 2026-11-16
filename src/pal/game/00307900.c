@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 
 
@@ -21,7 +22,8 @@ extern void *F6eb4f363_FUN_002BF728(char *object, char *local, float amount, flo
 
 /* func_00304AD0 uses the profile in 00304AD0-g8-qcopy.c. */
 
-void func_PAL_003085D8(char *object)
+/* Gives a nearby object a small random push each frame, unless a random check says to skip it (PAL copy). */
+void projectile_apply_random_push_2_pal(char *object)
 {
     char local[16];
     float base;

@@ -45,7 +45,7 @@ extern int g_vehicle_current_anim __attribute__((sda));
 extern char * part_find_owned_effect_slot(void *,int,int);
 extern float func_002A0558(void *,void *);
 extern int TryClaimNotice(int,int,int);
-extern s32 func_PAL_L00_002C4480(int,int);
+extern s32 hero_l00_set_action_pal(int,int);
 extern void set_hero_animation_pal(int,int,float);
 extern float FastVecLength(void *);
 extern float FastAddRotations(float,float);
@@ -94,20 +94,21 @@ typedef struct {
     Vec velocity, other;
     float lean, pitch, heading;
     float gap2C[3];
-    float phase, bob, tiltX, tiltY, baseHeight, throttle, health;
+    float phase, bob, tilt_x, tilt_y, base_height, throttle, health;
 } HoverState;
 typedef struct {
     char pad00[0x10]; Vec position;
     u8 state; char pad21[3]; MobyClass *mclass;
     char pad28[4]; float radius;
     u8 pad30, interaction; char pad32[0x68-0x32];
-    HoverState *data; char pad6C[3]; u8 touchTimer;
+    HoverState *data; char pad6C[3]; u8 touch_timer;
     char pad70[0x98-0x70]; int flags;
-    char pad9C[0xA8-0x9C]; u8 damageFlag;
+    char pad9C[0xA8-0x9C]; u8 damage_flag;
     char padA9[0xC0-0xA9]; Vec basis[3]; Vec rotation;
 } HoverMoby;
 
-void func_PAL_L30_003B7808(HoverMoby *obj) {
+/* Updates the museum hover vehicle: damage, health, steering, bobbing and its states (PAL version). */
+void UpdateHoverVehicleMoby_pal(HoverMoby *obj) {
     struct {
         Vec dir, accel, old;
         Vec matrix[4];
@@ -119,15 +120,15 @@ void func_PAL_L30_003B7808(HoverMoby *obj) {
     HoverState *st=obj->data;
     char *hit;
     if (obj->state) {
-        obj->position.f[2]=st->baseHeight;
+        obj->position.f[2]=st->base_height;
         hit=part_find_owned_effect_slot(obj,0x30001,0);
         if (hit && P(hit,0x20) && *(short *)(P(hit,0x20)+0xAA)!=0x853) {
             st->health-=F(hit,0x2c);
             if(st->health<=0) obj->state=5;
         }
-        obj->damageFlag=255;
+        obj->damage_flag=255;
     } else {
-        st->baseHeight=obj->position.f[2];
+        st->base_height=obj->position.f[2];
     }
     {
         MobyClass *cls=obj->mclass;
@@ -146,7 +147,7 @@ void func_PAL_L30_003B7808(HoverMoby *obj) {
             if(g_pad_held_flags&16) in.active=request;
         }
         if(in.active) {
-            func_PAL_L00_002C4480(0x31,0);
+            hero_l00_set_action_pal(0x31,0);
             set_hero_animation_pal(g_vehicle_idle_anim,0,15.0f);
             qcopy_nc(&g_hero_state.rotation,&obj->rotation);
             qcopy_nc(&g_hero_state.position,&obj->position);
@@ -257,14 +258,14 @@ physics:
     case 4:
         obj->flags=obj->mclass->flags;
         I(g_hero_state.moby,0x9c)=0;
-        func_PAL_L00_002C4480(0,1);
+        hero_l00_set_action_pal(0,1);
         g_hero_state.vehicle=0;
         obj->state=1;
         break;
     case 5:
         obj->flags=obj->mclass->flags;
         I(g_hero_state.moby,0x9c)=0;
-        func_PAL_L00_002C4480(0,1);
+        hero_l00_set_action_pal(0,1);
         moby_transform_joint_to_world(obj,0,&frame.dir);
         SpawnExplosionEffects_pal(obj,st,&frame.dir,0.0f,0.0f,10,3,16,4.0f,2.0f,9.0f,1.0f,-1,15.0f,1,1,-1,0,0x810001);
         moby_mark_spawned(obj);
@@ -273,11 +274,11 @@ physics:
     case 6:
         break;
     }
-    st->baseHeight=obj->position.f[2];
+    st->base_height=obj->position.f[2];
     st->phase=FastAddRotations(st->phase,g_vehicle_bob_speed*0.0003490659f);
     st->bob=math_fast_sin_or_cos_b(st->phase)*g_vehicle_l30_bob_amplitude;
     obj->position.f[2]+=st->bob;
-    moby_scale_owner_words_by_angles(obj,&st->tiltX,&st->tiltY,g_vehicle_tilt_x_degrees*0.01745329424738884f,g_vehicle_tilt_y_rate*0.0003490659f,g_vehicle_tilt_z_rate*0.0003490659f);
+    moby_scale_owner_words_by_angles(obj,&st->tilt_x,&st->tilt_y,g_vehicle_tilt_x_degrees*0.01745329424738884f,g_vehicle_tilt_y_rate*0.0003490659f,g_vehicle_tilt_z_rate*0.0003490659f);
     obj->rotation.f[2]=st->heading;
     obj->rotation.f[0]=FastAddRotations(obj->rotation.f[0],st->lean);
     obj->rotation.f[1]=FastAddRotations(obj->rotation.f[1],st->pitch);
@@ -289,6 +290,6 @@ physics:
     obj->flags=obj->mclass->flags;
     if(obj->interaction && fast_vec_dist(&obj->position,g_camera_l30_position)<64.0f) {
         moby_update_ground_check(obj);
-        obj->touchTimer=60;
+        obj->touch_timer=60;
     }
 }

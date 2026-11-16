@@ -15,7 +15,9 @@ extern u32 FastTweenColor(u32, u32, float);
 extern float fast_vec_dist(void *, void *);
 extern void *part_spawn_object_following_effect(void *, void *, u32, int, int, float, float, int, int, int);
 
-void func_PAL_L02_0038FDC0(char *object) {
+/* Keeps a lamp or glowing prop alive: plays its hum, blinks some kinds, and while the camera is
+   near spawns the glow effects that follow the object. */
+void update_lamp_glow_effects_pal(char *object) {
     char *data = *(char **)(object + 0x68);
     short kind = *(short *)(object + 0xAA);
     float distance;

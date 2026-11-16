@@ -24,9 +24,9 @@ extern int FloatToInt(float);
 
 /* Emits count pairs of sprites (func_002C2210) at a jittered pos, each heading along
    the direction to D_L05_001B96C0 turned by a random angle about the up axis. */
-void func_PAL_L05_0041EC50(float *pos, int count, int color, char *owner)
+void part_spawn_sprite_pair_burst_pal(float *pos, int count, int color, char *owner)
 {
-    float dir[4], tmp[4], toward[4], up[4], half[4];
+    float dir[4], midpoint[4], toward[4], up[4], half[4];
     int i, sign;
     float size, angle;
     char *sprite;
@@ -52,7 +52,7 @@ void func_PAL_L05_0041EC50(float *pos, int count, int color, char *owner)
         math_apply_axis_rotation_to_quat(dir, toward, up, angle);
         vec_scale_to_length(dir, dir, math_random_float_range(g_sprite_burst_speed_min, g_sprite_burst_speed_max) * 0.020000001f);
         dir[2] = math_random_float_range(g_sprite_burst_lift_min, g_sprite_burst_lift_max) * 0.020000001f;
-        FastVecAdd(tmp, pos, half);
+        FastVecAdd(midpoint, pos, half);
         pos[0] += math_random_signed_float_range(0.0f, 0.15f);
         pos[1] += math_random_signed_float_range(0.0f, 0.15f);
         pos[2] += math_random_signed_float_range(0.0f, 0.15f);

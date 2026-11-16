@@ -48,7 +48,7 @@ extern void vec_add_random_offset(void *, float);
 extern void *part_spawn_object_relative_particle(void *, void *, void *, void *, int);
 
 /* Updates the stage objects and emits effects at the scripted frame counts. */
-void func_PAL_L15_00316F78(void)
+void gorn_stage_effects_update_pal(void)
 {
     /* The joint transform reuses the earlier effect vectors and writes 64 bytes. */
     union {
@@ -56,25 +56,25 @@ void func_PAL_L15_00316F78(void)
         Vec joint[4];
     } scratch;
     Vec matrix[3], offset, velocity, first, second, third, fourth;
-    char *p;
-    int n;
+    char *moby;
+    int i;
     float sign;
     float *row;
 
     anim_start_startup_animations();
-    for (n = 0; n < g_gorn_stage_state.count; n++) {
-        char *p = g_gorn_stage_state.objects[n];
-        if (p && FIELD(short, p, 0xAA) == 0xE29) {
-            FIELD(unsigned short, p, 0x34) |= 0x800;
+    for (i = 0; i < g_gorn_stage_state.count; i++) {
+        char *moby = g_gorn_stage_state.objects[i];
+        if (moby && FIELD(short, moby, 0xAA) == 0xE29) {
+            FIELD(unsigned short, moby, 0x34) |= 0x800;
         }
-        if (FIELD(short, p, 0xAA) == 0xD54) {
-            UpdateEquipmentPieces(p);
+        if (FIELD(short, moby, 0xAA) == 0xD54) {
+            UpdateEquipmentPieces(moby);
         }
-        if (p) {
-            int type = 0xFA0;
-            if (FIELD(short, p, 0xAA) == type && g_current_map_index != 51) {
-                if (FIELD(char *, p, 0x68)) {
-                    math_store_angle_update_result(p, FIELD(char *, p, 0x68) + 0xC,
+        if (moby) {
+            int class_id = MOBY_CLASS_TV_SCREENS;
+            if (FIELD(short, moby, 0xAA) == class_id && g_current_map_index != 51) {
+                if (FIELD(char *, moby, 0x68)) {
+                    math_store_angle_update_result(moby, FIELD(char *, moby, 0x68) + 0xC,
                                      0x80AAAAD2, 0x80396464, 0.073303841f);
                 }
             }
@@ -84,11 +84,11 @@ void func_PAL_L15_00316F78(void)
         return;
     }
 
-    p = g_gorn_stage_state.objects[2];
+    moby = g_gorn_stage_state.objects[2];
     if (g_gorn_stage_state.frame == 11) {
-        vec_fast_to_int_helper(FIELD(char *, p, 0x58) + 0x10, &scratch.effect.b);
-        quaternion_to_rotation_basis(&scratch.effect.b, p + 0xC0);
-        moby_compute_local_point(p, &scratch.effect.a, 4, 3, 5);
+        vec_fast_to_int_helper(FIELD(char *, moby, 0x58) + 0x10, &scratch.effect.b);
+        quaternion_to_rotation_basis(&scratch.effect.b, moby + 0xC0);
+        moby_compute_local_point(moby, &scratch.effect.a, 4, 3, 5);
         part_spawn_shockwave_burst(&scratch.effect.a, 1, 25, 20, 20, 20, 45, 1, 1, 1, 0, 1.5f);
     }
     if ((unsigned)(g_gorn_stage_state.frame - 17) >= 26 && !math_random_int_below(3)) {
@@ -97,19 +97,19 @@ void func_PAL_L15_00316F78(void)
             sign = -1;
         }
         row = g_effect_row_table[math_random_int_below(3)];
-        moby_compute_local_point(p, &scratch.effect.a, row[0], row[1], row[2]);
-        moby_compute_local_point(p, &scratch.effect.b, row[4], row[5], row[6]);
+        moby_compute_local_point(moby, &scratch.effect.a, row[0], row[1], row[2]);
+        moby_compute_local_point(moby, &scratch.effect.b, row[4], row[5], row[6]);
         scratch.effect.b.f[0] += math_random_signed_float_range(.5f, 1.5f);
         scratch.effect.b.f[1] += math_random_signed_float_range(.5f, 1.5f);
         scratch.effect.b.f[2] += math_random_signed_float_range(.5f, 1.5f);
         FastVecSub(&scratch.effect.c, &scratch.effect.b, &scratch.effect.a);
         vec_scale_to_length(&scratch.effect.c, &scratch.effect.c, 1.4000001f);
-        moby_spawn_shot_effect(p, &scratch.effect.a, &scratch.effect.c, 0xbe4620, 0x783214, 1, 0, 1, sign);
+        moby_spawn_shot_effect(moby, &scratch.effect.a, &scratch.effect.c, 0xbe4620, 0x783214, 1, 0, 1, sign);
     }
     if (g_gorn_stage_state.frame < 117) {
-        char *p = g_gorn_stage_state.objects[3];
+        char *moby = g_gorn_stage_state.objects[3];
         float strength = .4f;
-        moby_transform_joint_point(p, 0, scratch.joint);
+        moby_transform_joint_point(moby, 0, scratch.joint);
         /* Only the three rotation rows are needed by the following transforms. */
         copy_matrix3x4(matrix, scratch.joint);
         offset.q = 0;
@@ -117,7 +117,7 @@ void func_PAL_L15_00316F78(void)
         offset.f[3] = 1;
         velocity.q = 0;
         matrix_mul_vec3(&first, &offset, matrix);
-        FastVecAdd(&first, &first, p + 0x10);
+        FastVecAdd(&first, &first, moby + 0x10);
         first.f[3] = 0;
         second.q = first.q;
         third.q = first.q;
@@ -128,15 +128,15 @@ void func_PAL_L15_00316F78(void)
         vec_add_random_offset(&fourth, .3f);
         velocity.f[0] = -(math_random_float_range(30, 40) * 0.020000001f) * strength;
         matrix_mul_vec3(&velocity, &velocity, matrix);
-        part_spawn_object_relative_particle(p, &first, &velocity, g_cutscene_particle_vel_a, 1);
+        part_spawn_object_relative_particle(moby, &first, &velocity, g_cutscene_particle_vel_a, 1);
         velocity.f[0] = -(math_random_float_range(30, 40) * 0.020000001f) * strength;
         matrix_mul_vec3(&velocity, &velocity, matrix);
-        part_spawn_object_relative_particle(p, &second, &velocity, g_cutscene_particle_vel_a, 1);
+        part_spawn_object_relative_particle(moby, &second, &velocity, g_cutscene_particle_vel_a, 1);
         velocity.f[0] = -(math_random_float_range(30, 40) * 0.020000001f) * strength;
         matrix_mul_vec3(&velocity, &velocity, matrix);
-        part_spawn_object_relative_particle(p, &third, &velocity, g_cutscene_particle_vel_b, 1);
+        part_spawn_object_relative_particle(moby, &third, &velocity, g_cutscene_particle_vel_b, 1);
         velocity.f[0] = -(math_random_float_range(30, 40) * 0.020000001f) * strength;
         matrix_mul_vec3(&velocity, &velocity, matrix);
-        part_spawn_object_relative_particle(p, &fourth, &velocity, g_cutscene_particle_vel_c, 1);
+        part_spawn_object_relative_particle(moby, &fourth, &velocity, g_cutscene_particle_vel_c, 1);
     }
 }

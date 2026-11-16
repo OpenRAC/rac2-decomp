@@ -34,7 +34,8 @@ extern s32 FastTweenColor(s32, s32, float);
 extern void gfx_draw_screen_rectangle(s32, s32, s32, s32, s32, void *);
 extern s32 sprintf(char *, char *, ...);
 extern void FontPrintCenterScaled_pal(s32, s32, s64, char *, s32, float);
-s32 func_PAL_L20_0043A00C(void)
+/* Draws the on-screen timer bar and countdown number when the player is in this special mode (PAL: 50 Hz timings). Returns 1 if it drew. */
+s32 hud_l20_draw_timer_bar_pal(void)
 {
     s32 colors[2];
     char text[16];
@@ -84,28 +85,28 @@ s32 func_PAL_L20_0043A00C(void)
 
 /* The three floats of case 1 are read through $gp, and the two 128-bit copies are
    qcopy (retail materialises both addresses: addiu; lq 0; sq 0). */
-void tethered_body_update_pal(char *arg0) {
-    char *state = *(char **)(arg0 + 0x68);
+void tethered_body_update_pal(char *moby) {
+    char *state = *(char **)(moby + 0x68);
     TI128 pos;
     TI128 rot;
     TI128 out;
 
-    qcopy(&pos, arg0 + 0x10);
-    qcopy(&rot, arg0 + 0xF0);
+    qcopy(&pos, moby + 0x10);
+    qcopy(&rot, moby + 0xF0);
 
-    switch (*(u8 *)(arg0 + 0x20)) {
+    switch (*(u8 *)(moby + 0x20)) {
     case 0:
-        *(u16 *)(arg0 + 0x34) |= 0x1000;
+        *(u16 *)(moby + 0x34) |= 0x1000;
         *(f32 *)(state + 0x84) = 7.0f;
         *(int *)(state + 0xDC) |= 1;
         *(f32 *)(state + 0x88) = *(f32 *)(state + 0xE4);
-        moby_set_state(arg0, 1, -1);
+        moby_set_state(moby, 1, -1);
         break;
     case 1:
-        pushable_moby_update_pal(arg0, state + 0x50, g_tethered_body_param_a, g_tethered_body_param_b,
+        pushable_moby_update_pal(moby, state + 0x50, g_tethered_body_param_a, g_tethered_body_param_b,
                           g_tethered_body_param_c, *(s32 *)(state + 0xE0));
         break;
     }
-    FastVecSub(&out, arg0 + 0x10, &pos);
-    mat_combine_and_store(state + 0xA0, (char *)&out, (char *)&rot, arg0 + 0xF0);
+    FastVecSub(&out, moby + 0x10, &pos);
+    mat_combine_and_store(state + 0xA0, (char *)&out, (char *)&rot, moby + 0xF0);
 }

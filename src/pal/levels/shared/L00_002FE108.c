@@ -3,28 +3,32 @@
 
 void gfx_call_sync_helper(void);
 
-void func_PAL_L00_002FE108(void)
+/* Calls cam_init_scene_state. */
+void level_call_cam_init_scene_state_pal(void)
 {
   cam_init_scene_state();
   return;
 }
 
 
-void func_PAL_L00_002FE128(void)
+/* Calls gfx_restore_draw_position. */
+void level_call_gfx_restore_draw_position_pal(void)
 {
   gfx_restore_draw_position();
   return;
 }
 
 
-void func_PAL_L00_002FE148(void)
+/* Calls the PAL disc player sequence update. */
+void level_call_seq_update_disc_player_pal(void)
 {
-  func_PAL_00278E60();
+  seq_update_disc_player_pal();
   return;
 }
 
 
-void func_PAL_L00_002FE168(void)
+/* Calls text_draw_screen_wipe. */
+void level_call_text_draw_screen_wipe_pal(void)
 {
   text_draw_screen_wipe();
   return;

@@ -56,13 +56,13 @@ extern void FastVecAdd(void *out, void *a, void *b);
 extern float ApproachValue(float *value, float target, float step);
 extern float FastAddRotations(float angle, float delta);
 extern int math_fast_float_d(int *timer);
-extern void func_PAL_L00_003BAFE0(Moby *actor, void *position);
+extern void part_spawn_two_colored_sparkles_pal(Moby *actor, void *position);
 extern void *pair_game_spawn_shot(Moby *owner, void *position, void *velocity, void *player);
-extern void func_PAL_L00_003BAD50(float y, float z, float strength, float *vy, float *vz);
+extern void pair_game_apply_centre_pull_pal(float y, float z, float strength, float *vy, float *vz);
 extern void vec_clamp_length(float *vector, float limit);
 
 /* Steers both actors from their controllers, applies thrust and firing, and moves them. */
-void func_PAL_L00_003BA638(Moby *object)
+void update_paired_actor_movement_pal(Moby *object)
 {
     float axes[2];
     u32 held[2];
@@ -111,7 +111,7 @@ void func_PAL_L00_003BA638(Moby *object)
             local.v[0] = -0.4f;
             matrix_mul_vec3(&local, &local, actor->matrix);
             FastVecAdd(&local, &local, actor->position);
-            func_PAL_L00_003BAFE0(actor, &local);
+            part_spawn_two_colored_sparkles_pal(actor, &local);
         }
 
         /* Fire on circle or square once the reload timer has run out. */
@@ -131,7 +131,7 @@ void func_PAL_L00_003BA638(Moby *object)
         }
 
         /* Pull toward the centre, cap the speed and move. */
-        func_PAL_L00_003BAD50(context->positions[i].v[1], context->positions[i].v[2],
+        pair_game_apply_centre_pull_pal(context->positions[i].v[1], context->positions[i].v[2],
                           g_pair_game_centre_pull * 0.00040000002f,
                           &context->velocities[i].v[1], &context->velocities[i].v[2]);
         vec_clamp_length(context->velocities[i].v, g_pair_game_top_speed * 0.020000001f);

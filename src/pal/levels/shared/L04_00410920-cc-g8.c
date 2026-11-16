@@ -14,17 +14,19 @@ extern float math_random_float_range(float, float);
 extern void *part_spawn_object_relative_particle(void *, void *, void *, void *, int);
 extern void snd_stop_voice(int);
 
-/* `object` is a late copy of the parameter and `m` a copy of that copy: gcse's copy
+/* Spawns the exhaust particles at the three exhaust points of the bike; the amount and speed grow
+   with the engine strength and fade out when the bike idles (PAL). */
+/* `object` is a late copy of the parameter and `moby` a copy of that copy: gcse's copy
    propagation follows one copy per pass, so its PRE pass hashes the addresses off
    `object`'s higher pseudo.  That puts the third vector's reaching register before
-   those of m + 0x10 and m + 0xc0, the spill-slot order retail has; the next pass
+   those of moby + 0x10 and moby + 0xc0, the spill-slot order retail has; the next pass
    restores the parameter and leaves no copy in the output. */
-void func_PAL_L04_00410920(unsigned char *self)
+void racer_spawn_exhaust_effects_pal(unsigned char *self)
 {
     EffectQuad offsets[3];
     float velocity[4];
     float point[4], first[4], second[4], third[4];
-    unsigned char *p;
+    unsigned char *vars;
     unsigned char *parameters;
     float strength, scale, fade, spread;
     int i, handle;
@@ -36,22 +38,22 @@ void func_PAL_L04_00410920(unsigned char *self)
     {
         unsigned char *object = self;
 
-        p = *(unsigned char **)(object + 0x68);
+        vars = *(unsigned char **)(object + 0x68);
         if (object[0xbc] == 3 || object[0xbc] == 4) g_exhaust_fade_timer = 0;
-        strength = *(float *)(p + 0x27c) * 8.333333f;
+        strength = *(float *)(vars + 0x27c) * 8.333333f;
         if (strength > 1.0f) strength = 1.0f;
         else if (strength < 0.0f) strength = 0.0f;
-        scale = *(float *)(p + 0x30c) * 2.4999998f;
+        scale = *(float *)(vars + 0x30c) * 2.4999998f;
         if (scale > 1.0f) scale = 1.0f;
         else if (scale < 0.5f) scale = 0.5f;
         {
-            unsigned char *m = object;
+            unsigned char *moby = object;
 
             for (i = 0; i < 3; i++) {
                 if (i == 1) parameters = g_exhaust_effect_params_b;
                 else parameters = g_exhaust_effect_params_a;
-                matrix_mul_vec3(point, &offsets[i], m + 0xc0);
-                FastVecAdd(point, point, m + 0x10);
+                matrix_mul_vec3(point, &offsets[i], moby + 0xc0);
+                FastVecAdd(point, point, moby + 0x10);
                 point[3] = 0.0f;
                 qcopy(first, point);
                 qcopy(second, point);
@@ -61,8 +63,8 @@ void func_PAL_L04_00410920(unsigned char *self)
                 vec_add_random_offset(first, spread);
                 vec_add_random_offset(second, spread);
                 vec_add_random_offset(third, strength * 0.009f + 0.005f);
-                if (strength > 0.0f || g_exhaust_fade_timer > 0 || *(int *)(p + 0x278) > 0) {
-                    if (strength == 0.0f && *(int *)(p + 0x278) == 0) {
+                if (strength > 0.0f || g_exhaust_fade_timer > 0 || *(int *)(vars + 0x278) > 0) {
+                    if (strength == 0.0f && *(int *)(vars + 0x278) == 0) {
                         fade = (float)g_exhaust_fade_timer * 0.033333335f;
                         g_exhaust_fade_timer--;
                     } else {
@@ -77,32 +79,32 @@ void func_PAL_L04_00410920(unsigned char *self)
                     velocity[0] = -velocity[0];
                     velocity[0] *= scale;
                     velocity[0] *= fade;
-                    part_spawn_object_relative_particle(m, first, velocity, parameters + 0x30, 1);
+                    part_spawn_object_relative_particle(moby, first, velocity, parameters + 0x30, 1);
                     velocity[0] = (math_random_float_range(1.0f, 2.25f) + strength * 3.0f) * 0.020000001f;
                     velocity[0] = -velocity[0];
                     velocity[0] *= scale;
                     velocity[0] *= fade;
-                    part_spawn_object_relative_particle(m, second, velocity, parameters + 0x40, 1);
-                    part_spawn_object_relative_particle(m, point, velocity, parameters + 0x50, 1);
+                    part_spawn_object_relative_particle(moby, second, velocity, parameters + 0x40, 1);
+                    part_spawn_object_relative_particle(moby, point, velocity, parameters + 0x50, 1);
                 } else {
-                    handle = *(int *)(p + 0x714);
+                    handle = *(int *)(vars + 0x714);
                     if (handle != -1) {
                         unsigned char *record = g_sound_state + handle * 0x70;
-                        if (*(unsigned char **)(record + 0x88) == m && record[0x74]) snd_stop_voice(handle);
+                        if (*(unsigned char **)(record + 0x88) == moby && record[0x74]) snd_stop_voice(handle);
                     }
-                    *(int *)(p + 0x714) = -1;
+                    *(int *)(vars + 0x714) = -1;
                     velocity[0] = (math_random_float_range(1.5f, 2.5f) + strength * 1.5f) * 0.020000001f;
                     velocity[0] = -velocity[0];
                     velocity[0] *= scale;
-                    part_spawn_object_relative_particle(m, first, velocity, parameters, 1);
+                    part_spawn_object_relative_particle(moby, first, velocity, parameters, 1);
                     velocity[0] = (math_random_float_range(1.5f, 2.5f) + strength * 2.45f) * 0.020000001f;
                     velocity[0] = -velocity[0];
                     velocity[0] *= scale;
-                    part_spawn_object_relative_particle(m, second, velocity, parameters + 0x10, 1);
+                    part_spawn_object_relative_particle(moby, second, velocity, parameters + 0x10, 1);
                     velocity[0] = (math_random_float_range(1.5f, 2.5f) + strength * 3.25f) * 0.020000001f;
                     velocity[0] = -velocity[0];
                     velocity[0] *= scale;
-                    part_spawn_object_relative_particle(m, third, velocity, parameters + 0x20, 1);
+                    part_spawn_object_relative_particle(moby, third, velocity, parameters + 0x20, 1);
                 }
             }
         }

@@ -15,23 +15,23 @@ struct RotorState {
     /* 0x060 */ int f60;
     /* 0x064 */ char pad64[0x9C];
     /* 0x100 */ float points[13][4];
-    /* 0x1D0 */ float oldPoints[13][4];
+    /* 0x1D0 */ float old_points[13][4];
     /* 0x2A0 */ char pad2A0[0x10];
     /* 0x2B0 */ int choices[4][4];
     /* 0x2F0 */ char pad2F0[0x30];
-    /* 0x320 */ int pathIndex;
+    /* 0x320 */ int path_index;
     /* 0x324 */ struct RotorPath *path;
     /* 0x328 */ char pad328[8];
     /* 0x330 */ int records[10];
     /* 0x358 */ int linked;
     /* 0x35C */ char pad35C[0xC];
-    /* 0x368 */ int projectileClass;
+    /* 0x368 */ int projectile_class;
     /* 0x36C */ char pad36C[4];
-    /* 0x370 */ s16 pathPoint;
+    /* 0x370 */ s16 path_point;
     /* 0x372 */ char pad372[2];
-    /* 0x374 */ s16 projectileIndex;
-    /* 0x376 */ s16 projectileDelay;
-    /* 0x378 */ s16 ropeCount;
+    /* 0x374 */ s16 projectile_index;
+    /* 0x376 */ s16 projectile_delay;
+    /* 0x378 */ s16 rope_count;
     /* 0x37A */ u16 toggle;
     /* 0x37C */ char pad37C[4];
     /* 0x380 */ u8 disabled[10];
@@ -107,10 +107,10 @@ void IntegrateVerletChain_pal(void *object)
 
     vec_clear_128(&gravity);
     pos = state->points;
-    old = state->oldPoints;
+    old = state->old_points;
     gravity.f[2] = -1.0f / 500.0f;
 
-    t = IntToFloat(state->ropeCount);
+    t = IntToFloat(state->rope_count);
     damping = math_lerp_float(0.97f, 0.98f, (t -= 2.0f) / IntToFloat(8));
 
     for (i = 12; i >= 0; i--, pos++, old++) {

@@ -34,6 +34,7 @@ extern void trooper_update_body_pal(char *);
 extern int g_hero_vehicle_mode[] __attribute__((sda));
 extern int g_level_l20_progress_stage;
 
+/* Per-frame update of the Megacorp trooper: it picks a target, walks, turns and shoots, and breaks apart when it is hit. */
 void trooper_update_pal(unsigned char *object) {
     Vector position, velocity;
     unsigned char *state = *(unsigned char **)(object + 0x68);
@@ -86,9 +87,9 @@ void trooper_update_pal(unsigned char *object) {
             trooper_play_anim_with_torso((char *)object, 11, 17, 0.0f);
         }
         if (*(float *)(state + 0x11C) <= *(float *)(state + 0x84)) {
-            unsigned char *aimTarget = *(unsigned char **)(state + 0x200);
-            angle = mat_fast_helper_a(*(float *)(aimTarget + 0x10) - *(float *)(object + 0x10),
-                                  *(float *)(aimTarget + 0x14) - *(float *)(object + 0x14));
+            unsigned char *aim_target = *(unsigned char **)(state + 0x200);
+            angle = mat_fast_helper_a(*(float *)(aim_target + 0x10) - *(float *)(object + 0x10),
+                                  *(float *)(aim_target + 0x14) - *(float *)(object + 0x14));
             moby_start_effect_from_entry((int)object, angle);
             if (FastDiffRots(*(float *)(object + 0xF8), angle) < 0.05235988274216652f)
                 moby_set_state(object, 4, -1);

@@ -9,6 +9,7 @@ extern void moby_mark_spawned(void *);
 extern void func_002A10E8(void *);
 extern void moby_mark_spawned(void *);
 
+/* Updates the Swingshot hook. It copies the Swingshot's state into matching animations and removes itself when the Swingshot is gone (PAL build). */
 void swingshot_hook_update_pal(unsigned char *self)
 {
     static void *cases[8] = {&&c0, &&c1, &&c2, &&c3, &&c4, &&c5, &&c6, &&c7};
@@ -103,6 +104,7 @@ extern int cam_moby_update(unsigned char *);
 extern int math_random_int_below(int);
 extern void moby_set_state(unsigned char *, unsigned char, int);
 
+/* Waits to be hit or set off at random, then fades out and removes itself (PAL build). */
 void moby_fade_out_update_pal(unsigned char *self)
 {
     if (g_turret_target_moby != 0)

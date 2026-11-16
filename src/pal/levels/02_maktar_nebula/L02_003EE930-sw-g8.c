@@ -38,88 +38,88 @@ extern void gfx_draw_energy_sheet(char *);
 typedef union { int i[0x20]; float f[0x20]; } PlatState;
 
 /* Updates the platform's activation, swing, travel and scrolling surface. */
-void func_PAL_L02_003EE930(char *actor) {
-    char *state = *(char **)(actor + 0x68);
+void swing_platform_update_pal(char *moby) {
+    char *state = *(char **)(moby + 0x68);
     float angles[4], rotation[12], inverse[16], offset[4];
-    float speed, distance, target;
-    switch (*(unsigned char *)(actor + 0x20)) {
+    float speed, distance, target_speed;
+    switch (*(unsigned char *)(moby + 0x20)) {
     case 0:
-    swing_platform_init_group(actor);
+    swing_platform_init_group(moby);
     return;
     case 2:
     if (g_swing_platform_initialized == 0) {
         unsigned int timer, next;
-        if (!flag_is_third_pending_set(actor)) return;
-        next = *(unsigned short *)(actor + 0x96);
+        if (!flag_is_third_pending_set(moby)) return;
+        next = *(unsigned short *)(moby + 0x96);
         timer = next;
         next++;
-        *(unsigned short *)(actor + 0x96) = next;
+        *(unsigned short *)(moby + 0x96) = next;
         if (timer < 6) return;
     }
     if (*(int *)(state + 4)) { g_game_flag_table.active = 1; MemcardSave(0, -1); }
-    *(int *)(state + 0x2C) = PlayMobySound(0, 4, actor);
-    group_set_moby_states_from_mode(actor);
+    *(int *)(state + 0x2C) = PlayMobySound(0, 4, moby);
+    group_set_moby_states_from_mode(moby);
     return;
     case 3:
     if (!(math_fabs((float)g_frame_l02_counter - **(float **)(state + 0x28)) > 8.0f)) return;
-    if (swing_platform_is_leading(actor)) {
+    if (swing_platform_is_leading(moby)) {
         **(float **)(state + 0x28) = (float)g_frame_l02_counter;
-        moby_set_state(actor, 4, -1);
-        *(unsigned short *)(actor + 0x34) = (*(unsigned short *)(actor + 0x34) & 0xFFBE) | 0x1000;
-        *(int *)(actor + 0x98) = *(int *)(*(char **)(actor + 0x24) + 0x10);
+        moby_set_state(moby, 4, -1);
+        *(unsigned short *)(moby + 0x34) = (*(unsigned short *)(moby + 0x34) & 0xFFBE) | 0x1000;
+        *(int *)(moby + 0x98) = *(int *)(*(char **)(moby + 0x24) + 0x10);
         *(float *)(state + 0xC) = 0;
     }
     return;
     case 4:
     speed = 0.024f;
-    if (flag_set_first_pending(actor)) speed = 6e+01f;
+    if (flag_set_first_pending(moby)) speed = 6e+01f;
     qzero(angles);
     angles[2] = *(float *)(state + 0x3C);
     euler_rotation_basis(rotation, angles);
     matrix_from_basis_rows(inverse, rotation);
-    FastVecSub(offset, actor + 0x10, state + 0x30);
+    FastVecSub(offset, moby + 0x10, state + 0x30);
     matrix_mul_vec3(offset, offset, inverse);
     distance = math_fabs(offset[1]);
     if (distance <= math_fabs(*(float *)(state + 0xC))) {
         offset[1] = 0;
-        moby_set_state(actor, 5, -1);
+        moby_set_state(moby, 5, -1);
     } else math_step_value_toward_target(offset + 1, state + 0xC, 0.0f, speed, speed, 1.2f);
     matrix_mul_vec3(offset, offset, rotation);
-    FastVecAdd(actor + 0x10, state + 0x30, offset);
+    FastVecAdd(moby + 0x10, state + 0x30, offset);
     return;
     case 5:
-    if (flag_set_first_pending(actor)) {
-        qcopy(state + 0x40, actor + 0x10);
+    if (flag_set_first_pending(moby)) {
+        qcopy(state + 0x40, moby + 0x10);
         *(float *)(state + 0x10) = 0;
         *(float *)(state + 0xC) = 0;
     }
     distance = math_fabs(*(float *)(state + 0x10) - 1.0f);
     if (distance < math_fabs(*(float *)(state + 0xC))) {
         *(float *)(state + 0x10) = 1.0f;
-        moby_set_state(actor, 6, -1);
+        moby_set_state(moby, 6, -1);
     } else math_step_value_toward_target(state + 0x10, state + 0xC, 1.0f, 0.004f, 0.004f, 0.20000002f);
-    lerp_vector(actor + 0x10, state + 0x40, state + 0x30, *(float *)(state + 0x10));
-    *(float *)(actor + 0xF8) = FastAddRotations(*(float *)(state + 0x3C), (1.0f - *(float *)(state + 0x10)) * 1.5707965f);
-    *(float *)(actor + 0xF0) = (1.0f - *(float *)(state + 0x10)) * 3.1415927f;
+    lerp_vector(moby + 0x10, state + 0x40, state + 0x30, *(float *)(state + 0x10));
+    *(float *)(moby + 0xF8) = FastAddRotations(*(float *)(state + 0x3C), (1.0f - *(float *)(state + 0x10)) * 1.5707965f);
+    *(float *)(moby + 0xF0) = (1.0f - *(float *)(state + 0x10)) * 3.1415927f;
     return;
     case 7:
-    if (group_are_mobys_settled(actor)) {
-        int index = *(int *)(state + 0x2C);
-        if (index != -1) {
-            char *slot = g_sound_state + index * 0x70;
-            if (*(char **)(slot + 0x88) == actor && *(unsigned char *)(slot + 0x74)) snd_stop_voice(index);
+    if (group_are_mobys_settled(moby)) {
+        int voice_index = *(int *)(state + 0x2C);
+        if (voice_index != -1) {
+            char *slot = g_sound_state + voice_index * 0x70;
+            if (*(char **)(slot + 0x88) == moby && *(unsigned char *)(slot + 0x74)) snd_stop_voice(voice_index);
         }
         *(int *)(state + 0x2C) = -1;
-        group_reset_moby_hit_points(actor);
-        moby_set_state(actor, 8, -1);
+        group_reset_moby_hit_points(moby);
+        moby_set_state(moby, 8, -1);
     }
     return;
     case 8:
-    target = (float)g_swing_platform_direction * 0.080000006f;
-    ApproachValue(&g_swing_platform_speed, target, 0.0064000003f);
-    vec_scale_to_length(angles, actor + 0xD0, g_swing_platform_speed);
-    if (group_update_effect_mobys(actor, angles)) {
-        if (g_swing_platform_speed == target) {
+    target_speed = (float)g_swing_platform_direction * 0.080000006f;
+    ApproachValue(&g_swing_platform_speed, target_speed, 0.0064000003f);
+    vec_scale_to_length(angles, moby + 0xD0, g_swing_platform_speed);
+    if (group_update_effect_mobys(moby, angles)) {
+        if (g_swing_platform_speed == target_speed) {
             if (FastVecDot(g_drive_velocity_view, angles) < -0.001f) {
                 if (++((PlatState *)state)->i[8] > 25) g_swing_platform_direction = -g_swing_platform_direction;
             } else ((PlatState *)state)->i[8] = 0;
@@ -130,7 +130,7 @@ void func_PAL_L02_003EE930(char *actor) {
     if (((PlatState *)state)->f[6] > 1.0f) ((PlatState *)state)->f[6] -= 1.0f;
     else if (((PlatState *)state)->f[6] < -1.0f) ((PlatState *)state)->f[6] += 1.0f;
     ApproachValue(&((PlatState *)state)->f[7], 1.0f, 0.020000001f);
-    gfx_add_draw_callback_first(gfx_draw_energy_sheet, actor);
+    gfx_add_draw_callback_first(gfx_draw_energy_sheet, moby);
     case 1:
     case 6:
         return;

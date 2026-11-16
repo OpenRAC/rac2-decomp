@@ -21,41 +21,42 @@ extern void ref_L03_003C4BD8_00(unsigned char *, void *);
 /* The position the tilt is measured from: a four-float vector in the boot's resident data. */
 extern char g_zero_l00_vector[];
 
-void func_PAL_L03_003C8BE8(unsigned char *a0) {
-    unsigned char *s0 = *(unsigned char **)(a0 + 0x68);
-    float u;
-    float v;
+/* Every so often picks a new random head tilt for the bot, or makes it look toward a fixed point. (PAL: timers scaled to 50 Hz) */
+void bot_update_head_tilt_pal(unsigned char *object) {
+    unsigned char *state = *(unsigned char **)(object + 0x68);
+    float pitch;
+    float yaw;
     int flag;
 
-    if (math_fast_float_d(s0 + 0x384) != 0) {
-        if (a0[0x95] == 2) {
-            *(float *)(s0 + 0x388) = math_random_signed_float_range(5.0f, 60.0f) * 0.017453294f;
-            *(float *)(s0 + 0x38C) = math_random_float_range(-20.0f, 0.0f) * 0.017453294f;
-            *(int *)(s0 + 0x384) = (math_random_int_range(30, 45) * 5 + 2) / 6;
-            *(int *)(s0 + 0x390) = 0;
+    if (math_fast_float_d(state + 0x384) != 0) {
+        if (object[0x95] == 2) {
+            *(float *)(state + 0x388) = math_random_signed_float_range(5.0f, 60.0f) * 0.017453294f;
+            *(float *)(state + 0x38C) = math_random_float_range(-20.0f, 0.0f) * 0.017453294f;
+            *(int *)(state + 0x384) = (math_random_int_range(30, 45) * 5 + 2) / 6;
+            *(int *)(state + 0x390) = 0;
         } else {
-            *(float *)(s0 + 0x388) = math_random_signed_float_range(5.0f, 20.0f) * 0.017453294f;
-            *(float *)(s0 + 0x38C) = math_random_float_range(-15.0f, 5.0f) * 0.017453294f;
+            *(float *)(state + 0x388) = math_random_signed_float_range(5.0f, 20.0f) * 0.017453294f;
+            *(float *)(state + 0x38C) = math_random_float_range(-15.0f, 5.0f) * 0.017453294f;
             flag = (math_random_int_below(4) == 0);
-            *(int *)(s0 + 0x390) = flag;
+            *(int *)(state + 0x390) = flag;
             if (flag) {
-                *(int *)(s0 + 0x384) = (math_random_int_range(180, 300) * 5 + 2) / 6;
+                *(int *)(state + 0x384) = (math_random_int_range(180, 300) * 5 + 2) / 6;
             } else {
-                *(int *)(s0 + 0x384) = (math_random_int_range(60, 120) * 5 + 2) / 6;
+                *(int *)(state + 0x384) = (math_random_int_range(60, 120) * 5 + 2) / 6;
             }
         }
     }
 
-    if (*(int *)(s0 + 0x390) != 0) {
-        ref_L03_003C4BD8_00(a0, g_zero_l00_vector);
+    if (*(int *)(state + 0x390) != 0) {
+        ref_L03_003C4BD8_00(object, g_zero_l00_vector);
     } else {
-        u = *(float *)(s0 + 0x38C);
-        v = *(float *)(s0 + 0x388);
+        pitch = *(float *)(state + 0x38C);
+        yaw = *(float *)(state + 0x388);
         /* This cc1 emits the two pairs of stores in the opposite order to the source, so the
            pair at 0x324 comes first here to land them at 0x2A4 as the retail has them. */
-        *(float *)(s0 + 0x324) = u;
-        *(float *)(s0 + 0x328) = v;
-        *(float *)(s0 + 0x2A4) = u;
-        *(float *)(s0 + 0x2A8) = v;
+        *(float *)(state + 0x324) = pitch;
+        *(float *)(state + 0x328) = yaw;
+        *(float *)(state + 0x2A4) = pitch;
+        *(float *)(state + 0x2A8) = yaw;
     }
 }

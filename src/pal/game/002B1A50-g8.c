@@ -14,6 +14,7 @@ extern void ref_L00_00327858_03(void *owner, void *payload, int count);
 extern Rac2Native_bf55aa2a4d0dd351_SDataCallDispatchFlags ref_L00_00327858_01(void *owner, Rac2Native_bf55aa2a4d0dd351_SDataCallDispatchContext *context);
 extern Rac2Native_bf55aa2a4d0dd351_SDataCallDispatchFlags ref_L00_00327858_00(void *owner, Rac2Native_bf55aa2a4d0dd351_SDataCallDispatchContext *context);
 
+/* Runs the action of a moby by its kind and switches the action off when the result asks for it (PAL). */
 Rac2Native_bf55aa2a4d0dd351_SDataCallDispatchFlags moby_dispatch_action_by_kind_pal(void *owner, Rac2Native_bf55aa2a4d0dd351_SDataCallDispatchContext *context)
 {
     Rac2Native_bf55aa2a4d0dd351_SDataCallDispatchFlags result = 0;

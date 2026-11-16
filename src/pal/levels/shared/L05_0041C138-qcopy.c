@@ -13,10 +13,10 @@ extern float math_random_float_range(float, float);
 extern void *part_spawn_object_relative_particle(char *, void *, void *, void *, s32);
 
 /* Spawns three trail marks at the object's tail: copies the aimed vector three times, shrinks each and releases it with a random sideways drift. */
-void func_PAL_L05_0041C240(char *obj)
+void moby_spawn_tail_marks_pal(char *obj)
 {
     V4_F415958 dir, drift, tail, mark1, mark2, mark3;
-    float k;
+    float drift_scale;
 
     dir.q = 0;
     dir.f[0] = -0.503f;
@@ -24,7 +24,7 @@ void func_PAL_L05_0041C240(char *obj)
     drift.q = 0;
     matrix_mul_vec3(&tail, &dir, obj + 0xC0);
     FastVecAdd(&tail, &tail, obj + 0x10);
-    k = 0.4f;
+    drift_scale = 0.4f;
     tail.w[3] = 0;
     qcopy(&mark1, &tail);
     qcopy(&mark2, &tail);
@@ -33,10 +33,10 @@ void func_PAL_L05_0041C240(char *obj)
     vec_add_random_offset(&mark1, 0.1f);
     vec_add_random_offset(&mark2, 0.1f);
     vec_add_random_offset(&mark3, 0.1f);
-    drift.f[0] = -(math_random_float_range(30.0f, 40.0f) * 0.020000001f) * k;
+    drift.f[0] = -(math_random_float_range(30.0f, 40.0f) * 0.020000001f) * drift_scale;
     part_spawn_object_relative_particle(obj, &mark1, &drift, &g_tail_mark_a1_params, 1);
-    drift.f[0] = -(math_random_float_range(30.0f, 40.0f) * 0.020000001f) * k;
+    drift.f[0] = -(math_random_float_range(30.0f, 40.0f) * 0.020000001f) * drift_scale;
     part_spawn_object_relative_particle(obj, &mark2, &drift, &g_tail_mark_a2_params, 1);
-    drift.f[0] = -(math_random_float_range(30.0f, 40.0f) * 0.020000001f) * k;
+    drift.f[0] = -(math_random_float_range(30.0f, 40.0f) * 0.020000001f) * drift_scale;
     part_spawn_object_relative_particle(obj, &mark3, &drift, &g_tail_mark_a3_params, 1);
 }

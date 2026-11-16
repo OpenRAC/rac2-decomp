@@ -32,7 +32,9 @@ extern void FastVecSub(void *, void *, void *);
 /* func_PAL_002C19C0 uses the quadword-copy profile in 002C0CC0-qcopy.c. */
 
 /* Adapted from RAC1 effect_particle_updates.c; measured against RAC2 retail. */
-void func_PAL_002C1B50(FadeSplitParticle *m) {
+/* Fading split spark: when its timer runs out it breaks into smaller smoke puffs;
+   otherwise it moves, bounces off walls and fades by distance. (PAL: 50 Hz timings) */
+void part_update_fading_split_spark_pal(FadeSplitParticle *m) {
     SplitVector v, p;
     FadeSplitCollision c;
     FadeSplitMotion *e = &m->e;
@@ -54,7 +56,7 @@ void func_PAL_002C1B50(FadeSplitParticle *m) {
         v.f[0] += math_random_float_range(-e->v.f[0] * 0.2f, e->v.f[0] * 0.2f);
         v.f[1] += math_random_float_range(-e->v.f[1] * 0.2f, e->v.f[1] * 0.2f);
         v.f[2] += math_random_float_range(-e->v.f[2] * 0.2f, 0.0f);
-        n = (FadeSplitParticle *)func_PAL_002C19C0((char *)&p, (char *)&v, (e->b18 & 0x10) | 0x88, e->x1C);
+        n = (FadeSplitParticle *)part_spawn_smoke_pal((char *)&p, (char *)&v, (e->b18 & 0x10) | 0x88, e->x1C);
         if (n) {
             n->hA = 2;
             n->fC = m->fC;

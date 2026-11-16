@@ -13,27 +13,28 @@ extern float g_item_piece_offset __attribute__((sda));
 extern float g_item_piece_speed_range __attribute__((sda));
 extern float g_item_piece_spread_range __attribute__((sda));
 
-void breakable_item_update_pal(u8 *s0) {
-    s32 state = s0[0x20];
-    u8 *s1 = *(u8 **)(s0 + 0x68);
+/* Breakable item: when its effect slot is hit, breaks into pieces and explodes (PAL: 50 Hz speeds). */
+void breakable_item_update_pal(u8 *moby) {
+    s32 state = moby[0x20];
+    u8 *vars = *(u8 **)(moby + 0x68);
     s32 one = 1;
     switch (state) {
     case 0:
-        moby_set_state(s0, 1, -1);
+        moby_set_state(moby, 1, -1);
         break;
     case 1:
-        if (part_find_owned_effect_slot(s0, 0x04010000, 0) != 0 && *(s32 *)s1 == 0) {
-            moby_set_state(s0, 2, -1);
+        if (part_find_owned_effect_slot(moby, 0x04010000, 0) != 0 && *(s32 *)vars == 0) {
+            moby_set_state(moby, 2, -1);
         }
-        s0[0xA8] = 0xFF;
+        moby[0xA8] = 0xFF;
         break;
     case 2: {
         s32 v = 0xFFFF;
-        part_explode_object_into_pieces(s0, &g_item_piece_spread_range, &g_item_piece_speed_range,
+        part_explode_object_into_pieces(moby, &g_item_piece_spread_range, &g_item_piece_speed_range,
                           &g_item_piece_offset, 0xFFFF, 0, -1, 0, v, 0xFF, 0);
-        SpawnExplosion(s0 + 0x10, 0, 5, 5, 5, 5, 5, 0,
-                      *(float *)(s0 + 0x2C) * 10.0f, 20.0f, one, 0, one, 0);
-        moby_mark_spawned(s0);
+        SpawnExplosion(moby + 0x10, 0, 5, 5, 5, 5, 5, 0,
+                      *(float *)(moby + 0x2C) * 10.0f, 20.0f, one, 0, one, 0);
+        moby_mark_spawned(moby);
         break;
     }
     }

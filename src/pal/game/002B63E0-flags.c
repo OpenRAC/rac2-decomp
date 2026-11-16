@@ -46,6 +46,7 @@ typedef struct {
     unsigned char bE6, bE7, bE8, bE9, bEA;    
 } Ctl_002B5828;
 
+/* Updates the ground contact of a controlled moby: finds the ground, raises flags on falling, climbing or reaching the target, and sets animation speed and effects (PAL). */
 void moby_update_ground_contact_pal(Self_002B5828 *self, Ctl_002B5828 *ctl, void *target, void *newpos)
 {
     int changed;

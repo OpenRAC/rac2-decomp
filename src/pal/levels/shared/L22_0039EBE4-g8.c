@@ -68,7 +68,7 @@ extern struct { u8 pad[0x18]; void *object; s32 count; Quad position; } ref_L22_
  * swept path. A collision starts its impact effects; expiry or negative world
  * coordinates remove the projectile.
  */
-void func_PAL_L22_003A0498(ProjectileObject *obj)
+void homing_projectile_update_pal(ProjectileObject *obj)
 {
     struct {
         Quad offset, velocity, matrix[3], rotation, turn, previous, position;
@@ -206,14 +206,14 @@ extern Quad g_homing_projectile_aim __attribute__((sda));
 /* Spawns a class-0x100 moby at `position` with the owner's orientation and a 150-frame
    timer, picks its target (the argument, else the level's fallback), then drops the
    target when it is out of range or behind, and points the hero's aim at the shot. */
-ProjectileObject *func_PAL_L22_003A00C0(ProjectileObject *owner, Quad *position,
-                                    ProjectileObject *target, s32 a3, s32 a4)
+ProjectileObject *homing_projectile_spawn_pal(ProjectileObject *owner, Quad *position,
+                                    ProjectileObject *target, s32 mode, s32 is_player)
 {
-    Quad offset, targetpos, start, direction, facing;
+    Quad offset, target_pos, start, direction, facing;
     s32 reject;
     ProjectileObject *obj;
     ProjectileData *data;
-    f32 ownerangle, targetangle, distance, dot;
+    f32 owner_angle, target_angle, distance, dot;
 
     obj = ref_L22_0039CDC0_0(0x100);
     if (obj) {
@@ -232,8 +232,8 @@ ProjectileObject *func_PAL_L22_003A00C0(ProjectileObject *owner, Quad *position,
 
             data->timer = 125;
             obj->scale += obj->scale;
-            data->mode = a3;
-            data->player = a4;
+            data->mode = mode;
+            data->player = is_player;
             if (target) {
                 data->target = target;
                 data->color = 0x890000;
@@ -252,19 +252,19 @@ ProjectileObject *func_PAL_L22_003A00C0(ProjectileObject *owner, Quad *position,
         if (!data->mode && data->target) {
             ref_L22_0039CDC0_2(&offset, &data->target->basis[2], 5.0f);
             ref_L22_0039CDC0_3(&offset, &data->target->position, &offset);
-            qcopy(&targetpos, &data->target->position);
-            ref_L22_0039CDC0_5(&targetpos, 0.0f);
+            qcopy(&target_pos, &data->target->position);
+            ref_L22_0039CDC0_5(&target_pos, 0.0f);
             ref_L22_0039CDC0_4(&data->direction, &offset, &obj->position);
             qcopy(&start, &obj->position);
             ref_L22_0039CDC0_5(&start, 0.0f);
             reject = 0;
-            ref_L22_0039CDC0_4(&direction, &targetpos, &start);
+            ref_L22_0039CDC0_4(&direction, &target_pos, &start);
             ref_L22_0039CDC0_6(&direction, &direction, 1.0f);
             ref_L22_0039CDC0_6(&data->direction, &data->direction, 1.0f);
-            ownerangle = ref_L22_0039CDC0_7(&owner->position);
-            targetangle = ref_L22_0039CDC0_7(&data->target->position);
-            distance = ref_L22_0039CDC0_8(&targetpos, &start);
-            if (distance < 5.0f && ref_L22_0039CDC0_9(ownerangle - targetangle) > 10.0f)
+            owner_angle = ref_L22_0039CDC0_7(&owner->position);
+            target_angle = ref_L22_0039CDC0_7(&data->target->position);
+            distance = ref_L22_0039CDC0_8(&target_pos, &start);
+            if (distance < 5.0f && ref_L22_0039CDC0_9(owner_angle - target_angle) > 10.0f)
                 reject = 1;
             qcopy(&facing, &obj->basis[0]);
             dot = ref_L22_0039CDC0_10(&direction, &facing);

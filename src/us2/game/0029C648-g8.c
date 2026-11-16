@@ -2,19 +2,21 @@
 #include "names.h"
 
 extern char *g_resident_data_base;
-extern int func_US2_00349728(void *, int);
+extern int menu_choice_list_update_widgets_us2(void *, int);
 
-int func_US2_0029CFA0(int value) {
+/* Passes a value to a resident menu panel and returns its answer; returns 0 if the resident data does not exist. */
+int resident_menu_update_us2(int value) {
     if (g_resident_data_base != 0)
-        return func_US2_00349728(g_resident_data_base + 0x39160, value);
+        return menu_choice_list_update_widgets_us2(g_resident_data_base + 0x39160, value);
     return 0;
 }
 
-extern int func_US2_00347B88(void *, int);
+extern int UpdateItemGridMenu_us2(void *, int);
 
-int func_US2_0029D040(int value) {
+/* Passes a value to a resident menu panel and returns its answer; returns 0 if the resident data does not exist. */
+int resident_menu_update_2_us2(int value) {
     if (g_resident_data_base != 0)
-        return func_US2_00347B88(g_resident_data_base + 0x39620, value);
+        return UpdateItemGridMenu_us2(g_resident_data_base + 0x39620, value);
     return 0;
 }
 
@@ -25,7 +27,7 @@ extern CamCc ref_L00_0030CFE0_01;
 extern void UpdateViewContext(void);
 extern void hud_update_subobject_alt_us2(void *);
 
-void func_US2_0029CC48(void)
+void hud_draw_scaled_us2(void)
 {
     if (g_resident_data_base != 0) {
         float saved = ref_L00_0030CFE0_01.scale;

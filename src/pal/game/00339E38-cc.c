@@ -48,7 +48,7 @@ void text_draw_framed_box_pal(void *object, short *box, int style, char *text, i
     char buffer[768];
     int flags = box[9];
     int top, bottom, left, right;
-    int halfWidth, halfHeight;
+    int half_width, half_height;
     int x, y;
 
     box[9] |= 3;
@@ -76,27 +76,27 @@ void text_draw_framed_box_pal(void *object, short *box, int style, char *text, i
     }
     if (center) {
         int height = (unsigned short)box[7];
-        int newTop = (g_screen_width[1] - (short)height) >> 1;
-        int middle = newTop + ((short)height >> 1);
+        int new_top = (g_screen_width[1] - (short)height) >> 1;
+        int middle = new_top + ((short)height >> 1);
 
-        box[1] = newTop + height;
+        box[1] = new_top + height;
         box[5] = middle;
-        box[0] = newTop;
+        box[0] = new_top;
     }
     switch (mode) {
     case 0: text_draw_window_medium(box, style, buffer, length); break;
     case 1: text_draw_window_small(box, style, buffer, length); break;
     case 2: text_draw_window_large(box, style, buffer, length); break;
     }
-    halfWidth = (box[6] >> 1) + 10;
-    halfHeight = (box[7] >> 1) + 5;
+    half_width = (box[6] >> 1) + 10;
+    half_height = (box[7] >> 1) + 5;
     box[9] &= ~4;
     x = box[4];
     y = box[5];
-    top = y - halfHeight;
-    left = x - halfWidth;
-    right = x + halfWidth;
-    bottom = y + halfHeight;
+    top = y - half_height;
+    left = x - half_width;
+    right = x + half_width;
+    bottom = y + half_height;
     gfx_draw_rounded_box(top, bottom, left, right, 96, 0x60442D00);
     text_box_draw_frame_pal(object, 96, 0x55F0C070, (float)top, (float)bottom, (float)left, (float)right);
     switch (mode) {

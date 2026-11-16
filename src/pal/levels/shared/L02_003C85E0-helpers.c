@@ -42,9 +42,9 @@ struct L02SpinObj {
 };
 
 /* Measured pointer-list starts are accessed without guessing their capacities. */
-void puzzle_reset_linked_part_group_pal(char *arg)
+void puzzle_reset_linked_part_group_pal(char *moby)
 {
-    char *parent = *(char **)(arg + 0x68);
+    char *parent = *(char **)(moby + 0x68);
     struct L02ListObj **list;
     struct L02TurnObj **turn;
     struct L02SpinObj **spin;

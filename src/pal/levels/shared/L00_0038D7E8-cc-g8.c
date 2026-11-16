@@ -63,11 +63,12 @@ typedef struct {
     TrailWork *work;
 } TrailMoby;
 
-char *func_PAL_L00_0038D7E8(void *owner, Vector4 *position, Vector4 *velocity)
+/* Creates a Megaturret shot for the given owner at the given position moving the given way, and turns it to face its direction. Returns null if it cannot be set up. */
+char *megaturret_spawn_shot_pal(void *owner, Vector4 *position, Vector4 *velocity)
 {
     Vector4 direction, forward, quaternion, axis;
     Vector4 rotation[3];
-    char *object = CreateMoby(0x1367);
+    char *object = CreateMoby(MOBY_CLASS_MEGATURRET);
     TrailWork *work;
     float angle;
     if (object) {

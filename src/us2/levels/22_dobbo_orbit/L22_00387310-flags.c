@@ -8,12 +8,13 @@ extern void moby_set_state(u8 *, s32, s32);
 extern s32 snd_play_from_global_bank(s32, s32, void *);
 extern void value_set_entry_by_index_us2(s32, s32);
 
-void moby_wait_no_active_trigger_event_us2(s32 a0)
+/* Starts in the idle state, then waits until no other object of class 3389 is still active before it fires the one-time event (USA v2.00). */
+void moby_wait_no_active_trigger_event_us2(s32 moby)
 {
-    switch (*(u8 *)(a0 + 0x20)) {
+    switch (*(u8 *)(moby + 0x20)) {
     case 0:
-        *(u8 *)(a0 + 0x30) = 0xFF;
-        moby_set_state((u8 *)a0, 1, -1);
+        *(u8 *)(moby + 0x30) = 0xFF;
+        moby_set_state((u8 *)moby, 1, -1);
         break;
     case 1: {
         s32 found = 0;

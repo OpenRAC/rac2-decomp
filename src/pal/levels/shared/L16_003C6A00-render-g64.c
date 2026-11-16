@@ -34,9 +34,9 @@ extern void multiply_matrix3x3(void *, void *, void *);
 extern void draw_world_quad(void *, void *, int);
 
 /* Draws alternating rotated packet pairs for the visible members of the object group. */
-void func_PAL_L16_003C70F0(u8 *object)
+void DrawRotatingGroupInstances_pal(u8 *object)
 {
-    float matrices[32][16], rotation[16], localRotation[12], sphere[4];
+    float matrices[32][16], rotation[16], local_rotation[12], sphere[4];
     L16DrawPacket packets[2];
     float angles[4], projected[4], combined[12];
     u16 *list;
@@ -85,12 +85,12 @@ void func_PAL_L16_003C70F0(u8 *object)
     *(int *)(packets[1].attributes + 4) = g_render_quad_attr_b[0];
     vec_clear_128((Quad *)angles);
     angles[2] = 0.3926991f;
-    euler_rotation_basis(localRotation, angles);
+    euler_rotation_basis(local_rotation, angles);
     for (k = 0; k < 2; k++) {
-        matrix_mul_vec3(packets[k].vertices[2], packets[k].vertices[2], localRotation);
-        matrix_mul_vec3(packets[k].vertices[3], packets[k].vertices[3], localRotation);
+        matrix_mul_vec3(packets[k].vertices[2], packets[k].vertices[2], local_rotation);
+        matrix_mul_vec3(packets[k].vertices[3], packets[k].vertices[3], local_rotation);
     }
-    multiply_matrix3x3(combined, localRotation, localRotation);
+    multiply_matrix3x3(combined, local_rotation, local_rotation);
     for (pass = 0; pass < 16; pass++) {
         pair = (pass & 1) ? 2 : 0;
         for (i = 0; i < 2; i++) {

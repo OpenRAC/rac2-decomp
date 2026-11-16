@@ -21,9 +21,11 @@ extern L05Slot40 g_slot_value_table[];
 extern int snd_play_from_class_bank(int, int, char *, int);
 extern void moby_mark_spawned(void *);
 extern int g_active_effect_moby __attribute__((sda));
-extern void func_PAL_L05_003D1248(char *);
+extern void pickup_draw_glow_sprites_pal(char *);
 
-void func_PAL_L05_003D0F1C(char *object)
+/* A pickup that homes on the active effect moby and, once close, adds to its slot's value, shows a
+   message and removes itself; otherwise it spins and draws its glow (PAL). */
+void pickup_update_homing_pal(char *object)
 {
     char *state = *(char **)(object + 0x68);
     float scale;
@@ -70,5 +72,5 @@ void func_PAL_L05_003D0F1C(char *object)
         }
     }
     *(float *)(object + 0xF8) = FastAddRotations(*(float *)(object + 0xF8), 0.03f);
-    func_PAL_L05_003D1248(object);
+    pickup_draw_glow_sprites_pal(object);
 }

@@ -12,6 +12,8 @@ extern void joba_rail_reset_pal(u8 *);
 
 extern void rotor_reset_group(u8 *);
 
+/* Finds the first free boss of the given class (chain creature or arachnoid) in the object's group,
+   hands it to the object and starts it. */
 u8 *arena_activate_boss_of_class_pal(u8 *obj, s32 id) {
     u8 *state = *(u8 **)(obj + 0x68);
     s32 index = *(s32 *)(state + 0xC0);
@@ -39,7 +41,7 @@ u8 *arena_activate_boss_of_class_pal(u8 *obj, s32 id) {
                 rotor_reset_group(record);
                 *(s32 *)(state + 0x118) += 1;
                 return record;
-            case 0xB3A:
+            case MOBY_CLASS_ARACHNOID:
                 joba_rail_reset_pal(record);
                 *(s32 *)(state + 0x11C) += 1;
                 return record;

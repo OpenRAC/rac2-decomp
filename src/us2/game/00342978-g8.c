@@ -22,37 +22,38 @@ struct Obj {
     int mode764;
 };
 
-void tab_menu_draw_icons_us2(struct Obj *o)
+/* Draws the row of icons of a tab menu, tinting the selected one. */
+void tab_menu_draw_icons_us2(struct Obj *menu)
 {
     int i;
 
-    for (i = 0; i < o->count460; i++) {
-        object_set_first_float4(&o->h380, o->fp536[0] + g_tab_menu_icon_offset_x,
-                o->fp536[1] + g_tab_menu_icon_offset_y + g_tab_menu_icon_spacing * (float)i, 0.0f, 0.0f);
-        if (o->mode764 == 2) {
-            int v = o->p456[i];
+    for (i = 0; i < menu->count460; i++) {
+        object_set_first_float4(&menu->h380, menu->fp536[0] + g_tab_menu_icon_offset_x,
+                menu->fp536[1] + g_tab_menu_icon_offset_y + g_tab_menu_icon_spacing * (float)i, 0.0f, 0.0f);
+        if (menu->mode764 == 2) {
+            int icon = menu->p456[i];
 
-            if (v == 5)
-                hud_set_widget_value_pair(&o->h380, 60062, 5);
+            if (icon == 5)
+                hud_set_widget_value_pair(&menu->h380, 60062, 5);
             else
-                hud_set_widget_value_pair(&o->h380, v, 0);
-        } else if (o->mode764 == 0) {
-            int w = o->p456[i];
+                hud_set_widget_value_pair(&menu->h380, icon, 0);
+        } else if (menu->mode764 == 0) {
+            int icon = menu->p456[i];
 
-            if (w == 6)
-                hud_set_widget_value_pair(&o->h380, 60055, 0);
+            if (icon == 6)
+                hud_set_widget_value_pair(&menu->h380, 60055, 0);
             else
-                hud_set_widget_value_pair(&o->h380, o->a452, w);
+                hud_set_widget_value_pair(&menu->h380, menu->a452, icon);
         } else {
-            hud_set_widget_value_pair(&o->h380, o->a452, o->p456[i]);
+            hud_set_widget_value_pair(&menu->h380, menu->a452, menu->p456[i]);
         }
         {
-            int *r = object_get_fourth_field(&o->h380);
-            int t = o->tbl440[o->mode764] ^ i;
+            int *color = object_get_fourth_field(&menu->h380);
+            int unselected = menu->tbl440[menu->mode764] ^ i;
             int alt = 0x70FFFEED;
 
-            *r = t ? 0x60F0F0B0 : alt;
+            *color = unselected ? 0x60F0F0B0 : alt;
         }
-        hud_draw_colored_quad_widget(&o->h380);
+        hud_draw_colored_quad_widget(&menu->h380);
     }
 }

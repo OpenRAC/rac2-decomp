@@ -53,7 +53,8 @@ extern struct A g_vendor_menu_state;
 extern struct B g_memcard_state;
 extern s32 g_special_items_bought_flags;
 
-void func_PAL_L00_0037BEC8(void) {
+/* Steps the shop message states: shows the memory card result message and moves on. */
+void shop_l00_step_message_states_pal(void) {
     {
     static void *rc2_labels[] = {&&rc2_case_0, &&rc2_case_1, &&rc2_case_2, &&rc2_case_3, &&rc2_case_4, &&rc2_case_5, &&rc2_case_6};
     u32 rc2_selector = (u32)(g_vendor_menu_state.st);
@@ -127,9 +128,9 @@ goto *D_0026DBE0[rc2_selector];
     rc2_case_6:
         if (g_memcard_state.f15C < 3 && g_memcard_state.f164 < 0) {
             if (g_memcard_state.f1C == 0) {
-                s32 a = g_memcard_state.f8;
-                if (a == 2 && g_memcard_state.f14 != 0) {
-                    g_vendor_menu_state.st = a;
+                s32 state = g_memcard_state.f8;
+                if (state == 2 && g_memcard_state.f14 != 0) {
+                    g_vendor_menu_state.st = state;
                     goto rc2_switch_end;
                 }
             }

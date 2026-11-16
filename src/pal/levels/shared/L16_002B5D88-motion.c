@@ -55,11 +55,13 @@ extern void EaseHeroPositionToGoal_pal(void);
 extern void cam_project_vector_onto_view_plane(char *,char *);
 extern float hero_get_speed_along_forward(void *);
 
+/* Applies the player's movement for this frame, limits the speed, and records how far the player
+ * moved (PAL). */
 void hero_apply_movement_pal(void)
 {
-    float oldPosition[4],horizontal[4],vertical[4];
+    float old_position[4],horizontal[4],vertical[4];
     float limit,saved;
-    qcopy(oldPosition,V(0x80));
+    qcopy(old_position,V(0x80));
     UpdateHeroAttachment_pal(g_hero_state.field588,V(0x100),V(0x90));
     if (g_hero_state.field2294==0x14 || g_hero_state.field2294==0x5B || g_hero_state.field2294==0x58 || g_hero_state.field2294==0x81) {
         if (g_hero_state.field1f0==0 && cam_get_view_space_vector_length(V(0xF0))>g_hero_state.field264-0.02f)
@@ -87,10 +89,10 @@ moved:
     if (FastVecLength(V(0x100))<=0.0001f) {
         hero_resolve_collision_with_rewind();
         hero_probe_ground();
-        FastVecSub(V(0x110),V(0x80),oldPosition);
+        FastVecSub(V(0x110),V(0x80),old_position);
         EaseHeroPositionToGoal_pal();
     } else hero_probe_ground();
-    FastVecSub(V(0x120),V(0x80),oldPosition);
+    FastVecSub(V(0x120),V(0x80),old_position);
     qcopy(V(0x140),V(0x120));
     qcopy(V(0x130),V(0x120));
     vec_scale_to_length(V(0x120),V(0x120),1.0f);
@@ -131,14 +133,14 @@ moved:
         g_hero_state.field10c=saved;
         hero_resolve_collision_with_rewind();
         hero_probe_ground();
-        FastVecSub(V(0x110),V(0x80),oldPosition);
+        FastVecSub(V(0x110),V(0x80),old_position);
         EaseHeroPositionToGoal_pal();
     }
     FastVecSub(V(0x150),V(0x80),horizontal);
     g_hero_state.field184=FastVecLength(V(0x150));
     g_hero_state.field15c=g_hero_state.field10c;
     g_hero_state.field10c=0.0f;
-    FastVecSub(V(0x110),V(0x80),oldPosition);
+    FastVecSub(V(0x110),V(0x80),old_position);
     g_hero_state.field17c=0.0f;
     if (g_hero_state.field174>0.004f) {
         g_hero_state.field17c=g_hero_state.field118/g_hero_state.field174;

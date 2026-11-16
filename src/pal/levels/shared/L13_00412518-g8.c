@@ -27,11 +27,13 @@ typedef struct {
     unsigned short color, flags;
 } DCObject;
 
-char *SpawnEA7Moby_pal(char *a0, char *a1, char *a2, int a3, float f12)
+/* Spawns a sparkle moby (class 0xEA7) at a position, facing along a direction, with random
+ * spin and two ground sparkle effects (PAL). */
+char *SpawnEA7Moby_pal(char *owner, char *direction, char *position, int unused, float param)
 {
     float angle, scale;
-    char *p = a2;
-    char *q = a0;
+    char *p = position;
+    char *q = owner;
     char *entity = CreateMoby(0xEA7);
 
     if (entity != 0) {
@@ -42,15 +44,15 @@ char *SpawnEA7Moby_pal(char *a0, char *a1, char *a2, int a3, float f12)
         *(long long *)(entity + 0x38) = *(long long *)(q + 0x38);
         *(L13_TI128 *)(entity + 0x10) = *(L13_TI128 *)p;
         p = *(char **)(entity + 0x68);
-        *(L13_TI128 *)p = *(L13_TI128 *)a1;
+        *(L13_TI128 *)p = *(L13_TI128 *)direction;
         *(char **)(p + 0x10) = q;
-        *(float *)(p + 0x14) = f12;
+        *(float *)(p + 0x14) = param;
         *(float *)(p + 0x20) = 0.1500000059604645f;
         ((DCObject *)entity)->flags |= 0x208;
 
         *(float *)(entity + 0xF8) =
-            FastAddRotations(mat_fast_helper_a(*(float *)(a1 + 0), *(float *)(a1 + 4)), 1.5707964906692505f);
-        *(float *)(entity + 0xF0) = -mat_fast_helper_a(vec_length_xy(a1), *(float *)(a1 + 8));
+            FastAddRotations(mat_fast_helper_a(*(float *)(direction + 0), *(float *)(direction + 4)), 1.5707964906692505f);
+        *(float *)(entity + 0xF0) = -mat_fast_helper_a(vec_length_xy(direction), *(float *)(direction + 8));
         angle = math_random_angle();
 
         q = entity + 0xC0;

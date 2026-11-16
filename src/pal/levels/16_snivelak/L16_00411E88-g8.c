@@ -19,31 +19,32 @@ extern u8 g_turret_aim_vector[] __attribute__((nosda));
 extern float g_turret_ease_rate_a __attribute__((sda));
 extern float g_turret_ease_rate_b __attribute__((sda));
 
-void func_PAL_L16_00411E88(u8 *arg)
+/* Turns the turret toward the hero, easing its yaw and pitch joints (PAL: 50 Hz rates). */
+void turret_l16_aim_at_hero_pal(u8 *moby)
 {
-    float temp[4];
+    float joint_pos[4];
     float target[4];
     u8 *state;
     u8 *origin;
     float value;
     float scale;
     float rate;
-    state = *(u8 **)(arg + 0x68);
+    state = *(u8 **)(moby + 0x68);
     math_fast_float_d(state + 0x238);
     FastDecTimer(state + 0x23C);
-    if (*(u16 *)(arg + 0x96) < 0xFFFF) ++*(u16 *)(arg + 0x96);
-    moby_transform_joint_to_world(arg, 0, temp);
-    if (arg[0x20] != 4) {
+    if (*(u16 *)(moby + 0x96) < 0xFFFF) ++*(u16 *)(moby + 0x96);
+    moby_transform_joint_to_world(moby, 0, joint_pos);
+    if (moby[0x20] != 4) {
         origin = state + 0x1F0;
-        value = fast_vec_dist(temp, origin) - 1.0f;
+        value = fast_vec_dist(joint_pos, origin) - 1.0f;
         FastVecScale(target, g_turret_aim_vector, value * 1.6666666f);
         target[2] = 0.0f;
         FastVecAdd(target, target, origin);
-        FastVecSub(temp, target, temp);
-        *(float *)(state + 0x2B8) = fast_subtract_rotations(mat_fast_helper_a(temp[0], temp[1]), *(float *)(arg + 0xF8));
-        moby_transform_joint_to_world(arg, 1, temp);
-        FastVecSub(temp, target, temp);
-        value = fast_subtract_rotations(-mat_fast_helper_a(vec_length_xy(temp), temp[2]), *(float *)(arg + 0xF4));
+        FastVecSub(joint_pos, target, joint_pos);
+        *(float *)(state + 0x2B8) = fast_subtract_rotations(mat_fast_helper_a(joint_pos[0], joint_pos[1]), *(float *)(moby + 0xF8));
+        moby_transform_joint_to_world(moby, 1, joint_pos);
+        FastVecSub(joint_pos, target, joint_pos);
+        value = fast_subtract_rotations(-mat_fast_helper_a(vec_length_xy(joint_pos), joint_pos[2]), *(float *)(moby + 0xF4));
         if (value > 0.523598849773407f) value = 0.523598849773407f;
         else if (value < -0.523598849773407f) value = -0.523598849773407f;
         *(float *)(state + 0x334) = value;
@@ -53,6 +54,6 @@ void func_PAL_L16_00411E88(u8 *arg)
         scale = 0.085f;
     }
     rate = scale * 1.44f;
-    moby_update_eased_node(arg, state + 0x250, 0, g_turret_ease_rate_a * rate, g_turret_ease_rate_b * rate);
-    moby_update_eased_node(arg, state + 0x2D0, 1, g_turret_ease_rate_a * rate, g_turret_ease_rate_b * rate);
+    moby_update_eased_node(moby, state + 0x250, 0, g_turret_ease_rate_a * rate, g_turret_ease_rate_b * rate);
+    moby_update_eased_node(moby, state + 0x2D0, 1, g_turret_ease_rate_a * rate, g_turret_ease_rate_b * rate);
 }

@@ -10,11 +10,11 @@ extern float FastAddRotations(float, float);
 extern void *state_get_stored_pointer_value(void);
 extern void level_append_object(void *, void *, int, int);
 extern void moby_reset_action_state(void *);
-extern void func_PAL_L15_0043B0D8(char *);
+extern void gorn_ship_init_pal(char *);
 extern void gorn_ship_update_flight_pal(void *, int);
-extern void func_PAL_L15_0043BB70(void);
+extern void gorn_ships_reset_pal(void);
 extern void gorn_ship_spawn_damage_effects(void *);
-extern char *func_PAL_L05_0042A240(void *, int, int, int, int, int, int, int, float, int, int, int);
+extern char *moby_spawn_large_explosion_pal(void *, int, int, int, int, int, int, int, float, int, int, int);
 extern int math_random_int_below(int);
 extern void moby_mark_spawned(void *);
 extern void euler_rotation_basis(void *, void *);
@@ -34,6 +34,7 @@ extern int math_random_int_below(int);
 extern void moby_mark_spawned(void *);
 extern void euler_rotation_basis(void *, void *);
 
+/* Per-frame update of the Gorn enemy ship moby (class 4625): arms it, runs its route, fades it in and out, and drops it when it falls out of the level. (PAL: 50 Hz timings) */
 void gorn_ship_update_pal(unsigned char *object) {
     float point[4] __attribute__((aligned(16)));
     unsigned char *state = *(unsigned char **)(object + 0x68);
@@ -42,9 +43,9 @@ void gorn_ship_update_pal(unsigned char *object) {
     case 0:
         object[0x30] = 0xFF;
         if (!state_get_stored_pointer_value()) return;
-        func_PAL_L15_0043B0D8((char *)object);
+        gorn_ship_init_pal((char *)object);
         if (*(int *)(state + 0x264))
-            level_append_object(object, func_PAL_L15_0043BB70, 0, 0);
+            level_append_object(object, gorn_ships_reset_pal, 0, 0);
         qcopy(state + 0x430, object + 0x10);
         break;
     case 1:
@@ -94,11 +95,11 @@ void gorn_ship_update_pal(unsigned char *object) {
         point[1] = *(float *)(object + 0x14) + math_random_float_range(-3.0f, 3.0f);
         point[2] = *(float *)(object + 0x18) + math_random_float_range(-3.0f, 3.0f);
         if (*(int *)(state + 0x278) == 0) {
-            func_PAL_L05_0042A240(point, 1, 24, 24, 24, 24, 24, 0, 3.0f, 1, 1, 1);
+            moby_spawn_large_explosion_pal(point, 1, 24, 24, 24, 24, 24, 0, 3.0f, 1, 1, 1);
             *(int *)(state + 0x278) = 1;
         }
         if (math_random_int_below(12) == 0 && *(float *)(object + 0x18) > 350.0f)
-            func_PAL_L05_0042A240(point, 0, 4, 4, 4, 4, 4, 0, 1.5f, 0, 0, 0);
+            moby_spawn_large_explosion_pal(point, 0, 4, 4, 4, 4, 4, 0, 1.5f, 0, 0, 0);
         *(float *)(object + 0x18) -= *(float *)(state + 0x27C);
         *(float *)(state + 0x27C) += 0.00080000004f;
         *(float *)(state + 0x404) = FastAddRotations(*(float *)(state + 0x404), 0.0017453296f);

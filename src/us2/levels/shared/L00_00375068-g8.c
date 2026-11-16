@@ -22,8 +22,9 @@ extern int PlayMobySound(int, int, char *);
 extern char *GetLocalizedString(int);
 extern void shop_set_message_text(void *);
 extern void shop_close_sub_menu_us2(void);
-extern void func_US2_002FC008(void);
+extern void PrepareVendorSelectionPreview_us2(void);
 
+/* Handles the selected-item purchase dialog: waits for the answer, then charges bolts and confirms or plays the refusal sound. */
 void UpdateSelectedItemPurchaseDialog_us2(int *answer, int *unused) {
     PurchaseModel *model = &g_purchase_menu_model;
     int index = model->index;
@@ -60,6 +61,6 @@ void UpdateSelectedItemPurchaseDialog_us2(int *answer, int *unused) {
             }
         } else PlayMobySound(0, 17, g_purchase_menu_model.object);
         g_purchase_menu_model.state = 0;
-        func_US2_002FC008();
+        PrepareVendorSelectionPreview_us2();
     }
 }

@@ -34,14 +34,14 @@ extern float math_spring_float_to_goal(float *, float *, float, float, float, fl
 extern int weapon_spend_ammo(int, int);
 extern int snd_is_voice_playing_for_owner(char *, int);
 extern int PlayMobySound(int, int, char *);
-extern void func_PAL_002A7E68(char *, int, int, int);
+extern void anim_start_blended_pal(char *, int, int, int);
 extern int coll_process_hit(float, char *, int, char *, int);
 extern void FastVecSub(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
 extern void make_hit_descriptor(void *, char *, int, void *, float);
 extern void QueueMobyImpact(char *, void *);
 extern int StartAttachedEffect_pal(char *, int, char *);
-extern s32 func_PAL_L00_002C4480(int, int);
+extern s32 hero_l00_set_action_pal(int, int);
 extern void vec_clear_128(void *);
 extern void matrix_mul_vec3(void *, void *, void *);
 extern void vec_compute_object_to_target(char *, char *, void *, float);
@@ -56,7 +56,7 @@ extern void ref_L00_00419C98_01(void *, char *);
 
 /* Initializes the effect tables on first update, processes nearby targets while active,
    and advances the emission vector and scrolling phases. */
-void func_PAL_L02_0044B234(char *object)
+void lava_l02_l00_gun_update_pal(char *object)
 {
     float vector[4];
     union { EffectVectorBits word; float v[4]; } direction;
@@ -65,7 +65,7 @@ void func_PAL_L02_0044B234(char *object)
     char *state = *(char **)(object+0x68);
     char **target;
     if (g_hero_state.i[0x1244/4]==3 && g_lava_gun_ring_entries) {
-        for (;i<35;i++) { char *p=g_lava_gun_ring_entries+i*64; if (*(int *)(p+0x38)>=0) { table_clear_entry_flag(*(int *)(p+0x38)); *(int *)(p+0x38)=-1; } }
+        for (;i<35;i++) { char *entry=g_lava_gun_ring_entries+i*64; if (*(int *)(entry+0x38)>=0) { table_clear_entry_flag(*(int *)(entry+0x38)); *(int *)(entry+0x38)=-1; } }
     }
     if (!((unsigned char *)object)[0x20]) {
         *(int *)(state+0x34)=AcquireEntitySlot(object,0,&unused);
@@ -95,7 +95,7 @@ void func_PAL_L02_0044B234(char *object)
         { int divisor=10; if (*(int *)(state+0x60)%divisor==0) weapon_spend_ammo(-1,1); }
         ++*(int *)(state+0x60);
         if (!snd_is_voice_playing_for_owner(object,*(int *)(state+0x38))) *(int *)(state+0x38)=PlayMobySound(0,4,object);
-        if (((unsigned char *)object)[0x43]!=2) func_PAL_002A7E68(object,2,0,0);
+        if (((unsigned char *)object)[0x43]!=2) anim_start_blended_pal(object,2,0,0);
         count=coll_process_hit(0.5f,state,16,object,0);
         if (count>0) { int remaining; target=g_area_hit_targets; remaining=count; do {
             if (*target!=g_hero_state.p[0x2290/4]) {
@@ -118,7 +118,7 @@ void func_PAL_L02_0044B234(char *object)
         math_spring_float_to_goal((float *)(state+0x50),(float *)(state+0x54),0,0.072000004f,0.012f,0.15f);
         *(int *)(state+0x60)=0;
     }
-    if (g_hero_state.i[0x2294/4]==1) func_PAL_L00_002C4480(29,1);
+    if (g_hero_state.i[0x2294/4]==1) hero_l00_set_action_pal(29,1);
     moby_transform_joint_to_world(object,0,state);
     vec_clear_128(vector); vector[1]=-1;
     matrix_mul_vec3(vector,vector,object+0xc0);

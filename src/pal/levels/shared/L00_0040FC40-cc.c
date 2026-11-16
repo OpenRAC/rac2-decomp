@@ -14,7 +14,7 @@ extern void FastVecAdd(float *, float *, float *);
 extern float math_random_signed_float_range(float, float);
 extern float math_random_float_range(float, float);
 extern s32 math_random_int_range(s32, s32);
-extern u8 *func_PAL_002C23B8(f32 *pos, f32 *sym, s32 a2, s32 a3, u32 color, s32 alpha, f32 f12, f32 f13, f32 f14, f32 f15, f32 f16);
+extern u8 *part_spawn_burst_pal(f32 *pos, f32 *sym, s32 a2, s32 a3, u32 color, s32 alpha, f32 f12, f32 f13, f32 f14, f32 f15, f32 f16);
 extern s32 func_001163B0(void);
 
 /* Lays a line of grey particles from ORIGIN towards the object's position (+0x10), about
@@ -22,7 +22,7 @@ extern s32 func_001163B0(void);
    size, lifetime and a small velocity against D_0018A0E0. The velocity's scale is computed in
    its own statement, so the vector's address is formed after that call and stays a plain
    stack address there, while the emitter's copy of it is kept in a saved register. */
-void func_PAL_L00_0040FC40(u8 *self, Vector *origin)
+void line_particles_spawn_pal(u8 *self, Vector *origin)
 {
     Vector start;
     Vector velocity;
@@ -60,7 +60,7 @@ void func_PAL_L00_0040FC40(u8 *self, Vector *origin)
             color = 0x7F7F7F;
             alpha = 0x50;
         }
-        part = func_PAL_002C23B8(position.f, velocity.f, (((int)(life) * 5 + 2) / 6), alpha, color, spin, 21000.0f, size, 1.0f, 0.0f, 1.0f);
+        part = part_spawn_burst_pal(position.f, velocity.f, (((int)(life) * 5 + 2) / 6), alpha, color, spin, 21000.0f, size, 1.0f, 0.0f, 1.0f);
         FastVecAdd(position.f, position.f, step.f);
         if (part != 0) {
             part[2] = *g_effect_definitions.texture;

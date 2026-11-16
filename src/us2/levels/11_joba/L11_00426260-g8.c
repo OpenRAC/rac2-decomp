@@ -80,7 +80,7 @@ static inline int rider_kind(char *moby)
 }
 
 /* Initializes the rider, maintains its linked objects and handles damage/removal. */
-int func_US2_L11_00426260(unsigned char *object)
+int joba_rider_update_us2(unsigned char *object)
 {
     Vector hit_position;
     char *state = POINTER(object, 0x68);
@@ -207,7 +207,7 @@ int func_US2_L11_00426260(unsigned char *object)
                 ids = g_group_id_lists[BYTE(object, 0x21)];
                 for (;;) {
                     candidate = moby_at(group_entry_id(ids));
-                    if (moby_state(candidate) >= 0 && moby_class(candidate) == 0xcf5 &&
+                    if (moby_state(candidate) >= 0 && moby_class(candidate) == MOBY_CLASS_JOBA_TRIBESMAN &&
                         rider_kind(candidate) == 1) {
                         POINTER(state, 0x55c) = candidate;
                         break;
@@ -291,7 +291,7 @@ int func_US2_L11_00426260(unsigned char *object)
         char *attacker = POINTER(state, 0x38);
         if (attacker != 0) {
             kind = HALF(attacker, 0xaa);
-            if (kind != 0xed8 && kind != 0x47 && kind != 0xdd9 && kind != 0xd1b && kind != 0xce7 && kind != 0xd07 && kind != 0)
+            if (kind != MOBY_CLASS_CLANK_ZAPPER && kind != 0x47 && kind != 0xdd9 && kind != 0xd1b && kind != 0xce7 && kind != MOBY_CLASS_JOBIAN_SAUR_BEAST && kind != 0)
                 g_enemy_spawn_enabled = 0;
         }
         if (BYTE(object, 0xbc) == 1 && result != 1) {
@@ -331,7 +331,7 @@ int func_US2_L11_00426260(unsigned char *object)
                 char *candidate;
                 id = *ids;
                 candidate = (char *)(g_moby_l11_table + (id & 0x7fff) * 0x100);
-                if (HALF(candidate, 0xaa) == 0xcf5 && WORD(POINTER(candidate, 0x68), 0x294) == 0) {
+                if (HALF(candidate, 0xaa) == MOBY_CLASS_JOBA_TRIBESMAN && WORD(POINTER(candidate, 0x68), 0x294) == 0) {
                     WORD(POINTER(candidate, 0x68), 0x294) = 1;
                     break;
                 }

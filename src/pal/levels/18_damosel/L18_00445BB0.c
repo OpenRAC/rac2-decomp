@@ -15,7 +15,7 @@ extern int flag_set_first_pending(void *);
 extern void snd_stop_voice(int);
 extern void moby_mark_spawned(void *);
 extern void cam_mode_noop(void *);
-extern void func_PAL_002B15D8(void *, int, void *, float, float, float, float, int);
+extern void part_spawn_masked_debris_pal(void *, int, void *, float, float, float, float, int);
 extern void SetDeathBits_pal(void *, int, int);
 extern char g_sound_state[], g_hero_position[];
 extern void FastVecSub(float *, const float *, const float *);
@@ -35,10 +35,11 @@ extern void snd_stop_voice(int);
 extern void SpawnExplosionEffects_pal(void *, void *, void *, float, float, int, int, int,
                          float, float, float, float, int, float, int, int, int, int, int);
 extern void vec_transform_and_set_height(void *, void *, void *, void *, float);
-extern void func_PAL_002B15D8(void *, int, void *, float, float, float, float, int);
+extern void part_spawn_masked_debris_pal(void *, int, void *, float, float, float, float, int);
 extern void SetDeathBits_pal(void *, int, int), moby_mark_spawned(void *);
 extern void cam_mode_noop(void *);
 
+/* Destructible object: takes damage from hits and explodes when its health runs out (PAL: 50 Hz speeds). */
 void destructible_object_update_pal(unsigned char *object)
 {
     char *state = *(char **)(object + 0x68);
@@ -65,7 +66,7 @@ void destructible_object_update_pal(unsigned char *object)
         if (!hit) goto intact;
         owner = *(char **)(hit + 0x20);
         excluded = 0;
-        if (owner && (*(short *)(owner + 0xaa) == 0xb69 || *(short *)(owner + 0xaa) == 0xf9e)) excluded = 1;
+        if (owner && (*(short *)(owner + 0xaa) == MOBY_CLASS_PROTOPET || *(short *)(owner + 0xaa) == 0xf9e)) excluded = 1;
         if (excluded) break;
         zero = 0.0f;
         damage = moby_update_aim_target_strength_pal(object, hit);
@@ -78,7 +79,7 @@ void destructible_object_update_pal(unsigned char *object)
             FastVecSub(direction, (float *)(object + 0x10), (float *)g_hero_position);
             vec_transform_and_set_height(object, direction, direction, 0, zero);
             vec_scale_to_length((char *)direction, (char *)direction, 0.120000005f);
-            func_PAL_002B15D8(object, 0x1fff, direction, 3.0f, 6.0f, 3.0f, 6.0f, 255);
+            part_spawn_masked_debris_pal(object, 0x1fff, direction, 3.0f, 6.0f, 3.0f, 6.0f, 255);
             SetDeathBits_pal(object, 0, 3);
             moby_mark_spawned(object);
         }

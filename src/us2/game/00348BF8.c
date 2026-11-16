@@ -3,12 +3,12 @@
 
 extern void *pool_alloc_cell(void *);
 extern void *ui_return_second_arg(int, int);
-extern void func_US2_003377B0(void *, void *, void *);
+extern void hud_init_widget_defaults_us2(void *, void *, void *);
 extern char g_list_menu_attach_widget_defaults[];
 
 /* func_US2_00348BF8, the USA v2.00 copy of func_00347EC8: the same C, where the fields move 0x10 on
    and the new field at 0x54 is cleared too. */
-void func_US2_00348BF8(char *object, void *data)
+void list_menu_reset_attach_items_us2(char *object, void *data)
 {
     int *position;
     *(int *)(object + 0x60) = 0;
@@ -19,7 +19,7 @@ void func_US2_00348BF8(char *object, void *data)
         *(int **)(object + 0x5C) = position;
         position[1] = 0; position[2] = 0; position[3] = 0; position[0] = 0;
     }
-    func_US2_003377B0(object, g_list_menu_attach_widget_defaults, data);
+    hud_init_widget_defaults_us2(object, g_list_menu_attach_widget_defaults, data);
     *(int *)(object + 0xAC) = 0x70FFFEED;
     *(int *)(object + 0xB0) = 0x80F0F0F0;
     *(int *)(object + 0xB4) = 0x80808080;
@@ -42,18 +42,20 @@ extern u8 g_movie_seen_flags[] __attribute__((section(".sdata")));
 /* func_00347F80 is built from 00345358-wrap.c. */
 
 
-void func_US2_00348DA0(u8 *a0,f32 *a1) {
- f32 *end;
- *(f32 **)(a0+0x68)=a1;
- *(s32 *)(a0+0xC0)=0;
- end=a1+0x50;
- if(a1[0]>0.0f) {
+/* Sets the list menu's record table, counts its records (stopping at a non-positive first value or the table end),
+   and resets the selection to 0 if it is now past the count. */
+void list_menu_set_entry_records_us2(u8 *object,f32 *records) {
+ f32 *records_end;
+ *(f32 **)(object+0x68)=records;
+ *(s32 *)(object+0xC0)=0;
+ records_end=records+0x50;
+ if(records[0]>0.0f) {
   do {
-   a1+=5;
-   (*(s32 *)(a0+0xC0))++;
-  } while(*a1>0.0f && (s32)a1<(s32)end);
+   records+=5;
+   (*(s32 *)(object+0xC0))++;
+  } while(*records>0.0f && (s32)records<(s32)records_end);
  }
- if(*(s32 *)(a0+0x60)>=*(s32 *)(a0+0xC0)) *(s32 *)(a0+0x60)=0;
+ if(*(s32 *)(object+0x60)>=*(s32 *)(object+0xC0)) *(s32 *)(object+0x60)=0;
 }
 
 
@@ -61,11 +63,12 @@ void func_US2_00348E10(u8 *a0, s32 a1, s32 a2) { *(s32 *)(a0 + 0xB8) = a1; *(s32
 
 
 
-void func_US2_00348E28(u8 *a0,f32 f0,f32 f1) {
- (*(f32 **)(a0+0x5C))[0]=f0;
- (*(f32 **)(a0+0x5C))[1]=f1;
- (*(s32 **)(a0+0x5C))[2]=0;
- (*(s32 **)(a0+0x5C))[3]=0;
+/* Sets the menu position pair (x, y) and clears the two words after it. */
+void list_menu_set_position_us2(u8 *object,f32 x,f32 y) {
+ (*(f32 **)(object+0x5C))[0]=x;
+ (*(f32 **)(object+0x5C))[1]=y;
+ (*(s32 **)(object+0x5C))[2]=0;
+ (*(s32 **)(object+0x5C))[3]=0;
 }
 
 
@@ -80,24 +83,25 @@ extern char *Faac80289_FUN_00336968(char *p);
 
 /* func_00348138 is built from 00345358-menu.c. */
 
-char *func_US2_00349200(char *a0)
+/* Destroys the seven labels and seven rows of a menu page and returns it. */
+char *menu_page_destruct_us2(char *page)
 {
-    char *p = a0 + 536;
+    char *row = page + 536;
     int i;
 
-    Faac80289_FUN_003361A8(a0);
-    Faac80289_FUN_003361A8(a0 + 76);
-    Faac80289_FUN_003361A8(a0 + 152);
-    Faac80289_FUN_003361A8(a0 + 228);
-    Faac80289_FUN_003361A8(a0 + 304);
-    Faac80289_FUN_003361A8(a0 + 380);
-    Faac80289_FUN_003361A8(a0 + 456);
+    Faac80289_FUN_003361A8(page);
+    Faac80289_FUN_003361A8(page + 76);
+    Faac80289_FUN_003361A8(page + 152);
+    Faac80289_FUN_003361A8(page + 228);
+    Faac80289_FUN_003361A8(page + 304);
+    Faac80289_FUN_003361A8(page + 380);
+    Faac80289_FUN_003361A8(page + 456);
 
     for (i = 6; i != -1; i--) {
-        Faac80289_FUN_00336968(p);
-        p += 88;
+        Faac80289_FUN_00336968(row);
+        row += 88;
     }
-    return a0;
+    return page;
 }
 
 

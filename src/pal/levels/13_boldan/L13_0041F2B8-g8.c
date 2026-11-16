@@ -21,7 +21,8 @@ extern char g_camera_l13_position[];
 /* The two spark colours as read by the second loop's unused pick. */
 extern const int D_L13_001B16C0_1[], D_L13_001B16C4_1[];
 typedef struct { char pad0[0x10]; float position[4]; } MobyHead;
-void func_PAL_L13_0041F2B8(char *moby) {
+/* Builds one lightning beam: a random jagged 32-point path with four side branches, then spawns trail particles along it. */
+void lightning_beam_build_pal(char *moby) {
     D_02C80 *beam = (*(D_02C80 **)(moby+0x68));
     Vq_02C80 path[32];
     Vq_02C80 path_steps[32];

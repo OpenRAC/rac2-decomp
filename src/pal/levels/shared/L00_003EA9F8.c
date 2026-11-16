@@ -11,7 +11,7 @@ extern void vec_scale_to_length(char *, char *, float);
 extern void FastVecAdd(char *, char *, char *);
 
 /* Allocate an owner-tagged effect record and initialize its mode-specific fields. */
-char *func_PAL_L00_003EA9F8(char *rec, int mode, float amount, char *pos)
+char *AllocateOwnedEffectParticle_pal(char *rec, int mode, float amount, char *pos)
 {
     char v[16] __attribute__((aligned(16)));
     char w[16] __attribute__((aligned(16)));

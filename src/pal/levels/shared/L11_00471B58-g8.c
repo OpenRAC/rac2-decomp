@@ -11,7 +11,7 @@ extern int math_random_int_below(int);
 extern void FastVecAdd(void *, void *, void *);
 extern void ResetBoltPointsToLine(void *);
 extern void lightning_rebuild_bolt_points(char *);
-extern void func_PAL_L11_00472280(char *);
+extern void draw_object_ribbon_pair_pal(char *);
 extern void gfx_add_draw_callback_third(void (*)(char *), void *);
 extern int gfx_add_point_light(void *, int, float, float);
 
@@ -46,7 +46,7 @@ void UpdateRibbonTrailPoints_pal(char *object)
         for (i = count - 4; i < count; i++) {
             qcopy_nc(&((Vec128_L11 *)(g_ribbon_row_table + *(int *)(state + 0x38) * 640))[i], &((Vec128_L11 *)source)[i + 1]);
         }
-        gfx_add_draw_callback_third(func_PAL_L11_00472280, object);
+        gfx_add_draw_callback_third(draw_object_ribbon_pair_pal, object);
         if (!*(unsigned char *)(object + 0x20)) {
             *(int *)(state + 0x24) = gfx_add_point_light(state, 0, 0.0f, 0.0f);
             object[0x20] = 1;

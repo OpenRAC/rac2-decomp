@@ -89,7 +89,7 @@ extern void func_US2_0029DA88(int, int, int);
 extern int math_fast_float_d(void *);
 extern void FontSetWindow(unsigned short *, int, int, int, int, int, int, int, int);
 extern void level_forward_draw_args_us2(int, int, int, int, int, int, int, int, int, int);
-extern void func_US2_0029CC48(void);
+extern void hud_draw_scaled_us2(void);
 
 /* Screen-space y coordinates take an extra offset in display mode 1. */
 static __inline__ int Y3(float y) {
@@ -142,7 +142,7 @@ static __inline__ int label_y(void *handle, float value, float scale, float half
 
 /* Draw the encounter's meters, counters and optional prompt panel. */
 int L23_DrawEncounterHud_us2(void) {
-    char textBuffer[64];
+    char text_buffer[64];
     char *text;
     ColorView color;
     unsigned short panel[16];
@@ -209,8 +209,8 @@ int L23_DrawEncounterHud_us2(void) {
     one2 = 1;
     half2 = 0.5f;
     hud = &g_hud_counters;
-    sprintf(textBuffer, g_str_hud_counter_format, hud->counter);
-    text = textBuffer;
+    sprintf(text_buffer, g_str_hud_counter_format, hud->counter);
+    text = text_buffer;
     text_draw_centered_medium(g_hud_counter_text_x, scaled_coord(g_hud_counter_text_y, g_hud_scale_y, half2, 1),
                   g_hud_text_param, (unsigned char *)text, func_001157AC(text));
     if (hud->icons) {
@@ -249,6 +249,6 @@ int L23_DrawEncounterHud_us2(void) {
         hint = GetLocalizedString(0x2dc2);
         level_forward_draw_args_us2((int)panel, 0x80F0F0F0, label, 0, 0, -1, 0, hint, 0, 0);
     }
-    func_US2_0029CC48();
+    hud_draw_scaled_us2();
     return 1;
 }

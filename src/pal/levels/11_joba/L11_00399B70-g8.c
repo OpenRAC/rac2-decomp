@@ -30,33 +30,33 @@ extern u8 g_item_l11_record_table[];
 
 /* Scales the state's vector by the level's factor, clamps its timer to the state's
    limit, and runs the two animation angles through the engine's wrap function. */
-void func_PAL_L11_00399E30(u8 *arg0) {
-    u8 *s1 = arg0;
-    u8 *s0 = *(u8 **)(s1 + 0x68);
-    f32 f0, f1, f2, f4;
+void debris_l11_piece_update_pal(u8 *object) {
+    u8 *moby = object;
+    u8 *vars = *(u8 **)(moby + 0x68);
+    f32 vel_x, vel_y, fall, min_fall;
 
-    FastVecAdd((f32 *)(s1 + 0x10), (f32 *)(s1 + 0x10), (f32 *)s0);
-    f2 = *(f32 *)(s0 + 0x8) - 0.006f;
-    f0 = *(f32 *)(s0 + 0x0) * g_debris_velocity_scale;
-    f1 = *(f32 *)(s0 + 0x4) * g_debris_velocity_scale;
-    f4 = *(f32 *)(s0 + 0x20);
-    *(f32 *)(s0 + 0x8) = f2;
-    *(f32 *)(s0 + 0x0) = f0;
-    *(f32 *)(s0 + 0x4) = f1;
-    if (f2 < f4)
-        *(f32 *)(s0 + 0x8) = f4;
-    *(f32 *)(s1 + 0xF8) = FastAddRotations(*(f32 *)(s1 + 0xF8), *(f32 *)(s0 + 0x28));
-    *(f32 *)(s1 + 0xF0) = FastAddRotations(*(f32 *)(s1 + 0xF0), *(f32 *)(s0 + 0x2C) * (f32)*(s32 *)(s0 + 0x24));
-    f0 = math_fabs(*(f32 *)(s1 + 0xF0));
-    if (f0 > 0.78539824f)
-        *(s32 *)(s0 + 0x24) = -*(s32 *)(s0 + 0x24);
-    if (math_fast_float_d(s0 + 0x1C) != 0) {
-        moby_mark_spawned(s1);
-    } else if (s1[0x31] == 0) {
-        moby_mark_spawned(s1);
-    } else if (*(s32 *)(s0 + 0x1C) < 0x19) {
-        if (vec_fast_helper_a(s1 + 0x23) != 0)
-            moby_mark_spawned(s1);
+    FastVecAdd((f32 *)(moby + 0x10), (f32 *)(moby + 0x10), (f32 *)vars);
+    fall = *(f32 *)(vars + 0x8) - 0.006f;
+    vel_x = *(f32 *)(vars + 0x0) * g_debris_velocity_scale;
+    vel_y = *(f32 *)(vars + 0x4) * g_debris_velocity_scale;
+    min_fall = *(f32 *)(vars + 0x20);
+    *(f32 *)(vars + 0x8) = fall;
+    *(f32 *)(vars + 0x0) = vel_x;
+    *(f32 *)(vars + 0x4) = vel_y;
+    if (fall < min_fall)
+        *(f32 *)(vars + 0x8) = min_fall;
+    *(f32 *)(moby + 0xF8) = FastAddRotations(*(f32 *)(moby + 0xF8), *(f32 *)(vars + 0x28));
+    *(f32 *)(moby + 0xF0) = FastAddRotations(*(f32 *)(moby + 0xF0), *(f32 *)(vars + 0x2C) * (f32)*(s32 *)(vars + 0x24));
+    vel_x = math_fabs(*(f32 *)(moby + 0xF0));
+    if (vel_x > 0.78539824f)
+        *(s32 *)(vars + 0x24) = -*(s32 *)(vars + 0x24);
+    if (math_fast_float_d(vars + 0x1C) != 0) {
+        moby_mark_spawned(moby);
+    } else if (moby[0x31] == 0) {
+        moby_mark_spawned(moby);
+    } else if (*(s32 *)(vars + 0x1C) < 0x19) {
+        if (vec_fast_helper_a(moby + 0x23) != 0)
+            moby_mark_spawned(moby);
     }
 }
 
@@ -101,7 +101,7 @@ extern u8 g_joba_choice_table[];
 /* Spawns a moby at POSITION pushed three frames along MOTION, with random swing and spin
    rates, a random lifetime around D_L11_001AEC3C frames and the level's scale (doubled
    when the current selection record is enabled). */
-PieceMoby_00396DC8 *func_PAL_L11_00399B70(void *unused, f32 *position, f32 *motion) {
+PieceMoby_00396DC8 *debris_l11_spawn_piece_pal(void *unused, f32 *position, f32 *motion) {
     PieceMoby_00396DC8 *obj = CreateMoby(0x1AC);
 
     if (obj != 0) {

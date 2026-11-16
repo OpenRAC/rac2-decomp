@@ -1,7 +1,7 @@
 #include "names.h"
 /* func_PAL_L08_00428528, the PAL copy of func_L08_00423010: the same C, where lit 0.0008726647356525064f becomes 0.0010471977f. */
 #include "common.h"
-typedef struct { float f0, f4, f8, fC; } Quad;
+typedef struct { float unk_0, unk_4, unk_8, unk_C; } Quad;
 extern float vec_distance_xy(void *, void *);
 extern void FastVecAdd(void *, void *, void *);
 extern float math_fast_sin_or_cos_a(float);
@@ -19,12 +19,12 @@ extern int moby_move_and_collide(void *, void *, int, float, float, float);
 extern float math_turn_angle_toward_target(void *, float, float, float, float, float);
 
 /* Steer toward the selected target, adjust elevation, and apply movement. */
-int func_PAL_L08_00428528(char *object, float turn, float turnAccel, float turnDamp,
-                     float accel, float friction, float maxSpeed, float rise, float stop) {
+int sandfly_move_toward_target_pal(char *object, float turn, float turn_accel, float turn_damp,
+                     float accel, float friction, float max_speed, float rise, float stop) {
     float delta[4], point[4];
     char *state = *(char **)(object + 0x68);
     float heading, distance, acceleration, speed, limit, height, pitch;
-    float scaledDistance;
+    float scaled_distance;
     int result = 0;
     heading=mat_fast_helper_a(*(float *)(state+0x160)-*(float *)(object+0x10),
                           *(float *)(state+0x164)-*(float *)(object+0x14));
@@ -33,9 +33,9 @@ int func_PAL_L08_00428528(char *object, float turn, float turnAccel, float turnD
     distance -= stop;
     if (distance < 0)
         distance = 0;
-    scaledDistance = distance * 0.00040000002f;
+    scaled_distance = distance * 0.00040000002f;
     acceleration = accel;
-    acceleration *= scaledDistance;
+    acceleration *= scaled_distance;
     if (acceleration > accel * 0.00040000002f)
         acceleration = accel * 0.00040000002f;
     speed = *(float *)(state + 0x1C0);
@@ -44,13 +44,13 @@ int func_PAL_L08_00428528(char *object, float turn, float turnAccel, float turnD
         speed -= friction * speed;
     if (distance < stop)
         result = 8;
-    limit = maxSpeed * 0.020000001f;
+    limit = max_speed * 0.020000001f;
     if (speed > limit)
         speed = limit;
     else if (speed < -limit)
         speed = -limit;
     MobySpringTurn(object,heading,turn*6.981318e-06f,
-                  turnAccel*6.981318e-06f,turnDamp*0.0003490659f,state+0x1C4);
+                  turn_accel*6.981318e-06f,turn_damp*0.0003490659f,state+0x1C4);
     point[0]=math_fast_sin_or_cos_a(heading)*speed*10.0f;
     point[1]=math_fast_sin_or_cos_b(heading)*speed*10.0f;
     point[2]=0;
@@ -71,7 +71,7 @@ int func_PAL_L08_00428528(char *object, float turn, float turnAccel, float turnD
     *(float *)(object+0xF4)=math_turn_angle_toward_target(state+0x1C8,*(float *)(object+0xF4),pitch,
                                           0.0025132746f,0.0012566373f,0.0012566373f);
     if (result&7) MobySpringTurn(object,heading,turn*2.0943955e-05f,
-                                turnAccel*6.981318e-06f,turnDamp*0.0010471977f,state+0x1C4);
+                                turn_accel*6.981318e-06f,turn_damp*0.0010471977f,state+0x1C4);
     *(float *)(state+0x1C0)=speed;
     return result;
 }

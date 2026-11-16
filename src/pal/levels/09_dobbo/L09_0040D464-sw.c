@@ -38,12 +38,13 @@ extern void moby_mark_table_entry_flagged(int);
 extern void level_capture_checkpoint_state(char *, char *);
 extern int MemcardSave(int, int);
 
-void func_PAL_L09_0040D464(u8 *obj)
+/* Per-frame update of the bolt-trading character (moby class 3600): it talks to the hero, offers a deal for bolts, and takes the payment when he accepts. */
+void dobbo_paid_offer_npc_update_pal(u8 *obj)
 {
-    char *p = *(char **)(obj + 0x68);
+    char *vars = *(char **)(obj + 0x68);
     char *entry;
-    int startCurrency;
-    int offerCurrency;
+    int start_currency;
+    int offer_currency;
     int currency;
     int balance;
     int remaining;
@@ -56,14 +57,14 @@ void func_PAL_L09_0040D464(u8 *obj)
         }
         if (g_request_flag_table.flags & 1) {
             STUB_printf(g_str_dobbo_setting_a);
-            startCurrency = g_player_bolts;
+            start_currency = g_player_bolts;
             if (g_item_owned_flags[0x197]) {
-                if (startCurrency < g_dobbo_currency_limit_high)
+                if (start_currency < g_dobbo_currency_limit_high)
                     goto start_six;
                 else
                     moby_set_state(obj, 7, 1);
             } else {
-                if (startCurrency < g_dobbo_currency_limit_low) {
+                if (start_currency < g_dobbo_currency_limit_low) {
                 start_six:
                     moby_set_state(obj, 6, 1);
                 } else
@@ -87,7 +88,7 @@ void func_PAL_L09_0040D464(u8 *obj)
         moby_reset_vars_defaults(obj);
         break;
     case 1:
-        if (IsPointInCuboid(g_hero_position, *(int *)p)) {
+        if (IsPointInCuboid(g_hero_position, *(int *)vars)) {
             STUB_printf(g_str_dobbo_setting_f);
             if (req_push_queue(g_request_l09_queue, 0x5f)) {
                 level_apply_index_for_key(obj);
@@ -105,9 +106,9 @@ void func_PAL_L09_0040D464(u8 *obj)
         if (game_is_either_mode_two())
             break;
         g_dobbo_setting_flags[2] = 0;
-        if (*(int *)(p + 8) != -1) {
+        if (*(int *)(vars + 8) != -1) {
             entry = g_dobbo_point_table;
-            entry += *(int *)(p + 8) << 7;
+            entry += *(int *)(vars + 8) << 7;
             hero_reset_position_and_direction_pal(entry + 0x30, entry + 0x70, 0, 1);
         }
         obj[0x31] = 1;
@@ -123,7 +124,7 @@ void func_PAL_L09_0040D464(u8 *obj)
         break;
     case 4:
         obj[0x30] = 0xff;
-        if (IsPointInCuboid(g_hero_position, *(int *)p)) {
+        if (IsPointInCuboid(g_hero_position, *(int *)vars)) {
             STUB_printf(g_str_dobbo_setting_g);
             if (req_push_queue(g_request_l09_queue, 0x60)) {
                 req_launch_queued(g_request_l09_queue);
@@ -142,22 +143,22 @@ void func_PAL_L09_0040D464(u8 *obj)
         if (game_is_either_mode_two())
             break;
         g_dobbo_setting_flags[2] = 0;
-        if (*(int *)(p + 8) != -1) {
+        if (*(int *)(vars + 8) != -1) {
             entry = g_dobbo_point_table;
-            entry += *(int *)(p + 8) << 7;
+            entry += *(int *)(vars + 8) << 7;
             hero_reset_position_and_direction_pal(entry + 0x30, entry + 0x70, 0, 1);
         }
         obj[0x31] = 1;
         *(u16 *)(obj + 0x34) &= 0xfffe;
         g_dobbo_setting_flag_b[0] = 1;
-        offerCurrency = g_player_bolts;
+        offer_currency = g_player_bolts;
         if (g_item_owned_flags[0x197]) {
-            if (offerCurrency < g_dobbo_currency_limit_high)
+            if (offer_currency < g_dobbo_currency_limit_high)
                 goto offer_six;
             else
                 moby_set_state(obj, 7, -1);
         } else {
-            if (offerCurrency < g_dobbo_currency_limit_low) {
+            if (offer_currency < g_dobbo_currency_limit_low) {
             offer_six:
                 moby_set_state(obj, 6, -1);
             } else

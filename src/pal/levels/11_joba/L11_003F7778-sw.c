@@ -11,7 +11,7 @@ extern void vec_scale_to_length(void *, void *, f32);
 extern void make_hit_descriptor(void *, void *, s32, void *, f32);
 extern s32 CollLine(void *, void *, s32, void *, void *);
 extern s32 joba_beam_pick_target_point(void *, void *, void *);
-extern void func_PAL_L11_003F8E90(void *, s32);
+extern void part_spawn_beam_hit_sparks_pal(void *, s32);
 extern void UpdateTwinRecordAnglesAndPositions(void *);
 extern void snd_stop_voice(s32);
 extern u8 g_sound_state[];
@@ -40,13 +40,14 @@ typedef struct { f32 x,y,z,w; } Vec4 __attribute__((aligned(16)));
 typedef struct { Vec4 pos; Vec4 end; u8 pad20[0x80]; } PathRec;
 typedef struct { u8 pad[0xA0]; PathRec path[2]; u8 pad1e0[0x10]; Vec4 target[2]; Vec4 origin[2]; Vec4 last[2]; u8 pad250[0x10]; f32 scale[2]; u8 *hit[2]; u8 pad270[4]; s16 timer[2]; u16 state[2]; s16 repeat[2]; u8 pad280[0x10]; s32 sound; } PathState;
 
-void func_PAL_L11_003F7778(u8 *object) {
+/* Runs the two Joba beams, one per side. Each one aims, shoots out, sparks where it hits something, and then resets (PAL: frame counts rescaled for 50 Hz). */
+void joba_beams_update_pal(u8 *object) {
     f32 starts[2][4] __attribute__((aligned(16)));
     f32 delta[4] __attribute__((aligned(16)));
     struct { u8 pad[0x18]; u8 kind, flags; u16 id; u8 tail[0x14]; } query __attribute__((aligned(16)));
     u8 *data = P(object,0x68);
     s32 i;
-    f32 t;
+    f32 fraction;
     moby_transform_joint_to_world(object,1,starts[0]);
     moby_transform_joint_to_world(object,0,starts[1]);
     for (i=0;i<2;i++) {
@@ -75,9 +76,9 @@ void func_PAL_L11_003F7778(u8 *object) {
                 if (joba_beam_pick_target_point(object,data+0x210+i*16,data+0x1F0+i*16))
                     ((PathState *)data)->repeat[i]=g_joba_beam_repeat_count;
             } else {
-                t=IntToFloat(((PathState *)data)->timer[i]);
-                t/=IntToFloat(g_joba_beam_phase_frames_a);
-                ((PathState *)data)->scale[i]=t;
+                fraction=IntToFloat(((PathState *)data)->timer[i]);
+                fraction/=IntToFloat(g_joba_beam_phase_frames_a);
+                ((PathState *)data)->scale[i]=fraction;
             }
             break;
         case 2:
@@ -85,13 +86,13 @@ void func_PAL_L11_003F7778(u8 *object) {
             if (((PathState *)data)->timer[i]<=((s32)(g_joba_beam_phase_frames_b) * 5 + 2) / 6) {
                 u8 *path;
                 s32 off;
-                t=IntToFloat(((PathState *)data)->timer[i]);
-                t/=IntToFloat(((s32)(g_joba_beam_phase_frames_b) * 5 + 2) / 6);
+                fraction=IntToFloat(((PathState *)data)->timer[i]);
+                fraction/=IntToFloat(((s32)(g_joba_beam_phase_frames_b) * 5 + 2) / 6);
                 off=i*0xA0;
                 path=data+0xA0+off;
-                F(data+off,0xB0)=((PathState *)data)->origin[i].x+(((PathState *)data)->target[i].x-((PathState *)data)->origin[i].x)*t;
-                F(data+off,0xB4)=((PathState *)data)->origin[i].y+(((PathState *)data)->target[i].y-((PathState *)data)->origin[i].y)*t;
-                F(data+off,0xB8)=((PathState *)data)->origin[i].z+(((PathState *)data)->target[i].z-((PathState *)data)->origin[i].z)*t;
+                F(data+off,0xB0)=((PathState *)data)->origin[i].x+(((PathState *)data)->target[i].x-((PathState *)data)->origin[i].x)*fraction;
+                F(data+off,0xB4)=((PathState *)data)->origin[i].y+(((PathState *)data)->target[i].y-((PathState *)data)->origin[i].y)*fraction;
+                F(data+off,0xB8)=((PathState *)data)->origin[i].z+(((PathState *)data)->target[i].z-((PathState *)data)->origin[i].z)*fraction;
                 FastVecSub(delta,path+0x10,path);
                 vec_scale_to_length(delta,delta,0.040000003f);
                 make_hit_descriptor(&query,object,0x210001,delta,data[0x34]);
@@ -102,7 +103,7 @@ void func_PAL_L11_003F7778(u8 *object) {
                     u8 *hit=g_collision_l11_result.hit;
                     if (hit && H(hit,0xAA)!=0xC7D) {
                         u8 *snapshot;
-                        func_PAL_L11_003F8E90(path+0x10,15);
+                        part_spawn_beam_hit_sparks_pal(path+0x10,15);
                         qcopy(data+0x1F0+i*16,data+i*0xA0+0xB0);
                         ((PathState *)data)->timer[i]=0;
                         ((PathState *)data)->state[i]=4;
@@ -116,7 +117,7 @@ void func_PAL_L11_003F7778(u8 *object) {
             } else {
                 u8 *end=data+i*0xA0+0xB0;
                 ((PathState *)data)->state[i]=5;
-                func_PAL_L11_003F8E90(end,10);
+                part_spawn_beam_hit_sparks_pal(end,10);
                 ((PathState *)data)->timer[i]=0;
             }
             break;
@@ -128,7 +129,7 @@ void func_PAL_L11_003F7778(u8 *object) {
                 end=data+i*0xA0+0xB0;
                 FastVecAdd(end,end,delta);
                 qcopy(data+0x230+i*16,((PathState *)data)->hit[i]+0x10);
-                if ((g_arena_progress_level&15)==(((s32)object>>8)&15)) func_PAL_L11_003F8E90(end,1);
+                if ((g_arena_progress_level&15)==(((s32)object>>8)&15)) part_spawn_beam_hit_sparks_pal(end,1);
             } else {
                 ((PathState *)data)->timer[i]=0;
                 ((PathState *)data)->hit[i]=0;
@@ -139,11 +140,11 @@ void func_PAL_L11_003F7778(u8 *object) {
         }
         case 4:
             if (((PathState *)data)->timer[i]<((s32)(g_joba_beam_phase_frames_c) * 5 + 2) / 6) {
-                t=IntToFloat(((PathState *)data)->timer[i]);
-                t/=IntToFloat(((s32)(g_joba_beam_phase_frames_c) * 5 + 2) / 6);
-                F(data+i*0xA0,0xA0)=((PathState *)data)->origin[i].x+(((PathState *)data)->target[i].x-((PathState *)data)->origin[i].x)*t;
-                F(data+i*0xA0,0xA4)=((PathState *)data)->origin[i].y+(((PathState *)data)->target[i].y-((PathState *)data)->origin[i].y)*t;
-                F(data+i*0xA0,0xA8)=((PathState *)data)->origin[i].z+(((PathState *)data)->target[i].z-((PathState *)data)->origin[i].z)*t;
+                fraction=IntToFloat(((PathState *)data)->timer[i]);
+                fraction/=IntToFloat(((s32)(g_joba_beam_phase_frames_c) * 5 + 2) / 6);
+                F(data+i*0xA0,0xA0)=((PathState *)data)->origin[i].x+(((PathState *)data)->target[i].x-((PathState *)data)->origin[i].x)*fraction;
+                F(data+i*0xA0,0xA4)=((PathState *)data)->origin[i].y+(((PathState *)data)->target[i].y-((PathState *)data)->origin[i].y)*fraction;
+                F(data+i*0xA0,0xA8)=((PathState *)data)->origin[i].z+(((PathState *)data)->target[i].z-((PathState *)data)->origin[i].z)*fraction;
             } else if (((PathState *)data)->repeat[i]<g_joba_beam_repeat_count) {
                 u8 *path=data+0xA0+i*0xA0;
                 ((PathState *)data)->repeat[i]++;

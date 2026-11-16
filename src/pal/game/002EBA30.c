@@ -8,6 +8,7 @@ extern char g_copy_setup_data[];
 extern int load_start_disc_read(int, int, int);
 extern short snd_pump_music_and_disc_read(int);
 
+/* Loads the data for one chunk of the current scene. */
 int scene_load_chunk_data_pal(int index)
 {
     char *table = g_copy_setup_data;

@@ -10,7 +10,7 @@ typedef struct {
     short action;
     int value;
     short text2;
-    unsigned short fadeTimer;
+    unsigned short fade_timer;
 } ListEntry;
 
 typedef struct ListMenu {
@@ -30,7 +30,7 @@ typedef struct {
     char padE4[4];
     ListMenu *focus;
     char padEC[0x128 - 0xEC];
-    int pendingFocus;
+    int pending_focus;
 } MenuPage;
 
 /* The menu system: its current page, the page to open next and the flag that keeps the
@@ -40,12 +40,12 @@ typedef struct {
     MenuPage *current;
     int next;
     char pad1C[0x134 - 0x1C];
-    int closeLocked;
+    int close_locked;
 } MenuSystem;
 
 typedef struct {
     char pad000[0x1B4];
-    int rawPressed;
+    int raw_pressed;
     char pad1B8[0xC];
     int pressed;
 } PadState;
@@ -59,7 +59,7 @@ extern int *g_map_select_list;
 extern void map_set_current_and_refresh(int);
 extern void FadeToBlack(int);
 extern void menu_set_pause_scale_inverse(float);
-extern int func_PAL_002D6A10(ListMenu *, int, int *);
+extern int menu_process_selected_row_request_pal(ListMenu *, int, int *);
 extern int snd_play_from_global_bank(int, unsigned int, void *);
 
 /* The timers are compared signed and stepped as unsigned halfwords; returning the new
@@ -79,7 +79,7 @@ static inline unsigned short decrementTimer(unsigned short timer)
 }
 
 /* Text list input: highlight fades, then close, back, the entry's action and up/down. */
-int func_PAL_002D6A98(ListMenu *menu)
+int UpdateMenuListActions_pal(ListMenu *menu)
 {
     int focused = g_pause_menu_state.current->focus == menu;
     int i;
@@ -94,12 +94,12 @@ int func_PAL_002D6A98(ListMenu *menu)
 
         if (focused && menu->selected == i) {
             entry = (ListEntry *)(i * sizeof(ListEntry) + (int)menu->entries);
-            entry->fadeTimer = incrementTimer(entry->fadeTimer);
+            entry->fade_timer = incrementTimer(entry->fade_timer);
         } else {
-            if ((short)menu->entries[i].fadeTimer > ((s32)g_label_default_color * 5 + 2) / 6)
-                menu->entries[i].fadeTimer = ((s32)g_label_default_color * 5 + 2) / 6;
+            if ((short)menu->entries[i].fade_timer > ((s32)g_label_default_color * 5 + 2) / 6)
+                menu->entries[i].fade_timer = ((s32)g_label_default_color * 5 + 2) / 6;
             entry = (ListEntry *)(i * sizeof(ListEntry) + (int)menu->entries);
-            entry->fadeTimer = decrementTimer(entry->fadeTimer);
+            entry->fade_timer = decrementTimer(entry->fade_timer);
         }
     }
     if (!focused)
@@ -121,7 +121,7 @@ int func_PAL_002D6A98(ListMenu *menu)
         /* The shared exit keeps the 0/-1 choice a branch rather than a conditional move. */
         if (back != 0) {
             g_pause_menu_state.next = back;
-        } else if (g_pause_menu_state.closeLocked == 0) {
+        } else if (g_pause_menu_state.close_locked == 0) {
             result = -1;
             goto finish;
         }
@@ -137,7 +137,7 @@ finish:
             menu_set_pause_scale_inverse(4.0f);
         }
         result = 0;
-        if (func_PAL_002D6A10(menu, menu->entries[menu->selected].action, &result) != 0)
+        if (menu_process_selected_row_request_pal(menu, menu->entries[menu->selected].action, &result) != 0)
             return result;
     }
 
@@ -146,7 +146,7 @@ finish:
         count++;
     previous = menu->selected;
     if (menu->flags & 1)
-        buttons = g_pad_state.rawPressed;
+        buttons = g_pad_state.raw_pressed;
     else
         buttons = g_pad_state.pressed;
     if ((buttons & 0x1000) || ((menu->flags & 0x100) && (buttons & 4))) {
@@ -155,7 +155,7 @@ finish:
         else if (menu->flags & 0x1000)
             menu->selected = count - 1;
         else
-            g_pause_menu_state.current->pendingFocus = menu->up;
+            g_pause_menu_state.current->pending_focus = menu->up;
     }
     if ((buttons & 0x4000) || ((menu->flags & 0x100) && (buttons & 8))) {
         int selected = menu->selected;
@@ -165,9 +165,9 @@ finish:
         else if (menu->flags & 0x1000)
             menu->selected = 0;
         else
-            g_pause_menu_state.current->pendingFocus = menu->down;
+            g_pause_menu_state.current->pending_focus = menu->down;
     }
-    if (menu->selected != previous || g_pause_menu_state.current->pendingFocus != 0) {
+    if (menu->selected != previous || g_pause_menu_state.current->pending_focus != 0) {
         snd_play_from_global_bank(3, 0, 0);
         if (menu->flags & 0x20)
             map_set_current_and_refresh(g_map_select_list[menu->selected]);

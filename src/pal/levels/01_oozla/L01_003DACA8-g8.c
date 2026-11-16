@@ -6,18 +6,18 @@ typedef struct {
     int timer;
 } OozlaCountdown;
 typedef struct {
-    u8 pad0[0x20];
+    u8 pad_0[0x20];
     u8 state;
-    u8 pad21[0x10];
-    u8 field31;
-    u16 field32;
+    u8 pad_21[0x10];
+    u8 field_31;
+    u16 field_32;
     u16 flags;
-    u8 pad36[0x32];
-    OozlaCountdown *p;
-    u8 pad6c[0x2C];
-    int field98;
-    u8 pad9c[12];
-    u8 fielda8;
+    u8 pad_36[0x32];
+    OozlaCountdown *countdown;
+    u8 pad_6c[0x2C];
+    int field_98;
+    u8 pad_9c[12];
+    u8 field_a8;
 } OozlaStateMoby;
 extern int g_oozla_intro_timer MACRO_ADDR;
 extern float g_breakable_alpha_check_a, g_breakable_alpha_check_b;
@@ -33,46 +33,47 @@ extern int flag_set_first_pending(void *);
 extern int math_fast_float_d(void *);
 extern void moby_mark_spawned(void *);
 
-void breakable_l01_object_update_pal(OozlaStateMoby *a0)
+/* Breakable object. When something hits it, it breaks into pieces, hides, and removes itself after a short wait (PAL). */
+void breakable_l01_object_update_pal(OozlaStateMoby *moby)
 {
-    OozlaCountdown *p = a0->p;
+    OozlaCountdown *countdown = moby->countdown;
 
-    switch (a0->state) {
+    switch (moby->state) {
     case 0: {
         g_oozla_intro_timer++;
-        a0->flags |= 0x800;
-        moby_set_state(a0, 1, -1);
+        moby->flags |= 0x800;
+        moby_set_state(moby, 1, -1);
         break;
     }
     case 1:
-        if (part_find_owned_effect_slot(a0, 0x4010000, 0) && !p->active) {
+        if (part_find_owned_effect_slot(moby, 0x4010000, 0) && !countdown->active) {
             g_oozla_intro_timer = g_oozla_intro_timer - 1;
-            moby_set_state(a0, 2, -1);
+            moby_set_state(moby, 2, -1);
         }
-        a0->fielda8 = 255;
+        moby->field_a8 = 255;
         break;
     case 2:
-        if (a0->field31 && g_breakable_alpha_check_a < 0.9f && g_breakable_alpha_check_b < 0.9f &&
+        if (moby->field_31 && g_breakable_alpha_check_a < 0.9f && g_breakable_alpha_check_b < 0.9f &&
             g_breakable_count < g_breakable_active_limit)
-            part_l01_spawn_ring_of_sparks(a0, 15, 1.5f, 6.5f, 1.5f, 0.080000006f);
+            part_l01_spawn_ring_of_sparks(moby, 15, 1.5f, 6.5f, 1.5f, 0.080000006f);
         else
-            part_l01_spawn_ring_of_sparks(a0, 6, 1.5f, 6.5f, 1.5f, 0.080000006f);
-        PlayMobySound(0, 0, a0);
-        part_spawn_scaled_bolts_pal(a0, 1, 0.0f);
-        moby_l00_spawn_child(a0, 0xF94, 0);
-        moby_set_state(a0, 3, -1);
+            part_l01_spawn_ring_of_sparks(moby, 6, 1.5f, 6.5f, 1.5f, 0.080000006f);
+        PlayMobySound(0, 0, moby);
+        part_spawn_scaled_bolts_pal(moby, 1, 0.0f);
+        moby_l00_spawn_child(moby, 0xF94, 0);
+        moby_set_state(moby, 3, -1);
         break;
     case 3:
-        if (flag_set_first_pending(a0)) {
-            a0->flags |= 1;
-            a0->field31 = 0;
-            a0->field98 = 0;
-            p->timer = 100;
+        if (flag_set_first_pending(moby)) {
+            moby->flags |= 1;
+            moby->field_31 = 0;
+            moby->field_98 = 0;
+            countdown->timer = 100;
             g_breakable_count++;
         }
-        if (math_fast_float_d(&p->timer)) {
+        if (math_fast_float_d(&countdown->timer)) {
             g_breakable_count--;
-            moby_mark_spawned(a0);
+            moby_mark_spawned(moby);
         }
         break;
     }

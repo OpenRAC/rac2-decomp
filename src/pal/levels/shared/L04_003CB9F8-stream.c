@@ -51,10 +51,10 @@ void UpdateChildMobyStream_pal(Moby *moby)
     float spacing;
     float start;
     float end;
-    float minScale;
-    float maxScale = 0.24f;
+    float min_scale;
+    float max_scale = 0.24f;
     float length;
-    float scaleRange;
+    float scale_range;
     float offset;
     float t;
     float alpha;
@@ -67,21 +67,21 @@ void UpdateChildMobyStream_pal(Moby *moby)
         spacing = 0.85f;
         start = -2;
         end = 1.4f;
-        minScale = 0.14f;
+        min_scale = 0.14f;
         id = 0xF10;
     } else {
         first = -1.5f;
         id = 0xF0F;
-        maxScale = 0.21f;
+        max_scale = 0.21f;
         spacing = 0.75f;
         start = -1.5f;
         end = 1.5f;
-        minScale = 0.114f;
+        min_scale = 0.114f;
     }
     children = vars->children;
     offsets = vars->offsets;
     length = end - first;
-    scaleRange = maxScale - minScale;
+    scale_range = max_scale - min_scale;
 
     if (moby->state == 0) {
         for (i = 0; i < 5; i++) {
@@ -112,7 +112,7 @@ void UpdateChildMobyStream_pal(Moby *moby)
         FastVecAdd(children[i]->position, children[i]->position, &shift);
 
         t = (offset - start) / length;
-        children[i]->scale = children[i]->mclass->scale * (minScale + (1 - t) * scaleRange);
+        children[i]->scale = children[i]->mclass->scale * (min_scale + (1 - t) * scale_range);
         if (t < 0.25f)
             alpha = t * 4;
         else if (t > 0.75f)

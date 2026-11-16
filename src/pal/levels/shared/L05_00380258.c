@@ -17,7 +17,7 @@ extern int math_random_int_below(int);
 extern int FloatToInt(float);
 extern unsigned char *g_particle_params_table[];
 
-void func_PAL_L05_00380258(float *position, int count, int color, int duration)
+void emit_particle_pair_burst_pal(float *position, int count, int color, int duration)
 {
     float velocity[4], point[4], direction[4], axis[4], half[4];
     float size, angle;

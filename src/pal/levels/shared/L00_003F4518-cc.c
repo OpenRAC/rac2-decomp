@@ -29,7 +29,7 @@ extern float math_random_signed_float_range(float, float);
 extern void vec_scale_to_length(void *, void *, float);
 extern void FastVecAdd(void *, void *, void *);
 
-PoolRecord *func_PAL_L00_003F4518(char *owner, int kind, PoolVector *position, float angle) {
+PoolRecord *blast_alloc_pool_record_pal(char *owner, int kind, PoolVector *position, float angle) {
     PoolVector direction, offset;
     PoolRecord *slot;
     char *slotOwner;

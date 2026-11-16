@@ -20,7 +20,7 @@ extern void value_set_entry_by_index_us2(int, int);
 /* USA v2.00's own function, no v1.01 twin: walks the moby list 40 entries per call, counting live
    mobies of classes 0x11C7, 0x1266 and 0xF57. A full pass that finds none sets the flag at
    D_001A7A60[6] and runs the same award sequence as func_L19_00423548, then returns 1. */
-int func_US2_L19_0042BBF8(void)
+int moby_scan_award_when_cleared_us2(void)
 {
     int i;
     GrelbinMoby *moby;
@@ -28,7 +28,7 @@ int func_US2_L19_0042BBF8(void)
     if (g_item_enabled_flags[6] == 0) {
         for (i = 0; i < 40; i++) {
             moby = g_moby_l19_array + g_moby_array_cursor;
-            if (moby->oClass == 0x11C7 || moby->oClass == 0x1266 || moby->oClass == 0xF57) {
+            if (moby->oClass == 0x11C7 || moby->oClass == 0x1266 || moby->oClass == MOBY_CLASS_ARCTIC_LEVIATHAN) {
                 if (moby != 0 && moby->state != 0xFE && moby->state != 0xFD)
                     g_moby_spawn_counter++;
             }

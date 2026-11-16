@@ -49,7 +49,7 @@ extern float g_aim_rate_scale_a __attribute__((sda)), g_aim_rate_scale_b __attri
 extern float g_aim_correction_scale __attribute__((sda)), g_aim_damping_scale __attribute__((sda));
 extern int hero_is_action_allowed(void);
 extern int hero_get_camera_params_pal(float *, float *, float *);
-extern void hero_update_camera_block_pal(void), func_PAL_L00_002D5E90(void);
+extern void hero_update_camera_block_pal(void), UpdateHeroHeldObject_pal(void);
 extern float FastVecLength(void *), vec_length_xy(void *), mat_fast_helper_a(float,float);
 extern void vec_scale_to_length(void *,void *,float), matrix_mul_vec3(void *,void *,void *);
 extern void FastVecAdd(void *,void *,void *), FastVecSub(void *,void *,void *);
@@ -66,13 +66,13 @@ extern void hero_steer_heading(int,float,float,float);
 #define HF(o) (*(float *)(hero + (o)))
 #define HI(o) (*(int *)(hero + (o)))
 /* Update the hero aim direction, collision-sensitive turn rates, and aim transitions. */
-void func_PAL_L00_002D5680(void)
+void UpdateHeroAimAndTransitions_pal(void)
 {
     char *hero;
     char *aim;
     float direction[4], local[4];
-    float target, probeRate, probeLimit, rate, limit, yaw, pitch, yawScale, pitchScale, distance;
-    float value, pitchBound;
+    float target, probe_rate, probe_limit, rate, limit, yaw, pitch, yaw_scale, pitch_scale, distance;
+    float value, pitch_bound;
     int hit;
     char *object;
     if (hero_is_action_allowed()) {
@@ -84,30 +84,30 @@ void func_PAL_L00_002D5680(void)
             matrix_mul_vec3(aim, aim, aim - 0x14A0);
         yaw = mat_fast_helper_a(HF(0x14E0), HF(0x14E4));
         pitch = mat_fast_helper_a(vec_length_xy(aim), HF(0x14E8));
-        if (hero_get_camera_params_pal(&target, &probeRate, &probeLimit)) {
-            math_approach_target_with_braking(-pitch, (float *)(aim + 0x10), probeRate, probeRate, probeLimit);
+        if (hero_get_camera_params_pal(&target, &probe_rate, &probe_limit)) {
+            math_approach_target_with_braking(-pitch, (float *)(aim + 0x10), probe_rate, probe_rate, probe_limit);
             value = fast_subtract_rotations(target, yaw);
-            math_approach_target_with_braking(value, (float *)(aim + 0x14), probeRate, probeRate, probeLimit);
+            math_approach_target_with_braking(value, (float *)(aim + 0x14), probe_rate, probe_rate, probe_limit);
         } else {
             distance = 0.0f;
             vec_scale_to_length(direction, g_cam_follow_matrix, 30.0f);
             hit = 0;
             FastVecAdd(direction, direction, g_cam_follow_matrix - 0x230);
             if (CollLine(g_cam_follow_matrix - 0x230, direction, 1, HI(0x2290), 0)) {
-                char *probeObject = g_collision_result.object;
-                if (probeObject && *(short *)(*(char **)(probeObject + 0x24) + 0x46) == 5) {
+                char *probe_object = g_collision_result.object;
+                if (probe_object && *(short *)(*(char **)(probe_object + 0x24) + 0x46) == 5) {
                     distance = fast_vec_dist(g_cam_follow_matrix - 0x230, g_collision_result.position);
                     hit = 1;
                 }
             }
-            yawScale = math_fabs(g_pad_state.yaw) < 1.0f ? 0.3f : 1.0f;
-            pitchScale = math_fabs(g_pad_state.pitch) < 1.0f ? 0.3f : 1.0f;
+            yaw_scale = math_fabs(g_pad_state.yaw) < 1.0f ? 0.3f : 1.0f;
+            pitch_scale = math_fabs(g_pad_state.pitch) < 1.0f ? 0.3f : 1.0f;
             if (hit) {
-                if (yawScale > 0.6f) yawScale = 0.6f;
-                if (pitchScale > 0.6f) pitchScale = 0.6f;
+                if (yaw_scale > 0.6f) yaw_scale = 0.6f;
+                if (pitch_scale > 0.6f) pitch_scale = 0.6f;
             }
-            limit = -g_pad_state.pitch * 0.0003490659f * g_look_sensitivity_a * pitchScale;
-            rate = g_pad_state.yaw * 0.0003490659f * g_look_sensitivity_b * yawScale;
+            limit = -g_pad_state.pitch * 0.0003490659f * g_look_sensitivity_a * pitch_scale;
+            rate = g_pad_state.yaw * 0.0003490659f * g_look_sensitivity_b * yaw_scale;
             if (g_invert_aim_option) rate = -rate;
             if (hit) {
                 float cap = g_look_sensitivity_b * 0.0003490659f;
@@ -133,19 +133,19 @@ void func_PAL_L00_002D5680(void)
             if (math_fabs(rate) < value || g_hero_state.pitchRate * rate < 0.0f)
                 ApproachValue(&g_hero_state.pitchRate, rate, g_aim_rate_scale_b * 6.981318e-06f);
             else
-                ApproachValue(&g_hero_state.pitchRate, rate, g_look_rate_scale_b * (yawScale * 6.981318e-06f));
+                ApproachValue(&g_hero_state.pitchRate, rate, g_look_rate_scale_b * (yaw_scale * 6.981318e-06f));
             value = math_fabs(g_hero_state.yawRate);
             if (math_fabs(limit) < value || g_hero_state.yawRate * limit < 0.0f)
                 ApproachValue(&g_hero_state.yawRate, limit, g_aim_rate_scale_a * 6.981318e-06f);
             else
-                ApproachValue(&g_hero_state.yawRate, limit, g_look_rate_scale_a * (pitchScale * 6.981318e-06f));
+                ApproachValue(&g_hero_state.yawRate, limit, g_look_rate_scale_a * (pitch_scale * 6.981318e-06f));
         }
         yaw = FastAddRotations(yaw, g_hero_state.yawRate);
         pitch = FastAddRotations(pitch, g_hero_state.pitchRate);
         if (!g_hero_locked_flag) yaw = FastAddRotations(yaw, g_hero_state.heading);
-        pitchBound = 1.483529999f;
-        if (pitch > pitchBound) { pitch = pitchBound; g_hero_state.pitchRate = 0; }
-        else if (pitch < -pitchBound) { g_hero_state.pitchRate = 0; pitch = -pitchBound; }
+        pitch_bound = 1.483529999f;
+        if (pitch > pitch_bound) { pitch = pitch_bound; g_hero_state.pitchRate = 0; }
+        else if (pitch < -pitch_bound) { g_hero_state.pitchRate = 0; pitch = -pitch_bound; }
         aim = (char *)&g_hero_state + 0x14E0;
         vec_build_spherical_offset(aim, 1.0f, yaw, pitch);
         hero = aim - 0x14E0;
@@ -175,17 +175,17 @@ void func_PAL_L00_002D5680(void)
             g_hero_state.activeTime = 0;
         }
     } else if (g_hero_state.state != 1 && g_hero_state.state != 0x1D) {
-        char *oldObject;
+        char *old_object;
         if (!g_hero_state.active) return;
-        func_PAL_L00_002D5E90();
-        oldObject = g_hero_state.targetObject;
-        if (oldObject && *(short *)(oldObject + 0xAA) != 0x47) {
-            FastVecSub((char *)&g_hero_state + 0x14A0, oldObject + 0x10, (char *)&g_hero_state + 0x80);
+        UpdateHeroHeldObject_pal();
+        old_object = g_hero_state.targetObject;
+        if (old_object && *(short *)(old_object + 0xAA) != 0x47) {
+            FastVecSub((char *)&g_hero_state + 0x14A0, old_object + 0x10, (char *)&g_hero_state + 0x80);
             matrix_mul_vec3((char *)&g_hero_state + 0x14A0, (char *)&g_hero_state + 0x14A0, (char *)&g_hero_state + 0x40);
             g_hero_state.blendTime = 0;
             g_hero_state.blend.value = 1.0f;
         }
         g_hero_state.active = 0;
     }
-    if (g_hero_state.active) func_PAL_L00_002D5E90();
+    if (g_hero_state.active) UpdateHeroHeldObject_pal();
 }

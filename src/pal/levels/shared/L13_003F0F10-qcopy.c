@@ -8,7 +8,7 @@ typedef struct {
     short key;
 } Obj_389848;
 extern void level_list_add_key(Obj_389848 *);
-extern void func_PAL_002AC3C0(char *, char *);
+extern void gfx_update_color_fade_pal(char *, char *);
 extern void *part_find_owned_effect_slot(char *, int, int);
 extern int FastDecTimer(void *);
 extern f32 moby_update_aim_target_strength_pal(char *, char *);
@@ -19,65 +19,67 @@ extern void moby_mark_spawned(char *);
 extern char *SpawnExplosion_pal(void *, int, int, int, int, int, int, int, int, int, int, int,
                           f32, f32);
 
-void decaying_enemy_update_pal(char *a0)
+/* Updates an enemy that decays: it loses health from its attached effects and explodes when
+ * the health runs out (PAL). */
+void decaying_enemy_update_pal(char *moby_arg)
 {
-    char *self = a0;
-    char *ctl;
+    char *moby = moby_arg;
+    char *vars;
     unsigned char state;
-    char *child;
-    char *obj;
-    f32 vec[4];
-    f32 tmp1[4];
-    f32 tmp2[4];
+    char *effect;
+    char *owner;
+    f32 pos[4];
+    f32 forward[4];
+    f32 back[4];
     f32 scale;
 
-    ctl = *(char **)(self + 0x68);
-    state = *(unsigned char *)(self + 0x20);
+    vars = *(char **)(moby + 0x68);
+    state = *(unsigned char *)(moby + 0x20);
     switch (state) {
     case 0:
-        level_list_add_key((Obj_389848 *)self);
-        *(unsigned char *)(self + 0x20) = 1;
+        level_list_add_key((Obj_389848 *)moby);
+        *(unsigned char *)(moby + 0x20) = 1;
     case 1:
-        func_PAL_002AC3C0(self, ctl + 0x50);
-        child = (char *)part_find_owned_effect_slot(self, 1, 0);
-        if (FastDecTimer(ctl + 0x26) == 0)
-            child = 0;
-        if (child != 0) {
-            scale = *(f32 *)(child + 0x2C);
-            if (*(f32 *)(ctl + 0xF8) != 0.0f) {
-                obj = *(char **)(child + 0x20);
-                if (obj != 0 && *(short *)(self + 0xAA) == *(short *)(obj + 0xAA))
-                    *(f32 *)(child + 0x2C) = scale * *(f32 *)(ctl + 0xF8);
+        gfx_update_color_fade_pal(moby, vars + 0x50);
+        effect = (char *)part_find_owned_effect_slot(moby, 1, 0);
+        if (FastDecTimer(vars + 0x26) == 0)
+            effect = 0;
+        if (effect != 0) {
+            scale = *(f32 *)(effect + 0x2C);
+            if (*(f32 *)(vars + 0xF8) != 0.0f) {
+                owner = *(char **)(effect + 0x20);
+                if (owner != 0 && *(short *)(moby + 0xAA) == *(short *)(owner + 0xAA))
+                    *(f32 *)(effect + 0x2C) = scale * *(f32 *)(vars + 0xF8);
             }
         } else {
-            child = (char *)part_find_owned_effect_slot(self, 0x10000, 0);
-            if (child != 0) {
-                scale = *(f32 *)(child + 0x2C);
+            effect = (char *)part_find_owned_effect_slot(moby, 0x10000, 0);
+            if (effect != 0) {
+                scale = *(f32 *)(effect + 0x2C);
                 scale *= 0.5f;
-                *(f32 *)(child + 0x2C) = scale;
-                if (*(f32 *)(ctl + 0xF8) != 0.0f) {
-                    obj = *(char **)(child + 0x20);
-                    if (obj != 0 && *(short *)(self + 0xAA) == *(short *)(obj + 0xAA))
-                        *(f32 *)(child + 0x2C) = scale * *(f32 *)(ctl + 0xF8);
+                *(f32 *)(effect + 0x2C) = scale;
+                if (*(f32 *)(vars + 0xF8) != 0.0f) {
+                    owner = *(char **)(effect + 0x20);
+                    if (owner != 0 && *(short *)(moby + 0xAA) == *(short *)(owner + 0xAA))
+                        *(f32 *)(effect + 0x2C) = scale * *(f32 *)(vars + 0xF8);
                 }
             }
         }
-        scale = moby_update_aim_target_strength_pal(self, child);
-        *(unsigned char *)(self + 0xA8) = 0xFF;
-        *(f32 *)(ctl + 0x20) -= scale;
-        part_spawn_damage_debris_pal(self, ctl + 0x100, ctl + 0x20);
-        if (*(f32 *)(ctl + 0x20) <= 0.0f) {
+        scale = moby_update_aim_target_strength_pal(moby, effect);
+        *(unsigned char *)(moby + 0xA8) = 0xFF;
+        *(f32 *)(vars + 0x20) -= scale;
+        part_spawn_damage_debris_pal(moby, vars + 0x100, vars + 0x20);
+        if (*(f32 *)(vars + 0x20) <= 0.0f) {
             {
-            f32 *v = vec;
-            *(TI128 *)v = *(TI128 *)(self + 0x10);
+            f32 *v = pos;
+            *(TI128 *)v = *(TI128 *)(moby + 0x10);
             }
-            vec_scale_to_length(tmp2, self + 0xD0, -2.0f);
-            FastVecAdd(vec, tmp2, vec);
-            vec_scale_to_length(tmp1, self + 0xC0, 1.5f);
-            FastVecAdd(vec, tmp1, vec);
-            SpawnExplosion_pal(vec, 0, 0x19, 0x14, 0x14, 0x14, 0x2D, 1, 1, 0, 0, 0,
+            vec_scale_to_length(back, moby + 0xD0, -2.0f);
+            FastVecAdd(pos, back, pos);
+            vec_scale_to_length(forward, moby + 0xC0, 1.5f);
+            FastVecAdd(pos, forward, pos);
+            SpawnExplosion_pal(pos, 0, 0x19, 0x14, 0x14, 0x14, 0x2D, 1, 1, 0, 0, 0,
                           0.75f, 20.0f);
-            moby_mark_spawned(self);
+            moby_mark_spawned(moby);
         }
     }
 }

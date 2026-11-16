@@ -24,8 +24,8 @@ void ship_build_trail_slices_pal(void)
     int index;
     void *obj;
     float scale;
-    char *p;
-    char *q;
+    char *vertex;
+    char *constants;
     int i;
 
     if (g_level_group_index != 1)
@@ -37,19 +37,19 @@ void ship_build_trail_slices_pal(void)
         index = 1;
     if (index != -1 && obj != 0) {
         if (g_ship_trail_state.entries[index] != 0) {
-            char *d = obj + 0x10;
-            char *c = obj + 0xC0;
+            char *position = obj + 0x10;
+            char *matrix = obj + 0xC0;
             g_ship_trail_state.mesh = (int)g_ship_trail_mesh;
-            p = (char *)g_ship_trail_mesh + 0x20;
-            q = (char *)&g_ship_trail_constants;
+            vertex = (char *)g_ship_trail_mesh + 0x20;
+            constants = (char *)&g_ship_trail_constants;
             i = 3;
             scale = *(float *)(obj + 0x2C) / *(float *)(*(int *)(obj + 0x24) + 0x24);
             for (; i >= 0; i--) {
-                matrix_mul_vec3(p, q, c);
-                FastVecScale(p, p, scale);
-                FastVecAdd(p, p, d);
-                p += 0x10;
-                q += 0x10;
+                matrix_mul_vec3(vertex, constants, matrix);
+                FastVecScale(vertex, vertex, scale);
+                FastVecAdd(vertex, vertex, position);
+                vertex += 0x10;
+                constants += 0x10;
             }
             *(int *)(g_ship_trail_state.mesh + 0x68) = g_ship_trail_state.entries[index];
         }

@@ -42,7 +42,7 @@ extern int FastTweenColor(int, int, float);
    D_L08_001B9B00, laid out as RAC1's update_gold_bolt_glow_rings lays out its rings: each
    ring's colour follows the frame counter, and its byte argument (the ring angle in RAC1)
    is the counter's low byte, doubled and/or inverted by the ring index. */
-void func_PAL_L08_003D0280(char *obj)
+void gfx_draw_glowing_spark_rings_pal(char *obj)
 {
     TI128 joint, velocity, step, ring, ring_step;
     int count;

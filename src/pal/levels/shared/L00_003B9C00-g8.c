@@ -13,7 +13,9 @@ extern char *CreateMoby(int);
 extern void moby_init_child_from_parent(char *,int);
 extern void moby_set_light_color(char *,int);
 
-int func_PAL_L00_003BA320(char *object)
+/* Creates the two paired objects and gives them their starting positions and speeds. Returns 1 if
+ * both were created. (PAL: 50 Hz timings) */
+int initialize_paired_objects_pal(char *object)
 {
     int i=0;
     Quad *source,*position;
@@ -33,7 +35,7 @@ int func_PAL_L00_003BA320(char *object)
     source=g_pair_game_effect_sources;
     out=state->positions;
     do {
-        *slot=CreateMoby(i?0xe7d:0xeb0);
+        *slot=CreateMoby(i?MOBY_CLASS_SHEEP:MOBY_CLASS_DARK_SHEEP);
         moby_init_child_from_parent(*slot,0);
         *(unsigned short *)(*slot+0x34)|=0x4100;
         (*slot)[0xbc]=i;

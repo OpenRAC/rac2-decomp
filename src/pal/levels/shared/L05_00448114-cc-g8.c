@@ -32,7 +32,7 @@ extern char g_ship_saved_matrix_row2[] __attribute__((sda));
 extern char g_slot_record_source[];
 
 extern void hero_set_objects_flag_bit(void);
-extern void func_PAL_L05_00448CA8(void *, void *, void *);
+extern void UpdateSteeringInput_pal(void *, void *, void *);
 extern void ship_apply_steering_rotation(void *, void *, void *);
 extern void cam_update_chase_position_pal(void *);
 extern void UpdateDrivenMobyTransform_pal(void *);
@@ -51,19 +51,19 @@ extern int math_fast_float_d(void *);
 #define U(p, o) (*(unsigned short *)((char *)(p) + (o)))
 
 /* Dispatches the flight controller and its timed transform transitions. */
-void func_PAL_L05_00448114(char *obj)
+void UpdateTimedTransformState_pal(char *obj)
 {
-    int first, second;
+    int yaw_rate, pitch_rate;
     char *input = P(obj, 0x70) + 0x50;
-    float a = g_cam_yaw_param_first, b = g_cam_yaw_param_second, c = g_cam_yaw_param_third;
-    float d = g_cam_pitch_param_first, e = g_cam_pitch_param_second, f = g_cam_pitch_param_third;
+    float yaw_a = g_cam_yaw_param_first, yaw_b = g_cam_yaw_param_second, yaw_c = g_cam_yaw_param_third;
+    float pitch_a = g_cam_pitch_param_first, pitch_b = g_cam_pitch_param_second, pitch_c = g_cam_pitch_param_third;
 
-    F(input, 0) = a;
-    F(input, 4) = b;
-    F(input, 8) = c;
-    F(input, 12) = d;
-    F(input, 16) = e;
-    F(input, 20) = f;
+    F(input, 0) = yaw_a;
+    F(input, 4) = yaw_b;
+    F(input, 8) = yaw_c;
+    F(input, 12) = pitch_a;
+    F(input, 16) = pitch_b;
+    F(input, 20) = pitch_c;
     g_ship_mode_word = 2;
     if (!g_hero_state[0x22B5]) {
         I(P(g_hero_state, 0x2290), 0x98) = 0;
@@ -80,14 +80,14 @@ void func_PAL_L05_00448114(char *obj)
 
     switch (g_ship_state) {
     case 0:
-        func_PAL_L05_00448CA8(obj, &first, &second);
-        ship_apply_steering_rotation(obj, &first, &second);
+        UpdateSteeringInput_pal(obj, &yaw_rate, &pitch_rate);
+        ship_apply_steering_rotation(obj, &yaw_rate, &pitch_rate);
         cam_update_chase_position_pal(obj);
         UpdateDrivenMobyTransform_pal(obj);
         break;
     case 1:
-        func_PAL_L05_00448CA8(obj, &first, &second);
-        ship_apply_steering_rotation(obj, &first, &second);
+        UpdateSteeringInput_pal(obj, &yaw_rate, &pitch_rate);
+        ship_apply_steering_rotation(obj, &yaw_rate, &pitch_rate);
         cam_update_chase_position_pal(obj);
         UpdateDrivenMobyTransform_pal(obj);
         D_L05_001B1F60_sda = g_ship_fade_level_a + 0.05f;
@@ -120,8 +120,8 @@ void func_PAL_L05_00448114(char *obj)
         }
         break;
     case 2:
-        func_PAL_L05_00448CA8(obj, &first, &second);
-        ship_apply_steering_rotation(obj, &first, &second);
+        UpdateSteeringInput_pal(obj, &yaw_rate, &pitch_rate);
+        ship_apply_steering_rotation(obj, &yaw_rate, &pitch_rate);
         cam_update_chase_position_pal(obj);
         UpdateDrivenMobyTransform_pal(obj);
         D_L05_001B1F60_sda = g_ship_fade_level_a - 0.05f;

@@ -41,17 +41,17 @@ extern s32 g_trail_ribbon_color_scale_b __attribute__((sda));
 extern s32 g_trail_ribbon_halo_value __attribute__((sda));
 
 /* releases the measured handles and seeds the frame */
-void effect_controller_update_pal(u8 *arg0) {
-    s32 *payload = *(s32 **)(arg0 + 0x68);
+void effect_controller_update_pal(u8 *moby) {
+    s32 *payload = *(s32 **)(moby + 0x68);
 
-    effect_controller_init_link_table(arg0);
+    effect_controller_init_link_table(moby);
     if (D_L23_001B1484_2 != 0) {
         if (mothership_is_held() != 0) {
-            gfx_add_draw_callback_first((void *)gfx_draw_spinning_star_quads, arg0);
+            gfx_add_draw_callback_first((void *)gfx_draw_spinning_star_quads, moby);
         } else if (mothership_is_blast_timer_running() != 0) {
-            gfx_add_draw_callback_first((void *)hero_draw_trail_ribbons, arg0);
+            gfx_add_draw_callback_first((void *)hero_draw_trail_ribbons, moby);
         } else if (mothership_is_blast_cooling_down() != 0) {
-            hero_spawn_trail_effect(arg0);
+            hero_spawn_trail_effect(moby);
         } else {
             payload[1] = 0;
         }
@@ -73,5 +73,5 @@ void effect_controller_update_pal(u8 *arg0) {
             }
         }
     }
-    effect_controller_count_frame(arg0);
+    effect_controller_count_frame(moby);
 }

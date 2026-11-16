@@ -6,7 +6,7 @@
 
 extern int flag_set_first_pending(u8 *);
 extern int math_random_int_below(int);
-extern void func_PAL_002A7E68(u8 *, int, int, int);
+extern void anim_start_blended_pal(u8 *, int, int, int);
 extern void moby_set_state(u8 *, int, int);
 extern void moby_set_controller_speed_limits(u8 *, float, float, float, float);
 extern int path_measure_moby_against_entry(u8 *, int, float);
@@ -36,19 +36,20 @@ extern u8 *g_waypoint_table[] __attribute__((sda));
 
 typedef struct { u8 pad[0x30]; u8 pos[0x10]; u8 rest[0x40]; } TargetRecord;
 
-#define WORD(p,o) (*(int *)((p)+(o)))
-#define HALF(p,o) (*(s16 *)((p)+(o)))
-#define UHALF(p,o) (*(u16 *)((p)+(o)))
-#define FLOAT(p,o) (*(float *)((p)+(o)))
-#define PTR(p,o) (*(u8 **)((p)+(o)))
+#define WORD(entry,o) (*(int *)((entry)+(o)))
+#define HALF(entry,o) (*(s16 *)((entry)+(o)))
+#define UHALF(entry,o) (*(u16 *)((entry)+(o)))
+#define FLOAT(entry,o) (*(float *)((entry)+(o)))
+#define PTR(entry,o) (*(u8 **)((entry)+(o)))
 
-void func_PAL_L18_003FC158(u8 *object)
+/* Runs the robot's behaviour by state: it idles, wanders along its path, goes for the hero or a target, and blows up when hit. (PAL: 50 Hz timings) */
+void robot_update_behavior_pal(u8 *object)
 {
     u8 temp[16] __attribute__((aligned(16)));
     u8 position[16] __attribute__((aligned(16)));
     u8 *state = PTR(object, 0x68);
     u8 *entity;
-    u16 *p;
+    u16 *entry;
     float best, distance;
     int hit;
     switch (object[0x20]) {
@@ -56,14 +57,14 @@ void func_PAL_L18_003FC158(u8 *object)
     case 1:
         if (flag_set_first_pending(object)) {
             if (object[0x43] != math_random_int_below(2))
-                func_PAL_002A7E68(object, math_random_int_below(2), 0, 8);
+                anim_start_blended_pal(object, math_random_int_below(2), 0, 8);
         }
         break;
     case 2:
         if (flag_set_first_pending(object)) {
             moby_set_controller_speed_limits(object, 0.0032000002f, 0.080000006f, 0.010053098f, 0.25132746f);
             if (object[0x43] != math_random_int_below(2))
-                func_PAL_002A7E68(object, math_random_int_below(2), 0, 8);
+                anim_start_blended_pal(object, math_random_int_below(2), 0, 8);
         } else if (HALF(state, 0x768)) {
             moby_set_state(object, 5, 2);
             moby_set_state(object, 4, -1);
@@ -72,7 +73,7 @@ void func_PAL_L18_003FC158(u8 *object)
     case 3:
         if (flag_set_first_pending(object)) {
             if (object[0x43] != math_random_int_below(2) + 4)
-                func_PAL_002A7E68(object, math_random_int_below(2) + 4, 0, 8);
+                anim_start_blended_pal(object, math_random_int_below(2) + 4, 0, 8);
             object[0xBC] = ((s32)(math_random_int_below(180) + 120) * 5 + 2) / 6;
         } else if (UHALF(object, 0x96) > object[0xBC])
             moby_set_state(object, object[0x94], -1);
@@ -80,7 +81,7 @@ void func_PAL_L18_003FC158(u8 *object)
     case 4:
         if (flag_set_first_pending(object)) {
             if (object[0x43] != math_random_int_below(2) + 2)
-                func_PAL_002A7E68(object, math_random_int_below(2) + 2, 0, 8);
+                anim_start_blended_pal(object, math_random_int_below(2) + 2, 0, 8);
         } else if (object[0x60] & 2)
             moby_set_state(object, object[0x94], -1);
         break;
@@ -92,7 +93,7 @@ void func_PAL_L18_003FC158(u8 *object)
             object[0xBC] = 0;
             moby_set_controller_speed_limits(object, 0.006f, 0.15f, 0.010053098f, 0.25132746f);
             if (object[0x43] != math_random_int_below(2) + 6)
-                func_PAL_002A7E68(object, math_random_int_below(2) + 6, 0, 8);
+                anim_start_blended_pal(object, math_random_int_below(2) + 6, 0, 8);
             HALF(state, 0x760) = path_measure_moby_against_entry(object+0x10, WORD(state, 0x714), 0.0f);
         } else if (object[0xBC] == 0) {
             path_advance_waypoint_index(object, state+0x700, WORD(state, 0x714), 4.0f, (s16 *)(state+0x760), HALF(state, 0x76C));
@@ -100,7 +101,7 @@ void func_PAL_L18_003FC158(u8 *object)
 enter_pause:
                 object[0xBC] = 1;
                 if (object[0x43] != math_random_int_below(2) + 4)
-                    func_PAL_002A7E68(object, math_random_int_below(2)+4, 0, 8);
+                    anim_start_blended_pal(object, math_random_int_below(2)+4, 0, 8);
             }
         } else if (object[0xBC] == 1 && (object[0x60] & 2)) {
             moby_set_state(object, 5, -1);
@@ -122,12 +123,12 @@ enter_pause:
         if (flag_set_first_pending(object)) {
             object[0xBC] = 0;
             if (object[0x43] != math_random_int_below(2)+2)
-                func_PAL_002A7E68(object, math_random_int_below(2)+2, 0, 8);
+                anim_start_blended_pal(object, math_random_int_below(2)+2, 0, 8);
         } else if (object[0xBC] == 0 && (object[0x60] & 2)) {
             object[0xBC] = 1;
             moby_set_controller_speed_limits(object, 0.006f, 0.15f, 0.010053098f, 0.25132746f);
             if (object[0x43] != math_random_int_below(2)+6)
-                func_PAL_002A7E68(object, math_random_int_below(2)+6, 0, 8);
+                anim_start_blended_pal(object, math_random_int_below(2)+6, 0, 8);
         } else if (object[0xBC] == 1) {
             qcopy(state+0x700, g_hero_position);
             HALF(state, 0x76A) = 1;
@@ -139,7 +140,7 @@ enter_pause:
             } else if (vec_distance_squared_xy(object+0x10, state+0x700) < FLOAT(state, 0x72C)*FLOAT(state, 0x72C)) {
                 object[0xBC] = 2;
                 if (object[0x43] != math_random_int_below(2)+4)
-                    func_PAL_002A7E68(object, math_random_int_below(2)+4, 0, 8);
+                    anim_start_blended_pal(object, math_random_int_below(2)+4, 0, 8);
             }
         } else if (object[0xBC] == 2 && (object[0x60] & 2))
             moby_set_state(object, 6, -1);
@@ -153,12 +154,12 @@ enter_pause:
     case 7:
         if (flag_set_first_pending(object)) {
             if (object[0x43] != math_random_int_below(2)+6)
-                func_PAL_002A7E68(object, math_random_int_below(2)+6, 0, 8);
+                anim_start_blended_pal(object, math_random_int_below(2)+6, 0, 8);
             best = 1000.0f;
-            for (p=g_condition_target_lists[WORD(state, 0x74C)];
-                 (WORD(state, 0x74C)&255)!=255 && WORD(state, 0x74C)<=g_max_l18_group_index && p &&
-                 ((p != 0 && (s16)p[-1]>=0) || p==g_condition_target_lists[WORD(state, 0x74C)]); p++) {
-                entity=g_moby_l18_table[0]+((*p&0x7FFF)<<8);
+            for (entry=g_condition_target_lists[WORD(state, 0x74C)];
+                 (WORD(state, 0x74C)&255)!=255 && WORD(state, 0x74C)<=g_max_l18_group_index && entry &&
+                 ((entry != 0 && (s16)entry[-1]>=0) || entry==g_condition_target_lists[WORD(state, 0x74C)]); entry++) {
+                entity=g_moby_l18_table[0]+((*entry&0x7FFF)<<8);
                 if (!entity) break;
                 distance=vec_distance_squared_xy(object+0x10, entity+0x10);
                 if (distance<best) { PTR(state, 0x750)=entity; best=distance; }
@@ -180,7 +181,7 @@ enter_pause:
     case 8:
         if (flag_set_first_pending(object)) {
             if (object[0x43] != math_random_int_below(2)+6)
-                func_PAL_002A7E68(object, math_random_int_below(2)+6, 0, 8);
+                anim_start_blended_pal(object, math_random_int_below(2)+6, 0, 8);
             qcopy(state+0x700, ((TargetRecord *)g_waypoint_table[0])[WORD(state, 0x744)].pos);
         }
         HALF(state, 0x76A)=1;

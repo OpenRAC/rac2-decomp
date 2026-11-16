@@ -18,7 +18,7 @@ typedef struct {
 extern HeroModes g_hero_state;
 extern u8 g_moby_nibble_table[];
 /* Player stats: the pending bolt credit at +0x1C. */
-typedef struct { u8 pad0[0x1C]; int pendingBolts; } PlayerStats;
+typedef struct { u8 pad0[0x1C]; int pending_bolts; } PlayerStats;
 extern PlayerStats g_player_stats MACRO_ADDR;
 extern u8 g_item_enabled_flags[] MACRO_ADDR;
 extern int g_warp_triggered_flags[] MACRO_ADDR;
@@ -36,6 +36,7 @@ extern int snd_play_from_global_bank(int, int, void *);
 extern int text_sum_subtitle_lengths(void);
 extern void value_set_entry_by_index_us2(int, int);
 
+/* A pickup that floats until the hero is close, then flies to the hero, shrinks, and adds a bolt when it arrives (USA v2.00 copy). */
 void UpdateHomingCollectible_us2(u8 *object)
 {
     float direction[4] __attribute__((aligned(16)));
@@ -97,7 +98,7 @@ void UpdateHomingCollectible_us2(u8 *object)
                 }
                 moby_mark_spawned(*(u8 **)(state + 4));
             }
-            g_player_stats.pendingBolts++;
+            g_player_stats.pending_bolts++;
             snd_play_from_class_bank(3, 0, object, 0x11C7);
             moby_mark_spawned(object);
             if (!text_sum_subtitle_lengths() && !g_item_enabled_flags[6]) {

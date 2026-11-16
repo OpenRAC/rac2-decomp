@@ -50,6 +50,8 @@ extern void cam_set_strength_and_steer_target(void *, f32, f32);
 #define GUIDE (*(f32 **)(s + 0x170))
 #define SET_GUIDE(x, y, z) (GUIDE[0] = (x), GUIDE[1] = (y), GUIDE[2] = (z))
 
+/* Keeps the arena camera guide point: allocated while the object is in state 8 or 9 and moved to a
+   point that depends on the fighter being shown, released otherwise. */
 void arena_update_camera_guide_pal(u8 *obj) {
     u8 *s = *(u8 **)(obj + 0x68);
 

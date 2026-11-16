@@ -19,7 +19,7 @@ extern s32 g_enemy_spawn_enabled, g_tribe_group_limit, g_arena_progress_level;
 extern u8 *CreateMoby(s32);
 extern void moby_mark_spawned(void *);
 extern void moby_set_state(void *, s32, s32);
-extern void func_PAL_002A7E68(void *, s32, s32, s32);
+extern void anim_start_blended_pal(void *, s32, s32, s32);
 extern void func_002A0F48(void *);
 extern void moby_copy_joint_transform_to_object(void *, void *, s32, s32);
 extern f32 fast_vec_dist(void *, void *);
@@ -32,9 +32,9 @@ extern void math_apply_axis_rotation_to_quat(void *, void *, void *, f32);
 extern void mat_normalize_columns(void *);
 extern void func_002A10E8(void *);
 extern void part_spawn_explosion_with_sparks_pal(void *, void *, f32, f32, s32);
-extern s32 func_PAL_002B1A50(void *, void *, s32);
-extern void func_PAL_L11_0042F7E8(void *, s32);
-extern void func_PAL_002AC290(void *, void *);
+extern s32 moby_apply_damage_to_object_pal(void *, void *, s32);
+extern void part_l11_spawn_paired_sparks_pal(void *, s32);
+extern void gfx_start_color_fade_pal(void *, void *);
 extern void MarkGroupClassCF5CF6Members(void *);
 extern s32 moby_count_group_not_in_state(s32, s32);
 extern s32 hero_check_distance_zones(void *, void *, s32, s32, f32, f32, s32);
@@ -43,7 +43,7 @@ extern char g_hero_l11_position[];
 extern char g_hero_l11_position[];
 
 /* Initializes linked objects, updates damage, and releases children on removal. */
-s32 func_PAL_L11_0042E7D0(u8 *object) {
+s32 jobian_lieutenant_update_pal(u8 *object) {
     f32 vectors[16];
     s32 damage;
     u16 *ids;
@@ -145,22 +145,22 @@ s32 func_PAL_L11_0042E7D0(u8 *object) {
             }
         } else {
             moby_set_state(object, 4, 0);
-            if (object[0x43]) func_PAL_002A7E68(object, 0, 0, 0);
+            if (object[0x43]) anim_start_blended_pal(object, 0, 0, 0);
             if (*(s32 *)(data + 0x540) == 1) {
                 *(u8 **)(data + 0x55C) = g_moby_l11_table + (*(s32 *)(data + 0x544) << 8);
                 moby_set_state(object, 5, 0);
-                if (object[0x43] != 13) func_PAL_002A7E68(object, 13, 0, 0);
+                if (object[0x43] != 13) anim_start_blended_pal(object, 13, 0, 0);
             } else if (*(s32 *)(data + 0x540) == 2) {
                 *(u8 **)(data + 0x55C) = g_moby_l11_table + (*(s32 *)(data + 0x544) << 8);
                 moby_set_state(object, 5, 0);
-                if (object[0x43] != 15) func_PAL_002A7E68(object, 15, 5, 0);
+                if (object[0x43] != 15) anim_start_blended_pal(object, 15, 5, 0);
             } else if (*(s32 *)(data + 0x540) == 3) {
                 *(u8 **)(data + 0x55C) = g_moby_l11_table + (*(s32 *)(data + 0x544) << 8);
                 moby_set_state(object, 5, 0);
-                if (object[0x43] != 15) func_PAL_002A7E68(object, 15, 0, 0);
+                if (object[0x43] != 15) anim_start_blended_pal(object, 15, 0, 0);
             } else if (*(s32 *)(data + 0x54C) != -1) {
                 moby_set_state(object, 11, 0);
-                if (object[0x43] != 4) func_PAL_002A7E68(object, 4, 0, 0);
+                if (object[0x43] != 4) anim_start_blended_pal(object, 4, 0, 0);
             }
             *(u8 **)(data + 0x29C) = CreateMoby(0x9AC);
             if (!*(u8 **)(data + 0x29C)) return 1;
@@ -225,12 +225,12 @@ s32 func_PAL_L11_0042E7D0(u8 *object) {
         *(s32 *)(data + 0x290) = 0;
     }
     *(s32 *)(data + 0x290) = 0;
-    damage = func_PAL_002B1A50(object, data + 0x60, 0);
+    damage = moby_apply_damage_to_object_pal(object, data + 0x60, 0);
     if (damage) {
         u8 *attacker = *(u8 **)(data + 0x38);
         if (attacker) {
             s32 cls = *(s16 *)(attacker + 0xAA);
-            if (cls != 0x47 && cls != 0xDD9 && cls != 0xD1B && cls != 0xCE7 && cls != 0xD07 && cls != 0)
+            if (cls != 0x47 && cls != 0xDD9 && cls != 0xD1B && cls != 0xCE7 && cls != MOBY_CLASS_JOBIAN_SAUR_BEAST && cls != 0)
                 g_enemy_spawn_enabled = 0;
         }
         if (object[0xBC] == 1)
@@ -238,7 +238,7 @@ s32 func_PAL_L11_0042E7D0(u8 *object) {
         if (*(f32 *)(object + 0x48) != 1.0f) *(f32 *)(object + 0x48) = 1.0f;
         if (*(s32 *)(data + 0x290)) {
             moby_transform_joint_to_world(object, 3, vectors);
-            func_PAL_L11_0042F7E8(vectors, 8);
+            part_l11_spawn_paired_sparks_pal(vectors, 8);
         }
         if (damage == 5) {
             *(f32 *)(data + 0xF4) = 1.0053098f;
@@ -251,7 +251,7 @@ s32 func_PAL_L11_0042E7D0(u8 *object) {
         }
         *(s32 *)(data + 0x290) = 0;
         data[0x57] = 0xD2;
-        func_PAL_002AC290(object, data + 0x50);
+        gfx_start_color_fade_pal(object, data + 0x50);
         if (object[0x95] != 2) MarkGroupClassCF5CF6Members(object);
         if ((u32)(damage - 4) < 2 && g_tribe_group_limit >= object[0x21] && moby_count_group_not_in_state(object[0x21], -1) >= 2) {
             ids = g_group_id_lists[object[0x21]];

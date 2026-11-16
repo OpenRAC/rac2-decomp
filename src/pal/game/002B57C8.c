@@ -4,7 +4,8 @@
 extern int g_menu_mode __attribute__((sda));
 extern int g_pal_return_value_a __attribute__((sda));
 
-int func_PAL_002B57C8(void) {
+/* Returns a PAL-only global value. */
+int get_pal_return_value_a(void) {
     return g_pal_return_value_a;
 }
 
@@ -18,6 +19,7 @@ extern int math_random_int_range(int, int);
 extern int moby_step_controller(void *, void *, float);
 extern int moby_step_controller(void *, void *, float);
 
+/* Turns the moby toward a target point (with a wobble) and steps the controller (PAL). */
 int moby_turn_toward_target_and_step_pal(char *self, float *target, float amount)
 {
     char *data = moby_get_controller(self);
@@ -38,7 +40,8 @@ int moby_turn_toward_target_and_step_pal(char *self, float *target, float amount
 }
 
 
-int moby_step_at_own_position_pal(char *m) {
-    return moby_step_controller(m, m + 0x10, *(float *)(m + 0xF8));
+/* Steps the moby controller toward the moby's own position, using its field at 0xF8 (PAL). */
+int moby_step_at_own_position_pal(char *moby) {
+    return moby_step_controller(moby, moby + 0x10, *(float *)(moby + 0xF8));
 }
 

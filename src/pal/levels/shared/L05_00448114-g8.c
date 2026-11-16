@@ -18,7 +18,8 @@ extern unsigned char *func_L05_003D1E60(void *,int,int);
 extern void ship_update_record_transform(void *,float);
 extern void mat_get_euler_angles(void *,void *);
 
-void func_PAL_L05_004485A0(char *obj)
+/* Starts the recorded-path transition for the ship: saves its position and orientation and sets the timer (PAL: 50 Hz). */
+void ship_start_record_playback_pal(char *obj)
 {
     Quadword matrix[4];
     Entry *entry;

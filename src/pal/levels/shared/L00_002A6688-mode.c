@@ -78,7 +78,8 @@ extern float math_fabs(float);
 extern int subtitle_request_voice_line(int,int);
 extern int menu_update_entry_states(void);
 extern void level_advance_checked_cursor(void);
-void func_PAL_L00_002A6688(void)
+/* Tracks hero stats and milestones: gives the collection reward, counts quick left-right stick flicks and long hero moves, and fires voice lines on a timer (PAL). */
+void hero_update_stat_trackers_pal(void)
 {
     float v[4], mag;
     int sign,i,count;

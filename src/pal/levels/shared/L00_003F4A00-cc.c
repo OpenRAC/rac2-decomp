@@ -26,7 +26,8 @@ extern float FastAddRotations(float, float);
 extern int math_random_int_range(int, int);
 extern int math_fast_float_d(void *);
 
-void func_PAL_L00_003F4A00(char *owner)
+/* Ages the blast pool records that belong to one owner: it moves and fades them, and frees each one when its time runs out (PAL: 50 Hz counts). */
+void blast_update_pool_records_pal(char *owner)
 {
     Vector displacement, velocity;
     Effect *record;

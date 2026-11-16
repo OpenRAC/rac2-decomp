@@ -13,7 +13,9 @@ extern int math_random_int_below(int);
 extern float math_random_float_range(float, float);
 extern void FastVecScale(void *, void *, float);
 
-void func_PAL_L04_00410678(L04Quad *position, L04Quad *direction, int count, int mode)
+/* Spawns count dust particles at position, flying along direction with some random spread; mode
+   makes them bigger and faster (PAL). */
+void part_l04_spawn_burst_pal(L04Quad *position, L04Quad *direction, int count, int mode)
 {
     float velocity[4], point[4], scaled[4], result[4];
     float size, angle, pitch;

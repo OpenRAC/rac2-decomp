@@ -15,7 +15,7 @@ extern void text_draw_right_aligned_small(int, int, u64, char *, int);
  * func_PAL_L00_0030F3E8 and the draw call is func_0027F980. As in
  * func_PAL_002CE388, retail reads the first word through $gp and the second
  * through lui, hence the two declaration forms and the -G8 unit. */
-int func_PAL_L00_00349574(void)
+int level_l00_draw_text_right_pal(void)
 {
     SetupGifPaging(0);
     module_l00_call_handler_12_pal();

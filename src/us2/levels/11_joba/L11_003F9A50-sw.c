@@ -53,6 +53,7 @@ typedef struct {
 extern JobaPlayerView g_hero_state;
 extern char g_hero_target_point[];
 
+/* Updates the Joba Deser Rider who talks with the player. It waits until the player is near, plays two dialogue scenes, then leaves. (USA v2.00) */
 void UpdateJobaDialogueActor_us2(unsigned char *moby) {
     float target[4] __attribute__((aligned(16)));
     float origin[4] __attribute__((aligned(16)));

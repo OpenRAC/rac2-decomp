@@ -10,14 +10,14 @@
    otherwise. */
 typedef struct {
     char pad0[4];
-    unsigned char byte04;       /* +0x04: set, the entry counts as owned */
+    unsigned char owned;       /* +0x04: set, the entry counts as owned */
     char pad5;
     short material;             /* +0x06 */
     int name;                   /* +0x08: text id */
     char pad0C[0x7C];
-    unsigned short usesAmmo;    /* +0x88 */
+    unsigned short uses_ammo;    /* +0x88 */
     char pad8A[4];
-    unsigned short maxAmmo;     /* +0x8E */
+    unsigned short max_ammo;     /* +0x8E */
     char tail[0x50];
 } ItemRecord;
 
@@ -33,7 +33,7 @@ typedef struct {
 
 extern int snd_play_from_global_bank(int, int, void *);
 extern void *memset(void *, int, unsigned int);
-extern int func_PAL_002A9FA0(int, int, int, int, int);
+extern int math_ping_pong_blend_values_pal(int, int, int, int, int);
 extern int *object_get_fourth_field(void *);
 extern void object_set_first_float4(void *, float, float, float, float);
 extern char *GetLocalizedString(int);
@@ -50,7 +50,7 @@ extern int g_item_ammo_counts[];
 extern int g_selected_item_material __attribute__((sda));
 extern int g_selection_grid_cursor[];
 
-int func_PAL_00348DF8(ItemMenu *menu, int buttons)
+int UpdateItemGridMenu_pal(ItemMenu *menu, int buttons)
 {
     float pos0[2] __attribute__((aligned(16)));
     float pos4C[2] __attribute__((aligned(16)));
@@ -62,11 +62,11 @@ int func_PAL_00348DF8(ItemMenu *menu, int buttons)
     float pos268[2] __attribute__((aligned(16)));
     float pos2C0[2] __attribute__((aligned(16)));
     int result = -1;
-    int old = menu->column + menu->row * 4;
+    int old_selection = menu->column + menu->row * 4;
     int selection, n;
     int *color;
-    int entry, item, ammo, maxAmmo;
-    ItemRecord *record, *initialRecord;
+    int entry, item, ammo, max_ammo;
+    ItemRecord *record, *initial_record;
     char *text;
 
     if (buttons & 0x1000) {
@@ -97,10 +97,10 @@ int func_PAL_00348DF8(ItemMenu *menu, int buttons)
     __builtin_memcpy(pos210, g_shop_item_pos_a, 8);
     __builtin_memcpy(pos268, g_shop_item_pos_b, 8);
     __builtin_memcpy(pos2C0, g_shop_item_pos_c, 8);
-    if (old != selection)
-        func_PAL_002A9FA0(0, 0, 1, 0, 1);
+    if (old_selection != selection)
+        math_ping_pong_blend_values_pal(0, 0, 1, 0, 1);
     color = object_get_fourth_field((char *)menu + 0xE4);
-    *color = func_PAL_002A9FA0(0x60442D00, 0x70FFFEED, 20, 0, 0);
+    *color = math_ping_pong_blend_values_pal(0x60442D00, 0x70FFFEED, 20, 0, 0);
 
     object_set_first_float4((char *)menu + 0x0, pos0[0] + menu->origin[0], pos0[1] + menu->origin[1], 0.0f, 0.0f);
     object_set_first_float4((char *)menu + 0x4C, pos4C[0] + menu->origin[0], pos4C[1] + menu->origin[1], 0.0f, 0.0f);
@@ -116,8 +116,8 @@ int func_PAL_00348DF8(ItemMenu *menu, int buttons)
     if (selection >= 0) {
         entry = g_menu_item_table_first[selection][3];
         item = g_item_slot_to_record[entry];
-        initialRecord = &g_weapon_table[item];
-        if (initialRecord->byte04) {
+        initial_record = &g_weapon_table[item];
+        if (initial_record->owned) {
             g_item_owned_flags[entry] = 1;
             g_help_unlocked_flags[entry] = 1;
         }
@@ -127,17 +127,17 @@ int func_PAL_00348DF8(ItemMenu *menu, int buttons)
             sprintf(menu->name, GetLocalizedString(g_weapon_table[g_item_slot_to_record[entry]].name));
             record = &g_weapon_table[g_item_slot_to_record[entry]];
             ammo = g_item_ammo_counts[entry];
-            maxAmmo = record->maxAmmo;
-            if (record->usesAmmo) {
+            max_ammo = record->max_ammo;
+            if (record->uses_ammo) {
                 text += sprintf(text, g_str_shop_label_format, GetLocalizedString(0xBDA));
                 if (ammo < 1000)
                     text += sprintf(text, g_str_shop_ammo_format, ammo);
                 else
                     text += sprintf(text, g_str_shop_ammo_split_format, ammo / 1000, ammo % 1000);
-                if (maxAmmo < 1000)
-                    sprintf(text, g_str_count_format, maxAmmo);
+                if (max_ammo < 1000)
+                    sprintf(text, g_str_count_format, max_ammo);
                 else
-                    sprintf(text, g_str_shop_max_ammo_format, maxAmmo / 1000, maxAmmo % 1000);
+                    sprintf(text, g_str_shop_max_ammo_format, max_ammo / 1000, max_ammo % 1000);
             } else {
                 sprintf(text, ref_00346C60_00, GetLocalizedString(0xBCA));
             }

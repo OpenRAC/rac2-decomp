@@ -29,36 +29,37 @@ typedef struct { int delay, startId, endId, unused; int first[2], second[2]; int
 #define FIELD(o) (*(int *)(data + (o)))
 #define HALF(o) (*(short *)(data + (o)))
 #define POOL (*(PoolRecord64 **)(data + 0x34))
-void func_PAL_L01_003D6A78(unsigned char *self)
+/* Updates the launcher. In turn it waits for its trigger, fires projectiles on its timer, and holds the camera override while the hero is in its zone (PAL: 50 Hz timers). */
+void oozla_launcher_update_pal(unsigned char *moby)
 {
-    LaunchState *state = *(LaunchState **)(self + 0x68);
+    LaunchState *state = *(LaunchState **)(moby + 0x68);
     unsigned char *data = (unsigned char *)state;
     LaunchVector point, target;
     int i, command;
-    int *firstIDs, *secondIDs;
-    switch (self[0x20]) {
+    int *first_ids, *second_ids;
+    switch (moby[0x20]) {
     case 0:
         POOL = 0;
         for (i = 0; i < 2; i++) {
             if (state->first[i] == -1) {
-                STUB_printf(g_str_launcher_debug_format, *(short *)(self + 0xaa), *(short *)(self + 0xb2), i);
-                moby_set_state(self, 4, -1);
+                STUB_printf(g_str_launcher_debug_format, *(short *)(moby + 0xaa), *(short *)(moby + 0xb2), i);
+                moby_set_state(moby, 4, -1);
             }
             if (state->second[i] == -1) {
-                STUB_printf(g_str_launcher_debug_format_alt, *(short *)(self + 0xaa), *(short *)(self + 0xb2), i);
-                moby_set_state(self, 4, -1);
+                STUB_printf(g_str_launcher_debug_format_alt, *(short *)(moby + 0xaa), *(short *)(moby + 0xb2), i);
+                moby_set_state(moby, 4, -1);
             }
         }
-        if (self[0x20] == 0) moby_set_state(self, 1, -1);
+        if (moby[0x20] == 0) moby_set_state(moby, 1, -1);
         break;
     case 1:
-        if (self[0xbc]) {
+        if (moby[0xbc]) {
             g_moby_l01_table[FIELD(4) * 256 + 0xbc] = 1;
             FIELD(0x28) = 0;
-            self[0xbc] = 0;
+            moby[0xbc] = 0;
             FIELD(0x3c) = 0;
             FIELD(0x2c) = (FIELD(0x24) * 5 + 2) / 6;
-            moby_set_state(self, 2, -1);
+            moby_set_state(moby, 2, -1);
         }
         break;
     case 2:
@@ -77,26 +78,26 @@ void func_PAL_L01_003D6A78(unsigned char *self)
                 index = state->second[selection];
                 qcopy_nc(&point, base + index * 128 + 0x30);
                 qcopy_nc(&target, base + index * 128 + 0x70);
-                moby_l01_spawn_child(self, &point, &target, HALF(0x32) + 0xa9e, HALF(0x30));
+                moby_l01_spawn_child(moby, &point, &target, HALF(0x32) + 0xa9e, HALF(0x30));
             }
             {
                 int duration = (FIELD(0) * 5 + 2) / 6;
-                int triggerIndex = FIELD(8);
+                int trigger_index = FIELD(8);
                 state->timer = duration;
-                g_moby_l01_table[triggerIndex * 256 + 0xbc] = 1;
+                g_moby_l01_table[trigger_index * 256 + 0xbc] = 1;
             }
         }
         if (FIELD(0x28) < (FIELD(0) * 5 + 2) / 6 - 33)
             g_moby_l01_table[FIELD(8) * 256 + 0xbc] = 0;
-        if (math_fast_float_d((int *)(data + 0x2c))) moby_set_state(self, 3, -1);
+        if (math_fast_float_d((int *)(data + 0x2c))) moby_set_state(moby, 3, -1);
         break;
     case 3:
         g_moby_l01_table[FIELD(4) * 256 + 0xbc] = 0;
-        moby_set_byte_on_group(self[0x21], 0);
-        moby_set_state(self, 1, -1);
+        moby_set_byte_on_group(moby[0x21], 0);
+        moby_set_state(moby, 1, -1);
         break;
     }
-    if (self[0x20] == 2 && FIELD(0x38) != -1 && IsPointInCuboid(g_hero_position, FIELD(0x38))) {
+    if (moby[0x20] == 2 && FIELD(0x38) != -1 && IsPointInCuboid(g_hero_position, FIELD(0x38))) {
         if (POOL == 0) {
             POOL = cam_alloc_override_slot(5);
             qzero((unsigned char *)POOL + 0x20);

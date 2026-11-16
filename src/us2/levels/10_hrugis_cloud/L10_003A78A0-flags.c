@@ -88,6 +88,7 @@ extern f32 math_random_signed_float_range(f32 a0, f32 a1);
 extern f32 math_random_float_range(f32 a0, f32 a1);
 extern u32 g_running_total __attribute__((sda));
 
+/* Moves a falling object, bounces it off what it hits and spawns the hit effect. (USA v2.00) */
 void falling_l04_debris_update_us2(char *obj) {
     struct {
         Vec velocity, normal, old, surface;

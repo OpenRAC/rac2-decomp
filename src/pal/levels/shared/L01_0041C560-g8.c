@@ -22,26 +22,26 @@ extern void FastVecAdd(void *, void *, void *);
 extern void moby_transform_joint_to_world(void *, int, void *);
 
 /* builds the tilt of a hanging chain over three steps and draws it */
-void part_spawn_sparkle_drift_pal(char *a0)
+void part_spawn_sparkle_drift_pal(char *moby)
 {
-    TI128 m, v1, v2;
+    TI128 position, drift_a, drift_b;
     int i;
-    int b;
+    int alpha;
 
-    if (*(unsigned char *)(a0 + 0x20) == 1) {
-        FastVecScale(&m, a0, 0.0009765625f);
+    if (*(unsigned char *)(moby + 0x20) == 1) {
+        FastVecScale(&position, moby, 0.0009765625f);
     } else {
-        moby_transform_joint_to_world(a0, 0, &m);
+        moby_transform_joint_to_world(moby, 0, &position);
     }
     i = 2;
-    vec_random_direction(&v1, g_sparkle_drift_a_min * 0.020000001f, g_sparkle_drift_a_max * 0.020000001f);
-    b = g_sparkle_l01_alpha_2;
-    part_spawn_hero_relative(&m, &v1, g_sparkle_particle_type_a, b, math_random_int_below(255), 0, g_sparkle_scale_a);
+    vec_random_direction(&drift_a, g_sparkle_drift_a_min * 0.020000001f, g_sparkle_drift_a_max * 0.020000001f);
+    alpha = g_sparkle_l01_alpha_2;
+    part_spawn_hero_relative(&position, &drift_a, g_sparkle_particle_type_a, alpha, math_random_int_below(255), 0, g_sparkle_scale_a);
     do {
         i--;
-        vec_random_direction(&v2, g_sparkle_drift_b_min * 0.020000001f, g_sparkle_drift_b_max * 0.020000001f);
-        FastVecAdd(&v1, &v1, &v2);
-        b = g_sparkle_l01_alpha_2;
-        part_spawn_hero_relative(&m, &v1, g_sparkle_particle_type_b, b, math_random_int_below(255), 0, g_sparkle_scale_b);
+        vec_random_direction(&drift_b, g_sparkle_drift_b_min * 0.020000001f, g_sparkle_drift_b_max * 0.020000001f);
+        FastVecAdd(&drift_a, &drift_a, &drift_b);
+        alpha = g_sparkle_l01_alpha_2;
+        part_spawn_hero_relative(&position, &drift_a, g_sparkle_particle_type_b, alpha, math_random_int_below(255), 0, g_sparkle_scale_b);
     } while (i >= 0);
 }

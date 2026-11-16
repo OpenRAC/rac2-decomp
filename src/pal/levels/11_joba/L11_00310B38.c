@@ -22,7 +22,7 @@ typedef struct {
 extern MobList_L11_0030F060 ref_L11_0030F060_00;
 extern int g_current_map_index __attribute__((sda));
 extern void anim_start_startup_animations(void);
-extern void func_PAL_002E7270(void *);
+extern void update_equipment_pieces_pal(void *);
 extern void math_store_angle_update_result(void *, void *, int, int, float);
 extern void gfx_add_draw_callback_first(void *, void *);
 extern void level_start_progress_cue(void *);
@@ -31,7 +31,7 @@ extern void level_start_progress_cue(void *);
    is skipped in game state 0x33 and its float argument 0.0610865355f becomes 0.07330384f (6/5 for 50 Hz).
    Walks the level's list of mobs; when the game state is 0xB and the list's word at +0x30 is 2 it
    queues func_L11_0030ED58. */
-void func_PAL_L11_00310B38(void) {
+void moby_update_list_flags_pal(void) {
     int i;
 
     anim_start_startup_animations();
@@ -41,7 +41,7 @@ void func_PAL_L11_00310B38(void) {
         if (mob != 0 && mob->type == 0xE29)
             mob->flags |= 0x800;
         if (mob->type == 0xD54)
-            func_PAL_002E7270(mob);
+            update_equipment_pieces_pal(mob);
         if (mob != 0) {
             int kind = 0xFA0;
 

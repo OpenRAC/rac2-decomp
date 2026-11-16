@@ -10,6 +10,7 @@ extern s32 vec_fast_helper_a(void *);
 extern s32 moby_fuse_linked_objects(u8 *, void *, void *, s32, s32);
 extern void moby_set_state(u8 *, s32, s32);
 
+/* Wakes a linked enemy: moves it to its partner object and starts its first state, attached or free (PAL). */
 void moby_wake_linked_enemy_pal(u8 *object)
 {
     u8 *state = *(u8 **)(object + 0x68);

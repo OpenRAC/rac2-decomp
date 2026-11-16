@@ -68,6 +68,7 @@ extern void hero_update_collection_progress_us2(void);
 extern int math_random_int_range(int, int);
 
 
+/* Sets up the hero at level start: clears its state, finds the hero object and resets its aim, health and timers. */
 void InitializeHero_us2(void)
 {
     int saved[7];

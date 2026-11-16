@@ -20,6 +20,7 @@ extern int func_0029C560(int);
 extern char *tab_menu_get_selected_entry(void *);
 extern void menu_start_action(int);
 
+/* Handles input for a pop-up menu: leaves at once if the game is in a special state, otherwise reports cancel or accept and sends the preview message. (USA v2.00) */
 int menu_popup_update_us2(void)
 {
     MenuMessage message;

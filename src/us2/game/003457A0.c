@@ -16,25 +16,26 @@ extern void F6402b823_FUN_00344F98(char *a);
 extern void F6402b823_FUN_00345178(char *a);
 extern void F6402b823_FUN_00344938(char *a);
 
-void func_US2_003462C0(char *obj)
+/* Draws the grid menu: its parts, the four mode pages and the labels, when it is active (USA v2.00 copy). */
+void menu_screen_draw_parts_us2(char *menu)
 {
-    if (*(int *)(obj + 1192) != 0) {
-        char *s0 = obj + 456;
+    if (*(int *)(menu + 1192) != 0) {
+        char *widget = menu + 456;
 
-        F6402b823_FUN_00336320(obj);
-        F6402b823_FUN_00336320(obj + 76);
-        F6402b823_FUN_00336320(obj + 152);
-        F6402b823_FUN_00336320(obj + 228);
-        F6402b823_FUN_00336A78(s0);
-        F6402b823_FUN_00336A78(obj + 696);
-        F6402b823_FUN_00336A78(s0);
-        F6402b823_FUN_00335E68(obj + 544, 0);
-        F6402b823_FUN_00345268(obj);
-        F6402b823_FUN_00345088(obj);
-        F6402b823_FUN_00344F98(obj);
-        F6402b823_FUN_00345178(obj);
-        F6402b823_FUN_00344938(obj);
-        F6402b823_FUN_00336320(obj + 380);
+        F6402b823_FUN_00336320(menu);
+        F6402b823_FUN_00336320(menu + 76);
+        F6402b823_FUN_00336320(menu + 152);
+        F6402b823_FUN_00336320(menu + 228);
+        F6402b823_FUN_00336A78(widget);
+        F6402b823_FUN_00336A78(menu + 696);
+        F6402b823_FUN_00336A78(widget);
+        F6402b823_FUN_00335E68(menu + 544, 0);
+        F6402b823_FUN_00345268(menu);
+        F6402b823_FUN_00345088(menu);
+        F6402b823_FUN_00344F98(menu);
+        F6402b823_FUN_00345178(menu);
+        F6402b823_FUN_00344938(menu);
+        F6402b823_FUN_00336320(menu + 380);
     }
 }
 
@@ -43,23 +44,24 @@ extern void *F449e2f67_FUN_003361A8(char *p);
 extern char *F449e2f67_FUN_00336968(char *p);
 extern void *F449e2f67_FUN_003366D0(char *p);
 
-char *func_US2_00346368(char *p)
+/* Sets up the parts of the selection menu before they are filled in (USA v2.00 copy). */
+char *menu_screen_init_parts_us2(char *menu)
 {
-    F449e2f67_FUN_003361A8(p);
-    F449e2f67_FUN_003361A8(p + 76);
-    F449e2f67_FUN_003361A8(p + 152);
-    F449e2f67_FUN_003361A8(p + 228);
-    F449e2f67_FUN_003361A8(p + 304);
-    F449e2f67_FUN_003361A8(p + 380);
-    F449e2f67_FUN_00336968(p + 456);
-    F449e2f67_FUN_00336968(p + 544);
-    F449e2f67_FUN_003366D0(p + 632);
-    F449e2f67_FUN_00336968(p + 696);
-    F449e2f67_FUN_00336968(p + 784);
-    F449e2f67_FUN_00336968(p + 872);
-    F449e2f67_FUN_00336968(p + 960);
-    F449e2f67_FUN_00336968(p + 1048);
-    return p;
+    F449e2f67_FUN_003361A8(menu);
+    F449e2f67_FUN_003361A8(menu + 76);
+    F449e2f67_FUN_003361A8(menu + 152);
+    F449e2f67_FUN_003361A8(menu + 228);
+    F449e2f67_FUN_003361A8(menu + 304);
+    F449e2f67_FUN_003361A8(menu + 380);
+    F449e2f67_FUN_00336968(menu + 456);
+    F449e2f67_FUN_00336968(menu + 544);
+    F449e2f67_FUN_003366D0(menu + 632);
+    F449e2f67_FUN_00336968(menu + 696);
+    F449e2f67_FUN_00336968(menu + 784);
+    F449e2f67_FUN_00336968(menu + 872);
+    F449e2f67_FUN_00336968(menu + 960);
+    F449e2f67_FUN_00336968(menu + 1048);
+    return menu;
 }
 
 
@@ -68,7 +70,7 @@ char *func_US2_00346368(char *p)
 extern void *pool_alloc_cell(void *);
 extern int *ui_return_second_arg(int, int);
 extern void object_init_derived_arrays(void *, void *, void *);
-extern void func_US2_003377B0(void *, void *, void *);
+extern void hud_init_widget_defaults_us2(void *, void *, void *);
 extern void object_init_derived_c(void *, void *, void *);
 extern int *object_get_fourth_field(void *);
 extern void object_set_helper_result(void *, void *, int);
@@ -77,7 +79,7 @@ extern void object_set_second_float4(void *, float, float, float, float);
 extern void hud_set_widget_field_b(void *, void *);
 extern void hud_set_widget_field_a(void *, int);
 extern char *GetLocalizedString(int);
-extern int func_US2_00346EF0(void *, int, void *);
+extern int selection_menu_update_layout_us2(void *, int, void *);
 extern char *g_resident_data_base[] __attribute__((sda));
 extern char g_menu_widget_desc_first[];
 extern char g_menu_widget_desc_second[];
@@ -94,31 +96,31 @@ extern char g_menu_hud_desc_title[];
 extern char g_menu_hud_label_desc_alt[];
 extern char g_menu_icon_desc[];
 
-void func_US2_003463F8(char *self, void *owner)
+void selection_menu_init_us2(char *self, void *parent)
 {
     int scratch;
-    *(void **)(self + 0x474) = owner;
-    if (owner) {
-        int *p = ui_return_second_arg(16, pool_alloc_cell(owner));
-        *(int **)(self + 0x470) = p;
-        p[1] = 0; p[2] = 0; p[3] = 0; p[0] = 0;
+    *(void **)(self + 0x474) = parent;
+    if (parent) {
+        int *pos = ui_return_second_arg(16, pool_alloc_cell(parent));
+        *(int **)(self + 0x470) = pos;
+        pos[1] = 0; pos[2] = 0; pos[3] = 0; pos[0] = 0;
     }
     *(int *)(self + 0x4f8) = 1;
     (*(float **)(self + 0x470))[0] = 250.0f;
     (*(float **)(self + 0x470))[1] = 207.0f;
-    object_init_derived_arrays(self + 0x0, g_menu_widget_desc_first, owner);
-    object_init_derived_arrays(self + 0x4c, g_menu_widget_desc_second, owner);
-    object_init_derived_arrays(self + 0x98, g_menu_widget_desc_third, owner);
-    object_init_derived_arrays(self + 0xe4, g_menu_widget_desc_fourth, owner);
-    object_init_derived_arrays(self + 0x130, g_menu_frame_desc, owner);
-    object_init_derived_arrays(self + 0x17c, g_menu_panel_desc, owner);
-    func_US2_003377B0(self + 0x2b8, g_menu_hud_desc_label, owner);
-    func_US2_003377B0(self + 0x310, g_menu_hud_desc_body, owner);
-    func_US2_003377B0(self + 0x368, g_selection_menu_widget_defaults_a, owner);
-    func_US2_003377B0(self + 0x3c0, g_selection_menu_widget_defaults_b, owner);
-    func_US2_003377B0(self + 0x418, g_selection_menu_widget_defaults_c, owner);
-    func_US2_003377B0(self + 0x1c8, g_menu_hud_desc_title, owner);
-    func_US2_003377B0(self + 0x220, g_menu_hud_label_desc_alt, owner);
+    object_init_derived_arrays(self + 0x0, g_menu_widget_desc_first, parent);
+    object_init_derived_arrays(self + 0x4c, g_menu_widget_desc_second, parent);
+    object_init_derived_arrays(self + 0x98, g_menu_widget_desc_third, parent);
+    object_init_derived_arrays(self + 0xe4, g_menu_widget_desc_fourth, parent);
+    object_init_derived_arrays(self + 0x130, g_menu_frame_desc, parent);
+    object_init_derived_arrays(self + 0x17c, g_menu_panel_desc, parent);
+    hud_init_widget_defaults_us2(self + 0x2b8, g_menu_hud_desc_label, parent);
+    hud_init_widget_defaults_us2(self + 0x310, g_menu_hud_desc_body, parent);
+    hud_init_widget_defaults_us2(self + 0x368, g_selection_menu_widget_defaults_a, parent);
+    hud_init_widget_defaults_us2(self + 0x3c0, g_selection_menu_widget_defaults_b, parent);
+    hud_init_widget_defaults_us2(self + 0x418, g_selection_menu_widget_defaults_c, parent);
+    hud_init_widget_defaults_us2(self + 0x1c8, g_menu_hud_desc_title, parent);
+    hud_init_widget_defaults_us2(self + 0x220, g_menu_hud_label_desc_alt, parent);
     *object_get_fourth_field(self + 0x0) = 0x60442d00;
     *object_get_fourth_field(self + 0x98) = 0x55f0c070;
     *object_get_fourth_field(self + 0xe4) = 0x55f0c070;
@@ -140,7 +142,7 @@ void func_US2_003463F8(char *self, void *owner)
     *(int *)(self + 0x4fc) = 0;
     *(int *)(self + 0x500) = 0;
     *(int *)(self + 0x508) = 0;
-    object_init_derived_c(self + 0x278, g_menu_icon_desc, owner);
+    object_init_derived_c(self + 0x278, g_menu_icon_desc, parent);
     *object_get_fourth_field(self + 0x278) = 0x60f0f0b0;
     object_set_second_float4(self + 0x278, 32.0f, 32.0f, 0.0f, 0.0f);
     *object_get_fourth_field(self + 0x1c8) = 0x80f0f0f0;
@@ -156,5 +158,5 @@ void func_US2_003463F8(char *self, void *owner)
     hud_set_widget_field_b(self + 0x368, GetLocalizedString(0x2bed));
     hud_set_widget_field_b(self + 0x3c0, GetLocalizedString(0x2bee));
     hud_set_widget_field_b(self + 0x418, GetLocalizedString(0x2bf0));
-    func_US2_00346EF0(self, 0, &scratch);
+    selection_menu_update_layout_us2(self, 0, &scratch);
 }

@@ -8,13 +8,14 @@ typedef int TI128 __attribute__((mode(TI)));
 extern void yeedil_boss_compute_shot_launch_pal(char *, char *, char *, float *);
 extern u8 *ActivateGroupMemberAt_pal(int, const float *, const float *, float);
 
-u8 *group_activate_member_along_aim_pal(char *arg0) {
-    char *state = *(char **)(arg0 + 0x68);
-    TI128 v0;
-    TI128 v1;
-    float f;
+/* Finds the group member to activate along the enemy aim and returns it. (PAL) */
+u8 *group_activate_member_along_aim_pal(char *moby) {
+    char *state = *(char **)(moby + 0x68);
+    TI128 origin;
+    TI128 direction;
+    float spread;
 
-    f = 1.0471977f;
-    yeedil_boss_compute_shot_launch_pal(arg0, (char *)&v0, (char *)&v1, &f);
-    return ActivateGroupMemberAt_pal(*(int *)(state + 0x21C), (float *)&v0, (float *)&v1, f);
+    spread = 1.0471977f;
+    yeedil_boss_compute_shot_launch_pal(moby, (char *)&origin, (char *)&direction, &spread);
+    return ActivateGroupMemberAt_pal(*(int *)(state + 0x21C), (float *)&origin, (float *)&direction, spread);
 }

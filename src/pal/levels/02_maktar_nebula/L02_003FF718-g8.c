@@ -9,9 +9,9 @@ extern int g_arena_tally_reload_time __attribute__((sda));
 extern char g_hero_state[];
 
 /* Accumulate the active group entries and reset their current report state. */
-void func_PAL_L02_003FF718(char *object)
+void arena_start_enemy_tally_pal(char *moby)
 {
-    char *state = *(char **)(object + 0x68);
+    char *state = *(char **)(moby + 0x68);
     u32 index = *(u32 *)(state + 0x40);
     u32 entry;
     short *cursor;
@@ -40,7 +40,7 @@ void func_PAL_L02_003FF718(char *object)
         if ((u8)record[0x20] == 1)
             continue;
         type = *(short *)(record + 0xAA);
-        if (type == 0x9CA || type == 0xB22 || type == 0xC3B || type == 0xC3E || type == 0x9F8 || type == 0xA44) {
+        if (type == 0x9CA || type == 0xB22 || type == MOBY_CLASS_MEGACORP_SECURITY_ROBOT_FLAMETHROWER || type == MOBY_CLASS_PX6_BLADEBALL || type == MOBY_CLASS_CHAINBLADE || type == MOBY_CLASS_B2_BRAWLER_LEGS) {
             *(int *)(state + 0x60) += 1;
             *(float *)(state + 0x64) += *(float *)(*(char **)(record + 0x68) + 0x20);
         }

@@ -56,114 +56,115 @@ extern void quaternion_to_rotation_basis(void *,void *);
 extern void multiply_matrix3x3(void *,void *,void *);
 extern int vec_fast_helper_d(void *,void *);
 
-void AmmoPickupUpdate_pal(char *m)
+/* Per-frame update of a dropped pickup (ammo and similar). It picks up its item when the player is close and not full, plays the pickup sound, and while collected flies toward the player before disappearing. */
+void AmmoPickupUpdate_pal(char *moby)
 {
-    char *d=*(char **)(m+0x68);
-    PickupResource *e;
-    int j,i,yes,changed,old,delta,sound;
+    char *vars=*(char **)(moby+0x68);
+    PickupResource *entry;
+    int j,i,can_pickup,moved,old_count,delta,sound;
     float speed,time,target_speed;
-    float a[4] __attribute__((aligned(16)));
-    float b[4] __attribute__((aligned(16)));
-    float c[4] __attribute__((aligned(16)));
-    float v[4] __attribute__((aligned(16)));
-    float v2[4] __attribute__((aligned(16)));
-    float v3[4] __attribute__((aligned(16)));
-    float v4[4] __attribute__((aligned(16)));
+    float to_player[4] __attribute__((aligned(16)));
+    float drift[4] __attribute__((aligned(16)));
+    float to_target[4] __attribute__((aligned(16)));
+    float spin_axis[4] __attribute__((aligned(16)));
+    float up_before[4] __attribute__((aligned(16)));
+    float up_after[4] __attribute__((aligned(16)));
+    float up_delta[4] __attribute__((aligned(16)));
     float up[4] __attribute__((aligned(16)));
     char matrix[48] __attribute__((aligned(16)));
-    switch(B(m,0x20)) {
+    switch(B(moby,0x20)) {
     case 0:
-        B(m,0x20)=1;
+        B(moby,0x20)=1;
         for(j=0;j<56;j++) {
-            e=&g_weapon_l00_table[g_item_slot_to_record[j]];
-            if(e->moby_class==S(m,0xaa))I(d,0x68)=j;
+            entry=&g_weapon_l00_table[g_item_slot_to_record[j]];
+            if(entry->moby_class==S(moby,0xaa))I(vars,0x68)=j;
         }
         break;
     case 1:
-        if(B(d,0x5c)==3 && (g_frame_l00_counter[0]&15)==(((int)m>>8)&15)) {
-            qzero(d);vec_store_helper(d+0x10);B(d,0x5c)=0;
+        if(B(vars,0x5c)==3 && (g_frame_l00_counter[0]&15)==(((int)moby>>8)&15)) {
+            qzero(vars);vec_store_helper(vars+0x10);B(vars,0x5c)=0;
         }
-        qcopy(a,d);
-        cam_moby_update_pal(m);
-        changed=0;
-        if(fast_vec_dist(a,d)>F(d,0x48)*2.0f)changed=1;
-        yes=1;
-        if(B(d,0x5c)||changed) {
-            if(math_fast_float_d(d+0x7c)) {
-                if(math_fabs(F(m,0x18)-PLAYER->position[2])>PLAYER->height)yes=0;
-                else if(vec_distance_xy(m+0x10,PLAYER->position)>PLAYER->range)yes=0;
+        qcopy(to_player,vars);
+        cam_moby_update_pal(moby);
+        moved=0;
+        if(fast_vec_dist(to_player,vars)>F(vars,0x48)*2.0f)moved=1;
+        can_pickup=1;
+        if(B(vars,0x5c)||moved) {
+            if(math_fast_float_d(vars+0x7c)) {
+                if(math_fabs(F(moby,0x18)-PLAYER->position[2])>PLAYER->height)can_pickup=0;
+                else if(vec_distance_xy(moby+0x10,PLAYER->position)>PLAYER->range)can_pickup=0;
             }
         } else {
-            yes=0;
-            if(math_fabs(F(m,0x18)-PLAYER->position[2])<PLAYER->height &&
-               vec_distance_xy(m+0x10,PLAYER->position)<PLAYER->range)I(d,0x7c)=3;
+            can_pickup=0;
+            if(math_fabs(F(moby,0x18)-PLAYER->position[2])<PLAYER->height &&
+               vec_distance_xy(moby+0x10,PLAYER->position)<PLAYER->range)I(vars,0x7c)=3;
         }
-        if(g_item_ammo_counts[I(d,0x68)] >=
-           ((PickupResource *)(g_item_slot_to_record[I(d,0x68)] * 224 + (unsigned int)g_weapon_l00_table))->capacity)yes=0;
+        if(g_item_ammo_counts[I(vars,0x68)] >=
+           ((PickupResource *)(g_item_slot_to_record[I(vars,0x68)] * 224 + (unsigned int)g_weapon_l00_table))->capacity)can_pickup=0;
         if(g_hero_locked_flag[0]) {
-            if(gravity_get_center_distance(m+0x10)<F(d,0x78)-2.0f)goto force_pickup;
-        } else if(F(m,0x18)<F(d,0x78)-2.0f)goto force_pickup;
+            if(gravity_get_center_distance(moby+0x10)<F(vars,0x78)-2.0f)goto force_pickup;
+        } else if(F(moby,0x18)<F(vars,0x78)-2.0f)goto force_pickup;
         if(!PLAYER->override)goto check_enabled;
 force_pickup:
-        yes=1;
+        can_pickup=1;
 check_enabled:
-        if(!PLAYER->enabled)yes=0;
-        if(yes) {
-            i=I(d,0x68);old=g_item_ammo_counts[i];
-            weapon_add_ammo(i,I(d,0x60));
-            if(old<g_item_ammo_counts[i]) {
-                delta=g_item_ammo_counts[i]-old;
+        if(!PLAYER->enabled)can_pickup=0;
+        if(can_pickup) {
+            i=I(vars,0x68);old_count=g_item_ammo_counts[i];
+            weapon_add_ammo(i,I(vars,0x60));
+            if(old_count<g_item_ammo_counts[i]) {
+                delta=g_item_ammo_counts[i]-old_count;
                 if(delta==1) {
-                    e=&g_weapon_l00_table[g_item_slot_to_record[i]];
-                    sound=e->single_sound;
+                    entry=&g_weapon_l00_table[g_item_slot_to_record[i]];
+                    sound=entry->single_sound;
                 } else {
-                    e=&g_weapon_l00_table[g_item_slot_to_record[i]];
-                    sound=e->multiple_sound;
+                    entry=&g_weapon_l00_table[g_item_slot_to_record[i]];
+                    sound=entry->multiple_sound;
                 }
                 part_reset_effects_pal(sound,delta,-1);
             }
-            moby_set_state(m,2,-1);
-            F(d,0x74)=0.16000001f;
-            vec_clear_128(d);
+            moby_set_state(moby,2,-1);
+            F(vars,0x74)=0.16000001f;
+            vec_clear_128(vars);
             if(subtract_integer_with_clamp(g_frame_l00_counter[0]-g_sound_last_frame[0])>8) {
-                PlayMobySound(0,0,m);g_sound_last_frame[0]=g_frame_l00_counter[0];
+                PlayMobySound(0,0,moby);g_sound_last_frame[0]=g_frame_l00_counter[0];
             }
         }
         break;
     case 2:
-        FastVecSub(a,m+0x10,PLAYER->position);
-        matrix_mul_vec3(a,a,PLAYER->matrix);
+        FastVecSub(to_player,moby+0x10,PLAYER->position);
+        matrix_mul_vec3(to_player,to_player,PLAYER->matrix);
         target_speed=8.0f;
-        if(a[2]>0.0f)target_speed=0.0f;
-        ApproachValue(d+0x74,target_speed,0.0096f);
-        vec_scale_to_length(b,PLAYER->axis,F(d,0x74));
-        FastVecAdd(m+0x10,m+0x10,b);
-        FastVecAdd(m+0x10,m+0x10,PLAYER->motion);
-        speed=FastVecLength(d);
+        if(to_player[2]>0.0f)target_speed=0.0f;
+        ApproachValue(vars+0x74,target_speed,0.0096f);
+        vec_scale_to_length(drift,PLAYER->axis,F(vars,0x74));
+        FastVecAdd(moby+0x10,moby+0x10,drift);
+        FastVecAdd(moby+0x10,moby+0x10,PLAYER->motion);
+        speed=FastVecLength(vars);
         ApproachValue(&speed,1.2800001f,0.0096f);
-        FastVecSub(c,PLAYER->target,m+0x10);
-        time=FastVecLength(c)/speed;
-        if(time<25.0f)ApproachValue(m+0x2c,0.0f,F(*(char **)(m+0x24),0x24)*0.04f);
-        if(F(m,0x2c)==0.0f) {moby_mark_spawned(m);return;}
-        if(time<=1.0f) {moby_mark_spawned(m);return;}
-        vec_scale_to_length(d,c,speed);
-        FastVecAdd(m+0x10,m+0x10,d);
-        FastVecCross(v,PLAYER->axis,d);
-        vec_set_direction_with_complement(v,v,0.10471977f);
+        FastVecSub(to_target,PLAYER->target,moby+0x10);
+        time=FastVecLength(to_target)/speed;
+        if(time<25.0f)ApproachValue(moby+0x2c,0.0f,F(*(char **)(moby+0x24),0x24)*0.04f);
+        if(F(moby,0x2c)==0.0f) {moby_mark_spawned(moby);return;}
+        if(time<=1.0f) {moby_mark_spawned(moby);return;}
+        vec_scale_to_length(vars,to_target,speed);
+        FastVecAdd(moby+0x10,moby+0x10,vars);
+        FastVecCross(spin_axis,PLAYER->axis,vars);
+        vec_set_direction_with_complement(spin_axis,spin_axis,0.10471977f);
         *(Quadword *)up=0;up[2]=0.3f;
-        matrix_mul_vec3(v2,up,m+0xc0);
-        quaternion_to_rotation_basis(v,matrix);
-        multiply_matrix3x3(m+0xc0,matrix,m+0xc0);
-        matrix_mul_vec3(v3,up,m+0xc0);
-        FastVecSub(v4,v3,v2);
-        FastVecSub(m+0x10,m+0x10,v4);
+        matrix_mul_vec3(up_before,up,moby+0xc0);
+        quaternion_to_rotation_basis(spin_axis,matrix);
+        multiply_matrix3x3(moby+0xc0,matrix,moby+0xc0);
+        matrix_mul_vec3(up_after,up,moby+0xc0);
+        FastVecSub(up_delta,up_after,up_before);
+        FastVecSub(moby+0x10,moby+0x10,up_delta);
         break;
     }
-    if(B(m,0x20)==1 && vec_fast_helper_d(m,g_hero_moby)) {
-        B(m,0x23)=B(m,0x23)>36?B(m,0x23)-4:36;
+    if(B(moby,0x20)==1 && vec_fast_helper_d(moby,g_hero_moby)) {
+        B(moby,0x23)=B(moby,0x23)>36?B(moby,0x23)-4:36;
     } else {
-        B(m,0x23)=B(m,0x23)<124?B(m,0x23)+4:128;
+        B(moby,0x23)=B(moby,0x23)<124?B(moby,0x23)+4:128;
     }
-    if(*(s8 *)(m+0x23)>=0)*(u16 *)(m+0x34)|=0x2000;
-    else *(u16 *)(m+0x34)&=0xdfff;
+    if(*(s8 *)(moby+0x23)>=0)*(u16 *)(moby+0x34)|=0x2000;
+    else *(u16 *)(moby+0x34)&=0xdfff;
 }

@@ -18,7 +18,7 @@ extern char *part_spawn_ground_effect(void *, int, float, float, unsigned int, i
 /* Emits count pairs of sparks at position, moving along direction turned by a random rotation;
    position is jittered a little before each pair. Both arms of the random-bit test are the same
    code: retail keeps the test, so it stays. */
-void func_PAL_L00_003C11A0(float *position, float *direction, int count, int color)
+void part_l00_spawn_spark_burst_2_pal(float *position, float *direction, int count, int color)
 {
     float velocity[4];
     float previous[4];

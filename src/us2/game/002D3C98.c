@@ -15,6 +15,7 @@ typedef struct {
 extern Statistics_2D2CE8 g_progress_statistics;
 extern int func_0029C6F0(int);
 
+/* Handles button input for a menu page: counts the visit in the statistics and either accepts, cancels or passes the button to the page. (USA v2.00) */
 int menu_page_update_count_stats_us2(void)
 {
     int result = 0;
@@ -57,6 +58,7 @@ void func_0029C730(void);
 extern void SetupGifPaging(long arg0);
 extern void SetupGifPaging(long param_1);
 
+/* Draws one menu page by calling its page-specific draw routine between the common start and end of menu drawing. (USA v2.00) */
 unsigned long long menu_page_draw_2_us2(void)
 {
     SetupGifPaging(0);
@@ -67,6 +69,7 @@ unsigned long long menu_page_draw_2_us2(void)
 
 extern void func_0029C7A0(void);
 
+/* Draws one menu page by calling its page-specific draw routine between the common start and end of menu drawing. (USA v2.00) */
 unsigned long long menu_page_draw_3_us2(void)
 {
     SetupGifPaging(0);
@@ -77,6 +80,7 @@ unsigned long long menu_page_draw_3_us2(void)
 
 extern void func_0029C810(void);
 
+/* Draws one menu page by calling its page-specific draw routine between the common start and end of menu drawing. (USA v2.00) */
 int menu_page_draw_4_us2(void) {
     SetupGifPaging(0);
     func_0029C810();

@@ -18,7 +18,9 @@ extern int math_fast_float_d(int *);
 extern int FastDecTimer(void *);
 
 /* func_PAL_L00_003B7A10, the PAL copy of func_L00_003B4018: the same C, with the frame time 1/50 and the next time scaled to 50 Hz. */
-void func_PAL_L00_003B7A10(void)
+/* Updates the timed rings: starts a new one when the timer is up and ages the active ones. (PAL: 50
+ * Hz timings) */
+void update_timed_events_pal(void)
 {
     if(g_orb_burst_pending) {
         int i;

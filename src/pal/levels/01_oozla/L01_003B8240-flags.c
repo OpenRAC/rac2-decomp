@@ -10,31 +10,31 @@ extern void enemy_update_wander_heading_pal(void *, void *, void *);
    and clamps the 0x1B8 rate to an eighth; the speeds are put back afterwards.
    The clamp needs -ffast-math (the retail's min.s): it is in a file of its own
    because the flag changes the other bodies of a shared unit. */
-void swamp_beast_move_pal(u8 *arg0, void *arg1) {
-    u8 *s0 = *(u8 **)(arg0 + 0x68);
+void swamp_beast_move_pal(u8 *moby, void *input) {
+    u8 *state = *(u8 **)(moby + 0x68);
     void *list[16];
     int count = 0;
-    f32 f20, f21;
+    f32 saved_speed_a, saved_speed_b;
 
-    if (s0[0x35D] != 0) {
-        swamp_beast_collect_nearby(arg0, list, &count);
+    if (state[0x35D] != 0) {
+        swamp_beast_collect_nearby(moby, list, &count);
     }
-    f20 = *(f32 *)(s0 + 0x130);
-    f21 = *(f32 *)(s0 + 0x138);
+    saved_speed_a = *(f32 *)(state + 0x130);
+    saved_speed_b = *(f32 *)(state + 0x138);
     if (count > 0) {
-        *(f32 *)(s0 + 0x138) = f21 + f21;
-        *(f32 *)(s0 + 0x130) = f20 + f20;
+        *(f32 *)(state + 0x138) = saved_speed_b + saved_speed_b;
+        *(f32 *)(state + 0x130) = saved_speed_a + saved_speed_a;
     }
-    enemy_update_wander_heading_pal(arg0, arg1, s0 + 0x110);
-    moby_follow_attached_target_pal(arg0);
-    if (*(f32 *)(s0 + 0x1B8) > 0.10000001f) {
-        f32 v = *(f32 *)(s0 + 0x1B8) * 0.9f;
+    enemy_update_wander_heading_pal(moby, input, state + 0x110);
+    moby_follow_attached_target_pal(moby);
+    if (*(f32 *)(state + 0x1B8) > 0.10000001f) {
+        f32 new_rate = *(f32 *)(state + 0x1B8) * 0.9f;
 
-        *(f32 *)(s0 + 0x1B8) = (v < 0.10000001f) ? v : 0.10000001f;
+        *(f32 *)(state + 0x1B8) = (new_rate < 0.10000001f) ? new_rate : 0.10000001f;
     }
-    *(f32 *)(s0 + 0x130) = f20;
-    *(f32 *)(s0 + 0x138) = f21;
-    if (s0[0x35D] != 0) {
+    *(f32 *)(state + 0x130) = saved_speed_a;
+    *(f32 *)(state + 0x138) = saved_speed_b;
+    if (state[0x35D] != 0) {
         swamp_beast_clear_collected_marks(list, &count);
     }
 }
@@ -42,33 +42,33 @@ void swamp_beast_move_pal(u8 *arg0, void *arg1) {
 extern int moby_turn_toward_target_and_step_pal(void *, void *, f32);
 
 /* The same as func_L01_003B49D8, with the extra helper call the object asks for. */
-int swamp_beast_move_with_speed_pal(u8 *arg0, void *arg1, f32 *arg2) {
-    u8 *s0 = *(u8 **)(arg0 + 0x68);
+int swamp_beast_move_with_speed_pal(u8 *moby, void *input, f32 *speed) {
+    u8 *state = *(u8 **)(moby + 0x68);
     void *list[16];
     int count = 0;
-    f32 f20, f21;
-    int r;
+    f32 saved_speed_a, saved_speed_b;
+    int result;
 
-    if (s0[0x35D] != 0) {
-        swamp_beast_collect_nearby(arg0, list, &count);
+    if (state[0x35D] != 0) {
+        swamp_beast_collect_nearby(moby, list, &count);
     }
-    f20 = *(f32 *)(s0 + 0x130);
-    f21 = *(f32 *)(s0 + 0x138);
+    saved_speed_a = *(f32 *)(state + 0x130);
+    saved_speed_b = *(f32 *)(state + 0x138);
     if (count > 0) {
-        *(f32 *)(s0 + 0x138) = f21 + f21;
-        *(f32 *)(s0 + 0x130) = f20 + f20;
+        *(f32 *)(state + 0x138) = saved_speed_b + saved_speed_b;
+        *(f32 *)(state + 0x130) = saved_speed_a + saved_speed_a;
     }
-    r = moby_turn_toward_target_and_step_pal(arg0, arg1, *arg2);
-    moby_follow_attached_target_pal(arg0);
-    if (*(f32 *)(s0 + 0x1B8) > 0.10000001f) {
-        f32 v = *(f32 *)(s0 + 0x1B8) * 0.9f;
+    result = moby_turn_toward_target_and_step_pal(moby, input, *speed);
+    moby_follow_attached_target_pal(moby);
+    if (*(f32 *)(state + 0x1B8) > 0.10000001f) {
+        f32 new_rate = *(f32 *)(state + 0x1B8) * 0.9f;
 
-        *(f32 *)(s0 + 0x1B8) = (v < 0.10000001f) ? v : 0.10000001f;
+        *(f32 *)(state + 0x1B8) = (new_rate < 0.10000001f) ? new_rate : 0.10000001f;
     }
-    *(f32 *)(s0 + 0x130) = f20;
-    *(f32 *)(s0 + 0x138) = f21;
-    if (s0[0x35D] != 0) {
+    *(f32 *)(state + 0x130) = saved_speed_a;
+    *(f32 *)(state + 0x138) = saved_speed_b;
+    if (state[0x35D] != 0) {
         swamp_beast_clear_collected_marks(list, &count);
     }
-    return r;
+    return result;
 }

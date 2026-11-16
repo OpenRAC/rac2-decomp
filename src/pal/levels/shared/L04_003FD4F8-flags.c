@@ -15,7 +15,8 @@ typedef struct {
     float normal[4];
 } CollisionSteeringHit;
 
-void func_PAL_L04_003FE558(char *object, float *heading, float *pitch)
+/* Steers a projectile away from walls: probes ahead and below it and bends the heading and pitch away from what it finds. */
+void projectile_steer_around_walls_pal(char *object, float *heading, float *pitch)
 {
     float probe[4] __attribute__((aligned(16)));
     float vector[4] __attribute__((aligned(16)));

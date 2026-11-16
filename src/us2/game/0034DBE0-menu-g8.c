@@ -90,9 +90,11 @@ extern float fade_reset_amount(void *);
 extern int fade_swap_field_28(void *, int);
 #define ITEM(n) (&D_00239BA0[D_00139568[n]])
 
-void func_US2_0034DBE0(Hud *self)
+/* Updates the item status HUD: the radial menu slots, the selected item's icon, ammo and bolt counters, fading
+   widgets and meter. (USA v2.00) */
+void hud_update_item_status_us2(Hud *self)
 {
-    int x, y, color, rgb;
+    int x, y, color, bolt_count;
     int selX, selY, selColor;
     Ui3C *slotWidget;
     Ui3C *slotAlphaWidget;
@@ -101,7 +103,7 @@ void func_US2_0034DBE0(Hud *self)
     UIWord limit;
     Ui48 *widget;
     float scale, width;
-    Ui94 *a0;
+    Ui94 *ammo_widget_0;
     Ui94 *bolt;
     UIWord slotWord;
     self->alternateBolts = save_count_items_above_baseline();
@@ -246,8 +248,8 @@ heroFallback:
     anim_step_morph(&self->boltWidgets[1]);
     anim_step_morph(&self->boltWidgets[2]);
     anim_step_morph(&self->boltWidgets[3]);
-    if (self->ammoTimer && --self->ammoTimer == 0) { Ui94 *w1; if (!((w1 = &self->ammoWidgets[0])->state)) {
-        fade_start_backward(w1, 0);
+    if (self->ammoTimer && --self->ammoTimer == 0) { Ui94 *first_widget; if (!((first_widget = &self->ammoWidgets[0])->state)) {
+        fade_start_backward(first_widget, 0);
         fade_start_backward(&self->ammoWidgets[1], 0);
         fade_start_backward(&self->ammoWidgets[2], 0);
         fade_start_direction(&self->middleWidget, -1);
@@ -317,22 +319,22 @@ heroFallback:
         } else {
             fade_swap_field_28(&self->warningWidgets[0], 0);
             fade_swap_field_28(&self->warningWidgets[1], 0);
-            a0 = &self->ammoWidgets[0];
-            if (!a0->state) {
-                Ui94 *a1 = &self->ammoWidgets[1];
-                a0->value = 1.0f;
-                a1->value = 1.0f;
-                a0->state = 1;
-                a1->state = 1;
-                anim_step_morph(a0);
-                anim_step_morph(a1);
+            ammo_widget_0 = &self->ammoWidgets[0];
+            if (!ammo_widget_0->state) {
+                Ui94 *ammo_widget_1 = &self->ammoWidgets[1];
+                ammo_widget_0->value = 1.0f;
+                ammo_widget_1->value = 1.0f;
+                ammo_widget_0->state = 1;
+                ammo_widget_1->state = 1;
+                anim_step_morph(ammo_widget_0);
+                anim_step_morph(ammo_widget_1);
             }
         }
     }
     anim_update_keyframe(&self->warningWidgets[0], 1);
     anim_update_keyframe(&self->warningWidgets[1], 1);
-    {Ui94 *w3 = &self->ammoWidgets[0];
-    if (w3->state || !present) {
+    {Ui94 *first_ammo_widget = &self->ammoWidgets[0];
+    if (first_ammo_widget->state || !present) {
         UIWord alpha, alpha2;
         alpha = object_get_fourth_field(self)->word & 0xFF000000;
         alpha2 = object_get_fourth_field(&self->ammoDigits[1])->word & 0xFF000000;
@@ -347,8 +349,8 @@ heroFallback:
             c->word = (c->word & 0xFFFFFF) | alpha2;
         }
     }}
-    rgb = *(self->boltMode ? &self->alternateBolts : self->boltCount);
-    sprintf(self->boltText, g_str_count_format, rgb);
+    bolt_count = *(self->boltMode ? &self->alternateBolts : self->boltCount);
+    sprintf(self->boltText, g_str_count_format, bolt_count);
     {
         int count;
         count = func_001157AC(self->boltText) - 1;

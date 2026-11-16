@@ -42,7 +42,7 @@ extern float vec_distance_xy(char *, char *);
 extern float math_spring_float_to_goal(float *, float *, float, float, float, float);
 
 /* Selects and eases the hero collision capsule dimensions for the movement mode. */
-void func_PAL_L00_002B3210(void)
+void hero_update_collision_capsule_pal(void)
 {
     switch (g_hero_state.vehicle_mode) {
     case 0:

@@ -1,4 +1,6 @@
 #include "include_asm.h"
+#include "names.h"
 
-void func_PAL_0028A468(void) {
+/* Empty function: does nothing. */
+void subtitle_box_draw_nothing_pal(void) {
 }

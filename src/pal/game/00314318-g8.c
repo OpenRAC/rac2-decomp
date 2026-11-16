@@ -19,7 +19,8 @@ extern float math_random_angle(void);
 extern void math_apply_axis_rotation_to_quat(void *, void *, void *, float);
 extern void *part_spawn_hero_relative(void *, void *, void *, int, int, int, float);
 
-void func_PAL_00314558(unsigned char *object)
+/* Spawns two sparkle effects at the object, using a random spin and a color chosen by its flag (PAL: 50 Hz timings). */
+void part_spawn_sparkles_pal(unsigned char *object)
 {
     char first[16];
     char second[16];
@@ -28,7 +29,7 @@ void func_PAL_00314558(unsigned char *object)
     char *basis;
     void *effect;
     unsigned char kind;
-    unsigned char random;
+    unsigned char random_seed;
 
     state = *(unsigned char **)(object + 0x68);
     FastVecSub(first, g_camera_eye_state, object + 0x10);
@@ -40,10 +41,10 @@ void func_PAL_00314558(unsigned char *object)
 
     effect = state[0x57] != 0 ? g_sparkle_effect_alt : g_sparkle_effect_default;
     kind = g_sparkle_kind;
-    random = (unsigned char)math_random_int_below(255);
-    part_spawn_hero_relative(object + 0x10, third, effect, kind, random, 1, g_sparkle_scale);
+    random_seed = (unsigned char)math_random_int_below(255);
+    part_spawn_hero_relative(object + 0x10, third, effect, kind, random_seed, 1, g_sparkle_scale);
 
     kind = g_sparkle_kind;
-    random = (unsigned char)math_random_int_below(255);
-    part_spawn_hero_relative(object + 0x10, third, g_sparkle_effect_third, kind, random, 1, g_sparkle_scale_third);
+    random_seed = (unsigned char)math_random_int_below(255);
+    part_spawn_hero_relative(object + 0x10, third, g_sparkle_effect_third, kind, random_seed, 1, g_sparkle_scale_third);
 }

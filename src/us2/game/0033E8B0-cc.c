@@ -13,26 +13,27 @@ extern void Fc558ca70_FUN_0033B018(char *p, float a, float b);
 extern int Fc558ca70_FUN_002E5E58(int a, int b, int c);
 extern unsigned char g_option_toggles[] __attribute__((sda));
 
-int func_US2_0033E8B0(char *a0, int a1)
+/* Updates a two-toggle menu: up/down changes the selected row and confirm flips that row's option byte. (USA v2.00) */
+int two_toggle_b_update_us2(char *object, int buttons)
 {
-    char *p = a0 + 8;
-    float *q;
-    int v;
+    char *child = object + 8;
+    float *vec;
+    int value;
 
-    Fc558ca70_FUN_0033AE28(p);
-    q = *(float **)(a0 + 732);
-    Fc558ca70_FUN_0033B018(p, q[0], q[1]);
-    if (a1 & 0x1000) {
+    Fc558ca70_FUN_0033AE28(child);
+    vec = *(float **)(object + 732);
+    Fc558ca70_FUN_0033B018(child, vec[0], vec[1]);
+    if (buttons & 0x1000) {
         Fc558ca70_FUN_002E5E58(3, 0, 0);
-        v = *(int *)(a0 + 728);
-        *(int *)(a0 + 728) = (v + 1) % 2;
-    } else if (a1 & 0x4000) {
+        value = *(int *)(object + 728);
+        *(int *)(object + 728) = (value + 1) % 2;
+    } else if (buttons & 0x4000) {
         Fc558ca70_FUN_002E5E58(3, 0, 0);
-        v = *(int *)(a0 + 728);
-        *(int *)(a0 + 728) = (v + 1) % 2;
-    } else if (a1 & 0x40) {
+        value = *(int *)(object + 728);
+        *(int *)(object + 728) = (value + 1) % 2;
+    } else if (buttons & 0x40) {
         Fc558ca70_FUN_002E5E58(4, 0, 0);
-        switch (*(int *)(a0 + 728)) {
+        switch (*(int *)(object + 728)) {
         case 0:
             g_option_toggles[2] = g_option_toggles[2] == 0;
             break;
@@ -41,7 +42,7 @@ int func_US2_0033E8B0(char *a0, int a1)
             break;
         }
     }
-    return (a1 >> 6) & 1;
+    return (buttons >> 6) & 1;
 }
 
 /* func_0033B540 is matched in 0033AE20-g8.c (-G8 small data). */

@@ -24,10 +24,11 @@ extern char g_menu_page_source_alt[];
 extern volatile int g_pause_menu_busy_flag __attribute__((sda));
 extern int (*g_menu_page_input_handlers[])(int);
 extern void func_0029CE38(void);
-extern int func_US2_0029D0C8(int);
-extern int func_US2_002D7BA0(int);
-extern int func_US2_0029D138(int);
+extern int mission_screen_place_parts_call_us2(int);
+extern int DrawMapScreen_us2(int);
+extern int list_screen_layout_call_us2(int);
 
+/* Checks the current menu page and reacts to button presses on it. */
 int menu_update_page_input_us2(void)
 {
     int result = 0;
@@ -42,11 +43,11 @@ int menu_update_page_input_us2(void)
     } else if (g_pause_menu_state.source == g_pause_page_d) {
         func_0029CE38();
     } else if (g_pause_menu_state.source == g_pause_page_c && !g_pause_menu_busy_flag) {
-        func_US2_0029D0C8(0);
+        mission_screen_place_parts_call_us2(0);
     } else if (g_pause_menu_state.source == g_pause_page_b && !g_pause_menu_busy_flag) {
-        if (func_US2_002D7BA0(0))
+        if (DrawMapScreen_us2(0))
             g_pause_menu_state.state = g_pause_menu_state.value == 4 ? 2 : 1;
-        func_US2_0029D138(g_pad_state.flags);
+        list_screen_layout_call_us2(g_pad_state.flags);
         result = g_pause_menu_state.destination != g_pause_page_c;
     } else if ((g_pause_menu_state.source == g_pause_page_a && !g_pause_menu_busy_flag)
                || (g_pause_menu_state.source == g_menu_page_source_alt && !g_pause_menu_busy_flag)) {

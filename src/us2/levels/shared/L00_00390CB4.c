@@ -4,7 +4,7 @@
  * after the level 111/98 gate, on D_US2_001B1860. */
 #include "common.h"
 /* Partial resident view: only fields observed by the launch gate are named. */
-typedef struct { char pad00[0xA8]; u16 launches; char padAA[2]; u32 bestTime, mask; } LaunchStats;
+typedef struct { char pad00[0xA8]; u16 launches; char padAA[2]; u32 best_time, mask; } LaunchStats;
 typedef struct {
     char pad00[0x33C]; char *support; int grounded; char pad344[0x434]; float heading;
     char pad77C[0xAB4]; u32 buttons; char pad1234[0xC]; int resource;
@@ -28,7 +28,7 @@ extern void anim_start_blended(void *, int, int, int), level_start_timed_object_
 extern char *visibomb_create_missile(char *, char *, float, float);
 extern int PlayMobySound(int, int, char *);
 /* Starts the tether when the shared input and movement gates permit it. */
-void func_US2_L00_00390CB4(char *actor) {
+void visibomb_gun_update_us2(char *actor) {
     int *state;
     int ready;
     float point[4];
@@ -61,7 +61,7 @@ void func_US2_L00_00390CB4(char *actor) {
     *(char **)(state + 1) = visibomb_create_missile(actor, (char *)point, heading, pitch);
     if (g_statistics_table.launches < 0xFFFF) g_statistics_table.launches++;
     now = g_frame_counter;
-    if (g_statistics_table.bestTime < now) g_statistics_table.bestTime = now;
+    if (g_statistics_table.best_time < now) g_statistics_table.best_time = now;
     g_statistics_table.mask |= 1U << g_current_map_index[0];
     g_statistics_table.mask |= 0x80000000;
     state[0] = 60;

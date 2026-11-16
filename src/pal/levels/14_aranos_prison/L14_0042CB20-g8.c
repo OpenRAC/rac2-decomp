@@ -73,9 +73,9 @@ extern int FloatToInt(float);
 extern float math_random_signed_float_range(float, float);
 extern float math_random_angle(void);
 extern void moby_set_state(void *, int, int);
-extern void func_PAL_002A7E68(void *, int, int, int);
+extern void anim_start_blended_pal(void *, int, int, int);
 extern void moby_update_ground_check(void *);
-extern int func_PAL_002B1A50(char *object, char *state, int special);
+extern int moby_apply_damage_to_object_pal(char *object, char *state, int special);
 extern void group_marker_alert_guards(unsigned char *);
 extern int weapon_select_aim_target(char *self, int index, void *point, int force, float range, float height);
 extern void cam_compute_view_direction(char *a0, char *a1, int a2);
@@ -86,93 +86,94 @@ extern char *g_guard_entry_tables[] __attribute__((sda));
 extern char g_guard_reference_point[] __attribute__((sda));
 extern char g_tether_l14_origin_vec[];
 
-void func_PAL_L14_0042D918(char *self)
+/* Shared guard logic: sets up its stats on the first frame, then checks for the player getting close, damage and the path to the player. (PAL) */
+void guard_update_common_pal(char *moby)
 {
-    PrisonGuardVars *s = *(PrisonGuardVars **)(self + 0x68);
+    PrisonGuardVars *vars = *(PrisonGuardVars **)(moby + 0x68);
     int hit;
 
-    if (B(self, 0x20) == 0) {
-        if (g_current_map_index[0] == 2 && F(self, 0x18) > 400.0f) {
+    if (B(moby, 0x20) == 0) {
+        if (g_current_map_index[0] == 2 && F(moby, 0x18) > 400.0f) {
             if (g_aim_l14_blocked_flag == 0)
                 return;
-            coll_get_ground_distance_below(self + 0x10, self, self + 0x10);
-            s->h338 = 1;
-            W(self, 0x9C) = 3;
-            UH(self, 0x34) |= 0x100;
-            s->f90 = fast_vec_dist(self + 0x10, g_guard_reference_point) - 1.5f;
+            coll_get_ground_distance_below(moby + 0x10, moby, moby + 0x10);
+            vars->h338 = 1;
+            W(moby, 0x9C) = 3;
+            UH(moby, 0x34) |= 0x100;
+            vars->f90 = fast_vec_dist(moby + 0x10, g_guard_reference_point) - 1.5f;
         } else {
-            W(self, 0x9C) = 12;
-            s->f90 = F(self, 0x18) - 1.0f;
+            W(moby, 0x9C) = 12;
+            vars->f90 = F(moby, 0x18) - 1.0f;
         }
-        if (s->i210 == -1) {
-            moby_mark_spawned(self);
+        if (vars->i210 == -1) {
+            moby_mark_spawned(moby);
             return;
         }
         {
-            char *e = g_guard_entry_tables[0] + s->i210 * 0x30;
-            if (H(e, 0x30) != 0) {
-                s->i13C = s->i218 = **(int **)(e + 0x3C);
+            char *entry = g_guard_entry_tables[0] + vars->i210 * 0x30;
+            if (H(entry, 0x30) != 0) {
+                vars->i13C = vars->i218 = **(int **)(entry + 0x3C);
             } else {
-                s->i218 = -1;
+                vars->i218 = -1;
             }
         }
-        s->f324 = math_random_float_range(1.0f, 1.333f);
-        F(self, 0x2C) = F(*(char **)(self + 0x24), 0x24) * s->f324;
-        s->b48 = FloatToInt(15.0f);
-        s->b4A = FloatToInt(6.4f);
-        s->i98 = 3;
-        s->f80 = 0.2f;
-        s->f84 = 0.2f;
-        s->f8C = 0.4f;
-        s->f108 = 0.4f;
-        s->f134 = 0.05f;
-        s->b60 = 11;
-        s->b28 = 3;
-        s->f30 = 0.333f;
-        s->f104 = s->f324 * 0.2f;
-        s->f100 = s->f324 * 0.3f;
-        s->f10C = 0.4f;
-        s->f110 = 1.5707964897155762f;
-        s->f130 = 0.523598849773407f;
-        s->i138 |= 0x280;
-        s->f1DC = math_random_signed_float_range(18.0f, 22.0f) * 0.01745329424738884f;
-        s->b1E8 = 7;
-        s->b1E9 = 6;
-        s->h1E2 = 100;
-        s->h1E4 = 150;
-        s->f1D4 = 3.0f;
-        s->f1D0 = g_guard_frame_scale * 0.020000001f;
-        s->f328 = math_random_angle();
-        if (s->i214 != 0) {
-            UH(self, 0x34) = (UH(self, 0x34) | 0x41) & ~0x1000;
-            W(self, 0x98) = 0;
-            moby_set_state(self, 13, 4);
-            if (B(self, 0x43) != 10)
-                func_PAL_002A7E68(self, 10, 0, 0);
+        vars->f324 = math_random_float_range(1.0f, 1.333f);
+        F(moby, 0x2C) = F(*(char **)(moby + 0x24), 0x24) * vars->f324;
+        vars->b48 = FloatToInt(15.0f);
+        vars->b4A = FloatToInt(6.4f);
+        vars->i98 = 3;
+        vars->f80 = 0.2f;
+        vars->f84 = 0.2f;
+        vars->f8C = 0.4f;
+        vars->f108 = 0.4f;
+        vars->f134 = 0.05f;
+        vars->b60 = 11;
+        vars->b28 = 3;
+        vars->f30 = 0.333f;
+        vars->f104 = vars->f324 * 0.2f;
+        vars->f100 = vars->f324 * 0.3f;
+        vars->f10C = 0.4f;
+        vars->f110 = 1.5707964897155762f;
+        vars->f130 = 0.523598849773407f;
+        vars->i138 |= 0x280;
+        vars->f1DC = math_random_signed_float_range(18.0f, 22.0f) * 0.01745329424738884f;
+        vars->b1E8 = 7;
+        vars->b1E9 = 6;
+        vars->h1E2 = 100;
+        vars->h1E4 = 150;
+        vars->f1D4 = 3.0f;
+        vars->f1D0 = g_guard_frame_scale * 0.020000001f;
+        vars->f328 = math_random_angle();
+        if (vars->i214 != 0) {
+            UH(moby, 0x34) = (UH(moby, 0x34) | 0x41) & ~0x1000;
+            W(moby, 0x98) = 0;
+            moby_set_state(moby, 13, 4);
+            if (B(moby, 0x43) != 10)
+                anim_start_blended_pal(moby, 10, 0, 0);
         } else {
-            moby_set_state(self, 1, 0);
-            if (B(self, 0x43) != 0)
-                func_PAL_002A7E68(self, 0, 0, 0);
+            moby_set_state(moby, 1, 0);
+            if (B(moby, 0x43) != 0)
+                anim_start_blended_pal(moby, 0, 0, 0);
         }
-        s->v2E0 = *(PrisonQword *)(self + 0x10);
+        vars->v2E0 = *(PrisonQword *)(moby + 0x10);
     }
 
-    if (B(self, 0x31) != 0) {
-        if (fast_vec_dist(self + 0x10, g_tether_l14_origin_vec) < 24.0f) {
-            moby_update_ground_check(self);
-            B(self, 0x6F) = 22;
+    if (B(moby, 0x31) != 0) {
+        if (fast_vec_dist(moby + 0x10, g_tether_l14_origin_vec) < 24.0f) {
+            moby_update_ground_check(moby);
+            B(moby, 0x6F) = 22;
         }
     }
-    hit = func_PAL_002B1A50(self, s->area50, 0);
+    hit = moby_apply_damage_to_object_pal(moby, vars->area50, 0);
     if (hit != 0) {
-        group_marker_alert_guards((unsigned char *)self);
+        group_marker_alert_guards((unsigned char *)moby);
         if (hit >= 4)
-            moby_set_state(self, 12, -1);
+            moby_set_state(moby, 12, -1);
     }
-    if (B(self, 0x20) != 12 && s->i1D8 == 1)
-        moby_set_state(self, 12, -1);
-    if ((u8)(B(self, 0x95) - 3) >= 2)
-        s->h314 = weapon_select_aim_target(self, s->i210, 0, 0, 16.0f, 0.0f);
-    if (s->h338 != 0)
-        cam_compute_view_direction(self + 0x10, s->area300, 0);
+    if (B(moby, 0x20) != 12 && vars->i1D8 == 1)
+        moby_set_state(moby, 12, -1);
+    if ((u8)(B(moby, 0x95) - 3) >= 2)
+        vars->h314 = weapon_select_aim_target(moby, vars->i210, 0, 0, 16.0f, 0.0f);
+    if (vars->h338 != 0)
+        cam_compute_view_direction(moby + 0x10, vars->area300, 0);
 }

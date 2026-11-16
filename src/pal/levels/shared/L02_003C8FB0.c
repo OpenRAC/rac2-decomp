@@ -14,7 +14,7 @@ extern float FastAddRotations(float, float);
    (and the child of each 0x873 moby) blue in state 7 or dim otherwise, then sets the
    pulsing color between COLOR1 and COLOR2 on the group's 0xAF9-0xAFD, 0xB03 and 0x873
    mobys. */
-void func_PAL_L02_003C8FB0(char *obj, u32 color1, u32 color2) {
+void pulse_group_moby_colors_pal(char *obj, u32 color1, u32 color2) {
     char *vars = *(char **)(obj + 0x68);
     u16 *list;
     char *moby;

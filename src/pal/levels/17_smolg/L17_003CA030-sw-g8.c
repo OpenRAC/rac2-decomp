@@ -12,17 +12,17 @@ typedef struct {
     int flags8C;
     float progress;
     int point;
-    float field98, pitchSpeed, yawSpeed;
+    float field98, pitch_speed, yaw_speed;
     int selection, sound, enabled;
     int triggers[5];
-    int entryPaths[5];
-    int middlePaths[5];
-    int exitPaths[5];
+    int entry_paths[5];
+    int middle_paths[5];
+    int exit_paths[5];
     u8 pad100[0x114 - 0x100];
     int field114;
     float field118, field11C, field120, field124;
     int path128;
-    float startHeight;
+    float start_height;
 } PlatformVars;
 typedef struct {
     u8 pad0[0x10];
@@ -57,7 +57,7 @@ typedef struct {
     u8 pad0[0x212];
     short mode212, mode214;
     u8 pad216[0x33C - 0x216];
-    u8 *groundObject;
+    u8 *ground_object;
     u8 pad340[0x34E - 0x340];
     short mode34E;
 } PlatformHero;
@@ -107,38 +107,38 @@ static __inline__ void stopSound(u8 *object, PlatformVars *data)
    moby->choice, forwards or back, and stop its sound on the way. */
 void UpdateRidePlatform_pal(u8 *object)
 {
-    PlatformVector oldPosition, oldRotation, delta;
+    PlatformVector old_position, old_rotation, delta;
     PlatformMoby *moby = (PlatformMoby *)object;
     PlatformVars *data = moby->vars;
 
     u16 id;
-    PlatformPathRow *exitRow;
+    PlatformPathRow *exit_row;
     table_set_entry_field(object, ride_platform_is_carrying(object));
     data->flags8C |= 1;
     data->flags3E |= 8;
     if (g_platform_l17_sound_flag) {
         int i;
-        for (i = 0; i < g_path_l17_table[data->entryPaths[0]]->count; i++)
-            effect_create_timed(&g_path_l17_table[data->entryPaths[0]]->points[i],
+        for (i = 0; i < g_path_l17_table[data->entry_paths[0]]->count; i++)
+            effect_create_timed(&g_path_l17_table[data->entry_paths[0]]->points[i],
                               object, 4, 0x800000FF, 0x7F, 2, 0xFF, 0.333f);
-        for (i = 0; i < g_path_l17_table[data->middlePaths[0]]->count; i++)
-            effect_create_timed(&g_path_l17_table[data->middlePaths[0]]->points[i],
+        for (i = 0; i < g_path_l17_table[data->middle_paths[0]]->count; i++)
+            effect_create_timed(&g_path_l17_table[data->middle_paths[0]]->points[i],
                               object, 4, 0x8000FF00, 0x7F, 2, 0xFF, 0.333f);
-        for (i = 0; i < g_path_l17_table[data->exitPaths[0]]->count; i++)
-            effect_create_timed(&g_path_l17_table[data->exitPaths[0]]->points[i],
+        for (i = 0; i < g_path_l17_table[data->exit_paths[0]]->count; i++)
+            effect_create_timed(&g_path_l17_table[data->exit_paths[0]]->points[i],
                               object, 4, 0x80FF0000, 0x7F, 2, 0xFF, 0.333f);
     }
-    qcopy(&oldPosition, &moby->position);
-    qcopy(&oldRotation, &moby->rotation);
+    qcopy(&old_position, &moby->position);
+    qcopy(&old_rotation, &moby->rotation);
     switch (moby->state) {
     case 0:
-        if (data->entryPaths[0] != -1) {
-            PlatformPath *path = g_path_l17_table[data->entryPaths[0]];
+        if (data->entry_paths[0] != -1) {
+            PlatformPath *path = g_path_l17_table[data->entry_paths[0]];
             qcopy(&moby->position, &path->points[0]);
             moby->rotation.f[2] = mat_fast_helper_a(path->points[1].f[0] - moby->position.f[0],
                                            path->points[1].f[1] - moby->position.f[1]);
-        } else if (data->middlePaths[0] != -1) {
-            PlatformPath *path = g_path_l17_table[data->middlePaths[0]];
+        } else if (data->middle_paths[0] != -1) {
+            PlatformPath *path = g_path_l17_table[data->middle_paths[0]];
             qcopy(&moby->position, &path->points[0]);
             moby->rotation.f[2] = mat_fast_helper_a(path->points[1].f[0] - moby->position.f[0],
                                            path->points[1].f[1] - moby->position.f[1]);
@@ -172,21 +172,21 @@ void UpdateRidePlatform_pal(u8 *object)
         break;
     }
     case 2:
-        if (data->entryPaths[moby->choice] == -1 ||
-            ride_platform_move_along_path_pal(object, data->entryPaths[moby->choice], &data->sound)) {
+        if (data->entry_paths[moby->choice] == -1 ||
+            ride_platform_move_along_path_pal(object, data->entry_paths[moby->choice], &data->sound)) {
             moby->state = 3;
             data->field114 = -1;
-            data->startHeight = moby->position.f[2];
+            data->start_height = moby->position.f[2];
         }
         break;
     case 3:
-        math_approach_target_with_direction_mode(&moby->rotation.f[1], 0.0f, &data->pitchSpeed,
+        math_approach_target_with_direction_mode(&moby->rotation.f[1], 0.0f, &data->pitch_speed,
                      g_platform_stop_angle_rate * 6.981318e-06f,
                      g_platform_stop_angle_rate * 6.981318e-06f, 0.25132746f, 0);
-        math_approach_target_with_direction_mode(&moby->rotation, 0.0f, &data->yawSpeed,
+        math_approach_target_with_direction_mode(&moby->rotation, 0.0f, &data->yaw_speed,
                      g_platform_turn_rate * 6.981318e-06f,
                      g_platform_turn_rate * 6.981318e-06f, 0.25132746f, 0);
-        if (g_hero_state.groundObject == object && g_hero_state.mode34E == 0) {
+        if (g_hero_state.ground_object == object && g_hero_state.mode34E == 0) {
             TryClaimNotice(10, 0x133F, 1);
             if (g_pad_held_flags & 0x10) {
                 data->progress = 0;
@@ -194,7 +194,7 @@ void UpdateRidePlatform_pal(u8 *object)
                 data->point = 1;
             }
         } else ride_platform_select_entry_pal(object);
-        goto updateSound;
+        goto update_sound;
     case 4:
         moby->state = 5;
         stopSound(object, data);
@@ -204,41 +204,41 @@ void UpdateRidePlatform_pal(u8 *object)
             g_hero_state.mode212 = 4;
             g_hero_state.mode214 = 4;
         }
-        if (ride_platform_move_along_path_pal(object, data->middlePaths[moby->choice], &data->sound))
+        if (ride_platform_move_along_path_pal(object, data->middle_paths[moby->choice], &data->sound))
             moby->state = 6;
         else platform_attach_path_to_transform(object);
         break;
     case 6:
-        math_approach_target_with_direction_mode(&moby->rotation.f[1], 0.0f, &data->pitchSpeed,
+        math_approach_target_with_direction_mode(&moby->rotation.f[1], 0.0f, &data->pitch_speed,
                      g_platform_stop_angle_rate * 6.981318e-06f,
                      g_platform_stop_angle_rate * 6.981318e-06f, 0.25132746f, 0);
-        math_approach_target_with_direction_mode(&moby->rotation, 0.0f, &data->yawSpeed,
+        math_approach_target_with_direction_mode(&moby->rotation, 0.0f, &data->yaw_speed,
                      g_platform_turn_rate * 6.981318e-06f,
                      g_platform_turn_rate * 6.981318e-06f, 0.25132746f, 0);
-        exitRow = (PlatformPathRow *)data->exitPaths;
-        if (exitRow->paths[moby->choice] != -1 &&
+        exit_row = (PlatformPathRow *)data->exit_paths;
+        if (exit_row->paths[moby->choice] != -1 &&
             fast_vec_dist(&moby->position, g_hero_position) > 15.0f) {
             moby->state = 7;
             data->point = 1;
-        } else if (exitRow->paths[moby->choice] == -1 && g_platform_actor_ref != (char *)object)
+        } else if (exit_row->paths[moby->choice] == -1 && g_platform_actor_ref != (char *)object)
             moby->state = 1;
-        goto updateSound;
+        goto update_sound;
     case 8:
-        math_approach_target_with_direction_mode(&moby->rotation.f[1], 0.0f, &data->pitchSpeed,
+        math_approach_target_with_direction_mode(&moby->rotation.f[1], 0.0f, &data->pitch_speed,
                      g_platform_stop_angle_rate * 6.981318e-06f,
                      g_platform_stop_angle_rate * 6.981318e-06f, 0.25132746f, 0);
-        math_approach_target_with_direction_mode(&moby->rotation, 0.0f, &data->yawSpeed,
+        math_approach_target_with_direction_mode(&moby->rotation, 0.0f, &data->yaw_speed,
                      g_platform_turn_rate * 6.981318e-06f,
                      g_platform_turn_rate * 6.981318e-06f, 0.25132746f, 0);
-        if (g_hero_state.groundObject == object && g_hero_state.mode34E == 0) {
+        if (g_hero_state.ground_object == object && g_hero_state.mode34E == 0) {
             TryClaimNotice(10, 0x133F, 1);
             if (g_pad_held_flags & 0x10) {
                 data->progress = 0;
                 moby->state = 9;
-                data->point = g_path_l17_table[data->middlePaths[moby->choice]]->count - 2;
+                data->point = g_path_l17_table[data->middle_paths[moby->choice]]->count - 2;
             }
         }
-updateSound:
+update_sound:
         if (!snd_is_voice_playing_for_owner(object, data->sound) && g_platform_l17_sound_flag_2[0] != 0xFF)
             data->sound = snd_play_from_class_bank(1, 4, object, 0x922);
         break;
@@ -251,11 +251,11 @@ updateSound:
             g_hero_state.mode212 = 4;
             g_hero_state.mode214 = 4;
         }
-        if (platform_move_along_path_with_sound_pal(object, data->middlePaths[moby->choice], &data->sound))
+        if (platform_move_along_path_with_sound_pal(object, data->middle_paths[moby->choice], &data->sound))
             moby->state = 6;
         break;
     case 7:
-        if (ride_platform_move_along_path_pal(object, data->exitPaths[moby->choice], &data->sound)) {
+        if (ride_platform_move_along_path_pal(object, data->exit_paths[moby->choice], &data->sound)) {
             moby->timer = 0;
             moby->state = 1;
             moby->animation = 0;
@@ -263,6 +263,6 @@ updateSound:
         break;
     }
     platform_update_bob_sway_pal(object);
-    FastVecSub(&delta, &moby->position, &oldPosition);
-    mat_combine_and_store(data->motion, &delta, &oldRotation, &moby->rotation);
+    FastVecSub(&delta, &moby->position, &old_position);
+    mat_combine_and_store(data->motion, &delta, &old_rotation, &moby->rotation);
 }

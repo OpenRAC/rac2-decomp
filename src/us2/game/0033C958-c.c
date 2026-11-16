@@ -19,6 +19,7 @@ extern void object_set_second_pair(void *, int, int);
 extern void text_set_alignment(void *, int);
 extern void widget_store_field(void *, int);
 
+/* Sets up the audio menu: prompt bar, texts and the two volume meters. */
 void audio_menu_init_us2(char *object, void *argument)
 {
     int *allocation;

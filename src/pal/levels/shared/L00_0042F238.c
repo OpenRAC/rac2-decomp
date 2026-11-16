@@ -17,36 +17,38 @@ typedef struct {
 } Global_b0898;
 extern Global_b0898 D_00189E20_b0898;
 
-int cam_test_trigger_volumes_pal(char *a)
+/* Tests whether the hero is inside any of the trigger's volumes (cuboid, record volume, sphere), after
+   checking the camera is free and the hero is slow enough; returns 1 when it is. */
+int cam_test_trigger_volumes_pal(char *trigger)
 {
     char *owner = g_follow_camera_object;
     char *sub = *(char **)(owner + 0x70);
     char *move = sub + 0x160;
     char *rot = sub + 0x1C0;
-    char *p = *(char **)(g_camera_def_table + *(short *)(a + 0x84) * 32 + 28);
+    char *params = *(char **)(g_camera_def_table + *(short *)(trigger + 0x84) * 32 + 28);
     unsigned int mode;
     if (*(short *)(owner + 0x86) != 0) return 0;
     mode = D_00189E20_b0898.flag - 1U < 2U;
-    if (*(short *)(p + 0x4A) && !mode) return 0;
-    if (*(short *)(p + 0x48) && mode) return 0;
-    if (*(int *)(p + 0x34)) {
+    if (*(short *)(params + 0x4A) && !mode) return 0;
+    if (*(short *)(params + 0x48) && mode) return 0;
+    if (*(int *)(params + 0x34)) {
         if (math_fabs(*(float *)(move + 0x34)) > 0.01f) return 0;
         if (math_fabs(*(float *)(rot + 8)) > 0.01f) return 0;
     }
     if ((unsigned int)(D_00189E20_b0898.mode - 0x62) >= 2 && D_00189E20_b0898.speed > 0.020000001f) return 0;
-    if (*(int *)(p + 0xC) >= 0) {
-        if (D_00189E20_b0898.mode == 0x62 && vec_distance_xy(D_00189E20_b0898.position, g_aranos_launch_poses[*(int *)(p + 0xC)].pos) < 3.0f) return 1;
-        if (IsPointInCuboid(g_hero_position, *(int *)(p + 0xC))) return 1;
+    if (*(int *)(params + 0xC) >= 0) {
+        if (D_00189E20_b0898.mode == 0x62 && vec_distance_xy(D_00189E20_b0898.position, g_aranos_launch_poses[*(int *)(params + 0xC)].pos) < 3.0f) return 1;
+        if (IsPointInCuboid(g_hero_position, *(int *)(params + 0xC))) return 1;
     }
-    if (*(int *)(p + 0x10) >= 0) {
-        if (D_00189E20_b0898.mode == 0x62 && vec_distance_xy(D_00189E20_b0898.position, g_aranos_launch_poses[*(int *)(p + 0x10)].pos) < 3.0f) return 1;
-        if (coll_point_inside_record_volume(g_hero_position, *(int *)(p + 0x10))) return 1;
+    if (*(int *)(params + 0x10) >= 0) {
+        if (D_00189E20_b0898.mode == 0x62 && vec_distance_xy(D_00189E20_b0898.position, g_aranos_launch_poses[*(int *)(params + 0x10)].pos) < 3.0f) return 1;
+        if (coll_point_inside_record_volume(g_hero_position, *(int *)(params + 0x10))) return 1;
     }
-    if (*(int *)(p + 8) >= 0) {
-        if (D_00189E20_b0898.mode == 0x62 && vec_distance_xy(D_00189E20_b0898.position, g_aranos_launch_poses[*(int *)(p + 8)].pos) < 3.0f) return 1;
-        if (coll_is_point_inside_unit_sphere(g_hero_position, *(int *)(p + 8))) return 1;
+    if (*(int *)(params + 8) >= 0) {
+        if (D_00189E20_b0898.mode == 0x62 && vec_distance_xy(D_00189E20_b0898.position, g_aranos_launch_poses[*(int *)(params + 8)].pos) < 3.0f) return 1;
+        if (coll_is_point_inside_unit_sphere(g_hero_position, *(int *)(params + 8))) return 1;
     }
-    *(short *)(p + 0x26) = 1;
+    *(short *)(params + 0x26) = 1;
     return 0;
 }
 
@@ -198,21 +200,21 @@ extern void UpdateVolumeAimCamera_pal(char *);
    entry's own pointer at +0x1C) and clears its flag half-word at +0x26 and its word at
    +0x20, but only when the entry is still idle, the global gate allows it and the extra
    check accepts the owner. */
-int cam_update_entry_reset_pal(char *a0)
+int cam_update_entry_reset_pal(char *trigger)
 {
-    char *p = *(char **)(g_camera_def_table + *(short *)(a0 + 0x84) * 0x20 + 0x1C);
+    char *params = *(char **)(g_camera_def_table + *(short *)(trigger + 0x84) * 0x20 + 0x1C);
 
-    if (*(short *)(p + 0x26) != 0) {
+    if (*(short *)(params + 0x26) != 0) {
         return 0;
     }
     if (g_game_l00_mode != 0) {
-        if (cam_test_trigger_volumes_pal(a0) != 0) {
-            *(short *)(p + 0x26) = 0;
-            *(int *)(p + 0x20) = 0;
+        if (cam_test_trigger_volumes_pal(trigger) != 0) {
+            *(short *)(params + 0x26) = 0;
+            *(int *)(params + 0x20) = 0;
             return 0;
         }
     }
-    UpdateVolumeAimCamera_pal(a0);
+    UpdateVolumeAimCamera_pal(trigger);
     return 0;
 }
 

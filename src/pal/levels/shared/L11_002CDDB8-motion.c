@@ -56,7 +56,7 @@ void HeroApplyMotionCollision_pal(void)
 {
     MotionVector initial, planar, vertical;
     MotionVector *resolved;
-    float limit, magnitude, component, savedW;
+    float limit, magnitude, component, saved_w;
     int state;
 
     qcopy(initial.f, (char *)&g_hero_state.position);
@@ -136,9 +136,9 @@ void HeroApplyMotionCollision_pal(void)
     qcopy(planar.f, (char *)&g_hero_state.position);
     if (FastVecLength((char *)&g_hero_state.impulse) > 0.0001f) {
         FastVecAdd((char *)&g_hero_state.position, (char *)&g_hero_state.position, (char *)&g_hero_state.impulse);
-        savedW = g_hero_state.impulse.f[3];
+        saved_w = g_hero_state.impulse.f[3];
         vec_clear_128((TI128 *)(char *)&g_hero_state.impulse);
-        g_hero_state.impulse.f[3] = savedW;
+        g_hero_state.impulse.f[3] = saved_w;
         hero_resolve_collision_with_rewind();
         hero_probe_ground();
         FastVecSub((char *)&g_hero_state.displacement, (char *)&g_hero_state.position, initial.f);

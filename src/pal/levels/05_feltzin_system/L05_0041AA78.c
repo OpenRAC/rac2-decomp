@@ -11,33 +11,34 @@ extern void func_37AEC0(char *object, int flag);
 extern int g_feltzin_challenge_state[];
 extern char *g_feltzin_enemy_table __attribute__((sda));
 
+/* Sets up a new enemy: starts it at a random spot around its spawn point and creates its two helper objects when needed. */
 void feltzin_enemy_init_with_helpers_pal(char *obj)
 {
-    char *sub = *(char **)(obj + 0x68);
-    char *r;
+    char *state = *(char **)(obj + 0x68);
+    char *effect_rec;
     char *table;
-    float a, b, c;
+    float radius, angle_a, angle_b;
 
     *(unsigned char *)(obj + 0x20) = 1;
     *(unsigned short *)(obj + 0x34) = *(unsigned short *)(obj + 0x34) | 0x100;
-    r = func_379CA0(obj);
-    *(int *)(r + 0x148) = 5;
+    effect_rec = func_379CA0(obj);
+    *(int *)(effect_rec + 0x148) = 5;
     func_37AEC0(obj, 1);
     table = g_feltzin_enemy_table + g_feltzin_challenge_state[0] * 128;
-    *(int *)(sub + 0x274) = -1;
-    *(float *)(sub + 0x180) = 5.0f;
-    *(int *)(sub + 0x268) = 0;
-    a = func_332B50(0.0f, *(float *)table);
-    b = func_332C18();
-    c = func_332C18();
-    func_33B330(obj + 0x10, a, b, c);
+    *(int *)(state + 0x274) = -1;
+    *(float *)(state + 0x180) = 5.0f;
+    *(int *)(state + 0x268) = 0;
+    radius = func_332B50(0.0f, *(float *)table);
+    angle_a = func_332C18();
+    angle_b = func_332C18();
+    func_33B330(obj + 0x10, radius, angle_a, angle_b);
     func_306630(obj + 0x10, table + 0x30, obj + 0x10);
-    if (*(int *)(r + 0x110) == 1) {
-        *(int *)(sub + 0x26C) = feltzin_helper_create(obj, 0);
-        *(int *)(sub + 0x270) = feltzin_helper_create(obj, 1);
+    if (*(int *)(effect_rec + 0x110) == 1) {
+        *(int *)(state + 0x26C) = feltzin_helper_create(obj, 0);
+        *(int *)(state + 0x270) = feltzin_helper_create(obj, 1);
     } else {
-        *(int *)(sub + 0x26C) = 0;
-        *(int *)(sub + 0x270) = 0;
+        *(int *)(state + 0x26C) = 0;
+        *(int *)(state + 0x270) = 0;
     }
     *(float *)(obj + 0x2C) = 0.02f;
 }

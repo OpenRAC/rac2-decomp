@@ -42,7 +42,8 @@ typedef struct {
     BounceVector point, normal, offset;
 } BounceWorkspace;
 
-void func_PAL_L01_003ED1BC(unsigned char *object) {
+/* Updates the Mini Nuke projectile: it flies and bounces, then explodes and removes itself when it lands or leaves the map. */
+void mini_nuke_projectile_update_l01_pal(unsigned char *object) {
     char *state = *(char **)(object + 0x68);
     BounceWorkspace work;
     int collision;
@@ -59,7 +60,7 @@ void func_PAL_L01_003ED1BC(unsigned char *object) {
         part_steer_effect_direction(BI(state, 0x34), state, 0);
         vec_add_object_direction_scaled(object + 0x10, (float *)state, g_nuke_move_speed * 0.00040000002f);
         work.excluded[0] = 0;
-        work.excluded[1] = 0xA5A;
+        work.excluded[1] = MOBY_CLASS_MINI_NUKE;
         qcopy(&work.query.previous, &work.previous);
         qcopy(&work.query.position, object + 0x10);
         qcopy(&work.query.velocity, state);

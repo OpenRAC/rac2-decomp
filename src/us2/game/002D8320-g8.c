@@ -72,12 +72,13 @@ extern void menu_restore_saved_screen_image(int);
 extern int req_push_queue(char *, int);
 extern int req_launch_queued(char *);
 
-int func_US2_002D8320(PageMenu *menu)
+/* Handles buttons on the page list: moves between pages and rows, goes back, or opens the page's own screen. */
+int level_page_menu_update_input_us2(PageMenu *menu)
 {
-    int previous, count, old, next, mapped;
+    int previous_page, row_count, old_selection, next_page, mapped;
     PageMap *map;
 
-    previous = ((PageMap *)g_map_overlay_state)->page;
+    previous_page = ((PageMap *)g_map_overlay_state)->page;
     if (*(PageMenu **)(((PageRoot *)g_pause_menu_state)->owner + 0xE8) != menu) {
         if (((PageMap *)g_map_overlay_state)->page < 28)
             menu->selection[((PageMap *)g_map_overlay_state)->page] = -1;
@@ -86,43 +87,43 @@ int func_US2_002D8320(PageMenu *menu)
     if ((((PagePad *)g_pad_state)->buttons & 0xD00) && !((PageRoot *)g_pause_menu_state)->lock && ((PageRoot *)g_pause_menu_state)->owner != g_level_page_root)
         return 1;
 
-    /* Next and previous available page. */
+    /* Next and previous_page available page. */
     if (((PagePad *)g_pad_state)->buttons & 8) {
-        for (next = ((PageMap *)g_map_overlay_state)->page + 1; next < 28; next++) {
-            if (g_map_visited_flags[next] || g_current_map_index == next) {
-                if (map_find_table_index(next) < 0)
+        for (next_page = ((PageMap *)g_map_overlay_state)->page + 1; next_page < 28; next_page++) {
+            if (g_map_visited_flags[next_page] || g_current_map_index == next_page) {
+                if (map_find_table_index(next_page) < 0)
                     return 0;
-                map_set_current_and_refresh(next);
+                map_set_current_and_refresh(next_page);
                 break;
             }
         }
     }
     if (((PagePad *)g_pad_state)->buttons & 4) {
-        for (next = ((PageMap *)g_map_overlay_state)->page - 1; next >= 0; next--) {
-            if (g_map_visited_flags[next] || g_current_map_index == next) {
-                if (map_find_table_index(next) < 0)
+        for (next_page = ((PageMap *)g_map_overlay_state)->page - 1; next_page >= 0; next_page--) {
+            if (g_map_visited_flags[next_page] || g_current_map_index == next_page) {
+                if (map_find_table_index(next_page) < 0)
                     return 0;
-                map_set_current_and_refresh(next);
+                map_set_current_and_refresh(next_page);
                 break;
             }
         }
     }
-    if (((PageMap *)g_map_overlay_state)->page != previous) {
+    if (((PageMap *)g_map_overlay_state)->page != previous_page) {
         snd_play_from_global_bank(3, 0, 0);
         menu_update_entry_states();
     }
 
     /* Rows of the page, written to the scratchpad. */
-    count = menu_list_active_entries_us2((int *)0x70000000, 0, (int *)0x70000100, 1);
-    menu->count = count;
-    if (count) {
+    row_count = menu_list_active_entries_us2((int *)0x70000000, 0, (int *)0x70000100, 1);
+    menu->count = row_count;
+    if (row_count) {
         u32 buttons = ((PagePad *)g_pad_state)->buttons;
         int *selections = menu->selection;
         {
             int *entry = &selections[((PageMap *)g_map_overlay_state)->page];
-            old = *entry;
+            old_selection = *entry;
             if (buttons & 0x1000)
-                *entry = (old + count - 1) % count;
+                *entry = (old_selection + row_count - 1) % row_count;
         }
         if (buttons & 0x4000) {
             int *entry = &selections[((PageMap *)g_map_overlay_state)->page];
@@ -130,10 +131,10 @@ int func_US2_002D8320(PageMenu *menu)
         }
         {
             int *entry = &selections[((PageMap *)g_map_overlay_state)->page];
-            if (*entry != old)
+            if (*entry != old_selection)
                 snd_play_from_global_bank(3, 0, 0);
         }
-        if ((buttons & 0x5000) || ((PageMap *)g_map_overlay_state)->page != previous) {
+        if ((buttons & 0x5000) || ((PageMap *)g_map_overlay_state)->page != previous_page) {
             int *entry;
             g_page_preview.timer = -576;
             entry = &selections[((PageMap *)g_map_overlay_state)->page];

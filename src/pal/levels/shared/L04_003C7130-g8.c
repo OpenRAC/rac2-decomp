@@ -31,53 +31,54 @@ extern int math_random_int_range(int,int);
 extern float math_random_float_range(float,float);
 extern float math_random_signed_float_range(float,float);
 extern void transform_vector(void *,void *,void *);
-extern char *func_PAL_002BE9A8(float,void *,int,float,void *,float,int,float,int);
+extern char *part_spawn_spinning_spark_pal(float,void *,int,float,void *,float,int,float,int);
 extern void ref_PAL_L04_003C7130_00(void *,void *);
-extern void func_PAL_L04_003C7600(void *);
+extern void particle_l04_emitter_draw_pal(void *);
 extern void part_init_from_ranges(void *,int);
 extern void part_init_simple(void *,int);
 extern u32 math_add_to_running_total(u32);
 typedef struct { short first,count; int matrix; char pad08[0x40]; float radius; } EmitterView;
-void func_PAL_L04_003C7130(char *self) {
+/* Runs a particle emitter: sets up its particles on the first update, then spawns sparks near the player and registers the render callback (PAL: 50 Hz timings). */
+void particle_l04_emitter_update_pal(char *moby) {
     EVec bound, velocity, position;
-    char *state = *(char **)(self+0x68), *matrix;
+    char *vars = *(char **)(moby+0x68), *matrix;
     int i,end,color,kind;
-    float size,r;
+    float size,link_radius;
     char *particle,*data;
-    switch (EB(self,0x20)) {
+    switch (EB(moby,0x20)) {
     case 0:
-        EB(self,0x20)=1; EB(self,0x30)=255;
-        if (((EmitterView *)state)->matrix==-1) { moby_mark_spawned(self); return; }
-        ((EmitterView *)state)->radius=FastVecLength(g_linked_record_table+((EmitterView *)state)->matrix*128+0x10);
-        r=FastVecLength(g_linked_record_table+((EmitterView *)state)->matrix*128);
-        if (((EmitterView *)state)->radius<r) ((EmitterView *)state)->radius=r;
-        EF(state,0x44)=EH(state,0x40) ? ((EmitterView *)state)->radius : 3.0f;
-        EF(state,0x50)=FastVecLength(g_linked_record_table+((EmitterView *)state)->matrix*128+0x20)*0.5f;
-        EH(state,0)=math_add_to_running_total(EH(state,2)+EH(state,0x40));
-        end=EH(state,0)+EH(state,2);
-        for(i=EH(state,0);i<end;i++) {
+        EB(moby,0x20)=1; EB(moby,0x30)=255;
+        if (((EmitterView *)vars)->matrix==-1) { moby_mark_spawned(moby); return; }
+        ((EmitterView *)vars)->radius=FastVecLength(g_linked_record_table+((EmitterView *)vars)->matrix*128+0x10);
+        link_radius=FastVecLength(g_linked_record_table+((EmitterView *)vars)->matrix*128);
+        if (((EmitterView *)vars)->radius<link_radius) ((EmitterView *)vars)->radius=link_radius;
+        EF(vars,0x44)=EH(vars,0x40) ? ((EmitterView *)vars)->radius : 3.0f;
+        EF(vars,0x50)=FastVecLength(g_linked_record_table+((EmitterView *)vars)->matrix*128+0x20)*0.5f;
+        EH(vars,0)=math_add_to_running_total(EH(vars,2)+EH(vars,0x40));
+        end=EH(vars,0)+EH(vars,2);
+        for(i=EH(vars,0);i<end;i++) {
             g_particle_mirror_flags[i]=math_random_int_below(2);
             g_particle_positions[i].f[3]=1.0f;
-            part_init_from_ranges(self,i);
+            part_init_from_ranges(moby,i);
             g_particle_fade_in_timers[i]=0;
         }
-        { int start=end; end+=EH(state,0x40);
+        { int start=end; end+=EH(vars,0x40);
         for(i=start;i<end;i++) {
             g_particle_mirror_flags[i]=math_random_int_below(2);
             g_particle_positions[i].f[3]=1.0f;
-            part_init_simple(self,i);
+            part_init_simple(moby,i);
         }
         }
-        EF(g_linked_record_table+((EmitterView *)state)->matrix*128,0x3C)=1.0f;
-        EI(state,0x38)=(EB(state,0x3E)<<16)|(EB(state,0x3D)<<8)|EB(state,0x3C);
+        EF(g_linked_record_table+((EmitterView *)vars)->matrix*128,0x3C)=1.0f;
+        EI(vars,0x38)=(EB(vars,0x3E)<<16)|(EB(vars,0x3D)<<8)|EB(vars,0x3C);
         break;
     case 1: {
         int j;
-        matrix=g_linked_record_table+((EmitterView *)state)->matrix*128;
+        matrix=g_linked_record_table+((EmitterView *)vars)->matrix*128;
         qcopy(&bound,matrix+0x30);
         bound.f[2]+=9.0f; bound.f[3]=10.0f;
         if (math_fast_helper_a(&bound,g_spark_bound_radius)<0) return;
-        if (EH(state,0x42) && vec_distance_xy(g_tether_zero_vec,self+0x10)<128.0f) {
+        if (EH(vars,0x42) && vec_distance_xy(g_tether_zero_vec,moby+0x10)<128.0f) {
             for(j=0;j<g_spark_particle_count;j++) {
                 velocity.f[0]=math_random_signed_float_range(0.0f,1.0f);
                 velocity.f[1]=math_random_signed_float_range(0.0f,1.0f);
@@ -86,20 +87,20 @@ void func_PAL_L04_003C7130(char *self) {
                 position.f[2]+=0.5f;
                 velocity.f[0]=math_random_signed_float_range(0.0f,0.0050000004f);
                 velocity.f[1]=math_random_signed_float_range(0.0f,0.0050000004f);
-                velocity.f[2]=EF(state,0x20)*0.020000001f;
-                size=math_random_float_range(EF(state,0x24),EF(state,0x28));
-                color=(math_random_int_range(EH(state,0x2C),EH(state,0x2E))<<24)|g_spark_color_rgb;
+                velocity.f[2]=EF(vars,0x20)*0.020000001f;
+                size=math_random_float_range(EF(vars,0x24),EF(vars,0x28));
+                color=(math_random_int_range(EH(vars,0x2C),EH(vars,0x2E))<<24)|g_spark_color_rgb;
                 kind=math_random_int_range(g_spark_kind_min,g_spark_kind_max);
-                particle=func_PAL_002BE9A8(g_spark_particle_param_a,&position,kind,1.0f,&velocity,g_spark_particle_param_b,color,size,0);
+                particle=part_spawn_spinning_spark_pal(g_spark_particle_param_a,&position,kind,1.0f,&velocity,g_spark_particle_param_b,color,size,0);
                 if (particle) {
                     data=particle+0x20;
-                    EH(particle,0xA)=((s32)math_random_int_range(EI(state,0x30),EI(state,0x34)) * 5 + 2) / 6;
+                    EH(particle,0xA)=((s32)math_random_int_range(EI(vars,0x30),EI(vars,0x34)) * 5 + 2) / 6;
                     EI(data,4)=3; EB(data,0xA)=color>>24; EB(data,0xB)=EB(particle,0xA);
                     if(math_random_int_below(2)) EB(particle,3)=0x44;
                 }
             }
         }
-        ref_PAL_L04_003C7130_00(func_PAL_L04_003C7600,self);
+        ref_PAL_L04_003C7130_00(particle_l04_emitter_draw_pal,moby);
         break;
     }
     }

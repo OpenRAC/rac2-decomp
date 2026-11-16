@@ -60,7 +60,7 @@ extern Particle *SpawnSpinningSparkParticle(void *, float, float, float, int, vo
 extern int FloatToInt(float);
 
 /* Update special scene objects, then emit the ship's paired exhaust particles. */
-void func_US2_L06_0033CAF0(void)
+void notak_update_scene_effects_us2(void)
 {
     Vector left, right, velocity, position, shift;
     Moby *ship;
@@ -76,7 +76,7 @@ void func_US2_L06_0033CAF0(void)
             obj->flags |= 0x800;
         if (obj->class_id == 0xD54)
             UpdateEquipmentPieces(obj);
-        if (obj && obj->class_id == 0xFA0 && g_current_map_index != 0x33) {
+        if (obj && obj->class_id == MOBY_CLASS_TV_SCREENS && g_current_map_index != 0x33) {
             char *state = obj->state;
 
             if (state)

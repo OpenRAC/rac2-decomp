@@ -30,9 +30,9 @@ extern void FastVecScale(void *,void *,float),func_002A0F48(void *);
 extern void BuildObjectAttachmentTransforms(void *,void *,int,int,int,int,int,int);
 extern void moby_init_child_from_parent(void *,void *);
 extern float ApproachValue(float *,float,float);
-extern void func_PAL_L22_003F9948(void *),func_PAL_L22_003F9A10(void *),moby_toggle_linked_by_distance(void *);
+extern void sway_start_pal(void *),sway_update_decaying_pal(void *),moby_toggle_linked_by_distance(void *);
 extern void multiply_matrix3x3(void *,void *,void *),moby_update_attached_transforms(void *,void *);
-extern void part_spray_height(void *), func_PAL_L22_003F9B18(void *,int);
+extern void part_spray_height(void *), part_emit_column_pal(void *,int);
 extern int snd_start_in_slot(int,int,int);
 extern void SpawnRandomKindAt(void *,int),ref_L22_003F45D8_13(void *,int);
 typedef unsigned int Qword __attribute__((mode(TI)));
@@ -44,8 +44,9 @@ typedef struct {
     u8 *converted[14];
 } ControllerPrefix;
 
+/* Per-frame update for moby class 3389: finds the nearby group of level pieces, spawns layered copies of it, swaps pieces for solid objects when they are hit, and cleans up at the end. */
 void barrier_pieces_update_pal(u8 *obj) {
-    u8 *ctl=P(obj,0x68);
+    u8 *vars=P(obj,0x68);
     float matrix[12] __attribute__((aligned(16)));
     float rotation[4] __attribute__((aligned(16)));
     switch(B(obj,0x20)) {
@@ -53,11 +54,11 @@ void barrier_pieces_update_pal(u8 *obj) {
         {
             int i,known,layer,nearest,kind;
             u16 *list;
-            float best,max,d,scale,offset;
+            float best_dist,max_dist,dist,scale,offset;
             u8 *created;
             nearest=-1;
-            best=9999.0f;
-            max=0.0f;
+            best_dist=9999.0f;
+            max_dist=0.0f;
             kind=-1;
             for(i=0;i<ref_L22_003F45D8_00;i++) {
                 for(list=ref_L22_003F45D8_01[i]; list && ((s16)list[-1]>=0 || list==ref_L22_003F45D8_01[i]); list++) {
@@ -68,33 +69,33 @@ void barrier_pieces_update_pal(u8 *obj) {
                     if(!entity) break;
                     inst=ref_L22_003F45D8_08+index*32;
                     type=ref_L22_003F45D8_07[B(inst,0x1d)];
-                    d=vec_distance_xy(entity+0x30,obj+0x10);
-                    if(d<best) {
+                    dist=vec_distance_xy(entity+0x30,obj+0x10);
+                    if(dist<best_dist) {
                         kind=type;
-                        best=d;
+                        best_dist=dist;
                         nearest=i;
                     }
                 }
             }
-            if(nearest==-1 || best>2.0f) {
+            if(nearest==-1 || best_dist>2.0f) {
                 moby_mark_spawned(obj);
                 return;
             }
-            I(ctl,0x10)=nearest;
-            I(ctl,0xa4)=kind;
+            I(vars,0x10)=nearest;
+            I(vars,0xa4)=kind;
             euler_rotation_basis(obj+0xc0,obj+0xf0);
             {
-                u16 group=U(ctl,0x10);
+                u16 group=U(vars,0x10);
                 int count=ref_L22_003F45D8_02;
-                H(ctl,0x16)=group;
-                if((s16)group>=count) H(ctl,0x16)=-1;
+                H(vars,0x16)=group;
+                if((s16)group>=count) H(vars,0x16)=-1;
             }
             for(known=0;known<ref_L22_003F45D8_09;known++) if(ref_L22_003F45D8_10[known]==kind) break;
             if(known==ref_L22_003F45D8_09) {
                 ref_L22_003F45D8_09=known+1;
                 ref_L22_003F45D8_10[known]=kind;
             }
-            for(list=ref_L22_003F45D8_01[I(ctl,0x10)];list && ((s16)list[-1]>=0 || list==ref_L22_003F45D8_01[I(ctl,0x10)]);list++) {
+            for(list=ref_L22_003F45D8_01[I(vars,0x10)];list && ((s16)list[-1]>=0 || list==ref_L22_003F45D8_01[I(vars,0x10)]);list++) {
                 int index,type;
                 u8 *entity,*inst;
                 index=*list&0x7fff;
@@ -103,16 +104,16 @@ void barrier_pieces_update_pal(u8 *obj) {
                 inst=ref_L22_003F45D8_08+index*32;
                 type=ref_L22_003F45D8_07[B(inst,0x1d)];
                 if(type!=0xca4 && type!=0xca5 && type!=0xca7) {
-                    d=fast_vec_dist(entity+0x30,ref_L22_003F45D8_11);
-                    if(max<d) max=d;
+                    dist=fast_vec_dist(entity+0x30,ref_L22_003F45D8_11);
+                    if(max_dist<dist) max_dist=dist;
                 }
             }
-            H(ctl,0x14)=FloatToInt((max-fast_vec_dist(obj+0x10,ref_L22_003F45D8_11)+4.5f)*0.25f);
-            F(ctl,0xa0)=H(ctl,0x14)*4.0f;
-            qcopy_nc(ctl,obj+0xe0);
+            H(vars,0x14)=FloatToInt((max_dist-fast_vec_dist(obj+0x10,ref_L22_003F45D8_11)+4.5f)*0.25f);
+            F(vars,0xa0)=H(vars,0x14)*4.0f;
+            qcopy_nc(vars,obj+0xe0);
             scale=1.0f;
             offset=0.0f;
-            for(layer=0;layer<H(ctl,0x14);layer++) {
+            for(layer=0;layer<H(vars,0x14);layer++) {
                 if(kind==0xc4c) created=CreateMoby(0xdcb);
                 else created=CreateMoby(0xdcc);
                 if(created) {
@@ -127,13 +128,13 @@ void barrier_pieces_update_pal(u8 *obj) {
                     FastVecScale(created+0xd0,created+0xd0,scale);
                     U(created,0x34)|=0x4100;
                     func_002A0F48(created);
-                    P(ctl,0x18+layer*4)=created;
+                    P(vars,0x18+layer*4)=created;
                 }
                 scale*=1.08f;
             }
-            BuildObjectAttachmentTransforms(obj,ctl+0xd0,90,-1,I(ctl,0x10),H(ctl,0x16),7,0);
-            B(ctl,0x11d)=1;
-            F(ctl,0xac)=50.0f;
+            BuildObjectAttachmentTransforms(obj,vars+0xd0,90,-1,I(vars,0x10),H(vars,0x16),7,0);
+            B(vars,0x11d)=1;
+            F(vars,0xac)=50.0f;
             B(obj,0x30)=255;
             B(obj,0x20)=1;
             break;
@@ -144,20 +145,20 @@ void barrier_pieces_update_pal(u8 *obj) {
             u16 *list;
             u8 *entity,*inst,*created,*hit,*scan,*rec,*found,*end;
             hit=0;
-            for(i=0;i<H(ctl,0x14);i++) {
-                if(!((ControllerPrefix *)ctl)->children[i]) continue;
-                found=part_find_owned_effect_slot(((ControllerPrefix *)ctl)->children[i],0x80000,0);
+            for(i=0;i<H(vars,0x14);i++) {
+                if(!((ControllerPrefix *)vars)->children[i]) continue;
+                found=part_find_owned_effect_slot(((ControllerPrefix *)vars)->children[i],0x80000,0);
                 if(!found) continue;
                 hit=found;
-                if(I(ctl,0xa8) || !(F(hit,0x2c)<F(ctl,0xac))) continue;
-                for(list=ref_L22_003F45D8_01[I(ctl,0x10)];list && ((s16)list[-1]>=0 || list==ref_L22_003F45D8_01[I(ctl,0x10)]);list++) {
+                if(I(vars,0xa8) || !(F(hit,0x2c)<F(vars,0xac))) continue;
+                for(list=ref_L22_003F45D8_01[I(vars,0x10)];list && ((s16)list[-1]>=0 || list==ref_L22_003F45D8_01[I(vars,0x10)]);list++) {
                     index=*list&0x7fff;
                     entity=ref_L22_003F45D8_04+index*64;
                     if(!entity) break;
                     inst=ref_L22_003F45D8_08+index*32;
                     type=ref_L22_003F45D8_07[B(inst,0x1d)];
                     if(type!=0xc4a && type!=0xc4c && type!=0xc4f && type!=0xc50 && type!=0xf5f && type!=0xc55) continue;
-                    if(fast_vec_dist(entity+0x30,((ControllerPrefix *)ctl)->children[i]+0x10)>2.0f) continue;
+                    if(fast_vec_dist(entity+0x30,((ControllerPrefix *)vars)->children[i]+0x10)>2.0f) continue;
                     first=0xdc2;
                     second=0xdc3;
                     switch(type) {
@@ -219,31 +220,31 @@ void barrier_pieces_update_pal(u8 *obj) {
                         break;
                     }
                     created=0;
-                    if(((ControllerPrefix *)ctl)->converted[i]) {
-                        if(H(((ControllerPrefix *)ctl)->converted[i],0xaa)!=second) {
+                    if(((ControllerPrefix *)vars)->converted[i]) {
+                        if(H(((ControllerPrefix *)vars)->converted[i],0xaa)!=second) {
                             created=CreateMoby(second);
                             if(!created) break;
-                            moby_mark_spawned(((ControllerPrefix *)ctl)->converted[i]);
-                            rec=ctl;
+                            moby_mark_spawned(((ControllerPrefix *)vars)->converted[i]);
+                            rec=vars;
                             do {
-                                if(!B(rec,0x11c) && ((ControllerPrefix *)ctl)->converted[i]==ref_L22_003F45D8_12+H(rec,0x118)*256) H(rec,0x118)=(created-ref_L22_003F45D8_12)>>8;
+                                if(!B(rec,0x11c) && ((ControllerPrefix *)vars)->converted[i]==ref_L22_003F45D8_12+H(rec,0x118)*256) H(rec,0x118)=(created-ref_L22_003F45D8_12)>>8;
                                 rec+=0x50;
-                            } while((int)rec<(int)(ctl+0x1c20));
-                            ((ControllerPrefix *)ctl)->converted[i]=created;
+                            } while((int)rec<(int)(vars+0x1c20));
+                            ((ControllerPrefix *)vars)->converted[i]=created;
                         }
                     } else created=CreateMoby(first);
                     if(created) {
-                        end=ctl+0x1c20;
+                        end=vars+0x1c20;
                         active=1;
-                        for(scan=ctl;(int)scan<(int)end;scan+=0x50) {
+                        for(scan=vars;(int)scan<(int)end;scan+=0x50) {
                             if(B(scan,0x11c)==active && H(scan,0x118)==index) {
                                 B(scan,0x11c)=0;
                                 H(scan,0x118)=(created-ref_L22_003F45D8_12)>>8;
                                 break;
                             }
                         }
-                        moby_init_child_from_parent(created,((ControllerPrefix *)ctl)->children[i]);
-                        ((ControllerPrefix *)ctl)->converted[i]=created;
+                        moby_init_child_from_parent(created,((ControllerPrefix *)vars)->children[i]);
+                        ((ControllerPrefix *)vars)->converted[i]=created;
                         *(Qword *)(created+0xc0)=*(Qword *)(entity);
                         *(Qword *)(created+0xd0)=*(Qword *)(entity+0x10);
                         *(Qword *)(created+0xe0)=*(Qword *)(entity+0x20);
@@ -253,25 +254,25 @@ void barrier_pieces_update_pal(u8 *obj) {
                     break;
                 }
             }
-            if(math_fast_float_d(ctl+0xa8) && hit) {
-                ApproachValue((float *)(ctl+0xac),0.0f,F(hit,0x2c));
-                if(F(ctl,0xac)==0.0f) {
+            if(math_fast_float_d(vars+0xa8) && hit) {
+                ApproachValue((float *)(vars+0xac),0.0f,F(hit,0x2c));
+                if(F(vars,0xac)==0.0f) {
                     B(obj,0x20)=2;
                     break;
                 }
-                func_PAL_L22_003F9948(obj);
-                I(ctl,0xa8)=33;
+                sway_start_pal(obj);
+                I(vars,0xa8)=33;
             }
-            for(j=0;j<H(ctl,0x14);j++) B(((ControllerPrefix *)ctl)->children[j],0xa8)=255;
-            func_PAL_L22_003F9A10(obj);
-            if(I(ctl,0xc8)) {
+            for(j=0;j<H(vars,0x14);j++) B(((ControllerPrefix *)vars)->children[j],0xa8)=255;
+            sway_update_decaying_pal(obj);
+            if(I(vars,0xc8)) {
                 qzero_nc(rotation);
                 rotation[2]=0.010471977f;
                 euler_rotation_basis(matrix,rotation);
                 multiply_matrix3x3(obj+0xc0,obj+0xc0,matrix);
             }
             moby_toggle_linked_by_distance(obj);
-            if(F(ctl,0xbc)!=0.0f || I(ctl,0xc8)) moby_update_attached_transforms(obj,ctl+0xd0);
+            if(F(vars,0xbc)!=0.0f || I(vars,0xc8)) moby_update_attached_transforms(obj,vars+0xd0);
             break;
         }
         case 2:
@@ -281,20 +282,20 @@ void barrier_pieces_update_pal(u8 *obj) {
             u8 *inst;
             snd_start_in_slot(16,0,0);
             part_spray_height(obj);
-            func_PAL_L22_003F9B18(obj,1);
+            part_emit_column_pal(obj,1);
             if(g_current_map_index==22) SpawnRandomKindAt(obj+0x10,0);
             else if(g_current_map_index==23) ref_L22_003F45D8_13(obj+0x10,0);
-            for(i=0;i<H(ctl,0x14);i++) if(((ControllerPrefix *)ctl)->children[i]) moby_mark_spawned(((ControllerPrefix *)ctl)->children[i]);
-            for(j=0;j<H(ctl,0x14);j++) if(((ControllerPrefix *)ctl)->converted[j]) moby_mark_spawned(((ControllerPrefix *)ctl)->converted[j]);
-            if(I(ctl,0x10)>=0) {
-                for(list=ref_L22_003F45D8_01[I(ctl,0x10)];list && ((s16)list[-1]>=0 || list==ref_L22_003F45D8_01[I(ctl,0x10)]);list++) {
+            for(i=0;i<H(vars,0x14);i++) if(((ControllerPrefix *)vars)->children[i]) moby_mark_spawned(((ControllerPrefix *)vars)->children[i]);
+            for(j=0;j<H(vars,0x14);j++) if(((ControllerPrefix *)vars)->converted[j]) moby_mark_spawned(((ControllerPrefix *)vars)->converted[j]);
+            if(I(vars,0x10)>=0) {
+                for(list=ref_L22_003F45D8_01[I(vars,0x10)];list && ((s16)list[-1]>=0 || list==ref_L22_003F45D8_01[I(vars,0x10)]);list++) {
                     inst=ref_L22_003F45D8_05+(*list&0x7fff)*32;
                     if(!inst)break;
                     B(inst,0x1e)|=4;
                 }
             }
-            if(H(ctl,0x16)>=0) {
-                for(list=ref_L22_003F45D8_03[H(ctl,0x16)];list && ((s16)list[-1]>=0 || list==ref_L22_003F45D8_03[H(ctl,0x16)]);list++) {
+            if(H(vars,0x16)>=0) {
+                for(list=ref_L22_003F45D8_03[H(vars,0x16)];list && ((s16)list[-1]>=0 || list==ref_L22_003F45D8_03[H(vars,0x16)]);list++) {
                     inst=ref_L22_003F45D8_06+(*list&0x7fff)*32;
                     if(!inst)break;
                     B(inst,0x16)|=1;

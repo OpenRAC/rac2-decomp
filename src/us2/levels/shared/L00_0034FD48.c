@@ -17,6 +17,7 @@ int setup_l00_run_three_return_zero_6_us2(void)
 extern int g_menu_input_flags;
 extern int module_l00_call_handler_with_arg_9(int a);
 
+/* Runs an update step using the saved input state and returns zero. */
 int input_l00_update_return_zero_3_us2(void)
 {
     module_l00_call_handler_with_arg_9(g_menu_input_flags);

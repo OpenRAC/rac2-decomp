@@ -67,22 +67,23 @@ typedef struct {
     float scroll;
 } BeamState;
 
-void func_PAL_L30_0041C5B0(int unused0, int unused1, int unused2, int unused3,
+/* Draws the museum projectile's beam as several glowing quads that scroll and spin, with a billboard glow at its head (PAL version). */
+void museum_projectile_draw_beam_pal(int unused0, int unused1, int unused2, int unused3,
                       int unused4, char *obj)
 {
     RenderQuad quad;
     float delta[4], offset[4], center[4], width[4], base[4], temp[4];
     BeamState *state = *(BeamState **)(obj + 0x68);
     float *vertices;
-    float *u;
-    float *v;
+    float *tex_u;
+    float *tex_v;
     float angle, cosine, sine, glow;
     int i, j;
     part_reset_quad_record_c(&quad);
     gfx_init_quad_packet_state(&quad, g_beam_packet_texture_a, 1, 0x80);
     vertices = quad.vertices[1];
-    u = quad.tex.uv;
-    v = quad.tex.uv + 1;
+    tex_u = quad.tex.uv;
+    tex_v = quad.tex.uv + 1;
     quad.colors[1] = g_beam_start_color_alpha << 24;
     quad.colors[1] |= g_beam_start_color_blue << 16;
     quad.colors[1] |= g_beam_start_color_green << 8;
@@ -102,12 +103,12 @@ void func_PAL_L30_0041C5B0(int unused0, int unused1, int unused2, int unused3,
     quad.tex.uv[6] = 1;
     quad.tex.uv[7] = 1;
     {
-        float *p = u;
+        float *u_ptr = tex_u;
         for (i = 3; i >= 0; i--) {
-            *p -= state->scroll;
-            if (*p <= 7.0f)
-                *p += 7.0f;
-            p += 2;
+            *u_ptr -= state->scroll;
+            if (*u_ptr <= 7.0f)
+                *u_ptr += 7.0f;
+            u_ptr += 2;
         }
     }
     state->scroll += 0.1f;
@@ -146,17 +147,17 @@ void func_PAL_L30_0041C5B0(int unused0, int unused1, int unused2, int unused3,
     cosine = math_fast_sin_or_cos_a(angle);
     sine = math_fast_sin_or_cos_b(angle);
     {
-        float *q = v;
-        float *p = u;
+        float *v_ptr = tex_v;
+        float *u_ptr = tex_u;
         for (j = 3; j >= 0; j--) {
-            temp[0] = *p - 0.5f;
-            temp[1] = *q - 0.5f;
-            *p = temp[0] * cosine - temp[1] * sine;
-            *q = temp[0] * sine + temp[1] * cosine;
-            *p += 0.5f;
-            *q += 0.5f;
-            p += 2;
-            q += 2;
+            temp[0] = *u_ptr - 0.5f;
+            temp[1] = *v_ptr - 0.5f;
+            *u_ptr = temp[0] * cosine - temp[1] * sine;
+            *v_ptr = temp[0] * sine + temp[1] * cosine;
+            *u_ptr += 0.5f;
+            *v_ptr += 0.5f;
+            u_ptr += 2;
+            v_ptr += 2;
         }
     }
     state->angle = FastAddRotations(state->angle, g_beam_spin_speed * 0.017453294f);

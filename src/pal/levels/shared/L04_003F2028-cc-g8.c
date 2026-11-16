@@ -18,7 +18,7 @@ extern void moby_mark_spawned(void *);
 extern int GetFirstMobyInGroup(unsigned char **, int, int, int);
 extern float fast_vec_dist(void *, void *);
 extern void moby_update_ground_check(void *);
-extern void func_PAL_002A7E68(void *, int, int, int);
+extern void anim_start_blended_pal(void *, int, int, int);
 extern int FastDecTimer(short *);
 extern int math_random_int_below(int);
 extern int FindHeroOrMobyTarget(void *, void *, void *, int, void *, int, float);
@@ -72,83 +72,83 @@ typedef struct {
 
 /* Launcher: pick a target point near a record (nearest to the player, or a
  * random one), fire a child towards it, and retire after enough shots. */
-void func_PAL_L04_003F2028(unsigned char *m)
+void LaunchSpawnerMobyUpdate_pal(unsigned char *moby)
 {
     float target[4], delta[4], rotation[4], axis[4], position[4], velocity[4];
-    L04_EE090Vars *p = *(L04_EE090Vars **)(m + 0x68);
+    L04_EE090Vars *vars = *(L04_EE090Vars **)(moby + 0x68);
     unsigned char *cursor, *chosen, *child;
     int count, index;
     float scale, z;
 
-    moby_start_timed_effect(m, (unsigned char *)p);
-    if (m[0x31] && fast_vec_dist(m + 0x10, g_tether_zero_vec) < 24.0f) {
-        moby_update_ground_check(m);
-        m[0x6F] = 22;
+    moby_start_timed_effect(moby, (unsigned char *)vars);
+    if (moby[0x31] && fast_vec_dist(moby + 0x10, g_tether_zero_vec) < 24.0f) {
+        moby_update_ground_check(moby);
+        moby[0x6F] = 22;
     }
-    switch (m[0x20]) {
+    switch (moby[0x20]) {
     case 0:
-        p->active = 1;
-        p->speed = 1.0f;
-        p->shots = 0;
+        vars->active = 1;
+        vars->speed = 1.0f;
+        vars->shots = 0;
         if (g_game_tick_counter) {
             cursor = 0;
             count = 0;
-            while (!GetFirstMobyInGroup(&cursor, p->group, 0, 0)) {
+            while (!GetFirstMobyInGroup(&cursor, vars->group, 0, 0)) {
                 moby_mark_spawned(cursor);
                 count++;
             }
-            if (count < p->limit)
-                p->limit = count;
-            m[0x20] = 1;
+            if (count < vars->limit)
+                vars->limit = count;
+            moby[0x20] = 1;
         }
         break;
     case 1: {
         float best, distance;
 
-        moby_start_timed_effect(m, (unsigned char *)p);
-        if (m[0x43] == 1 && (m[0x60] & 2))
-            func_PAL_002A7E68(m, 0, 0, 4);
-        if (!FastDecTimer(&p->timer))
+        moby_start_timed_effect(moby, (unsigned char *)vars);
+        if (moby[0x43] == 1 && (moby[0x60] & 2))
+            anim_start_blended_pal(moby, 0, 0, 4);
+        if (!FastDecTimer(&vars->timer))
             break;
         if (!math_random_int_below(7)) {
             void *ids, *path;
-            int n, pathCount;
+            int n, path_count;
             ids = 0;
             n = 0;
             path = 0;
-            pathCount = 0;
-            if (p->idList != -1) {
-                ids = &p->idList;
+            path_count = 0;
+            if (vars->idList != -1) {
+                ids = &vars->idList;
                 n = 1;
             }
-            if (p->pathIndex != -1) {
-                unsigned char *d = g_route_path_table[p->pathIndex];
+            if (vars->pathIndex != -1) {
+                unsigned char *d = g_route_path_table[vars->pathIndex];
                 path = d + 0x10;
-                pathCount = *(int *)d;
+                path_count = *(int *)d;
             }
-            FindHeroOrMobyTarget(m, &p->goal, ids, n, path, pathCount, p->range);
+            FindHeroOrMobyTarget(moby, &vars->goal, ids, n, path, path_count, vars->range);
         } else {
-            unsigned char *q = p->link;
+            unsigned char *q = vars->link;
             if (q && q[0x20] != 0xFE && q[0x20] != 0xFD) {
-                qcopy_nc(&p->goal, q + 0x10);
+                qcopy_nc(&vars->goal, q + 0x10);
             } else {
-                p->link = 0;
-                p->linkState = 2;
+                vars->link = 0;
+                vars->linkState = 2;
             }
         }
-        if (p->linkState == 2)
+        if (vars->linkState == 2)
             break;
-        index = moby_count_slot_objects_find_free(m, (unsigned char *)p);
-        if (p->fired >= p->limit || index == -1)
+        index = moby_count_slot_objects_find_free(moby, (unsigned char *)vars);
+        if (vars->fired >= vars->limit || index == -1)
             break;
         chosen = 0;
-        if (p->nearest) {
+        if (vars->nearest) {
             int i;
             best = 100000.0f;
             /* Read through an int-pointer view, as in func_L06_003F3800;
-             * p->targets[i] here gives different registers and stack slots. */
+             * vars->targets[i] here gives different registers and stack slots. */
             for (i = 0; i < 4; i++) {
-                int id = ((int *)((unsigned char *)p + 0x90))[i];
+                int id = ((int *)((unsigned char *)vars + 0x90))[i];
                 if (id != -1) {
                     unsigned char *q = g_linked_record_table + id * 128;
                     distance = fast_vec_dist(g_hero_position, q + 0x30);
@@ -159,13 +159,13 @@ void func_PAL_L04_003F2028(unsigned char *m)
                 }
             }
             if (!chosen) {
-                FastVecSub(target, &p->goal, m + 0x10);
+                FastVecSub(target, &vars->goal, moby + 0x10);
                 FastVecScale(target, target, 0.5f);
-                if (p->range > 1.0f)
+                if (vars->range > 1.0f)
                     vec_fast_divide_helper(target, target, 1.0f);
                 if (FastVecLength(target) < 1.0f)
                     vec_scale_to_length(target, target, 1.0f);
-                FastVecAdd(target, target, m + 0x10);
+                FastVecAdd(target, target, moby + 0x10);
             } else {
                 qcopy_nc(target, chosen + 0x30);
             }
@@ -176,17 +176,17 @@ void func_PAL_L04_003F2028(unsigned char *m)
              * exit test short enough that jump1 does not peel an iteration. */
             for (i = 0; i < 4; i++) {
                 int k = (i + start) % 4;
-                if (p->targets[k] != -1) {
-                    chosen = g_linked_record_table + p->targets[k] * 128;
+                if (vars->targets[k] != -1) {
+                    chosen = g_linked_record_table + vars->targets[k] * 128;
                     break;
                 }
             }
             if (!chosen) {
-                float radius = p->range;
+                float radius = vars->range;
                 if (radius < 1.0f)
                     radius = 1.0f;
                 math_random_planar_offset(target, radius);
-                FastVecAdd(target, target, m + 0x10);
+                FastVecAdd(target, target, moby + 0x10);
             } else {
                 qcopy_nc(target, chosen + 0x30);
             }
@@ -200,15 +200,15 @@ void func_PAL_L04_003F2028(unsigned char *m)
         z = coll_probe_ground_height_below(target, 0, 3.0f);
         if (z != 0)
             target[2] = z;
-        FastVecSub(delta, target, m + 0x10);
+        FastVecSub(delta, target, moby + 0x10);
         scale = FastVecLength(delta) * 0.012000001f;
         vec_scale_to_length(delta, delta, scale);
-        moby_transform_joint_to_world(m, 0, rotation);
+        moby_transform_joint_to_world(moby, 0, rotation);
         vec_scale_to_length(axis, delta, 0.05f);
         vec_add_random_offset(axis, 0.025f);
         delta[2] = weapon_compute_shot_launch_speed(rotation, target, 0, scale, -0.00392f);
-        *(UpdateQuad *)position = *(UpdateQuad *)(m + 0x10);
-        child = SpawnChildMoby(m, position);
+        *(UpdateQuad *)position = *(UpdateQuad *)(moby + 0x10);
+        child = SpawnChildMoby(moby, position);
         *(float *)(child + 0x2C) = *(float *)(*(unsigned char **)(child + 0x24) + 0x24);
         vec_random_direction(position, 2.0f, 3.0f);
         position[2] = 0;
@@ -217,21 +217,21 @@ void func_PAL_L04_003F2028(unsigned char *m)
         *(UpdateQuad *)velocity = 0;
         velocity[2] = 3.0f;
         level_build_spawn_record(child, rotation, velocity, position, velocity, g_effect_default_params, 50, 0, 0);
-        p->timer = ((s32)(p->delay) * 5 + 2) / 6;
-        p->fired++;
-        if (++p->shots >= 19)
-            moby_set_state(m, 2, -1);
-        PlayMobySound(0, 0, m);
-        if (m[0x43] != 1)
-            func_PAL_002A7E68(m, 1, 0, 4);
+        vars->timer = ((s32)(vars->delay) * 5 + 2) / 6;
+        vars->fired++;
+        if (++vars->shots >= 19)
+            moby_set_state(moby, 2, -1);
+        PlayMobySound(0, 0, moby);
+        if (moby[0x43] != 1)
+            anim_start_blended_pal(moby, 1, 0, 4);
         break;
     }
     case 2:
-        SpawnExplosion_pal(m + 0x10, 0, 25, 20, 20, 20, 20, 0, 1, 0, 0, 0, 0.75f, 20.0f);
-        p->speed = 0;
-        PlayMobySound(1, 0, m);
-        SetDeathBits_pal(m, 0, 3);
-        moby_mark_spawned(m);
+        SpawnExplosion_pal(moby + 0x10, 0, 25, 20, 20, 20, 20, 0, 1, 0, 0, 0, 0.75f, 20.0f);
+        vars->speed = 0;
+        PlayMobySound(1, 0, moby);
+        SetDeathBits_pal(moby, 0, 3);
+        moby_mark_spawned(moby);
         break;
     }
 }

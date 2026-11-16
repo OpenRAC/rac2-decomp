@@ -22,7 +22,7 @@ extern int PlayMobySound(int, int, char *);
 extern char *GetLocalizedString(int);
 extern void shop_set_message_text(void *);
 extern void shop_close_sub_menu_pal(void);
-extern void func_PAL_002FC1D0(void);
+extern void PrepareVendorSelectionPreview_pal(void);
 
 void UpdateSelectedItemPurchaseDialog_pal(int *answer, int *unused) {
     PurchaseModel *model = &g_purchase_menu_model;
@@ -60,6 +60,6 @@ void UpdateSelectedItemPurchaseDialog_pal(int *answer, int *unused) {
             }
         } else PlayMobySound(0, 17, g_purchase_menu_model.object);
         g_purchase_menu_model.state = 0;
-        func_PAL_002FC1D0();
+        PrepareVendorSelectionPreview_pal();
     }
 }

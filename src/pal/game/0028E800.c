@@ -5,68 +5,68 @@ typedef unsigned char u8;
 typedef unsigned short u16;
 typedef int s32;
 typedef struct Anim28DF80_Frame {
-    u16 f0;
-    u16 f2;
-    u16 f4;
+    u16 unk_0;
+    u16 frame_count;
+    u16 first_frame;
     u8 pad6;
-    u8 f7;
+    u8 frame_time;
 } Anim28DF80_Frame;
 typedef struct Anim28DF80_State {
-    short f0;
-    u8 f2;
-    s32 f4;
+    short record_index;
+    u8 mode;
+    s32 current_frame;
     char pad8[4];
-    s32 fC;
+    s32 start_time;
 } Anim28DF80_State;
 extern Anim28DF80_Frame *g_hud_element_table __attribute__((sda));
 extern s32 g_game_time __attribute__((sda));
 extern s32 math_random_int_below(s32);
 
 /* Picks the frame of an animation record: clamp, loop, ping-pong or one-shot. */
-s32 func_PAL_0028E800(Anim28DF80_State *a0) {
-    s32 r = 0;
-    Anim28DF80_Frame *t = g_hud_element_table + a0->f0;
+s32 hud_pick_anim_frame_pal(Anim28DF80_State *anim) {
+    s32 frame = 0;
+    Anim28DF80_Frame *record = g_hud_element_table + anim->record_index;
 
-    if (t->f0 != 0xFFFF) {
-        switch (a0->f2) {
+    if (record->unk_0 != 0xFFFF) {
+        switch (anim->mode) {
         case 0:
-            r = t->f4;
+            frame = record->first_frame;
             break;
         case 1:
-            r = t->f4 + (g_game_time - a0->fC) / t->f7 % t->f2;
+            frame = record->first_frame + (g_game_time - anim->start_time) / record->frame_time % record->frame_count;
             break;
         case 2:
-            r = (g_game_time - a0->fC) / t->f7 % (t->f2 * 2 - 2);
-            if (r >= t->f2) {
-                s32 k = r + 2;
-                r = t->f2 * 2 - k;
+            frame = (g_game_time - anim->start_time) / record->frame_time % (record->frame_count * 2 - 2);
+            if (frame >= record->frame_count) {
+                s32 offset = frame + 2;
+                frame = record->frame_count * 2 - offset;
             }
-            r += t->f4;
+            frame += record->first_frame;
             break;
         case 3:
-            if (a0->fC < g_game_time) {
-                r = (g_game_time - a0->fC) / t->f7;
-                if (r < t->f2 * 2 - 2) {
-                    if (r >= t->f2) {
-                        s32 k = r + 2;
-                        r = t->f2 * 2 - k;
+            if (anim->start_time < g_game_time) {
+                frame = (g_game_time - anim->start_time) / record->frame_time;
+                if (frame < record->frame_count * 2 - 2) {
+                    if (frame >= record->frame_count) {
+                        s32 offset = frame + 2;
+                        frame = record->frame_count * 2 - offset;
                     }
-                    r += t->f4;
+                    frame += record->first_frame;
                 } else {
-                    r = t->f4;
+                    frame = record->first_frame;
                     {
-                        s32 k = math_random_int_below(25) + 8;
-                        a0->fC = t->f2 * 2 + k;
+                        s32 offset = math_random_int_below(25) + 8;
+                        anim->start_time = record->frame_count * 2 + offset;
                     }
                 }
             } else {
-                r = a0->f4;
+                frame = anim->current_frame;
             }
             break;
         }
     }
-    a0->f4 = r;
-    return r;
+    anim->current_frame = frame;
+    return frame;
 }
 
 
@@ -77,57 +77,57 @@ extern void weapon_menu_update_entry(void);
 
 /* Walks the records, caps their timers, moves their positions on, and lets a
    record run its own handler. */
-int hud_update_record_timers_pal(int arg)
+int hud_update_record_timers_pal(int run_handlers)
 {
-    char *rec;
-    char *end;
+    char *record;
+    char *record_end;
     int count = 0;
 
     weapon_menu_update_entry();
-    rec = (char *)g_hud_elements;
-    end = (char *)g_hud_elements + 0x750;
+    record = (char *)g_hud_elements;
+    record_end = (char *)g_hud_elements + 0x750;
     do {
-        int v;
+        int timer;
 
-        if ((*(int *)(rec + 4) & 0x10) || g_hud_record_timer_flag) {
-            v = *(int *)(rec + 0x7C);
-            if (v < 8) {
-                *(int *)(rec + 0x7C) = 8;
+        if ((*(int *)(record + 4) & 0x10) || g_hud_record_timer_flag) {
+            timer = *(int *)(record + 0x7C);
+            if (timer < 8) {
+                *(int *)(record + 0x7C) = 8;
             }
-            v = *(int *)(rec + 0x7C);
+            timer = *(int *)(record + 0x7C);
         } else {
-            v = *(int *)(rec + 0x7C);
+            timer = *(int *)(record + 0x7C);
         }
 
-        if (v > 0) {
-            v = v - 1;
-            *(int *)(rec + 0x7C) = v;
-            if (v > 0) {
+        if (timer > 0) {
+            timer = timer - 1;
+            *(int *)(record + 0x7C) = timer;
+            if (timer > 0) {
                 count++;
-                if (*(int *)(rec + 0x6C) < 30) {
-                    *(int *)(rec + 0x6C) = *(int *)(rec + 0x6C) + 1;
+                if (*(int *)(record + 0x6C) < 30) {
+                    *(int *)(record + 0x6C) = *(int *)(record + 0x6C) + 1;
                 }
-            } else if (*(int *)(rec + 0x6C) >= -5) {
-                *(int *)(rec + 0x6C) = *(int *)(rec + 0x6C) - 1;
+            } else if (*(int *)(record + 0x6C) >= -5) {
+                *(int *)(record + 0x6C) = *(int *)(record + 0x6C) - 1;
             }
-        } else if (*(int *)(rec + 0x6C) >= -5) {
-            *(int *)(rec + 0x6C) = *(int *)(rec + 0x6C) - 1;
+        } else if (*(int *)(record + 0x6C) >= -5) {
+            *(int *)(record + 0x6C) = *(int *)(record + 0x6C) - 1;
         }
 
-        if (*(int *)(rec + 0x68) != 0) {
-            if (*(int *)(rec + 0x6C) == -6) {
-                hud_finish_element_setup(rec);
+        if (*(int *)(record + 0x68) != 0) {
+            if (*(int *)(record + 0x6C) == -6) {
+                hud_finish_element_setup(record);
             }
         }
 
-        if (arg != 0) {
-            void (*handler)(char *) = *(void (**)(char *))(rec + 0x14);
+        if (run_handlers != 0) {
+            void (*handler)(char *) = *(void (**)(char *))(record + 0x14);
             if (handler) {
-                handler(rec);
+                handler(record);
             }
         }
-        rec += 0x90;
-    } while ((int)rec < (int)end);
+        record += 0x90;
+    } while ((int)record < (int)record_end);
     return count;
 }
 

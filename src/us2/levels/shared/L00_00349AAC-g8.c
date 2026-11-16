@@ -11,7 +11,8 @@ extern void DoGifPaging(void);
 extern int g_right_text_alt_x __attribute__((sda));
 extern int g_right_text_alt_y;
 
-int func_US2_L00_00349AAC(void)
+/* Draws the right-aligned prompt text 0x2BE5 (alternate position) between GIF paging setup and finish; returns zero. */
+int menu_draw_centered_prompt_low_l00_us2(void)
 {
     SetupGifPaging(0);
     module_l00_call_handler_13_us2();

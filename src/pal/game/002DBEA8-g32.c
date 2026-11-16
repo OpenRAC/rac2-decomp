@@ -12,7 +12,8 @@ extern void snd_play_menu_sound_if_enabled(int, int);
 extern int request_begin_slot(int, int, int, int, int);
 extern void FadeToBlack(int);
 
-int func_PAL_002DBEA8(ListMenu *object)
+/* Toggle list input: counts down the fade, handles close and back, moves the cursor and flips the selected entry's switch or starts the action. */
+int menu_toggle_list_update_pal(ListMenu *object)
 {
     char *root = g_pause_menu_state;
     int active = *(ListMenu **)(*(char **)(root + 0x14) + 0xE8) == object;
@@ -20,8 +21,8 @@ int func_PAL_002DBEA8(ListMenu *object)
     int old;
 
     if (object->timer != 0) {
-        int t = --object->timer;
-        g_screen_fade = (float)(t < 5 ? t : 4) * 0.25f;
+        int timer_left = --object->timer;
+        g_screen_fade = (float)(timer_left < 5 ? timer_left : 4) * 0.25f;
         return 0;
     }
     if (!active)
@@ -63,9 +64,9 @@ finish:
             object->cursor = old - 1;
     }
     if (g_pad_state[0x1C4 / 4] & 0x4000) {
-        int cur = object->cursor;
-        if (object->list[cur + 1].f0 != 0)
-            object->cursor = cur + 1;
+        int cursor_now = object->cursor;
+        if (object->list[cursor_now + 1].f0 != 0)
+            object->cursor = cursor_now + 1;
     }
     if (g_pad_state[0x1C4 / 4] & 0x40) {
         snd_play_menu_sound_if_enabled(0, 0x11);

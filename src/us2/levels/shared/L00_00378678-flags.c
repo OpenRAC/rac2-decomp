@@ -14,7 +14,8 @@ extern void text_draw_medium(int, int, unsigned long long, unsigned char *, int)
 extern unsigned int level_get_native_table_entry(int);
 extern int text_draw_centered_medium(int, int, unsigned long long, unsigned char *, int);
 
-void func_US2_L00_00378678(void) {
+/* Draws the selected item's price with a bolt icon (in red when too expensive) and the item's name below. */
+void shop_draw_price_and_description_us2(void) {
     unsigned int colors[4];
     char text[256];
     char *model = g_purchase_menu_model;

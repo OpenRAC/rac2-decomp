@@ -32,8 +32,8 @@ extern void boss_pick_strongest_generator(void);
 extern int math_fast_float_d(void *);
 extern int FastDecTimer(void *);
 extern char *part_find_owned_effect_slot(void *, int, int);
-extern void func_PAL_L23_00423838(void);
-extern void func_PAL_002AC290(void *, void *);
+extern void boss_start_fight_once_pal(void);
+extern void gfx_start_color_fade_pal(void *, void *);
 extern float math_random_signed_float_range(float, float);
 extern float FastAddRotations(float, float);
 extern float math_fast_sin_or_cos_a(float);
@@ -44,41 +44,41 @@ extern void part_l23_spawn_hit_sparks_pal(char *);
 extern void moby_set_state(void *, int, int);
 extern void cancel_hero_item_animation_pal(void);
 extern void release_moby_animation_slot(int, void *);
-extern s32 func_PAL_L22_002C99C8(int, int);
-extern void func_PAL_002AC3C0(void *, void *);
+extern s32 hero_l22_set_action_pal(int, int);
+extern void gfx_update_color_fade_pal(void *, void *);
 extern int part_spawn_damage_debris_pal(void *, void *, void *);
 extern void moby_transform_joint_point(void *, int, void *);
 
 /* the boss shield: while it is down, takes the hits of the shots that reach it; while it is up,
    sums the strength of the live generators into the shield measure */
 void UpdateShieldHitsAndStrength_pal(unsigned char *moby) {
-    char tmp[16];
-    float vec[4];
-    float mtx[16];
-    unsigned char *st = *(unsigned char **)(g_mothership_boss_moby + 0x68);
-    char *hit;
+    char effect_pos[16];
+    float spawn_vel[4];
+    float joint_matrix[16];
+    unsigned char *boss_state = *(unsigned char **)(g_mothership_boss_moby + 0x68);
+    char *shot;
     float total;
     int i;
 
     boss_pick_strongest_generator();
     math_fast_float_d(&g_boss_fight_timer);
-    if (*(int *)(st + 0x60C) == -1 && *(char **)(st + 0x610) == 0) {
-        FastVecScale(tmp, moby + 0xE0, g_boss_gun_vec_scale_a);
-        FastVecAdd(tmp, tmp, moby + 0x10);
-        qcopy(&g_boss_effect_position, tmp);
-        hit = part_find_owned_effect_slot(moby, 0x30000, 0);
+    if (*(int *)(boss_state + 0x60C) == -1 && *(char **)(boss_state + 0x610) == 0) {
+        FastVecScale(effect_pos, moby + 0xE0, g_boss_gun_vec_scale_a);
+        FastVecAdd(effect_pos, effect_pos, moby + 0x10);
+        qcopy(&g_boss_effect_position, effect_pos);
+        shot = part_find_owned_effect_slot(moby, 0x30000, 0);
         moby[0xA8] = 0xFF;
-        FastDecTimer(st + 0x26);
-        if (hit != 0) {
-            if (*(short *)(st + 0x26) != 0 || *(int *)(st + 0x604) != 0
-                || (*(int *)(hit + 0x20) == g_hero_moby && g_charged_l23_blast_timer < 0)) {
-                hit = 0;
-                if (*(int *)(st + 0x604) != 0 && *(unsigned short *)(st + 0x26) == 0)
-                    func_PAL_L23_00423838();
+        FastDecTimer(boss_state + 0x26);
+        if (shot != 0) {
+            if (*(short *)(boss_state + 0x26) != 0 || *(int *)(boss_state + 0x604) != 0
+                || (*(int *)(shot + 0x20) == g_hero_moby && g_charged_l23_blast_timer < 0)) {
+                shot = 0;
+                if (*(int *)(boss_state + 0x604) != 0 && *(unsigned short *)(boss_state + 0x26) == 0)
+                    boss_start_fight_once_pal();
             }
-            if (hit != 0) {
-                st[0x147] = 0xFF;
-                func_PAL_002AC290(moby, st + 0x140);
+            if (shot != 0) {
+                boss_state[0x147] = 0xFF;
+                gfx_start_color_fade_pal(moby, boss_state + 0x140);
                 if (*(unsigned short *)(moby + 0x7C) != 0) {
                     for (i = 0; i < 4; i++) {
                         float angle;
@@ -88,73 +88,73 @@ void UpdateShieldHitsAndStrength_pal(unsigned char *moby) {
                         angle = FastAddRotations(math_random_signed_float_range(90.0f, 120.0f) * 0.017453294f,
                                               g_hero_l23_state_block.f158);
                         speed = math_random_float_range(2.0f, 4.0f) * 0.020000001f;
-                        vec[0] = math_fast_sin_or_cos_a(angle) * speed;
-                        vec[1] = math_fast_sin_or_cos_b(angle) * speed;
-                        vec[2] = 0.0f;
-                        vec[2] = math_random_float_range(5.0f, 8.0f) * 0.020000001f;
+                        spawn_vel[0] = math_fast_sin_or_cos_a(angle) * speed;
+                        spawn_vel[1] = math_fast_sin_or_cos_b(angle) * speed;
+                        spawn_vel[2] = 0.0f;
+                        spawn_vel[2] = math_random_float_range(5.0f, 8.0f) * 0.020000001f;
                         child = cam_moby_create_pal(moby, 1, *(short *)(moby + 0xAA), i, moby + 0x10,
-                                              moby + 0xF0, vec, 90.0f, 15.0f, 0xFF);
+                                              moby + 0xF0, spawn_vel, 90.0f, 15.0f, 0xFF);
                         if (child != 0)
                             *(void **)(child + 0x64) = (void *)moby_fade_out_update_pal;
                     }
                     *(unsigned short *)(moby + 0x7C) = 0;
                 }
-                part_l23_spawn_hit_sparks_pal(*(char **)(hit + 0x20));
-                *(float *)(st + 0x20) -= *(float *)(hit + 0x2C);
-                *(short *)(st + 0x26) = 17;
-                if (*(float *)(st + 0x20) <= 0.0f) {
+                part_l23_spawn_hit_sparks_pal(*(char **)(shot + 0x20));
+                *(float *)(boss_state + 0x20) -= *(float *)(shot + 0x2C);
+                *(short *)(boss_state + 0x26) = 17;
+                if (*(float *)(boss_state + 0x20) <= 0.0f) {
                     moby_set_state(moby, 4, 0);
                     g_hero_state.f2294 = 0;
                     cancel_hero_item_animation_pal();
                     release_moby_animation_slot(g_hero_state.f2290, g_hero_state.f1870);
                     g_hero_state.f187C = 0;
-                    func_PAL_L22_002C99C8(0, 1);
+                    hero_l22_set_action_pal(0, 1);
                     return;
                 }
             }
         }
-        func_PAL_002AC3C0(moby, st + 0x140);
-        part_spawn_damage_debris_pal(moby, st + 0x210, st + 0x20);
+        gfx_update_color_fade_pal(moby, boss_state + 0x140);
+        part_spawn_damage_debris_pal(moby, boss_state + 0x210, boss_state + 0x20);
     } else {
-        char *held;
+        char *held_part;
 
-        total = *(float *)(st + 0x32C) * (float)*(short *)(st + 0x2F6);
-        if (*(int *)(st + 0x60C) != -1) {
-            int k;
+        total = *(float *)(boss_state + 0x32C) * (float)*(short *)(boss_state + 0x2F6);
+        if (*(int *)(boss_state + 0x60C) != -1) {
+            int gen_index;
 
-            moby_transform_joint_point(moby, *(int *)(st + 0x60C) + 1, mtx);
-            FastVecScale(tmp, (char *)(mtx + 4), g_boss_gun_vec_scale_b);
-            FastVecAdd(tmp, tmp, moby + 0x10);
-            qcopy(&g_boss_effect_position, tmp);
-            for (k = 0; k < 5; k++) {
-                char *gen = ((char **)(st + 0x358))[k];
+            moby_transform_joint_point(moby, *(int *)(boss_state + 0x60C) + 1, joint_matrix);
+            FastVecScale(effect_pos, (char *)(joint_matrix + 4), g_boss_gun_vec_scale_b);
+            FastVecAdd(effect_pos, effect_pos, moby + 0x10);
+            qcopy(&g_boss_effect_position, effect_pos);
+            for (gen_index = 0; gen_index < 5; gen_index++) {
+                char *generator = ((char **)(boss_state + 0x358))[gen_index];
 
-                if (gen != 0) {
-                    float v = *(float *)(*(char **)(gen + 0x68) + 0x20);
+                if (generator != 0) {
+                    float generator_hp = *(float *)(*(char **)(generator + 0x68) + 0x20);
 
-                    if (g_mothership_hit_damage_floor < v)
-                        total += v;
+                    if (g_mothership_hit_damage_floor < generator_hp)
+                        total += generator_hp;
                 }
             }
         } else {
-            FastVecScale(tmp, moby + 0xE0, g_boss_gun_vec_scale_a);
-            FastVecAdd(tmp, tmp, moby + 0x10);
-            qcopy(&g_boss_effect_position, tmp);
+            FastVecScale(effect_pos, moby + 0xE0, g_boss_gun_vec_scale_a);
+            FastVecAdd(effect_pos, effect_pos, moby + 0x10);
+            qcopy(&g_boss_effect_position, effect_pos);
         }
-        held = *(char **)(st + 0x610);
-        if (held != 0) {
-            float h = *(float *)(*(char **)(held + 0x68) + 0x20);
+        held_part = *(char **)(boss_state + 0x610);
+        if (held_part != 0) {
+            float held_hp = *(float *)(*(char **)(held_part + 0x68) + 0x20);
 
-            if (h >= 0.0f) {
-                total += h;
+            if (held_hp >= 0.0f) {
+                total += held_hp;
             } else {
-                moby_mark_spawned(held);
-                *(char **)(st + 0x610) = 0;
-                *(short *)(st + 0x26) = 25;
+                moby_mark_spawned(held_part);
+                *(char **)(boss_state + 0x610) = 0;
+                *(short *)(boss_state + 0x26) = 25;
             }
         }
         if (*(unsigned short *)(moby + 0x7C) != 0)
-            total += *(float *)(st + 0x324) * (float)*(short *)(st + 0x2F6);
-        *(float *)(st + 0x20) = total;
+            total += *(float *)(boss_state + 0x324) * (float)*(short *)(boss_state + 0x2F6);
+        *(float *)(boss_state + 0x20) = total;
     }
 }

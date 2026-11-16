@@ -121,12 +121,12 @@ static __inline__ s32 sprite_y(void *handle, f32 y, f32 adjustment)
     return result;
 }
 
-s32 func_PAL_L05_00423C50(void) {
+s32 menu_draw_feltzin_mission_result_pal(void) {
     char buf[128];
     f32 center, fade, image_y;
     void *sprite;
     char *text;
-    s32 x, y, t, hx;
+    s32 center_x, title_y, phase, header_x;
     s32 count;
     u32 blend, color;
 
@@ -139,11 +139,11 @@ s32 func_PAL_L05_00423C50(void) {
         gfx_draw_scaled_object(sprite, center, (f32)label_y(sprite, 200.0f, g_screen_l05_scale, 0.5f, 1), 0x60442D00, 1.0f, 0.0f);
         sprite = table_find_by_id(g_feltzin_mission_data + 0x8710, 0x44);
         gfx_draw_scaled_object(sprite, center, (f32)label_y(sprite, 200.0f, g_screen_l05_scale, 0.5f, 1), 0x55F0C070, 1.0f, 0.0f);
-        t = g_feltzin_mission_index % 50;
-        if (t >= 25)
-            fade = 1.0f - (f32)(t - 25) * 0.04f;
+        phase = g_feltzin_mission_index % 50;
+        if (phase >= 25)
+            fade = 1.0f - (f32)(phase - 25) * 0.04f;
         else
-            fade = (f32)t * 0.04f;
+            fade = (f32)phase * 0.04f;
         blend = FastTweenColor(0x80FFDE8D, 0x60442D00, fade);
         color = (g_pad_state[0x68] & 0x2000) ? 0x80007FFF : blend;
         sprite = table_find_by_id(g_feltzin_mission_data + 0x8710, 0x4A);
@@ -157,11 +157,11 @@ s32 func_PAL_L05_00423C50(void) {
         {
             s32 len;
 
-            hx = FloatToInt(center);
+            header_x = FloatToInt(center);
             len = func_001157AC(buf);
-            text_draw_centered_large(hx, 46, 0x80F0F0F0, buf, len);
+            text_draw_centered_large(header_x, 46, 0x80F0F0F0, buf, len);
         }
-        x = FloatToInt(center);
+        center_x = FloatToInt(center);
         switch (g_feltzin_selected_entry) {
         case 0:
         {
@@ -169,14 +169,14 @@ s32 func_PAL_L05_00423C50(void) {
 
             text = GetLocalizedString(0xEFA);
             if (g_pal_region_mode == 3) {
-                text_draw_centered_medium(x, screen_coord(g_label_mode, 101.0f, -2.0f), 0x80F0F0F0, text, func_001157AC(text));
+                text_draw_centered_medium(center_x, screen_coord(g_label_mode, 101.0f, -2.0f), 0x80F0F0F0, text, func_001157AC(text));
             } else {
-                text_draw_centered_small(x, screen_coord(g_label_mode, 101.0f, -2.0f), 0x80F0F0F0, text, func_001157AC(text));
+                text_draw_centered_small(center_x, screen_coord(g_label_mode, 101.0f, -2.0f), 0x80F0F0F0, text, func_001157AC(text));
             }
             text = GetLocalizedString(0xEFF);
             {
-                s32 ty = label_y(text, 131.0f, g_screen_l05_scale, 0.5f, 1);
-                text_print_wrapped_default(117, ty, 280, 400, 0x80F0F0F0, (u8 *)text, func_001157AC(text));
+                s32 text_y = label_y(text, 131.0f, g_screen_l05_scale, 0.5f, 1);
+                text_print_wrapped_default(117, text_y, 280, 400, 0x80F0F0F0, (u8 *)text, func_001157AC(text));
             }
             index = D_L05_001B1350_gp[0];
             if (index >= 3)
@@ -185,13 +185,13 @@ s32 func_PAL_L05_00423C50(void) {
             if (g_extras_unlocked_flag != 0)
                 count *= 10;
             if (count != 0) {
-                s32 len, ty;
+                s32 len, text_y;
                 do {
                     sprintf(buf, GetLocalizedString(0xF04), count);
-                    ty = label_y(buf, 242.0f, g_screen_l05_scale, 0.5f, 1);
+                    text_y = label_y(buf, 242.0f, g_screen_l05_scale, 0.5f, 1);
                 } while (0);
                 len = func_001157AC(buf);
-                text_print_wrapped_default(117, ty, 280, 400, 0x80F0F0F0, (u8 *)buf, len);
+                text_print_wrapped_default(117, text_y, 280, 400, 0x80F0F0F0, (u8 *)buf, len);
             }
             if (g_language_settings[4] == 5) {
                 text_draw_medium(168, screen_coord(g_label_mode, 294.0f, 3.0f), 0x80F0F0F0, GetLocalizedString(0xE64), -1);
@@ -212,23 +212,23 @@ s32 func_PAL_L05_00423C50(void) {
                     char *title = GetLocalizedString(0xEFC);
 
                     if (g_pal_region_mode == 4 || g_pal_region_mode == 5 || g_pal_region_mode == 0 || g_pal_region_mode == 1) {
-                        y = screen_coord(g_label_mode, 101.0f, -1.0f);
-                        DrawCenteredScaledText(x, y, 0x80F0F0F0, title, func_001157AC(title), 0.85f);
+                        title_y = screen_coord(g_label_mode, 101.0f, -1.0f);
+                        DrawCenteredScaledText(center_x, title_y, 0x80F0F0F0, title, func_001157AC(title), 0.85f);
                     } else if (g_pal_region_mode == 3) {
-                        y = screen_coord(g_label_mode, 101.0f, -2.0f);
-                        text_draw_centered_medium(x, y, 0x80F0F0F0, title, func_001157AC(title));
+                        title_y = screen_coord(g_label_mode, 101.0f, -2.0f);
+                        text_draw_centered_medium(center_x, title_y, 0x80F0F0F0, title, func_001157AC(title));
                     } else {
-                        y = screen_coord(g_label_mode, 101.0f, -2.0f);
-                        text_draw_centered_small(x, y, 0x80F0F0F0, title, func_001157AC(title));
+                        title_y = screen_coord(g_label_mode, 101.0f, -2.0f);
+                        text_draw_centered_small(center_x, title_y, 0x80F0F0F0, title, func_001157AC(title));
                     }
                 }
                 text = GetLocalizedString(0xF01);
                 {
-                    s32 len, ty, len1, ty1;
-                    ty1 = label_y(text, 131.0f, g_screen_l05_scale, 0.5f, 1);
+                    s32 len, text_y, len1, text_y1;
+                    text_y1 = label_y(text, 131.0f, g_screen_l05_scale, 0.5f, 1);
                     do {
                         len1 = func_001157AC(text);
-                        text_print_wrapped_default(117, ty1, 280, 400, 0x80F0F0F0, (u8 *)text, len1);
+                        text_print_wrapped_default(117, text_y1, 280, 400, 0x80F0F0F0, (u8 *)text, len1);
                         index = g_feltzin_challenge_data[1];
                         if (index >= 3)
                             index = 2;
@@ -236,10 +236,10 @@ s32 func_PAL_L05_00423C50(void) {
                         if (g_extras_unlocked_flag != 0)
                             count *= 10;
                         sprintf(buf, GetLocalizedString(0xF04), count);
-                        ty = label_y3(buf, 242.0f, g_screen_l05_scale, 0.5f, 1);
+                        text_y = label_y3(buf, 242.0f, g_screen_l05_scale, 0.5f, 1);
                     } while (0);
                     len = func_001157AC(buf);
-                    text_print_wrapped_default(117, ty, 280, 400, 0x80F0F0F0, (u8 *)buf, len);
+                    text_print_wrapped_default(117, text_y, 280, 400, 0x80F0F0F0, (u8 *)buf, len);
                 }
                 if (g_language_settings[4] == 5) {
                     text_draw_medium(168, screen_coord(g_label_mode, 294.0f, 3.0f), 0x80F0F0F0, GetLocalizedString(0xE64), -1);
@@ -252,7 +252,7 @@ s32 func_PAL_L05_00423C50(void) {
                 }
             } else {
                 text = GetLocalizedString(0xE98);
-                text_draw_centered_large(x, label_y(text, 170.0f, g_screen_l05_scale, 0.5f, 1), 0x80F0F0F0, text, func_001157AC(text));
+                text_draw_centered_large(center_x, label_y(text, 170.0f, g_screen_l05_scale, 0.5f, 1), 0x80F0F0F0, text, func_001157AC(text));
             }
             break;
         case 2:
@@ -261,17 +261,17 @@ s32 func_PAL_L05_00423C50(void) {
     
                 text = GetLocalizedString(0xEFB);
                 if (g_pal_region_mode == 2 || g_pal_region_mode == 3 || g_pal_region_mode == 5) {
-                    text_draw_centered_medium(x, screen_coord(g_label_mode, 101.0f, -2.0f), 0x80F0F0F0, text, func_001157AC(text));
+                    text_draw_centered_medium(center_x, screen_coord(g_label_mode, 101.0f, -2.0f), 0x80F0F0F0, text, func_001157AC(text));
                 } else {
-                    text_draw_centered_small(x, screen_coord(g_label_mode, 101.0f, -2.0f), 0x80F0F0F0, text, func_001157AC(text));
+                    text_draw_centered_small(center_x, screen_coord(g_label_mode, 101.0f, -2.0f), 0x80F0F0F0, text, func_001157AC(text));
                 }
                 text = GetLocalizedString(0xF00);
                 {
-                    s32 len, ty, len1, ty1;
-                    ty1 = label_y(text, 131.0f, g_screen_l05_scale, 0.5f, 1);
+                    s32 len, text_y, len1, text_y1;
+                    text_y1 = label_y(text, 131.0f, g_screen_l05_scale, 0.5f, 1);
                     do {
                         len1 = func_001157AC(text);
-                        text_print_wrapped_default(117, ty1, 280, 400, 0x80F0F0F0, (u8 *)text, len1);
+                        text_print_wrapped_default(117, text_y1, 280, 400, 0x80F0F0F0, (u8 *)text, len1);
                         index = g_feltzin_challenge_data[2];
                         if (index >= 3)
                             index = 2;
@@ -279,10 +279,10 @@ s32 func_PAL_L05_00423C50(void) {
                         if (g_extras_unlocked_flag != 0)
                             count *= 10;
                         sprintf(buf, GetLocalizedString(0xF04), count);
-                        ty = label_y3(buf, 242.0f, g_screen_l05_scale, 0.5f, 1);
+                        text_y = label_y3(buf, 242.0f, g_screen_l05_scale, 0.5f, 1);
                     } while (0);
                     len = func_001157AC(buf);
-                    text_print_wrapped_default(117, ty, 280, 400, 0x80F0F0F0, (u8 *)buf, len);
+                    text_print_wrapped_default(117, text_y, 280, 400, 0x80F0F0F0, (u8 *)buf, len);
                 }
                 if (g_language_settings[4] == 5) {
                     text_draw_medium(168, screen_coord(g_label_mode, 294.0f, 3.0f), 0x80F0F0F0, GetLocalizedString(0xE64), -1);
@@ -295,7 +295,7 @@ s32 func_PAL_L05_00423C50(void) {
                 }
             } else {
                 text = GetLocalizedString(0xE98);
-                text_draw_centered_large(x, label_y(text, 170.0f, g_screen_l05_scale, 0.5f, 1), 0x80F0F0F0, text, func_001157AC(text));
+                text_draw_centered_large(center_x, label_y(text, 170.0f, g_screen_l05_scale, 0.5f, 1), 0x80F0F0F0, text, func_001157AC(text));
             }
             break;
         case 3:
@@ -304,19 +304,19 @@ s32 func_PAL_L05_00423C50(void) {
     
                 text = GetLocalizedString(0xEFE);
                 if (g_language_settings[4] == 3) {
-                    y = screen_coord(g_label_mode, 101.0f, -2.0f);
-                    text_draw_centered_medium(x, y, 0x80F0F0F0, text, func_001157AC(text));
+                    title_y = screen_coord(g_label_mode, 101.0f, -2.0f);
+                    text_draw_centered_medium(center_x, title_y, 0x80F0F0F0, text, func_001157AC(text));
                 } else {
-                    y = screen_coord(g_label_mode, 101.0f, -2.0f);
-                    text_draw_centered_small(x, y, 0x80F0F0F0, text, func_001157AC(text));
+                    title_y = screen_coord(g_label_mode, 101.0f, -2.0f);
+                    text_draw_centered_small(center_x, title_y, 0x80F0F0F0, text, func_001157AC(text));
                 }
                 text = GetLocalizedString(0xF03);
                 {
-                    s32 len, ty, len1, ty1;
-                    ty1 = label_y(text, 131.0f, g_screen_l05_scale, 0.5f, 1);
+                    s32 len, text_y, len1, text_y1;
+                    text_y1 = label_y(text, 131.0f, g_screen_l05_scale, 0.5f, 1);
                     do {
                         len1 = func_001157AC(text);
-                        text_print_wrapped_default(117, ty1, 280, 400, 0x80F0F0F0, (u8 *)text, len1);
+                        text_print_wrapped_default(117, text_y1, 280, 400, 0x80F0F0F0, (u8 *)text, len1);
                         index = g_feltzin_challenge_data[3];
                         if (index >= 3)
                             index = 2;
@@ -324,10 +324,10 @@ s32 func_PAL_L05_00423C50(void) {
                         if (g_extras_unlocked_flag != 0)
                             count *= 10;
                         sprintf(buf, GetLocalizedString(0xF04), count);
-                        ty = label_y3(buf, 242.0f, g_screen_l05_scale, 0.5f, 1);
+                        text_y = label_y3(buf, 242.0f, g_screen_l05_scale, 0.5f, 1);
                     } while (0);
                     len = func_001157AC(buf);
-                    text_print_wrapped_default(117, ty, 280, 400, 0x80F0F0F0, (u8 *)buf, len);
+                    text_print_wrapped_default(117, text_y, 280, 400, 0x80F0F0F0, (u8 *)buf, len);
                 }
                 if (g_language_settings[4] == 5) {
                     text_draw_medium(168, screen_coord(g_label_mode, 294.0f, 3.0f), 0x80F0F0F0, GetLocalizedString(0xE64), -1);
@@ -340,7 +340,7 @@ s32 func_PAL_L05_00423C50(void) {
                 }
             } else {
                 text = GetLocalizedString(0xE98);
-                text_draw_centered_large(x, label_y(text, 170.0f, g_screen_l05_scale, 0.5f, 1), 0x80F0F0F0, text, func_001157AC(text));
+                text_draw_centered_large(center_x, label_y(text, 170.0f, g_screen_l05_scale, 0.5f, 1), 0x80F0F0F0, text, func_001157AC(text));
             }
             break;
         }

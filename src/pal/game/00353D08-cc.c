@@ -64,9 +64,10 @@ extern void *mpeg_vobuf_get_next_frame(char *);
 extern void mpeg_vobuf_advance_write(u8 *);
 extern void mpeg_build_frame_packet_pal(void *, void *, int, int, int);
 
-int mpeg_dec_run_loop_pal(void *p)
+/* Main video decode loop: waits for a free output frame, decodes into it, and passes it on until stopped (PAL). */
+int mpeg_dec_run_loop_pal(void *decoder)
 {
-    int *object = p;
+    int *object = decoder;
     int result = 1;
     void *packet;
     int i;

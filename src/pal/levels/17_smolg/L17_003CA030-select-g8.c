@@ -32,6 +32,9 @@ typedef struct {
     unsigned char choice;
 } SelectMoby;
 
+/* Checks the five entry slots of a ride platform. When one is selected, the platform moves to
+   that slot's start point, turns to face along it and switches to its moving state (PAL: 50 Hz
+   timings). */
 void ride_platform_select_entry_pal(char *self) {
     SelectMoby *moby = (SelectMoby *)self;
     SelectData *data = moby->data;

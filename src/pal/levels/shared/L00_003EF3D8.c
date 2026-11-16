@@ -47,72 +47,73 @@ typedef struct {
     float height;
 } L00_003EB0C0_State;
 
+/* Updates an object made of several parts that spin, and keeps its parts turning (PAL: 50 Hz rates). */
 void rotating_parts_update_pal(char *self)
 {
     float angles[4];
     char mat[48];
-    L00_003EB0C0_State *st = *(L00_003EB0C0_State **)(self + 0x68);
+    L00_003EB0C0_State *vars = *(L00_003EB0C0_State **)(self + 0x68);
     int i;
     int last;
 
     switch (*(unsigned char *)(self + 0x20)) {
     case 0:
-        if (st->id == -1)
+        if (vars->id == -1)
             break;
         {
             /* An int, not a byte constant: reload would otherwise reuse the -1 still in $v0. */
             int alpha = 255;
             *(unsigned char *)(self + 0x30) = alpha;
         }
-        BuildObjectAttachmentTransforms(self, st->entries, 79, *((int *)&st->id + 1), *(int *)&st->id, st->flags, 7, 0);
-        if (!st->present) {
+        BuildObjectAttachmentTransforms(self, vars->entries, 79, *((int *)&vars->id + 1), *(int *)&vars->id, vars->flags, 7, 0);
+        if (!vars->present) {
             moby_mark_spawned(self);
             break;
         }
-        if (!st->mode) {
-            st->update = 1;
+        if (!vars->mode) {
+            vars->update = 1;
             *(unsigned short *)(self + 0x34) |= 0x104;
             euler_rotation_basis(self + 0xC0, self + 0xF0);
         }
-        st->height = *(float *)(self + 0x18);
-        if (st->firstAngle != 0.0f)
-            st->firstAngle *= 0.01745329424738884f;
-        st->firstVelocity = math_fast_sin_or_cos_b(st->firstAngle) * st->firstSpeed;
+        vars->height = *(float *)(self + 0x18);
+        if (vars->firstAngle != 0.0f)
+            vars->firstAngle *= 0.01745329424738884f;
+        vars->firstVelocity = math_fast_sin_or_cos_b(vars->firstAngle) * vars->firstSpeed;
         self[0x20] = 1;
         break;
     case 1:
-        if (g_tutorial_points != st->level)
+        if (g_tutorial_points != vars->level)
             break;
-        if (st->firstStep > 0.0f)
-            math_update_wrapped_angle_offset(self, &st->firstAngle, &st->firstVelocity, st->firstSpeed,
-                          st->firstStep * 0.0003490659f, st->height);
-        if (st->secondStep > 0.0f) {
-            moby_scale_owner_words_by_angles(self, st->secondSpeed * 0.01745329424738884f, &st->secondAngle,
-                          st->secondStep * 0.0003490659f, &st->secondVelocity, 0.0069813184f);
-            if (st->update)
+        if (vars->firstStep > 0.0f)
+            math_update_wrapped_angle_offset(self, &vars->firstAngle, &vars->firstVelocity, vars->firstSpeed,
+                          vars->firstStep * 0.0003490659f, vars->height);
+        if (vars->secondStep > 0.0f) {
+            moby_scale_owner_words_by_angles(self, vars->secondSpeed * 0.01745329424738884f, &vars->secondAngle,
+                          vars->secondStep * 0.0003490659f, &vars->secondVelocity, 0.0069813184f);
+            if (vars->update)
                 euler_rotation_basis(self + 0xC0, self + 0xF0);
         }
-        if (!st->mode) {
-            angles[0] = st->angles[0] * 0.0003490659f;
-            angles[1] = st->angles[1] * 0.0003490659f;
-            angles[2] = st->angles[2] * 0.0003490659f;
+        if (!vars->mode) {
+            angles[0] = vars->angles[0] * 0.0003490659f;
+            angles[1] = vars->angles[1] * 0.0003490659f;
+            angles[2] = vars->angles[2] * 0.0003490659f;
             euler_rotation_basis(mat, angles);
             multiply_matrix3x3(self + 0xC0, self + 0xC0, mat);
-            if (st->secondStep > 0.0f)
+            if (vars->secondStep > 0.0f)
                 mat_get_euler_angles(self + 0xC0, self + 0xF0);
         } else {
             i = 0;
             do {
-                angles[0] = st->angles[0] * 0.0003490659f;
-                angles[1] = st->angles[1] * 0.0003490659f;
-                angles[2] = st->angles[2] * 0.0003490659f;
+                angles[0] = vars->angles[0] * 0.0003490659f;
+                angles[1] = vars->angles[1] * 0.0003490659f;
+                angles[2] = vars->angles[2] * 0.0003490659f;
                 euler_rotation_basis(mat, angles);
-                multiply_matrix3x3(st->entries + i * 0x50, st->entries + i * 0x50, mat);
-                last = *(unsigned char *)(st->entries + i * 0x50 + 0x4A);
+                multiply_matrix3x3(vars->entries + i * 0x50, vars->entries + i * 0x50, mat);
+                last = *(unsigned char *)(vars->entries + i * 0x50 + 0x4A);
                 i++;
             } while (last != 1);
         }
-        moby_update_attached_transforms(self, st->entries);
+        moby_update_attached_transforms(self, vars->entries);
         break;
     }
 }

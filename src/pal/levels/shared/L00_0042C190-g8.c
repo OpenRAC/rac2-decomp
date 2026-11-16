@@ -32,12 +32,14 @@ extern Global_6C78C D_0018C750_6C78;
 
 typedef struct { char pad[0x20]; short count, active, timer; } TransitionState;
 typedef int CameraQuad __attribute__((mode(TI)));
-int func_PAL_L00_0042C190(char *a, char *b)
+/* Counts the hero hits on a camera trigger: switches the camera when it is hit often enough (PAL: six
+   hits, 25 frame timer), records the best time, and steers the camera back while the timer runs. */
+int cam_check_trigger_hit_pal(char *trigger, char *other)
 {
     float temp[4] __attribute__((aligned(16)));
     char v1[16] __attribute__((aligned(16)));
     char v2[16] __attribute__((aligned(16)));
-    TransitionState *p = *(TransitionState **)(g_camera_def_table[0].table + *(short *)(a + 0x84)*32 + 28);
+    TransitionState *trans = *(TransitionState **)(g_camera_def_table[0].table + *(short *)(trigger + 0x84)*32 + 28);
     char *owner;
     char *hit;
     int type;
@@ -45,22 +47,22 @@ int func_PAL_L00_0042C190(char *a, char *b)
     float len, dot;
     if (ref_L00_00426C78_00) { ref_L00_00426C78_00 = 0; return 0; }
     type = D_00189E20_6C78.identity;
-    { int identity = *(short *)(a + 0x86);
+    { int identity = *(short *)(trigger + 0x86);
     ref_L00_00426C78_00 = 0;
     if (type == identity || type == 0x51) {
         owner = g_follow_camera_object;
-        otherType = *(short *)(b + 0x86);
+        otherType = *(short *)(other + 0x86);
         if (!(otherType == 0 || otherType == 10 || otherType == 14 || otherType == 2)) goto clear;
         ownerType = *(short *)(owner + 0x86);
         if (!(ownerType == 0 || ownerType == 10 || ownerType == 14 || ownerType == 2)) goto clear;
         *(CameraQuad *)temp = *(CameraQuad *)g_hero_position;
         hit = FindIntersectingGridPrimitive((char *)temp, 0.25f);
         if (hit && (*(int *)(hit + 0x18) & 1)) return 0;
-        p->timer = 0;
-        p->active = 1;
-        p->count++;
-        if (p->count >= 6) {
-            if (*(short *)(owner + 0x86) == 0) *(char *)(a + 0x7C) = 5;
+        trans->timer = 0;
+        trans->active = 1;
+        trans->count++;
+        if (trans->count >= 6) {
+            if (*(short *)(owner + 0x86) == 0) *(char *)(trigger + 0x7C) = 5;
             return 1;
         }
         temp[0] = math_fast_sin_or_cos_a(D_00189E20_6C78.angle);
@@ -69,14 +71,14 @@ int func_PAL_L00_0042C190(char *a, char *b)
         cam_set_strength_and_steer((char *)temp, 0.06981317698955536f, temp[2]);
         goto timer;
 clear:
-        p->count = 0;
-        p->active = 0;
+        trans->count = 0;
+        trans->active = 0;
         goto timer;
     }
     }
-    p->count = 0;
-    if (p->active == 0) goto timer;
-    p->active = 0;
+    trans->count = 0;
+    if (trans->active == 0) goto timer;
+    trans->active = 0;
     if (*(short *)(D_L00_001B8C80_6C78.owner + 0x86) != 0) goto timer;
     if (D_0018C750_6C78.count < 65535) ++D_0018C750_6C78.count;
     if (((int)g_frame_counter[0] * 5 + 2) / 6 > D_0018C750_6C78.time) D_0018C750_6C78.time = ((int)g_frame_counter[0] * 5 + 2) / 6;
@@ -95,10 +97,10 @@ clear:
         dot = math_fast_angle_helper(FastVecDot(v2, v1) / len);
         if (1.3962636f <= 1.5707964f - dot) { cam_reset_default(); return 0; }
     }
-    p->timer = 25;
+    trans->timer = 25;
 timer:
-    if (p->timer) {
-        FastDecTimer((char *)&p->timer);
+    if (trans->timer) {
+        FastDecTimer((char *)&trans->timer);
         temp[0] = math_fast_sin_or_cos_a(D_00189E20_6C78.angle);
         temp[1] = math_fast_sin_or_cos_b(D_00189E20_6C78.angle);
         temp[2] = 0;

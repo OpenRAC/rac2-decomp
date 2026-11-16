@@ -15,26 +15,27 @@ extern void vec_scale_to_length(void *, void *, float);
 extern float vec_distance_xy(void *, void *);
 extern u8 g_hero_l16_moby[];
 
-void func_PAL_L16_00409AD0(u8 *arg)
+/* Updates the boss turret each frame: animates it and shoots at the hero when he is lined up (PAL). */
+void boss_turret_update_pal(u8 *moby)
 {
     float delta[4];
     float pos[4];
     u8 query[0x30];
     u8 *state;
     u8 *hero;
-    state = *(u8 **)(arg + 0x68);
+    state = *(u8 **)(moby + 0x68);
     math_fast_float_d(state + 0x258);
-    if (*(u16 *)(arg + 0x96) < 0xFFFF) ++*(u16 *)(arg + 0x96);
-    snivelak_sync_child(arg);
-    if (!state[0x211]) AttachManipulator(arg, 7, state + 0x210);
+    if (*(u16 *)(moby + 0x96) < 0xFFFF) ++*(u16 *)(moby + 0x96);
+    snivelak_sync_child(moby);
+    if (!state[0x211]) AttachManipulator(moby, 7, state + 0x210);
     build_axis_rotation_quaternion(state + 0x220, 2, *(float *)(state + 0x26C));
     *(float *)(state + 0x26C) = fast_subtract_rotations(*(float *)(state + 0x26C), 0.49916422f);
     if (*(s32 *)(state + 0x2AC)) {
-        make_hit_descriptor(query, arg, 1, arg + 0xE0, 10.0f);
-        *(u16 *)(query + 0x1A) = *(u16 *)(arg + 0xAA);
-        *(TI128 *)pos = *(TI128 *)(arg + 0x10);
+        make_hit_descriptor(query, moby, 1, moby + 0xE0, 10.0f);
+        *(u16 *)(query + 0x1A) = *(u16 *)(moby + 0xAA);
+        *(TI128 *)pos = *(TI128 *)(moby + 0x10);
         pos[2] += 3.5f;
-        vec_scale_to_length(delta, arg + 0xC0, -1.3f);
+        vec_scale_to_length(delta, moby + 0xC0, -1.3f);
         FastVecAdd(pos, delta, pos);
         hero = g_hero_l16_moby;
         if (math_fabs(*(float *)(hero + 0x88) - pos[2]) < 0.1f &&

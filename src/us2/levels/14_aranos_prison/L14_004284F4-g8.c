@@ -51,30 +51,32 @@ extern void level_l00_call_module_handler_with_arg_9_us2(void *, int);
 extern void gfx_add_draw_callback_first(void *, void *);
 extern void part_spawn_spark_side(void *);
 
-void func_US2_L14_004284F4(PrisonLight *object)
+/* Searchlight (USA v2.00): once triggered it plays its sound and pulses the beam level, then
+   fades out and removes itself. */
+void searchlight_update_us2(PrisonLight *moby)
 {
-    PrisonLightState *state = object->vars;
+    PrisonLightState *state = moby->vars;
     float angle, denominator;
     int period, ticks;
     unsigned int counter, previous;
     unsigned short flags;
 
-    switch (object->state) {
+    switch (moby->state) {
     case 0:
-        moby_set_state(object, 1, -1);
+        moby_set_state(moby, 1, -1);
         state->sound = -1;
         break;
     case 1:
         if (g_screen_mode_flag != 1)
             break;
-        if (object->update)
-            part_spawn_spark_side(object);
-        if (part_find_owned_effect_slot(object, 0x10000, 0) || flag_is_third_pending_set(object)) {
+        if (moby->update)
+            part_spawn_spark_side(moby);
+        if (part_find_owned_effect_slot(moby, 0x10000, 0) || flag_is_third_pending_set(moby)) {
             level_l00_call_module_handler_with_arg_9_us2(GetLocalizedString(0x2F53), 240);
-            moby_set_state(object, 2, -1);
+            moby_set_state(moby, 2, -1);
         }
-        if (((PrisonSoundAnchor *)(g_sound_state + state->sound * 112))->owner != object || !((PrisonSoundAnchor *)(g_sound_state + state->sound * 112))->active)
-            state->sound = PlayMobySound(0, 4, object);
+        if (((PrisonSoundAnchor *)(g_sound_state + state->sound * 112))->owner != moby || !((PrisonSoundAnchor *)(g_sound_state + state->sound * 112))->active)
+            state->sound = PlayMobySound(0, 4, moby);
         break;
     case 2:
         ticks = g_frame_tick_counter;
@@ -85,30 +87,30 @@ void func_US2_L14_004284F4(PrisonLight *object)
         angle /= denominator;
         angle = math_fast_sin_or_cos_b(angle - 3.1415927f);
         ApproachValue(&state->level, g_searchlight_level_scale * angle + g_searchlight_level_offset, g_searchlight_approach_rate * 0.016666668f);
-        gfx_add_draw_callback_first((void *)searchlight_draw_glow, object);
-        counter = object->frames;
+        gfx_add_draw_callback_first((void *)searchlight_draw_glow, moby);
+        counter = moby->frames;
         previous = counter++;
-        object->frames = counter;
+        moby->frames = counter;
         if (previous >= 181)
             state->done = 1;
-        if (state->sound != -1 && ((PrisonSoundAnchor *)(g_sound_state + state->sound * 112))->owner == object && ((PrisonSoundAnchor *)(g_sound_state + state->sound * 112))->active)
+        if (state->sound != -1 && ((PrisonSoundAnchor *)(g_sound_state + state->sound * 112))->owner == moby && ((PrisonSoundAnchor *)(g_sound_state + state->sound * 112))->active)
             snd_stop_voice(state->sound);
         state->sound = -1;
         if (!g_screen_mode_flag) {
             level_l00_call_module_handler_with_arg_9_us2(GetLocalizedString(0x2F54), 240);
-            flags = object->flags;
-            object->pending = 0;
+            flags = moby->flags;
+            moby->pending = 0;
             flags |= 0x41;
             flags &= 0xefff;
-            object->flags = flags;
-            moby_set_state(object, 3, -1);
+            moby->flags = flags;
+            moby_set_state(moby, 3, -1);
         }
         break;
     case 3:
-        gfx_add_draw_callback_first((void *)searchlight_draw_glow, object);
+        gfx_add_draw_callback_first((void *)searchlight_draw_glow, moby);
         ApproachValue(&state->level, 0.0f, g_searchlight_decay_rate * 0.016666668f);
         if (state->level == 0.0f)
-            moby_mark_spawned(object);
+            moby_mark_spawned(moby);
         break;
     }
 }

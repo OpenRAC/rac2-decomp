@@ -39,29 +39,30 @@ extern void moby_call_helper_two_one(void);
 extern void game_set_stored_value_pair(void (*)(void), void *);
 extern void moby_mark_flag_and_append_to_list(int);
 
-void portal_update_us2(char *obj) {
-    char *d = *(char **)(obj + 0x68);
-    float v[4];
+/* Update for a portal moby. On the first frame it sets up its look and level link; later it sends the hero to the linked level when they step into it (USA v2.00). */
+void portal_update_us2(char *moby) {
+    char *vars = *(char **)(moby + 0x68);
+    float position[4];
     int dest;
 
-    switch (*(unsigned char *)(obj + 0x20)) {
+    switch (*(unsigned char *)(moby + 0x20)) {
     case 0: {
         int zone;
-        if (*(unsigned char *)(obj + 0x43) != 2) anim_start_blended(obj, 2, 0, 1);
-        moby_set_state(obj, 1, -1);
-        *(unsigned char *)(obj + 0x30) = 255;
-        if (g_current_map_index[0] == 26) *(short *)(obj + 0x32) = 255;
-        qcopy(d + 0x20, obj + 0x10);
-        qcopy(d + 0x30, obj + 0xf0);
+        if (*(unsigned char *)(moby + 0x43) != 2) anim_start_blended(moby, 2, 0, 1);
+        moby_set_state(moby, 1, -1);
+        *(unsigned char *)(moby + 0x30) = 255;
+        if (g_current_map_index[0] == 26) *(short *)(moby + 0x32) = 255;
+        qcopy(vars + 0x20, moby + 0x10);
+        qcopy(vars + 0x30, moby + 0xf0);
         zone = g_current_map_index[0] << 4;
-        *(short *)(d + 0x1e) = g_moby_group_flags[*(unsigned char *)(obj + 0xb0) + zone] >> 7;
-        if (g_moby_group_flags[*(unsigned char *)(obj + 0xb0) + zone] & 0x80) {
-            if (*(int *)(d + 4)) moby_set_flag_bit(g_moby_l02_pool + (*(int *)(d + 4) << 8), 1);
+        *(short *)(vars + 0x1e) = g_moby_group_flags[*(unsigned char *)(moby + 0xb0) + zone] >> 7;
+        if (g_moby_group_flags[*(unsigned char *)(moby + 0xb0) + zone] & 0x80) {
+            if (*(int *)(vars + 4)) moby_set_flag_bit(g_moby_l02_pool + (*(int *)(vars + 4) << 8), 1);
         }
         if (g_current_map_index[0] == 2 && g_game_flag_table[0x71] == 26) {
             state_set_flag_one();
             g_game_flag_table[0x71] = 1;
-            part_start_record_effect_by_index(*(int *)(d + 0x14), *(int *)(d + 0x10));
+            part_start_record_effect_by_index(*(int *)(vars + 0x14), *(int *)(vars + 0x10));
             level_capture_checkpoint_state(g_hero_position, g_hero_position + 0x10);
             if (g_map_visited_flags[4] && !g_game_flag_table[0xa5]) {
                 g_game_flag_table[0xa5] = 1;
@@ -70,18 +71,18 @@ void portal_update_us2(char *obj) {
         }
     }
     case 1:
-        if (g_hero_state.portal == obj && g_hero_state.active) {
-            FastVecSub(v, g_hero_state.pos, obj + 0x10);
-            vec_transform_by_object_or_given(obj, v, v, 0);
-            if (v[2] < -0.6f) {
-                int currentLevel;
-                currentLevel = g_current_map_index[0];
+        if (g_hero_state.portal == moby && g_hero_state.active) {
+            FastVecSub(position, g_hero_state.pos, moby + 0x10);
+            vec_transform_by_object_or_given(moby, position, position, 0);
+            if (position[2] < -0.6f) {
+                int map_index;
+                map_index = g_current_map_index[0];
                 g_hero_state.state = 2;
                 dest = 2;
-                if (currentLevel == 26) {
+                if (map_index == 26) {
                     TryClaimNotice(8, 0x1303, 1);
                 } else {
-                    TryClaimNotice(8, g_moby_group_flags[*(unsigned char *)(obj + 0xb0) + (currentLevel << 4)] & 0x80 ? 0x131F : 0x1302, 1);
+                    TryClaimNotice(8, g_moby_group_flags[*(unsigned char *)(moby + 0xb0) + (map_index << 4)] & 0x80 ? 0x131F : 0x1302, 1);
                     dest = 26;
                 }
                 if (g_pad_held_flags & 0x10) {
@@ -91,16 +92,16 @@ void portal_update_us2(char *obj) {
                 }
             }
         }
-        if (g_current_map_index[0] == 26 && (g_moby_group_flags[0x1a0 + *(unsigned char *)(obj + 0xb0)] & 0x80)) {
+        if (g_current_map_index[0] == 26 && (g_moby_group_flags[0x1a0 + *(unsigned char *)(moby + 0xb0)] & 0x80)) {
             if (g_map_visited_flags[4]) return;
             if (req_push_queue(g_message_queue, 0xa7)) {
                 req_push_queue(g_message_queue, 4);
                 req_push_queue(g_message_queue, 0xa8);
                 req_launch_queued(g_message_queue);
-                game_set_stored_value_pair(moby_call_helper_two_one, obj);
+                game_set_stored_value_pair(moby_call_helper_two_one, moby);
                 g_hero_state.flag = 0;
                 moby_mark_flag_and_append_to_list(4);
-                moby_set_state(obj, 3, -1);
+                moby_set_state(moby, 3, -1);
             }
         }
         break;

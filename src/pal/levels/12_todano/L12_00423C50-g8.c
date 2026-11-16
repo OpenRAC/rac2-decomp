@@ -25,42 +25,43 @@ extern f32 g_explosion_piece_table_b[] SDATA(D_L12_001B2288);
 extern f32 g_explosion_piece_offsets[] SDATA(D_L12_001B22B0);
 extern u8 *CreateMoby(int);
 
-void func_PAL_L12_00425A08(u8 *a0)
+/* Pulses the colour of a linked moby. When the hero walks into its zone, it turns the linked moby off and wakes up a third one (PAL: 50 Hz timings). */
+void zone_color_pulse_update_pal(u8 *moby)
 {
-    s32 *s = *(s32 **)(a0 + 0x68);
-    u8 *rec;
-    u8 *obj;
-    f32 phase, d;
+    s32 *vars = *(s32 **)(moby + 0x68);
+    u8 *linked;
+    u8 *target;
+    f32 phase, period;
 
-    switch (a0[0x20]) {
+    switch (moby[0x20]) {
     case 0:
-        moby_set_state(a0, 1, -1);
+        moby_set_state(moby, 1, -1);
         break;
     case 1:
-        rec = g_moby_list_start + (s[1] << 8);
-        if (rec[0x31] != 0) {
+        linked = g_moby_list_start + (vars[1] << 8);
+        if (linked[0x31] != 0) {
             phase = IntToFloat(g_frame_l12_counter % 50);
-            d = IntToFloat(50);
+            period = IntToFloat(50);
             phase *= 6.2831855f;
-            phase /= d;
-            *(s32 *)(rec + 0x78) = PulseColor(0x802020A0, 0x80202050, phase - 3.1415927f);
+            phase /= period;
+            *(s32 *)(linked + 0x78) = PulseColor(0x802020A0, 0x80202050, phase - 3.1415927f);
         }
-        if (s[0] == -1)
+        if (vars[0] == -1)
             break;
-        obj = g_tracked_object_ptr;
-        if (obj != 0) {
-            if (IsPointInCuboid(obj + 0x10, s[0])) {
-                *(s32 *)(rec + 0x78) = 0x80A02020;
-                moby_set_state(a0, 2, -1);
-                if (s[2] != -1)
-                    moby_set_flag_bit(g_moby_list_start + (s[2] << 8), 1);
+        target = g_tracked_object_ptr;
+        if (target != 0) {
+            if (IsPointInCuboid(target + 0x10, vars[0])) {
+                *(s32 *)(linked + 0x78) = 0x80A02020;
+                moby_set_state(moby, 2, -1);
+                if (vars[2] != -1)
+                    moby_set_flag_bit(g_moby_list_start + (vars[2] << 8), 1);
             }
         } else if (second_tracked_object_is_open()) {
-            if (IsPointInCuboid(g_second_tracked_object + 0x10, s[0])) {
-                *(s32 *)(rec + 0x78) = 0x80A02020;
-                moby_set_state(a0, 2, -1);
-                if (s[2] != -1)
-                    moby_set_flag_bit(g_moby_list_start + (s[2] << 8), 1);
+            if (IsPointInCuboid(g_second_tracked_object + 0x10, vars[0])) {
+                *(s32 *)(linked + 0x78) = 0x80A02020;
+                moby_set_state(moby, 2, -1);
+                if (vars[2] != -1)
+                    moby_set_flag_bit(g_moby_list_start + (vars[2] << 8), 1);
             }
         }
         break;

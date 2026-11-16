@@ -22,7 +22,7 @@ extern void math_apply_axis_rotation_to_quat(void *, void *, void *, float);
 extern unsigned char *part_spawn_ground_effect(void *, int, float, float, unsigned int, int, int, void *, int, float);
 extern int FloatToInt(float);
 /* Emit paired particles, either outward or toward the camera. */
-void func_PAL_00320D00(char *pos, int count, int mode) {
+void part_spawn_hit_sparks_pal(char *pos, int count, int mode) {
     float velocity[4] __attribute__((aligned(16)));
     float point[4] __attribute__((aligned(16)));
     float direction[4] __attribute__((aligned(16)));

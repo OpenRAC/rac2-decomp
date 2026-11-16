@@ -6,8 +6,8 @@ typedef struct {
 } Vec4f __attribute__((aligned(16)));
 typedef struct {
     u8 pad0[0xC];
-    s16 unkC;
-    u8 padE[2];
+    s16 unk_c;
+    u8 pad_e[2];
     Vec4f home;
     u8 pad20[0x60 - 0x20];
     f32 unk60;
@@ -152,7 +152,7 @@ void GoldBoltUpdate_us2(GoldBoltMoby *moby) {
         if (g_hero_state.vehicle_mode != 3 && g_hero_state.vehicle_mode != 0) {
             break;
         }
-        if (vars->unkC != 0) {
+        if (vars->unk_c != 0) {
             g_platinum_bolt_timer = 180;
             value_set_entry_by_index_us2(0x3315, -1);
             help_unlock_entry(50);

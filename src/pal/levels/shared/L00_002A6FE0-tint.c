@@ -21,6 +21,7 @@ extern void set_moby_color(void *owner, int a1, int a2, int a3);
 extern void hero_copy_color_to_slot_objects(void);
 extern void hero_empty_hook(int first, void *second);
 
+/* Flashes the hero a dark and light blue tint for the first half second of certain states. Then, if an item is equipped and ready, updates its effect (PAL). */
 void UpdateHeroBlinkAndItemTint_pal(void)
 {
     int r, g, b;

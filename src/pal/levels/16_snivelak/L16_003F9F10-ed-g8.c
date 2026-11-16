@@ -1,5 +1,5 @@
 #include "names.h"
-/* func_PAL_L16_003F9F10, the PAL copy of func_L16_003F5708: the same C, where third and fourth take
+/* func_PAL_L16_003F9F10, the PAL copy of func_L16_003F5708: the same C, where index_scale and lifetime take
    the 50 Hz scale and 60 becomes 50. */
 
 #include "include_asm.h"
@@ -8,7 +8,7 @@
 /* func_PAL_L16_003F9F10 has a unit of its own: retail reads the particle colours and lifetime bounds
    through bare absolute `lui $r ; lw $r,%lo($r)` pairs that never sit in a delay slot, yet builds
    the size table's address with `addiu $v1,$gp,...` and adds the scaled index to it in a register.
-   -mno-split-addresses gives the first form but folds the table into the load; the default split
+   -mno-split-addresses gives the color_a form but folds the table into the load; the default split
    profile gives the table form but lets the scheduler drop a bare load into each call slot.
    -membedded-data makes cc1 count a small-data reference as two words (no delay slot, no
    displacement fold), which gives both, unchanged elsewhere: retail puts no $gp access of this
@@ -18,9 +18,9 @@
 typedef int Quadword __attribute__((mode(TI)));
 
 extern float g_burst_l16_particle_count __attribute__((sda));   /* particle count (200.0) */
-extern int g_burst_color_a_start __attribute__((sda));     /* first colour pair */
+extern int g_burst_color_a_start __attribute__((sda));     /* color_a colour pair */
 extern int g_burst_color_a_end[] __attribute__((sda));
-extern int g_burst_color_b_start[] __attribute__((sda));   /* second colour pair */
+extern int g_burst_color_b_start[] __attribute__((sda));   /* color_b colour pair */
 extern int g_burst_color_b_end[] __attribute__((sda));
 extern float g_burst_size_table[2] __attribute__((sda)); /* sizes, picked by func_002A77E0(2) */
 extern int g_burst_trail_flags __attribute__((sda));
@@ -42,14 +42,14 @@ extern void *part_spawn_trail(void *, void *, void *, int, int, int, int, int, i
 
 /* Emits randomly positioned particles outside the central rectangle, each with colours blended
    at random between two pairs, a random size from the table and random lifetimes. */
-void func_PAL_L16_003F9F10(char *object)
+void part_emit_outside_central_box_pal(char *object)
 {
     float position[4];
     float random[4];
     float direction[4];
     int i;
     float scale;
-    int first, second, third, fourth;
+    int color_a, color_b, index_scale, lifetime;
     float size;
     float blend;
 
@@ -66,16 +66,16 @@ void func_PAL_L16_003F9F10(char *object)
         matrix_mul_vec3(position, position, object + 192);
         FastVecAdd(position, position, object + 16);
         blend = math_random_float_range(0.0f, 1.0f);
-        first = FastTweenColor(g_burst_color_a_start, g_burst_color_a_end[0], blend);
+        color_a = FastTweenColor(g_burst_color_a_start, g_burst_color_a_end[0], blend);
         blend = math_random_float_range(0.0f, 1.0f);
-        second = FastTweenColor(g_burst_color_b_start[0], g_burst_color_b_end[0], blend);
+        color_b = FastTweenColor(g_burst_color_b_start[0], g_burst_color_b_end[0], blend);
         size = g_burst_size_table[math_random_int_below(2)];
         vec_clear_128(random);
         random[3] = size;
         vec_clear_128(direction);
         direction[3] = size;
-        third = ((int)math_random_int_range(1, g_burst_index_max) * 5 + 2) / 6;
-        fourth = ((int)math_random_int_range(g_burst_lifetime_min[0], g_burst_lifetime_max[0]) * 5 + 2) / 6;
-        part_spawn_trail(position, random, direction, first, second, third, fourth, 50, g_burst_trail_flags);
+        index_scale = ((int)math_random_int_range(1, g_burst_index_max) * 5 + 2) / 6;
+        lifetime = ((int)math_random_int_range(g_burst_lifetime_min[0], g_burst_lifetime_max[0]) * 5 + 2) / 6;
+        part_spawn_trail(position, random, direction, color_a, color_b, index_scale, lifetime, 50, g_burst_trail_flags);
     }
 }

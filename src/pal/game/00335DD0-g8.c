@@ -61,7 +61,9 @@ static __inline__ int IsEffect3_1271(int id)
     if(weapon->active) active=weapon->type==3;
     return active;
 }
-int func_PAL_00335DD0(char *object,int id,int owner)
+/* Starts draining health from a moby hit by the given weapon: finds a free slot, sets its timer and
+ * colour, and queues a kill hit when health runs out (PAL: 50 Hz timings). */
+int weapon_start_health_drain_pal(char *object,int id,int owner)
 {
     float backwards[4] __attribute__((aligned(16)));
     Hit334160 damage __attribute__((aligned(16)));
@@ -96,8 +98,8 @@ int func_PAL_00335DD0(char *object,int id,int owner)
                     {
                     int colored=0;
                     if(*(unsigned short *)(slot->object+0x34)&0x20) {
-                        char *p=P(P(slot->object,0x68),0x10);
-                        if(p && H(p,0)) {r=B(p,4);g=B(p,5);b=B(p,6);colored=1;}
+                        char *tint=P(P(slot->object,0x68),0x10);
+                        if(tint && H(tint,0)) {r=B(tint,4);g=B(tint,5);b=B(tint,6);colored=1;}
                     }
                     if(!colored) get_moby_color(slot->object,&r,&g,&b);
                     }

@@ -38,7 +38,7 @@ extern void vec_scale_triangle_vertices(unsigned char *, int);
 extern int math_fast_float_d(int *);
 extern void trail_advance_samples(unsigned char *);
 
-void func_PAL_L26_003D881C(unsigned char *object) {
+void orbiting_moby_update_pal(unsigned char *object) {
     Vector position;
     union {
         float init_matrix[12];

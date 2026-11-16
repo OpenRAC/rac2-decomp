@@ -59,28 +59,29 @@ typedef struct {
     char dir[0x10];
 } Thing;
 
-void func_PAL_L05_00419C60(Thing *m)
+/* Trigger zone: waits until the player (or a switch) sets it off, then checks the needed items, runs the request, repositions the player, marks flags and saves (PAL). */
+void trigger_l00_zone_update_l05_pal(Thing *moby)
 {
-    TriggerVars *p = m->vars;
+    TriggerVars *vars = moby->vars;
     int notify, i, missing, fail;
     int played;
 
-    switch (m->state) {
+    switch (moby->state) {
     case 0:
-        if ((p->item != -1 && g_map_visited_flags[p->item] != 0)
-            || (m->group != 0xFF && (g_moby_group_flags[m->group + g_current_map_index * 16] & 0x80))) {
-            moby_mark_spawned(m);
+        if ((vars->item != -1 && g_map_visited_flags[vars->item] != 0)
+            || (moby->group != 0xFF && (g_moby_group_flags[moby->group + g_current_map_index * 16] & 0x80))) {
+            moby_mark_spawned(moby);
             break;
         }
-        moby_set_state(m, 1, -1);
+        moby_set_state(moby, 1, -1);
     case 1:
-        if (p->on == 0 && flag_is_third_pending_set(m) == 0 && m->hit == 0)
+        if (vars->on == 0 && flag_is_third_pending_set(moby) == 0 && moby->hit == 0)
             break;
-        p->on = 1;
-        moby_set_state(m, 2, -1);
+        vars->on = 1;
+        moby_set_state(moby, 2, -1);
     case 2:
-        if (p->on == 0) {
-            moby_set_state(m, 1, -1);
+        if (vars->on == 0) {
+            moby_set_state(moby, 1, -1);
             break;
         }
         if (g_hero_state.mode == 0x1C)
@@ -89,22 +90,22 @@ void func_PAL_L05_00419C60(Thing *m)
             break;
         if (g_coin_door_state != 0)
             break;
-        if (p->msg != -1 && IsPointInCuboid(g_hero_state.body, p->msg) == 0)
+        if (vars->msg != -1 && IsPointInCuboid(g_hero_state.body, vars->msg) == 0)
             break;
         fail = 1;
         missing = 1;
-        if (g_item_trigger_entry_lists[g_current_map_index] != 0 && g_item_trigger_entry_lists[g_current_map_index][p->idx] != 0) {
-            for (i = 0; g_item_trigger_entry_lists[g_current_map_index][p->idx][i] != -1; i++) {
-                int e = g_item_trigger_entry_lists[g_current_map_index][p->idx][i];
+        if (g_item_trigger_entry_lists[g_current_map_index] != 0 && g_item_trigger_entry_lists[g_current_map_index][vars->idx] != 0) {
+            for (i = 0; g_item_trigger_entry_lists[g_current_map_index][vars->idx][i] != -1; i++) {
+                int e = g_item_trigger_entry_lists[g_current_map_index][vars->idx][i];
 
                 missing = 0;
-                if (p->tail.b.quiet == 0) {
+                if (vars->tail.b.quiet == 0) {
                     int bit = 1 << (e & 0x1F);
                     if (g_request_flag_table[(unsigned int)e >> 2] & bit)
                         continue;
                 }
                 if (req_push_queue(g_request_l06_queue, e) == 0 && i == 0) {
-                    STUB_printf(g_str_l06_item_trigger_debug_2, m->id, m->oclass, g_current_map_index, p->idx, e);
+                    STUB_printf(g_str_l06_item_trigger_debug_2, moby->id, moby->oclass, g_current_map_index, vars->idx, e);
                     return;
                 }
                 fail = 0;
@@ -116,80 +117,80 @@ void func_PAL_L05_00419C60(Thing *m)
            on an 8-byte boundary. */
         do {
             if (missing != 0)
-                STUB_printf(g_str_l06_item_trigger_debug, g_current_map_index, p->idx);
+                STUB_printf(g_str_l06_item_trigger_debug, g_current_map_index, vars->idx);
         } while (0);
         if (fail != 0) {
-            p->tail.b.had = 0;
-            moby_set_state(m, 4, -1);
+            vars->tail.b.had = 0;
+            moby_set_state(moby, 4, -1);
             break;
         }
-        p->tail.b.had = 1;
+        vars->tail.b.had = 1;
         req_launch_queued(g_request_l06_queue);
-        if (g_game_l06_frame_counter < 5 || (g_current_map_index == 6 && p->idx == 0))
+        if (g_game_l06_frame_counter < 5 || (g_current_map_index == 6 && vars->idx == 0))
             game_set_slowdown_factor_pal();
-        moby_set_state(m, 3, -1);
+        moby_set_state(moby, 3, -1);
         break;
     case 3:
         if (game_is_either_mode_two() == 0) {
-            if (p->link != -1) {
-                char *o = g_region_table + (p->link << 7);
-                hero_reset_position_and_direction_pal(o + 0x30, o + 0x70, 0, 1);
+            if (vars->link != -1) {
+                char *record = g_region_table + (vars->link << 7);
+                hero_reset_position_and_direction_pal(record + 0x30, record + 0x70, 0, 1);
             }
-            moby_set_state(m, 4, -1);
+            moby_set_state(moby, 4, -1);
         }
         if (g_current_map_index != 0)
             break;
-        if (p->item == -1)
+        if (vars->item == -1)
             break;
         if (game_is_either_mode_two() != 0)
             break;
         notify = 0;
-        if (p->item != -1) {
-            moby_mark_flag_and_append_to_list(p->item);
-            if (p->item != 0x18)
-                snd_play_indexed_pal(p->item);
+        if (vars->item != -1) {
+            moby_mark_flag_and_append_to_list(vars->item);
+            if (vars->item != 0x18)
+                snd_play_indexed_pal(vars->item);
             notify = 1;
         }
-        if (m->group != 0xFF && !(g_moby_group_flags[m->group + g_current_map_index * 16] & 0x80)) {
-            moby_mark_table_entry_flagged(m->group);
+        if (moby->group != 0xFF && !(g_moby_group_flags[moby->group + g_current_map_index * 16] & 0x80)) {
+            moby_mark_table_entry_flagged(moby->group);
             notify = 1;
         }
-        if (p->count != 0 && (p->tail.word & 0xFFFF0000)) {
-            if (p->link != -1) {
-                char *o = g_region_table + (p->link << 7);
-                level_capture_checkpoint_state(o + 0x30, o + 0x70);
+        if (vars->count != 0 && (vars->tail.word & 0xFFFF0000)) {
+            if (vars->link != -1) {
+                char *record = g_region_table + (vars->link << 7);
+                level_capture_checkpoint_state(record + 0x30, record + 0x70);
             } else
-                level_capture_checkpoint_state(m->pos, m->dir);
+                level_capture_checkpoint_state(moby->pos, moby->dir);
         }
-        if (p->tail.low != -1)
-            data_set_small_value_and_refresh(p->tail.low, 1);
-        else if (notify != 0 || p->tail.b.had != 0)
+        if (vars->tail.low != -1)
+            data_set_small_value_and_refresh(vars->tail.low, 1);
+        else if (notify != 0 || vars->tail.b.had != 0)
             MemcardSave(0, -1);
         break;
     case 4:
         played = 0;
-        if (p->item != -1) {
-            moby_mark_flag_and_append_to_list(p->item);
-            if (p->item != 0x18)
-                snd_play_indexed_pal(p->item);
+        if (vars->item != -1) {
+            moby_mark_flag_and_append_to_list(vars->item);
+            if (vars->item != 0x18)
+                snd_play_indexed_pal(vars->item);
             played = 1;
         }
-        if (m->group != 0xFF && !(g_moby_group_flags[m->group + g_current_map_index * 16] & 0x80)) {
-            moby_mark_table_entry_flagged(m->group);
+        if (moby->group != 0xFF && !(g_moby_group_flags[moby->group + g_current_map_index * 16] & 0x80)) {
+            moby_mark_table_entry_flagged(moby->group);
             played = 1;
         }
-        if (p->count > 0 && (p->tail.word & 0xFFFF0000)) {
-            if (p->link != -1) {
-                char *o = g_region_table + (p->link << 7);
-                level_capture_checkpoint_state(o + 0x30, o + 0x70);
+        if (vars->count > 0 && (vars->tail.word & 0xFFFF0000)) {
+            if (vars->link != -1) {
+                char *record = g_region_table + (vars->link << 7);
+                level_capture_checkpoint_state(record + 0x30, record + 0x70);
             } else
                 level_capture_checkpoint_state(g_hero_position, g_hero_position + 0x10);
         }
-        if (p->tail.low != -1)
-            data_set_small_value_and_refresh(p->tail.low, 1);
-        else if ((played != 0 || p->tail.b.had != 0) && p->count != p->tail.low)
+        if (vars->tail.low != -1)
+            data_set_small_value_and_refresh(vars->tail.low, 1);
+        else if ((played != 0 || vars->tail.b.had != 0) && vars->count != vars->tail.low)
             MemcardSave(0, -1);
-        moby_mark_spawned(m);
+        moby_mark_spawned(moby);
         break;
     }
 }

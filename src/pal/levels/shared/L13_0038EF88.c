@@ -26,47 +26,47 @@ extern char g_hero_state[];
  * halves of thirty-two, and any other state does nothing.  D_00189EA0 is the pointer the
  * entry test hands to func_002ACBC8, and the map selection block D_00189E20 sits 0x80
  * before it. */
-void trigger_list_check_hero_pal(Obj_38C1B8 *a0)
+void trigger_list_check_hero_pal(Obj_38C1B8 *obj)
 {
-    Table_389848 *t = a0->table;
-    int *e;
-    unsigned char *q;
-    unsigned char *m;
+    Table_389848 *table = obj->table;
+    int *second_half;
+    unsigned char *hero_state;
+    unsigned char *hero_base;
     int i;
     int j;
-    int v;
+    int entry;
 
-    switch (a0->state) {
+    switch (obj->state) {
     case 0:
-        a0->state = 1;
-        a0->flag = 0xFF;
+        obj->state = 1;
+        obj->flag = 0xFF;
         break;
     case 1:
-        q = (unsigned char *)g_hero_state;
-        e = t->entries + 32;
+        hero_state = (unsigned char *)g_hero_state;
+        second_half = table->entries + 32;
         for (i = 0; i < 32; i++) {
-            v = t->entries[i];
-            if (v < 0)
+            entry = table->entries[i];
+            if (entry < 0)
                 continue;
-            if (IsPointInCuboid(g_hero_position, v) == 0)
+            if (IsPointInCuboid(g_hero_position, entry) == 0)
                 continue;
-            if (t->count != 0) {
-                *(float *)(q + 0x24C8) = 0.25f;
+            if (table->count != 0) {
+                *(float *)(hero_state + 0x24C8) = 0.25f;
                 continue;
             }
-            m = (unsigned char *)g_hero_position - 0x80;
-            if (m[0x22B4] != 0) {
+            hero_base = (unsigned char *)g_hero_position - 0x80;
+            if (hero_base[0x22B4] != 0) {
                 FadeToBlack(8);
                 hero_record_play_counters();
-            } else if (*(int *)(m + 0x2294) != 0x74) {
+            } else if (*(int *)(hero_base + 0x2294) != 0x74) {
                 ref_L13_0038C1B8_00(0x74, 1);
             }
         }
         for (j = 0; j < 32; j++) {
-            v = e[j];
-            if (v < 0)
+            entry = second_half[j];
+            if (entry < 0)
                 continue;
-            if (IsPointInCuboid(g_hero_position, v) == 0)
+            if (IsPointInCuboid(g_hero_position, entry) == 0)
                 continue;
             FadeToBlack(8);
             hero_record_play_counters();

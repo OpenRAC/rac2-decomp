@@ -36,7 +36,7 @@ extern void snd_stop_voice(int handle);
 extern float *moby_get_private_value_0(void *moby);
 extern char *part_find_owned_effect_slot(void *moby, int mask, int arg);
 extern void vec_scale_to_length(void *out, void *in, float length);
-extern void func_PAL_002B15D8(void *moby, int a1, float f12, float f13, float f14, float f15, void *vec, int a3);
+extern void part_spawn_masked_debris_pal(void *moby, int a1, float f12, float f13, float f14, float f15, void *vec, int a3);
 extern void part_spawn_explosion_with_sparks_pal(void *moby, float f12, float f13, void *position, int a2);
 extern void moby_mark_spawned(void *moby);
 #define GROUP_MEMBER(entry) ((JobaGroupMoby *)(D_L11_001B359C + (((entry) & 0x7FFF) << 8)))
@@ -63,14 +63,15 @@ extern void moby_mark_spawned(void *moby);
         } while (*list++ >= 0);                                                   \
     }
 #define MEMBER_ALIVE(m) ((m) && (m)->state != 254 && (m)->state != 253 && health > 0.0f)
+/* Fades out the group controller with a burst of sparks and removes it. */
 static __inline__ void FinishGroupMoby(float *vec, JobaGroupMoby *self) {
-    func_PAL_002B15D8(self, 255, 3.0f, 6.0f, 3.0f, 6.0f, vec, 255);
+    part_spawn_masked_debris_pal(self, 255, 3.0f, 6.0f, 3.0f, 6.0f, vec, 255);
     part_spawn_explosion_with_sparks_pal(self, 1.0f, 13.0f, self->position, -1);
     moby_mark_spawned(self);
 }
 
 /* Parent moby in vars[0], two member groups in vars[1] and vars[2], sound handle in vars[5]. */
-void func_PAL_L11_00480AF0(JobaGroupMoby *self) {
+void moby_group_trigger_update_pal(JobaGroupMoby *self) {
     float vec[4];
     int *data = self->vars;
     JobaGroupMoby *parent = (JobaGroupMoby *)(g_moby_l11_table + (data[0] << 8));
@@ -157,7 +158,7 @@ void func_PAL_L11_00480AF0(JobaGroupMoby *self) {
                     }
                 } while (*list++ >= 0);
                 part_spawn_explosion_with_sparks_pal(self, 1.0f, 13.0f, self->position, -1);
-                func_PAL_002B15D8(self, 255, 3.0f, 6.0f, 3.0f, 6.0f, vec, 255);
+                part_spawn_masked_debris_pal(self, 255, 3.0f, 6.0f, 3.0f, 6.0f, vec, 255);
                 moby_mark_spawned(self);
                 return;
             }

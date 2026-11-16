@@ -70,7 +70,8 @@ typedef struct {
 } Hero2318;
 extern Hero2318 g_hero_state;
 
-void func_US2_L00_002B2408(void) {
+/* Clank zapper: picks a nearby target, fires the zapper at it on a timer, and spawns charging sparks around the weapon. */
+void hero_update_zapper_us2(void) {
     float v[4] __attribute__((aligned(16)));
     float a[4] __attribute__((aligned(16)));
     float b[4] __attribute__((aligned(16)));

@@ -15,9 +15,9 @@ extern char *g_resident_data_base __attribute__((sda));
 extern void object_set_helper_result(void *, void *, int);
 extern void DrawItemGrid(int *);
 
-static __inline__ void initDescriptor_340498(int *f) { f[20] = 0; f[21] = 1; }
+static __inline__ void initDescriptor_340498(int *desc) { desc[20] = 0; desc[21] = 1; }
 
-void radial_menu_draw_info_second_us2(char *o)
+void radial_menu_draw_info_second_us2(char *menu)
 {
     Word2_340498 q0 = g_radial_info_second_word_pair_a;
     Word2_340498 q1 = g_radial_info_second_word_pair_b;
@@ -25,33 +25,33 @@ void radial_menu_draw_info_second_us2(char *o)
     Word2_340498 q3 = g_radial_info_second_word_pair_c;
     Word2_340498 q4 = g_radial_info_shared_word_pair;
     Word2_340498 q5 = g_info_word_pair_page;
-    int f[23];
+    int desc[23];
     char *child;
-    initDescriptor_340498(f);
-    f[19] = *(int *)(o + 0x820);
-    f[21] = *(int *)(o + 0x81C) == 1;
-    f[16] = (int)(o + 0xA78);
-    f[3] = *(int *)(o + 0x814);
-    f[4] = *(int *)(o + 0x818);
-    child = o + 0x17C;
-    f[9] = (int)&q4;
-    f[14] = 1;
-    f[13] = 0;
-    f[1] = 3;
-    f[2] = 2;
-    f[0] = (int)g_menu_item_table_second;
-    f[17] = (int)(o + 0x880);
+    initDescriptor_340498(desc);
+    desc[19] = *(int *)(menu + 0x820);
+    desc[21] = *(int *)(menu + 0x81C) == 1;
+    desc[16] = (int)(menu + 0xA78);
+    desc[3] = *(int *)(menu + 0x814);
+    desc[4] = *(int *)(menu + 0x818);
+    child = menu + 0x17C;
+    desc[9] = (int)&q4;
+    desc[14] = 1;
+    desc[13] = 0;
+    desc[1] = 3;
+    desc[2] = 2;
+    desc[0] = (int)g_menu_item_table_second;
+    desc[17] = (int)(menu + 0x880);
     object_set_helper_result(child, g_resident_data_base + 0x8710, 0x5D);
-    f[10] = (int)child;
-    f[12] = (int)(o + 0x214);
-    f[15] = (int)(o + 0x7D0);
-    f[8] = (int)&q3;
-    f[7] = (int)&q2;
-    f[11] = 0;
-    f[18] = *(int *)(o + 0x80C);
-    f[6] = (int)&q1;
-    f[5] = (int)&q0;
-    f[20] = (int)&q5;
-    f[22] = 0;
-    DrawItemGrid(f);
+    desc[10] = (int)child;
+    desc[12] = (int)(menu + 0x214);
+    desc[15] = (int)(menu + 0x7D0);
+    desc[8] = (int)&q3;
+    desc[7] = (int)&q2;
+    desc[11] = 0;
+    desc[18] = *(int *)(menu + 0x80C);
+    desc[6] = (int)&q1;
+    desc[5] = (int)&q0;
+    desc[20] = (int)&q5;
+    desc[22] = 0;
+    DrawItemGrid(desc);
 }

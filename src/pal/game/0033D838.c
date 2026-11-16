@@ -17,6 +17,7 @@ extern short g_screen_adjust_offsets[];
 
 extern int Ffb202470_FUN_0033AB50(char *p);
 
+/* Destroys the prompt bar of the map screen and returns the object (PAL). */
 char *map_screen_destroy_prompt_bar_pal(char *object)
 {
     Ffb202470_FUN_0033AB50(object + 8);
@@ -25,53 +26,53 @@ char *map_screen_destroy_prompt_bar_pal(char *object)
 
 
 /* func_PAL_0033DDC0, the PAL copy of func_0033BE98: the same C, with the three-string setup added. */
-int func_PAL_0033DDC0(char *object, int mask)
+int screen_adjust_menu_update_pal(char *object, int mask)
 {
     char *sub;
     char *text, *second;
-    short oldx;
-    short oldy;
-    int *v;
+    short old_x;
+    short old_y;
+    int *anchor;
 
     sub = object + 8;
     text = GetLocalizedString(0x1B73);
     second = GetLocalizedString(0xB5F);
     prompt_bar_set_texts_pal(sub, text, second, GetLocalizedString(0xB60));
     prompt_bar_update_pal(sub);
-    v = *(int **)(object + 0x2DC);
-    menu_set_anchor_pos(sub, *(float *)v, *(float *)(v + 1));
+    anchor = *(int **)(object + 0x2DC);
+    menu_set_anchor_pos(sub, *(float *)anchor, *(float *)(anchor + 1));
     if ((mask & 0x40) != 0 && *(int *)(object + 0x2D8) == 0)
         snd_play_from_global_bank(4, 0, 0);
     if ((mask & 0xf000) != 0) {
-        short *p = g_screen_adjust_offsets;
-        oldx = p[180];
-        oldy = p[181];
+        short *offsets = g_screen_adjust_offsets;
+        old_x = offsets[180];
+        old_y = offsets[181];
         if ((mask & 0x1000) != 0) {
-            ((unsigned short *)p)[181] = ((unsigned short *)p)[181] - 1;
-            if ((short)((unsigned short *)p)[181] < -32)
-                p[181] = -32;
+            ((unsigned short *)offsets)[181] = ((unsigned short *)offsets)[181] - 1;
+            if ((short)((unsigned short *)offsets)[181] < -32)
+                offsets[181] = -32;
         }
         if ((mask & 0x4000) != 0) {
-            unsigned short *q = (unsigned short *)g_screen_adjust_offsets;
-            q[181] = q[181] + 1;
-            if ((short)q[181] > 32)
-                ((short *)q)[181] = 32;
+            unsigned short *offsets_b = (unsigned short *)g_screen_adjust_offsets;
+            offsets_b[181] = offsets_b[181] + 1;
+            if ((short)offsets_b[181] > 32)
+                ((short *)offsets_b)[181] = 32;
         }
         if ((mask & 0x8000) != 0) {
-            unsigned short *q = (unsigned short *)g_screen_adjust_offsets;
-            q[180] = q[180] - 1;
-            if ((short)q[180] < -40)
-                ((short *)q)[180] = -40;
+            unsigned short *offsets_b = (unsigned short *)g_screen_adjust_offsets;
+            offsets_b[180] = offsets_b[180] - 1;
+            if ((short)offsets_b[180] < -40)
+                ((short *)offsets_b)[180] = -40;
         }
         if ((mask & 0x2000) != 0) {
-            unsigned short *q = (unsigned short *)g_screen_adjust_offsets;
-            q[180] = q[180] + 1;
-            if ((short)q[180] > 40)
-                ((short *)q)[180] = 40;
+            unsigned short *offsets_b = (unsigned short *)g_screen_adjust_offsets;
+            offsets_b[180] = offsets_b[180] + 1;
+            if ((short)offsets_b[180] > 40)
+                ((short *)offsets_b)[180] = 40;
         }
         {
-            short *q = g_screen_adjust_offsets;
-            if (oldx != q[180] || oldy != q[181])
+            short *offsets_b = g_screen_adjust_offsets;
+            if (old_x != offsets_b[180] || old_y != offsets_b[181])
                 snd_play_from_global_bank(4, 0, 0);
         }
         gfx_reapply_display_layout();
@@ -80,7 +81,7 @@ int func_PAL_0033DDC0(char *object, int mask)
 }
 
 /* func_PAL_0033DF90, the PAL copy of func_0033C028: only the box and its label remain. */
-void func_PAL_0033DF90(char *object)
+void onoff_menu_draw_with_help_pal(char *object)
 {
     char scratch[32];
 
@@ -92,7 +93,8 @@ void func_PAL_0033DF90(char *object)
 /* func_0033B540 is matched in 0033AE20-g8.c (-G8 small data). */
 
 
-char *func_PAL_0033E000(char *object)
+/* Destroys the prompt bar of the screen adjust menu and returns the object (PAL). */
+char *screen_adjust_menu_destroy_pal(char *object)
 {
     Ffb202470_FUN_0033AB50(object + 8);
     return object;
@@ -105,7 +107,8 @@ char *func_PAL_0033E000(char *object)
 /* func_0033B540 is matched in 0033AE20-g8.c (-G8 small data). */
 
 
-char *func_PAL_0033E300(char *object)
+/* Destroys the prompt bar of the on/off menu and returns the object (PAL). */
+char *onoff_menu_destroy_pal(char *object)
 {
     Ffb202470_FUN_0033AB50(object + 8);
     return object;
@@ -118,7 +121,8 @@ char *func_PAL_0033E300(char *object)
 /* func_0033B540 is matched in 0033AE20-g8.c (-G8 small data). */
 
 
-char *func_PAL_0033E888(char *object)
+/* Destroys the prompt bar of the four-option menu and returns the object (PAL). */
+char *four_option_menu_destroy_pal(char *object)
 {
     Ffb202470_FUN_0033AB50(object + 8);
     return object;
@@ -132,26 +136,27 @@ extern int Fc558ca70_FUN_002E5E58(int a, int b, int c);
 extern volatile unsigned char Fc558ca70_D_001A7B95 __attribute__((sda));
 extern volatile unsigned char Fc558ca70_D_001A7B94 __attribute__((sda));
 
-int func_PAL_0033E9E8(char *a0, int a1)
+/* Updates the two-toggle menu: moves the selection and flips the chosen option on X (PAL). */
+int two_toggle_a_update_pal(char *menu, int pad_flags)
 {
-    char *p = a0 + 8;
-    float *q;
-    int v;
+    char *prompt_bar = menu + 8;
+    float *anchor;
+    int selection;
 
-    Fc558ca70_FUN_0033AE28(p);
-    q = *(float **)(a0 + 732);
-    Fc558ca70_FUN_0033B018(p, q[0], q[1]);
-    if (a1 & 0x1000) {
+    Fc558ca70_FUN_0033AE28(prompt_bar);
+    anchor = *(float **)(menu + 732);
+    Fc558ca70_FUN_0033B018(prompt_bar, anchor[0], anchor[1]);
+    if (pad_flags & 0x1000) {
         Fc558ca70_FUN_002E5E58(3, 0, 0);
-        v = *(int *)(a0 + 728);
-        *(int *)(a0 + 728) = (v + 1) % 2;
-    } else if (a1 & 0x4000) {
+        selection = *(int *)(menu + 728);
+        *(int *)(menu + 728) = (selection + 1) % 2;
+    } else if (pad_flags & 0x4000) {
         Fc558ca70_FUN_002E5E58(3, 0, 0);
-        v = *(int *)(a0 + 728);
-        *(int *)(a0 + 728) = (v + 1) % 2;
-    } else if (a1 & 0x40) {
+        selection = *(int *)(menu + 728);
+        *(int *)(menu + 728) = (selection + 1) % 2;
+    } else if (pad_flags & 0x40) {
         Fc558ca70_FUN_002E5E58(4, 0, 0);
-        switch (*(int *)(a0 + 728)) {
+        switch (*(int *)(menu + 728)) {
         case 0:
             Fc558ca70_D_001A7B95 = Fc558ca70_D_001A7B95 == 0;
             break;
@@ -160,14 +165,15 @@ int func_PAL_0033E9E8(char *a0, int a1)
             break;
         }
     }
-    return (a1 >> 6) & 1;
+    return (pad_flags >> 6) & 1;
 }
 
 
 
 extern void *prompt_bar_destroy_pal(int);
 
-char *func_PAL_0033EC50(char *object)
+/* Destroys the audio menu: its prompt bar and two volume meters (PAL). */
+char *two_toggle_a_destroy_pal(char *object)
 {
     extern void *object_construct_derived_b(void *);
     prompt_bar_destroy_pal((int)(object + 8));
@@ -197,7 +203,8 @@ extern int sprintf(char *, const char *, ...);
 
 /* func_0033D028 uses small data in 0033D028-g8.c. */
 
-void func_PAL_0033F190(char *object)
+/* Draws the audio menu: two volume meters with labels and the third option with its value (PAL). */
+void audio_menu_draw_pal(char *object)
 {
     char buffer[128];
     SolTextPair pair;
@@ -229,7 +236,8 @@ void func_PAL_0033F190(char *object)
 /* func_0033B540 is matched in 0033AE20-g8.c (-G8 small data). */
 
 
-char *func_PAL_0033F310(char *object)
+/* Destroys the prompt bar of the single-toggle menu and returns the object (PAL). */
+char *single_toggle_a_destroy_pal(char *object)
 {
     Ffb202470_FUN_0033AB50(object + 8);
     return object;
@@ -241,9 +249,10 @@ extern void F5979c03f_FUN_0033AE28 (char *object);
 extern void F5979c03f_FUN_0033B018 (char *object, float x, float y);
 extern int F5979c03f_FUN_002E5E58 (int a, int b, int c);
 
-int func_PAL_0033F470 (char *object, int flags)
+/* Updates the single-toggle menu: flips its option on X (PAL). */
+int single_toggle_a_update_pal (char *object, int flags)
 {
-  unsigned char *g = &g_option_flag_c;
+  unsigned char *flag = &g_option_flag_c;
   float *vec;
   int discarded;
 
@@ -255,7 +264,7 @@ int func_PAL_0033F470 (char *object, int flags)
     {
       discarded = F5979c03f_FUN_002E5E58 (4, 0, 0);
       (void) discarded;
-      *g = (*g < 1);
+      *flag = (*flag < 1);
     }
 
   return (flags >> 6) & 1;
@@ -264,7 +273,8 @@ int func_PAL_0033F470 (char *object, int flags)
 
 extern int text_draw_centered_small(int, int, unsigned long, char *, int);
 
-void func_PAL_0033F508(char *object)
+/* Draws the single-toggle menu: one option label with its current value (PAL). */
+void single_toggle_a_draw_pal(char *object)
 {
     char buffer[128];
     SolTextPair pair;
@@ -286,7 +296,8 @@ void func_PAL_0033F508(char *object)
 /* func_0033B540 is matched in 0033AE20-g8.c (-G8 small data). */
 
 
-char *func_PAL_0033F5D8(char *object)
+/* Destroys the prompt bar of the second single-toggle menu and returns the object (PAL). */
+char *single_toggle_b_destroy_pal(char *object)
 {
     Ffb202470_FUN_0033AB50(object + 8);
     return object;
@@ -301,7 +312,8 @@ char *func_PAL_0033F5D8(char *object)
 /* func_0033B540 is matched in 0033AE20-g8.c (-G8 small data). */
 
 
-char *func_PAL_0033F9A0(char *object)
+/* Destroys the prompt bar of the second two-toggle menu and returns the object (PAL). */
+char *two_toggle_b_destroy_pal(char *object)
 {
     Ffb202470_FUN_0033AB50(object + 8);
     return object;
@@ -310,7 +322,7 @@ char *func_PAL_0033F9A0(char *object)
 
 
 /* func_PAL_0033FB00, the PAL copy of func_0033DC30: the same C, with the three-string setup added. */
-int func_PAL_0033FB00(char *object, int flags)
+int single_toggle_c_update_pal(char *object, int flags)
 {
     float *vec;
     char *child;
@@ -337,7 +349,8 @@ int func_PAL_0033FB00(char *object, int flags)
 /* func_0033B540 is matched in 0033AE20-g8.c (-G8 small data). */
 
 
-char *func_PAL_0033FC98(char *object)
+/* Destroys the prompt bar of the third single-toggle menu and returns the object (PAL). */
+char *single_toggle_c_destroy_pal(char *object)
 {
     Ffb202470_FUN_0033AB50(object + 8);
     return object;
@@ -346,7 +359,7 @@ char *func_PAL_0033FC98(char *object)
 
 
 /* func_PAL_0033FDF8, the PAL copy of func_0033DEE0: the same C, with the three-string setup added. */
-int func_PAL_0033FDF8(char *object, int flags)
+int single_toggle_d_update_pal(char *object, int flags)
 {
     float *vec;
     char *child;
@@ -372,7 +385,8 @@ int func_PAL_0033FDF8(char *object, int flags)
 /* func_0033B540 is matched in 0033AE20-g8.c (-G8 small data). */
 
 
-char *func_PAL_0033FED8(char *object)
+/* Destroys the prompt bar of the fourth single-toggle menu and returns the object (PAL). */
+char *single_toggle_d_destroy_pal(char *object)
 {
     Ffb202470_FUN_0033AB50(object + 8);
     return object;
@@ -381,7 +395,7 @@ char *func_PAL_0033FED8(char *object)
 
 
 /* func_PAL_00340038, the PAL copy of func_0033E0D8: the same C, with the three-string setup added. */
-int func_PAL_00340038(char *object, int flags)
+int single_toggle_e_update_pal(char *object, int flags)
 {
     float *vec;
     char *child;
@@ -406,12 +420,13 @@ int func_PAL_00340038(char *object, int flags)
 
 
 
-extern int func_PAL_003402F0(int);
+extern int list_menu_get_selected_index_pal(int);
 
-int func_PAL_003402B8(int owner)
+/* Returns the address of the selected record in the list page owner (PAL). */
+int list_page_get_selected_record_pal(int owner)
 {
     int result;
-    result = func_PAL_003402F0(owner);
+    result = list_menu_get_selected_index_pal(owner);
     return *(int *)(owner + 0x3B8) + result * 0x14;
 }
 
@@ -422,22 +437,22 @@ extern void *UpdateMenuListSelection_pal(char *, int);
 extern void menu_set_position_pal(char *, float, float);
 
 /* func_PAL_00340348, the PAL copy of func_0033E3A0: the same C, with the three-string setup added and the second child moved. */
-int func_PAL_00340348(char *object, int flags)
+int list_page_update_pal(char *object, int flags)
 {
-    char *first = object + 8;
-    char *second;
+    char *prompt_bar = object + 8;
+    char *list;
     float *position;
     char *text, *label;
 
     text = GetLocalizedString(0xBB1);
     label = GetLocalizedString(0xB86);
-    prompt_bar_set_texts_pal(first, text, label, GetLocalizedString(0xB60));
-    prompt_bar_update_pal(first);
-    second = object + 0x2E0;
+    prompt_bar_set_texts_pal(prompt_bar, text, label, GetLocalizedString(0xB60));
+    prompt_bar_update_pal(prompt_bar);
+    list = object + 0x2E0;
     position = *(float **)(object + 0x3BC);
-    menu_set_anchor_pos(first, position[0], position[1]);
-    UpdateMenuListSelection_pal(second, flags);
-    menu_set_position_pal(second, (*(float **)(object + 0x3BC))[0], (*(float **)(object + 0x3BC))[1]);
+    menu_set_anchor_pos(prompt_bar, position[0], position[1]);
+    UpdateMenuListSelection_pal(list, flags);
+    menu_set_position_pal(list, (*(float **)(object + 0x3BC))[0], (*(float **)(object + 0x3BC))[1]);
     return (flags >> 6) & 1;
 }
 
@@ -447,8 +462,9 @@ int func_PAL_00340348(char *object, int flags)
 
 void prompt_bar_draw(int);
 
-void menu_draw_frame_pal(int param_1) {
-  prompt_bar_draw(param_1 + 8);
+/* Draws the frame menu: its prompt bar (PAL). */
+void menu_draw_frame_pal(int menu) {
+  prompt_bar_draw(menu + 8);
 }
 
 extern int func_0033AB50_1(void *);

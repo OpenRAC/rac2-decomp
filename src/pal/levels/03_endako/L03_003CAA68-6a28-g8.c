@@ -61,7 +61,8 @@ extern int g_pad_held_flags NOT_SDA;
 extern AimState6A28 g_hero_l03_state_alias;
 extern char g_str_camera_console_entry[];
 
-void camera_console_update_pal(char *obj)
+/* Updates a camera console: when the hero stands in front and presses the button, switches to the remote camera view, and back again. (PAL) */
+void camera_console_update_pal(char *moby)
 {
     char mat[0x40] __attribute__((aligned(16)));
     float local[4] __attribute__((aligned(16)));
@@ -69,46 +70,46 @@ void camera_console_update_pal(char *obj)
     float pos[4] __attribute__((aligned(16)));
     float cam1[4] __attribute__((aligned(16)));
     float cam2[4] __attribute__((aligned(16)));
-    char *vars = *(char **)(obj + 0x68);
+    char *vars = *(char **)(moby + 0x68);
 
-    switch (*(u8 *)(obj + 0x20)) {
+    switch (*(u8 *)(moby + 0x20)) {
     case 0:
         if (*(int *)vars == -1) {
-            moby_mark_spawned(obj);
+            moby_mark_spawned(moby);
             break;
         }
         *(int *)(vars + 0x30) = -1;
-        *(int *)(obj + 0x98) = 0;
-        *(unsigned short *)(obj + 0x34) |= 1;
-        obj[0x31] = 0;
-        moby_set_state(obj, 1, -1);
+        *(int *)(moby + 0x98) = 0;
+        *(unsigned short *)(moby + 0x34) |= 1;
+        moby[0x31] = 0;
+        moby_set_state(moby, 1, -1);
         break;
 
     case 1:
     case 2:
-        if (vec_distance_xy(obj + 0x10, g_hero_position) < 6.0f && *(int *)(g_hero_position + 0x2C0)) {
-            matrix_from_basis_rows(mat, obj + 0xC0);
-            FastVecSub(local, g_hero_position, obj + 0x10);
+        if (vec_distance_xy(moby + 0x10, g_hero_position) < 6.0f && *(int *)(g_hero_position + 0x2C0)) {
+            matrix_from_basis_rows(mat, moby + 0xC0);
+            FastVecSub(local, g_hero_position, moby + 0x10);
             matrix_mul_vec3(local, local, mat);
-            if (*(u8 *)(obj + 0x20) == 1 && flag_is_third_pending_set(obj))
-                moby_set_state(obj, 2, -1);
+            if (*(u8 *)(moby + 0x20) == 1 && flag_is_third_pending_set(moby))
+                moby_set_state(moby, 2, -1);
             if (local[0] < 4.0f && local[0] > 0.0f && local[1] < 2.5f && local[1] > -2.5f) {
-                if (*(u8 *)(obj + 0x20) == 1) {
+                if (*(u8 *)(moby + 0x20) == 1) {
                     TryClaimNotice(8, 0x1310, 1);
                     break;
                 }
                 TryClaimNotice(8, 0x12FA, 1);
                 if (hero_is_allowed_for_mode(8) && (g_pad_held_flags & 0x10)) {
-                    moby_set_state(obj, 3, -1);
+                    moby_set_state(moby, 3, -1);
                     *(Quad *)pos = 0;
                     pos[0] = 2.0f;
-                    matrix_mul_vec3(pos, pos, obj + 0xC0);
-                    FastVecAdd(pos, pos, obj + 0x10);
+                    matrix_mul_vec3(pos, pos, moby + 0xC0);
+                    FastVecAdd(pos, pos, moby + 0x10);
                     vec_clear_128(rot);
-                    rot[2] = FastAddRotations(*(float *)(obj + 0xF8), 3.14159f);
+                    rot[2] = FastAddRotations(*(float *)(moby + 0xF8), 3.14159f);
                     hero_reset_position_and_direction_pal(pos, rot, 0x31, 1);
                     g_held_object_ptr = g_moby_record_base + (*(int *)vars << 8);
-                    camera_select_remote_view(obj, cam1, cam2);
+                    camera_select_remote_view(moby, cam1, cam2);
                     SetCamera5Pose(cam1, cam2, 1, 0, 0);
                     console_start_remote_view(g_moby_record_base + (*(int *)vars << 8));
                 }
@@ -126,10 +127,10 @@ void camera_console_update_pal(char *obj)
             g_hero_l03_state_alias.f = 64.42f;
             g_hero_l03_state_alias.b1 = 1;
             g_hero_l03_state_alias.b0 = 0;
-            moby_set_state(obj, 2, -1);
+            moby_set_state(moby, 2, -1);
             level_clear_table_entry_pal(0);
         } else {
-            camera_select_remote_view(obj, mat, mat + 0x10);
+            camera_select_remote_view(moby, mat, mat + 0x10);
             object_copy_vector_to_selected(mat);
             cam_set_state_rotation(mat + 0x10);
             if (*(int *)(vars + 0x1C) != -1

@@ -3,6 +3,7 @@
 
 extern void func_3747B0(void);
 
+/* Calls the menu update step. */
 void menu_call_update_us2(void) {
     func_3747B0();
 }

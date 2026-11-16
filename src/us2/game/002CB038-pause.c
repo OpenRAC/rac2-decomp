@@ -137,13 +137,14 @@ extern void gfx_copy_image_to_gs_blocks(int, int, int);
 extern void menu_upload_pause_background_to_gs(void);
 extern void select_moby_context(int);
 extern void mem_copy_aligned(void *, void *, int);
-extern void func_US2_002CAFD8(void);
+extern void view_reset_fov_and_fog(void);
 
-void func_US2_002CB038(void)
+/* Sets up the pause or cutscene screen: picks the menu page for the current state, resets the camera and screen buffers, and lays out the memory areas used while paused (USA v2.00). */
+void menu_enter_pause_state_us2(void)
 {
     int queued = 0;
-    int s, j, k, n, t, u;
-    int *p;
+    int s, j, k, n, gs_base, gs_after_background;
+    int *buffer_ptr;
     void (*upd)(void);
 
     g_collision_hit[4] |= 0x80000000;
@@ -220,53 +221,53 @@ void func_US2_002CB038(void)
     }
 
     {
-        u8 *r = g_pause_camera_state;
-        FastVecScale(r, g_pause_camera_scale_vec, 1.0f);
-        qcopy(r - 0x10, g_pause_camera_copy_vec);
-        r += 0x20;
-        qzero_nc(r);
+        u8 *camera_ptr = g_pause_camera_state;
+        FastVecScale(camera_ptr, g_pause_camera_scale_vec, 1.0f);
+        qcopy(camera_ptr - 0x10, g_pause_camera_copy_vec);
+        camera_ptr += 0x20;
+        qzero_nc(camera_ptr);
     }
     qzero_nc(g_pause_camera_state + 0x10);
     qcopy(g_pause_menu_state.v50, g_camera_eye_state);
     qcopy(g_pause_menu_state.v60, g_camera_eye_state + 0x10);
     mem_copy_aligned(g_pause_menu_state.v200, g_camera_eye_state + 0x230, 0x30);
     g_pause_menu_state.unkF8 = g_view_params.fB0;
-    func_US2_002CAFD8();
+    view_reset_fov_and_fog();
     gfx_wait_for_dma_status_bits(1);
     sceGsSyncV(0);
     D_001B1598_sda = g_frame_counter_3[0] + 1;
 
     if (queued) {
-        int a, b, c, d;
-        a = g_loader_memory.fC + 0x30000;
-        b = g_loader_memory.f10 + 0x30000;
-        c = a + 0x3C000;
-        d = b + 0xE0000;
-        g_pause_menu_state.unk10C = c + 0x11800;
+        int area_a, area_b, area_c, area_d;
+        area_a = g_loader_memory.fC + 0x30000;
+        area_b = g_loader_memory.f10 + 0x30000;
+        area_c = area_a + 0x3C000;
+        area_d = area_b + 0xE0000;
+        g_pause_menu_state.unk10C = area_c + 0x11800;
         g_packet_buffer_size[0] = 0x30000;
-        g_pause_menu_state.unk114 = a;
-        g_pause_menu_state.unk20 = b;
-        g_pause_menu_state.unk118 = c;
-        g_pause_menu_state.unk11C = d;
-        g_pause_menu_state.unk110 = d;
+        g_pause_menu_state.unk114 = area_a;
+        g_pause_menu_state.unk20 = area_b;
+        g_pause_menu_state.unk118 = area_c;
+        g_pause_menu_state.unk11C = area_d;
+        g_pause_menu_state.unk110 = area_d;
         menu_stream_chunk_table_init(0);
     } else {
-        int a, b, c, d, e, f;
-        a = g_loader_memory.fC + 0x60000;
-        b = g_loader_memory.f10 + 0x60000;
-        b = b + 0xC000;
-        a = a + 0xC000;
-        c = a + 0x30000;
-        d = b + 0xE0000;
-        e = c + 0xC1000;
-        f = d + 0x60800;
-        g_pause_menu_state.unk10C = e;
+        int area_a, area_b, area_c, area_d, area_e, area_f;
+        area_a = g_loader_memory.fC + 0x60000;
+        area_b = g_loader_memory.f10 + 0x60000;
+        area_b = area_b + 0xC000;
+        area_a = area_a + 0xC000;
+        area_c = area_a + 0x30000;
+        area_d = area_b + 0xE0000;
+        area_e = area_c + 0xC1000;
+        area_f = area_d + 0x60800;
+        g_pause_menu_state.unk10C = area_e;
         g_packet_buffer_size[0] = 0x60000;
-        g_pause_menu_state.unk114 = a;
-        g_pause_menu_state.unk20 = b;
-        g_pause_menu_state.unk118 = c;
-        g_pause_menu_state.unk11C = d;
-        g_pause_menu_state.unk110 = f;
+        g_pause_menu_state.unk114 = area_a;
+        g_pause_menu_state.unk20 = area_b;
+        g_pause_menu_state.unk118 = area_c;
+        g_pause_menu_state.unk11C = area_d;
+        g_pause_menu_state.unk110 = area_f;
         menu_stream_chunk_table_init(1);
     }
     g_packet_buffer_offset = 0x2000;
@@ -285,26 +286,26 @@ void func_US2_002CB038(void)
     } else {
         menu_upload_pause_background_to_gs();
     }
-    t = g_vram_frame_base[0];
-    g_pause_menu_state.unk28 = t;
+    gs_base = g_vram_frame_base[0];
+    g_pause_menu_state.unk28 = gs_base;
     if (queued) {
-        g_map_overlay_state.unk24C = t;
-        u = t + 0x40000;
-        g_map_overlay_state.unk250 = u;
-        g_vram_frame_base[0] = u + 0x400;
+        g_map_overlay_state.unk24C = gs_base;
+        gs_after_background = gs_base + 0x40000;
+        g_map_overlay_state.unk250 = gs_after_background;
+        g_vram_frame_base[0] = gs_after_background + 0x400;
         for (j = 0; j < 4; j++) {
-            int v = g_vram_frame_base[0];
-            g_map_overlay_state.bufs[j] = v;
-            g_vram_frame_base[0] = v + 0x4000;
+            int buffer_addr = g_vram_frame_base[0];
+            g_map_overlay_state.bufs[j] = buffer_addr;
+            g_vram_frame_base[0] = buffer_addr + 0x4000;
         }
     } else {
-        int z;
+        int buffer_index;
         g_map_overlay_state.unk24C = 0;
         g_map_overlay_state.unk250 = 0;
-        p = &g_map_overlay_state.bufs[3];
-        for (z = 0; z < 4; z++) {
-            *p = 0;
-            p--;
+        buffer_ptr = &g_map_overlay_state.bufs[3];
+        for (buffer_index = 0; buffer_index < 4; buffer_index++) {
+            *buffer_ptr = 0;
+            buffer_ptr--;
         }
     }
     select_moby_context(1);

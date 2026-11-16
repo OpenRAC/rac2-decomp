@@ -21,7 +21,8 @@ extern float math_fast_sin_or_cos_a(float);
 extern float math_fast_sin_or_cos_b(float);
 extern void *part_spawn_random_tinted_effect(float, float, float *, float *, float *);
 
-void part_emit_hero_side_particles_pal(char *self, int arg1)
+/* Every so often, puffs out two small particles to the sides of the hero (PAL). */
+void part_emit_hero_side_particles_pal(char *self, int threshold)
 {
     float v[4] __attribute__((aligned(16)));
     float w[4] __attribute__((aligned(16)));
@@ -33,7 +34,7 @@ void part_emit_hero_side_particles_pal(char *self, int arg1)
 
     n = D_00189E20_20.counter + 1;
     D_00189E20_20.counter = n;
-    if (arg1 < (short)n) {
+    if (threshold < (short)n) {
         for (i = 0; i < 2; i++) {
             if (i == 0)
                 f = FastAddRotations(D_00189E20_20.angle, 0.785398006f);
@@ -78,8 +79,9 @@ typedef struct {
 extern char g_hero_state[];
 extern float math_random_angle(void);
 extern int math_random_int_range(int, int);
-extern Effect2BFB38 *func_PAL_002C0838(void *, void *, int, int);
+extern Effect2BFB38 *part_spawn_spark_2_pal(void *, void *, int, int);
 
+/* Every so often, sprinkles a small spark particle near the hero that drifts the way the hero moves (PAL). */
 void part_emit_hero_trail_spark_pal(int period, int threshold)
 {
     EmissionStateView *state = (EmissionStateView *)g_hero_state;
@@ -100,9 +102,9 @@ void part_emit_hero_trail_spark_pal(int period, int threshold)
         velocity[2] = math_random_float_range(0.060000002f, 0.13000001f);
         lifetime = math_random_int_range(90, 120);
         if (state->amount < 0.25f)
-            func_PAL_002C0838(position, velocity, 3, lifetime);
+            part_spawn_spark_2_pal(position, velocity, 3, lifetime);
         else
-            func_PAL_002C0838(position, velocity, 1, lifetime);
+            part_spawn_spark_2_pal(position, velocity, 1, lifetime);
         ((EmissionStateView *)g_hero_state)->counter = math_random_int_below(period);
     }
 }

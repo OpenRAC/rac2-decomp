@@ -5,7 +5,7 @@ typedef u64 TI128 __attribute__((mode(TI)));
 extern u8 *g_hero_moby;
 extern int text_measure_width_small_scaled(u8 *, int, float);
 extern u64 GetEffectTextureDescriptor(int);
-extern void func_PAL_0027FB48(float, float, u64, u8 *, int, float, u64, u8 *);
+extern void FontPrintScaled_pal(float, float, u64, u8 *, int, float, u64, u8 *);
 extern u8 g_font_print_data[];
 extern u8 g_screen_update_index;
 extern u8 *g_moby_array __attribute__((sda));
@@ -17,19 +17,19 @@ extern u8 *g_hero_moby;
  * the text is drawn with font texture 1. func_PAL_0027FB48 is declared with its
  * integer and float parameters interleaved; each register bank keeps its
  * order, and the interleaving sets the order of the argument moves. */
-void func_PAL_00280218(int x, int y, u64 color, u8 *text, int length, float scale) {
+void text_draw_centered_small_scaled(int x, int y, u64 color, u8 *text, int length, float scale) {
     float fx, fy;
     u64 texture;
 
     fx = x - (text_measure_width_small_scaled(text, length, scale) >> 1);
     fy = y;
     texture = GetEffectTextureDescriptor(1);
-    func_PAL_0027FB48(fx, fy, color, text, length, scale, texture, g_font_print_data);
+    FontPrintScaled_pal(fx, fy, color, text, length, scale, texture, g_font_print_data);
 }
 
 
 /* Scale that fits text into maxWidth, never below minScale and never above 1. */
-float func_PAL_00280358(u8 *text, int length, int maxWidth, float minScale) {
+float text_calc_fit_scale(u8 *text, int length, int maxWidth, float minScale) {
     int width;
     float scale;
 
@@ -48,27 +48,28 @@ float func_PAL_00280358(u8 *text, int length, int maxWidth, float minScale) {
     return scale;
 }
 
-extern int func_PAL_0027F790(u8 *, int, float);
+extern int text_measure_width_medium_scaled(u8 *, int, float);
 extern u8 g_font_glyph_table_small[];
 
 /* Scaled FontPrintCenter: x is moved left by half the scaled text width, then
  * the text is drawn with font texture 1. func_PAL_0027FB48 is declared with its
  * integer and float parameters interleaved; each register bank keeps its
  * order, and the interleaving sets the order of the argument moves. */
-void func_PAL_002803E8(int x, int y, u64 color, u8 *text, int length, float scale) {
+void text_draw_centered_medium_scaled(int x, int y, u64 color, u8 *text, int length, float scale) {
     float fx, fy;
     u64 texture;
 
-    fx = x - (func_PAL_0027F790(text, length, scale) >> 1);
+    fx = x - (text_measure_width_medium_scaled(text, length, scale) >> 1);
     fy = y;
     texture = GetEffectTextureDescriptor(2);
-    func_PAL_0027FB48(fx, fy, color, text, length, scale, texture, g_font_glyph_table_small);
+    FontPrintScaled_pal(fx, fy, color, text, length, scale, texture, g_font_glyph_table_small);
 }
 
 
-extern void func_PAL_002804A8(float);
+extern void FontPrintWindow_pal(float);
 
-void func_PAL_00280A30(void) {
-    func_PAL_002804A8(1.0f);
+/* Prints text in a window at the default scale of 1. */
+void text_window_print_unit_scale(void) {
+    FontPrintWindow_pal(1.0f);
 }
 

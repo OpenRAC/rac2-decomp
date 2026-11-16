@@ -8,7 +8,7 @@
 extern void FastVecSub(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
 extern void anim_start_startup_animations(void);
-extern void func_US2_002E72D8(char *);
+extern void UpdateEquipmentPieces_us2(char *);
 extern void math_store_angle_update_result(char *, char *, int, int, float);
 extern void vec_fast_to_int_helper(char *, char *);
 extern void quaternion_to_rotation_basis(char *, char *);
@@ -30,7 +30,8 @@ extern Scene05 g_scene_objects;
 extern char g_scene_spawn_entries[];
 extern int g_current_map_index __attribute__((sda));
 
-void func_US2_L05_00315A58(void)
+/* Level setup pass: tweaks flags on a few scenery objects and, in the intro cutscene, spawns sparks around a target object. (USA v2.00) */
+void feltzin_init_scene_objects_us2(void)
 {
     float pos[4] __attribute__((aligned(16)));
     union {
@@ -38,29 +39,29 @@ void func_US2_L05_00315A58(void)
         struct { float dest[4], delta[4]; } vectors;
     } scratch __attribute__((aligned(16)));
     int i;
-    char *obj;
+    char *target;
     anim_start_startup_animations();
     for (i = 0; i < g_scene_objects.count; i++) {
-        char *current = g_scene_objects.objects[i];
-        if (current && *(short *)(current + 0xAA) == 0xE29)
-            *(unsigned short *)(current + 0x34) |= 0x800;
-        if (*(short *)(current + 0xAA) == 0xD54) func_US2_002E72D8(current);
-        if (current) {
+        char *moby = g_scene_objects.objects[i];
+        if (moby && *(short *)(moby + 0xAA) == 0xE29)
+            *(unsigned short *)(moby + 0x34) |= 0x800;
+        if (*(short *)(moby + 0xAA) == 0xD54) UpdateEquipmentPieces_us2(moby);
+        if (moby) {
             int class_id = 0xFA0;
-            if (*(short *)(current + 0xAA) == class_id && g_current_map_index != 0x33) {
-                char *state = *(char **)(current + 0x68);
-                if (state) math_store_angle_update_result(current, state + 0xC, 0x80AAAAD2, 0x80396464, 0.06108653545379639f);
+            if (*(short *)(moby + 0xAA) == class_id && g_current_map_index != 0x33) {
+                char *vars = *(char **)(moby + 0x68);
+                if (vars) math_store_angle_update_result(moby, vars + 0xC, 0x80AAAAD2, 0x80396464, 0.06108653545379639f);
             }
         }
     }
     if (g_current_map_index != 5 || g_scene_objects.mode) return;
-    obj = g_scene_objects.objects[2];
+    target = g_scene_objects.objects[2];
     if (g_scene_objects.timer == 0x62) {
-        vec_fast_to_int_helper(*(char **)(obj + 0x58) + 0x10, (char *)scratch.matrix);
-        quaternion_to_rotation_basis((char *)scratch.matrix, obj + 0xC0);
-        moby_compute_local_point(obj, (char *)pos, 4.0f, 3.0f, 5.0f);
+        vec_fast_to_int_helper(*(char **)(target + 0x58) + 0x10, (char *)scratch.matrix);
+        quaternion_to_rotation_basis((char *)scratch.matrix, target + 0xC0);
+        moby_compute_local_point(target, (char *)pos, 4.0f, 3.0f, 5.0f);
         part_spawn_shockwave_burst((char *)pos, 1, 25, 20, 20, 20, 45, 1, 1, 1, 0, 1.5f);
-        moby_compute_local_point(obj, (char *)pos, 9.0f, 4.0f, 4.0f);
+        moby_compute_local_point(target, (char *)pos, 9.0f, 4.0f, 4.0f);
         part_spawn_shockwave_burst((char *)pos, 35, 50, 30, 30, 30, 50, 1, 1, 1, 1, 1.0f);
     }
     if ((unsigned int)(g_scene_objects.timer - 0x29) < 0x72 && !math_random_int_below(4)) {
@@ -68,14 +69,14 @@ void func_US2_L05_00315A58(void)
         float *entry;
         if (math_random_int_below(2)) sign = -1.0f;
         entry = (float *)(g_scene_spawn_entries + math_random_int_below(3) * 32);
-        moby_compute_local_point(obj, (char *)pos, entry[0], entry[1], entry[2]);
-        moby_compute_local_point(obj, (char *)scratch.vectors.dest, entry[4], entry[5], entry[6]);
+        moby_compute_local_point(target, (char *)pos, entry[0], entry[1], entry[2]);
+        moby_compute_local_point(target, (char *)scratch.vectors.dest, entry[4], entry[5], entry[6]);
         scratch.vectors.dest[0] += math_random_signed_float_range(0.5f, 1.5f);
         scratch.vectors.dest[1] += math_random_signed_float_range(0.5f, 1.5f);
         scratch.vectors.dest[2] += math_random_signed_float_range(0.5f, 1.5f);
         FastVecSub((char *)scratch.vectors.delta, (char *)scratch.vectors.dest, (char *)pos);
         vec_scale_to_length((char *)scratch.vectors.delta, (char *)scratch.vectors.delta, 1.1666667461395264f);
-        moby_spawn_shot_effect(obj, (char *)pos, (char *)scratch.vectors.delta, 0x46BE20, 0x327814, 1, 0, 1, sign);
+        moby_spawn_shot_effect(target, (char *)pos, (char *)scratch.vectors.delta, 0x46BE20, 0x327814, 1, 0, 1, sign);
     }
 }
 

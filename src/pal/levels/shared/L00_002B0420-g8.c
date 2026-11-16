@@ -26,6 +26,7 @@ extern void FastVecScale(void *, void *, float);
 extern void mat_get_euler_angles(void *, void *);
 extern float mat_measure_difference(Row *, Row *);
 
+/* Saves the latest object transform in a history and, when asked, averages the recent ones (leaving out odd ones) to give a smooth result. */
 void FilterTransformHistory_pal(char *object, void *matrix, int filter)
 {
     Row sum[4];

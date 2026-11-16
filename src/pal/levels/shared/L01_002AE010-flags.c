@@ -49,7 +49,7 @@ typedef struct Moby {
 typedef struct WeaponInfo {
     char pad00[0x2C];
     int animation;               
-    int altAnimation;            
+    int alt_animation;            
     char pad34[0xAC];
 } WeaponInfo;
 typedef struct HeroState {
@@ -66,7 +66,7 @@ typedef struct HeroState {
     char pad780[0xE98 - 0x780];
     Moby *attached[2];           
     char padEA0[4];
-    int attachedMode;            
+    int attached_mode;            
     char padEA8[0x2290 - 0xEA8];
     Moby *moby;                  
     char pad2294[8];
@@ -79,7 +79,7 @@ typedef struct HeroState {
     unsigned char f22C3;
     char pad22C4[0x24B0 - 0x22C4];
     int animation;               
-    int weaponId;                
+    int weapon_id;                
 } HeroState;
 extern void cancel_hero_item_animation_pal(void);
 extern char g_hero_state[];
@@ -87,13 +87,13 @@ extern char g_hero_state[];
 /* For the hero's two attached mobys: point them at their buffers, start the animation the
    current item's table entry names, fade them in or out (removing one that has faded out),
    then copy the hero moby's matrix to hero + 0x730 and ease hero + 0x778 to 0. */
-void func_PAL_L01_002B0208(void)
+void hero_update_attached_mobys_pal(void)
 {
     HeroState *hero;
     HeroState *state;
     HeroQuad *matrix;
     WeaponInfo *weapon;
-    int weaponId, animation;
+    int weapon_id, animation;
     int i;
 
     hero = (HeroState *)g_hero_state;
@@ -106,12 +106,12 @@ void func_PAL_L01_002B0208(void)
         if (*slot) {
             (*slot)->buffer0 = g_hero_attached_moby_buffers + i * 0xC00;
             (*slot)->buffer1 = g_hero_attached_moby_buffers + 0x600 + i * 0xC00;
-            weaponId = hero_slot_item_id(0);
-            if (weaponId == player->weaponId) {
-                weapon = &((WeaponInfo *)g_action_table)[g_item_slot_to_record[weaponId]];
+            weapon_id = hero_slot_item_id(0);
+            if (weapon_id == player->weapon_id) {
+                weapon = &((WeaponInfo *)g_action_table)[g_item_slot_to_record[weapon_id]];
                 animation = weapon->animation;
                 if (player->state == 12)
-                    animation = weapon->altAnimation;
+                    animation = weapon->alt_animation;
                 if (animation != -1 && (*slot)->animation != animation) {
                     player->animation = animation;
                     initialize_moby_animation_blend(player->moby, *slot, animation, 0, 7, 1);
@@ -121,8 +121,8 @@ void func_PAL_L01_002B0208(void)
                 HeroState *owner = (HeroState *)g_hero_state;
 
                 AdvanceAndDecodeAnimationFrames(owner->moby, *slot);
-                if (owner->attachedMode) {
-                    if (owner->attachedMode == 2)
+                if (owner->attached_mode) {
+                    if (owner->attached_mode == 2)
                         ApproachValue(&(*slot)->fade, 0.0f, 0.3f);
                     else
                         ApproachValue(&(*slot)->fade, 0.0f, 0.08400001f);
@@ -134,7 +134,7 @@ void func_PAL_L01_002B0208(void)
                 } else {
                     ApproachValue(&(*slot)->fade, 1.0f, 0.24000001f);
                     if (((*slot)->flags & 2) && !owner->f22BA) {
-                        owner->attachedMode = 1;
+                        owner->attached_mode = 1;
                         (*slot)->f28 = 0;
                         owner->f22B8 = 0;
                         return;

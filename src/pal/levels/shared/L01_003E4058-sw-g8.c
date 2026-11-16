@@ -49,7 +49,8 @@ extern void ref_L00_003DD6A8_37(char *, char *);
 extern int ref_L00_003DD6A8_38(char *, char *, char *, char *, char *, char *);
 extern void ref_L00_003DD6A8_39(char *, char *), ref_L00_003DD6A8_40(char *, float);
 
-void func_PAL_L01_003E4058(char *object)
+/* Per-frame update of the thrown Spider Bot. It flies out, lands, walks around and then explodes (PAL: 50 Hz timings). */
+void spider_l01_bot_update_pal(char *object)
 {
     char oldpos[16], ahead[16], behind[16];
     char *data = *(char **)(object + 0x68);
@@ -59,8 +60,8 @@ void func_PAL_L01_003E4058(char *object)
     if ((unsigned char)object[0x20] >= 2) {
         ref_L00_003DD6A8_00(object, g_spider_bot_vector, 1);
     } else {
-        char *p = object + 0x10;
-        ref_L00_003DD6A8_01(p, g_spider_bot_vector);
+        char *moby_position = object + 0x10;
+        ref_L00_003DD6A8_01(moby_position, g_spider_bot_vector);
     }
     ref_L00_003DD6A8_02(g_spider_bot_vector, g_spider_bot_vector, -1.0f);
     ref_L00_003DD6A8_02(ahead, object + 0xE0, g_ground_probe_distance);
@@ -123,7 +124,7 @@ void func_PAL_L01_003E4058(char *object)
         if (ref_L00_003DD6A8_04(oldpos, object + 0x10, 2, object, 0)) {
             char *hitinfo = g_collision_result;
             char *hit = *(char **)(hitinfo + 0x18);
-            if (hit && (hit == player->target || *(short *)(hit + 0xAA) == 0x907)) break;
+            if (hit && (hit == player->target || *(short *)(hit + 0xAA) == MOBY_CLASS_SPIDERBOT_GLOVE)) break;
             qcopy(object + 0x10, hitinfo + 0x20);
             ref_L00_003DD6A8_17(data);
             ref_L00_003DD6A8_07(6, 0, 1);

@@ -22,6 +22,7 @@ extern void text_draw_window_medium(unsigned short *, unsigned long, unsigned ch
 extern void gfx_draw_screen_rectangle(int, int, int, int, int, void *);
 extern void DoGifPaging(void);
 
+/* Draws the prompt box over the menu area: the text with a shadow, a border, and a bright copy on top. */
 int menu_prompt_box_draw_us2(PromptMenuPrefix *menu)
 {
     unsigned char *text;

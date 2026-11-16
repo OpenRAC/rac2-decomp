@@ -41,23 +41,24 @@ extern f32 fast_vec_dist(u8 *a, u8 *b);
 extern f32 g_bomb_scale __attribute__((sda));
 extern u8 *g_hit_object_list[];
 
-void boss_setup_screen_effect_pal(u8 *a0)
+/* Sets up the screen effect of the boss. For one variant it also creates the effect record once and fills it in. */
+void boss_setup_screen_effect_pal(u8 *moby)
 {
-    EffectState *s1 = *(EffectState **)(a0 + 0x68);
+    EffectState *vars = *(EffectState **)(moby + 0x68);
 
     follow_camera_set_distance(0, g_boss_cam_distance, 0.003f);
     follow_camera_set_height(g_boss_cam_height, 0.003f);
-    if (*(u8 *)(a0 + 0x95) != 0) {
-        if (s1->effect == 0)
-            s1->effect = (Effect *)cam_alloc_override_slot_pal(5);
+    if (*(u8 *)(moby + 0x95) != 0) {
+        if (vars->effect == 0)
+            vars->effect = (Effect *)cam_alloc_override_slot_pal(5);
         {
             f32 x = g_boss_cam_distance;
             f32 y = g_boss_cam_height;
             u32 z;
-            s1->effect->x = x;
+            vars->effect->x = x;
             z = g_boss_screen_color;
-            s1->effect->y = y;
-            s1->effect->color = z;
+            vars->effect->y = y;
+            vars->effect->color = z;
         }
     }
 }

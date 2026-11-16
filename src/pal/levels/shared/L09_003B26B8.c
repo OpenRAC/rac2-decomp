@@ -13,21 +13,21 @@ extern char g_projectile_draw_callback[];
 /* rebuilds the object's orientation matrix from its stored angles and hands it to the stage */
 void projectile_update_orientation_pal(char *object)
 {
-    char *p = *(char **)(object + 0x68);
-    float m[4];
-    char *q = object + 0x10;
-    char *r = p + 0x10;
+    char *vars = *(char **)(object + 0x68);
+    float quat[4];
+    char *position = object + 0x10;
+    char *offset = vars + 0x10;
 
-    vec_scale_to_length((char *)m, p + 0x30, 1.0f);
-    math_build_axis_angle_quat(m, m, *(float *)(p + 0x5C));
-    FastVecScale(r, p, *(float *)(p + 0x50));
-    vec_rotate_by_quaternion(r, r, (char *)m);
-    *(float *)(p + 0x20) = -*(float *)(p + 0x10);
-    *(float *)(p + 0x24) = -*(float *)(p + 0x14);
-    *(float *)(p + 0x28) = -*(float *)(p + 0x18);
-    FastVecAdd(r, q, r);
-    FastVecAdd(p + 0x20, q, p + 0x20);
-    *(float *)(p + 0x5C) = fast_subtract_rotations(*(float *)(p + 0x5C), 0.37699118f);
+    vec_scale_to_length((char *)quat, vars + 0x30, 1.0f);
+    math_build_axis_angle_quat(quat, quat, *(float *)(vars + 0x5C));
+    FastVecScale(offset, vars, *(float *)(vars + 0x50));
+    vec_rotate_by_quaternion(offset, offset, (char *)quat);
+    *(float *)(vars + 0x20) = -*(float *)(vars + 0x10);
+    *(float *)(vars + 0x24) = -*(float *)(vars + 0x14);
+    *(float *)(vars + 0x28) = -*(float *)(vars + 0x18);
+    FastVecAdd(offset, position, offset);
+    FastVecAdd(vars + 0x20, position, vars + 0x20);
+    *(float *)(vars + 0x5C) = fast_subtract_rotations(*(float *)(vars + 0x5C), 0.37699118f);
     gfx_add_draw_callback_first(g_projectile_draw_callback, object);
 }
 

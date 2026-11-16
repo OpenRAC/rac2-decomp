@@ -31,17 +31,18 @@ extern float g_ribbon_fade_rate __attribute__((sda));
 extern char g_ribbon_buffers[][0x280];
 extern void DrawPrisonScrollingRibbonWithHalo(char *, char *, int, int, int, float, float, float);
 
-void func_PAL_L14_00427E08(char *object) {
-    char *state = *(char **)(object + 0x68);
+/* Draws the two scrolling ribbons (a core and a pair) of the effect, scrolling the texture (PAL: 1.2x speed for 50 Hz). */
+void gfx_draw_ribbon_pair_pal(char *moby) {
+    char *vars = *(char **)(moby + 0x68);
 
     g_ribbon_l14_uv_scroll -= ((g_ribbon_scroll_speed) * 1.2f);
     if (g_ribbon_l14_uv_scroll <= -8.0f)
         g_ribbon_l14_uv_scroll += 8.0f;
-    DrawPrisonScrollingRibbonWithHalo(object, g_ribbon_buffers[*(int *)(state + 0x38)],
-        g_ribbon_l14_draw_param_a, g_ribbon_l14_draw_param_b, *(int *)(state + 0x2C) - 2,
-        *(float *)(state + 0x40), *(float *)(state + 0x44), g_ribbon_end_scale);
-    DrawPrisonScrollingRibbonWithHalo(object, g_ribbon_buffers[*(int *)(state + 0x38)] + 0x140,
-        g_ribbon_pair_color_a, g_ribbon_pair_color_b, *(int *)(state + 0x2C),
+    DrawPrisonScrollingRibbonWithHalo(moby, g_ribbon_buffers[*(int *)(vars + 0x38)],
+        g_ribbon_l14_draw_param_a, g_ribbon_l14_draw_param_b, *(int *)(vars + 0x2C) - 2,
+        *(float *)(vars + 0x40), *(float *)(vars + 0x44), g_ribbon_end_scale);
+    DrawPrisonScrollingRibbonWithHalo(moby, g_ribbon_buffers[*(int *)(vars + 0x38)] + 0x140,
+        g_ribbon_pair_color_a, g_ribbon_pair_color_b, *(int *)(vars + 0x2C),
         g_ribbon_fade_start, g_ribbon_fade_end, g_ribbon_fade_rate);
 }
 

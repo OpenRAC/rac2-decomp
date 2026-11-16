@@ -16,7 +16,7 @@ extern char g_str_thousands_format_b[];
 extern char g_str_number_thousands_format[];
 extern char g_str_number_plain_format[];
 
-void func_PAL_002FAB40(char *dst, int value)
+void text_format_number_with_separators_pal(char *dst, int value)
 {
     if (value > 999999) {
         if (g_pal_region_mode == 3 || g_pal_region_mode == 5 || g_pal_region_mode == 4)

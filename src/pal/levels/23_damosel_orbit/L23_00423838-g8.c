@@ -29,13 +29,13 @@ extern s32 g_trail_ribbon_color_scale_a __attribute__((sda));
 extern s32 g_trail_ribbon_color_scale_b __attribute__((sda));
 extern s32 g_trail_ribbon_halo_value __attribute__((sda));
 
-/* publishes the boot stamp once, seeding the shared state first */
-void func_PAL_L23_00423838(void) {
+/* publishes the boot stamp once, seeding the shared boss first */
+void boss_start_fight_once_pal(void) {
     if (g_boss_fight_timer == 0) {
-        u8 *state = g_mothership_boss_moby;
+        u8 *boss = g_mothership_boss_moby;
 
-        if (state != 0) {
-            PlayMobySound(0x10, 0, state);
+        if (boss != 0) {
+            PlayMobySound(0x10, 0, boss);
         }
     }
     g_boss_fight_timer = ((s32)(g_boss_fight_start_value) * 5 + 2) / 6;

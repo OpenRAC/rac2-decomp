@@ -21,10 +21,11 @@ extern int gfx_swap_packed_color_channels(unsigned int, int);
 extern int math_random_int_range(int, int);
 extern char *part_spawn_firework_spark(void *, void *, int, int, float, int, int, int, int, float);
 extern void swap_color_channel_words(int *, int *, int *, int);
-extern char *func_PAL_003096D0(char *, char *, char *, float, int,
+extern char *part_spawn_shockwave_ring_pal(char *, char *, char *, float, int,
                           unsigned char, unsigned char, unsigned char, unsigned char);
 extern char *moby_spawn_template_effect(char *, void *, int, void *);
 
+/* Spawns a burst of firework sparks and, when there is a parent, two glows, then an optional flash (PAL). */
 void part_l00_spawn_explosion_burst_pal(char *parent, char *position, float scale, float flash)
 {
     BurstVector zero;
@@ -50,13 +51,13 @@ void part_l00_spawn_explosion_burst_pal(char *parent, char *position, float scal
         rgb[0] = 127; rgb[1] = 64; rgb[2] = 0;
         swap_color_channel_words(rgb, rgb + 1, rgb + 2, 1);
         glow = scale * 4.0f;
-        func_PAL_003096D0(parent, position, (char *)&zero, glow, 17,
+        part_spawn_shockwave_ring_pal(parent, position, (char *)&zero, glow, 17,
                       *(unsigned char *)&rgb[0], *(unsigned char *)&rgb[1],
                       *(unsigned char *)&rgb[2], 48);
         rgb[0] = 96; rgb[1] = 32; rgb[2] = 0;
         swap_color_channel_words(rgb, rgb + 1, rgb + 2, 1);
         glow = scale * 3.0f;
-        func_PAL_003096D0(parent, position, (char *)&zero, glow, 24,
+        part_spawn_shockwave_ring_pal(parent, position, (char *)&zero, glow, 24,
                       *(unsigned char *)&rgb[0], *(unsigned char *)&rgb[1],
                       *(unsigned char *)&rgb[2], 32);
     }

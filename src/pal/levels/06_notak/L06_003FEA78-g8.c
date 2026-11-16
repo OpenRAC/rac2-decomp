@@ -8,11 +8,11 @@ extern float math_random_float_range(float, float);
 extern float g_bob_l06_amplitude __attribute__((sda));
 
 /* Advance a moving object's path and keep its spacing from the next object. */
-void func_PAL_L06_00401D78(char *moby)
+void update_path_moby_spacing_pal(char *moby)
 {
     char *state = *(char **)(moby + 0x68);
     char *next;
-    float phase, pathPosition;
+    float phase, path_position;
     int length;
     path_sample_position(*(char **)(state + 0x30), *(int *)(state + 0x40),
                  (float *)(moby + 0x10), (float *)(moby + 0xF0), 0, *(float *)(state + 0x10));
@@ -20,10 +20,10 @@ void func_PAL_L06_00401D78(char *moby)
     *(float *)(state + 0x4C) = phase;
     *(float *)(moby + 0x18) += g_bob_l06_amplitude * math_fast_sin_or_cos_b(phase);
     length = **(int **)(state + 0x30);
-    pathPosition = *(float *)(state + 0x10) + *(float *)(state + 0x14);
-    *(float *)(state + 0x10) = pathPosition;
-    if ((float)length <= pathPosition)
-        *(float *)(state + 0x10) = pathPosition - (float)length;
+    path_position = *(float *)(state + 0x10) + *(float *)(state + 0x14);
+    *(float *)(state + 0x10) = path_position;
+    if ((float)length <= path_position)
+        *(float *)(state + 0x10) = path_position - (float)length;
     if (*(float *)(state + 0x14) > *(float *)(state + 0x38))
         *(float *)(state + 0x14) -= *(float *)(state + 0x18);
     else
@@ -31,23 +31,23 @@ void func_PAL_L06_00401D78(char *moby)
     next = *(char **)(state + 0x34);
     if (next && next != moby) {
         char *other = *(char **)(next + 0x68);
-        float nextSpeed;
+        float next_speed;
         float gap = *(float *)(other + 0x10) - *(float *)(state + 0x10);
-        float ownSpeed;
+        float own_speed;
         if (gap < 0.0f)
             gap += (float)**(int **)(state + 0x30);
-        nextSpeed = *(float *)(other + 0x38);
-        ownSpeed = *(float *)(state + 0x38);
-        if (nextSpeed < ownSpeed) {
-            float difference = ownSpeed - nextSpeed;
+        next_speed = *(float *)(other + 0x38);
+        own_speed = *(float *)(state + 0x38);
+        if (next_speed < own_speed) {
+            float difference = own_speed - next_speed;
             float deceleration = *(float *)(state + 0x18);
-            float nextMargin = *(float *)(other + 0x1C);
-            float ownMargin = *(float *)(state + 0x1C);
+            float next_margin = *(float *)(other + 0x1C);
+            float own_margin = *(float *)(state + 0x1C);
             deceleration += deceleration;
             /* The shared source line preserves the measured debug-label padding. */
-            difference *= difference; if (gap < difference / deceleration + nextMargin + ownMargin) {
-                *(float *)(other + 0x38) = ownSpeed;
-                *(float *)(state + 0x38) = nextSpeed;
+            difference *= difference; if (gap < difference / deceleration + next_margin + own_margin) {
+                *(float *)(other + 0x38) = own_speed;
+                *(float *)(state + 0x38) = next_speed;
             }
         }
         if (*(unsigned char *)(*(char **)(state + 0x34) + 0x20) == 2 &&

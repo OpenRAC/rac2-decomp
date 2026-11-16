@@ -7,12 +7,13 @@ extern float g_enemy_anim_limit_turn_a __attribute__((sda)), g_enemy_anim_limit_
 extern float g_trooper_limit_turn_c __attribute__((sda)), g_trooper_limit_turn_d __attribute__((sda));
 extern void STUB_printf(const char *, ...);
 extern void moby_set_controller_speed_limits(void *, float, float, float, float);
-extern void func_PAL_002A7E68(void *, int, int, int);
+extern void anim_start_blended_pal(void *, int, int, int);
 #define I(p,o) (*(int *)((p)+(o)))
 #define F(p,o) (*(float *)((p)+(o)))
 #define B(p,o) (*(unsigned char *)((p)+(o)))
 
-void enemy_set_animation_state_pal(char *object, int state, int a2, int a3) {
+/* Switches the enemy and its partner to a new animation and sets how fast it turns and moves in that animation (PAL). */
+void enemy_set_animation_state_pal(char *object, int state, int start_frame, int blend_time) {
     char *data = *(char **)(object+0x68);
     STUB_printf(g_str_enemy_state_debug, *(short *)(object+0xB2), state);
     if (state == 12) {
@@ -37,8 +38,8 @@ void enemy_set_animation_state_pal(char *object, int state, int a2, int a3) {
         B(data,0xC2)=10; B(data,0xC3)=17; B(data,0xC6)=0;
     }
     if ((I(data,0x428) || (I(data,0x2DC)!=-1 && I(data,0x2DC)==I(data,0x2B0))) && state!=15) {
-        if (B(object,0x43)!=14) func_PAL_002A7E68(object,14,a2,a3);
-    } else if (B(object,0x43)!=state) func_PAL_002A7E68(object,state,a2,a3);
+        if (B(object,0x43)!=14) anim_start_blended_pal(object,14,start_frame,blend_time);
+    } else if (B(object,0x43)!=state) anim_start_blended_pal(object,state,start_frame,blend_time);
     { char *partner=*(char **)(data+0x2F8);
-    if (partner && B(partner,0x43)!=state) func_PAL_002A7E68(partner,state,a2,a3); }
+    if (partner && B(partner,0x43)!=state) anim_start_blended_pal(partner,state,start_frame,blend_time); }
 }

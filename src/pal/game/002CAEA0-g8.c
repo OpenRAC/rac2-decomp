@@ -50,7 +50,8 @@ extern void level_forward_value_b_pal(int);
 extern void level_forward_value(int);
 extern void SubmitBufferedDmaChain(void);
 
-void func_PAL_002CB410(void)
+/* Closes the pause menu after its fade: runs the widget close callbacks, saves changed weapon choices to the hero state and returns the menu to its idle mode (PAL). */
+void menu_close_and_save_choices_pal(void)
 {
     int i, j;
 

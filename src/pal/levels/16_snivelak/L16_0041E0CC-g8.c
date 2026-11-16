@@ -29,7 +29,8 @@ extern float g_marker_rotation_speed __attribute__((sda));
 extern float g_marker_l13_rise_speed __attribute__((sda));
 extern float g_marker_value_speed __attribute__((sda));
 
-void func_PAL_L16_0041E588(char *object)
+/* Runs a glowing marker that spins and pulses, and reports when the player or a shot touches it (PAL: 50 Hz rates). */
+void spinning_marker_update_pal(char *object)
 {
     MarkerWorkspace local;
     float *state=*(float **)(object+0x68);

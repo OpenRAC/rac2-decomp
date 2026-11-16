@@ -39,9 +39,9 @@ typedef struct {
     short x280;
     u8 pad282[6];
     short timer;
-    short savedMode;
-    short savedAnim;
-    u8 savedPhase;
+    short saved_mode;
+    short saved_anim;
+    u8 saved_phase;
     u8 pad28F;
     short forced;
     short x292;
@@ -53,7 +53,7 @@ struct Actor {
     u8 pad21[0x13];
     unsigned short flags;
     u8 pad36[0xC];
-    u8 previousAnim;
+    u8 previous_anim;
     u8 anim;
     u8 pad44[4];
     float x48;
@@ -62,7 +62,7 @@ struct Actor {
     u8 pad61[7];
     SentryState *state;
     u8 pad6C[0x2A];
-    unsigned short stateTime;
+    unsigned short state_time;
     u8 pad98[4];
     int x9C;
     u8 padA0[0x18];
@@ -89,7 +89,7 @@ extern float fast_vec_dist(void *, void *);
 extern float mat_fast_helper_a(float, float);
 extern float moby_get_anim_value(Actor *);
 extern int flag_set_first_pending(Actor *);
-extern void func_PAL_002A7E68(Actor *, int, int, int);
+extern void anim_start_blended_pal(Actor *, int, int, int);
 extern void moby_set_state(Actor *, int, int);
 extern float math_random_float_range(float, float);
 extern void arena_set_current_boss(Actor *, Actor *);
@@ -99,7 +99,7 @@ extern int snd_play_from_global_bank(int, int, void *);
 extern void value_set_entry_by_index_pal(int, int);
 extern int FastDecTimer(short *);
 extern void vec_clear_128(Quadword *);
-extern void func_PAL_L02_003DD308(Actor *);
+extern void walker_boss_update_damage_pal(Actor *);
 extern float coll_probe_ground_height_below(void *, int, float);
 extern float *arena_get_camera_point(Actor *);
 extern void FastVecSub(void *, void *, void *);
@@ -118,31 +118,31 @@ extern int snd_is_voice_playing_for_owner(Actor *, int);
 extern void snd_stop_voice(int);
 extern void boss_spawn_joint_sparks_pal(Actor *);
 extern float IntToFloat(int);
-extern char *func_PAL_L02_0032D5F8(Actor *, int, void *, void *, int, int, void *, void *, void *, float);
-extern void func_PAL_L02_003DFD18(Actor *, void *);
+extern char *part_spawn_flying_fragment_pal(Actor *, int, void *, void *, int, int, void *, void *, void *, float);
+extern void part_spawn_green_glitter_pal(Actor *, void *);
 extern void moby_mark_spawned(Actor *);
 extern int snd_play_from_class_bank(int, int, Actor *, int);
 extern void *SpawnExplosion_pal(void *, int, int, float, int, int, int, int, int, float, int, int, int, void *);
 extern void moby_transform_joint_to_world(Actor *, int, void *);
 extern void vec_random_direction(float *, float, float);
-extern void func_PAL_002B15D8(Actor *, int, float *, float, float, float, float, unsigned char);
+extern void part_spawn_masked_debris_pal(Actor *, int, float *, float, float, float, float, unsigned char);
 extern void brawler_switch_off_actor(Actor *);
 extern void turret_update_linked_object(Actor *);
 
 /* Drive this actor's emergence, movement, attacks and destruction. */
-void func_PAL_L02_003DBD24(Actor *self)
+void brawler_legs_update_pal(Actor *self)
 {
     SentryState *state;
     char *slot;
     Actor *child;
     float target[4] __attribute__((aligned(16)));
     float direction[4] __attribute__((aligned(16)));
-    float curve[4] __attribute__((aligned(16)));
+    float burst_velocity[4] __attribute__((aligned(16)));
     float distance, yaw, frame, facing, value;
-    short damageKind;
+    short damage_kind;
     int sound;
 
-    func_PAL_L02_003DD308(self);
+    walker_boss_update_damage_pal(self);
     state = self->state;
     *(Quadword *)target = 0;
     if (state->target) {
@@ -151,11 +151,11 @@ void func_PAL_L02_003DBD24(Actor *self)
     distance = vec_distance_xy(self->position, target);
     yaw = mat_fast_helper_a(target[0] - self->position[0], target[1] - self->position[1]);
     frame = moby_get_anim_value(self);
-    damageKind = 0;
+    damage_kind = 0;
     if (((ResidentView *)g_hero_state)->damage) {
-        damageKind = *(short *)((char *)((ResidentView *)g_hero_state)->damage + 0xAA);
+        damage_kind = *(short *)((char *)((ResidentView *)g_hero_state)->damage + 0xAA);
     }
-    if (((ResidentView *)g_hero_state)->motion == 7 || ((ResidentView *)g_hero_state)->damage == self || damageKind == 0xD08) {
+    if (((ResidentView *)g_hero_state)->motion == 7 || ((ResidentView *)g_hero_state)->damage == self || damage_kind == 0xD08) {
         state->forced = 1;
     }
     switch (self->mode) {
@@ -166,21 +166,21 @@ void func_PAL_L02_003DBD24(Actor *self)
         state->forced = 0;
         if (flag_set_first_pending(self)) {
             self->phase = 0;
-            self->stateTime = 0;
-            func_PAL_002A7E68(self, 0, 0, 3);
+            self->state_time = 0;
+            anim_start_blended_pal(self, 0, 0, 3);
             if ((g_moby_l02_pool + self->state->proxy)->anim) {
-                func_PAL_002A7E68((g_moby_l02_pool + self->state->proxy), 0, 0, 8);
+                anim_start_blended_pal((g_moby_l02_pool + self->state->proxy), 0, 0, 8);
                 break;
             }
             break;
         }
-        if (self->phase == 0 && self->stateTime > 50) {
+        if (self->phase == 0 && self->state_time > 50) {
             self->phase = 1;
             if (self->anim != 3) {
-                func_PAL_002A7E68(self, 3, 0, 8);
+                anim_start_blended_pal(self, 3, 0, 8);
             }
             if ((g_moby_l02_pool + self->state->proxy)->anim != 6) {
-                func_PAL_002A7E68((g_moby_l02_pool + self->state->proxy), 6, 0, 8);
+                anim_start_blended_pal((g_moby_l02_pool + self->state->proxy), 6, 0, 8);
             }
             self->position[2] = coll_probe_ground_height_below(self->position, 0, 10.0f);
             FastVecSub(direction, arena_get_camera_point(self->parent), self->position);
@@ -194,10 +194,10 @@ void func_PAL_L02_003DBD24(Actor *self)
         else if (self->phase == 1 && (self->x60 & 2)) {
             self->phase = 2;
             if (self->anim != 4) {
-                func_PAL_002A7E68(self, 4, 0, 6);
+                anim_start_blended_pal(self, 4, 0, 6);
             }
             if ((g_moby_l02_pool + self->state->proxy)->anim != 7) {
-                func_PAL_002A7E68((g_moby_l02_pool + self->state->proxy), 7, 0, 8);
+                anim_start_blended_pal((g_moby_l02_pool + self->state->proxy), 7, 0, 8);
                 break;
             }
             break;
@@ -207,10 +207,10 @@ void func_PAL_L02_003DBD24(Actor *self)
             self->phase = 3;
             state->x292 = 0;
             if (self->anim != 5) {
-                func_PAL_002A7E68(self, 5, 3, 2);
+                anim_start_blended_pal(self, 5, 3, 2);
             }
             if ((g_moby_l02_pool + self->state->proxy)->anim != 8) {
-                func_PAL_002A7E68((g_moby_l02_pool + self->state->proxy), 8, 0, 8);
+                anim_start_blended_pal((g_moby_l02_pool + self->state->proxy), 8, 0, 8);
             }
             boss_rebuild_joint_widgets(self);
             break;
@@ -227,10 +227,10 @@ void func_PAL_L02_003DBD24(Actor *self)
                 ((EffectTuning *)g_hero_effect_state)->detail = 0;
                 vec_clear_128(&state->xF0);
                 if (self->anim) {
-                    func_PAL_002A7E68(self, 0, 0, 0);
+                    anim_start_blended_pal(self, 0, 0, 0);
                 }
                 if ((g_moby_l02_pool + self->state->proxy)->anim) {
-                    func_PAL_002A7E68((g_moby_l02_pool + self->state->proxy), 0, 0, 0);
+                    anim_start_blended_pal((g_moby_l02_pool + self->state->proxy), 0, 0, 0);
                 }
                 moby_set_state(self, 5, 1);
                 state->timer = (((int)(FloatToInt(math_random_float_range(600.0f, 1200.0f))) * 5 + 2) / 6);
@@ -242,13 +242,13 @@ void func_PAL_L02_003DBD24(Actor *self)
             self->phase = 0;
             qcopy(state->home, g_brawler_home_position);
             if (self->anim != 1) {
-                func_PAL_002A7E68(self, 1, 0, 8);
+                anim_start_blended_pal(self, 1, 0, 8);
             }
             brawler_clear_damage_stage_latch(self);
             chainblade_advance_health_phase(state->child);
             arena_set_current_boss(self->parent, state->child);
             vec_clear_128(&state->xF0);
-            self->stateTime = 0;
+            self->state_time = 0;
             break;
         }
         if (self->phase == 0) {
@@ -256,10 +256,10 @@ void func_PAL_L02_003DBD24(Actor *self)
             if (value < 0.01f) {
                 self->phase = 1;
                 if (self->anim != 3) {
-                    func_PAL_002A7E68(self, 3, 0, 8);
+                    anim_start_blended_pal(self, 3, 0, 8);
                 }
                 if ((g_moby_l02_pool + self->state->proxy)->anim != 6) {
-                    func_PAL_002A7E68((g_moby_l02_pool + self->state->proxy), 6, 0, 8);
+                    anim_start_blended_pal((g_moby_l02_pool + self->state->proxy), 6, 0, 8);
                 }
                 vec_clear_128(&state->xF0);
                 moby_aim_move_record_at_target(self, g_brawler_target_position, 0.40000004f, state->x7C);
@@ -268,25 +268,25 @@ void func_PAL_L02_003DBD24(Actor *self)
         }
         if (self->phase == 1 && (self->x60 & 2)) {
             self->phase = 2;
-            self->stateTime = 0;
+            self->state_time = 0;
             if (self->anim != 4) {
-                func_PAL_002A7E68(self, 4, 0, 8);
+                anim_start_blended_pal(self, 4, 0, 8);
             }
             if ((g_moby_l02_pool + self->state->proxy)->anim != 7) {
-                func_PAL_002A7E68((g_moby_l02_pool + self->state->proxy), 7, 0, 8);
+                anim_start_blended_pal((g_moby_l02_pool + self->state->proxy), 7, 0, 8);
                 break;
             }
         } else if (self->phase == 2) {
             value = fast_vec_dist(self->position, g_brawler_target_position);
-            if (!(value < 1.0f) && self->stateTime < 251) {
+            if (!(value < 1.0f) && self->state_time < 251) {
                 break;
             }
             self->phase = 3;
             if (self->anim != 5) {
-                func_PAL_002A7E68(self, 5, 0, 8);
+                anim_start_blended_pal(self, 5, 0, 8);
             }
             if ((g_moby_l02_pool + self->state->proxy)->anim != 8) {
-                func_PAL_002A7E68((g_moby_l02_pool + self->state->proxy), 8, 0, 8);
+                anim_start_blended_pal((g_moby_l02_pool + self->state->proxy), 8, 0, 8);
                 break;
             }
         } else if (self->phase == 3 && (self->x60 & 2)) {
@@ -296,10 +296,10 @@ void func_PAL_L02_003DBD24(Actor *self)
     case 4:
         if (flag_set_first_pending(self)) {
             if (self->anim) {
-                func_PAL_002A7E68(self, 0, 0, 8);
+                anim_start_blended_pal(self, 0, 0, 8);
             }
             if ((g_moby_l02_pool + self->state->proxy)->anim) {
-                func_PAL_002A7E68((g_moby_l02_pool + self->state->proxy), 0, 0, 8);
+                anim_start_blended_pal((g_moby_l02_pool + self->state->proxy), 0, 0, 8);
             }
         }
         vec_step_toward_target_limited(self->position, g_brawler_target_position, 0.20000002f);
@@ -310,10 +310,10 @@ void func_PAL_L02_003DBD24(Actor *self)
     case 5:
         if (flag_set_first_pending(self)) {
             if (self->anim != 1) {
-                func_PAL_002A7E68(self, 1, 0, 12);
+                anim_start_blended_pal(self, 1, 0, 12);
             }
             if ((g_moby_l02_pool + self->state->proxy)->anim != 1) {
-                func_PAL_002A7E68((g_moby_l02_pool + self->state->proxy), 1, 0, 8);
+                anim_start_blended_pal((g_moby_l02_pool + self->state->proxy), 1, 0, 8);
             }
             self->phase = 1;
         }
@@ -321,31 +321,31 @@ void func_PAL_L02_003DBD24(Actor *self)
         if (self->phase == 1 && facing > 0.78539824f) {
             self->phase = 2;
             if (self->anim != 2) {
-                func_PAL_002A7E68(self, 2, 0, 12);
+                anim_start_blended_pal(self, 2, 0, 12);
             }
             if ((g_moby_l02_pool + self->state->proxy)->anim != 3) {
-                func_PAL_002A7E68((g_moby_l02_pool + self->state->proxy), 3, 0, 8);
+                anim_start_blended_pal((g_moby_l02_pool + self->state->proxy), 3, 0, 8);
             }
         }
         if (self->phase == 2 && facing < 0.17453295f) {
             self->phase = 1;
             if (self->anim != 1) {
-                func_PAL_002A7E68(self, 1, 0, 12);
+                anim_start_blended_pal(self, 1, 0, 12);
             }
             if ((g_moby_l02_pool + self->state->proxy)->anim != 1) {
-                func_PAL_002A7E68((g_moby_l02_pool + self->state->proxy), 1, 0, 8);
+                anim_start_blended_pal((g_moby_l02_pool + self->state->proxy), 1, 0, 8);
             }
         }
         if (self->phase == 1 && distance < 10.0f) {
             self->phase = 0;
             if (self->anim) {
-                func_PAL_002A7E68(self, 0, 0, 12);
+                anim_start_blended_pal(self, 0, 0, 12);
             }
         }
         if (self->phase == 0 && distance > 20.0f) {
             self->phase = 1;
             if (self->anim != 1) {
-                func_PAL_002A7E68(self, 1, 0, 8);
+                anim_start_blended_pal(self, 1, 0, 8);
             }
         }
         if (((ResidentView *)g_hero_state)->damage) {
@@ -361,30 +361,30 @@ void func_PAL_L02_003DBD24(Actor *self)
         break;
     case 6:
         if (flag_set_first_pending(self)) {
-            if (self->previousAnim == 7) {
+            if (self->previous_anim == 7) {
                 self->phase = 1;
                 if ((g_moby_l02_pool + self->state->proxy)->anim != 10) {
-                    func_PAL_002A7E68((g_moby_l02_pool + self->state->proxy), 10, 0, 8);
+                    anim_start_blended_pal((g_moby_l02_pool + self->state->proxy), 10, 0, 8);
                 }
-            } else if (self->previousAnim == 6) {
+            } else if (self->previous_anim == 6) {
                 self->phase = 0;
                 self->flags &= 0xEFFF;
             } else {
                 if (self->anim != 6) {
-                    func_PAL_002A7E68(self, 6, 0, 0);
+                    anim_start_blended_pal(self, 6, 0, 0);
                 }
                 if ((g_moby_l02_pool + self->state->proxy)->anim != 9) {
-                    func_PAL_002A7E68((g_moby_l02_pool + self->state->proxy), 9, 0, 8);
+                    anim_start_blended_pal((g_moby_l02_pool + self->state->proxy), 9, 0, 8);
                 }
                 self->phase = 0;
                 self->flags &= 0xEFFF;
             }
         } else if (self->phase == 0 && frame > 28.0f) {
             if (self->anim != 7) {
-                func_PAL_002A7E68(self, 7, 0, 0);
+                anim_start_blended_pal(self, 7, 0, 0);
             }
             if ((g_moby_l02_pool + self->state->proxy)->anim != 10) {
-                func_PAL_002A7E68((g_moby_l02_pool + self->state->proxy), 10, 0, 8);
+                anim_start_blended_pal((g_moby_l02_pool + self->state->proxy), 10, 0, 8);
             }
             self->phase = 1;
             state->x30 = 1.5f;
@@ -396,10 +396,10 @@ void func_PAL_L02_003DBD24(Actor *self)
             self->x9C = 1;
             if (FastDecTimer(&state->timer) || brawler_is_health_below_stage(self)) {
                 if (self->anim != 8) {
-                    func_PAL_002A7E68(self, 8, 0, 0);
+                    anim_start_blended_pal(self, 8, 0, 0);
                 }
                 if ((g_moby_l02_pool + self->state->proxy)->anim != 11) {
-                    func_PAL_002A7E68((g_moby_l02_pool + self->state->proxy), 11, 0, 8);
+                    anim_start_blended_pal((g_moby_l02_pool + self->state->proxy), 11, 0, 8);
                 }
                 self->phase = 2;
                 self->flags &= 0xEFFF;
@@ -428,41 +428,41 @@ void func_PAL_L02_003DBD24(Actor *self)
     case 7:
         if (flag_set_first_pending(self)) {
             if ((g_moby_l02_pool + self->state->proxy)->anim != 7) {
-                func_PAL_002A7E68((g_moby_l02_pool + self->state->proxy), 7, 0, 12);
+                anim_start_blended_pal((g_moby_l02_pool + self->state->proxy), 7, 0, 12);
             }
             state->x24C += 0.27925274f;
-            self->stateTime = 0;
-        } else if (self->stateTime >= 181) {
+            self->state_time = 0;
+        } else if (self->state_time >= 181) {
             moby_set_state(self, 6, -1);
         }
         break;
     case 8:
         if (flag_set_first_pending(self)) {
             if (self->anim != 8) {
-                func_PAL_002A7E68(self, 8, 0, 17);
+                anim_start_blended_pal(self, 8, 0, 17);
             }
             if ((g_moby_l02_pool + self->state->proxy)->anim != 9) {
-                func_PAL_002A7E68((g_moby_l02_pool + self->state->proxy), 9, 0, 12);
+                anim_start_blended_pal((g_moby_l02_pool + self->state->proxy), 9, 0, 12);
             }
             state->x24C += 0.27925274f;
         } else if (frame > 45.0f) {
-            moby_set_state(self, state->savedMode, -1);
+            moby_set_state(self, state->saved_mode, -1);
         }
         break;
     case 9:
         if (flag_set_first_pending(self)) {
             if ((g_moby_l02_pool + self->state->proxy)->anim != 12) {
-                func_PAL_002A7E68((g_moby_l02_pool + self->state->proxy), 12, 0, 12);
+                anim_start_blended_pal((g_moby_l02_pool + self->state->proxy), 12, 0, 12);
             }
         }
         boss_spawn_joint_sparks_pal(self);
         if (!((g_moby_l02_pool + self->state->proxy)->x60 & 2)) {
             break;
         }
-        self->mode = state->savedMode;
-        self->phase = state->savedPhase;
-        if ((g_moby_l02_pool + self->state->proxy)->anim != state->savedAnim) {
-            func_PAL_002A7E68((g_moby_l02_pool + self->state->proxy), state->savedAnim, 0, 12);
+        self->mode = state->saved_mode;
+        self->phase = state->saved_phase;
+        if ((g_moby_l02_pool + self->state->proxy)->anim != state->saved_anim) {
+            anim_start_blended_pal((g_moby_l02_pool + self->state->proxy), state->saved_anim, 0, 12);
         }
         break;
     case 10:
@@ -475,31 +475,31 @@ void func_PAL_L02_003DBD24(Actor *self)
                 }
             }
             state->sound = -1;
-            if (self->previousAnim == 7) {
+            if (self->previous_anim == 7) {
                 self->phase = 1;
                 if ((g_moby_l02_pool + self->state->proxy)->anim != 13) {
-                    func_PAL_002A7E68((g_moby_l02_pool + self->state->proxy), 13, 0, 12);
+                    anim_start_blended_pal((g_moby_l02_pool + self->state->proxy), 13, 0, 12);
                 }
                 break;
             }
             else {
                 self->phase = 0;
-                if (self->previousAnim != 6 && self->anim != 9) {
-                    func_PAL_002A7E68(self, 9, 0, 12);
+                if (self->previous_anim != 6 && self->anim != 9) {
+                    anim_start_blended_pal(self, 9, 0, 12);
                 }
             }
             if ((g_moby_l02_pool + self->state->proxy)->anim != 13) {
-                func_PAL_002A7E68((g_moby_l02_pool + self->state->proxy), 13, 0, 12);
+                anim_start_blended_pal((g_moby_l02_pool + self->state->proxy), 13, 0, 12);
             }
             break;
         }
         if (self->phase == 0 && (self->x60 & 2)) {
             self->phase = 1;
             if ((g_moby_l02_pool + self->state->proxy)->anim != 13) {
-                func_PAL_002A7E68((g_moby_l02_pool + self->state->proxy), 13, 0, 12);
+                anim_start_blended_pal((g_moby_l02_pool + self->state->proxy), 13, 0, 12);
             }
             if (self->anim != 7) {
-                func_PAL_002A7E68(self, 7, 0, 8);
+                anim_start_blended_pal(self, 7, 0, 8);
                 break;
             }
         } else if (self->phase == 1 && ((g_moby_l02_pool + self->state->proxy)->x60 & 2)) {
@@ -516,14 +516,14 @@ void func_PAL_L02_003DBD24(Actor *self)
             }
             self->x48 = 0.0f;
             (g_moby_l02_pool + self->state->proxy)->x48 = 0.0f;
-            self->stateTime = 0;
+            self->state_time = 0;
             FastVecSub(direction, g_camera_l02_position, (g_moby_l02_pool + self->state->proxy)->position);
             vec_scale_to_length(direction, direction, math_random_float_range(0.10000001f, 0.14000002f));
             direction[2] += 0.080000006f;
             if (self->state->launcher) {
-                func_PAL_L02_0032D5F8(self->state->launcher, 0xA4C, self->state->launcher->position, self->state->launcher->rot, 250, 0, direction,
+                part_spawn_flying_fragment_pal(self->state->launcher, 0xA4C, self->state->launcher->position, self->state->launcher->rot, 250, 0, direction,
                         g_zero_l02_vector, g_zero_l02_vector, 0.002f);
-                func_PAL_L02_003DFD18(self, g_zero_l02_vector);
+                part_spawn_green_glitter_pal(self, g_zero_l02_vector);
                 moby_mark_spawned(self->state->launcher);
                 self->state->launcher = 0;
                 snd_play_from_class_bank(5, 0, self, 0xA44);
@@ -533,12 +533,12 @@ void func_PAL_L02_003DBD24(Actor *self)
             state->scale[0] = state->scale[1] = state->scale[2] = 2.0f;
             self->flags &= 0xEFFF;
         }
-        value = IntToFloat(self->stateTime) * -0.013333267f + 2.0f;
+        value = IntToFloat(self->state_time) * -0.013333267f + 2.0f;
         if (value < 0.0f) {
             value = 0.0f;
         }
         state->scale[0] = state->scale[1] = state->scale[2] = value;
-        if (self->stateTime > 150) {
+        if (self->state_time > 150) {
             self->x48 = 1.0f;
             (g_moby_l02_pool + self->state->proxy)->x48 = 1.0f;
             SpawnExplosion_pal(self->position, 1, 25, 2.0f, 20, 30, 40, 45, 1, 20.0f, 0, 1, 0, 0);
@@ -550,10 +550,10 @@ void func_PAL_L02_003DBD24(Actor *self)
             SpawnExplosion_pal(self->position, 0, 20, 0.7f, 0, 15, 10, 30, 1, 20.0f, 0, 0, 0, 0);
             moby_transform_joint_to_world(self, 8, direction);
             SpawnExplosion_pal(self->position, 0, 5, 0.7f, 15, 5, 25, 25, 1, 20.0f, 0, 0, 0, 0);
-            vec_random_direction(curve, 0.120000005f, 0.24000001f);
-            func_PAL_002B15D8(self, 0xFFF, curve, 3.0f, 6.0f, 3.0f, 6.0f, 255);
-            vec_random_direction(curve, 0.16000001f, 0.32000002f);
-            func_PAL_002B15D8((g_moby_l02_pool + self->state->proxy), 0x1F, curve, 3.0f, 6.0f, 3.0f, 6.0f, 255);
+            vec_random_direction(burst_velocity, 0.120000005f, 0.24000001f);
+            part_spawn_masked_debris_pal(self, 0xFFF, burst_velocity, 3.0f, 6.0f, 3.0f, 6.0f, 255);
+            vec_random_direction(burst_velocity, 0.16000001f, 0.32000002f);
+            part_spawn_masked_debris_pal((g_moby_l02_pool + self->state->proxy), 0x1F, burst_velocity, 3.0f, 6.0f, 3.0f, 6.0f, 255);
             snd_play_from_class_bank(5, 0, self, 0xA44);
             brawler_switch_off_actor(self);
             state->scale[0] = state->scale[1] = state->scale[2] = 1.0f;

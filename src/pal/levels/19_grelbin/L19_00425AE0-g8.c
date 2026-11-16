@@ -13,64 +13,64 @@ extern void moby_mark_spawned(void *);
 extern int moby_is_in_selected_zone(void *);
 extern float coll_probe_ground_height_below(void *, int, float);
 extern int CollLine(void *, void *, int, void *, void *);
-extern void mat_align_to_dir(void *, void *, void *), moby_set_state(void *, int, int), func_PAL_L19_004289C0(void *);
+extern void mat_align_to_dir(void *, void *, void *), moby_set_state(void *, int, int), EmitGrelbinGlowSprites_pal(void *);
 extern void *part_find_owned_effect_slot(void *, int, int);
 extern float moby_update_aim_target_strength_pal(void *, void *), IntToFloat(int);
 extern int FloatToInt(float);
-extern void func_PAL_002AC290(void *, void *), anim_start_immediate(void *, int, int), func_PAL_002AC3C0(void *, void *);
+extern void gfx_start_color_fade_pal(void *, void *), anim_start_immediate(void *, int, int), gfx_update_color_fade_pal(void *, void *);
 extern int math_random_int_range(int,int);
 extern int PlayMobySound(int,int,void *);
-extern void func_PAL_002B15D8(void *, int, void *, float, float, float, float, int);
+extern void part_spawn_masked_debris_pal(void *, int, void *, float, float, float, float, int);
 extern char *CreateMoby(int);
 extern void func_002A0F48(void *), hero_copy_field_to_moby(void *);
 /* Remove the object when its persistence state says so; otherwise apply hit damage
  * and spawn object kind 0x1266 when health runs out. */
-void UpdateBreakablePickupSpawner_pal(char *o)
+void UpdateBreakablePickupSpawner_pal(char *moby)
 {
- char *d, *hit, *n;
+ char *vars, *hit_info, *drop_moby;
  float *health; char *color;
- float a[4] __attribute__((aligned(16))), b[4] __attribute__((aligned(16)));
+ float scratch_a[4] __attribute__((aligned(16))), scratch_b[4] __attribute__((aligned(16)));
  float damage;
- if (*(u8 *)(o+0xb0)!=255) {
-  unsigned short id=*(unsigned short *)(o+0xb2);
-  int v;
-  if (g_trigger_active_table.state[(short)id] || (v=g_moby_nibble_table[((short)id>>1)+(g_current_map_index<<10)], (id&1) ? ((v>>4)&7) : (v&7))) {moby_mark_spawned(o);return;}
+ if (*(u8 *)(moby+0xb0)!=255) {
+  unsigned short id=*(unsigned short *)(moby+0xb2);
+  int saved_count;
+  if (g_trigger_active_table.state[(short)id] || (saved_count=g_moby_nibble_table[((short)id>>1)+(g_current_map_index<<10)], (id&1) ? ((saved_count>>4)&7) : (saved_count&7))) {moby_mark_spawned(moby);return;}
  }
- if (!moby_is_in_selected_zone(o+0x10)) return;
- d=*(char **)(o+0x68);
- if (!*(u8 *)(o+0x20)) {
-  *(int *)(o+0x78)=g_moby_default_word;
-  *(float *)(o+0x18)=coll_probe_ground_height_below(o+0x10,0,0.5f)-0.1f;
-  *(u8 *)(o+0x31)=1; *(u16 *)(o+0x34)|=0x100; *(int *)(o+0x48)=0;
-  qcopy(a,o+0x10); qcopy(b,o+0x10); a[2]+=1; b[2]-=10;
-  CollLine(a,b,2,o,0);
-  mat_align_to_dir(o+0xc0,g_hit_matrix_buf,0); moby_set_state(o,1,0);
+ if (!moby_is_in_selected_zone(moby+0x10)) return;
+ vars=*(char **)(moby+0x68);
+ if (!*(u8 *)(moby+0x20)) {
+  *(int *)(moby+0x78)=g_moby_default_word;
+  *(float *)(moby+0x18)=coll_probe_ground_height_below(moby+0x10,0,0.5f)-0.1f;
+  *(u8 *)(moby+0x31)=1; *(u16 *)(moby+0x34)|=0x100; *(int *)(moby+0x48)=0;
+  qcopy(scratch_a,moby+0x10); qcopy(scratch_b,moby+0x10); scratch_a[2]+=1; scratch_b[2]-=10;
+  CollLine(scratch_a,scratch_b,2,moby,0);
+  mat_align_to_dir(moby+0xc0,g_hit_matrix_buf,0); moby_set_state(moby,1,0);
  }
- if (*(u8 *)(o+0x31)) func_PAL_L19_004289C0(o);
- if (*(u8 *)(o+0x20)!=1) return;
- hit=part_find_owned_effect_slot(o,0x230000,0);
- health=(float *)(d+0x20);color=d+0x50;
- damage=moby_update_aim_target_strength_pal(o,hit);
+ if (*(u8 *)(moby+0x31)) EmitGrelbinGlowSprites_pal(moby);
+ if (*(u8 *)(moby+0x20)!=1) return;
+ hit_info=part_find_owned_effect_slot(moby,0x230000,0);
+ health=(float *)(vars+0x20);color=vars+0x50;
+ damage=moby_update_aim_target_strength_pal(moby,hit_info);
  if(damage>0) {
   *health-=damage;
   *(u8 *)(color+7)=255; *(u8 *)(color+8)=255; *(u8 *)(color+9)=255;
-  func_PAL_002AC290(o,color);
-  anim_start_immediate(o,0,FloatToInt(IntToFloat(*(short *)(d+0x24))-*health)<8 ? FloatToInt(IntToFloat(*(short *)(d+0x24))-*health):7);
-  {int s=math_random_int_range(0,2); if(*health>0)PlayMobySound(s,0,o);}
+  gfx_start_color_fade_pal(moby,color);
+  anim_start_immediate(moby,0,FloatToInt(IntToFloat(*(short *)(vars+0x24))-*health)<8 ? FloatToInt(IntToFloat(*(short *)(vars+0x24))-*health):7);
+  {int sound_index=math_random_int_range(0,2); if(*health>0)PlayMobySound(sound_index,0,moby);}
  }
- *(u8 *)(o+0xa8)=255;func_PAL_002AC3C0(o,color);
+ *(u8 *)(moby+0xa8)=255;gfx_update_color_fade_pal(moby,color);
  if(*health<=0) {
-  qzero(a); a[2]=0.20000002f;
-  if(hit)qcopy(b,hit);else {qcopy(b,o+0x10); b[2]+=2;}
-  qzero(a);a[2]=0.18f;
-  func_PAL_002B15D8(o,15,a,3,6,3,6,255);
-  n=CreateMoby(0x1266);
-  if(n) {
-   *(u8 *)(n+0x23)=0x50;*(u16 *)(n+0x34)|=0x800;
-   *(float *)(n+0x2c)=*(float *)(*(char **)(n+0x24)+0x24)*0.65f;
-   *(u8 *)(n+0x30)=255;*(u16 *)(n+0x32)=255;*(u8 *)(n+0x31)=1;*(u8 *)(n+0x20)=0;*(u8 *)(n+0xbc)=0;
-   qcopy(n+0x10,o+0x10);func_002A0F48(n);hero_copy_field_to_moby(n);PlayMobySound(3,0,o);*(char **)(*(char **)(n+0x68)+4)=o;
+  qzero(scratch_a); scratch_a[2]=0.20000002f;
+  if(hit_info)qcopy(scratch_b,hit_info);else {qcopy(scratch_b,moby+0x10); scratch_b[2]+=2;}
+  qzero(scratch_a);scratch_a[2]=0.18f;
+  part_spawn_masked_debris_pal(moby,15,scratch_a,3,6,3,6,255);
+  drop_moby=CreateMoby(0x1266);
+  if(drop_moby) {
+   *(u8 *)(drop_moby+0x23)=0x50;*(u16 *)(drop_moby+0x34)|=0x800;
+   *(float *)(drop_moby+0x2c)=*(float *)(*(char **)(drop_moby+0x24)+0x24)*0.65f;
+   *(u8 *)(drop_moby+0x30)=255;*(u16 *)(drop_moby+0x32)=255;*(u8 *)(drop_moby+0x31)=1;*(u8 *)(drop_moby+0x20)=0;*(u8 *)(drop_moby+0xbc)=0;
+   qcopy(drop_moby+0x10,moby+0x10);func_002A0F48(drop_moby);hero_copy_field_to_moby(drop_moby);PlayMobySound(3,0,moby);*(char **)(*(char **)(drop_moby+0x68)+4)=moby;
   }
-  *(u8 *)(o+0x20)=2;*(u16 *)(o+0x34)=(*(u16 *)(o+0x34)|0x41)&0xefff;*(int *)(o+0x98)=0;
+  *(u8 *)(moby+0x20)=2;*(u16 *)(moby+0x34)=(*(u16 *)(moby+0x34)|0x41)&0xefff;*(int *)(moby+0x98)=0;
  }
 }

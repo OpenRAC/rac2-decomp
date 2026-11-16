@@ -19,12 +19,12 @@ extern int g_frame_l02_counter;
 extern float g_chickenbot_wait_min[] __attribute__((sda));
 extern float D_L02_001B00F8_abs MACRO_ADDR;
 
-extern void func_PAL_L02_003D24B8(void *);
+extern void enemy_init_pal(void *);
 extern void moby_l02_explode_and_remove_pal(void *);
 extern void moby_reset_turn_place_pal(void *);
 extern void chickenbot_update_group_pulse_color_pal(void *);
 extern void turret_clamp_aim_yaw_pitch(void *);
-extern void func_PAL_L02_003D31A0(void *);
+extern void part_spawn_two_puffs_pal(void *);
 extern int flag_set_second_pending(void *);
 extern int flag_set_first_pending(void *);
 extern int math_random_int_below(int);
@@ -33,7 +33,7 @@ extern int FastDecTimer(void *);
 extern int moby_dispatch_action_by_kind(void *, void *);
 extern int moby_run_entry_hook_by_mode_pal(void *, void *, int);
 extern int moby_count_group_side_from_object(void *, int, int);
-extern int func_PAL_002AF6C0(void *, float);
+extern int math_is_value_within_step_pal(void *, float);
 extern float math_random_angle(void);
 extern float math_random_float_range(float, float);
 extern float math_fast_sin_or_cos_a(float);
@@ -44,7 +44,7 @@ extern float vec_distance_xy(void *, void *);
 extern float mat_fast_helper_a(float, float);
 extern void moby_set_controller_speed_limits(void *, float, float, float, float);
 extern void moby_set_state(void *, int, int);
-extern void func_PAL_002A7E68(void *, int, int, int);
+extern void anim_start_blended_pal(void *, int, int, int);
 extern void FastVecAdd(void *, void *, void *);
 extern void path_clamp_move_to_area(void *, void *, void *, int, float);
 extern int moby_start_effect_from_entry(void *, float);
@@ -54,14 +54,15 @@ extern int moby_check_target_point_from_offset(char *, void *);
 /* The integer and floating argument banks retain their independent order. */
 extern int coll_sweep_from_object(void *, float, float *, int, float, float, int, int, int);
 
-void func_PAL_L02_003D18D8(char *o)
+/* Runs the chickenbot's state machine: waits, turns toward the hero, walks, aims and attacks. */
+void chickenbot_state_machine_update_pal(char *o)
 {
     char *p = *(char **)(o + 0x68);
     float angle, speed;
     int r;
     Quad temp;
 
-    func_PAL_L02_003D24B8(o);
+    enemy_init_pal(o);
     switch (U8(o, 0x95)) {
     case 0:
         if (flag_set_second_pending(o)) {
@@ -139,12 +140,12 @@ void func_PAL_L02_003D18D8(char *o)
             if (flag_set_first_pending(o)) {
                 r = !math_random_int_below(4);
                 if (U8(o, 0x43) != r)
-                    func_PAL_002A7E68(o, r, 0, 8);
+                    anim_start_blended_pal(o, r, 0, 8);
                 S(p, 0x312) = ((int)(math_random_int_range(60, 120)) * 5 + 2) / 6;
             }
             if (U8(o, 0x43) == 1) {
                 if (U8(o, 0x60) & 2)
-                    func_PAL_002A7E68(o, 0, 0, 17);
+                    anim_start_blended_pal(o, 0, 0, 17);
             } else if (!S(p, 0x312) &&
                        (!S(p, 0x338) || FastVecDot(p + 0x300, g_hero_state_block) > 0.8f))
                 moby_set_state(o, 2, -1);
@@ -153,7 +154,7 @@ void func_PAL_L02_003D18D8(char *o)
     case 2:
         if (flag_set_first_pending(o)) {
             if (U8(o, 0x43) != 6)
-                func_PAL_002A7E68(o, 6, 0, 17);
+                anim_start_blended_pal(o, 6, 0, 17);
             angle = math_random_angle();
             speed = math_random_float_range(2, 5);
             F(p, 0x2F0) = math_fast_sin_or_cos_a(angle) * speed;
@@ -171,7 +172,7 @@ void func_PAL_L02_003D18D8(char *o)
         break;
     case 3:
         if (flag_set_first_pending(o) && U8(o, 0x43) != math_random_int_below(2) + 4)
-            func_PAL_002A7E68(o, math_random_int_below(2) + 4, 0, 8);
+            anim_start_blended_pal(o, math_random_int_below(2) + 4, 0, 8);
         if (fast_vec_dist(o + 0x10, g_hero_position) < D_L02_001B00F8_abs)
             moby_set_state(o, 4, -1);
         else if (U8(o, 0x60) & 2) {
@@ -190,14 +191,14 @@ void func_PAL_L02_003D18D8(char *o)
         break;
     case 6:
         if (flag_set_first_pending(o) && U8(o, 0x43) != math_random_int_below(2) + 2)
-            func_PAL_002A7E68(o, math_random_int_below(2) + 2, 0, 8);
+            anim_start_blended_pal(o, math_random_int_below(2) + 2, 0, 8);
         moby_check_target_point_from_offset(o, p + 0x1F0);
         if (U8(o, 0x60) & 2)
             moby_set_state(o, 3, -1);
         break;
     case 7:
         if (flag_set_first_pending(o) && U8(o, 0x43) != 12)
-            func_PAL_002A7E68(o, 12, 0, 8);
+            anim_start_blended_pal(o, 12, 0, 8);
         moby_check_target_point_from_offset(o, p + 0x1F0);
         if (U8(o, 0x60) & 2)
             moby_set_state(o, 3, -1);
@@ -205,7 +206,7 @@ void func_PAL_L02_003D18D8(char *o)
     case 4:
         if (flag_set_first_pending(o)) {
             if (U8(o, 0x43) != 6)
-                func_PAL_002A7E68(o, 6, 0, 8);
+                anim_start_blended_pal(o, 6, 0, 8);
             {
                 float upper = g_chickenbot_wait_min[1];
                 F(p, 0x334) = math_random_float_range(g_chickenbot_wait_min[0], upper) + 0.5f;
@@ -222,7 +223,7 @@ void func_PAL_L02_003D18D8(char *o)
     case 5:
         if (flag_set_first_pending(o)) {
             if (U8(o, 0x43) != 6)
-                func_PAL_002A7E68(o, 6, 0, 17);
+                anim_start_blended_pal(o, 6, 0, 17);
             angle = math_random_angle();
             speed = math_random_float_range(2, 5);
             F(p, 0x2F0) = math_fast_sin_or_cos_a(angle) * speed;
@@ -240,13 +241,13 @@ void func_PAL_L02_003D18D8(char *o)
         break;
     case 8:
         if (flag_set_first_pending(o) && U8(o, 0x43) != math_random_int_below(2) + 2)
-            func_PAL_002A7E68(o, math_random_int_below(2) + 2, 0, 8);
+            anim_start_blended_pal(o, math_random_int_below(2) + 2, 0, 8);
         if (U8(o, 0x60) & 2)
             moby_set_state(o, 9, -1);
         break;
     case 9:
         if (flag_set_first_pending(o) && U8(o, 0x43) != 6)
-            func_PAL_002A7E68(o, 6, 0, 4);
+            anim_start_blended_pal(o, 6, 0, 4);
         if (!(U16(o, 0x96) & 3))
             F(p, 0x31C) = moby_count_group_side_from_object(o, g_hero_moby, -1) * 0.087266475f;
         moby_run_entry_hook_by_mode_pal(o, p + 0x1F0, 1);
@@ -259,10 +260,10 @@ void func_PAL_L02_003D18D8(char *o)
             F(p, 0x320) = mat_fast_helper_a(F(p, 0x1F0) - F(o, 0x10),
                                        F(p, 0x1F4) - F(o, 0x14));
             if (U8(o, 0x43) != 8)
-                func_PAL_002A7E68(o, 8, 2, 8);
+                anim_start_blended_pal(o, 8, 2, 8);
         }
         moby_start_effect_from_entry(o, F(p, 0x320));
-        if (func_PAL_002AF6C0(o, 13))
+        if (math_is_value_within_step_pal(o, 13))
             coll_test_hit_at_bone(o, 1, 0x4000001, 0, 1, 0, 0.75f, U8(p, 0x34), 1);
         if (U8(o, 0x60) & 2)
             moby_set_state(o, 9, -1);
@@ -270,12 +271,12 @@ void func_PAL_L02_003D18D8(char *o)
     case 14:
         if (flag_set_first_pending(o)) {
             if (U8(o, 0x43) != 10)
-                func_PAL_002A7E68(o, 10, 0, 5);
+                anim_start_blended_pal(o, 10, 0, 5);
             I(p, 0x1BC) = g_frame_l02_counter;
         }
         vec_scale_to_length(&temp, p + 0x1A0, 1);
         moby_run_entry_hook_by_mode_pal(o, &temp, 0);
-        func_PAL_L02_003D31A0(o);
+        part_spawn_two_puffs_pal(o);
         coll_sweep_from_object(o, 0.6f, (float *)(o + 0x10), 0x4000000, 1, 1, 0, 1, 0);
         if (F(p, 0x190) >= F(o, 0x18)) {
             if (S(p, 0x314) == 1)

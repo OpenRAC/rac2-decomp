@@ -113,11 +113,11 @@ extern void relocate_asset_entry_pointers(Bank *, int);
 extern void RegisterObjectRenderClass(char *, void *, void *, int);
 extern void ref_L00_00303990_00();
 extern void RegisterShrubRenderClass(char *, void *, void *, void *, int);
-extern void func_US2_00292650(void *, int);
+extern void gfx_load_texture_upload_params_us2(void *, int);
 extern void level_load_quadword_block(char *);
 extern void tex_rebase_pack_fill_ranges(void *, char *, void *, int);
 extern void STUB_printf(const char *, ...);
-extern char *func_US2_L00_003012A0(int);
+extern char *load_level_data_us2(int);
 extern void tutorial_reset_record_values(void);
 extern void level_update_object_visibility(int);
 extern void RestoreSavedHeroState(void);
@@ -137,7 +137,7 @@ int LoadLevelArchiveResources_us2(int load, int resume)
     int fx;
     int fy;
     char *e;
-    TexRef *t1, *tex, *t3, *t4;
+    TexRef *tex_table_a, *tex, *tex_table_b, *tex_table_c;
     int slot8;
     int *list;
     int j;
@@ -145,7 +145,7 @@ int LoadLevelArchiveResources_us2(int load, int resume)
     Span *span;
     unsigned short *us;
     char *q2, *q, *p;
-    int sq, a3, ci, k;
+    int sq, slot_index, ci, k;
 
     if (load)
         hud_load_banks_us2();
@@ -170,10 +170,10 @@ int LoadLevelArchiveResources_us2(int load, int resume)
         g_gif_packet_template_second[1] = 0xFFA0000000E0ULL;
         g_gif_packet_template_second[2] = 0x40000400004000ULL;
 
-        t1 = (TexRef *)((char *)h + h->i[0x34 / 4]);
+        tex_table_a = (TexRef *)((char *)h + h->i[0x34 / 4]);
         g_level_chunk_count_c = h->i[0x30 / 4];
         for (c1 = 0; c1 < g_level_chunk_count_c; c1++)
-            g_class_offsets_table[c1] = g_level_load_context.i[0x2C / 4] + t1[c1].offset + (log2dim(t1[c1].kind) << 28);
+            g_class_offsets_table[c1] = g_level_load_context.i[0x2C / 4] + tex_table_a[c1].offset + (log2dim(tex_table_a[c1].kind) << 28);
         tex = (TexRef *)((char *)h + h->i[0x3C / 4]);
         g_level_chunk_count_a = h->i[0x38 / 4];
         for (c2 = 0; c2 < g_level_chunk_count_a; c2++) {
@@ -182,16 +182,16 @@ int LoadLevelArchiveResources_us2(int load, int resume)
         }
         qcopy(&g_load_slots, &tex[h->i[0x80 / 4]]);
         g_load_slots.uh[0x10 / 2] = ((unsigned short *)h)[0x80 / 2];
-        t3 = (TexRef *)((char *)h + h->i[0x44 / 4]);
+        tex_table_b = (TexRef *)((char *)h + h->i[0x44 / 4]);
         g_level_chunk_count_d = h->i[0x40 / 4];
         for (c3 = 0; c3 < g_level_chunk_count_d; c3++) {
-            int value = g_level_load_context.i[0x2C / 4] + t3[c3].offset + (log2dim(t3[c3].kind) << 28);
+            int value = g_level_load_context.i[0x2C / 4] + tex_table_b[c3].offset + (log2dim(tex_table_b[c3].kind) << 28);
             g_class_values_c[c3] = value;
         }
-        t4 = (TexRef *)((char *)h + h->i[0x4C / 4]);
+        tex_table_c = (TexRef *)((char *)h + h->i[0x4C / 4]);
         g_level_chunk_count_b = h->i[0x48 / 4];
         for (c4 = 0; c4 < g_level_chunk_count_b; c4++) {
-            int value = g_level_load_context.i[0x2C / 4] + t4[c4].offset + (log2dim(t4[c4].kind) << 28);
+            int value = g_level_load_context.i[0x2C / 4] + tex_table_c[c4].offset + (log2dim(tex_table_c[c4].kind) << 28);
             g_class_values_b[c4] = value;
         }
         g_level_load_context.p[0x1C / 4] = base + h->i[0x8 / 4];
@@ -298,7 +298,7 @@ int LoadLevelArchiveResources_us2(int load, int resume)
             g_level_load_context.p[0x34 / 4] = p;
             g_level_chunk_base = (int)p;
         }
-        func_US2_00292650((char *)h + h->i[0x5C / 4], h->i[0x58 / 4]);
+        gfx_load_texture_upload_params_us2((char *)h + h->i[0x5C / 4], h->i[0x58 / 4]);
         if (h->i[0xA4 / 4] != 0) {
             level_load_quadword_block(base + h->i[0xA4 / 4]);
         } else {
@@ -349,14 +349,14 @@ int LoadLevelArchiveResources_us2(int load, int resume)
             base += nslots * 32;
         }
         e = tab + span->off;
-        for (a3 = 0; a3 < g_slot_count; a3++) {
-            if (g_slot_table[a3].h1A >= span->count) {
+        for (slot_index = 0; slot_index < g_slot_count; slot_index++) {
+            if (g_slot_table[slot_index].h1A >= span->count) {
                 STUB_printf(g_str_register_class_debug);
-                g_slot_table[a3].h1A = -1;
+                g_slot_table[slot_index].h1A = -1;
             } else {
-                g_slot_table[a3].h1A = *(unsigned short *)(e + g_slot_table[a3].h1A * 4);
+                g_slot_table[slot_index].h1A = *(unsigned short *)(e + g_slot_table[slot_index].h1A * 4);
             }
-            g_slot_table[a3].i1C = 0;
+            g_slot_table[slot_index].i1C = 0;
         }
         end = base + 0x3F;
         span++;
@@ -380,7 +380,7 @@ int LoadLevelArchiveResources_us2(int load, int resume)
         base = (char *)((unsigned int)end & ~0x3F);
         g_level_load_context.p[0x48 / 4] = base;
     }
-    g_level_load_context.i[0x68 / 4] = func_US2_L00_003012A0(load);
+    g_level_load_context.i[0x68 / 4] = load_level_data_us2(load);
     if (load)
         g_load_entry_index[0] = -1;
     if (g_tutorial_points.i[0xC / 4] != 0) {

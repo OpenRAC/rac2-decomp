@@ -46,7 +46,8 @@ extern void anim_start_blended(void *, int, int, int), vec_build_spherical_offse
 extern void FastVecAdd(void *, void *, void *), FastVecSub(void *, void *, void *);
 extern void moby_update_eased_node(void *, void *, int, float, float);
 
-void func_PAL_L18_00445BB0(u8 *obj)
+/* Parts shop keeper: sells the ship part for bolts once the hero holds the other parts, and looks about idly (PAL: 50 Hz timings). */
+void parts_purchase_npc_update_pal(u8 *obj)
 {
     float target[4] __attribute__((aligned(16)));
     float position[4] __attribute__((aligned(16)));

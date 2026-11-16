@@ -101,7 +101,9 @@ struct CC7Data {
     float f388;
     float f38c;
 };
-int func_PAL_L02_003D06F0(unsigned char *obj) {
+/* Updates a chained enemy and the child moby linked to it: sets both up in state 0, keeps the
+   child on the parent's matrix, checks hits and tracks the hero (PAL: 50 Hz timings). */
+int linked_child_update_pal(unsigned char *obj) {
     struct CC7Data *data=(struct CC7Data *)P(obj,0x68);
     unsigned char *hit;
     char *child;

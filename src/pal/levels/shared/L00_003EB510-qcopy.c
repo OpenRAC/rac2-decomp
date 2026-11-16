@@ -7,35 +7,36 @@ extern float math_random_float_range(float lo, float hi);
 extern int part_alloc_effect_slot(char *object, int a, float b, float c, float d);
 extern void func_002A0F48(char *object);
 
-char *mini_nuke_projectile_spawn_pal(int a0, TI128 *a1, TI128 *a2)
+/* Creates a Mini Nuke projectile at the given place and speed, with a random spin. */
+char *mini_nuke_projectile_spawn_pal(int shooter, TI128 *position, TI128 *velocity)
 {
-    char *p;
-    char *s0;
-    float r;
+    char *projectile;
+    char *vars;
+    float spin;
     float lo;
     float hi;
 
-    p = CreateMoby(0xC07);
-    if (p != 0) {
+    projectile = CreateMoby(0xC07);
+    if (projectile != 0) {
         short v = 0xFF;
 
-        s0 = *(char **)(p + 0x68);
-        *(short *)(p + 0x32) = v;
-        *(char *)(p + 0x30) = v;
-        *(char *)(p + 0x20) = 0;
-        *(TI128 *)(p + 0x10) = *a1;
-        *(TI128 *)s0 = *a2;
-        *(float *)(p + 0x2C) = 0.01f;
+        vars = *(char **)(projectile + 0x68);
+        *(short *)(projectile + 0x32) = v;
+        *(char *)(projectile + 0x30) = v;
+        *(char *)(projectile + 0x20) = 0;
+        *(TI128 *)(projectile + 0x10) = *position;
+        *(TI128 *)vars = *velocity;
+        *(float *)(projectile + 0x2C) = 0.01f;
         lo = 0.062831864f;
         hi = 0.12566373f;
-        r = math_random_float_range(lo, hi);
-        *(float *)(s0 + 0x10) = r;
-        r = math_random_float_range(lo, hi);
-        *(float *)(s0 + 0x14) = r;
-        *(int *)(s0 + 0x30) = a0;
-        *(int *)(s0 + 0x18) = 0;
-        *(int *)(s0 + 0x34) = part_alloc_effect_slot(p, 0, 1.0f, 1.0f, 1.0f);
-        func_002A0F48(p);
+        spin = math_random_float_range(lo, hi);
+        *(float *)(vars + 0x10) = spin;
+        spin = math_random_float_range(lo, hi);
+        *(float *)(vars + 0x14) = spin;
+        *(int *)(vars + 0x30) = shooter;
+        *(int *)(vars + 0x18) = 0;
+        *(int *)(vars + 0x34) = part_alloc_effect_slot(projectile, 0, 1.0f, 1.0f, 1.0f);
+        func_002A0F48(projectile);
     }
-    return p;
+    return projectile;
 }

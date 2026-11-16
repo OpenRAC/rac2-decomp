@@ -58,28 +58,30 @@ typedef struct {
     char dir[0x10];
 } Thing;
 
-void func_PAL_00335118(Thing *m)
+/* Item reward trigger: waits for the hero to enter its area, queues the reward requests, then
+ * grants the item (PAL version). */
+void item_reward_trigger_update_pal(Thing *moby)
 {
-    TriggerVars *p = m->vars;
+    TriggerVars *vars = moby->vars;
     int notify, i, missing, fail;
     int played;
 
-    switch (m->state) {
+    switch (moby->state) {
     case 0:
-        if ((p->item != -1 && g_map_visited_flags[p->item] != 0)
-            || (m->group != 0xFF && (g_moby_group_flags[m->group + g_current_map_index * 16] & 0x80))) {
-            moby_mark_spawned(m);
+        if ((vars->item != -1 && g_map_visited_flags[vars->item] != 0)
+            || (moby->group != 0xFF && (g_moby_group_flags[moby->group + g_current_map_index * 16] & 0x80))) {
+            moby_mark_spawned(moby);
             break;
         }
-        moby_set_state(m, 1, -1);
+        moby_set_state(moby, 1, -1);
     case 1:
-        if (p->on == 0 && flag_is_third_pending_set(m) == 0 && m->hit == 0)
+        if (vars->on == 0 && flag_is_third_pending_set(moby) == 0 && moby->hit == 0)
             break;
-        p->on = 1;
-        moby_set_state(m, 2, -1);
+        vars->on = 1;
+        moby_set_state(moby, 2, -1);
     case 2:
-        if (p->on == 0) {
-            moby_set_state(m, 1, -1);
+        if (vars->on == 0) {
+            moby_set_state(moby, 1, -1);
             break;
         }
         if (g_hero_state.mode == 0x1C)
@@ -88,22 +90,22 @@ void func_PAL_00335118(Thing *m)
             break;
         if (g_current_game_mode != 0)
             break;
-        if (p->msg != -1 && IsPointInCuboid(g_hero_state.body, p->msg) == 0)
+        if (vars->msg != -1 && IsPointInCuboid(g_hero_state.body, vars->msg) == 0)
             break;
         fail = 1;
         missing = 1;
-        if (g_item_reward_tables[g_current_map_index] != 0 && g_item_reward_tables[g_current_map_index][p->idx] != 0) {
-            for (i = 0; g_item_reward_tables[g_current_map_index][p->idx][i] != -1; i++) {
-                int e = g_item_reward_tables[g_current_map_index][p->idx][i];
+        if (g_item_reward_tables[g_current_map_index] != 0 && g_item_reward_tables[g_current_map_index][vars->idx] != 0) {
+            for (i = 0; g_item_reward_tables[g_current_map_index][vars->idx][i] != -1; i++) {
+                int request_id = g_item_reward_tables[g_current_map_index][vars->idx][i];
 
                 missing = 0;
-                if (p->tail.b.quiet == 0) {
-                    int bit = 1 << (e & 0x1F);
-                    if (g_request_flag_table[(unsigned int)e >> 2] & bit)
+                if (vars->tail.b.quiet == 0) {
+                    int bit = 1 << (request_id & 0x1F);
+                    if (g_request_flag_table[(unsigned int)request_id >> 2] & bit)
                         continue;
                 }
-                if (req_push_queue(g_loader_movie, e) == 0 && i == 0) {
-                    STUB_printf(g_str_reward_trigger_debug, m->id, m->oclass, g_current_map_index, p->idx, e);
+                if (req_push_queue(g_loader_movie, request_id) == 0 && i == 0) {
+                    STUB_printf(g_str_reward_trigger_debug, moby->id, moby->oclass, g_current_map_index, vars->idx, request_id);
                     return;
                 }
                 fail = 0;
@@ -113,82 +115,82 @@ void func_PAL_00335118(Thing *m)
                flow deletes the arm and jump2 deletes the emptied test. It is not `!= 0`
                because thread_jumps would then send it past the test below and keep it. */
             if (missing > 0)
-                played = p->item + 1;
+                played = vars->item + 1;
         }
         if (missing != 0)
-            STUB_printf(g_str_item_reward_trigger_debug, g_current_map_index, p->idx);
+            STUB_printf(g_str_item_reward_trigger_debug, g_current_map_index, vars->idx);
         if (fail != 0) {
-            p->tail.b.had = 0;
-            moby_set_state(m, 4, -1);
+            vars->tail.b.had = 0;
+            moby_set_state(moby, 4, -1);
             break;
         }
-        p->tail.b.had = 1;
+        vars->tail.b.had = 1;
         req_launch_queued(g_loader_movie);
-        if (g_game_time < 5 || (g_current_map_index == 6 && p->idx == 0))
+        if (g_game_time < 5 || (g_current_map_index == 6 && vars->idx == 0))
             game_set_slowdown_factor_pal();
-        moby_set_state(m, 3, -1);
+        moby_set_state(moby, 3, -1);
         break;
     case 3:
         if (game_is_either_mode_two() == 0) {
-            if (p->link != -1) {
-                char *o = g_vec_record_table + (p->link << 7);
-                stub_empty_15(o + 0x30, o + 0x70, 0, 1);
+            if (vars->link != -1) {
+                char *record = g_vec_record_table + (vars->link << 7);
+                stub_empty_15(record + 0x30, record + 0x70, 0, 1);
             }
-            moby_set_state(m, 4, -1);
+            moby_set_state(moby, 4, -1);
         }
         if (g_current_map_index != 0)
             break;
-        if (p->item == -1)
+        if (vars->item == -1)
             break;
         if (game_is_either_mode_two() != 0)
             break;
         notify = 0;
-        if (p->item != -1) {
-            moby_mark_flag_and_append_to_list(p->item);
-            if (p->item != 0x18)
-                snd_play_indexed_pal(p->item);
+        if (vars->item != -1) {
+            moby_mark_flag_and_append_to_list(vars->item);
+            if (vars->item != 0x18)
+                snd_play_indexed_pal(vars->item);
             notify = 1;
         }
-        if (m->group != 0xFF && !(g_moby_group_flags[m->group + g_current_map_index * 16] & 0x80)) {
-            moby_mark_table_entry_flagged(m->group);
+        if (moby->group != 0xFF && !(g_moby_group_flags[moby->group + g_current_map_index * 16] & 0x80)) {
+            moby_mark_table_entry_flagged(moby->group);
             notify = 1;
         }
-        if (p->count != 0 && (p->tail.word & 0xFFFF0000)) {
-            if (p->link != -1) {
-                char *o = g_vec_record_table + (p->link << 7);
-                level_capture_checkpoint_state(o + 0x30, o + 0x70);
+        if (vars->count != 0 && (vars->tail.word & 0xFFFF0000)) {
+            if (vars->link != -1) {
+                char *record = g_vec_record_table + (vars->link << 7);
+                level_capture_checkpoint_state(record + 0x30, record + 0x70);
             } else
-                level_capture_checkpoint_state(m->pos, m->dir);
+                level_capture_checkpoint_state(moby->pos, moby->dir);
         }
-        if (p->tail.low != -1)
-            data_set_small_value_and_refresh(p->tail.low, 1);
-        else if (notify != 0 || p->tail.b.had != 0)
+        if (vars->tail.low != -1)
+            data_set_small_value_and_refresh(vars->tail.low, 1);
+        else if (notify != 0 || vars->tail.b.had != 0)
             MemcardSave(0, -1);
         break;
     case 4:
         played = 0;
-        if (p->item != -1) {
-            moby_mark_flag_and_append_to_list(p->item);
-            if (p->item != 0x18)
-                snd_play_indexed_pal(p->item);
+        if (vars->item != -1) {
+            moby_mark_flag_and_append_to_list(vars->item);
+            if (vars->item != 0x18)
+                snd_play_indexed_pal(vars->item);
             played = 1;
         }
-        if (m->group != 0xFF && !(g_moby_group_flags[m->group + g_current_map_index * 16] & 0x80)) {
-            moby_mark_table_entry_flagged(m->group);
+        if (moby->group != 0xFF && !(g_moby_group_flags[moby->group + g_current_map_index * 16] & 0x80)) {
+            moby_mark_table_entry_flagged(moby->group);
             played = 1;
         }
-        if (p->count > 0 && (p->tail.word & 0xFFFF0000)) {
-            if (p->link != -1) {
-                char *o = g_vec_record_table + (p->link << 7);
-                level_capture_checkpoint_state(o + 0x30, o + 0x70);
+        if (vars->count > 0 && (vars->tail.word & 0xFFFF0000)) {
+            if (vars->link != -1) {
+                char *record = g_vec_record_table + (vars->link << 7);
+                level_capture_checkpoint_state(record + 0x30, record + 0x70);
             } else
                 level_capture_checkpoint_state(g_hero_position, g_hero_position + 0x10);
         }
-        if (p->tail.low != -1)
-            data_set_small_value_and_refresh(p->tail.low, 1);
-        else if ((played != 0 || p->tail.b.had != 0) && p->count != p->tail.low)
+        if (vars->tail.low != -1)
+            data_set_small_value_and_refresh(vars->tail.low, 1);
+        else if ((played != 0 || vars->tail.b.had != 0) && vars->count != vars->tail.low)
             MemcardSave(0, -1);
-        moby_mark_spawned(m);
+        moby_mark_spawned(moby);
         break;
     }
 }

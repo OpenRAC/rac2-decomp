@@ -6,7 +6,7 @@ extern void item_grid_menu_draw(int);
 
 /* Reads the object base from a shared global and, when it is non-zero, calls the handler at a
  * fixed byte offset in it. */
-void func_PAL_L00_0030F0D0(void)
+void module_l00_call_handler_5_pal(void)
 {
     int value = D_L00_001A904C_2;
 
@@ -26,29 +26,29 @@ void module_l00_call_handler_6_pal(void)
         menu_screen_large_draw_parts(value + 0x39BA0);
 }
 
-extern int func_PAL_00348DF8(int, int);
+extern int UpdateItemGridMenu_pal(int, int);
 
 /* Reads the object base from a shared global and, when it is non-zero, returns the handler's
  * result at a fixed byte offset in it; otherwise returns 0. */
-int func_PAL_L00_0030F130(int argument)
+int module_l00_call_handler_with_arg_6_pal(int argument)
 {
     int value = D_L00_001A904C_2;
 
     if (value != 0)
-        return func_PAL_00348DF8(value + 0x39620, argument);
+        return UpdateItemGridMenu_pal(value + 0x39620, argument);
     return 0;
 }
 
-extern int func_PAL_0033B218(int, int);
+extern int mission_screen_place_parts_pal(int, int);
 
 /* Reads the object base from a shared global and, when it is non-zero, returns the handler's
  * result at a fixed byte offset in it; otherwise returns 0. */
-int func_PAL_L00_0030F1B8(int argument)
+int module_l00_call_handler_with_arg_7_pal(int argument)
 {
     int value = D_L00_001A904C_2;
 
     if (value != 0)
-        return func_PAL_0033B218(value + 0x3B4C8, argument);
+        return mission_screen_place_parts_pal(value + 0x3B4C8, argument);
     return 0;
 }
 
@@ -68,7 +68,7 @@ extern int list_screen_layout_pal(int, int);
 
 /* Reads the object base from a shared global and, when it is non-zero, returns the handler's
  * result at a fixed byte offset in it; otherwise returns 0. */
-int func_PAL_L00_0030F228(int argument)
+int module_l00_call_handler_with_arg_8_pal(int argument)
 {
     int value = D_L00_001A904C_2;
 

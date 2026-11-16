@@ -12,45 +12,47 @@ extern char *cam_init_object_table_a(char *p);
 extern char *cam_init_object_table_d(char *p);
 extern char *cam_init_object_table_c(char *p);
 
-char *func_US2_L00_0043A8D8(char *p)
+/* Initializes a chain of 14 camera/sub-object tables at fixed offsets and returns the base pointer. */
+char *sub_object_init_chain_us2(char *object)
 {
-    cam_init_object_table_a(p);
-    cam_init_object_table_a(p + 76);
-    cam_init_object_table_a(p + 152);
-    cam_init_object_table_a(p + 228);
-    cam_init_object_table_a(p + 304);
-    cam_init_object_table_a(p + 380);
-    cam_init_object_table_d(p + 456);
-    cam_init_object_table_d(p + 544);
-    cam_init_object_table_c(p + 632);
-    cam_init_object_table_d(p + 696);
-    cam_init_object_table_d(p + 784);
-    cam_init_object_table_d(p + 872);
-    cam_init_object_table_d(p + 960);
-    cam_init_object_table_d(p + 1048);
-    return p;
+    cam_init_object_table_a(object);
+    cam_init_object_table_a(object + 76);
+    cam_init_object_table_a(object + 152);
+    cam_init_object_table_a(object + 228);
+    cam_init_object_table_a(object + 304);
+    cam_init_object_table_a(object + 380);
+    cam_init_object_table_d(object + 456);
+    cam_init_object_table_d(object + 544);
+    cam_init_object_table_c(object + 632);
+    cam_init_object_table_d(object + 696);
+    cam_init_object_table_d(object + 784);
+    cam_init_object_table_d(object + 872);
+    cam_init_object_table_d(object + 960);
+    cam_init_object_table_d(object + 1048);
+    return object;
 }
 
 
 
 
-char *func_US2_L00_0043C380(char *p)
+/* Same table-chain initializer, a second copy used by another menu. */
+char *sub_object_init_chain_copy_us2(char *object)
 {
-    cam_init_object_table_a(p);
-    cam_init_object_table_a(p + 76);
-    cam_init_object_table_a(p + 152);
-    cam_init_object_table_a(p + 228);
-    cam_init_object_table_a(p + 304);
-    cam_init_object_table_a(p + 380);
-    cam_init_object_table_d(p + 456);
-    cam_init_object_table_d(p + 544);
-    cam_init_object_table_c(p + 632);
-    cam_init_object_table_d(p + 696);
-    cam_init_object_table_d(p + 784);
-    cam_init_object_table_d(p + 872);
-    cam_init_object_table_d(p + 960);
-    cam_init_object_table_d(p + 1048);
-    return p;
+    cam_init_object_table_a(object);
+    cam_init_object_table_a(object + 76);
+    cam_init_object_table_a(object + 152);
+    cam_init_object_table_a(object + 228);
+    cam_init_object_table_a(object + 304);
+    cam_init_object_table_a(object + 380);
+    cam_init_object_table_d(object + 456);
+    cam_init_object_table_d(object + 544);
+    cam_init_object_table_c(object + 632);
+    cam_init_object_table_d(object + 696);
+    cam_init_object_table_d(object + 784);
+    cam_init_object_table_d(object + 872);
+    cam_init_object_table_d(object + 960);
+    cam_init_object_table_d(object + 1048);
+    return object;
 }
 
 

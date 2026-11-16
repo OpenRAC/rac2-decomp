@@ -6,18 +6,19 @@ extern int func_419B10(void *, void *, int, void *, void *, void *, float, float
 extern void func_32D0F0(void *, int, float);
 float bot_compute_speed_from_turn(unsigned char *);
 
-int bot_move_toward_waypoint_pal(unsigned char *a0, int a1, int a2) {
-    unsigned char *s0 = *(unsigned char **)(a0 + 0x68);
-    float f = 0.0f;
+/* Asks where a bot should go next and moves it that way, returning the result of the check. */
+int bot_move_toward_waypoint_pal(unsigned char *object, int index, int use_extra) {
+    unsigned char *state = *(unsigned char **)(object + 0x68);
+    float extra = 0.0f;
     float out;
-    int r;
+    int result;
 
-    if (a2 != 0)
-        f = bot_compute_speed_from_turn(a0);
-    r = func_419B10(*(void **)(s0 + 0x220), a0 + 0x10, a1, &out, s0 + 0x368, s0 + 0x36C, f,
-                    *(float *)(s0 + 0x110));
-    func_32D0F0(a0, a1, out);
-    return r;
+    if (use_extra != 0)
+        extra = bot_compute_speed_from_turn(object);
+    result = func_419B10(*(void **)(state + 0x220), object + 0x10, index, &out, state + 0x368, state + 0x36C, extra,
+                    *(float *)(state + 0x110));
+    func_32D0F0(object, index, out);
+    return result;
 }
 
 

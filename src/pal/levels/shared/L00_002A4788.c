@@ -10,9 +10,9 @@ typedef struct {
     char pad20[0x14];
     unsigned short flags;   /* 0x34 */
     char pad36[0x2C];
-    unsigned char b62;      /* 0x62 */
+    unsigned char unk_62;      /* 0x62 */
     char pad63[0x1B];
-    unsigned char b7E;      /* 0x7E */
+    unsigned char unk_7E;      /* 0x7E */
     char pad7F[0x2B];
     short oclass;           /* 0xAA */
     char padAC[0x14];
@@ -106,8 +106,8 @@ void InitializeHero_pal(void)
         }
     }
     if (D_001A79F0_1[0] == 1 || D_001A79F0_1[0] == 8)
-        (((HeroState *)g_hero_state)->m[0x2290 / 4])->b7E |= 1;
-    (((HeroState *)g_hero_state)->m[0x2290 / 4])->b62 = 0xFF;
+        (((HeroState *)g_hero_state)->m[0x2290 / 4])->unk_7E |= 1;
+    (((HeroState *)g_hero_state)->m[0x2290 / 4])->unk_62 = 0xFF;
     if (g_menu_choice_table[0] == 0)
         g_menu_choice_table[0] = 30;
 

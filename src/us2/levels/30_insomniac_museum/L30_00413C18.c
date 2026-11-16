@@ -30,6 +30,7 @@ char *museum_explosion_spawn(void *, float, int, int, int, int, int, int, int, i
 /* func_L30_004135A0 is defined in L30_004135A0-g8.c. */
 
 
+/* Updates the explosion tester: opens the tuning menu on a button press and spawns a test explosion every 45 frames. */
 void UpdateMuseumExplosionTester_us2(char *obj) {
     char *st = *(char **)(obj + 0x68);
     char *menu;

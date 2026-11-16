@@ -41,7 +41,7 @@ extern float g_turret_angle_offset __attribute__((sda)), g_turret_hero_range __a
 extern void moby_mark_spawned(char *), moby_set_state(char *, int, int);
 extern float coll_get_ground_distance_below(char *, char *, char *);
 extern void matrix_mul_vec3(char *, char *, char *), FastVecAdd(char *, char *, char *);
-extern int func_US2_00289840(int, int);
+extern int subtitle_request_voice_line_us2(int, int);
 extern int flag_set_first_pending(char *), PlayMobySound(int, int, char *);
 extern void hero_reset_position_and_direction(char *, char *, int, int), SetCamera5Pose(char *, char *, int, int, int);
 extern float math_fabs(float), vec_distance_xy(char *, char *), mat_fast_helper_a(float, float), FastAddRotations(float, float), fast_subtract_rotations(float, float), FastDiffRots(float, float);
@@ -54,38 +54,39 @@ extern void AdjustPlayerHealth_us2(int), module_l00_call_handler_with_arg_4_us2(
 extern f32 ApproachValue(float *, float, float);
 extern int FloatToInt(float);
 
+/* Updates the turret the player can climb into: waiting, being used, aiming, firing and being destroyed (USA v2.00 copy). */
 void snivelak_turret_update_us2(char *self) {
-    char buf[16];
-    char *st = P(self, 0x68), *hit;
+    char offset_pos[16];
+    char *vars = P(self, 0x68), *effect_slot;
     float angle;
     int state;
-    Global *g;
+    Global *hero;
     switch (B(self, 0x20)) {
     case 0:
-        if (I(st, 0x60) == -1) {
+        if (I(vars, 0x60) == -1) {
             moby_mark_spawned(self);
             return;
         }
         coll_get_ground_distance_below(self + 0x10, self, self + 0x10);
         U(self, 0x34) |= 0x4000;
-        qcopy(st + 0x70, self + 0x10);
-        F(st, 0x7c) = F(self, 0xf8);
-        F(st, 0x94) = 4.0f;
+        qcopy(vars + 0x70, self + 0x10);
+        F(vars, 0x7c) = F(self, 0xf8);
+        F(vars, 0x94) = 4.0f;
         moby_set_state(self, 1, -1);
         if (g_snivelak_voice_cue_count >= 2 && g_turret_stage_value < 3)
-            func_US2_00289840(0xa0b, 0x62);
+            subtitle_request_voice_line_us2(0xa0b, 0x62);
         break;
     case 1:
     case 4:
         if (flag_set_first_pending(self))
             PlayMobySound(3, 0, self);
         state = B(self, 0x20);
-        if ((state == 4 && g_hero_state.target != self) || ((g = &g_hero_state), H(g, 0x34e) >= 20))
+        if ((state == 4 && g_hero_state.target != self) || ((hero = &g_hero_state), H(hero, 0x34e) >= 20))
             B(self, 0x20) = 1;
-        else if (state == 1 && g->target == self && g->active) {
-            matrix_mul_vec3(buf, (char *)&g_turret_local_offset, self + 0xc0);
-            FastVecAdd(buf, buf, self + 0x10);
-            hero_reset_position_and_direction(buf, self + 0xf0, 0x31, 0);
+        else if (state == 1 && hero->target == self && hero->active) {
+            matrix_mul_vec3(offset_pos, (char *)&g_turret_local_offset, self + 0xc0);
+            FastVecAdd(offset_pos, offset_pos, self + 0x10);
+            hero_reset_position_and_direction(offset_pos, self + 0xf0, 0x31, 0);
             g_hero_state.owner = self;
             SetCamera5Pose(g_turret_debris_vectors, g_turret_debris_vectors + 0x10, 3, 60, 0);
             g_turret_target_id = 0xffff;
@@ -93,34 +94,34 @@ void snivelak_turret_update_us2(char *self) {
             moby_set_state(self, 2, -1);
             break;
         }
-        if (math_fabs(F(self, 0x18) - F(st, 0x78) + g_turret_angle_offset) > 0.01f)
-            math_step_value_toward_target((float *)(self + 0x18), (float *)(st + 0x98), F(st, 0x78) - g_turret_angle_offset, 0.0005555555690079927f, 0.0005555555690079927f, 0.03333333507180214f);
+        if (math_fabs(F(self, 0x18) - F(vars, 0x78) + g_turret_angle_offset) > 0.01f)
+            math_step_value_toward_target((float *)(self + 0x18), (float *)(vars + 0x98), F(vars, 0x78) - g_turret_angle_offset, 0.0005555555690079927f, 0.0005555555690079927f, 0.03333333507180214f);
         if (vec_distance_xy(self + 0x10, (char *)&g_hero_state.x) > g_turret_hero_range) {
             angle = FastAddRotations(mat_fast_helper_a(g_hero_state.x - F(self, 0x10), g_hero_state.y - F(self, 0x14)), 3.1415927410125732f);
-            math_approach_target_with_direction_mode((float *)(self + 0xf8), (float *)(st + 0x9c), angle, 0.0017453294713050127f, 0.0017453294713050127f, 0.10471977293491364f, 0);
+            math_approach_target_with_direction_mode((float *)(self + 0xf8), (float *)(vars + 0x9c), angle, 0.0017453294713050127f, 0.0017453294713050127f, 0.10471977293491364f, 0);
         }
         break;
     case 2:
         if (flag_set_first_pending(self)) {
             PlayMobySound(3, 0, self);
-            I(st, 0x90) = 0;
+            I(vars, 0x90) = 0;
         }
-        angle = mat_fast_helper_a(F((char *)((I(st, 0x64) << 8) + (int)g_moby_instance_table), 0x10) - F(self, 0x10), F((char *)((I(st, 0x64) << 8) + (int)g_moby_instance_table), 0x14) - F(self, 0x14));
-        math_step_value_toward_target((float *)(self + 0x18), (float *)(st + 0x98), F(st, 0x78), 0.0016666667070239782f, 0.0016666667070239782f, 0.10000000894069672f);
-        math_approach_target_with_direction_mode((float *)(self + 0xf8), (float *)(st + 0x9c), angle, 0.0011635529808700085f, 0.0011635529808700085f, 0.10471977293491364f, 0);
+        angle = mat_fast_helper_a(F((char *)((I(vars, 0x64) << 8) + (int)g_moby_instance_table), 0x10) - F(self, 0x10), F((char *)((I(vars, 0x64) << 8) + (int)g_moby_instance_table), 0x14) - F(self, 0x14));
+        math_step_value_toward_target((float *)(self + 0x18), (float *)(vars + 0x98), F(vars, 0x78), 0.0016666667070239782f, 0.0016666667070239782f, 0.10000000894069672f);
+        math_approach_target_with_direction_mode((float *)(self + 0xf8), (float *)(vars + 0x9c), angle, 0.0011635529808700085f, 0.0011635529808700085f, 0.10471977293491364f, 0);
         if (math_fabs(fast_subtract_rotations(F(self, 0xf8), angle)) < 0.174532949924469f) {
-            if (I(st, 0xa4) != -1) {
-                Effect *effect = (Effect *)(I(st, 0xa4) * 0x70 + (int)g_sound_state);
+            if (I(vars, 0xa4) != -1) {
+                Effect *effect = (Effect *)(I(vars, 0xa4) * 0x70 + (int)g_sound_state);
                 if (effect->owner == self && effect->active)
-                    snd_stop_voice(I(st, 0xa4));
+                    snd_stop_voice(I(vars, 0xa4));
             }
-            I(st, 0xa4) = -1;
+            I(vars, 0xa4) = -1;
         } else {
-            Effect *effect = (Effect *)(I(st, 0xa4) * 0x70 + (int)g_sound_state);
-            if (effect->owner != self || !effect->active) I(st, 0xa4) =
+            Effect *effect = (Effect *)(I(vars, 0xa4) * 0x70 + (int)g_sound_state);
+            if (effect->owner != self || !effect->active) I(vars, 0xa4) =
                 PlayMobySound(4, 4, self);
         }
-        if (math_fabs(F(self, 0x18) - F(st, 0x78)) <= F(st, 0x98) && FastDiffRots(F(self, 0xf8), angle) <= 0.0872664749622345f)
+        if (math_fabs(F(self, 0x18) - F(vars, 0x78)) <= F(vars, 0x98) && FastDiffRots(F(self, 0xf8), angle) <= 0.0872664749622345f)
             moby_set_state(self, 3, -1);
         g_turret_target_id = 0xffff;
         turret_set_camera_matrices(self);
@@ -135,12 +136,12 @@ void snivelak_turret_update_us2(char *self) {
         if ((g_pad_held_flags & 16) || g_hero_state.mode != 0x31) {
             turret_reset_camera_state(self);
             moby_set_state(self, 4, -1);
-            if (I(st, 0xa4) != -1) {
-                Effect *effect = (Effect *)(I(st, 0xa4) * 0x70 + (int)g_sound_state);
+            if (I(vars, 0xa4) != -1) {
+                Effect *effect = (Effect *)(I(vars, 0xa4) * 0x70 + (int)g_sound_state);
                 if (effect->owner == self && effect->active)
-                    snd_stop_voice(I(st, 0xa4));
+                    snd_stop_voice(I(vars, 0xa4));
             }
-            I(st, 0xa4) = -1;
+            I(vars, 0xa4) = -1;
             g_snivelak_turret_state = 2;
             g_snivelak_turret_timer = 30;
         } else {
@@ -151,12 +152,12 @@ void snivelak_turret_update_us2(char *self) {
         }
         break;
     }
-    hit = part_find_owned_effect_slot(self, 1, 0);
-    if (!hit)
+    effect_slot = part_find_owned_effect_slot(self, 1, 0);
+    if (!effect_slot)
         return;
-    if (P(hit, 0x20) && H(P(hit, 0x20), 0xaa) == 0x12be)
-        ApproachValue((float *)(st + 0x94), 0.0f, 1.0f);
-    if (P(hit, 0x20) && (H(P(hit, 0x20), 0xaa) == 0xf79 || H(P(hit, 0x20), 0xaa) == 0x9b0 || F(st, 0x94) == 0.0f)) {
+    if (P(effect_slot, 0x20) && H(P(effect_slot, 0x20), 0xaa) == 0x12be)
+        ApproachValue((float *)(vars + 0x94), 0.0f, 1.0f);
+    if (P(effect_slot, 0x20) && (H(P(effect_slot, 0x20), 0xaa) == 0xf79 || H(P(effect_slot, 0x20), 0xaa) == 0x9b0 || F(vars, 0x94) == 0.0f)) {
         U(self, 0x34) = (U(self, 0x34) | 0x41) & 0xefff;
         I(self, 0x98) = 0;
         if ((unsigned)(B(self, 0x20) - 2) < 2)
@@ -164,8 +165,8 @@ void snivelak_turret_update_us2(char *self) {
         moby_set_state(self, 6, -1);
         B(self, 0xa8) = 0xff;
         turret_explode_into_debris(self);
-    } else if ((!P(hit, 0x20) || H(P(hit, 0x20), 0xaa) != 0xea7) && B(self, 0x20) == 3 && g_hero_state.mode == 0x31 && g_hero_state.timer == 0) {
-        AdjustPlayerHealth_us2(FloatToInt(F(hit, 0x2c)));
+    } else if ((!P(effect_slot, 0x20) || H(P(effect_slot, 0x20), 0xaa) != 0xea7) && B(self, 0x20) == 3 && g_hero_state.mode == 0x31 && g_hero_state.timer == 0) {
+        AdjustPlayerHealth_us2(FloatToInt(F(effect_slot, 0x2c)));
         if (g_hero_state.flag == 0) {
             turret_reset_camera_state(self);
             moby_set_state(self, 4, -1);

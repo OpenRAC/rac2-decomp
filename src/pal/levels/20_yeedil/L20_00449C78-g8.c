@@ -50,7 +50,7 @@ extern int FastTweenColor(int, int, float);
 extern char *moby_get_private_value_0(void *);
 extern void part_queue_impact_effect(char *object, int kind, int bits, float strength, void *position, void *vector);
 extern char *part_spawn_trail(void *, void *, void *, int, int, int, int, int, int);
-extern char *func_PAL_L20_0044E630(char *, char *, char *, char *);
+extern char *debris_l20_spawn_piece_pal(char *, char *, char *, char *);
 
 typedef union {
     int q __attribute__((mode(TI)));
@@ -59,34 +59,35 @@ typedef union {
 
 typedef struct {
     char pad0[0x21C];
-    int damageGroup0; /* 0x21C */
+    int damage_group_0; /* 0x21C */
     char pad220[4];
     int groups[3]; /* 0x224 */
-    int matrixIndex; /* 0x230 */
+    int matrix_index; /* 0x230 */
     char pad234[8];
-    int damageGroup1; /* 0x23C */
+    int damage_group_1; /* 0x23C */
     char pad240[0x1618];
-    int groupIndex; /* 0x1858 */
+    int group_index; /* 0x1858 */
 } State;
 
-void func_PAL_L20_00449C78(char *self) {
+/* Runs the big enemy death. It stops its sounds, removes nearby leftovers, damages everything in its two groups and bursts out sparks and debris. (PAL: 50 Hz timings) */
+void yeedil_boss_explode_death_pal(char *self) {
     State *s = (State *)P(self, 0x68);
-    char *selfPos;
+    char *self_pos;
     char *obj;
     float height;
     float scale;
     Vector pos;
     Vector vel;
     Vector acc;
-    int a;
-    int b;
-    int c;
-    int d;
+    int color_start;
+    int color_end;
+    int lifetime_a;
+    int lifetime_b;
     float sample;
 
     PlayMobySound(17, 0, self);
     {
-        unsigned short *list = g_yeedil_death_lists[s->groups[s->groupIndex]];
+        unsigned short *list = g_yeedil_death_lists[s->groups[s->group_index]];
 
         if (list != 0) {
             do {
@@ -100,11 +101,11 @@ void func_PAL_L20_00449C78(char *self) {
                 if (list == 0) {
                     break;
                 }
-            } while (*(short *)(list - 1) >= 0 || list == g_yeedil_death_lists[s->groups[s->groupIndex]]);
+            } while (*(short *)(list - 1) >= 0 || list == g_yeedil_death_lists[s->groups[s->group_index]]);
         }
     }
-    s->groupIndex++;
-    selfPos = self + 0x10;
+    s->group_index++;
+    self_pos = self + 0x10;
     obj = g_group_l20_member_table;
     if (obj <= g_moby_l20_list_end && (unsigned char)obj[0x20] != 255) {
         char *bound;
@@ -123,50 +124,50 @@ void func_PAL_L20_00449C78(char *self) {
             }
             if ((short)type != 0x1357) {
                 bound = g_moby_l20_list_end;
-                goto nextObject;
+                goto next_object;
             }
         hit:
             if (!(math_fabs(F(self, 0x18) - F(obj, 0x18)) < 10.0f)) {
                 bound = g_moby_l20_list_end;
-                goto nextObject;
+                goto next_object;
             }
             moby_mark_spawned(obj);
             bound = g_moby_l20_list_end;
-        nextObject:
+        next_object:
             obj += 256;
             if (bound < obj) {
-                goto objectsDone;
+                goto objects_done;
             }
             if ((unsigned char)obj[0x20] != 255) {
                 continue;
             }
-            goto objectsDone;
+            goto objects_done;
         }
     }
-objectsDone:
+objects_done:
     {
         unsigned short *list;
         float damage = 0.0f;
 
-        for (list = g_group_l20_id_lists[s->damageGroup0];
-             (s->damageGroup0 & 0xFF) != 0xFF && s->damageGroup0 <= g_group_count && list != 0 &&
-             ((list != 0 && (short)list[-1] >= 0) || list == g_group_l20_id_lists[s->damageGroup0]);
+        for (list = g_group_l20_id_lists[s->damage_group_0];
+             (s->damage_group_0 & 0xFF) != 0xFF && s->damage_group_0 <= g_group_count && list != 0 &&
+             ((list != 0 && (short)list[-1] >= 0) || list == g_group_l20_id_lists[s->damage_group_0]);
              list++) {
-            char *e = g_group_l20_member_table + ((*list & 0x7FFF) << 8);
+            char *member = g_group_l20_member_table + ((*list & 0x7FFF) << 8);
 
-            if (e == 0) {
+            if (member == 0) {
                 break;
             }
-            if ((*(unsigned short *)(e + 0x34) ^ 1) & 1) {
+            if ((*(unsigned short *)(member + 0x34) ^ 1) & 1) {
                 if (damage == 0.0f) {
-                    char *info = moby_get_private_value_0(e);
+                    char *info = moby_get_private_value_0(member);
 
                     if (info == 0) {
                         continue;
                     }
                     damage = (float)*(short *)(info + 4) * 0.25f;
                 }
-                part_queue_impact_effect(e, (int)g_hero_moby, 0x10000, damage, e + 0x10, g_effect_color_table);
+                part_queue_impact_effect(member, (int)g_hero_moby, 0x10000, damage, member + 0x10, g_effect_color_table);
             }
         }
     }
@@ -174,29 +175,29 @@ objectsDone:
         unsigned short *list;
         float damage = 0.0f;
 
-        for (list = g_group_l20_id_lists[s->damageGroup1];
-             (s->damageGroup1 & 0xFF) != 0xFF && s->damageGroup1 <= g_group_count && list != 0 &&
-             ((list != 0 && (short)list[-1] >= 0) || list == g_group_l20_id_lists[s->damageGroup1]);
+        for (list = g_group_l20_id_lists[s->damage_group_1];
+             (s->damage_group_1 & 0xFF) != 0xFF && s->damage_group_1 <= g_group_count && list != 0 &&
+             ((list != 0 && (short)list[-1] >= 0) || list == g_group_l20_id_lists[s->damage_group_1]);
              list++) {
-            char *e = g_group_l20_member_table + ((*list & 0x7FFF) << 8);
+            char *member = g_group_l20_member_table + ((*list & 0x7FFF) << 8);
 
-            if (e == 0) {
+            if (member == 0) {
                 break;
             }
-            if ((*(unsigned short *)(e + 0x34) ^ 1) & 1) {
+            if ((*(unsigned short *)(member + 0x34) ^ 1) & 1) {
                 if (damage == 0.0f) {
-                    char *info = moby_get_private_value_0(e);
+                    char *info = moby_get_private_value_0(member);
 
                     if (info == 0) {
                         continue;
                     }
                     damage = (float)*(short *)(info + 4) * 0.25f;
                 }
-                part_queue_impact_effect(e, (int)g_hero_moby, 0x10000, damage, e + 0x10, g_effect_color_table);
+                part_queue_impact_effect(member, (int)g_hero_moby, 0x10000, damage, member + 0x10, g_effect_color_table);
             }
         }
     }
-    sample = coll_probe_ground_height_below(selfPos, 0, 0.5f) - 2.0f;
+    sample = coll_probe_ground_height_below(self_pos, 0, 0.5f) - 2.0f;
     height = F(self, 0x18) - 0.5f;
     g_level_shared_float = sample;
     {
@@ -206,21 +207,21 @@ objectsDone:
             vec_store_helper(&pos);
             pos.f[0] = math_random_float_range(-1.0f, 1.0f);
             pos.f[1] = math_random_float_range(-1.0f, 1.0f);
-            transform_vector(&pos, &pos, g_linked_moby_table + s->matrixIndex * 128);
+            transform_vector(&pos, &pos, g_linked_moby_table + s->matrix_index * 128);
             pos.f[2] = height + math_random_float_range(-0.5f, 0.5f);
             sample = math_random_float_range(0.0f, 1.0f);
-            a = FastTweenColor(D_L20_001B2210_gp, g_yeedil_death_color_table[1], sample);
+            color_start = FastTweenColor(D_L20_001B2210_gp, g_yeedil_death_color_table[1], sample);
             sample = math_random_float_range(0.0f, 1.0f);
-            b = FastTweenColor(g_yeedil_death_color_table[2], g_yeedil_death_color_table[3], sample);
+            color_end = FastTweenColor(g_yeedil_death_color_table[2], g_yeedil_death_color_table[3], sample);
             scale = g_yeedil_death_scales[math_random_int_below(2)];
             vec_clear_128(&vel);
             vel.f[3] = scale;
             vec_clear_128(&acc);
             acc.f[3] = scale;
             acc.f[2] = math_random_float_range(D_L20_001B2240_gp[0], g_yeedil_death_accel_range[1]) * 0.020000001f;
-            c = (math_random_int_range(1, D_L20_001B2230_gp) * 5 + 2) / 6;
-            d = (math_random_int_range(g_yeedil_death_range_table[1], g_yeedil_death_range_table[2]) * 5 + 2) / 6;
-            part_spawn_trail(&pos, &vel, &acc, a, b, c, d, 50, g_yeedil_death_trail_param);
+            lifetime_a = (math_random_int_range(1, D_L20_001B2230_gp) * 5 + 2) / 6;
+            lifetime_b = (math_random_int_range(g_yeedil_death_range_table[1], g_yeedil_death_range_table[2]) * 5 + 2) / 6;
+            part_spawn_trail(&pos, &vel, &acc, color_start, color_end, lifetime_a, lifetime_b, 50, g_yeedil_death_trail_param);
         }
     }
     {
@@ -230,13 +231,13 @@ objectsDone:
             vec_store_helper(&pos);
             pos.f[0] = math_random_float_range(-1.0f, 1.0f);
             pos.f[1] = math_random_float_range(-1.0f, 1.0f);
-            transform_vector(&pos, &pos, g_linked_moby_table + s->matrixIndex * 128);
+            transform_vector(&pos, &pos, g_linked_moby_table + s->matrix_index * 128);
             pos.f[2] = height + math_random_float_range(-0.5f, 0.5f);
             qzero_nc(&vel);
             vel.f[2] = math_random_angle();
             qzero_nc(&acc);
             acc.f[2] = math_random_float_range(D_L20_001B2240_gp[4], g_yeedil_death_accel_range_b[1]) * 0.020000001f;
-            func_PAL_L20_0044E630(self, (char *)&pos, (char *)&vel, (char *)&acc);
+            debris_l20_spawn_piece_pal(self, (char *)&pos, (char *)&vel, (char *)&acc);
         }
     }
 }

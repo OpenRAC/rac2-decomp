@@ -83,76 +83,76 @@ static inline void prisonHelp(int msg, int idx)
 
 /* Drives the prison's help prompts: links the target moby, plays the hints at the trigger zones
    and records which help messages were already shown. */
-void func_US2_L14_003F64DC(char *obj)
+void help_prompt_update_us2(char *moby)
 {
-    PrisonHelpState *st = *(PrisonHelpState **)(obj + 0x68);
-    float vel[4] __attribute__((aligned(16)));
+    PrisonHelpState *vars = *(PrisonHelpState **)(moby + 0x68);
+    float offset[4] __attribute__((aligned(16)));
     int limit = 2;
 
     if (flag_is_byte_set())
         limit = 5;
 
-    switch (*(unsigned char *)(obj + 0x20)) {
+    switch (*(unsigned char *)(moby + 0x20)) {
     case 0:
-        *(short *)(obj + 0x96) = 0;
-        *(unsigned char *)(obj + 0x30) = 0xFF;
-        if (st->target >= 0)
-            st->moby = D_L14_001B259C_direct + (st->target << 8);
+        *(short *)(moby + 0x96) = 0;
+        *(unsigned char *)(moby + 0x30) = 0xFF;
+        if (vars->target >= 0)
+            vars->moby = D_L14_001B259C_direct + (vars->target << 8);
         else
-            st->moby = 0;
+            vars->moby = 0;
         if (!prisonGadgetUpgraded(limit)) {
-            if (st->moby)
-                st->active = 1;
+            if (vars->moby)
+                vars->active = 1;
             else
-                st->active = 0;
+                vars->active = 0;
         } else {
-            if (st->moby) {
-                *(unsigned short *)(st->moby + 0x34) |= 1;
-                st->moby[0x31] = 0;
+            if (vars->moby) {
+                *(unsigned short *)(vars->moby + 0x34) |= 1;
+                vars->moby[0x31] = 0;
             }
-            st->active = 0;
+            vars->active = 0;
         }
-        moby_set_state(obj, 1, -1);
+        moby_set_state(moby, 1, -1);
         break;
     case 1:
-        if (flag_set_first_pending(obj))
-            st->count = 0;
-        if (IsPointInCuboid(g_hero_position, st->zone[0])) {
+        if (flag_set_first_pending(moby))
+            vars->count = 0;
+        if (IsPointInCuboid(g_hero_position, vars->zone[0])) {
             if (!prisonGadgetUpgraded(limit))
-                moby_set_state(obj, 2, -1);
+                moby_set_state(moby, 2, -1);
         }
-        if (st->active) {
-            qcopy(vel, g_identity_l14_matrix);
-            vel[1] -= 0.1f;
-            moby_rotate_about_point(st->moby, vel, 0.05f, 0.0f, 0.0f);
+        if (vars->active) {
+            qcopy(offset, g_identity_l14_matrix);
+            offset[1] -= 0.1f;
+            moby_rotate_about_point(vars->moby, offset, 0.05f, 0.0f, 0.0f);
         }
         break;
     case 2:
-        if (flag_set_first_pending(obj))
-            st->count = 0;
-        if (g_shop_mode != 2 && st->count >= 6) {
+        if (flag_set_first_pending(moby))
+            vars->count = 0;
+        if (g_shop_mode != 2 && vars->count >= 6) {
             menu_seek_chain_entry(10, limit);
             gfx_run_screen_update_steps(2);
-            if (st->moby) {
-                *(unsigned short *)(st->moby + 0x34) |= 1;
-                st->moby[0x31] = 0;
+            if (vars->moby) {
+                *(unsigned short *)(vars->moby + 0x34) |= 1;
+                vars->moby[0x31] = 0;
             }
-            st->active = 0;
-            moby_set_state(obj, 1, -1);
+            vars->active = 0;
+            moby_set_state(moby, 1, -1);
         }
         break;
     }
 
-    if (IsPointInCuboid(g_hero_position, st->zone[1]) && !(g_help_prompt_flags & 2))
+    if (IsPointInCuboid(g_hero_position, vars->zone[1]) && !(g_help_prompt_flags & 2))
         prisonHelpTimed(0xA2C, 131);
-    if (IsPointInCuboid(g_hero_position, st->zone[2])) {
+    if (IsPointInCuboid(g_hero_position, vars->zone[2])) {
         prisonHelp(0xA09, 96);
         g_subtitle_history[97].count = 0xFFFF;
     }
-    if (IsPointInCuboid(g_hero_position, st->zone[3]) && g_help_l14_prompt_flags[2])
+    if (IsPointInCuboid(g_hero_position, vars->zone[3]) && g_help_l14_prompt_flags[2])
         prisonHelp(0xA0A, 97);
-    if (IsPointInCuboid(g_hero_position, st->hintZone) && !(g_moby_group_flags[st->row + g_current_map_index * 16] & 0x80) &&
+    if (IsPointInCuboid(g_hero_position, vars->hintZone) && !(g_moby_group_flags[vars->row + g_current_map_index * 16] & 0x80) &&
         g_subtitle_history[94].count < 2)
         prisonHelp(0xA07, 94);
-    st->count++;
+    vars->count++;
 }

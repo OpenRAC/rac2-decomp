@@ -25,70 +25,71 @@ extern void moby_set_state(u8 *a0, int a1, int a2);
 extern void moby_wake_linked_enemy_pal(u8 *a0);
 extern float vec_distance_xy(void *a0, void *a1);
 
-void func_PAL_L18_0042BF58(u8 *obj)
+/* Picks the closest idle enemy to this spawner's target point and wakes it up with the spawner's settings (PAL). */
+void spawner_activate_nearest_enemy_pal(u8 *moby)
 {
-    u8 *state = *(u8 **)(obj + 0x68);
-    u8 *best = 0;
-    int found = 0;
-    float best_d = 100000.0f;
-    float vec[4];
-    u16 *q;
-    u8 *e;
-    u8 *es;
-    float d;
+    u8 *vars = *(u8 **)(moby + 0x68);
+    u8 *best_moby = 0;
+    int found_path_point = 0;
+    float best_dist = 100000.0f;
+    float target_pos[4];
+    u16 *group_list;
+    u8 *cand;
+    u8 *cand_vars;
+    float dist;
 
-    if (*(int *)(state + 0x378) == -1) {
-        if (*(int *)(state + 0x368) == -1) {
-            STUB_printf(g_str_spawner_debug, *(s16 *)(obj + 0xB2), g_frame_l18_counter);
+    if (*(int *)(vars + 0x378) == -1) {
+        if (*(int *)(vars + 0x368) == -1) {
+            STUB_printf(g_str_spawner_debug, *(s16 *)(moby + 0xB2), g_frame_l18_counter);
         } else {
-            path_find_best_point_by_id(vec, obj + 0x10, g_hero_position, *(int *)(state + 0x368), 0.0f);
-            found = 1;
+            path_find_best_point_by_id(target_pos, moby + 0x10, g_hero_position, *(int *)(vars + 0x368), 0.0f);
+            found_path_point = 1;
         }
     } else {
-        *(TI128 *)vec = *(TI128 *)(g_path_pointer_table[*(int *)(state + 0x378)] + 0x10);
+        *(TI128 *)target_pos = *(TI128 *)(g_path_pointer_table[*(int *)(vars + 0x378)] + 0x10);
     }
 
-    q = (u16 *)g_condition_target_lists[obj[0x21]];
-    while (obj[0x21] != 0xFF && obj[0x21] <= g_max_l18_group_index && q != 0 &&
-           ((q != 0 && (s16)q[-1] >= 0) || q == (u16 *)g_condition_target_lists[obj[0x21]])) {
-        e = (u8 *)(g_moby_l18_table + ((*q & 0x7FFF) << 8));
-        if (e == 0)
+    group_list = (u16 *)g_condition_target_lists[moby[0x21]];
+    while (moby[0x21] != 0xFF && moby[0x21] <= g_max_l18_group_index && group_list != 0 &&
+           ((group_list != 0 && (s16)group_list[-1] >= 0) || group_list == (u16 *)g_condition_target_lists[moby[0x21]])) {
+        cand = (u8 *)(g_moby_l18_table + ((*group_list & 0x7FFF) << 8));
+        if (cand == 0)
             break;
-        es = *(u8 **)(e + 0x68);
-        d = vec_distance_xy(e + 0x10, vec);
-        if (es != 0 && (es[0x399] & 1) != 0 && d < best_d) {
-            best_d = d;
-            best = e;
+        cand_vars = *(u8 **)(cand + 0x68);
+        dist = vec_distance_xy(cand + 0x10, target_pos);
+        if (cand_vars != 0 && (cand_vars[0x399] & 1) != 0 && dist < best_dist) {
+            best_dist = dist;
+            best_moby = cand;
         }
-        q++;
+        group_list++;
     }
 
-    if (best != 0) {
-        u8 *bs;
-        int hw;
-        best[0x31] = 1;
-        hw = g_enemy_timer_max;
-        *(u16 *)(best + 0x34) &= 0xFFFE;
-        bs = *(u8 **)(best + 0x68);
-        *(int *)(bs + 0x36C) = *(int *)(state + 0x36C);
-        *(int *)(bs + 0x370) = *(int *)(state + 0x370);
-        *(int *)(bs + 0x374) = *(int *)(state + 0x374);
-        *(int *)(bs + 0x378) = *(int *)(state + 0x378);
-        *(int *)(bs + 0x360) = *(int *)(state + 0x360);
-        *(int *)(bs + 0x364) = *(int *)(state + 0x364);
-        *(u16 *)(bs + 0x390) = ((s32)(hw) * 5 + 2) / 6;
-        *(int *)(bs + 0x38C) = *(int *)(state + 0x378);
-        bs[0x39A] = 1;
-        bs[0x399] = 2;
-        *(u16 *)(bs + 0x392) = state[0x398];
-        if (found) {
-            moby_set_state(best, 0, 4);
-        } else if (bs[0x3EA] != 0 && *(int *)(bs + 0x3B4) != -1 &&
-                   ((u8 *)((*(int *)(bs + 0x3B4) << 8) + (int)D_L18_001B281C_sda))[0x20] != 0xFE &&
-                   ((u8 *)((*(int *)(bs + 0x3B4) << 8) + (int)D_L18_001B281C_sda))[0x20] != 0xFD) {
-            moby_wake_linked_enemy_pal(best);
+    if (best_moby != 0) {
+        u8 *best_vars;
+        int timer_max;
+        best_moby[0x31] = 1;
+        timer_max = g_enemy_timer_max;
+        *(u16 *)(best_moby + 0x34) &= 0xFFFE;
+        best_vars = *(u8 **)(best_moby + 0x68);
+        *(int *)(best_vars + 0x36C) = *(int *)(vars + 0x36C);
+        *(int *)(best_vars + 0x370) = *(int *)(vars + 0x370);
+        *(int *)(best_vars + 0x374) = *(int *)(vars + 0x374);
+        *(int *)(best_vars + 0x378) = *(int *)(vars + 0x378);
+        *(int *)(best_vars + 0x360) = *(int *)(vars + 0x360);
+        *(int *)(best_vars + 0x364) = *(int *)(vars + 0x364);
+        *(u16 *)(best_vars + 0x390) = ((s32)(timer_max) * 5 + 2) / 6;
+        *(int *)(best_vars + 0x38C) = *(int *)(vars + 0x378);
+        best_vars[0x39A] = 1;
+        best_vars[0x399] = 2;
+        *(u16 *)(best_vars + 0x392) = vars[0x398];
+        if (found_path_point) {
+            moby_set_state(best_moby, 0, 4);
+        } else if (best_vars[0x3EA] != 0 && *(int *)(best_vars + 0x3B4) != -1 &&
+                   ((u8 *)((*(int *)(best_vars + 0x3B4) << 8) + (int)D_L18_001B281C_sda))[0x20] != 0xFE &&
+                   ((u8 *)((*(int *)(best_vars + 0x3B4) << 8) + (int)D_L18_001B281C_sda))[0x20] != 0xFD) {
+            moby_wake_linked_enemy_pal(best_moby);
         } else {
-            moby_set_state(best, 0, 3);
+            moby_set_state(best_moby, 0, 3);
         }
     }
 }

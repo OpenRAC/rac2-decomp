@@ -1,5 +1,6 @@
 #include "include_asm.h"
 #include "names.h"
+#include "moby_classes.h"
 
 typedef unsigned char L00_0037F7E8_u8;
 typedef unsigned short L00_0037F7E8_u16;
@@ -34,6 +35,7 @@ typedef struct L00_0037F7E8_Object {
 extern int ref_L00_001A8F00_00 __attribute__((sda));
 extern L00_0037F7E8_u8 ref_L00_001B267C_00[] __attribute__((sda));
 
+/* Updates the level's mobies each frame: runs special ones, then hero, camera, particles and idle counters. */
 void moby_update_level_objects_us2(void)
 {
     L00_0037F7E8_u8 *head;
@@ -55,12 +57,13 @@ void moby_update_level_objects_us2(void)
         while (object != 0) {
             if (object->field20 >= 0) {
                 id = object->fieldAA;
-                if (id == 0xDC1) {
+                if (id == 0xDC1 /* moby class 3521 */) {
                     object->field64(object);
                     if ((object->field34 & 4) == 0)
                         func_002A0F48(object);
-                } else if (id == 0xCB2 || id == 0xB02 || id == 0x259
-                           || id == 0xA5C || id == 0x1192) {
+                } else if (id == MOBY_CLASS_SYNTHENOID || id == MOBY_CLASS_KILONOID
+                           || id == 0x259 /* moby class 601 */
+                           || id == MOBY_CLASS_SHIELD_CHARGER || id == MOBY_CLASS_TESLA_BARRIER) {
                     func_002A05A8((char *)object);
                     func_002A0F48(object);
                 }

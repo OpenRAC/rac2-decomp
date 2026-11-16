@@ -52,7 +52,7 @@ extern struct A g_vendor_menu_state;
 extern struct B g_memcard_state;
 extern s32 g_special_items_bought_flags;
 
-void func_PAL_002FBEB4(void) {
+void shop_step_message_states_pal(void) {
     {
     static void *rc2_labels[] = {&&rc2_case_0, &&rc2_case_1, &&rc2_case_2, &&rc2_case_3, &&rc2_case_4, &&rc2_case_5, &&rc2_case_6};
     u32 rc2_selector = (u32)(g_vendor_menu_state.st);

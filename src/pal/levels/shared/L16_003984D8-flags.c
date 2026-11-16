@@ -18,10 +18,12 @@ extern void FastVecAdd(void *,void *,void *);
 extern void mem_fast_helper_b(void *,int);
 extern void vec_clamp_length(float *,float);
 
+/* Moves a spinning object across the ground, pushing it along with the player's facing and
+ * tracking how much it has spun (PAL). */
 void spinning_object_move_along_ground_pal(char *object)
 {
     MotionWorkspace local;
-    char *state=*(char **)(object+0x68);
+    char *vars=*(char **)(object+0x68);
     float alignment;
     hero_resolve_stick_direction(0,1.0f);
     qcopy(&local.previous,(g_hero_state+0x190));
@@ -33,13 +35,13 @@ void spinning_object_move_along_ground_pal(char *object)
     matrix_mul_vec3(&local.velocity,&local.velocity,object+0xc0);
     alignment=FastVecDot(&local.previous,(g_hero_state+0x190));
     if (*(float *)(g_hero_state+0x24b8)>0.5f && alignment>0.5f)
-        ApproachValue((float *)(state+0x30),alignment*0.10000001f,0.002f);
-    else ApproachValue((float *)(state+0x30),0.0f,0.002f);
-    if (*(float *)(state+0x30)!=0.0f) {
-        vec_scale_to_length(&local.lateral,(g_hero_state+0x190),*(float *)(state+0x30));
+        ApproachValue((float *)(vars+0x30),alignment*0.10000001f,0.002f);
+    else ApproachValue((float *)(vars+0x30),0.0f,0.002f);
+    if (*(float *)(vars+0x30)!=0.0f) {
+        vec_scale_to_length(&local.lateral,(g_hero_state+0x190),*(float *)(vars+0x30));
         FastVecAdd(&local.velocity,&local.velocity,&local.lateral);
-        *(float *)(state+0x34)+=*(float *)(state+0x30)/(*(float *)(state+8)*6.28318548f);
-        if (*(float *)(state+0x34)>1.0f) *(float *)(state+0x34)=1.0f;
+        *(float *)(vars+0x34)+=*(float *)(vars+0x30)/(*(float *)(vars+8)*6.28318548f);
+        if (*(float *)(vars+0x34)>1.0f) *(float *)(vars+0x34)=1.0f;
     }
     FastVecAdd(&local.velocity,&local.velocity,object+0x10);
     mem_fast_helper_b(g_hero_state+0xf0,0xa0);

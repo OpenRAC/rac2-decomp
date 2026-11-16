@@ -100,20 +100,20 @@ extern int request_begin_slot(int, int, int, int, unsigned char *);
 extern void FadeToBlack(int), snd_start_music_stream_no_loop(int, int, int), music_Pause(int);
 extern void snd_set_current_buffer_flag(void);
 extern int sceSifCallRpc(void *, int, int, void *, int, void *, int, void *, void *);
-extern void func_PAL_002B57D0(void), music_Unpause(void);
+extern void mode_apply_pending_change_pal(void), music_Unpause(void);
 extern short snd_pump_music_and_disc_read_pal(int);
 extern void LoadClassIntoFreeCacheSlot(int);
 extern void gfx_process_screen_copy_regions(void), SubmitBufferedDmaChain(void), gfx_swap_packet_buffer(void);
 extern void PutDrawBufferSmall(void), gfx_append_gs_packet_tag_b(void), gfx_append_draw_list_header(void);
 extern int snd_Pump(void);
-extern void pad_poll_ports_pal(void), func_PAL_L00_00371E28(void), gfx_set_draw_mode_and_render_pal(void);
+extern void pad_poll_ports_pal(void), level_update_game_frame_input_pal(void), gfx_set_draw_mode_and_render_pal(void);
 extern void moby_update_level_objects_pal(void), gfx_reset_screen_overlay_pal(void);
 extern void level_run_frame_update_chain_pal(void), gfx_clear_screen_and_render_pal(void);
-extern void func_PAL_002F6F08(void), cutscene_update_frame_pal(void), gfx_render_frame_all_layers_pal(void), DrawLetterboxBars(void);
-extern void func_PAL_002CB710(void), gfx_call_engine_routine_zero_pal(void), func_PAL_00287018(void), gfx_render_frame_extra_layers_pal(void);
-extern void func_PAL_L00_003776E8(void), shop_draw_purchase_menu_scene_pal(void), transition_draw_background_pal(void);
-extern int func_PAL_002EA0B0(void);
-extern void func_PAL_L00_002FE148(void), func_PAL_L00_002FE168(void);
+extern void mpeg_play_movie_pal(void), cutscene_update_frame_pal(void), gfx_render_frame_all_layers_pal(void), DrawLetterboxBars(void);
+extern void menu_update_pause_pal(void), gfx_call_engine_routine_zero_pal(void), UpdateModalState_pal(void), gfx_render_frame_extra_layers_pal(void);
+extern void update_purchase_menu_and_preview_pal(void), shop_draw_purchase_menu_scene_pal(void), transition_draw_background_pal(void);
+extern int update_playback_scene_pal(void);
+extern void level_call_seq_update_disc_player_pal(void), level_call_text_draw_screen_wipe_pal(void);
 extern void math_trap_always(void), level_decrement_counter_clamped(void), math_add_wrapping_counter(void);
 extern void mc_update_state_pal(void), map_update_state_machine(void), SetupGifPaging(int);
 extern void VU1_addGSregister(unsigned int, unsigned long long);
@@ -130,10 +130,10 @@ extern void snd_clear_flag_and_update(void), snd_clear_all_voices(void), snd_wai
 extern void pad_reset_input_state(int), map_fill_buffer(void *), RunLevelTransition_pal(void);
 
 /* Clears level state, restores its settings and services frames until loading ends. */
-void func_PAL_L00_002A3988(void)
+void RunLevelLoop_pal(void)
 {
-    int i, allowed, oldMode, flush, extra, limit, ticks, sound, period;
-    float spriteSize;
+    int i, allowed, old_mode, flush, extra, limit, ticks, sound, period;
+    float sprite_size;
     float elapsed, angle;
     if (!(((unsigned int)g_level_bss_end_marker - (unsigned int)&D_L00_001B1680_1) & 15) && !((unsigned int)&D_L00_001B1680_1 & 15)) {
         mem_fast_helper_b(&D_L00_001B1680_1, (unsigned int)g_level_bss_end_marker - (unsigned int)&D_L00_001B1680_1);
@@ -188,7 +188,7 @@ void func_PAL_L00_002A3988(void)
     g_statistics_table[g_current_map_index].visited = g_statistics_table[g_current_map_index].visited | (1u << g_current_map_index) | 0x80000000u;
     snd_set_current_buffer_flag();
     sceSifCallRpc(g_gfx_rpc_client, 3, 0, 0, 0, 0, 0, 0, 0);
-    func_PAL_002B57D0();
+    mode_apply_pending_change_pal();
     if (!g_game_l00_mode[0]) music_Unpause();
     snd_pump_music_and_disc_read_pal(1);
     LoadClassIntoFreeCacheSlot(g_weapon_l00_table[g_item_slot_to_record[g_menu_choice_table]].sound);
@@ -208,15 +208,15 @@ void func_PAL_L00_002A3988(void)
         gfx_append_gs_packet_tag_b();
         gfx_append_draw_list_header();
         snd_Pump();
-        oldMode = g_game_l00_mode[0];
-        switch (oldMode) {
+        old_mode = g_game_l00_mode[0];
+        switch (old_mode) {
         case -1: case 0:
             pad_poll_ports_pal();
-            func_PAL_L00_00371E28();
+            level_update_game_frame_input_pal();
             if (g_debug_state == 1) {
                 T1_COUNT = 0;
                 pad_poll_ports_pal();
-                func_PAL_L00_00371E28();
+                level_update_game_frame_input_pal();
             }
             gfx_set_draw_mode_and_render_pal();
             break;
@@ -231,7 +231,7 @@ void func_PAL_L00_002A3988(void)
             gfx_clear_screen_and_render_pal();
             break;
         case 1:
-            func_PAL_002F6F08();
+            mpeg_play_movie_pal();
             break;
         case 2:
             pad_poll_ports_pal();
@@ -241,28 +241,28 @@ void func_PAL_L00_002A3988(void)
             break;
         case 3:
             pad_poll_ports_pal();
-            func_PAL_002CB710();
+            menu_update_pause_pal();
             gfx_call_engine_routine_zero_pal();
             break;
         case 4:
             pad_poll_ports_pal();
-            func_PAL_00287018();
+            UpdateModalState_pal();
             gfx_render_frame_extra_layers_pal();
             break;
         case 5:
             pad_poll_ports_pal();
-            func_PAL_L00_003776E8();
+            update_purchase_menu_and_preview_pal();
             shop_draw_purchase_menu_scene_pal();
             break;
         case 6:
             pad_poll_ports_pal();
-            func_PAL_002EA0B0();
+            update_playback_scene_pal();
             transition_draw_background_pal();
             break;
         case 9:
             pad_poll_ports_pal();
-            func_PAL_L00_002FE148();
-            func_PAL_L00_002FE168();
+            level_call_seq_update_disc_player_pal();
+            level_call_text_draw_screen_wipe_pal();
             break;
         case -2: case 10: default:
             math_trap_always();
@@ -298,11 +298,11 @@ void func_PAL_L00_002A3988(void)
                     g_memcard_input_latch[0] = g_memcard_input_latch[0] - 1;
                 period = 55;
                 SetupGifPaging(0);
-                spriteSize = 272.0f;
+                sprite_size = 272.0f;
                 VU1_addGSregister(71, 0x2004bULL);
                 hud_draw_sprite(GetIconFrame(0x755d, 0), 425, 250, 64, 64, 128);
                 angle = ((float)(g_ring_animation_counter[0] % period) * -6.2831854820251465f) / (float)period;
-                DrawRotatedSprite(64, 64, GetFrameTexture(GetIconFrame(0x755d, 1)), 7312.0f, 4512.0f, spriteSize, spriteSize, angle);
+                DrawRotatedSprite(64, 64, GetFrameTexture(GetIconFrame(0x755d, 1)), 7312.0f, 4512.0f, sprite_size, sprite_size, angle);
                 DoGifPaging();
                 if (g_save_menu_screen == 2) g_memcard_input_latch[0] = 0;
             }
@@ -343,7 +343,7 @@ void func_PAL_L00_002A3988(void)
                     if (limit < ticks) g_debug_tick_counter = 0;
                     if (!g_game_l00_mode[0]) {
                         pad_poll_ports_pal();
-                        func_PAL_L00_00371E28();
+                        level_update_game_frame_input_pal();
                     } else if (g_game_l00_mode[0] == 2 && !g_budget_blocked_flag) {
                         pad_poll_ports_pal();
                         cutscene_update_frame_pal();
@@ -393,8 +393,8 @@ void func_PAL_L00_002A3988(void)
             snd_start_music_stream_no_loop(sound, 1, 1024);
             InitializeHudSlotsAndBuffers();
         } else {
-            func_PAL_002B57D0();
-            if (g_game_l00_mode[0] != oldMode) g_pad_hold_frame_count[0] = 0;
+            mode_apply_pending_change_pal();
+            if (g_game_l00_mode[0] != old_mode) g_pad_hold_frame_count[0] = 0;
             if (g_packet_buffer_reset_flag[0]) gfx_reset_packet_buffer();
         }
         if (((int)g_frame_counter * 5 + 2) / 6 > g_statistics_table[g_current_map_index].maximum)

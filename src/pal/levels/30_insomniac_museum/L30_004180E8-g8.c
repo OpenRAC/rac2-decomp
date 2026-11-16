@@ -32,7 +32,7 @@ static inline int pulse_colour(int *vars) {
  * group member whose +0x31 flag is set; states 1 and 2 set it on the counted targets. The colour
  * comes from func_L01_0031BC68 with words 10 and 11 and a phase angle of D_L12_001B29C8 modulo
  * the period in word 8. */
-void func_PAL_L30_004180E8(u8 *obj) {
+void pulsing_l30_light_group_update_pal(u8 *obj) {
     int *vars = *(int **)(obj + 0x68);
     int i;
     int n;

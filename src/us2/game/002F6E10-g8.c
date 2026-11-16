@@ -14,7 +14,7 @@ extern char g_copy_setup_data[];
 extern int cutscene_map_id_to_index(int);
 extern void gfx_reset_packet_buffer(void);
 /* The dialog voice block: v2.00 clears the queued voice id before the movie plays. */
-typedef struct { char pad[0x24]; int pendingVoice; } Voice_6E10;
+typedef struct { char pad[0x24]; int pending_voice; } Voice_6E10;
 extern Voice_6E10 g_music_state;
 
 /* Plays the current FMV (D_001B220C, set up by func_002F5E20). With no stream it shows the
@@ -39,7 +39,7 @@ extern int ref_L00_002F5FB8_14 __attribute__((sda));
 extern int ref_L00_002F5FB8_16[];
 extern int g_memcard_state[];
 extern char g_str_movie_name[];
-extern void func_US2_0029DAD0(int, int);
+extern void msg_box_panel_init_short_us2(int, int);
 extern void req_flush_queue(void *);
 extern int request_end_slot(int,int);
 extern void gfx_wait_for_dma_status_bits(int);
@@ -57,13 +57,13 @@ extern int req_pop_queue(void *,int *,int *);
 extern int func_00126DC0(void *);
 extern void gfx_reset_record_list(void);
 extern int request_begin_slot(int,int,int,int,unsigned char *);
-void func_US2_002F6E10(void)
+void mpeg_play_movie_us2(void)
 {
     long packet[12] __attribute__((aligned(16)));
     long low, high;
     long base;
-    long highFlags;
-    int textureIndex;
+    long high_flags;
+    int texture_index;
     int frame, status, done, result;
     int first, second, index;
     Display_5FB8 *displays;
@@ -72,7 +72,7 @@ void func_US2_002F6E10(void)
     Stream_5FB8 *stream;
     Display_5FB8 *slot;
     if (ref_L00_002F5FB8_00 == 0) {
-        func_US2_0029DAD0((int)ref_L00_002F5FB8_04,-1);
+        msg_box_panel_init_short_us2((int)ref_L00_002F5FB8_04,-1);
         req_flush_queue(ref_L00_002F5FB8_05);
         request_end_slot(0,0);
         return;
@@ -81,9 +81,9 @@ void func_US2_002F6E10(void)
     second = ref_L00_002F5FB8_06[5];
     destination = (char *)(second + 0xE0000);
     gfx_wait_for_dma_status_bits(1);
-    textureIndex = 2;
+    texture_index = 2;
     displays = ref_L00_002F5FB8_07;
-    display = &displays[textureIndex];
+    display = &displays[texture_index];
     base = 0x3F70;
     func_00126288(packet,(short)base,(short)((1 << display->width) >> 6),display->psm,0,0,(short)(1 << display->width),(short)(1 << display->height));
     FlushCache(0);
@@ -93,18 +93,18 @@ void func_US2_002F6E10(void)
     FlushCache(0);
     sceGsExecLoadImage(packet,ref_L00_002F5FB8_08 + display->tex1 * 16);
     gfx_wait_paths_idle(0,0);
-    highFlags = 0x7ED8400000000L;
+    high_flags = 0x7ED8400000000L;
     low = ((long)((1 << display->width) >> 6) << 14) | (long)base;
     low = low | ((long)display->psm << 20);
     low = low | ((long)display->width << 26);
     low = low | ((long)display->height << 30);
-    high = low | highFlags;
-    displays[textureIndex].packet = high | 0x4000000000000000ULL;
+    high = low | high_flags;
+    displays[texture_index].packet = high | 0x4000000000000000ULL;
     FlushCache(0);
     snd_clear_all_voices();
     snd_wait_for_music_idle();
     snd_CheckLoadInProgress(0);
-    g_music_state.pendingVoice = -1;
+    g_music_state.pending_voice = -1;
     while (g_memcard_state[0x15C/4] >= 3 || g_memcard_state[0x164/4] >= 0) mc_update_state_us2();
     frame = 0;
     status = -1;
@@ -147,7 +147,7 @@ void func_US2_002F6E10(void)
     snd_CheckLoadInProgress(0);
     func_00126DC0(g_str_movie_name);
     gfx_wait_paths_idle(0,0);
-    slot = &ref_L00_002F5FB8_07[textureIndex];
+    slot = &ref_L00_002F5FB8_07[texture_index];
     sceGsExecLoadImage(packet,ref_L00_002F5FB8_08 + slot->tex1 * 16);
     gfx_wait_paths_idle(0,0);
     gfx_reset_record_list();

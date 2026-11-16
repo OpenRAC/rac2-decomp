@@ -29,7 +29,8 @@ extern float g_marker_rotation_speed __attribute__((sda));
 extern float g_marker_l13_rise_speed __attribute__((sda));
 extern float g_marker_value_speed __attribute__((sda));
 
-void func_PAL_L13_00424870(char *object)
+/* Glowing marker: sets itself up, treats hits from the hero on level 16, and animates its pulsing glow strip. */
+void targetable_marker_update_pal(char *object)
 {
     MarkerWorkspace local;
     float *state=*(float **)(object+0x68);

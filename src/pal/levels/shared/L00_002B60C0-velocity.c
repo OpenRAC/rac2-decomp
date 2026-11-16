@@ -48,7 +48,7 @@ extern void cam_set_view_space_vector_length(void *, void *, float);
 extern float hero_get_speed_along_forward(void *);
 
 /* Moves the hero's velocity toward the requested one, accelerating harder when reversing. */
-void func_PAL_L00_002B60C0(float rate)
+void ApproachHeroVelocity_pal(float rate)
 {
     float v[4] __attribute__((aligned(16)));
     float t[4] __attribute__((aligned(16)));

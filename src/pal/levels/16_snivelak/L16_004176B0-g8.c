@@ -22,25 +22,25 @@ extern s32 math_random_int_range(s32, s32);
 
 /* Raises the level's one-shot flag while the counter is low, then hands the sub-object
    its tail record. */
-void snivelak_play_voice_cues_pal(u8 *arg0)
+void snivelak_play_voice_cues_pal(u8 *moby)
 {
-    u8 *s1;
-    u8 *p;
-    u8 *q;
+    u8 *state;
+    u8 *hero;
+    u8 *cues;
 
-    s1 = *(u8 **)(arg0 + 0x68);
-    p = g_hero_l16_moby;
-    if (*(s32 *)(p + 0x2294) == 0x39) {
-        if (*(s32 *)(p + 0x1B8) == 0) {
+    state = *(u8 **)(moby + 0x68);
+    hero = g_hero_l16_moby;
+    if (*(s32 *)(hero + 0x2294) == 0x39) {
+        if (*(s32 *)(hero + 0x1B8) == 0) {
             STUB_printf(g_str_snivelak_voice_debug_a);
-            snd_play_unplayed_voice_line(arg0, 0x1C, 0x20);
+            snd_play_unplayed_voice_line(moby, 0x1C, 0x20);
             g_snivelak_voice_cue_count++;
         }
     }
-    q = g_snivelak_voice_cues;
-    if (*(s16 *)(q + 0x72) == 3 && *(s16 *)(q + 0x6C) < 0x1770) {
+    cues = g_snivelak_voice_cues;
+    if (*(s16 *)(cues + 0x72) == 3 && *(s16 *)(cues + 0x6C) < 0x1770) {
         STUB_printf(g_str_snivelak_voice_debug_b);
         snd_resume_music_stream();
     }
-    math_fast_float_d(s1 + 0x350);
+    math_fast_float_d(state + 0x350);
 }

@@ -3,19 +3,19 @@
 
 extern unsigned char g_level_progress_flags[28][4];
 
-extern int func_US2_002B1C90(int index);
+extern int save_count_entries_above_threshold_us2(int index);
 
 extern int g_level_value_table[21];
 
 /* Sums the counts of every entry but 26, and clamps the total to 0..40. */
-int func_US2_002B1C20(void)
+int save_count_filled_slots_us2(void)
 {
     int count = 0;
     int i;
 
     for (i = 0; i < 28; i++) {
         if (i != 26) {
-            count += func_US2_002B1C90(i);
+            count += save_count_entries_above_threshold_us2(i);
         }
     }
     if (count < 0) {
@@ -29,7 +29,7 @@ int func_US2_002B1C20(void)
 
 /* Counts the non-zero bytes of a 4-byte table entry, entry 2 also counting entry 26, and clamps
    the count to 0..40. */
-int func_US2_002B1C90(int index)
+int save_count_entries_above_threshold_us2(int index)
 {
     int count = 0;
     int i;
@@ -57,7 +57,7 @@ int func_US2_002B1C90(int index)
 }
 
 /* Entry of a 21-entry table, 0 past its end. */
-int func_US2_002B1D18(unsigned int index)
+int level_get_table_value_us2(unsigned int index)
 {
     if (index < 21) {
         return g_level_value_table[index];

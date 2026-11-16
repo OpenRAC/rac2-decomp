@@ -15,6 +15,7 @@ extern int snd_CheckLoadInProgress(int),load_start_disc_read(int,int,int);
 extern void STUB_printf(void *);
 extern char g_str_music_update_message_a[],g_str_music_update_message_b[],g_str_music_callback_message[];
 
+/* Updates the music system each frame: starts, queues and cross-fades the primary, transition and secondary streams and starts or finishes the pending disc read (PAL). */
 void snd_update_music_system_pal(void) {
     short requested_track;
     int fade_volume;

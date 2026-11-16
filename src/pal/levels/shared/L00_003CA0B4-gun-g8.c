@@ -57,11 +57,11 @@ extern char g_sound_state[];
 extern Vec g_scalar_transition_state[];
 extern int FastDecTimer(void *);
 extern int math_fast_float_d(void *);
-extern void func_PAL_002A7E68(void *, int, int, int);
-extern void func_PAL_L00_002AF458(void);
+extern void anim_start_blended_pal(void *, int, int, int);
+extern void start_equipped_item_animation_pal(void);
 extern void cancel_hero_item_animation_pal(void);
 extern void moby_transform_joint_to_world(void *, int, void *);
-extern s32 func_PAL_L00_002C4480(int, int);
+extern s32 hero_l00_set_action_pal(int, int);
 extern void copy_matrix3x4(void *, void *);
 extern void matrix_from_basis_rows(void *, void *);
 extern void transform_vector(void *, void *, void *);
@@ -78,8 +78,8 @@ extern void gauge_popup_show(int, int, int, float);
 extern int snd_play_from_global_bank(int, int, void *);
 extern void value_set_entry_by_index_pal(int, int);
 extern int PlayMobySound(int, int, void *);
-extern void *func_PAL_L00_00408110(void *);
-extern void func_PAL_L00_003CA9E0(void *);
+extern void *sheep_spawn_from_object_pal(void *);
+extern void lightning_l00_beam_update_pal(void *);
 extern int gfx_add_point_light(float, void *, int, float);
 extern void vec_scale_to_length(void *, void *, float);
 extern void FastVecAdd(void *, void *, void *);
@@ -88,7 +88,7 @@ extern void gfx_free_point_light(int);
 extern void snd_stop_voice(int);
 extern void anim_start_blended_with_flags(void *, int, int, int, int);
 
-void func_PAL_L00_003CA0B4(char *owner)
+void sheepinator_update_pal(char *owner)
 {
     Vec direction;
     union {
@@ -120,8 +120,8 @@ void func_PAL_L00_003CA0B4(char *owner)
     if ((unsigned int)g_hero_state.mode < 2 &&
         (g_pad_pressed_flags & g_hero_state.input) && allowed) {
         if (FIELD(owner, unsigned char, 0x43) != 2)
-            func_PAL_002A7E68(owner, 2, 0, 0);
-        if (!g_hero_state.flag) func_PAL_L00_002AF458();
+            anim_start_blended_pal(owner, 2, 0, 0);
+        if (!g_hero_state.flag) start_equipped_item_animation_pal();
         if (!context->active) {
             context->active = 1;
             if (g_statistics_table[16].count < 65535) g_statistics_table[16].count++;
@@ -130,7 +130,7 @@ void func_PAL_L00_003CA0B4(char *owner)
         }
         if (!context->timer) context->timer = 12;
         moby_transform_joint_to_world(owner, 0, context);
-        if (g_hero_state.state == 1) func_PAL_L00_002C4480(29, 1);
+        if (g_hero_state.state == 1) hero_l00_set_action_pal(29, 1);
         direction.q = 0;
         if (g_hero_state.state == 29 &&
             (FIELD(g_hero_state.object, unsigned short, 0x34) & 1)) {
@@ -200,11 +200,11 @@ have_target:
                 }
             }
             PlayMobySound(3, 0, owner);
-            func_PAL_L00_00408110(context->target);
+            sheep_spawn_from_object_pal(context->target);
             g_sheepinator_frame_counter++;
             context->target = 0;
         }
-        func_PAL_L00_003CA9E0(owner);
+        lightning_l00_beam_update_pal(owner);
         if (g_sheepinator_l00_light == -1)
             g_sheepinator_l00_light = gfx_add_point_light(7.5f, owner + 0x10, 0x207F7F, 0.0f);
         if (g_sheepinator_l00_light >= 0) {

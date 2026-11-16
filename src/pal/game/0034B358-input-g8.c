@@ -7,11 +7,12 @@ extern float square_root(float);
 extern float mat_fast_helper_a(float, float);
 #define RANGES (*(float (**)[2])(object + 0x144))
 
+/* Picks the selected direction from the stick angle (or the d-pad when the stick is idle), with a short delay between changes, and returns it. (PAL) */
 int UpdateDirectionSelection_pal(char *object)
 {
     float x, y, magnitude, angle;
     char *pad;
-    int oldSelection, i;
+    int old_selection, i;
     unsigned int buttons;
 
     if (--*(int *)(object + 0x154) < 0)
@@ -29,7 +30,7 @@ int UpdateDirectionSelection_pal(char *object)
         i = 0;
         if (*(int *)(object + 0x150) == 0)
             *(int *)(object + 0x14C) = -1;
-        oldSelection = *(int *)(object + 0x14C);
+        old_selection = *(int *)(object + 0x14C);
         if (magnitude > g_list_menu_input_threshold) {
             while (RANGES[i][0] != 0.0f || RANGES[i][1] != 0.0f) {
                 if ((RANGES[i][0] < 0.0f) != (RANGES[i][1] >= 0.0f)) {
@@ -71,7 +72,7 @@ int UpdateDirectionSelection_pal(char *object)
                 *(int *)(object + 0x150) = 1;
             }
         }
-        if (oldSelection != *(int *)(object + 0x14C))
+        if (old_selection != *(int *)(object + 0x14C))
             *(int *)(object + 0x154) = 8;
     }
     return *(int *)(object + 0x14C);

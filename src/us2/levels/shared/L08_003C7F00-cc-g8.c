@@ -104,7 +104,7 @@ extern void gfx_start_color_fade(void *, void *);
 extern void gfx_update_color_fade(void *, void *);
 extern f32 func_002A0558(void *, void *);
 extern s32 TryClaimNotice(s32, s32, s32);
-extern s32 func_US2_L08_002D31F8(s32, s32);
+extern s32 hero_l08_enter_state_us2(s32, s32);
 extern void set_hero_animation(int, int, f32);
 extern int FastDecTimer(void *);
 extern int math_fast_float_d(void *);
@@ -237,6 +237,7 @@ extern u8 g_collision_aim_vector[];
 extern Block400 g_hud_gauge_values;
 extern void hud_draw_health_gauge(void);
 
+/* Updates a rideable hover moby (levels 8, 19 and 30): hits, steering, thrust and effects, per state (v2.00 copy). */
 void RideableMobyUpdate_us2(RideMoby *moby)
 {
     f32 dir[4] __attribute__((aligned(16)));
@@ -357,7 +358,7 @@ void RideableMobyUpdate_us2(RideMoby *moby)
             }
         }
         if (fire != 0) {
-            func_US2_L08_002D31F8(0x31, 0);
+            hero_l08_enter_state_us2(0x31, 0);
             set_hero_animation(g_hover_anim_next, 0, 15.0f);
             *(TI128 *)(g_hero_state + 0x90) = moby->rot.q;
             *(TI128 *)(g_hero_state + 0x80) = moby->pos.q;
@@ -612,7 +613,7 @@ void RideableMobyUpdate_us2(RideMoby *moby)
     case 4:
         moby->x98 = *(s32 *)(moby->x24 + 0x10);
         *(s32 *)(((Hero *)g_hero_state)->ptr[0x2290 / 4] + 0x9C) = 0;
-        func_US2_L08_002D31F8(0, 1);
+        hero_l08_enter_state_us2(0, 1);
         ((Hero *)g_hero_state)->h[0x1834 / 2] = -1;
         ((Hero *)g_hero_state)->f[0x108 / 4] = 0.16666667f;
         ((Hero *)g_hero_state)->ptr[0x1830 / 4] = 0;
@@ -628,7 +629,7 @@ void RideableMobyUpdate_us2(RideMoby *moby)
     case 5:
         moby->x98 = *(s32 *)(moby->x24 + 0x10);
         *(s32 *)(((Hero *)g_hero_state)->ptr[0x2290 / 4] + 0x9C) = 0;
-        func_US2_L08_002D31F8(0, 1);
+        hero_l08_enter_state_us2(0, 1);
         moby_transform_joint_to_world(moby, 0, dir);
         SpawnExplosionEffects(moby, vars, dir, 0.0f, 0.0f, 10, 3, 16, 4.0f, 2.0f, 9.0f, 1.0f, -1, 15.0f, 1, 1, -1, 0, 0x810001);
         moby->pos.q = vars->x30;

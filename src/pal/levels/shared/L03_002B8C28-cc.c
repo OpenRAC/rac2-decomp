@@ -127,7 +127,8 @@ extern float ApproachValue(float *, float, float);
 extern float math_spring_float_to_goal(float *, float *, float, float, float, float);
 extern float vec_distance_xy(void *, void *);
 
-void func_PAL_L03_002B8C28(void) {
+/* Picks target values for the hero's camera settings from the hero's state, then eases the current values toward them. (PAL: 50 Hz easing rates) */
+void cam_update_hero_targets_pal(void) {
     switch (g_hero_l03_state_block[0x22B4]) {
     case 0:
         *(float *)(g_hero_l03_state_block + 0x258) = 0.8f;
@@ -141,16 +142,16 @@ void func_PAL_L03_002B8C28(void) {
         break;
     }
     {
-        unsigned char *g = g_hero_l03_state_block;
-        if (*(int *)(g + 0x229C) == 4) {
-            if (*(short *)(g + 0x4AC) < *(int *)(g + 0x1B8) && !g[0x49E])
-                *(float *)(g + 0x25C) = *(float *)(g + 0x4B8);
-        } else if (*(int *)(g + 0x2294) == 6) {
-            *(float *)(g + 0x25C) = 0.5f;
-        } else if (*(int *)(g + 0x2294) == 4) {
-            *(float *)(g + 0x258) = 0.350000023841858f;
-        } else if (*(int *)(g + 0x2294) == 0x7C) {
-            *(float *)(g + 0x260) = 0.8f;
+        unsigned char *hero = g_hero_l03_state_block;
+        if (*(int *)(hero + 0x229C) == 4) {
+            if (*(short *)(hero + 0x4AC) < *(int *)(hero + 0x1B8) && !hero[0x49E])
+                *(float *)(hero + 0x25C) = *(float *)(hero + 0x4B8);
+        } else if (*(int *)(hero + 0x2294) == 6) {
+            *(float *)(hero + 0x25C) = 0.5f;
+        } else if (*(int *)(hero + 0x2294) == 4) {
+            *(float *)(hero + 0x258) = 0.350000023841858f;
+        } else if (*(int *)(hero + 0x2294) == 0x7C) {
+            *(float *)(hero + 0x260) = 0.8f;
         }
     }
     if (!g_hero_l03_state_block[0x287] || *(int *)(g_hero_l03_state_block + 0x22A4) == 0x12 ||
@@ -158,11 +159,11 @@ void func_PAL_L03_002B8C28(void) {
         (!g_hero_l03_state_block[0x22B4] && *(float *)(g_hero_l03_state_block + 0x254) < 0.53f) ||
         *(int *)(g_hero_l03_state_block + 0x229C) == 0x11 || g_hero_l03_state_block[0x1494] ||
         vec_distance_xy(g_hero_l03_state_block + 0x240, g_hero_l03_state_block + 0x80) > *(float *)(g_hero_l03_state_block + 0x264) * 0.5f) {
-        float *p = (float *)(g_hero_l03_state_block + 0x250);
-        unsigned char *g = g_hero_l03_state_block;
-        ApproachValue(p, *(float *)(g + 0x258), 0.024f);
-        ApproachValue(p + 1, *(float *)(g + 0x25C), 0.024f);
-        math_spring_float_to_goal(p + 5, p + 6, *(float *)(g + 0x260), 0.028800001f, 0.43200004f, 0.080000006f);
+        float *settings = (float *)(g_hero_l03_state_block + 0x250);
+        unsigned char *hero = g_hero_l03_state_block;
+        ApproachValue(settings, *(float *)(hero + 0x258), 0.024f);
+        ApproachValue(settings + 1, *(float *)(hero + 0x25C), 0.024f);
+        math_spring_float_to_goal(settings + 5, settings + 6, *(float *)(hero + 0x260), 0.028800001f, 0.43200004f, 0.080000006f);
     }
 }
 
@@ -204,7 +205,7 @@ extern int math_random_int_below(int);
    in every level that has it. */
 /* The position the tilt is measured from: a four-float vector in the boot's resident data. */
 /* The level's entity table base, the group count and the table of group id lists (in the
-   resident image: the list of group g ends after its first entry with bit 15 set). */
+   resident image: the list of group hero ends after its first entry with bit 15 set). */
 /* The part of the object's private state (at +0x68) that these walks read: eight group ids at
    +0x200 and the id of an entity at +0x220. */
 extern float vec_distance_xy(void *, void *);

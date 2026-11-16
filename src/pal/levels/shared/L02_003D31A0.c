@@ -28,7 +28,9 @@ extern int math_random_int_below(int);
 extern void *part_spawn_hero_relative(void *, void *, int, int, int, int, float);
 extern void vec_random_direction(void *, float, float);
 
-void func_PAL_L02_003D31A0(u8 *self)
+/* Spawns two smoke puffs at the object: one at its position and one at a random point near it
+   (PAL: 50 Hz timings). */
+void part_spawn_two_puffs_pal(u8 *self)
 {
     L02Pair_CF1B8 speed = g_puff_speed_pair;
     L02Pair_CF1B8 size = g_puff_size_pair;

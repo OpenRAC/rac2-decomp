@@ -36,7 +36,7 @@ extern float mat_fast_helper_a(float, float);
 extern void euler_rotation_basis(void *, void *);
 extern float FastAddRotations(float, float);
 extern void func_002A677C(void *);
-extern void func_PAL_002A7E68(void *, int, int, int);
+extern void anim_start_blended_pal(void *, int, int, int);
 extern void moby_set_state(void *, int, int);
 extern int math_random_int_below(int);
 extern float math_random_float_range(float, float);
@@ -66,7 +66,7 @@ extern void drone_reset_to_idle_pal(u8 *);
 static __inline__ void anim(u8 *self, int a, int b)
 {
     if (self[0x43] != a)
-        func_PAL_002A7E68(self, a, 0, b);
+        anim_start_blended_pal(self, a, 0, b);
 }
 
 /* Movement tuning with the shared turn limits. */
@@ -75,41 +75,42 @@ static __inline__ void turn(u8 *self, float rate, float speed)
     moby_set_controller_speed_limits(self, rate, speed, 0.0016755164f, 0.12566373f);
 }
 
+/* Per-frame update of the Joba drone (moby class 3575): it patrols its path, chases, grabs and releases the player, and falls when hit. */
 void drone_update_pal(u8 *self)
 {
-    f32 v00[4];
-    f32 v10[4];
-    f32 v20[4];
-    f32 v30[4];
-    f32 m[4][4];
-    u8 *pv;
-    u8 *target;
-    f32 dist;
+    f32 target_pos[4];
+    f32 goal[4];
+    f32 step[4];
+    f32 offset[4];
+    f32 basis[4][4];
+    u8 *vars;
+    u8 *center;
+    f32 target_dist;
     f32 height;
 
-    pv = *(u8 **)(self + 0x68);
+    vars = *(u8 **)(self + 0x68);
     if (self[0x20] == 1)
         return;
-    if (*(s16 *)(pv + 0x1FC) != 0 && g_hero_l11_input_blocked == 0 && self[0x20] != 0xE && self[0x20] != 0xD)
+    if (*(s16 *)(vars + 0x1FC) != 0 && g_hero_l11_input_blocked == 0 && self[0x20] != 0xE && self[0x20] != 0xD)
         return;
     drone_launcher_update_state_pal(self);
-    if (*(u8 **)(pv + 0x1C4) != 0) {
-        *(TI128 *)v00 = *(TI128 *)(*(u8 **)(pv + 0x1C4) + 0x10);
-        mat_fast_helper_a(*(f32 *)(*(u8 **)(pv + 0x1C4) + 0x10) - *(f32 *)(self + 0x10),
-                      *(f32 *)(*(u8 **)(pv + 0x1C4) + 0x14) - *(f32 *)(self + 0x14));
+    if (*(u8 **)(vars + 0x1C4) != 0) {
+        *(TI128 *)target_pos = *(TI128 *)(*(u8 **)(vars + 0x1C4) + 0x10);
+        mat_fast_helper_a(*(f32 *)(*(u8 **)(vars + 0x1C4) + 0x10) - *(f32 *)(self + 0x10),
+                      *(f32 *)(*(u8 **)(vars + 0x1C4) + 0x14) - *(f32 *)(self + 0x14));
     } else {
-        *(Vec *)v00 = *(Vec *)(g_hero_state + 0x80);
+        *(Vec *)target_pos = *(Vec *)(g_hero_state + 0x80);
         mat_fast_helper_a(((Hero *)g_hero_state)->f[0x80 / 4] - *(f32 *)(self + 0x10),
                       ((Hero *)g_hero_state)->f[0x84 / 4] - *(f32 *)(self + 0x14));
     }
-    dist = fast_vec_dist((self + 0x10), v00);
+    target_dist = fast_vec_dist((self + 0x10), target_pos);
     if (self[0x20] == 1)
         return;
-    if (*(s16 *)(pv + 0x1FC) != 0 && g_hero_l11_input_blocked == 0)
+    if (*(s16 *)(vars + 0x1FC) != 0 && g_hero_l11_input_blocked == 0)
         return;
-    target = 0;
+    center = 0;
     if (*(s32 *)(self + 0xB8) != 0)
-        target = arena_get_center_point(*(u8 **)(self + 0xB8));
+        center = arena_get_center_point(*(u8 **)(self + 0xB8));
 
     switch (self[0x20]) {
     case 3: {
@@ -118,7 +119,7 @@ void drone_update_pal(u8 *self)
             self[0xBC] = 0;
             *(u16 *)(self + 0x96) = 0;
         }
-        if (self[0xBC] == 0 && *(u16 *)(self + 0x96) > *(s16 *)(pv + 0x1EE)) {
+        if (self[0xBC] == 0 && *(u16 *)(self + 0x96) > *(s16 *)(vars + 0x1EE)) {
             self[0xBC] = 1;
             break;
         }
@@ -139,102 +140,102 @@ void drone_update_pal(u8 *self)
         break;
     case 7: {
         u8 *path;
-        u8 *p;
+        u8 *point;
         s32 i;
         s32 best;
-        f32 d;
-        f32 lim;
+        f32 best_dist;
+        f32 reach;
 
-        if (*(s16 *)(pv + 0x1FC) != 0)
-            path = g_path_l11_table[*(s32 *)(pv + 0x1E0)];
+        if (*(s16 *)(vars + 0x1FC) != 0)
+            path = g_path_l11_table[*(s32 *)(vars + 0x1E0)];
         else
-            path = g_path_l11_table[*(s32 *)(pv + 0x1C0)];
+            path = g_path_l11_table[*(s32 *)(vars + 0x1C0)];
         if (flag_set_first_pending(self) != 0) {
-            p = path + 0x10;
+            point = path + 0x10;
             best = 0;
             turn(self, 0.040000003f, 4.0000005f);
-            *(f32 *)(pv + 0x1C8) = math_random_float_range(1.0f, 3.0f);
-            d = fast_vec_dist((self + 0x10), p);
-            for (i = 0; i < *(s32 *)path - 1; i++, p += 0x10) {
-                f32 e = fast_vec_dist((self + 0x10), p);
-                if (e < d) {
-                    d = e;
+            *(f32 *)(vars + 0x1C8) = math_random_float_range(1.0f, 3.0f);
+            best_dist = fast_vec_dist((self + 0x10), point);
+            for (i = 0; i < *(s32 *)path - 1; i++, point += 0x10) {
+                f32 next_dist = fast_vec_dist((self + 0x10), point);
+                if (next_dist < best_dist) {
+                    best_dist = next_dist;
                     best = i;
                 }
             }
-            *(s32 *)(pv + 0x1D4) = best;
-            *(s16 *)(pv + 0x1E8) = math_random_int_below(2);
+            *(s32 *)(vars + 0x1D4) = best;
+            *(s16 *)(vars + 0x1E8) = math_random_int_below(2);
         } else {
-            qcopy(v10, path + 0x10 + (*(s32 *)(pv + 0x1D4) << 4));
-            if (*(s16 *)(pv + 0x1FC) != 0) {
-                FastVecSub(v30, v10, target);
-                v30[2] = 0.0f;
-                vec_scale_to_length(v30, v30, 15.0f - *(f32 *)(pv + 0x1C8));
-                v10[0] = *(f32 *)(target + 0) + v30[0];
-                v10[1] = *(f32 *)(target + 4) + v30[1];
+            qcopy(goal, path + 0x10 + (*(s32 *)(vars + 0x1D4) << 4));
+            if (*(s16 *)(vars + 0x1FC) != 0) {
+                FastVecSub(offset, goal, center);
+                offset[2] = 0.0f;
+                vec_scale_to_length(offset, offset, 15.0f - *(f32 *)(vars + 0x1C8));
+                goal[0] = *(f32 *)(center + 0) + offset[0];
+                goal[1] = *(f32 *)(center + 4) + offset[1];
             } else {
-                v10[2] = *(f32 *)(pv + 0x1C8) + *(f32 *)(target + 8);
+                goal[2] = *(f32 *)(vars + 0x1C8) + *(f32 *)(center + 8);
             }
-            FastVecSub(v20, v10, (self + 0x10));
-            lim = 2.0f;
-            vec_scale_to_length(v20, v20, *(f32 *)(pv + 0x1D8));
-            FastVecAdd((self + 0x10), (self + 0x10), v20);
-            if (*(s16 *)(pv + 0x1FC) != 0)
-                lim = 4.0f;
-            if (*(s16 *)(pv + 0x1E8) != 0) {
-                if (fast_vec_dist((self + 0x10), v10) < lim)
-                    *(s32 *)(pv + 0x1D4) -= 1;
-                if (*(s32 *)(pv + 0x1D4) < 0)
-                    *(s32 *)(pv + 0x1D4) = *(s32 *)path - 1;
+            FastVecSub(step, goal, (self + 0x10));
+            reach = 2.0f;
+            vec_scale_to_length(step, step, *(f32 *)(vars + 0x1D8));
+            FastVecAdd((self + 0x10), (self + 0x10), step);
+            if (*(s16 *)(vars + 0x1FC) != 0)
+                reach = 4.0f;
+            if (*(s16 *)(vars + 0x1E8) != 0) {
+                if (fast_vec_dist((self + 0x10), goal) < reach)
+                    *(s32 *)(vars + 0x1D4) -= 1;
+                if (*(s32 *)(vars + 0x1D4) < 0)
+                    *(s32 *)(vars + 0x1D4) = *(s32 *)path - 1;
             } else {
-                if (fast_vec_dist((self + 0x10), v10) < lim)
-                    *(s32 *)(pv + 0x1D4) += 1;
-                if (*(s32 *)(pv + 0x1D4) >= *(s32 *)path)
-                    *(s32 *)(pv + 0x1D4) = 0;
+                if (fast_vec_dist((self + 0x10), goal) < reach)
+                    *(s32 *)(vars + 0x1D4) += 1;
+                if (*(s32 *)(vars + 0x1D4) >= *(s32 *)path)
+                    *(s32 *)(vars + 0x1D4) = 0;
             }
-            if (*(s32 *)(pv + 0x1D4) >= *(s32 *)path - 6 && *(f32 *)(pv + 0x1D8) >= 0.120000005f)
-                *(f32 *)(pv + 0x1D8) = *(f32 *)(pv + 0x1D8) - 0.0036000002f;
+            if (*(s32 *)(vars + 0x1D4) >= *(s32 *)path - 6 && *(f32 *)(vars + 0x1D8) >= 0.120000005f)
+                *(f32 *)(vars + 0x1D8) = *(f32 *)(vars + 0x1D8) - 0.0036000002f;
             func_002A677C(self);
-            if (*(s16 *)(pv + 0x1FC) != 0) {
-                moby_aim_at_target_offset_pal(self, v10);
+            if (*(s16 *)(vars + 0x1FC) != 0) {
+                moby_aim_at_target_offset_pal(self, goal);
             } else {
-                moby_turn_toward_target_and_step_pal(self, v10, *(f32 *)(pv + 0x1D0));
-                math_step_value_toward_target(self + 0x18, pv + 0x108, *(f32 *)(pv + 0x1C8), 0.00080000004f, 0.00080000004f,
+                moby_turn_toward_target_and_step_pal(self, goal, *(f32 *)(vars + 0x1D0));
+                math_step_value_toward_target(self + 0x18, vars + 0x108, *(f32 *)(vars + 0x1C8), 0.00080000004f, 0.00080000004f,
                               0.20000002f);
             }
         }
-        if (*(s16 *)(pv + 0x1EC) != 0)
+        if (*(s16 *)(vars + 0x1EC) != 0)
             moby_set_state(self, 8, 3);
         break;
     }
     case 8: {
-        s32 flag;
+        s32 reached;
         if (flag_set_first_pending(self) != 0)
             turn(self, 0.016f, 1.6000001f);
-        flag = 0;
-        if (*(s16 *)(pv + 0x1FC) != 0) {
-            if (4.0f < dist) {
-                FastVecSub(v10, v00, (self + 0x10));
-                vec_scale_to_length(v10, v10, 10.0f);
-                FastVecAdd(v10, v10, (self + 0x10));
-                moby_aim_at_target_offset_pal(self, v10);
+        reached = 0;
+        if (*(s16 *)(vars + 0x1FC) != 0) {
+            if (4.0f < target_dist) {
+                FastVecSub(goal, target_pos, (self + 0x10));
+                vec_scale_to_length(goal, goal, 10.0f);
+                FastVecAdd(goal, goal, (self + 0x10));
+                moby_aim_at_target_offset_pal(self, goal);
             } else {
-                moby_aim_at_target_offset_pal(self, v00);
+                moby_aim_at_target_offset_pal(self, target_pos);
             }
-            flag = dist < 4.0f;
+            reached = target_dist < 4.0f;
         } else {
-            height = *(f32 *)(target + 8) + 0.5f;
-            math_step_value_toward_target(self + 0x18, pv + 0x108, height, 0.008f, 0.040000003f, 0.20000002f);
-            moby_turn_toward_target_and_step_pal(self, v00, *(f32 *)(pv + 0x1D0));
+            height = *(f32 *)(center + 8) + 0.5f;
+            math_step_value_toward_target(self + 0x18, vars + 0x108, height, 0.008f, 0.040000003f, 0.20000002f);
+            moby_turn_toward_target_and_step_pal(self, target_pos, *(f32 *)(vars + 0x1D0));
             if (math_fabs(*(f32 *)(self + 0x18) - height) < 0.1f &&
                 vec_distance_xy((self + 0x10), &((Hero *)g_hero_state)->q[0x80 / 16]) < 2.0f)
-                flag = 1;
+                reached = 1;
         }
-        if (flag) {
+        if (reached) {
             *(u16 *)(self + 0x96) = 0;
             moby_set_state(self, 10, -1);
         }
-        coll_sweep_from_object(self, (self + 0x10), 1, 0.3f, (f32)pv[0x34], 1.0f, 0, 1, 0);
+        coll_sweep_from_object(self, (self + 0x10), 1, 0.3f, (f32)vars[0x34], 1.0f, 0, 1, 0);
         break;
     }
     case 9:
@@ -247,31 +248,31 @@ void drone_update_pal(u8 *self)
         height = 0.0f;
         break;
     case 11: {
-        s32 k;
-        f32 lim;
+        s32 i;
+        f32 reach;
         if (flag_set_second_pending(self) != 0) {
             turn(self, 0.0032000002f, 0.080000006f);
             *(u16 *)(self + 0x96) = 0;
         }
         *(f32 *)(self + 0x48) = 1.75f;
-        for (k = 0; k < 4; k++)
-            coll_test_hit_at_bone(self, k, 1, 0.5f, (f32)pv[0x34], 1.0f, 0, 1, 0);
-        lim = 1.8f;
-        if (lim <= fast_vec_dist((self + 0x10), &((Hero *)g_hero_state)->q[0x80 / 16])) {
-            qcopy(v10, v00);
-        } else if (fast_vec_dist((self + 0x10), &((Hero *)g_hero_state)->q[0x80 / 16]) < lim) {
-            FastVecSub(v10, (self + 0x10), v00);
-            vec_scale_to_length(v10, v10, 2.0f);
-            FastVecAdd(v10, v10, (self + 0x10));
+        for (i = 0; i < 4; i++)
+            coll_test_hit_at_bone(self, i, 1, 0.5f, (f32)vars[0x34], 1.0f, 0, 1, 0);
+        reach = 1.8f;
+        if (reach <= fast_vec_dist((self + 0x10), &((Hero *)g_hero_state)->q[0x80 / 16])) {
+            qcopy(goal, target_pos);
+        } else if (fast_vec_dist((self + 0x10), &((Hero *)g_hero_state)->q[0x80 / 16]) < reach) {
+            FastVecSub(goal, (self + 0x10), target_pos);
+            vec_scale_to_length(goal, goal, 2.0f);
+            FastVecAdd(goal, goal, (self + 0x10));
         } else {
-            qcopy(v10, (self + 0x10));
+            qcopy(goal, (self + 0x10));
         }
-        if (*(s16 *)(pv + 0x1FC) != 0) {
-            moby_aim_at_target_offset_pal(self, v10);
+        if (*(s16 *)(vars + 0x1FC) != 0) {
+            moby_aim_at_target_offset_pal(self, goal);
         } else {
-            math_step_value_toward_target(self + 0x18, pv + 0x108, *(f32 *)(target + 8) + 0.5f, 0.008f, 0.040000003f,
+            math_step_value_toward_target(self + 0x18, vars + 0x108, *(f32 *)(center + 8) + 0.5f, 0.008f, 0.040000003f,
                           0.20000002f);
-            moby_l01_turn_toward_target_pal(self, v10);
+            moby_l01_turn_toward_target_pal(self, goal);
         }
         if (((Hero *)g_hero_state)->ptr[0x249C / 4] == self) {
             moby_set_state(self, 12, -1);
@@ -297,22 +298,22 @@ void drone_update_pal(u8 *self)
             anim(self, 2, 2);
             *(f32 *)(self + 0x48) = 1.0f;
         }
-        qcopy(v10, (self + 0x10));
-        if (dist < 1.0f)
-            coll_sweep_from_object(self, v10, 1, 0.3f, (f32)pv[0x34], 1.0f, 0, 1, 0);
+        qcopy(goal, (self + 0x10));
+        if (target_dist < 1.0f)
+            coll_sweep_from_object(self, goal, 1, 0.3f, (f32)vars[0x34], 1.0f, 0, 1, 0);
         break;
     case 13:
-        qcopy_nc(v10, (self + 0x10));
-        *(f32 *)(pv + 0x108) = *(f32 *)(pv + 0x108) - *(f32 *)(pv + 0x8C);
-        FastVecAdd((self + 0x10), (self + 0x10), pv + 0x100);
-        if (CollLine(v10, (self + 0x10), 0, self, 0) == 0 && coll_test_point((self + 0x10), 4, self, 0.3f) == 0 &&
+        qcopy_nc(goal, (self + 0x10));
+        *(f32 *)(vars + 0x108) = *(f32 *)(vars + 0x108) - *(f32 *)(vars + 0x8C);
+        FastVecAdd((self + 0x10), (self + 0x10), vars + 0x100);
+        if (CollLine(goal, (self + 0x10), 0, self, 0) == 0 && coll_test_point((self + 0x10), 4, self, 0.3f) == 0 &&
             math_random_int_below(0x1E) != 0)
             break;
-        coll_sweep_from_object(self, (self + 0x10), 0x10000, 0.5f, (f32)pv[0x34], 1.0f, 0, 1, 0);
-        if (*(f32 *)(pv + 0x20) > 0.0f) {
+        coll_sweep_from_object(self, (self + 0x10), 0x10000, 0.5f, (f32)vars[0x34], 1.0f, 0, 1, 0);
+        if (*(f32 *)(vars + 0x20) > 0.0f) {
             moby_set_state(self, 8, 3);
             anim(self, 0, 4);
-        } else if (*(s16 *)(pv + 0x1FC) != 0 && math_random_int_below(2) == 0) {
+        } else if (*(s16 *)(vars + 0x1FC) != 0 && math_random_int_below(2) == 0) {
             moby_set_state(self, 14, -1);
         } else {
             moby_set_anim_type_three_pal(self, 0, 1);
@@ -321,32 +322,32 @@ void drone_update_pal(u8 *self)
         break;
     case 14: {
         s32 j;
-        u8 *t;
+        u8 *ring_center;
         f32 *rot;
         if (flag_set_first_pending(self) != 0) {
-            t = arena_get_center_point(*(u8 **)(self + 0xB8));
-            FastVecSub(pv + 0x100, t, (self + 0x10));
-            *(f32 *)(pv + 0x108) = 0.0f;
-            vec_scale_to_length(pv + 0x100, pv + 0x100, math_random_float_range(3.0f, 5.0f) * 0.020000001f);
-            *(s16 *)(pv + 0x1FC) = 0;
+            ring_center = arena_get_center_point(*(u8 **)(self + 0xB8));
+            FastVecSub(vars + 0x100, ring_center, (self + 0x10));
+            *(f32 *)(vars + 0x108) = 0.0f;
+            vec_scale_to_length(vars + 0x100, vars + 0x100, math_random_float_range(3.0f, 5.0f) * 0.020000001f);
+            *(s16 *)(vars + 0x1FC) = 0;
             for (j = 0; j < 3; j++) {
-                rot = (f32 *)(pv + 0x1B0);
+                rot = (f32 *)(vars + 0x1B0);
                 rot[j] = math_random_float_range(240.0f, 720.0f) * 0.0003490659f;
-                qcopy(m[j], self + 0xC0 + j * 0x10);
+                qcopy(basis[j], self + 0xC0 + j * 0x10);
             }
-            mat_get_euler_angles(m, self + 0xF0);
+            mat_get_euler_angles(basis, self + 0xF0);
             *(u16 *)(self + 0x34) &= 0xEFFF;
         }
-        *(f32 *)(pv + 0x108) = *(f32 *)(pv + 0x108) - *(f32 *)(pv + 0x8C);
-        hero_set_control_motion_and_step(self, pv + 0x100);
-        FastVecScale(pv + 0x1B0, pv + 0x1B0, 0.98f);
-        *(TI128 *)v20 = 0;
-        v20[2] = *(f32 *)(pv + 0x30);
-        *(TI128 *)v10 = *(TI128 *)v20;
-        moby_rotate_about_point(self, v10, *(f32 *)(pv + 0x1B0), *(f32 *)(pv + 0x1B4), *(f32 *)(pv + 0x1B8));
+        *(f32 *)(vars + 0x108) = *(f32 *)(vars + 0x108) - *(f32 *)(vars + 0x8C);
+        hero_set_control_motion_and_step(self, vars + 0x100);
+        FastVecScale(vars + 0x1B0, vars + 0x1B0, 0.98f);
+        *(TI128 *)step = 0;
+        step[2] = *(f32 *)(vars + 0x30);
+        *(TI128 *)goal = *(TI128 *)step;
+        moby_rotate_about_point(self, goal, *(f32 *)(vars + 0x1B0), *(f32 *)(vars + 0x1B4), *(f32 *)(vars + 0x1B8));
         euler_rotation_basis(self + 0xC0, self + 0xF0);
-        t = arena_get_center_point(*(u8 **)(self + 0xB8));
-        if (*(f32 *)(self + 0x18) < *(f32 *)(t + 8) + 5.0f || math_random_int_below(0x1C2) == 0 ||
+        ring_center = arena_get_center_point(*(u8 **)(self + 0xB8));
+        if (*(f32 *)(self + 0x18) < *(f32 *)(ring_center + 8) + 5.0f || math_random_int_below(0x1C2) == 0 ||
             *(u16 *)(self + 0x96) >= 0x12D) {
             moby_set_anim_type_three_pal(self, 0, -1);
             drone_reset_to_idle_pal(self);
@@ -355,41 +356,41 @@ void drone_update_pal(u8 *self)
     }
     }
 
-    if (*(s16 *)(pv + 0x1FC) != 0 && self[0x95] != 4) {
-        f32 z = *(f32 *)(self + 0x18);
-        FastVecSub(v10, (self + 0x10), target);
-        v10[2] = 0.0f;
-        vec_scale_to_length(v10, v10, 14.3f);
-        FastVecAdd((self + 0x10), v10, target);
-        *(f32 *)(self + 0x18) = z;
+    if (*(s16 *)(vars + 0x1FC) != 0 && self[0x95] != 4) {
+        f32 saved_z = *(f32 *)(self + 0x18);
+        FastVecSub(goal, (self + 0x10), center);
+        goal[2] = 0.0f;
+        vec_scale_to_length(goal, goal, 14.3f);
+        FastVecAdd((self + 0x10), goal, center);
+        *(f32 *)(self + 0x18) = saved_z;
     }
     if (self[0x20] != 0xE) {
-        *(f32 *)(pv + 0x1B0) = math_move_angle_toward_target(*(f32 *)(pv + 0x1B0), g_drone_target_angle_a * 0.0003490659f, 0.0625f);
-        *(f32 *)(pv + 0x1B4) = math_move_angle_toward_target(*(f32 *)(pv + 0x1B4), g_drone_target_angle_b * 0.0003490659f, 0.0625f);
-        *(f32 *)(pv + 0x1B8) = math_move_angle_toward_target(*(f32 *)(pv + 0x1B8), g_drone_target_angle_c * 0.0003490659f, 0.0625f);
-        *(f32 *)(self + 0xF0) = FastAddRotations(*(f32 *)(self + 0xF0), *(f32 *)(pv + 0x1B0));
-        *(f32 *)(self + 0xF4) = FastAddRotations(*(f32 *)(self + 0xF4), *(f32 *)(pv + 0x1B4));
-        *(f32 *)(self + 0xF8) = FastAddRotations(*(f32 *)(self + 0xF8), *(f32 *)(pv + 0x1B8));
+        *(f32 *)(vars + 0x1B0) = math_move_angle_toward_target(*(f32 *)(vars + 0x1B0), g_drone_target_angle_a * 0.0003490659f, 0.0625f);
+        *(f32 *)(vars + 0x1B4) = math_move_angle_toward_target(*(f32 *)(vars + 0x1B4), g_drone_target_angle_b * 0.0003490659f, 0.0625f);
+        *(f32 *)(vars + 0x1B8) = math_move_angle_toward_target(*(f32 *)(vars + 0x1B8), g_drone_target_angle_c * 0.0003490659f, 0.0625f);
+        *(f32 *)(self + 0xF0) = FastAddRotations(*(f32 *)(self + 0xF0), *(f32 *)(vars + 0x1B0));
+        *(f32 *)(self + 0xF4) = FastAddRotations(*(f32 *)(self + 0xF4), *(f32 *)(vars + 0x1B4));
+        *(f32 *)(self + 0xF8) = FastAddRotations(*(f32 *)(self + 0xF8), *(f32 *)(vars + 0x1B8));
     }
-    if (target != 0 && *(s16 *)(pv + 0x1FC) == 0 && *(f32 *)(self + 0x18) <= *(f32 *)(target + 8) + 0.4f) {
+    if (center != 0 && *(s16 *)(vars + 0x1FC) == 0 && *(f32 *)(self + 0x18) <= *(f32 *)(center + 8) + 0.4f) {
         if (self[0x31] == 0) {
-            *(f32 *)(pv + 0x108) = 0.020000001f;
-            *(f32 *)(self + 0x18) = *(f32 *)(target + 8) + 0.3f;
+            *(f32 *)(vars + 0x108) = 0.020000001f;
+            *(f32 *)(self + 0x18) = *(f32 *)(center + 8) + 0.3f;
         } else if (coll_test_point((self + 0x10), 6, 0, 0.3f) != 0) {
-            f32 s;
-            s32 n;
-            *(f32 *)(pv + 0x108) = 0.020000001f;
-            *(f32 *)(self + 0x18) = *(f32 *)(target + 8) + 0.3f;
-            v10[0] = *(f32 *)(self + 0x10) + math_random_float_range(-0.01f, 0.01f);
-            v10[1] = *(f32 *)(self + 0x14) + math_random_float_range(-0.01f, 0.01f);
-            v10[2] = *(f32 *)(self + 0x18) - 0.3f;
-            s = math_random_float_range(0.3f, 0.8f);
-            n = math_random_int_below(2);
-            if (n == 0)
-                n--;
-            vec_random_direction(v20, 0.001f, 0.060000002f);
-            v20[2] = math_random_float_range(1.0f, 5.0f) * 0.020000001f;
-            part_spawn_ground_effect(v10, s * 0.1f, s, 0x32, 0x7F007F7F, 0, n, v20, 0.0028800003f, 0);
+            f32 spark_size;
+            s32 spark_dir;
+            *(f32 *)(vars + 0x108) = 0.020000001f;
+            *(f32 *)(self + 0x18) = *(f32 *)(center + 8) + 0.3f;
+            goal[0] = *(f32 *)(self + 0x10) + math_random_float_range(-0.01f, 0.01f);
+            goal[1] = *(f32 *)(self + 0x14) + math_random_float_range(-0.01f, 0.01f);
+            goal[2] = *(f32 *)(self + 0x18) - 0.3f;
+            spark_size = math_random_float_range(0.3f, 0.8f);
+            spark_dir = math_random_int_below(2);
+            if (spark_dir == 0)
+                spark_dir--;
+            vec_random_direction(step, 0.001f, 0.060000002f);
+            step[2] = math_random_float_range(1.0f, 5.0f) * 0.020000001f;
+            part_spawn_ground_effect(goal, spark_size * 0.1f, spark_size, 0x32, 0x7F007F7F, 0, spark_dir, step, 0.0028800003f, 0);
         }
     }
     coll_sweep_from_object(self, (self + 0x10), 0x4000000, 0.8f, 5.0f, 1.0f, 0, 1, 0);

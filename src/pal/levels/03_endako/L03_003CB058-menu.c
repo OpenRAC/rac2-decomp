@@ -65,6 +65,7 @@ static __inline__ int screen_coord(int mode, float value, float offset, int one)
     return (int)scaled;
 }
 
+/* Draws the two-line remote view panel: two titles and four text lines, one with the view number. (PAL) */
 int menu_draw_two_line_panel_pal(void)
 {
     if (g_menu_data_base) {

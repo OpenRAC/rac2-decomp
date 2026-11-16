@@ -31,7 +31,7 @@ extern float math_random_float_range(float, float);
 extern float ApproachValue(float *, float, float);
 extern float pad_read_float_history(int);
 extern float ReadPadFloatHistory(int);
-extern unsigned char *func_PAL_L04_003FE7B0(unsigned char *, float *, unsigned char *, float, float, float, float, float);
+extern unsigned char *homing_rocket_spawn_pal(unsigned char *, float *, unsigned char *, float, float, float, float, float);
 
 #define I(o) (*(int *)(s + (o)))
 #define F(o) (*(float *)(s + (o)))
@@ -40,7 +40,7 @@ extern unsigned char *func_PAL_L04_003FE7B0(unsigned char *, float *, unsigned c
 /* The rail-grind trick on Barlow's hoverbike tracks: arms after a jump onto a rail, reads the
    stick for the trick direction, spins and leans the bike, and draws the trick ring whose
    colour climbs with the combo. */
-void func_PAL_L04_0041D788(u8 *self, u8 *s)
+void hoverbike_update_rail_grind_trick_pal(u8 *self, u8 *s)
 {
     Vector offset;
     Vector delta;
@@ -194,7 +194,7 @@ void func_PAL_L04_0041D788(u8 *self, u8 *s)
         FastVecAdd(point, point, self + 0x10);
         yaw = mat_fast_helper_a(*(float *)(self + 0x10) - point[0], *(float *)(self + 0x14) - point[1]);
         pitch = -mat_fast_helper_a(vec_distance_xy(point, self + 0x10), *(float *)(self + 0x18) - point[2]);
-        func_PAL_L04_003FE7B0(P(0x730), point, self, yaw, pitch, 0.0f, yaw, pitch);
+        homing_rocket_spawn_pal(P(0x730), point, self, yaw, pitch, 0.0f, yaw, pitch);
         I(0x724) = 2;
     }
     FastVecScale(offset, g_hoverbike_trick_offset_vec, F(0x6A4));

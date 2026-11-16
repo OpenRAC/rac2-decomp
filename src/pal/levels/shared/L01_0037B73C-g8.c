@@ -44,22 +44,22 @@ extern void set_identity_rotation_rows(void *),moby_set_state(void *,int,int);
 extern void DrawThreeObjectCounters(void *);
 extern void gfx_add_draw_callback_first(void (*)(void *),void *);
 extern float ApproachValue(float *,float,float),math_step_int_toward_target(int *,int,int);
-extern void func_PAL_L00_00387088(void *),func_PAL_L00_003874B8(void *);
+extern void twin_guns_update_and_fire_pal(void *),sheep_board_update_pal(void *);
 /* The retail caller passes the object even though the current callee body does not use it. */
 extern void sheep_board_update_same_class(void *),part_l00_spawn_random_burst(void *),sheep_board_destroy_objects(void *);
-extern void func_PAL_L00_00387C58(unsigned char *,void *);
+extern void part_spawn_goal_hit_pal(unsigned char *,void *);
 extern int coll_process_hit(void *,float,int,char *,void *);
 extern void FastVecAdd(void *,void *,void *),FastVecSub(void *,void *,void *);
 extern void vec_transform_by_object_or_given(void *,void *,void *,void *);
 extern void part_queue_impact_effect(char *,int,int,void *,void *,float);
 extern void moby_mark_spawned(void *),func_002A0F48(void *);
-extern void func_PAL_L00_00388038(void *,void *);
+extern void part_spawn_goal_score_pal(void *,void *);
 extern int PlayMobySound(int,int,void *);
 extern float FastAddRotations(float,float),math_fabs(float);
 extern void matrix_from_basis_rows(void *,void *),matrix_mul_vec3(void *,void *,void *);
 
 /* Update the two-player goal controller and its moving scoring objects. */
-void func_PAL_L01_0037B73C(unsigned char *object)
+void goal_l01_controller_update_pal(unsigned char *object)
 {
     struct { ControllerVector local; ControllerMatrix inverse; } workspace;
     ControllerOwnerState *owner;
@@ -96,8 +96,8 @@ void func_PAL_L01_0037B73C(unsigned char *object)
             step=0.16000001f;
             ApproachValue(&g_hero_second_scalar_transition_value,zero,step);
             ApproachValue(&g_hero_scalar_transition_value,zero,step);
-            func_PAL_L00_00387088(object);
-            func_PAL_L00_003874B8(object);
+            twin_guns_update_and_fire_pal(object);
+            sheep_board_update_pal(object);
             sheep_board_update_same_class(object);
             part_l00_spawn_random_burst(object);
             if (g_game_l00_mode!=7) {
@@ -114,7 +114,7 @@ void func_PAL_L01_0037B73C(unsigned char *object)
             int timer=0;
             position=(char *)object+0x10;
             FastVecAdd(position,position,*(void **)(object+0x68));
-            func_PAL_L00_00387C58(object,position);
+            part_spawn_goal_hit_pal(object,position);
             if (coll_process_hit(position,0.01f,0,*(char **)(object+0xB8),0) &&
                 g_collision_result.object) {
                 FastVecSub(&workspace.local,position,g_collision_result.object+0x10);
@@ -159,7 +159,7 @@ destroy:
             if (math_fabs(workspace.local.y-0.5f)<0.02f) {
                 for (index=0,goal=(char *)owner+0x8;index<2;index++) {
                     if (math_fabs((workspace.local.z-*(float *)goal)-0.045f)<0.05f) {
-                        func_PAL_L00_00388038(object,(char *)object+0x10);
+                        part_spawn_goal_score_pal(object,(char *)object+0x10);
                         D_L00_001AEDD0_gp[index]=200;
                         PlayMobySound(2,0,owner->targets[index]);
                         math_step_int_toward_target(&owner->scores[index],0,100);

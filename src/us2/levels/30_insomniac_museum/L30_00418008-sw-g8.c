@@ -53,7 +53,7 @@ extern void museum_effect_object_spawn(char *),museum_effect_holder_update(char 
 extern int ForceClaimNotice(int,int,int);
 extern int load_is_class_cached(int);
 extern void LoadClassIntoFreeCacheSlot(int), hero_start_loader_state(int);
-extern s32 func_US2_L00_002C4560(int,int);
+extern s32 hero_l00_change_action_us2(int,int);
 extern void matrix_mul_vec3(void *,void *,void *),FastVecAdd(void *,void *,void *),FastVecSub(void *,void *,void *);
 extern float FastAddRotations(float,float),mat_fast_helper_a(float,float),vec_distance_xy(void *,void *);
 extern void hero_start_target_state(void *,int,float);
@@ -94,7 +94,8 @@ typedef struct MuseumExhibit {
     float fade;
 } MuseumExhibit;
 
-void func_US2_L30_00418008(char *obj) {
+/* Updates a museum exhibit: shows its effect, lets the player step up to it, and plays the camera and fade sequence while the hero views it. */
+void museum_exhibit_display_update_us2(char *obj) {
     MuseumExhibit *st = (MuseumExhibit *)P(obj,0x68);
     float vec[4] __attribute__((aligned(16)));
     float pos[4] __attribute__((aligned(16)));
@@ -149,7 +150,7 @@ void func_US2_L30_00418008(char *obj) {
     }
     case 3:
         if (flag_set_first_pending(obj)) {
-            func_US2_L00_002C4560(0x6F,0);set_hero_animation(0x54,0,20.0f);
+            hero_l00_change_action_us2(0x6F,0);set_hero_animation(0x54,0,20.0f);
             FastVecSub(vec,g_camera_l30_position,g_hero_state.position);
             matrix_mul_vec3(vec,vec,g_hero_state.matrix40);
             SetCamera5Pose(g_camera_l30_position,g_camera_l30_position,3,120,0);

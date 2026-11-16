@@ -7,10 +7,10 @@ extern int TryClaimNotice(int, int, int);
 /* The func_L02_004114A0 message pick for the five level-13 states. Each case calls on
    its own: with one shared body the five labels would collapse into three ranges and
    the switch would become a compare tree. */
-void func_US2_L13_0041CF28(u8 *a0) {
-    int v = *(int *)(*(void **)(a0 + 0x68) + 0x10);
+void l13_claim_notice_by_kind_us2(u8 *moby) {
+    int kind = *(int *)(*(void **)(moby + 0x68) + 0x10);
 
-    switch (v) {
+    switch (kind) {
     case 0:
         TryClaimNotice(0xB, 0x1BC6, 1);
         break;

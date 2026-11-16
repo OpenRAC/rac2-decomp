@@ -27,22 +27,23 @@ extern void moby_set_state(void *, int, int);
 extern void moby_update_ground_check(void *);
 extern float math_step_value_toward_target(void *, void *, float, float, float, float);
 
-void moby_start_drop_pal(L03Moby9C38 *self, s32 quiet) {
-    L03Vars9C38 *vars = self->vars;
+/* Starts the object falling; when not quiet it first lifts the object a little and gives it a downward push (PAL: 50 Hz rates). */
+void moby_start_drop_pal(L03Moby9C38 *moby, s32 quiet) {
+    L03Vars9C38 *vars = moby->vars;
 
-    if (self->state != 2) {
-        self->flags = (self->flags & 0xFFBE) | 0x1000;
-        self->f98 = self->cls[4];
-        moby_set_state(self, 2, -1);
-        qcopy(self->pos, vars);
+    if (moby->state != 2) {
+        moby->flags = (moby->flags & 0xFFBE) | 0x1000;
+        moby->f98 = moby->cls[4];
+        moby_set_state(moby, 2, -1);
+        qcopy(moby->pos, vars);
         vars->drop = 0;
         if (quiet == 0) {
-            self->pos[2] = self->pos[2] + 10.0f;
-            math_step_value_toward_target(&self->pos[2], &vars->drop, vars->height, 1.0f,
+            moby->pos[2] = moby->pos[2] + 10.0f;
+            math_step_value_toward_target(&moby->pos[2], &vars->drop, vars->height, 1.0f,
                           g_slim_ship_turn_rate * 0.00040000002f, g_slim_ship_accel * 0.020000001f);
         }
     }
-    self->flags |= 0x400;
-    moby_update_ground_check(self);
+    moby->flags |= 0x400;
+    moby_update_ground_check(moby);
     vars->state = 4;
 }

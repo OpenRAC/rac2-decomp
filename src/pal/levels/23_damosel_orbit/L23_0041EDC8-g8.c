@@ -37,11 +37,11 @@ extern void build_axis_rotation_quaternion(void *, int, float);
 extern float fast_subtract_rotations(float, float);
 extern void mothership_turn_joints_pal(char *, float, float);
 
-/* Update the aiming direction and its signed turn rate. */
-int func_PAL_L23_0041F0D8(char *object, char *target) {
-    struct { Quad zero, matrix[4], axis, direction, cross; } local;
+/* Update the aiming aim_direction and its signed turn rate. */
+int UpdateAimTurn_pal(char *object, char *target) {
+    struct { Quad zero, matrix[4], axis, aim_direction, cross; } local;
     char *state = *(char **)(object + 0x68);
-    char *direction;
+    char *aim_direction;
     float speed, dot, angle;
     unsigned int mode;
     vec_clear_128(&local.zero);
@@ -58,11 +58,11 @@ int func_PAL_L23_0041F0D8(char *object, char *target) {
     FastVecScale(state + 0x4A0, (char *)&local.axis,
         (float)g_shield_fade_frames * g_shield_fade_time_scale * g_shield_fade_extra_scale);
     moby_transform_joint_to_world(object, 42, (char *)&local.axis);
-    FastVecSub((char *)&local.direction, target, (char *)&local.axis);
-    vec_scale_to_length((char *)&local.direction, (char *)&local.direction, 1.0f);
-    g_mothership_aim_dot = FastVecDot((char *)&local.direction, (char *)&g_mothership_aim_direction);
+    FastVecSub((char *)&local.aim_direction, target, (char *)&local.axis);
+    vec_scale_to_length((char *)&local.aim_direction, (char *)&local.aim_direction, 1.0f);
+    g_mothership_aim_dot = FastVecDot((char *)&local.aim_direction, (char *)&g_mothership_aim_direction);
     g_mothership_line_clear = CollLine(g_boss_joint_world_pos, g_player_target_point, 16, g_hero_moby, 0) == 0;
-    direction = (char *)&local.direction;
+    aim_direction = (char *)&local.aim_direction;
     speed = g_boss_turn_speed_default * 0.0003490659f;
     if (((unsigned char *)state)[0x404] && ((unsigned char *)state)[0x405]) {
         mode = ((unsigned char *)object)[0x20];
@@ -70,7 +70,7 @@ int func_PAL_L23_0041F0D8(char *object, char *target) {
             if ((unsigned char)mode == 16) speed = g_boss_turn_speed_mode_sixteen * 0.0003490659f;
             else if ((unsigned)(mode - 13) < 3) speed = g_boss_turn_speed_mode_thirteen * 0.0003490659f;
         }
-        FastVecCross((char *)&local.cross, direction, (char *)&g_mothership_aim_direction);
+        FastVecCross((char *)&local.cross, aim_direction, (char *)&g_mothership_aim_direction);
         dot = FastVecDot((char *)&local.cross, object + 0xD0);
         angle = math_fast_angle_helper(dot);
         math_fast_float_g(angle + 1.5707964f);

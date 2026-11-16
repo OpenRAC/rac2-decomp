@@ -14,28 +14,28 @@ extern char *moby_get_motion_data(unsigned char *owner);
 
 /* func_002ED870: owner ABI/declaration review retained. */
 /* Decomposes a float returned by a bound producer into hours, minutes and hundredths written through three pointer arguments, rounding each step with a bound helper and clamping the last field at 99. */
-int func_PAL_002EE490(int a0, int *p0, int *p1, int *p2)
+int math_split_time_into_parts_pal(int value, int *out_hours, int *out_minutes, int *out_hundredths)
 {
-    float t;
-    int a;
-    int b;
-    int c;
-    int d;
-    int e;
+    float remaining;
+    int hours;
+    int hour_seconds;
+    int minutes;
+    int minute_seconds;
+    int hundredths;
 
-    t = IntToFloat(a0);
-    a = FloatToInt(t * (0.00033333333f));
-    *p0 = a;
-    b = FloatToInt((float)a * 3e+03f);
-    t = t - (float)b;
-    c = FloatToInt(t * 0.02f);
-    *p1 = c;
-    d = FloatToInt((float)c * 5e+01f);
-    t = t - (float)d;
-    e = FloatToInt(t * (6.0f / 3.0f));
-    e = e > 99 ? 0 : e;
-    *p2 = e;
-    return e;
+    remaining = IntToFloat(value);
+    hours = FloatToInt(remaining * (0.00033333333f));
+    *out_hours = hours;
+    hour_seconds = FloatToInt((float)hours * 3e+03f);
+    remaining = remaining - (float)hour_seconds;
+    minutes = FloatToInt(remaining * 0.02f);
+    *out_minutes = minutes;
+    minute_seconds = FloatToInt((float)minutes * 5e+01f);
+    remaining = remaining - (float)minute_seconds;
+    hundredths = FloatToInt(remaining * (6.0f / 3.0f));
+    hundredths = hundredths > 99 ? 0 : hundredths;
+    *out_hundredths = hundredths;
+    return hundredths;
 }
 
 char *moby_get_motion_data(u8 *a0);

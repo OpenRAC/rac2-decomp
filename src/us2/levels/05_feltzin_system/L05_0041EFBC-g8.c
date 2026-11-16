@@ -33,18 +33,18 @@ extern float g_screen_l05_scale[] __attribute__((sda));
 extern char *g_feltzin_target_mobys[] __attribute__((sda));
 extern void hero_set_state_value_a(int), hero_set_state_value_b(int), level_select_random_object(void);
 extern void level_store_pair_with_increment(int, int), moby_set_flag_bit(void *, int);
-extern int func_US2_L00_002C4560(int, int);
+extern int hero_l00_change_action_us2(int, int);
 extern void hero_set_state_value_c(int);
 extern int LockedEntryMenuInput_us2(void);
 extern void ship_save_transform_state(void);
-extern int func_US2_00289840(int, int);
+extern int subtitle_request_voice_line_us2(int, int);
 extern int math_fast_float_d(void *);
-extern void func_US2_L05_00422838(void *), feltzin_mission_two_update_us2(void *);
+extern void feltzin_mission_one_update_us2(void *), feltzin_mission_two_update_us2(void *);
 extern void feltzin_mission_three_update_us2(void *), UpdateFeltzinGateCourse_us2(void *);
 extern void level_store_value_pair_us2(int, void *);
 extern int cam_is_mode_active(void);
-extern void feltzin_challenge_reset_free_records(void), func_US2_L05_00421A98(void);
-extern s32 func_US2_L05_0041F478(void);
+extern void feltzin_challenge_reset_free_records(void), feltzin_challenge_shutdown_us2(void);
+extern s32 DrawFeltzinCombatHud_us2(void);
 extern int feltzin_target_damage(char *, int);
 extern int g_feltzin_menu_mode __attribute__((sda));
 extern int g_feltzin_controller_moby __attribute__((sda));
@@ -70,21 +70,21 @@ extern int g_feltzin_menu_started __attribute__((sda));
    the saved mode record and sets flags on the hero's moby; later frames run func_L05_00379B60 and,
    after five settled frames, put the hero in action 0x31 and dispatch on the mode in
    D_L05_001B1360. */
-void func_US2_L05_0041EFBC(char *object)
+void feltzin_challenge_controller_update_us2(char *moby)
 {
-    State05 *sub = *(State05 **)(object + 0x68);
-    int one;
-    char *hero, *p;
-    switch ((unsigned char)object[0x20]) {
+    State05 *vars = *(State05 **)(moby + 0x68);
+    int on;
+    char *hero_data, *held_moby;
+    switch ((unsigned char)moby[0x20]) {
     case 0:
-        *(short *)(object + 0x32) = 0x1FF;
-        *(unsigned char *)(object + 0x30) = 0xFF;
-        object[0x20] = 1;
-        g_feltzin_challenge_state.id = sub->id;
+        *(short *)(moby + 0x32) = 0x1FF;
+        *(unsigned char *)(moby + 0x30) = 0xFF;
+        moby[0x20] = 1;
+        g_feltzin_challenge_state.id = vars->id;
         g_feltzin_challenge_state.radius = 8.0f;
         g_feltzin_menu_mode = -2;
         g_feltzin_challenge_state.enabled = 1;
-        g_feltzin_controller_moby = (int)object;
+        g_feltzin_controller_moby = (int)moby;
         g_feltzin_active_slot_index = 1;
         g_feltzin_challenge_active = 0;
         g_feltzin_record_a = 0;
@@ -96,31 +96,31 @@ void func_US2_L05_0041EFBC(char *object)
         g_feltzin_intro_done = 0;
         g_feltzin_menu_opened = 0;
         g_feltzin_needs_reset = 1;
-        *(short *)(object + 0x32) = 0x1FF;
-        *(unsigned char *)(object + 0x30) = 0xFF;
-        object[0x20] = 1;
-        sub->stage = 0;
+        *(short *)(moby + 0x32) = 0x1FF;
+        *(unsigned char *)(moby + 0x30) = 0xFF;
+        moby[0x20] = 1;
+        vars->stage = 0;
         g_feltzin_frame_counter = 0;
-        sub->warmup = 5400; sub->delay = 7200;
-        sub->first = 150; sub->second = 180;
-        sub->third = 300; sub->fourth = 480;
-        sub->fifth = 120; sub->timeout = 108000;
+        vars->warmup = 5400; vars->delay = 7200;
+        vars->first = 150; vars->second = 180;
+        vars->third = 300; vars->fourth = 480;
+        vars->fifth = 120; vars->timeout = 108000;
         g_feltzin_countdown[0] = 540;
         g_feltzin_challenge_state.callbacks[0] = feltzin_challenge_reset_free_records;
-        g_feltzin_challenge_state.callbacks[1] = func_US2_L05_00421A98;
+        g_feltzin_challenge_state.callbacks[1] = feltzin_challenge_shutdown_us2;
         g_feltzin_challenge_state.callbacks[2] = feltzin_target_damage;
-        g_feltzin_challenge_state.object = object;
+        g_feltzin_challenge_state.object = moby;
         hero_set_state_value_a(1);
         hero_set_state_value_b(0);
         g_feltzin_reset_callback[0] = (int)feltzin_challenge_reset_free_records;
-        g_feltzin_shutdown_callback[0] = (int)func_US2_L05_00421A98;
+        g_feltzin_shutdown_callback[0] = (int)feltzin_challenge_shutdown_us2;
         g_feltzin_challenge_data = g_game_flag_table[0x61];
         g_feltzin_challenge_param_a[0] = g_game_flag_table[0x62];
         g_feltzin_challenge_param_b[0] = g_game_flag_table[0x63];
         g_feltzin_challenge_param_c[0] = g_game_flag_table[0x64];
         if (!g_feltzin_challenge_data) g_feltzin_no_challenge_flag = 1;
         else g_feltzin_no_challenge_flag = 0;
-        hero = g_hero_state;
+        hero_data = g_hero_state;
         g_feltzin_record_flag_a[0] = g_ship_settings_byte_a[0];
         g_feltzin_record_flag_b[0] = g_ship_settings_byte_b[0];
         g_feltzin_record_flag_c[0] = g_ship_settings_byte_c[0];
@@ -130,25 +130,25 @@ void func_US2_L05_0041EFBC(char *object)
         g_feltzin_record_float_c[0] = g_ship_settings_float_d[0];
         g_feltzin_record_word[0] = g_ship_settings_word[0];
         g_feltzin_challenge_state.mode = 4;
-        g_feltzin_challenge_state.settings[0] = sub->a4;
-        g_feltzin_challenge_state.settings[1] = sub->a8;
-        g_feltzin_challenge_state.settings[2] = sub->aC;
-        g_feltzin_challenge_state.settings[3] = sub->a10;
-        p = *(char **)(hero + 0x2290);
-        if (p)
-            *(short *)(p+0x34) |= 0x41;
+        g_feltzin_challenge_state.settings[0] = vars->a4;
+        g_feltzin_challenge_state.settings[1] = vars->a8;
+        g_feltzin_challenge_state.settings[2] = vars->aC;
+        g_feltzin_challenge_state.settings[3] = vars->a10;
+        held_moby = *(char **)(hero_data + 0x2290);
+        if (held_moby)
+            *(short *)(held_moby+0x34) |= 0x41;
         /* fall through */
     case 1:
-        one = 1;
+        on = 1;
         level_select_random_object();
         level_store_pair_with_increment((int)(g_screen_l05_scale[0] * -230.0f + 0.5f), 2);
         if (!g_feltzin_init_flag_a) {
-            moby_set_flag_bit(g_feltzin_target_mobys[0] + sub->target*256,1);
-            g_feltzin_init_flag_a = one;
+            moby_set_flag_bit(g_feltzin_target_mobys[0] + vars->target*256,1);
+            g_feltzin_init_flag_a = on;
             g_feltzin_frame_counter = 0;
         }
         if (g_feltzin_frame_counter++ < 5 || g_game_mode_a[0] == 2) break;
-        func_US2_L00_002C4560(0x31,0);
+        hero_l00_change_action_us2(0x31,0);
         if (g_feltzin_needs_reset) {
             hero_set_state_value_c(1);
             g_feltzin_menu_mode = LockedEntryMenuInput_us2();
@@ -156,22 +156,22 @@ void func_US2_L05_0041EFBC(char *object)
             break;
         }
         if (!g_feltzin_init_flag_b) {
-            func_US2_00289840(0xA17,110);
-            g_feltzin_init_flag_b = one;
+            subtitle_request_voice_line_us2(0xA17,110);
+            g_feltzin_init_flag_b = on;
         }
-        if (math_fast_float_d((char *)sub+0x54)) g_feltzin_challenge_state.pending = 0;
-        else g_feltzin_challenge_state.pending = one;
+        if (math_fast_float_d((char *)vars+0x54)) g_feltzin_challenge_state.pending = 0;
+        else g_feltzin_challenge_state.pending = on;
         hero_set_state_value_c(0);
         if (g_feltzin_menu_mode != -2 && g_feltzin_mission_index >= 3) {
             switch (g_feltzin_menu_mode) {
-            case 0: func_US2_L05_00422838(object); break;
-            case 1: feltzin_mission_two_update_us2(object); break;
-            case 2: feltzin_mission_three_update_us2(object); break;
-            case 3: UpdateFeltzinGateCourse_us2(object); break;
+            case 0: feltzin_mission_one_update_us2(moby); break;
+            case 1: feltzin_mission_two_update_us2(moby); break;
+            case 2: feltzin_mission_three_update_us2(moby); break;
+            case 3: UpdateFeltzinGateCourse_us2(moby); break;
             }
         }
         if (g_feltzin_mission_data && !g_feltzin_intro_done && !g_feltzin_menu_started) {
-            level_store_value_pair_us2(0,func_US2_L05_0041F478);
+            level_store_value_pair_us2(0,DrawFeltzinCombatHud_us2);
             g_feltzin_menu_opened = 0;
             g_feltzin_intro_done = 1;
         }
@@ -181,7 +181,7 @@ void func_US2_L05_0041EFBC(char *object)
         if (!cam_is_mode_active()) {
             g_feltzin_challenge_state.pending = 0;
             g_feltzin_challenge_state.count++;
-            object[0x20] = 1;
+            moby[0x20] = 1;
         }
         break;
     }

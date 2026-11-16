@@ -52,21 +52,22 @@ static inline void TransformVertex(RPoint *v, EVec *m)
 {
     transform_vector(v, v, m);
 }
-void func_PAL_L04_003C7600(char *self) {
+/* Draws the emitter particles: a camera-facing basis and its mirror, a quad or box face per particle, then the emitter's own box (PAL: 50 Hz scroll rate). */
+void particle_l04_emitter_draw_pal(char *moby) {
     EVec position,up,basis[4],other[4];
     struct {
         RPoint vertices[4];
         u32 colors[4]; struct { float u,v; } uv[4]; u64 giftag[4];
     } packet;
-    char *state=*(char **)(self+0x68);
-    char *matrix=g_linked_record_table+EI(state,4)*128;
-    u32 alpha=(u32)EB(state,0x5C)<<24;
-    u32 rgb=(EB(state,0x5F)<<16)|(EB(state,0x5E)<<8)|EB(state,0x5D);
-    int end=EH(state,0)+EH(state,2)+EH(state,0x40);
+    char *vars=*(char **)(moby+0x68);
+    char *matrix=g_linked_record_table+EI(vars,4)*128;
+    u32 alpha=(u32)EB(vars,0x5C)<<24;
+    u32 rgb=(EB(vars,0x5F)<<16)|(EB(vars,0x5E)<<8)|EB(vars,0x5D);
+    int end=EH(vars,0)+EH(vars,2)+EH(vars,0x40);
     int i,j,k,index,opacity;
     RPoint *vertex;
     float speed,size,age;
-    qcopy(&position,self+0x10);
+    qcopy(&position,moby+0x10);
     up.q=0;
     position.f[3]=1.0f; up.f[2]=1.0f;
     FastVecSub(&basis[0],g_tether_zero_vec,&position);
@@ -83,11 +84,11 @@ void func_PAL_L04_003C7600(char *self) {
         FastVecCross(&other[2],&other[1],&other[0]);
         qcopy(&other[3],&basis[3]);
     } while (0);
-    packet.giftag[1]=GetEffectTextureDescriptor(EI(state,0x54)+0x3F);
+    packet.giftag[1]=GetEffectTextureDescriptor(EI(vars,0x54)+0x3F);
     packet.giftag[2]=0xFF9000000260ULL; packet.giftag[3]=0x8000000048ULL;
     packet.giftag[0]=0;
     VU1_addGSregister(0x4A,0); VU1_addGSregister(0x47,0x51001);
-    for(i=EH(state,0);i<end;i++) {
+    for(i=EH(vars,0);i<end;i++) {
         EVec *transform,*chosen;
         age=g_particle_uv_offsets[i]-((g_particle_life_rates[i]) * 1.2f);
         chosen=g_particle_mirror_flags[i] ? other : basis;
@@ -119,7 +120,7 @@ void func_PAL_L04_003C7600(char *self) {
                 opacity=FloatToInt((1.0f-IntToFloat(g_particle_fade_in_timers[i])*g_particle_l04_opacity_scale_2)*g_particle_l04_opacity_scale);
             } else if(g_particle_fade_out_timers[i]) {
                 if(FastDecTimer(&g_particle_fade_out_timers[i])) {
-                    part_init_from_ranges(self,i); opacity=0;
+                    part_init_from_ranges(moby,i); opacity=0;
                     g_particle_mirror_flags[i]=math_random_int_below(2);
                 } else opacity=FloatToInt(IntToFloat(g_particle_fade_out_timers[i])*g_particle_fade_scale*g_particle_l04_opacity_scale);
             } else {
@@ -136,24 +137,24 @@ void func_PAL_L04_003C7600(char *self) {
                 vertex->w=1.0f;
                 packet.uv[k].u=g_particle_l04_uv_u_table[k*2]-g_particle_uv_offsets[i];
                 packet.uv[k].v=g_particle_l04_uv_v_table[k*2];
-                packet.colors[k]=(u32)opacity*g_particle_color_weights[k]|EI(state,0x38);
+                packet.colors[k]=(u32)opacity*g_particle_color_weights[k]|EI(vars,0x38);
                 TransformVertex(vertex,transform);
             }
             draw_world_quad(&packet,0,0);
         }
     }
-    packet.giftag[1]=GetEffectTextureDescriptor(EI(state,0x58)+0x3F);
+    packet.giftag[1]=GetEffectTextureDescriptor(EI(vars,0x58)+0x3F);
     packet.giftag[3]=0x8000000044ULL;
     qcopy(&basis[3],matrix+0x30);
-    basis[3].f[2]-=EF(state,0x50);
-    if(!EH(state,0x42)) {
+    basis[3].f[2]-=EF(vars,0x50);
+    if(!EH(vars,0x42)) {
         for(j=0;j<6;j++) {
             for(k=0;k<4;k++) {
                 vertex=&packet.vertices[k];
                 index=g_particle_quad_indices[j][k];
                 vertex->x=g_particle_vertex_offsets_a[index].x;
-                vertex->y=g_particle_vertex_offsets_a[index].y*EF(state,0x48);
-                vertex->z=g_particle_vertex_offsets_a[index].z*EF(state,0x4C);
+                vertex->y=g_particle_vertex_offsets_a[index].y*EF(vars,0x48);
+                vertex->z=g_particle_vertex_offsets_a[index].z*EF(vars,0x4C);
                 vertex->w=1.0f;
                 TransformVertex(vertex,basis);
                 packet.uv[k].u=g_particle_l04_uv_u_table_2[index*2]+ref_L04_003C4050_00;

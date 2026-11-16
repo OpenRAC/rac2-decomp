@@ -11,11 +11,12 @@ extern int FastDecTimer(void *);
 extern s16 math_random_int_range(int, unsigned int);
 extern int PlayMobySound(int, int, void *);
 
-void func_PAL_L02_003CEF50(char *a0) {
-    char *s0 = *(char **)(a0 + 0x68);
+/* When a timer on the enemy runs out, picks a new timer value and sends a notice (PAL: 50 Hz timer). */
+void path_enemy_refresh_timer_pal(char *moby) {
+    char *vars = *(char **)(moby + 0x68);
 
-    if (FastDecTimer(s0 + 0x3B4) != 0) {
-        *(s16 *)(s0 + 0x3B4) = (((int)(math_random_int_range(D_L02_gp10B0, g_path_enemy_refresh_range)) * 5 + 2) / 6);
-        PlayMobySound(1, 0, a0);
+    if (FastDecTimer(vars + 0x3B4) != 0) {
+        *(s16 *)(vars + 0x3B4) = (((int)(math_random_int_range(D_L02_gp10B0, g_path_enemy_refresh_range)) * 5 + 2) / 6);
+        PlayMobySound(1, 0, moby);
     }
 }

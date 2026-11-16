@@ -15,6 +15,7 @@ extern char *g_spark_effect_byte;
 #define FS(p, o) (*(short *)((char *)(p) + (o)))
 #define FB(p, o) (*(unsigned char *)((char *)(p) + (o)))
 
+/* Spawns a spark particle at position with a random colour and velocity (PAL). */
 void part_spawn_spark_effect_pal(char *position, char *matrix, float speed)
 {
     float local[4], offset[4], velocity[4], inverse[16];

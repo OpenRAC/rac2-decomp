@@ -10,46 +10,48 @@ extern int g_frame_l03_counter;
 extern char *g_nearby_l03_moby_list[];
 extern int g_shared_trace_point __attribute__((sda));
 
-void trash_can_debris_update_pal(char *a0)
+/* Debris from a smashed trash can: waits for the spawn to finish, breaks when hit by a Ratchet
+   weapon or touched, fades out after a while (PAL: 50 Hz timings). */
+void trash_can_debris_update_pal(char *obj)
 {
-    switch (*(u8 *)(a0 + 0x20)) {
+    switch (*(u8 *)(obj + 0x20)) {
     case 0:
-        if (cam_moby_update_pal(a0)) {
-            moby_set_state(a0, 1, -1);
-            *(u16 *)(a0 + 0x34) |= 0x2000;
+        if (cam_moby_update_pal(obj)) {
+            moby_set_state(obj, 1, -1);
+            *(u16 *)(obj + 0x34) |= 0x2000;
         }
         break;
     case 1:
-        if ((g_frame_l03_counter & 15) == (((int)a0 >> 8) & 15)) {
-            int count = coll_process_hit(0.2f, a0 + 0x10, 0, a0, 0);
+        if ((g_frame_l03_counter & 15) == (((int)obj >> 8) & 15)) {
+            int count = coll_process_hit(0.2f, obj + 0x10, 0, obj, 0);
             if (count > 0) {
                 int remaining = count;
-                char **p = g_nearby_l03_moby_list;
+                char **hit_list = g_nearby_l03_moby_list;
                 do {
-                    int type = *(s16 *)(*p + 0xAA);
+                    int type = *(s16 *)(*hit_list + 0xAA);
                     if (type == 0xFF3 || type == 0xFFD)
-                        moby_set_state(a0, 3, -1);
+                        moby_set_state(obj, 3, -1);
                     --remaining;
-                    ++p;
+                    ++hit_list;
                 } while (remaining);
             }
         }
-        if (vec_distance_xy(a0 + 0x10, &g_shared_trace_point) < 0.3f)
-            moby_set_state(a0, 3, -1);
+        if (vec_distance_xy(obj + 0x10, &g_shared_trace_point) < 0.3f)
+            moby_set_state(obj, 3, -1);
         {
-            u32 timer = *(u16 *)(a0 + 0x96);
-            u32 old = timer++;
-            *(u16 *)(a0 + 0x96) = timer;
-            if (old > 500 && !*(u8 *)(a0 + 0x31))
-                moby_set_state(a0, 2, -1);
+            u32 frame_count = *(u16 *)(obj + 0x96);
+            u32 old_count = frame_count++;
+            *(u16 *)(obj + 0x96) = frame_count;
+            if (old_count > 500 && !*(u8 *)(obj + 0x31))
+                moby_set_state(obj, 2, -1);
         }
         break;
     case 2:
     case 3: {
-        int amount = *(u8 *)(a0 + 0x20) == 2 ? 2 : 8;
-        int alpha = *(u8 *)(a0 + 0x23);
-        if (alpha < amount) moby_mark_spawned(a0);
-        else *(u8 *)(a0 + 0x23) = alpha - amount;
+        int fade_step = *(u8 *)(obj + 0x20) == 2 ? 2 : 8;
+        int alpha = *(u8 *)(obj + 0x23);
+        if (alpha < fade_step) moby_mark_spawned(obj);
+        else *(u8 *)(obj + 0x23) = alpha - fade_step;
         break;
     }
     }

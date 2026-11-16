@@ -19,58 +19,59 @@ extern float mat_fast_helper_a(float, float);
 extern int moby_start_effect_from_entry(char *, float);
 extern int PlayMobySound(int, int, char *);
 
-int UpdateBouncingMoby_pal(char *arg0) {
-    char *s0 = arg0;
-    char *s2 = *(char **)(arg0 + 0x68);
-    char *s1;
-    char *s3;
-    float f0;
-    int v0;
-    Rec_42550 *p;
+/* Makes the enemy fall and bounce on the ground while it turns toward the hero or its target. Returns 1 when the bouncing has stopped. (PAL) */
+int UpdateBouncingMoby_pal(char *moby) {
+    char *self = moby;
+    char *vars = *(char **)(moby + 0x68);
+    char *hero;
+    char *hero_pos;
+    float value;
+    int link_index;
+    Rec_42550 *linked;
 
-    ApproachValue((float *)(s0 + 0x48), 1.0f, 0.040000003f);
+    ApproachValue((float *)(self + 0x48), 1.0f, 0.040000003f);
 
-    if (*(u8 *)(s0 + 0x94) == 2) {
-        StepAngleTowardTarget(s2 + 0x1804, 1, 0.0f, g_yeedil_grab_turn_scale * 0.00017453295f);
+    if (*(u8 *)(self + 0x94) == 2) {
+        StepAngleTowardTarget(vars + 0x1804, 1, 0.0f, g_yeedil_grab_turn_scale * 0.00017453295f);
     }
-    f0 = *(float *)(s2 + 0xF8);
-    s1 = g_hero_state;
-    *(float *)(s0 + 0x18) += f0;
+    value = *(float *)(vars + 0xF8);
+    hero = g_hero_state;
+    *(float *)(self + 0x18) += value;
 
-    *(float *)(s2 + 0xF8) -= *(float *)(s2 + 0x7C);
+    *(float *)(vars + 0xF8) -= *(float *)(vars + 0x7C);
 
-    if (*(int *)(s1 + 0x2294) == 0x8C) {
-        float f0;
-        s3 = s1 + 0x80;
-        f0 = vec_distance_xy(s3, s0 + 0x10);
-        if (f0 <= 4.0f) {
-            f0 = *(float *)(s1 + 0x88);
-            f0 += 5.0f;
-            *(float *)(s1 + 0x88) = f0;
-            f0 = coll_probe_ground_height_below(s3, 0, 0.5f);
-            *(float *)(s1 + 0x88) = f0;
-            *(unsigned short *)(s1 + 0x1E0) = 5;
-            *(unsigned short *)(s1 + 0x1F0) = 5;
+    if (*(int *)(hero + 0x2294) == 0x8C) {
+        float value;
+        hero_pos = hero + 0x80;
+        value = vec_distance_xy(hero_pos, self + 0x10);
+        if (value <= 4.0f) {
+            value = *(float *)(hero + 0x88);
+            value += 5.0f;
+            *(float *)(hero + 0x88) = value;
+            value = coll_probe_ground_height_below(hero_pos, 0, 0.5f);
+            *(float *)(hero + 0x88) = value;
+            *(unsigned short *)(hero + 0x1E0) = 5;
+            *(unsigned short *)(hero + 0x1F0) = 5;
         }
-        v0 = *(int *)(s2 + 0x230);
-        p = (Rec_42550 *)((v0 << 7) + (unsigned int)g_linked_moby_table);
-        f0 = mat_fast_helper_a(p->f30 - *(float *)(s0 + 0x10), p->f34 - *(float *)(s0 + 0x14));
-        moby_start_effect_from_entry(s0, f0);
+        link_index = *(int *)(vars + 0x230);
+        linked = (Rec_42550 *)((link_index << 7) + (unsigned int)g_linked_moby_table);
+        value = mat_fast_helper_a(linked->f30 - *(float *)(self + 0x10), linked->f34 - *(float *)(self + 0x14));
+        moby_start_effect_from_entry(self, value);
 
     } else {
-        moby_start_effect_from_entry(s0, mat_fast_helper_a(
-            *(float *)(s1 + 0x80) - *(float *)(s0 + 0x10),
-            *(float *)(s1 + 0x84) - *(float *)(s0 + 0x14)));
+        moby_start_effect_from_entry(self, mat_fast_helper_a(
+            *(float *)(hero + 0x80) - *(float *)(self + 0x10),
+            *(float *)(hero + 0x84) - *(float *)(self + 0x14)));
     }
 
-    if (*(float *)(s0 + 0x18) <= *(float *)(s2 + 0xE0)) {
+    if (*(float *)(self + 0x18) <= *(float *)(vars + 0xE0)) {
         float velocity;
-        *(float *)(s0 + 0x18) = *(float *)(s2 + 0xE0);
-        PlayMobySound(0, 0, s0);
-        velocity = *(float *)(s2 + 0xF8) * -g_yeedil_jump_velocity_scale;
-        *(float *)(s2 + 0xF8) = velocity;
+        *(float *)(self + 0x18) = *(float *)(vars + 0xE0);
+        PlayMobySound(0, 0, self);
+        velocity = *(float *)(vars + 0xF8) * -g_yeedil_jump_velocity_scale;
+        *(float *)(vars + 0xF8) = velocity;
         if (velocity < 0.020000001f) {
-            *(int *)(s2 + 0xF8) = 0;
+            *(int *)(vars + 0xF8) = 0;
             return 1;
         }
     }
@@ -84,6 +85,7 @@ extern float g_yeedil_jump_height __attribute__((sda));
 extern void moby_set_controller_speed_limits(unsigned char *, float, float, float, float);
 extern float square_root(float);
 
+/* Gets the enemy ready to jump. It picks the turn speed, remembers the ground height and works out how fast to go up. (PAL) */
 void yeedil_boss_start_jump_pal(char *actor)
 {
     char *state = *(char **)(actor + 0x68);

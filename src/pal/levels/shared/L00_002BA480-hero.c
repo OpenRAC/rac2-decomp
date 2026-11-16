@@ -88,8 +88,8 @@ extern f32 math_approach_with_velocity(s32, f32, s32, f32, f32, f32, s32);
 extern s32 moby_is_in_special_class_range(s32);
 extern void vec_clamp_length(s32, f32);
 extern void vec_build_spherical_offset(s32, f32, f32, f32);
-extern void func_PAL_002BEF58(s32, s32, s32, f32);
-extern void *func_PAL_002C0428(s32, s32, f32, f32);
+extern void part_spawn_white_flash_pal(s32, s32, s32, f32);
+extern void *part_spawn_bubble_pal(s32, s32, f32, f32);
 extern void snd_stop_voice(s32);
 extern s32 PlayMobySound(s32, s32, s32);
 extern void RippleDisturb(s32, s32, void *, f32, f32, f32, f32);
@@ -110,7 +110,7 @@ extern void cam_set_limits_fourth(f32, f32);
 extern void ProbeHeroAirborneWallContact_pal(void);
 extern s32 hero_find_ledge_grab_pal(s32, s32, s32);
 extern s32 hero_slot_item_id(s32);
-extern void func_PAL_L00_002B34C0(void);
+extern void hero_update_turn_from_anim_pal(void);
 extern s32 math_is_below_plane_within_depth(f32);
 extern void hero_resolve_stick_direction(f32, s32);
 extern void hero_update_target_speed_pal(void);
@@ -123,25 +123,25 @@ extern void hero_set_push_direction(s32);
 extern void hero_cancel_velocity_into_wall_pal(void);
 extern void hero_build_move_impulse(f32, f32);
 extern f32 hero_get_speed_along_forward(s32);
-extern void func_PAL_L00_002B60C0(f32);
-extern void func_PAL_L00_002B6488(void);
-extern void func_PAL_L00_002B6B38(void);
+extern void ApproachHeroVelocity_pal(f32);
+extern void ApplyHeroGravityAndJumpMotion_pal(void);
+extern void hero_update_airborne_steering_pal(void);
 extern void hero_l00_select_aim_target(f32, f32, f32);
 extern void hero_apply_mode_pose_offsets_pal(void);
 extern void UpdateHeroMotionResponseParameters_pal(void);
 extern void UpdateHeroLeanAndSwayParameters(void);
 extern void hero_apply_reference_tilt_rotation(s32, s32, s32, f32, f32, f32);
 extern void hero_shrink_vector_by_amount(f32);
-extern void func_PAL_L00_002B9508(void);
+extern void hero_steer_reference_point_pal(void);
 extern f32 hero_get_direction_angle_delta(s32, s32);
 extern s32 hero_play_sound(s32, s32);
 extern void snd_update_slot_object(s32, s32, s32);
 extern void hero_try_surface_push_response(f32, f32, f32);
 extern void part_emit_effects_at_nearby_mobys_pal(s32, s32);
 extern void part_emit_hero_radial_particles_pal(void);
-extern void func_PAL_L00_002BA480(void);
+extern void hero_setup_attached_object_transform_pal(void);
 extern void hero_update_height_offset_pal(void);
-extern s32 func_PAL_L00_002CB2C8(void);
+extern s32 hero_try_start_grab_pal(void);
 extern void set_hero_animation_pal(s32, s32, f32);
 extern void hero_apply_mode_transform(s32, s32, f32);
 extern void hero_build_relative_point(s32, s32, f32, f32, f32);
@@ -174,10 +174,12 @@ extern s32 ref_L00_002BA7D8_00 MACRO_ADDR;
 extern void hero_get_offset_vector(f32 *);
 extern s32 ref_US2_L00_002BA8E0_01;
 extern char g_impact_effect_data[] MACRO_ADDR;
-extern void func_PAL_L00_0038C620();
+extern void moby_l00_raise_state_to_8();
 extern void moby_raise_state_to_eight_copy();
 
-void func_PAL_L00_002BA750(void) {
+/* Runs the hero's state machine once per frame. It picks the code for the current state (walk, jump,
+ * swing, swim, hurt and so on) and moves, animates and steers the hero accordingly (PAL version). */
+void hero_l00_update_state_machine_pal(void) {
     Hero *hp71;
     s32 idx71;
     s32 cnt71;
@@ -599,7 +601,7 @@ void func_PAL_L00_002BA750(void) {
             }
         }
         if (((Hero *)g_hero_state)->u[0x2294/4] == 3) {
-            if (func_PAL_L00_002CB2C8() != 0) {
+            if (hero_try_start_grab_pal() != 0) {
                 break;
             }
         }
@@ -910,7 +912,7 @@ void func_PAL_L00_002BA750(void) {
             vec_scale_to_length((s32) ((TI128*)v20), (s32) ((TI128*)v20), 0.030000001f);
             FastVecAdd((s32) ((TI128*)v10), (s32) ((TI128*)v10), (s32) ((TI128*)v20));
             v10[2] += 0.040000003f;
-            func_PAL_002C0428((s32)((TI128*)v0), (s32) ((TI128*)v10), 25200.0f, -1.0f);
+            part_spawn_bubble_pal((s32)((TI128*)v0), (s32) ((TI128*)v10), 25200.0f, -1.0f);
             if ((f32) math_random_int_below(0x64) < 40.0f) {
                 var_a0_4 = 3;
                 var_a1_2 = 0x9;
@@ -937,7 +939,7 @@ void func_PAL_L00_002BA750(void) {
                             qcopy(v10, &((Hero *)g_hero_state)->q[0x110/16]);
                             vec_add_offset((s32) ((TI128*)v10), (s32) ((TI128*)v10), -0.015000001f, ((Hero *)g_hero_state)->f[0x98/4], ((Hero *)g_hero_state)->f[0x94/4]);
                             ((Hero *)g_hero_state)->h[0xA38/2] = FloatToInt((0.14000002f - ((Hero *)g_hero_state)->f[0x1B4/4]) * 28.571424f);
-                            func_PAL_002C0428((s32)((TI128*)v0), (s32) ((TI128*)v10), math_random_float_range(6300.0f, 9450.0f), -1.0f);
+                            part_spawn_bubble_pal((s32)((TI128*)v0), (s32) ((TI128*)v10), math_random_float_range(6300.0f, 9450.0f), -1.0f);
                         }
                     }
                 }
@@ -1029,7 +1031,7 @@ block_198:
             vec_scale_to_length((s32) ((TI128*)v20), (s32) ((TI128*)v20), 0.030000001f);
             FastVecAdd((s32) ((TI128*)v10), (s32) ((TI128*)v10), (s32) ((TI128*)v20));
             v10[2] += 0.040000003f;
-            func_PAL_002C0428((s32)((TI128*)v0), (s32) ((TI128*)v10), 25200.0f, -1.0f);
+            part_spawn_bubble_pal((s32)((TI128*)v0), (s32) ((TI128*)v10), 25200.0f, -1.0f);
             temp_v1_14 = M2C_FIELD(temp_s2, s32* , 0x1B8);
             if (temp_v1_14 < 0x21) {
                 lim67 = 5;
@@ -1555,7 +1557,7 @@ block_224:
                 }
             }
             if (((Hero *)g_hero_state)->u[0x2294/4] == 0x15) {
-                func_PAL_L00_002BA480();
+                hero_setup_attached_object_transform_pal();
             }
         }
         if (((Hero *)g_hero_state)->b[0x1492] != 0) {
@@ -1569,7 +1571,7 @@ block_224:
                 ((Hero *)g_hero_state)->f[0xF4/4] = (f32) (((Hero *)g_hero_state)->f[0xF4/4] + (math_fast_sin_or_cos_b(temp_f20_7) * var_f21_2));
                 qcopy(&((Hero *)g_hero_state)->q[0x140/16], &((Hero *)g_hero_state)->q[0xF0/16]);
             }
-            func_PAL_L00_002B9508();
+            hero_steer_reference_point_pal();
         } else {
             hero_approach_speed(0.014800001f, 0.0112000005f);
             hero_compute_push_direction(99999.0f);
@@ -1586,7 +1588,7 @@ block_224:
             ((Hero *)g_hero_state)->c[0x1239] = 2;
         }
         if (((Hero *)g_hero_state)->b[0x1492] != 0) {
-            func_PAL_L00_002B9508();
+            hero_steer_reference_point_pal();
             break;
         }
         temp_a1_5 = ((Hero *)g_hero_state)->i[0xBE4/4];
@@ -1747,7 +1749,7 @@ block_224:
                 ((Hero *)g_hero_state)->f[0xF4/4] = (f32) (((Hero *)g_hero_state)->f[0xF4/4] + (math_fast_sin_or_cos_b(((Hero *)g_hero_state)->f[0x98/4]) * 0.024000002f));
                 qcopy(&((Hero *)g_hero_state)->q[0x140/16], &((Hero *)g_hero_state)->q[0xF0/16]);
             }
-            func_PAL_L00_002B9508();
+            hero_steer_reference_point_pal();
         } else {
             if (((Hero *)g_hero_state)->i[0x1B8/4] > lim) {
                 hero_approach_speed(0.076000005f, 0.036000002f);
@@ -1890,7 +1892,7 @@ block_224:
         }
         var_f20_7 = 1.0f;
         if (((Hero *)g_hero_state)->h[0x1454/2] != 0) {
-            func_PAL_L00_002B34C0();
+            hero_update_turn_from_anim_pal();
         } else {
             ((Hero *)g_hero_state)->f[0x1458/4] = (f32) ((Hero *)g_hero_state)->f[0x98/4];
             qcopy(&((Hero *)g_hero_state)->q[0x1440/16], &((Hero *)g_hero_state)->q[0x0/16]);
@@ -2013,7 +2015,7 @@ block_224:
         ((Hero *)g_hero_l20_state_alias)->f[0x1C8/4] = temp_f0_20;
         break;
     case 0x2E:                                      /* switch 1 */
-        func_PAL_L00_002B9508();
+        hero_steer_reference_point_pal();
         cam_set_limits_first(0.04f, 0.2f);
         cam_set_limits_second(0.04f, 0.2f);
         cam_set_limits_third(0.04f, 0.2f);
@@ -2124,7 +2126,7 @@ block_224:
             v10[1] = temp_f0_23;
             v10[2] = math_random_float_range(0.060000002f, 0.10000001f);
             v10[3] = -0.012f;
-            func_PAL_002BEF58((s32)((TI128*)v0), (s32) ((TI128*)v10), 0, -1.0f);
+            part_spawn_white_flash_pal((s32)((TI128*)v0), (s32) ((TI128*)v10), 0, -1.0f);
         }
         temp_a1_6 = ((Hero *)g_hero_state)->ptr[0x1248/4];
         sp120 = 0;
@@ -2157,7 +2159,7 @@ block_224:
             qcopy(&((Hero *)g_hero_state)->q[0xF0/16], &((Hero *)g_hero_state)->q[0x120/16]);
             temp_v1_32 = ((void*)(g_hero_state + 0xF0)) - 0xF0;
             if ((u32) (M2C_FIELD(temp_v1_32, s32* , 0x2294) - 0x28) < 2U) {
-                func_PAL_L00_002B6488();
+                ApplyHeroGravityAndJumpMotion_pal();
             } else {
                 if (vec_length_xy((s32)(g_hero_state + 0xF0)) < 0.050000004f) {
                     ApproachValue((s32)(g_hero_state + 0xF0) + 0xC4, 0.080000006f, 0.016f);
@@ -2313,7 +2315,7 @@ block_807:
                     if (((Hero *)g_hero_state)->u[0x2294/4] == 0x3E) {
                         ((Hero *)g_hero_state)->f[0xF8/4] = (f32) (((Hero *)g_hero_state)->f[0xF8/4] - 0.0092f);
                     } else {
-                        func_PAL_L00_002B6488();
+                        ApplyHeroGravityAndJumpMotion_pal();
                     }
                 } else {
                     ((Hero *)g_hero_state)->i[0x660/4] = 0;
@@ -2420,7 +2422,7 @@ block_807:
                 v20[1] += math_fast_sin_or_cos_b(temp_f20_71) * temp_f21_71;
                 v20[2] = math_random_float_range(0.060000002f, 0.10000001f);
                 v20[3] = -0.014f;
-                func_PAL_002BEF58((s32) ((TI128*)v10), (s32) ((TI128*)v20), 0, -1.0f);
+                part_spawn_white_flash_pal((s32) ((TI128*)v10), (s32) ((TI128*)v20), 0, -1.0f);
             }
         }
         find_nearest_path_point(((Hero *)g_hero_state)->i[0x6E0/4], (s32) ((TI128*)v0), (s32) (((void*)g_hero_state) + 0x6D0), (s32) (((void*)g_hero_state) + 0x6E4), (s32) (((void*)g_hero_state) + 0x6E8), ((Hero *)g_hero_state)->i[0x6FC/4], 999.0f, 8.0f, 2.5f);
@@ -2506,7 +2508,7 @@ block_807:
     case 0x76:                                      /* switch 1 */
         ((Hero *)g_hero_state)->f[0x1A0/4] = ((Hero *)g_hero_state)->f[0x32C/4];
         ((Hero *)g_hero_state)->f[0x1B0/4] = 0.11000001f;
-        func_PAL_L00_002B60C0(0.010000001f);
+        ApproachHeroVelocity_pal(0.010000001f);
         hero_apply_mode_transform((s32) (((void*)g_hero_state) + 0xF0), (s32) ((void*)g_hero_state) + 0x130, 0.0072000003f);
         break;
     case 0x6:                                       /* switch 1 */
@@ -2526,7 +2528,7 @@ block_807:
         }
         hero_update_target_speed_pal();
         if (((Hero *)g_hero_state)->h[0x1E0/2] == 0) {
-            func_PAL_L00_002B6B38();
+            hero_update_airborne_steering_pal();
         }
         var_s1_5 = ((void*)g_hero_state) + 0xF0;
         hero_apply_mode_pose_offsets_pal();
@@ -2598,7 +2600,7 @@ block_807:
         if (((Hero *)g_hero_state)->f[0x24B8/4] < 0.2f) {
             var_f12_19 = 0.00080000004f;
         }
-        func_PAL_L00_002B60C0(var_f12_19);
+        ApproachHeroVelocity_pal(var_f12_19);
         break;
     case 0x8:                                       /* switch 1 */
         if (hero_slot_item_id(3) == 2) {
@@ -2704,7 +2706,7 @@ block_807:
         }
         if ((((Hero *)g_hero_state)->b[0x49C] != 0) || ((temp_a1_8 < temp_a2_5) && (temp_v1_33 = ((Hero *)g_hero_state)->u[0x2294/4], (temp_v1_33 != 0xB)) && (temp_v1_33 != 0x10) && (temp_v1_33 != 0xC) && (temp_v1_33 != 0x11) && (temp_v1_33 != 0x1B) && (temp_v1_33 != 0x89) && (temp_v1_33 != 0x48))) {
             if (((Hero *)g_hero_state)->h[0x528/2] != 0) {
-                func_PAL_L00_002B9508();
+                hero_steer_reference_point_pal();
                 if ((((Hero *)g_hero_state)->u[0x2294/4] == 0xA) && (((Hero *)g_hero_state)->i[0x1B8/4] < 0x8) && (((Hero *)g_hero_state)->f[0x178/4] < 0.14000002f)) {
                     ((Hero *)g_hero_state)->f[0xF0/4] = (f32) (((Hero *)g_hero_state)->f[0xF0/4] + (math_fast_sin_or_cos_a(((Hero *)g_hero_state)->f[0x98/4]) * 0.014f));
                     ((Hero *)g_hero_state)->f[0xF4/4] = (f32) (((Hero *)g_hero_state)->f[0xF4/4] + (math_fast_sin_or_cos_b(((Hero *)g_hero_state)->f[0x98/4]) * 0.014f));
@@ -2758,7 +2760,7 @@ block_807:
                 }
             }
         } else {
-            func_PAL_L00_002B6B38();
+            hero_update_airborne_steering_pal();
             if (((Hero *)g_hero_state)->u[0x2294/4] == 0x12) {
                 temp_s0_8 = ((void*)g_hero_state) + 0xF0;
                 var_f0_11 = vec_length_xy((s32) temp_s0_8);
@@ -2820,7 +2822,7 @@ block_807:
         if ((((Hero *)g_hero_state)->u[0x2294/4] == 0x38) && (((Hero *)g_hero_state)->b[0x49E] == 0) && (((Hero *)g_hero_state)->f[0xF8/4] > 0.030000001f)) {
             EmitHeroTimedEffects_pal();
         }
-        func_PAL_L00_002B6488();
+        ApplyHeroGravityAndJumpMotion_pal();
         ProbeHeroAirborneWallContact_pal();
         break;
     case 0x16:                                      /* switch 1 */
@@ -2900,7 +2902,7 @@ block_807:
                         part_queue_impact_effect(m, (s32) ((Hero *)g_hero_state)->ptr[0x2290/4], 0x10000, (s32) (((void*)g_hero_state) + 0xE0), (s32) g_impact_effect_data, 100.0f);
                         break;
                     case 0x1366:
-                        func_PAL_L00_0038C620();
+                        moby_l00_raise_state_to_8();
                         break;
                     case 0x1367:
                         moby_raise_state_to_eight_copy();
@@ -3028,7 +3030,7 @@ block_807:
     case 0x4E:                                      /* switch 1 */
         ((Hero *)g_hero_state)->f[0x1A0/4] = (f32) ((Hero *)g_hero_state)->f[0x32C/4];
         ((Hero *)g_hero_state)->f[0x1B0/4] = 0.11000001f;
-        func_PAL_L00_002B60C0(0.010000001f);
+        ApproachHeroVelocity_pal(0.010000001f);
         var_f12_16_u2 = 0.0072000003f;
         var_a1_5_u2 = ((void*)g_hero_state) + 0x130;
         hero_apply_mode_transform((s32)(g_hero_state + 0xF0), (s32) var_a1_5_u2, var_f12_16_u2);
@@ -3036,7 +3038,7 @@ block_807:
     case 0x41:                                      /* switch 1 */
         hero_resolve_stick_direction(0.060000002f, 0);
         if (((Hero *)g_hero_state)->h[0x1E0/2] == 0) {
-            func_PAL_L00_002B6B38();
+            hero_update_airborne_steering_pal();
         }
         hero_apply_mode_transform((s32) (((void*)g_hero_state) + 0xF0), (s32) (((void*)g_hero_state) + 0xF0), 0.0048f);
         if (((Hero *)g_hero_state)->f[0xF8/4] < -0.20000002f) {

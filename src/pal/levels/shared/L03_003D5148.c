@@ -10,7 +10,7 @@ typedef float f32;
 extern f32 g_timer_tick_step __attribute__((sda));
 extern u8 *g_moby_record_base __attribute__((sda));
 extern s32 coll_test_point(void *, s32, void *, f32);
-s32 route_check_points(u32 a0, u8 *first, u8 *second);
+s32 route_check_points(u32 moby, u8 *first, u8 *second);
 extern s32 FindRouteNodeIndex(u32, f32 *);
 extern f32 vec_distance_xy(void *, f32 *);
 extern f32 coll_probe_ground_height_below(f32 *, s32, f32);
@@ -34,18 +34,19 @@ s32 route_check_object_points(u8 *, u8 *, u8 *);
 extern s32 math_random_int_below(s32);
 extern f32 g_effect_aim_offset_scale;
 
-void part_spawn_emitter_pair_pal(u8 *a0, s32 a1, s32 a2) {
-    f32 buf[3];
-    f32 f20, f21;
-    s32 s1, s2;
+/* Spawns two puffs of particles with random size and speed, used by the particle emitter. */
+void part_spawn_emitter_pair_pal(u8 *moby, s32 position, s32 velocity) {
+    f32 spawn_pos[3];
+    f32 size, life;
+    s32 spin, vel;
 
-    s2 = a2;
-    f20 = math_random_float_range(0.25f, 1.0f);
-    s1 = math_random_int_below(2);
-    f21 = math_random_float_range(3.0f, 7.0f) * (0.00040000002f);
-    vec_random_direction(buf, 0.0f, 0.1f);
-    FastVecAdd(buf, buf, a1);
-    part_spawn_ground_effect(buf, 0x21, 0x7F800000, 0, s1, s2, 0, f20 * 0.2f, f20, f21);
-    part_spawn_ground_effect(buf, 0x32, 0x7F7F7F7F, 1, -s1, s2, 0, f20 * 0.14f, f20 * 0.7f, f21);
+    vel = velocity;
+    size = math_random_float_range(0.25f, 1.0f);
+    spin = math_random_int_below(2);
+    life = math_random_float_range(3.0f, 7.0f) * (0.00040000002f);
+    vec_random_direction(spawn_pos, 0.0f, 0.1f);
+    FastVecAdd(spawn_pos, spawn_pos, position);
+    part_spawn_ground_effect(spawn_pos, 0x21, 0x7F800000, 0, spin, vel, 0, size * 0.2f, size, life);
+    part_spawn_ground_effect(spawn_pos, 0x32, 0x7F7F7F7F, 1, -spin, vel, 0, size * 0.14f, size * 0.7f, life);
 }
 

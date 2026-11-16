@@ -9,34 +9,35 @@ extern s8 g_hero_state[];
 extern f32 g_stick_length;
 extern u8 g_pal_enable_flag;
 
-void func_PAL_00331948(s8 *a0) {
-    s8 *base;
-    s8 *base2;
-    s8 *obj;
+/* Reads the left stick into the vehicle state, clamped to -1..1, and stores its length. */
+void pad_read_clamped_stick_pal(s8 *object) {
+    s8 *hero;
+    s8 *hero2;
+    s8 *vars;
     f32 vec[2];
 
-    obj = *(s8 **)(a0 + 0x68);
+    vars = *(s8 **)(object + 0x68);
     if (g_pal_enable_flag != 0) {
-        base = g_hero_state;
-        (*(f32 *)((s8 *)(obj) + (0x54))) = (*(f32 *)((s8 *)(base) + (0x1FB0)));
+        hero = g_hero_state;
+        (*(f32 *)((s8 *)(vars) + (0x54))) = (*(f32 *)((s8 *)(hero) + (0x1FB0)));
     } else {
-        base = g_hero_state;
-        (*(f32 *)((s8 *)(obj) + (0x54))) = -(*(f32 *)((s8 *)(base) + (0x1FB0)));
+        hero = g_hero_state;
+        (*(f32 *)((s8 *)(vars) + (0x54))) = -(*(f32 *)((s8 *)(hero) + (0x1FB0)));
     }
-    base2 = g_hero_state;
-    (*(f32 *)((s8 *)(obj) + (0x50))) = -(*(f32 *)((s8 *)(base2) + (0x1FB4)));
-    if ((*(f32 *)((s8 *)(obj) + (0x54))) > 1.0f) {
-        (*(f32 *)((s8 *)(obj) + (0x54))) = 1.0f;
-    } else if ((*(f32 *)((s8 *)(obj) + (0x54))) < -1.0f) {
-        (*(f32 *)((s8 *)(obj) + (0x54))) = -1.0f;
+    hero2 = g_hero_state;
+    (*(f32 *)((s8 *)(vars) + (0x50))) = -(*(f32 *)((s8 *)(hero2) + (0x1FB4)));
+    if ((*(f32 *)((s8 *)(vars) + (0x54))) > 1.0f) {
+        (*(f32 *)((s8 *)(vars) + (0x54))) = 1.0f;
+    } else if ((*(f32 *)((s8 *)(vars) + (0x54))) < -1.0f) {
+        (*(f32 *)((s8 *)(vars) + (0x54))) = -1.0f;
     }
-    if ((*(f32 *)((s8 *)(obj) + (0x50))) > 1.0f) {
-        (*(f32 *)((s8 *)(obj) + (0x50))) = 1.0f;
-    } else if ((*(f32 *)((s8 *)(obj) + (0x50))) < -1.0f) {
-        (*(f32 *)((s8 *)(obj) + (0x50))) = -1.0f;
+    if ((*(f32 *)((s8 *)(vars) + (0x50))) > 1.0f) {
+        (*(f32 *)((s8 *)(vars) + (0x50))) = 1.0f;
+    } else if ((*(f32 *)((s8 *)(vars) + (0x50))) < -1.0f) {
+        (*(f32 *)((s8 *)(vars) + (0x50))) = -1.0f;
     }
     vec_clear_128(vec);
-    vec[0] = (*(f32 *)((s8 *)(obj) + (0x50)));
-    vec[1] = (*(f32 *)((s8 *)(obj) + (0x54)));
+    vec[0] = (*(f32 *)((s8 *)(vars) + (0x50)));
+    vec[1] = (*(f32 *)((s8 *)(vars) + (0x54)));
     g_stick_length = FastVecLength(vec);
 }

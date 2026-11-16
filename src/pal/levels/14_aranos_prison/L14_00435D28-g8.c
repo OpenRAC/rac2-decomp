@@ -6,7 +6,7 @@ extern void snd_stop_voice(int);
 extern void moby_set_state(char *,int,int);
 extern void gfx_add_draw_callback_third(void *,void *);
 extern float math_wrap_angle_full_turn(float);
-extern void func_PAL_L14_004364B0(char *);
+extern void prison_animated_quads_draw_pal(char *);
 extern float math_random_float_range(float, float);
 extern int flag_is_third_pending_set(void *);
 extern int flag_set_first_pending(void *);
@@ -46,11 +46,11 @@ typedef struct {
     float w74;
     float w78;
     float w7c;
-    float currentScale;
-    float baseScale;
-    float pulseScale;
+    float current_scale;
+    float base_scale;
+    float pulse_scale;
     int w8c;
-    int pulseFrames;
+    int pulse_frames;
     int w94;
     int w98;
     float w9c;
@@ -65,68 +65,68 @@ typedef struct {
     unsigned int wc0;
     int sound;
 } PrisonEffectState;
-/* func_PAL_L14_00435D28, the PAL copy of func_L14_00430410: the same C, with pulseFrames rescaled
+/* func_PAL_L14_00435D28, the PAL copy of func_L14_00430410: the same C, with pulse_frames rescaled
  * to 50 Hz on init and func_PAL_L14_004364B0 as the draw callback. */
 /* Initializes the pulse effect, maintains its sound and draw callback, and fades its scale. */
-void func_PAL_L14_00435D28(char *self)
+void prison_pulse_effect_update_pal(char *moby)
 {
-    PrisonEffectState *s = *(PrisonEffectState **)(self+0x68);
+    PrisonEffectState *vars = *(PrisonEffectState **)(moby+0x68);
     int i;
-    switch ((unsigned char)self[0x20]) {
+    switch ((unsigned char)moby[0x20]) {
     case 0:
-        s->pulseFrames=((s32)(s->pulseFrames) * 5 + 2) / 6;
-        s->w00=0;
-        s->w04=69; s->w08=1.2f; s->w0c=0x50000080;
-        s->w20=2.0f; s->w24=4.2f; s->w28=3.1f; s->w2c=3.7f;
-        s->w30=0x80000080; s->w34=0x80000080;
-        s->w38=0x80200060; s->w3c=0x80808080; s->w40=0x80200060;
-        s->w44=0x80300050; s->w48=0x80202880; s->w4c=0x80606020;
-        for (i=1;i>=0;i--) s->range[i]=i*50;
-        s->w10=300;
-        s->w60=-0.125f; s->w64=0.133f;
-        s->w68=0.241f; s->w6c=-0.221f;
-        s->w18=1.2f; s->w70=0.6f;
-        s->w74=0.5f; s->w78=0.4f;
-        s->w7c=0.7f;
-        s->w1c=54;
-        s->w94=0x28280080; s->w98=0x0a800000;
-        s->wa0=0.9f; s->wa4=0.1f;
-        s->wa8=20; s->wac=s->w14=0.8f;
-        s->wb0=70; s->wb4=s->w9c=2.0f;
+        vars->pulse_frames=((s32)(vars->pulse_frames) * 5 + 2) / 6;
+        vars->w00=0;
+        vars->w04=69; vars->w08=1.2f; vars->w0c=0x50000080;
+        vars->w20=2.0f; vars->w24=4.2f; vars->w28=3.1f; vars->w2c=3.7f;
+        vars->w30=0x80000080; vars->w34=0x80000080;
+        vars->w38=0x80200060; vars->w3c=0x80808080; vars->w40=0x80200060;
+        vars->w44=0x80300050; vars->w48=0x80202880; vars->w4c=0x80606020;
+        for (i=1;i>=0;i--) vars->range[i]=i*50;
+        vars->w10=300;
+        vars->w60=-0.125f; vars->w64=0.133f;
+        vars->w68=0.241f; vars->w6c=-0.221f;
+        vars->w18=1.2f; vars->w70=0.6f;
+        vars->w74=0.5f; vars->w78=0.4f;
+        vars->w7c=0.7f;
+        vars->w1c=54;
+        vars->w94=0x28280080; vars->w98=0x0a800000;
+        vars->wa0=0.9f; vars->wa4=0.1f;
+        vars->wa8=20; vars->wac=vars->w14=0.8f;
+        vars->wb0=70; vars->wb4=vars->w9c=2.0f;
         for(i=0;i<32;i++) {
             g_spark_quad_angles[i]=math_random_float_range(-3.1415927f,3.1415927f);
             g_spark_quad_progress[i]=(float)i*0.03125f;
         }
-        s->wb8=71; s->wbc=1.0f;
-        s->wc0=0x80800000;
-        self[0x31]=0; *(unsigned short *)(self+0x34)|=1;
-        s->sound=-1;
-        moby_set_state(self,1,-1);
+        vars->wb8=71; vars->wbc=1.0f;
+        vars->wc0=0x80800000;
+        moby[0x31]=0; *(unsigned short *)(moby+0x34)|=1;
+        vars->sound=-1;
+        moby_set_state(moby,1,-1);
         break;
     case 1:
-        if (((PrisonSoundAnchor *)(g_sound_state+s->sound*112))->owner!=self ||
-            !((PrisonSoundAnchor *)(g_sound_state+s->sound*112))->active)
-            s->sound=prisonStartSound(0,4,self);
-        gfx_add_draw_callback_third(func_PAL_L14_004364B0,self);
-        if(flag_is_third_pending_set(self)) {
-            if(D_L14_001B20C8_1<50) s->baseScale=0;
-            moby_set_state(self,2,-1);
+        if (((PrisonSoundAnchor *)(g_sound_state+vars->sound*112))->owner!=moby ||
+            !((PrisonSoundAnchor *)(g_sound_state+vars->sound*112))->active)
+            vars->sound=prisonStartSound(0,4,moby);
+        gfx_add_draw_callback_third(prison_animated_quads_draw_pal,moby);
+        if(flag_is_third_pending_set(moby)) {
+            if(D_L14_001B20C8_1<50) vars->base_scale=0;
+            moby_set_state(moby,2,-1);
         }
         break;
     case 2: {
-        int sound=s->sound;
-        if(sound!=-1 && ((PrisonSoundAnchor *)(g_sound_state+sound*112))->owner==self &&
+        int sound=vars->sound;
+        if(sound!=-1 && ((PrisonSoundAnchor *)(g_sound_state+sound*112))->owner==moby &&
             ((PrisonSoundAnchor *)(g_sound_state+sound*112))->active) snd_stop_voice(sound);
-        s->sound=-1;
-        if(flag_set_first_pending(self)) *(int *)(self+0x98)=0;
-        if(s->baseScale>0.5f) {
-            gfx_add_draw_callback_third(func_PAL_L14_004364B0,self);
-            s->baseScale-=0.05f;
+        vars->sound=-1;
+        if(flag_set_first_pending(moby)) *(int *)(moby+0x98)=0;
+        if(vars->base_scale>0.5f) {
+            gfx_add_draw_callback_third(prison_animated_quads_draw_pal,moby);
+            vars->base_scale-=0.05f;
         }
         break;
     }
     }
-    s->currentScale=s->baseScale+s->pulseScale*
-        math_fast_sin_or_cos_b(math_wrap_angle_full_turn((float)g_frame_tick_counter*6.2831855f/(float)s->pulseFrames));
+    vars->current_scale=vars->base_scale+vars->pulse_scale*
+        math_fast_sin_or_cos_b(math_wrap_angle_full_turn((float)g_frame_tick_counter*6.2831855f/(float)vars->pulse_frames));
 }
 

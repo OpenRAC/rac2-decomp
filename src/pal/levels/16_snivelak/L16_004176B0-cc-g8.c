@@ -39,11 +39,12 @@ extern float math_random_signed_float_range(float, float), math_random_float_ran
 extern void lerp_vector(void *, void *, void *, float);
 /* Particle calls consume six/three GPR inputs and five/one FP inputs.
  * Both return their allocated pointer or null; this caller ignores those results. */
-extern void *func_PAL_002C23B8(void *, void *, int, int, int, int, float, float, float, float, float);
+extern void *part_spawn_burst_pal(void *, void *, int, int, int, int, float, float, float, float, float);
 extern void *part_spawn_trail_2_pal(void *, void *, int, float);
 extern void vec_random_direction(void *, float, float);
 
-void func_PAL_L16_004176B0(u8 *moby)
+/* Draws the boss's laser beam from its body to its target, hurts whatever it hits and sprays sparks along the beam. */
+void snivelak_draw_laser_beam_pal(u8 *moby)
 {
     BeamBatch batch[2];
     float bone[16] __attribute__((aligned(16)));
@@ -70,9 +71,9 @@ void func_PAL_L16_004176B0(u8 *moby)
     float drop = -0.1f;
     int layers = 0x90001;
     int ignore = 0;
-    int lowerRow = 2;
-    int drawFirst = 0;
-    int drawCount = 1;
+    int lower_row = 2;
+    int draw_first = 0;
+    int draw_count = 1;
     void *body;
     float *muzzle;
     float *eye;
@@ -115,7 +116,7 @@ void func_PAL_L16_004176B0(u8 *moby)
                 if (j & 1)
                     FastVecScale(pos, side, g_laser_beam_side_offsets[i]);
                 else FastVecScale(pos, side, -g_laser_beam_side_offsets[i]);
-                if (j < lowerRow) FastVecAdd(pos, pos, start);
+                if (j < lower_row) FastVecAdd(pos, pos, start);
                 else FastVecAdd(pos, pos, end);
                 pos[3] = 1.0f;
             }
@@ -125,8 +126,8 @@ void func_PAL_L16_004176B0(u8 *moby)
             batch[i].packet[3] = 0x8000000048UL;
         }
     }
-    draw_world_quad(&batch[0], drawFirst, drawCount);
-    draw_world_quad(&batch[1], drawFirst, drawCount);
+    draw_world_quad(&batch[0], draw_first, draw_count);
+    draw_world_quad(&batch[1], draw_first, draw_count);
     if (*(int *)(state + 0x258) != g_frame_l16_counter) {
         *(int *)(state + 0x258) = g_frame_l16_counter;
         FastVecSub(delta, end, start);
@@ -137,7 +138,7 @@ void func_PAL_L16_004176B0(u8 *moby)
             speed = math_random_float_range(g_laser_spark_speed_table[2], g_laser_spark_speed_table[3]);
             vec_scale_to_length(velocity, delta, speed * 0.020000001f);
             lerp_vector(sample, end, start, math_random_float_range(0.0f, 1.0f));
-            func_PAL_002C23B8(sample, velocity, texture, (int)g_laser_spark_color >> shift,
+            part_spawn_burst_pal(sample, velocity, texture, (int)g_laser_spark_color >> shift,
                 g_laser_spark_color & 0xffffff, seed, size,
                 500.0f, 1.0f, 0.0f, 1.0f);
             size = math_random_float_range(10.0f, 20.0f);

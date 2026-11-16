@@ -35,7 +35,8 @@ extern unsigned char *g_effect_param_pointer_a;
 extern int g_frame_l00_counter __attribute__((sda));
 extern char homing_shot_draw_trail[];
 
-void func_PAL_L00_003F1518(char *obj)
+/* Updates the homing shot: it steers toward its target, hits things, leaves a trail and explodes (PAL: 50 Hz timers). */
+void homing_l00_shot_update_2_pal(char *obj)
 {
     float old[4], scratch[4], previous[4], delta[4], temp[4];
     unsigned char hit[48];
@@ -43,7 +44,7 @@ void func_PAL_L00_003F1518(char *obj)
     char *state = *(char **)(obj + 0x68);
     char *target;
     char *info;
-    char *p;
+    char *spawned;
     float *tracking_delta;
     float length, speed, scale;
     int work, i;
@@ -117,10 +118,10 @@ target_done:
             *(int *)(state + 0x38) = 5;
         }
         work = math_random_int_below(255);
-        p = part_spawn_gravity_fade(obj + 0x10, g_default_vector, 2, 0x202080, work, 64, 16, 420000.0f, 420000.0f, 0.0f, 1);
-        if (p) p[2] = *g_effect_param_pointer_b;
-        p = part_spawn_gravity_fade(obj + 0x10, g_default_vector, 2, 0x202080, (work + 128) % 255, 64, 16, 420000.0f, 420000.0f, 0.0f, 1);
-        if (p) p[2] = *g_effect_param_pointer_b;
+        spawned = part_spawn_gravity_fade(obj + 0x10, g_default_vector, 2, 0x202080, work, 64, 16, 420000.0f, 420000.0f, 0.0f, 1);
+        if (spawned) spawned[2] = *g_effect_param_pointer_b;
+        spawned = part_spawn_gravity_fade(obj + 0x10, g_default_vector, 2, 0x202080, (work + 128) % 255, 64, 16, 420000.0f, 420000.0f, 0.0f, 1);
+        if (spawned) spawned[2] = *g_effect_param_pointer_b;
         work = (int)delta;
         FastVecSub((void *)work, obj + 0x10, previous);
         FastVecScale((char *)work, (char *)work, 0.1f);
@@ -136,8 +137,8 @@ target_done:
             FastVecAdd(temp, temp, tracking_delta);
         }
         if (g_frame_l00_counter % 10 == 0) {
-            p = part_spawn_gravity_fade(obj + 0x10, g_default_vector, 25, 0x202080, 0, 32, 0, 2100.0f, 420000.0f, 0.0f, 1);
-            if (p) p[2] = *g_effect_param_pointer_a;
+            spawned = part_spawn_gravity_fade(obj + 0x10, g_default_vector, 25, 0x202080, 0, 32, 0, 2100.0f, 420000.0f, 0.0f, 1);
+            if (spawned) spawned[2] = *g_effect_param_pointer_a;
         }
         ref_PAL_L00_003F1518_00(homing_shot_draw_trail, obj);
         break;

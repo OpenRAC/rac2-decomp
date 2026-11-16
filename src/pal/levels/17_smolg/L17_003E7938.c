@@ -27,18 +27,18 @@ typedef struct {
 
 /* Walks the id list of the state's group and sets the state's mode word to 0x57 for every id
    that has an entity, stopping at the first that has none. */
-void func_PAL_L17_003E7938(u8 *a0)
+void grulch_activate_group_members_pal(u8 *obj)
 {
-    L17GroupState *state = *(L17GroupState **)(a0 + 0x68);
-    u16 *p;
-    u8 *e;
+    L17GroupState *state = *(L17GroupState **)(obj + 0x68);
+    u16 *group_ids;
+    u8 *entity;
 
-    for (p = g_group_l17_member_table[state->group];
-         (state->group & 0xFF) != 0xFF && state->group <= g_max_l17_group_id[0] && p != 0 &&
-         ((p != 0 && (s16)p[-1] >= 0) || p == g_group_l17_member_table[state->group]);
-         p++) {
-        e = D_L17_001B2C1C_base[0] + ((*p & 0x7FFF) << 8);
-        if (e == 0)
+    for (group_ids = g_group_l17_member_table[state->group];
+         (state->group & 0xFF) != 0xFF && state->group <= g_max_l17_group_id[0] && group_ids != 0 &&
+         ((group_ids != 0 && (s16)group_ids[-1] >= 0) || group_ids == g_group_l17_member_table[state->group]);
+         group_ids++) {
+        entity = D_L17_001B2C1C_base[0] + ((*group_ids & 0x7FFF) << 8);
+        if (entity == 0)
             break;
         state->mode = 0x3E;
     }

@@ -32,6 +32,7 @@ extern void *part_find_owned_effect_slot(void *, u32, s32);
 extern int snd_play_from_class_bank(int, int, void *, int);
 extern void part_explode_object_into_pieces_pal(void *, void *, void *, void *, int, int, int, int, int, int, int);
 
+/* Breakable debris with a sound: when its effect slot is hit, breaks into pieces, plays a sound and disappears (PAL: 50 Hz speeds). */
 void breakable_l18_debris_update_2_pal(Moby43FB08 *self) {
     f32 lo[4] __attribute__((aligned(16)));
     f32 hi[4] __attribute__((aligned(16)));

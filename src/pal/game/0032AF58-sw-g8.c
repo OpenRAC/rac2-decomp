@@ -15,7 +15,7 @@ extern void vec_clear_128(void *);
 extern float math_random_signed_float_range(float, float);
 extern float math_random_float_range(float, float);
 extern int math_random_int_range(int, int);
-extern char *func_PAL_002C84A8(void *, void *, int);
+extern char *part_spawn_drifting_2_pal(void *, void *, int);
 extern float fast_vec_dist(void *, void *);
 extern int moby_place_at_collision_point_mirror(void *, void *);
 extern void hero_check_under_falling_object_pal(void *);
@@ -23,12 +23,14 @@ extern void part_spawn_ground_impact_effect(void *);
 extern int SampleSurfaceHeightMap(void *, void *, float, float, float);
 extern void part_emit_spark_burst_pal(void *);
 extern int PlayMobySound(int, int, void *);
-extern void *func_PAL_002C0428(void *, void *, float, float);
+extern void *part_spawn_bubble_pal(void *, void *, float, float);
 extern int math_fast_float_d(void *);
 extern void moby_mark_spawned(void *);
 extern void gfx_register_overlay_draw_callback(void *, void *);
-extern void func_PAL_0032B920(void);
+extern void moby_do_nothing_pal(void);
 
+/* Per-frame update of a falling chunk: it falls and spins, drops dust while it moves, lands on
+   the ground or on the hero and bursts into sparks, then fades out and is freed (PAL: 50 Hz rates). */
 void falling_chunk_update_pal(char *self)
 {
     float old[4] __attribute__((aligned(16)));
@@ -62,7 +64,7 @@ void falling_chunk_update_pal(char *self)
             random[1]=math_random_signed_float_range(0, g_falling_chunk_random_range);
             random[2]=math_random_signed_float_range(0, g_falling_chunk_random_range);
             FastVecAdd(random, random, self + 0x10);
-            func_PAL_002C84A8(random, state, math_random_int_range(20, 40));
+            part_spawn_drifting_2_pal(random, state, math_random_int_range(20, 40));
         }
         fast_vec_dist(old, self + 0x10);
         if (moby_place_at_collision_point_mirror(self, old)) {
@@ -128,7 +130,7 @@ void falling_chunk_update_pal(char *self)
         velocity[2]=math_random_float_range(low, 2);
         velocity[3]=0;
         vec_scale_to_length(velocity, velocity, math_random_float_range(0.080000006f, 0.16000001f)*scale);
-        func_PAL_002C0428(self + 0x10, velocity, math_random_float_range(0.05f, 0.1f)*210000.0f, height);
+        part_spawn_bubble_pal(self + 0x10, velocity, math_random_float_range(0.05f, 0.1f)*210000.0f, height);
         if (math_fast_float_d(state + 0x34)) self[0x20]=4;
         break;
     }
@@ -139,5 +141,5 @@ void falling_chunk_update_pal(char *self)
         }
         break;
     }
-    gfx_register_overlay_draw_callback(func_PAL_0032B920, self);
+    gfx_register_overlay_draw_callback(moby_do_nothing_pal, self);
 }

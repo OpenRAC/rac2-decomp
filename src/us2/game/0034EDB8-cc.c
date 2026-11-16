@@ -15,11 +15,11 @@ extern void object_set_first_pair(void *, int, int);
 extern void object_set_second_pair(void *, int, int);
 extern void text_set_alignment(void *, unsigned int);
 extern void widget_store_field(void *, int);
-extern void func_US2_0034C008(void *, void *, void *);
+extern void hud_ammo_bolt_init_us2(void *, void *, void *);
 extern void object_init_derived_c(void *, void *, void *);
 extern int *object_get_fourth_field(void *);
 extern void *object_get_field_b(void *);
-extern void func_US2_00338AB8(void *, void *);
+extern void text_panel_init_us2(void *, void *);
 
 typedef struct {
     char records[0x798];
@@ -33,7 +33,9 @@ typedef struct {
     int f2210;
 } RecordSet;
 
-void records_screen_init_us2(void *object, void *a1, void *a2)
+/* Sets up the records screen: looks up two table entries, initialises the 20 record rows and the ammo/bolt HUD,
+   the title label and two text panels. (USA v2.00) */
+void records_screen_init_us2(void *object, void *font, void *pool)
 {
     RecordSet *set = object;
     char *record = (char *)0x8710;
@@ -44,7 +46,7 @@ void records_screen_init_us2(void *object, void *a1, void *a2)
     set->f2210 = table_find_by_id((int)g_resident_data_base + (int)record, 0x58);
     record = set->records;
     do {
-        object_init_derived_b(record, 0x20, 1, g_records_widget_data_a, a2);
+        object_init_derived_b(record, 0x20, 1, g_records_widget_data_a, pool);
         widget_set_pos_y(record, 5);
         func_US2_00337A38(record, 0x64);
         meter_set_value(record, 0);
@@ -55,15 +57,15 @@ void records_screen_init_us2(void *object, void *a1, void *a2)
         record += 0x48;
     } while (record < end);
     record = set->f1D30;
-    func_US2_0034C008(set->f7A0, a1, a2);
-    object_init_derived_c(record, g_records_widget_data_b, a2);
+    hud_ammo_bolt_init_us2(set->f7A0, font, pool);
+    object_init_derived_c(record, g_records_widget_data_b, pool);
     colour = object_get_fourth_field(record);
     *(float *)colour = 2155905152.0f;
     colour = object_get_field_b(record);
     *(float *)colour = 60008.0f;
     colour = object_get_field_b(record);
     *(int *)((char *)colour + 4) = 0;
-    set->f798 = a2;
-    func_US2_00338AB8(set->f1D6C, a2);
-    func_US2_00338AB8(set->f1FBC, a2);
+    set->f798 = pool;
+    text_panel_init_us2(set->f1D6C, pool);
+    text_panel_init_us2(set->f1FBC, pool);
 }

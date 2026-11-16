@@ -11,23 +11,24 @@ extern int g_snow_spawn_counter __attribute__((sda));
 
 /* func_L07_002F2C70 is defined in L07_002BE770-g8.c (it reads small data through $gp). */
 
-char *part_spawn_snow_pal(void *a, void *b, int c, int d)
+/* Creates one falling snow particle at source position with source random size, color and spin (PAL: 100 frame burst lifetime). */
+char *part_spawn_snow_pal(void *source, void *velocity, int is_burst, int use_group)
 {
- char *p=part_alloc(0x68); char *q;
- if(p) {
- q=p+0x20;
- *(int *)(q+0x10)=math_random_int_range(32,80);
- *(int *)(p+4)=0x808080;
- p[9]=FloatToInt(2.0f)-16; p[1]=0; p[3]=0x48;
- if(math_random_int_below(2)) p[2]=g_snow_particle_color_a[0]; else p[2]=g_snow_particle_color_b[0];
- *(float *)(p+12)=math_random_float_range(0.1f,0.24f)*210000.0f;
- p[8]=math_random_int_below(255);
- qcopy(p+16,a); qcopy(q,b);
- *(short *)(p+10)=1<<math_random_int_range(6,10);
- if(c) {*(short *)(p+10)=100; *(int *)(q+20)=1;}
- if(d) *(int *)(p+4)+=*(int *)(q+16)<<24;
- { float f=math_random_int_range(0,100); int n=g_snow_spawn_counter; *(float *)(q+12)=f; g_snow_spawn_counter=n+1; }
+ char *particle=part_alloc(0x68); char *params;
+ if(particle) {
+ params=particle+0x20;
+ *(int *)(params+0x10)=math_random_int_range(32,80);
+ *(int *)(particle+4)=0x808080;
+ particle[9]=FloatToInt(2.0f)-16; particle[1]=0; particle[3]=0x48;
+ if(math_random_int_below(2)) particle[2]=g_snow_particle_color_a[0]; else particle[2]=g_snow_particle_color_b[0];
+ *(float *)(particle+12)=math_random_float_range(0.1f,0.24f)*210000.0f;
+ particle[8]=math_random_int_below(255);
+ qcopy(particle+16,source); qcopy(params,velocity);
+ *(short *)(particle+10)=1<<math_random_int_range(6,10);
+ if(is_burst) {*(short *)(particle+10)=100; *(int *)(params+20)=1;}
+ if(use_group) *(int *)(particle+4)+=*(int *)(params+16)<<24;
+ { float spin=math_random_int_range(0,100); int counter=g_snow_spawn_counter; *(float *)(params+12)=spin; g_snow_spawn_counter=counter+1; }
  }
- return p;
+ return particle;
 }
 

@@ -2,7 +2,7 @@
 
 #include "common.h"
 typedef int Quadword __attribute__((mode(TI)));
-typedef struct { u8 prefix[0x2C0]; float waypoint[4]; float previousPosition[4]; } WaypointView;
+typedef struct { u8 prefix[0x2C0]; float waypoint[4]; float previous_position[4]; } WaypointView;
 typedef struct {
     u8 reserved_00[0x18]; u8 enabled, count, kind; u8 reserved_1b[0x65]; u8 payload[1];
 } DispatchContext;
@@ -18,7 +18,7 @@ extern float g_chainblade_alt_waypoint[4] __attribute__((sda));
 extern int g_chainblade_story_active __attribute__((sda));
 extern int g_one_shot_flag;
 extern unsigned char g_item_enabled_flags[] MACRO_ADDR;
-typedef struct { u8 prefix[0x80]; float position[4]; u8 reserved90[0x240C]; char *lockTarget; } HeroPositionView;
+typedef struct { u8 prefix[0x80]; float position[4]; u8 reserved90[0x240C]; char *lock_target; } HeroPositionView;
 extern HeroPositionView g_hero_state;
 extern void chainblade_handle_hits(char *);
 extern float vec_distance_xy(void *, void *);
@@ -179,8 +179,8 @@ void chainblade_update_us2(char *self)
         }
         if (*(u8 *)(self+0x60)&2) {
             if (chainblade_should_take_off(self) || chainblade_is_helper_ready(self)) SET_MODE(19,1); else SET_MODE(6,1);
-            if (!math_random_int_below(3) || g_hero_state.lockTarget==self)
-                chainblade_pick_idle_anim(self,g_hero_state.lockTarget==self ? 0 : -1);
+            if (!math_random_int_below(3) || g_hero_state.lock_target==self)
+                chainblade_pick_idle_anim(self,g_hero_state.lock_target==self ? 0 : -1);
         }
         break;
     case 8:
@@ -200,9 +200,9 @@ void chainblade_update_us2(char *self)
             moby_set_anim_type_three(self,0,-1); *(int *)(self+0x98)=*(int *)(*(char **)(self+0x24)+0x10);
         }
         if (*(unsigned short *)(self+0x96)>60) {
-            int storyActive = g_chainblade_story_active;
+            int story_active = g_chainblade_story_active;
             *(float *)(self+0x48)=1.0f;
-            if (storyActive && !g_item_enabled_flags[1]) {
+            if (story_active && !g_item_enabled_flags[1]) {
                 g_item_enabled_flags[1]=1; snd_play_from_global_bank(1,0,0); value_set_entry_by_index_us2(0x1233,-1); g_one_shot_flag=1;
             }
             part_queue_moby_for_glow(self,0,chainblade_reset_to_idle);
@@ -330,14 +330,14 @@ void chainblade_update_us2(char *self)
         events=moby_dispatch_action_by_kind(self,(void *)(state+0x60));
         if ((events&1)==1) { SET_MODE(20,2); H(0x32C)=1; break; }
         animFlags=events&2;
-        goto modeEleven;
+        goto mode_eleven;
     case 19:
         if (flag_set_first_pending((u8 *)self) && *(u8 *)(self+0x43)!=17) anim_start_blended(self,17,0,10);
-        { float animationFrame=moby_get_anim_value(self);
-        if (*(u8 *)(self+0x42)==17 && animationFrame>9.0f) { *(u8 *)(self+0x95)=2; *(u8 *)(self+0xBE)&=~2; }
+        { float animation_frame=moby_get_anim_value(self);
+        if (*(u8 *)(self+0x42)==17 && animation_frame>9.0f) { *(u8 *)(self+0x95)=2; *(u8 *)(self+0xBE)&=~2; }
         animFlags=*(u8 *)(self+0x60)&2;
         }
-    modeEleven:
+    mode_eleven:
         if (animFlags) SET_MODE(11,2);
         break;
     case 20:

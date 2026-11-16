@@ -10,14 +10,14 @@ extern void func_002A0F48(void *object);
 
 /* Initialize a kind-0xA82 object and its private record. */
 char *shot_moby_create_pal(void *position, void *direction,
-                  float value60, float value68, float value70, float value74,
+                  float speed, float param_68, float param_70, float param_74,
                   unsigned char color0, unsigned char color1,
                   unsigned char color2, unsigned char color3,
                   unsigned short flags, void *owner)
 {
     char *object;
     char *data;
-    unsigned int initial;
+    unsigned int alpha;
 
     if (g_shot_moby_count < 17)
         return 0;
@@ -25,23 +25,23 @@ char *shot_moby_create_pal(void *position, void *direction,
     if (object != 0) {
         data = *(char **)(object + 0x68);
         *(Quad_0031D3E0 *)(object + 0x10) = *(Quad_0031D3E0 *)position;
-        vec_scale_to_length(data, direction, value60 * 0.020000001f);
-        initial = 255;
+        vec_scale_to_length(data, direction, speed * 0.020000001f);
+        alpha = 255;
         object[0x20] = 0;
-        *(short *)(object + 0x32) = initial;
-        *(unsigned char *)(object + 0x30) = initial;
+        *(short *)(object + 0x32) = alpha;
+        *(unsigned char *)(object + 0x30) = alpha;
         *(void **)(data + 0x50) = owner;
         *(int *)(data + 0x54) = 0;
         *(float *)(object + 0x2C) = 0.015f;
         *(unsigned short *)(object + 0x34) |= 0x100;
-        *(float *)(data + 0x60) = value60;
-        *(float *)(data + 0x68) = value68;
-        *(float *)(data + 0x70) = value70;
+        *(float *)(data + 0x60) = speed;
+        *(float *)(data + 0x68) = param_68;
+        *(float *)(data + 0x70) = param_70;
         data[0x78] = color0;
         data[0x79] = color1;
         data[0x7A] = color2;
         data[0x7B] = color3;
-        *(float *)(data + 0x74) = value74;
+        *(float *)(data + 0x74) = param_74;
         *(int *)(data + 0x5C) = 0;
         *(unsigned short *)(data + 0x7E) = flags;
         *(int *)(data + 0x58) = 0;

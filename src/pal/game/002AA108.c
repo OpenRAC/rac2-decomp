@@ -28,61 +28,62 @@ extern Rec_002A96A0 *moby_get_private_value_0(s32);
 extern char *moby_get_private_value_4(s32);
 extern u8 moby_get_kind_slot(u8 *);
 
-f32 moby_update_aim_target_strength_pal(s32 a0, Src_002A96A0 *a1) {
-    Rec_002A96A0 *p = moby_get_private_value_0(a0);
-    f32 f = 0.0f;
-    if (p != 0) {
-        u8 *q = p->p18;
-        if (q != 0) {
-            u8 c = q[0x20];
-            if (c != 0xFE) {
-                if (c == 0xFD) {
-                    p->s1C = 0;
-                    p->p18 = 0;
+/* Tracks which target the player is aiming at and returns an updated strength value, with a short delay before switching (PAL). */
+f32 moby_update_aim_target_strength_pal(s32 id, Src_002A96A0 *src) {
+    Rec_002A96A0 *aim = moby_get_private_value_0(id);
+    f32 strength = 0.0f;
+    if (aim != 0) {
+        u8 *old_target = aim->p18;
+        if (old_target != 0) {
+            u8 old_kind = old_target[0x20];
+            if (old_kind != 0xFE) {
+                if (old_kind == 0xFD) {
+                    aim->s1C = 0;
+                    aim->p18 = 0;
                 }
             } else {
-                p->s1C = 0;
-                p->p18 = 0;
+                aim->s1C = 0;
+                aim->p18 = 0;
             }
         }
         {
-            short t = p->s1C;
-            if (t != 0) {
-                p->s1C = (unsigned short)p->s1C + 1;
-                if (t >= 0x65) {
-                    p->p18 = 0;
-                    p->s1C = 0;
+            short timer = aim->s1C;
+            if (timer != 0) {
+                aim->s1C = (unsigned short)aim->s1C + 1;
+                if (timer >= 0x65) {
+                    aim->p18 = 0;
+                    aim->s1C = 0;
                 }
             }
         }
-        if (a1 != 0) {
-            u8 *x = a1->p20;
-            f = a1->f2C;
-            if (x != 0) {
-                if (p->p18 != x) {
-                    p->p18 = x;
-                    p->b17 = moby_get_kind_slot(a1->p20);
-                    p->s1C = 1;
+        if (src != 0) {
+            u8 *new_target = src->p20;
+            strength = src->f2C;
+            if (new_target != 0) {
+                if (aim->p18 != new_target) {
+                    aim->p18 = new_target;
+                    aim->b17 = moby_get_kind_slot(src->p20);
+                    aim->s1C = 1;
                 } else {
-                    if (a1->b28 == 9) {
-                        if (p->s1C < 0x32) f = 0.0f;
-                        else p->s1C = 1;
+                    if (src->b28 == 9) {
+                        if (aim->s1C < 0x32) strength = 0.0f;
+                        else aim->s1C = 1;
                     } else {
-                        if (p->s1C < 8) f = 0.0f;
-                        p->s1C = 1;
+                        if (aim->s1C < 8) strength = 0.0f;
+                        aim->s1C = 1;
                     }
                 }
             }
-            if ((f32)p->s4 <= 1.0f && f > 0.0f && f < 1.0f) f = 1.0f;
-            if (a1->f24 & 0x100000) {
-                u8 *o = moby_get_private_value_4(a0);
-                if (o != 0) o[0x18] = 1;
+            if ((f32)aim->s4 <= 1.0f && strength > 0.0f && strength < 1.0f) strength = 1.0f;
+            if (src->f24 & 0x100000) {
+                u8 *other_state = moby_get_private_value_4(id);
+                if (other_state != 0) other_state[0x18] = 1;
             } else {
-                u8 *o = moby_get_private_value_4(a0);
-                if (o != 0) o[0x18] = 0;
+                u8 *other_state = moby_get_private_value_4(id);
+                if (other_state != 0) other_state[0x18] = 0;
             }
         }
     }
-    return f;
+    return strength;
 }
 

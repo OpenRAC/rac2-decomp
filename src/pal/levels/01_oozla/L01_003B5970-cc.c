@@ -65,7 +65,7 @@ extern void glow_flicker_update_pal(void *, void *, int);
     int id = state->sound; \
     if (id != -1) { \
         u8 *slot = D_00188660 + id * 0x70; \
-        if (*(MoverObject **)(slot + 0x88) == object && slot[0x74]) \
+        if (*(MoverObject **)(slot + 0x88) == moby && slot[0x74]) \
             func_002E59F8(id); \
     } \
     state->sound = -1; \
@@ -73,8 +73,8 @@ extern void glow_flicker_update_pal(void *, void *, int);
 
 #define KEEP_SOUND() { \
     u8 *slot = D_00188660 + state->sound * 0x70; \
-    if (*(MoverObject **)(slot + 0x88) != object || !slot[0x74]) \
-        state->sound = func_002E5DA0(0, 4, object, 0x9EA); \
+    if (*(MoverObject **)(slot + 0x88) != moby || !slot[0x74]) \
+        state->sound = func_002E5DA0(0, 4, moby, 0x9EA); \
 }
 
 #define INTERPOLATE() { \
@@ -82,44 +82,45 @@ extern void glow_flicker_update_pal(void *, void *, int);
     weight *= 0.5f; \
     func_00282CF0(delta, D_L01_001B264C[state->target].pos, state->homePos); \
     func_00282D30(delta, delta, weight); \
-    func_00282CC0(object->pos, state->homePos, delta); \
-    object->rot[2] = func_002AA150(state->homeRot[2], D_L01_001B264C[state->target].rot[2], weight); \
-    object->rot[1] = func_002AA150(state->homeRot[1], D_L01_001B264C[state->target].rot[1], weight); \
-    object->rot[0] = func_002AA150(state->homeRot[0], D_L01_001B264C[state->target].rot[0], weight); \
+    func_00282CC0(moby->pos, state->homePos, delta); \
+    moby->rot[2] = func_002AA150(state->homeRot[2], D_L01_001B264C[state->target].rot[2], weight); \
+    moby->rot[1] = func_002AA150(state->homeRot[1], D_L01_001B264C[state->target].rot[1], weight); \
+    moby->rot[0] = func_002AA150(state->homeRot[0], D_L01_001B264C[state->target].rot[0], weight); \
 }
 
-void func_PAL_L01_003B5970(MoverObject *object)
+/* Moves a platform between its home spot and a target spot. It waits, glides there, waits again and glides back, with a sound while it moves (PAL: 50 Hz timings). */
+void eased_mover_moby_update_pal(MoverObject *moby)
 {
-    float oldpos[4] __attribute__((aligned(16)));
-    float oldrot[4] __attribute__((aligned(16)));
+    float old_pos[4] __attribute__((aligned(16)));
+    float old_rot[4] __attribute__((aligned(16)));
     float delta[4] __attribute__((aligned(16)));
-    MoverState *state = object->state;
+    MoverState *state = moby->state;
     float weight;
 
-    qcopy(oldpos, object->pos);
-    qcopy(oldrot, object->rot);
-    switch (object->mode) {
+    qcopy(old_pos, moby->pos);
+    qcopy(old_rot, moby->rot);
+    switch (moby->mode) {
     case 0:
-        object->flags |= 0x2000;
+        moby->flags |= 0x2000;
         state->sound = -1;
-        qcopy(state->homePos, object->pos);
-        qcopy(state->homeRot, object->rot);
-        moby_set_state(object, 1, -1);
-        object->timer = 0;
+        qcopy(state->homePos, moby->pos);
+        qcopy(state->homeRot, moby->rot);
+        moby_set_state(moby, 1, -1);
+        moby->timer = 0;
         break;
     case 1:
         CLEAR_SOUND()
-        if (object->triggered) {
+        if (moby->triggered) {
             state->cycleWait = state->cycles;
             state->wait = state->waitDuration;
-            moby_set_state(object, 2, -1);
-            object->timer = *(int *)(object->info + 0x10);
+            moby_set_state(moby, 2, -1);
+            moby->timer = *(int *)(moby->info + 0x10);
         }
         break;
     case 2:
         if (math_fast_float_d(&state->wait)) {
             state->t = 0.0f;
-            moby_set_state(object, 3, -1);
+            moby_set_state(moby, 3, -1);
         }
         break;
     case 3:
@@ -129,10 +130,10 @@ void func_PAL_L01_003B5970(MoverObject *object)
         INTERPOLATE()
         if (state->t >= 1.0f) {
             if (state->nextWait == -1) {
-                moby_set_state(object, 5, -1);
+                moby_set_state(moby, 5, -1);
             } else {
                 state->wait = (((int)(state->nextWait) * 5 + 2) / 6);
-                moby_set_state(object, 4, -1);
+                moby_set_state(moby, 4, -1);
             }
         }
         KEEP_SOUND()
@@ -141,15 +142,15 @@ void func_PAL_L01_003B5970(MoverObject *object)
         CLEAR_SOUND()
         if (math_fast_float_d(&state->wait)) {
             state->t = 1.0f;
-            moby_set_state(object, 6, -1);
+            moby_set_state(moby, 6, -1);
         }
         break;
     case 5:
         CLEAR_SOUND()
-        if (object->triggered) {
+        if (moby->triggered) {
             state->wait = state->waitDuration;
-            object->triggered = 0;
-            moby_set_state(object, 4, -1);
+            moby->triggered = 0;
+            moby_set_state(moby, 4, -1);
         }
         break;
     case 6:
@@ -160,14 +161,14 @@ void func_PAL_L01_003B5970(MoverObject *object)
         if (state->t <= 0.0f) {
             if (state->cycles == -1) {
                 state->wait = (((int)(state->returnWait) * 5 + 2) / 6);
-                moby_set_state(object, 7, -1);
+                moby_set_state(moby, 7, -1);
             } else if (math_fast_float_d(&state->cycleWait)) {
-                moby_set_byte_on_group(object->index, 0);
-                moby_set_state(object, 1, -1);
-                object->timer = 0;
+                moby_set_byte_on_group(moby->index, 0);
+                moby_set_state(moby, 1, -1);
+                moby->timer = 0;
             } else {
                 state->wait = (((int)(state->returnWait) * 5 + 2) / 6);
-                moby_set_state(object, 7, -1);
+                moby_set_state(moby, 7, -1);
             }
         }
         KEEP_SOUND()
@@ -176,14 +177,14 @@ void func_PAL_L01_003B5970(MoverObject *object)
         CLEAR_SOUND()
         if (math_fast_float_d(&state->wait)) {
             state->t = 0.0f;
-            moby_set_state(object, 3, -1);
+            moby_set_state(moby, 3, -1);
         }
         break;
     }
-    object->triggered = 0;
-    if (object->mode < 8) {
-        FastVecSub(delta, object->pos, oldpos);
-        mat_combine_and_store(state->motion, delta, oldrot, object->rot);
+    moby->triggered = 0;
+    if (moby->mode < 8) {
+        FastVecSub(delta, moby->pos, old_pos);
+        mat_combine_and_store(state->motion, delta, old_rot, moby->rot);
     }
-    glow_flicker_update_pal(object, state->tailAC, object->mode >= 2);
+    glow_flicker_update_pal(moby, state->tailAC, moby->mode >= 2);
 }

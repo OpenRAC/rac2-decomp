@@ -75,7 +75,7 @@ extern void mem_fast_helper_b();
 extern void copy_matrix3x4();
 extern void gfx_append_draw_list_buffer_tag();
 extern void hud_update_record_handlers();
-extern void func_US2_0029CD18();
+extern void resident_menus_draw_us2();
 extern void mat_transform_array();
 extern void PatchMobyGifs();
 extern void mem_fill_scratch_area();
@@ -89,24 +89,24 @@ extern void func_002A0F48();
 extern void func_002A10E8();
 extern int math_ping_pong_blend_values();
 extern void text_draw_scrolling_help();
-extern void func_US2_L00_00376D40();
+extern void shop_draw_vendor_item_select_list_us2();
 extern void DrawAmmoSelectList();
 extern void shop_draw_item_icon_strip();
 extern void shop_draw_vendor_item_list();
-extern void func_US2_002FB718();
-extern void func_US2_L00_00378678();
-extern void func_US2_L00_003788C8();
-extern void func_US2_L00_00378C38();
-extern void func_US2_L00_00379000();
-extern void func_US2_L00_00379560();
-extern void func_US2_L00_00379738();
-extern void func_US2_L00_00379928();
-extern void func_US2_L00_00379C50();
-extern void func_US2_L00_0037A050();
-extern void func_US2_L00_0037A218();
-extern void func_US2_L00_0037A2C8();
-extern void func_US2_L00_0037A5D0();
-extern void func_US2_002FC008();
+extern void DrawVendorPurchasePrompt_us2();
+extern void shop_draw_price_and_description_us2();
+extern void shop_draw_upgrade_price_lines_us2();
+extern void shop_draw_selected_item_info_panel_us2();
+extern void shop_draw_purchase_action_prompts_us2();
+extern void shop_draw_item_purchase_button_labels_us2();
+extern void shop_draw_buy_back_labels_us2();
+extern void shop_draw_selected_item_purchase_panel_us2();
+extern void shop_draw_vendor_purchase_panel_us2();
+extern void shop_draw_purchase_affordability_prompt_us2();
+extern void shop_draw_selected_item_limit_status_us2();
+extern void shop_draw_item_limit_text_box_us2();
+extern void shop_l00_step_message_states_us2();
+extern void PrepareVendorSelectionPreview_us2();
 extern void ref_L00_0037A610_00();
 extern void gfx_swap_packet_buffer();
 extern void SubmitBufferedDmaChain(void);
@@ -181,7 +181,7 @@ void shop_draw_purchase_menu_scene_us2(void)
             menu->field94 = 0;
             menu->field90 = 0;
             menu->end = menu->text + 0x400;
-            func_US2_002FC008();
+            PrepareVendorSelectionPreview_us2();
         }
         /* Initialization falls through into the first rendered frame. */
     case 1:
@@ -239,17 +239,17 @@ void shop_draw_purchase_menu_scene_us2(void)
             gfx_draw_scaled_object_two_axes(c, color, (float)(g_screen_width[0] >> 1), (float)(g_screen_height[0] >> 1), scale, scale, 0.0f);
         }
         hud_update_record_handlers();
-        func_US2_0029CD18();
+        resident_menus_draw_us2();
         if (g_shop_blend_factor >= 1.0f) {
             ref_L00_0037A610_00();
             if (menu->mode == 0) {
-                func_US2_002FB718();
-                func_US2_L00_00379000();
-                func_US2_L00_00379C50();
-                func_US2_L00_00376D40();
+                DrawVendorPurchasePrompt_us2();
+                shop_draw_purchase_action_prompts_us2();
+                shop_draw_vendor_purchase_panel_us2();
+                shop_draw_vendor_item_select_list_us2();
                 text_draw_scrolling_help();
                 if (menu->auxiliary)
-                    func_US2_L00_0037A5D0();
+                    shop_l00_step_message_states_us2();
                 if (menu->draw) {
                     gfx_set_scissor_clamped(158, 360, 115, 206);
                     tex_upload_object_textures(menu->models, 1);
@@ -257,9 +257,9 @@ void shop_draw_purchase_menu_scene_us2(void)
                     tex_run_upload_and_setup();
                 }
             } else if (menu->mode == 3) {
-                func_US2_L00_00378678();
-                func_US2_L00_00379560();
-                func_US2_L00_0037A050();
+                shop_draw_price_and_description_us2();
+                shop_draw_item_purchase_button_labels_us2();
+                shop_draw_purchase_affordability_prompt_us2();
                 shop_draw_item_icon_strip();
                 text_draw_scrolling_help();
                 if (menu->draw) {
@@ -282,8 +282,8 @@ void shop_draw_purchase_menu_scene_us2(void)
                     tex_run_upload_and_setup();
                 }
             } else if (menu->mode == 2) {
-                func_US2_L00_00379928();
-                func_US2_L00_0037A2C8();
+                shop_draw_selected_item_purchase_panel_us2();
+                shop_draw_item_limit_text_box_us2();
                 shop_draw_vendor_item_list();
                 text_draw_scrolling_help();
                 if (menu->draw) {
@@ -297,12 +297,12 @@ void shop_draw_purchase_menu_scene_us2(void)
                     mem_restore_scratch_area();
                     tex_run_upload_and_setup();
                     gfx_set_scissor_clamped(0, g_screen_width[0] - 1, 0, g_screen_height[0] - 1);
-                    func_US2_L00_00378C38();
+                    shop_draw_selected_item_info_panel_us2();
                 }
             } else if (menu->mode == 1) {
-                func_US2_L00_003788C8();
-                func_US2_L00_00379738();
-                func_US2_L00_0037A218();
+                shop_draw_upgrade_price_lines_us2();
+                shop_draw_buy_back_labels_us2();
+                shop_draw_selected_item_limit_status_us2();
                 DrawAmmoSelectList();
                 text_draw_scrolling_help();
                 if (menu->draw) {

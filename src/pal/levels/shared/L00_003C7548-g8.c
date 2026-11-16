@@ -51,7 +51,7 @@ typedef struct {
    exists or the gate refuses, builds its basis from its angles, stores the scaled basis
    vectors and their combinations in the shared tables, clears the per-slot tables and resets
    the object's state block. Returns the object, or 0 when nothing was created. */
-unsigned char *func_PAL_L00_003C77F0(int mode)
+unsigned char *CreateTrailOwnerMoby_pal(int mode)
 {
     Owner3A *owner;
     OwnerState *state;

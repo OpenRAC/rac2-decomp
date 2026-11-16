@@ -16,7 +16,7 @@ extern void mat_get_euler_angles(void *, void *);
 /* Spawns a class 0x1211 part at the record that the object's table links to from slot idx, unless
    the link byte is the empty value 0xFF. The byte is read twice: `value` going on to hold the class
    keeps cse from sharing the first read, and the second becomes a register copy after reload. */
-void func_PAL_L15_0043BDC8(char *self, int idx) {
+void gorn_spawn_linked_part_pal(char *self, int idx) {
     char *p = *(char **)(self + 0x24);
     int count = *(short *)(p + 0x2E);
 

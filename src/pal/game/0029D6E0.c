@@ -11,11 +11,12 @@ extern void func_0029CD20(int);
 extern int *ui_return_second_arg(int, int);
 extern char *menu_system_init_pal(int *, int);
 extern void func_0029C0D0(void);
-extern void func_PAL_0029CAA0(void);
-extern void func_PAL_0029CA70(void);
+extern void menu_draw_hud_bolt_pal(void);
+extern void menu_draw_hud_subsystems_pal(void);
 extern void func_0029CD18(void);
 typedef struct { char pad[0x7A84]; void *cb1; void *cb2; } SubBf;
 
+/* Sets up the level object: clears its memory block and global table, then picks which pair of callbacks it uses for this level (PAL). */
 void level_init_callbacks_pal(void)
 {
     char *state = g_loader_memory;
@@ -41,8 +42,8 @@ void level_init_callbacks_pal(void)
         ((SubBf *)(obj + 0x38000))->cb1 = func_0029C0D0;
         ((SubBf *)(obj + 0x38000))->cb2 = func_0029CD18;
     } else {
-        ((SubBf *)(obj + 0x38000))->cb1 = func_PAL_0029CAA0;
-        ((SubBf *)(obj + 0x38000))->cb2 = func_PAL_0029CA70;
+        ((SubBf *)(obj + 0x38000))->cb1 = menu_draw_hud_bolt_pal;
+        ((SubBf *)(obj + 0x38000))->cb2 = menu_draw_hud_subsystems_pal;
     }
 }
 

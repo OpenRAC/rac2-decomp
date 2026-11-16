@@ -14,7 +14,7 @@ extern int linked_child_update(char *), moby_compute_aligned_direction(char *, v
 extern void moby_update_glow_pulse_timers(char *), turret_l02_aim_at_hero(char *), moby_set_random_spread_velocity(char *, void *), linked_effect_update(char *);
 extern void moby_delay_group_except_nearest(struct L02NearObject *), moby_randomize_group_timers(struct L02GroupObject *), moby_teleport_to_new_pose(char *, void *, void *);
 extern u8 *moby_find_group_in_state_13(int);
-extern void moby_mark_spawned(void *), moby_set_state(u8 *, int, int), anim_start_blended(char *, int, int, int), func_US2_002A7AA8(char *, void *, int);
+extern void moby_mark_spawned(void *), moby_set_state(u8 *, int, int), anim_start_blended(char *, int, int, int), SetDeathBits_us2(char *, void *, int);
 extern int flag_set_first_pending(u8 *), flag_set_second_pending(u8 *), math_random_int_below(int), math_random_int_range(int, int), FastDecTimer(short *);
 extern void moby_set_controller_speed_limits(u8 *, float, float, float, float);
 extern int moby_dispatch_action_by_kind(void *, void *);
@@ -31,6 +31,7 @@ typedef struct {
     u8 gap_22a0[0x1FC]; char *pointer_249c;
 } L02_ResidentCombatPrefix;
 
+/* Per-frame update of the ranged enemy (moby class 2501). */
 void ranged_l02_enemy_update_us2(char *self) {
     /* One frame area, two layouts: the aiming states and the case-21 hand-off. */
     union {
@@ -84,7 +85,7 @@ void ranged_l02_enemy_update_us2(char *self) {
         flags = moby_dispatch_action_by_kind(self, state + 0x50);
         if (flags & 1) {
             *(u16 *)(*(char **)(state + 0x370) + 0x34) |= 0x41; *(u16 *)(*(char **)(state + 0x370) + 0x34) &= 0xEFFF; *(int *)(*(char **)(state + 0x370) + 0x98) = 0;
-            func_US2_002A7AA8(self, 0, 3); part_queue_moby_for_glow(self, 0, linked_effect_update); return;
+            SetDeathBits_us2(self, 0, 3); part_queue_moby_for_glow(self, 0, linked_effect_update); return;
         }
         if (flags & 2) {
             *(int *)(state + 0x33C) = 0;

@@ -11,7 +11,8 @@ extern float g_particle_ground_vector[];
 extern float g_particle_floor_offset;
 extern float g_particle_min_floor_height;
 
-void func_PAL_L01_00333FF0(FallingParticle_C4B50 *self) {
+/* Moves a falling particle with its velocity, kills it when it leaves the map or drops below the ground, and pulls its velocity down each frame (PAL). */
+void part_l01_update_falling_pal(FallingParticle_C4B50 *self) {
     ParticlePayload_C4B50 motion, sample, sample_again;
     float *velocity = self->velocity_floor.lane;
     float floor = velocity[3];

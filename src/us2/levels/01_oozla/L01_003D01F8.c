@@ -32,7 +32,7 @@ extern int moby_handle_request_slot_state(int);
 extern void value_set_entry_by_index_us2(int, int);
 extern int MemcardSave(int, int);
 extern void cam_lock_entry(int);
-extern int func_US2_00289840(int, int);
+extern int subtitle_request_voice_line_us2(int, int);
 extern s32 math_closest_point_on_polygon_edge(void *a0, void *a1, void *a2, s32 a3);
 extern s32 FloatToInt(f32 a0);
 extern s32 g_swamp_monster_thresholds[] __attribute__((sda));
@@ -51,39 +51,39 @@ extern f32 IntToFloat(s32);
    the entry its vars name at +8, flags the object named at +0xC once, steps the subtitle history
    timer of entry 16 (TryQueueSubtitleSelection 0x9B9 after 180 frames) and frees the moby.
    The timer's three loads keep their retail order only when the frame counter is read last. */
-void cutscene_trigger_update_us2(u8 *a0)
+void cutscene_trigger_update_us2(u8 *moby)
 {
-    u8 *p = *(u8 **)(a0 + 0x68), *q;
+    u8 *p = *(u8 **)(moby + 0x68), *q;
     int mode;
 
-    switch (a0[0x20]) {
+    switch (moby[0x20]) {
     case 0:
         if (g_swamp_cutscene_flag) {
-            moby_mark_spawned(a0);
+            moby_mark_spawned(moby);
             break;
         }
-        *(float *)(a0 + 0x18) += 0.75f;
-        *(float *)(a0 + 0x2C) = *(float *)(*(u8 **)(a0 + 0x24) + 0x24) * 1.5f;
-        moby_set_state(a0, 1, -1);
+        *(float *)(moby + 0x18) += 0.75f;
+        *(float *)(moby + 0x2C) = *(float *)(*(u8 **)(moby + 0x24) + 0x24) * 1.5f;
+        moby_set_state(moby, 1, -1);
         break;
     case 1:
-        *(float *)(a0 + 0xF8) = FastAddRotations(*(float *)(a0 + 0xF8), 0.078539826f);
+        *(float *)(moby + 0xF8) = FastAddRotations(*(float *)(moby + 0xF8), 0.078539826f);
         if (IsPointInCuboid(g_hero_position, *(int *)(p + 4))) {
             p = g_cutscene_vars;
             if (req_push_queue(p, 0x26)) {
                 req_launch_queued(p);
-                moby_set_state(a0, 2, -1);
+                moby_set_state(moby, 2, -1);
             }
         }
-        if (a0[0x31])
-            part_spawn_sparkles_and_glow_rings(a0);
+        if (moby[0x31])
+            part_spawn_sparkles_and_glow_rings(moby);
         break;
     case 2:
         mode = g_hero_l01_control_mode;
-        (*(u16 *)(a0 + 0x96))++;
+        (*(u16 *)(moby + 0x96))++;
         if (mode == 2) {
-            a0[0x31] = 0;
-            *(u16 *)(a0 + 0x34) |= 1;
+            moby[0x31] = 0;
+            *(u16 *)(moby + 0x34) |= 1;
         }
         if (game_is_either_mode_two())
             break;
@@ -110,7 +110,7 @@ void cutscene_trigger_update_us2(u8 *a0)
                 if (start + elapsed >= now - 2) {
                     *(u16 *)(p + 0xC2) = ++elapsed;
                     if (elapsed >= 180) {
-                        func_US2_00289840(0x9B9, 0x10);
+                        subtitle_request_voice_line_us2(0x9B9, 0x10);
                         *(u16 *)(p + 0xC2) = 0;
                     }
                 } else {
@@ -120,7 +120,7 @@ void cutscene_trigger_update_us2(u8 *a0)
                 }
             }
         }
-        moby_mark_spawned(a0);
+        moby_mark_spawned(moby);
         break;
     }
 }

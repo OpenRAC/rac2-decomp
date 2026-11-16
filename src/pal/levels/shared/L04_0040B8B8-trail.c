@@ -24,7 +24,7 @@ extern void draw_world_quad(void *, void *, int);
    The spelling of each access picks retail's addresses: `p + i` keeps the frame offset out of
    the index sum, `&p[i + 1]` folds it into the base, and one `side` array (left edge, then right
    edge) shares its base, so the right-edge store joins the points' induction variable. */
-void func_PAL_L04_0040B8B8(u8 *obj)
+void racer_draw_trail_pal(u8 *obj)
 {
     Packet73E8 pkt;
     float cam[12];

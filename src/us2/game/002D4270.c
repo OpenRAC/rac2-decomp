@@ -8,6 +8,7 @@ extern int func_0029C920(int);
 extern int list_page_get_selected_record(int);
 extern void menu_start_action(int);
 
+/* Handles button input for a menu page and, if the preview button is pressed, sends the selected entry as a menu message. (USA v2.00) */
 int menu_page_update_with_preview_us2(void)
 {
     int result = 0;
@@ -56,6 +57,7 @@ extern void SetupGifPaging(long param_1);
 extern void func_0029C960(void);
 
 /* Candidate function: FUN_002d3390 */
+/* Draws one menu page by calling its page-specific draw routine between the common start and end of menu drawing. (USA v2.00) */
 unsigned long long menu_page_draw_9_us2(void)
 {
     SetupGifPaging(0);
@@ -66,6 +68,7 @@ unsigned long long menu_page_draw_9_us2(void)
 
 extern void func_0029C5A0(void);
 
+/* Draws one menu page by calling its page-specific draw routine between the common start and end of menu drawing. (USA v2.00) */
 int menu_page_draw_10_us2(void) {
     SetupGifPaging(0);
     func_0029C5A0();

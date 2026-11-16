@@ -18,7 +18,7 @@ extern int g_no_first_completion_flag __attribute__((sda));
 extern int g_mission_completion_counts __attribute__((sda));
 extern int g_state_frame_count __attribute__((sda));
 extern char *g_moby_base_table;
-extern void *func_PAL_L10_003A0590(void *, void *, int, int, int, int, int, int, float, float, float, float);
+extern void *energy_strip_create_pal(void *, void *, int, int, int, int, int, int, float, float, float, float);
 extern int math_fast_float_d(void *);
 extern void mission_store_completion_counts(void);
 extern int MemcardSave(int, int);
@@ -37,7 +37,7 @@ extern void func_L05_0037D608(void *, void *, f32);
 extern void hrugis_set_group_states(void *);
 extern void *level_find_object_by_class_id(int);
 extern int group_count_alive(void *);
-extern void func_PAL_L10_00429620(void *, int);
+extern void hrugis_finish_mission_reward_pal(void *, int);
 extern int list_count_ready_objects(void *);
 extern void FadeToBlack(int);
 extern void hrugis_reset_mission_state(void *);
@@ -49,7 +49,7 @@ extern void hrugis_reset_mission_state(void *);
    objects and the effect box. Then, until the 0xF85 moby reports done, each timer expiry
    either closes the D_L10_001B1444 sequence (with D_L10_001B1390 raised around the
    func_0029B3E0 call, which returns an int) or restarts state 0 through func_PAL_L10_00429620. */
-void func_PAL_L10_00429880(char *object)
+void mission_first_update_pal(char *object)
 {
     char **all;
     int result;
@@ -76,7 +76,7 @@ void func_PAL_L10_00429880(char *object)
         av.q = 0; bv.q = 0;
         av.f[0] = 469.63f; av.f[1] = 407.93f; av.f[2] = 502.79f;
         bv.f[0] = 476.13f; bv.f[1] = 415.41f; bv.f[2] = 502.79f;
-        func_PAL_L10_003A0590(&av,&bv,1,2000000,0x7F7F7F,0xFF1010,70,70,0.5f,0.2f,0.402f,1.12225f);
+        energy_strip_create_pal(&av,&bv,1,2000000,0x7F7F7F,0xFF1010,70,70,0.5f,0.2f,0.402f,1.12225f);
         if (g_gate_first) {
             moby_mark_spawned(g_gate_first);
             g_gate_first = 0;
@@ -105,7 +105,7 @@ void func_PAL_L10_00429880(char *object)
                 moby_mark_flag_and_append_to_list(12);
             }
         } else if (math_fast_float_d(st + 0x58)) {
-            func_PAL_L10_00429620(object,0);
+            hrugis_finish_mission_reward_pal(object,0);
             g_hud_blink_timer_first = 0;
             g_hud_blink_timer_second = 0;
         }
@@ -114,13 +114,13 @@ void func_PAL_L10_00429880(char *object)
 
 /* func_PAL_L10_00429B20, the PAL copy of func_L10_00424290: the same C, where the first call
    also releases the D_L10_001B1400/1404 objects and func_0027D330 takes 0x19 instead of 0x1E. */
-void func_PAL_L10_00429B20(u8 *a0) {
-    u8 **p;
-    int n;
+void mission_second_update_pal(u8 *object) {
+    u8 **objects;
+    int count;
     int i;
-    u8 *o;
-    void *v;
-    int r;
+    u8 *entry;
+    void *group;
+    int alive;
 
     if (g_mission_initialized == 0) {
         g_mission_initialized = 1;
@@ -128,19 +128,19 @@ void func_PAL_L10_00429B20(u8 *a0) {
         music_Unpause();
         entry_init_all_registered();
         hero_set_state_value_a(0);
-        p = level_get_object_list();
-        n = level_get_saved_value();
-        for (i = 0; i < n; i++) {
-            o = p[i];
-            switch (*(short *)(o + 0xAA)) {
+        objects = level_get_object_list();
+        count = level_get_saved_value();
+        for (i = 0; i < count; i++) {
+            entry = objects[i];
+            switch (*(short *)(entry + 0xAA)) {
             case 0xCBE:
-                entry_spawn_list_objects_with_flag_pal(o, 1);
+                entry_spawn_list_objects_with_flag_pal(entry, 1);
                 break;
             case 0xF93:
-                entry_spawn_list_objects_with_flag_pal(o, 1);
-                func_L05_0037CEE0(p[i], g_spot_record_table + g_mission_state.idx * 128 + 0x30, 64.0f);
-                func_L05_0037D608(p[i], g_spot_record_table + g_mission_state.idx * 128 + 0x30, 64.0f);
-                hrugis_set_group_states(p[i]);
+                entry_spawn_list_objects_with_flag_pal(entry, 1);
+                func_L05_0037CEE0(objects[i], g_spot_record_table + g_mission_state.idx * 128 + 0x30, 64.0f);
+                func_L05_0037D608(objects[i], g_spot_record_table + g_mission_state.idx * 128 + 0x30, 64.0f);
+                hrugis_set_group_states(objects[i]);
                 break;
             }
         }
@@ -155,21 +155,21 @@ void func_PAL_L10_00429B20(u8 *a0) {
             g_gate_second = 0;
         }
     }
-    v = level_find_object_by_class_id(0xF93);
-    r = v ? group_count_alive(v) : 0;
-    if (r == 0) {
-        func_PAL_L10_00429620(a0, 1);
+    group = level_find_object_by_class_id(0xF93);
+    alive = group ? group_count_alive(group) : 0;
+    if (alive == 0) {
+        hrugis_finish_mission_reward_pal(object, 1);
     }
     if (list_count_ready_objects(level_find_object_by_class_id(0xCBE)) == 0) {
         FadeToBlack(0x19);
         hero_set_state_value_c(0);
-        hrugis_reset_mission_state(a0);
+        hrugis_reset_mission_state(object);
     }
 }
 
 /* func_PAL_L10_00429D08, the PAL copy of func_L10_00424448: the same C, where the first call
    also releases the D_L10_001B1400/1404 objects. */
-void func_PAL_L10_00429D08(void *object)
+void mission_third_update_pal(void *object)
 {
     unsigned char **entries;
     int i, count;
@@ -198,5 +198,5 @@ void func_PAL_L10_00429D08(void *object)
         }
     }
     if (!list_count_ready_objects(level_find_object_by_class_id(0xF8E)))
-        func_PAL_L10_00429620(object, 2);
+        hrugis_finish_mission_reward_pal(object, 2);
 }

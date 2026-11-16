@@ -42,6 +42,7 @@ extern int hero_slot_item_id(int);
 extern unsigned int FastTweenColor(unsigned int, unsigned int, float);
 extern float ApproachValue(float *, float, float);
 
+/* Draws the glow quads around the hero (PAL). */
 void DrawHeroGlowQuads_pal(void)
 {
     int index, alpha;

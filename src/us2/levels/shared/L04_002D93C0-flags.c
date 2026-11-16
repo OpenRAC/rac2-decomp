@@ -11,7 +11,7 @@ extern float fade_reduce_value(float);
 extern void hero_clear_tracked_slots(void);
 extern void FastVecSub(f32 *,f32 *,f32 *);
 extern void hero_build_relative_point(void *,int,float,float,float);
-extern s32 func_US2_L04_002E7F28(int,int);
+extern s32 hero_l04_enter_state_us2(int,int);
 extern char *part_find_owned_effect_slot(void *,int,int);
 extern void AdjustPlayerHealth_us2(int);
 extern int hero_play_sound(int,int);
@@ -107,7 +107,7 @@ extern u32 g_running_total __attribute__((sda));
 
 /* Check the hero's surface contact and optionally apply its movement impulse. */
 int hero_check_surface_contact_us2(int update) {
-    char *entry, *m;
+    char *entry, *surface_moby;
     HopVector delta;
     int special;
     float amount;
@@ -118,10 +118,10 @@ int hero_check_surface_contact_us2(int update) {
     if (GROUND_HERO.h[0x1DC / 2]) return 0;
     if (g_hero_mode_state[0]) return 0;
     GROUND_HERO.i[0x249C / 4] = 0;
-    m = GROUND_HERO.p[0x2290 / 4];
-    if (AB(m, 0xA8) == 255) return 0;
-    entry = g_surface_table + AB(m, 0xA8) * 64;
-    if (AP(entry, 0x38) != m) return 0;
+    surface_moby = GROUND_HERO.p[0x2290 / 4];
+    if (AB(surface_moby, 0xA8) == 255) return 0;
+    entry = g_surface_table + AB(surface_moby, 0xA8) * 64;
+    if (AP(entry, 0x38) != surface_moby) return 0;
     if (!(AI(entry, 0x24) & 9)) return 0;
     if (AF(entry, 0x2C) != 0.0f) {
         g_contact_hit_flag = 0;
@@ -145,26 +145,26 @@ int hero_check_surface_contact_us2(int update) {
         hero_build_relative_point(&delta, 0, -1.0f, 0.0f, 0.0f);
     }
     if (!GROUND_HERO.b[0x22B4]) {
-        char *m = GROUND_HERO.p[0x249C / 4];
-        if (m && (AH(m, 0xAA) == 0x4EB || AH(m, 0xAA) == 0x558)) {
-            func_US2_L04_002E7F28(0x7D, 1);
+        char *surface_moby = GROUND_HERO.p[0x249C / 4];
+        if (surface_moby && (AH(surface_moby, 0xAA) == 0x4EB || AH(surface_moby, 0xAA) == 0x558)) {
+            hero_l04_enter_state_us2(0x7D, 1);
             return 1;
         }
         if ((GROUND_HERO.i[0x2294 / 4] == 1 ||
              GROUND_HERO.i[0x2294 / 4] == 0x1D || GROUND_HERO.i[0x1500 / 4]) &&
             !(AI(entry, 0x24) & 8)) {
-            char *m = part_find_owned_effect_slot(GROUND_HERO.p[0x2290 / 4], 1, 0);
-            if (m) AdjustPlayerHealth_us2(FloatToInt(AF(m, 0x2C)));
-            if (!GROUND_HERO.i[0x24CC / 4]) func_US2_L04_002E7F28(0x16, 1);
+            char *surface_moby = part_find_owned_effect_slot(GROUND_HERO.p[0x2290 / 4], 1, 0);
+            if (surface_moby) AdjustPlayerHealth_us2(FloatToInt(AF(surface_moby, 0x2C)));
+            if (!GROUND_HERO.i[0x24CC / 4]) hero_l04_enter_state_us2(0x16, 1);
             GROUND_HERO.h[0x1DC / 2] = 0x4D;
             if (!GROUND_HERO.h[0x21C / 2]) GROUND_HERO.h[0x21C / 2] = 0x12;
             hero_play_sound(20, 0);
             return 0;
         }
-        if (GROUND_HERO.i[0x229C / 4] == 0x12) func_US2_L04_002E7F28(0x72, 1);
-        else if (GROUND_HERO.i[0x229C / 4] == 0x11) func_US2_L04_002E7F28(0x73, 1);
-        else if (AI(entry, 0x24) & 8) func_US2_L04_002E7F28(0x8C, 1);
-        else func_US2_L04_002E7F28(0x16, 1);
+        if (GROUND_HERO.i[0x229C / 4] == 0x12) hero_l04_enter_state_us2(0x72, 1);
+        else if (GROUND_HERO.i[0x229C / 4] == 0x11) hero_l04_enter_state_us2(0x73, 1);
+        else if (AI(entry, 0x24) & 8) hero_l04_enter_state_us2(0x8C, 1);
+        else hero_l04_enter_state_us2(0x16, 1);
         if (GROUND_HERO.i[0x2294 / 4] == 0x8C) {
             qzero(&delta);
         } else {

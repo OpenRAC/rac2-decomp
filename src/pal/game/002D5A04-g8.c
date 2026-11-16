@@ -21,7 +21,7 @@ extern char *GetLocalizedString(int);
 extern int text_draw_centered_small(long long, long long, long long, char *, long long);
 extern void text_draw_right_aligned_small(long long, long long, long long, char *, long long);
 
-int func_PAL_002D5A04(void)
+int menu_popup_box_draw_pal(void)
 {
     float z;
 

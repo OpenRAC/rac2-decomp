@@ -8,7 +8,7 @@ extern float math_random_float_range(float, float);
 extern void moby_transform_joint_to_world(char *, int, char *);
 extern void FastVecScale(void *, void *, float);
 extern void part_spawn_spark_effect_pal(Vector *, void *, float);
-extern unsigned char *func_PAL_002C0428(Vector *, Vector *, float, float);
+extern unsigned char *part_spawn_bubble_pal(Vector *, Vector *, float, float);
 
 /* Joint branches and velocity copy follow RAC1 emit_hero_randomized_motion_effects
  * in overlays/shared/hero_idle_and_animation.c (OpenRAC/rac1-decomp, GPL-3.0). */
@@ -50,7 +50,7 @@ void EmitHeroRandomizedMotionEffects_pal(int count, int sourceMode, int sparks) 
             part_spawn_spark_effect_pal(&position, matrix, *(float *)(player + 0x170) * size);
         } else {
             size = math_random_float_range(4200.0f, 7350.0f);
-            func_PAL_002C0428(&position, &velocity, size, -1.0f);
+            part_spawn_bubble_pal(&position, &velocity, size, -1.0f);
         }
     }
 }
@@ -63,7 +63,7 @@ extern float math_fast_sin_or_cos_a(float);
 extern float math_fast_sin_or_cos_b(float);
 extern int FloatToInt(float);
 extern int math_random_int_range(int, int);
-extern void func_PAL_002BEF58(Vector *, Vector *, int, float);
+extern void part_spawn_white_flash_pal(Vector *, Vector *, int, float);
 extern void vec_build_spherical_offset(float *, float, float, float);
 extern unsigned char *part_spawn_scaling(Vector *, Vector *, unsigned int, unsigned int, int, int, int, int);
 
@@ -86,7 +86,7 @@ void EmitHeroTimedEffects_pal(void) {
         velocity.f[1] = math_fast_sin_or_cos_b(angle) * speed;
         velocity.f[3] = -0.0032000002f;
         velocity.f[2] = 0.0f;
-        func_PAL_002BEF58(&position, &velocity, 0, -1.0f);
+        part_spawn_white_flash_pal(&position, &velocity, 0, -1.0f);
         *(short *)(base + 0x51E) = math_random_int_range(2, 3);
     }
     if (FastDecTimer((short *)(timer - 2))) {

@@ -32,7 +32,7 @@ extern unsigned char *g_part_tex_smoke_table;
 
 /* Spawns a grey smoke particle at position with velocity; kinds below 5 get a
    random size and a shorter random life. */
-Particle_002C0CC0 *func_PAL_002C19C0(TI128 *position, TI128 *velocity, unsigned char kind, int arg3)
+Particle_002C0CC0 *part_spawn_smoke_pal(TI128 *position, TI128 *velocity, unsigned char kind, int arg3)
 {
     Particle_002C0CC0 *p = part_alloc(0x2A);
     typeof(p->motion) *m = &p->motion;

@@ -23,39 +23,39 @@ extern char *SpawnExplosion(void *, int, int, int, int, int, int, int, float, fl
    D_L02_001B30C8 and, when func_002A9640 finds something and the private word is clear, lowers
    the counter and moves to state 2; it always ends by setting the byte at +0xA8. State 2 starts
    the effects and moves to state 3, which sets the half-word at +0x7C. */
-void effect_l02_spawner_update_pal(unsigned char *a0) {
-    int state = a0[0x20];
-    int *s = *(int **)(a0 + 0x68);
+void effect_l02_spawner_update_pal(unsigned char *moby) {
+    int state = moby[0x20];
+    int *vars = *(int **)(moby + 0x68);
 
     switch (state) {
     case 0:
-        a0[0x30] = 0xFF;
-        moby_set_state(a0, 1, -1);
-        if (*s != 0)
+        moby[0x30] = 0xFF;
+        moby_set_state(moby, 1, -1);
+        if (*vars != 0)
             g_hovering_object_count--;
         break;
     case 1:
         if (g_arena_l02_active_flag[0] != 1) {
             if (g_effect_spawner_last_frame != g_frame_l02_counter) {
                 g_effect_spawner_last_frame = g_frame_l02_counter;
-                gfx_add_draw_callback_first(DrawRotatingObjectGroupEffects, a0);
+                gfx_add_draw_callback_first(DrawRotatingObjectGroupEffects, moby);
             }
-            if (part_find_owned_effect_slot(a0, 0x4010000, 0) != 0 && *s == 0) {
+            if (part_find_owned_effect_slot(moby, 0x4010000, 0) != 0 && *vars == 0) {
                 g_hovering_object_count--;
-                moby_set_state(a0, 2, -1);
+                moby_set_state(moby, 2, -1);
             }
-            a0[0xA8] = 0xFF;
+            moby[0xA8] = 0xFF;
         }
         break;
     case 2:
-        part_explode_object_into_pieces(a0, &g_piece_explode_param_a, &g_piece_explode_param_b, &g_piece_explode_param_c, 0xFFFF, 0,
+        part_explode_object_into_pieces(moby, &g_piece_explode_param_a, &g_piece_explode_param_b, &g_piece_explode_param_c, 0xFFFF, 0,
                           g_spawner_explode_param, 1, 0xFFFF, 0xFF, 0);
-        part_spawn_scaled_bolts(a0, 5, 0.5f);
-        SpawnExplosion(a0 + 0x10, 1, 0x19, 0x14, 0x14, 0x14, 0x2D, 1, 1.0f, 20.0f, 1, 1, 0, 0);
-        moby_set_state(a0, 3, -1);
+        part_spawn_scaled_bolts(moby, 5, 0.5f);
+        SpawnExplosion(moby + 0x10, 1, 0x19, 0x14, 0x14, 0x14, 0x2D, 1, 1.0f, 20.0f, 1, 1, 0, 0);
+        moby_set_state(moby, 3, -1);
         break;
     case 3:
-        *(unsigned short *)(a0 + 0x7C) = 0x8020;
+        *(unsigned short *)(moby + 0x7C) = 0x8020;
         break;
     }
 }

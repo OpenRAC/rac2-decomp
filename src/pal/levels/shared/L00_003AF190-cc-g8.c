@@ -82,6 +82,7 @@ extern int g_hero_locked_flag[] __attribute__((sda));
 extern char g_hero_l00_position[], g_projectile_offset_points[], g_homing_moby_index_list[] __attribute__((sda));
 extern HeroState g_hero_state;
 
+/* Spawns a targeted projectile: sets its direction basis from the owner or target, its spread, speed and lifetime, and a light slot. */
 SpawnObject *projectile_spawn_targeted_pal(SpawnObject *owner, char *pos, SpawnObject *target, char *arg,
                                float scale, float lo, float hi, float unused)
 {

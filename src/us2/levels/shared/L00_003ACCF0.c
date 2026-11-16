@@ -26,29 +26,30 @@ extern Res_189E20 g_hero_state;
 extern char g_cam_follow_matrix[];
 extern void vec_scale_to_length(void *, void *, float);
 extern void vec_compute_object_to_target(void *, void *, void *, int, float);
-extern char *func_US2_L00_003AB8F8(void *, void *, void *, void *, int);
+extern char *effect_spawn_owned_moby_us2(void *, void *, void *, void *, int);
 
-void func_US2_L00_003ACCF0(char *a0, char *a1) {
-    float buf[4];
+/* Fires the seeker effect from the hero's facing, aimed at the locked target when there is one (US2 copy of hero_fire_effect_from_facing). */
+void hero_fire_effect_from_facing_us2(char *position, char *owner) {
+    float velocity[4];
     float angle;
-    AngleRecord_262570 *e;
-    Res_189E20 *g;
-    void *p;
+    AngleRecord_262570 *weapon;
+    Res_189E20 *hero;
+    void *target;
 
-    e = &g_weapon_l00_table[g_seeker_weapon_index[0]];
-    angle = e->angle * 0.01666666753590107f;
+    weapon = &g_weapon_l00_table[g_seeker_weapon_index[0]];
+    angle = weapon->angle * 0.01666666753590107f;
     if (g_hero_state.i2294 == 0x1D) {
-        vec_scale_to_length(buf, g_cam_follow_matrix, angle);
+        vec_scale_to_length(velocity, g_cam_follow_matrix, angle);
     } else if (g_hero_state.h24EC == 1) {
-        vec_scale_to_length(buf, a1 + 0xD0, -angle);
+        vec_scale_to_length(velocity, owner + 0xD0, -angle);
     } else {
-        vec_scale_to_length(buf, (char *)&g_hero_state + 0x760, angle);
+        vec_scale_to_length(velocity, (char *)&g_hero_state + 0x760, angle);
     }
-    g = &g_hero_state;
-    p = 0;
-    if (g->pBF8 != 0) {
-        vec_compute_object_to_target(g->pBF8, a0, buf, 0, angle);
-        p = g->pBF8;
+    hero = &g_hero_state;
+    target = 0;
+    if (hero->pBF8 != 0) {
+        vec_compute_object_to_target(hero->pBF8, position, velocity, 0, angle);
+        target = hero->pBF8;
     }
-    func_US2_L00_003AB8F8(a0, buf, a1, p, 5);
+    effect_spawn_owned_moby_us2(position, velocity, owner, target, 5);
 }

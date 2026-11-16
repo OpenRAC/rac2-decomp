@@ -7,13 +7,13 @@
 
 extern void gfx_draw_screen_element_stored(void *);
 extern void hud_draw_colored_quad_widget(void *);
-extern void func_PAL_00338770(void *);
+extern void text_label_draw_pal(void *);
 extern float *object_get_second_field(void *);
 extern float *object_get_first_field(void *);
 extern unsigned int *object_get_fourth_field(void *);
 extern void DrawSegmentedRingMeter(void *);
 extern unsigned long GetEffectTextureDescriptor(int);
-extern void func_PAL_0027FB48(float, float, unsigned long, char *, int, float, unsigned long, unsigned char *);
+extern void FontPrintScaled_pal(float, float, unsigned long, char *, int, float, unsigned long, unsigned char *);
 extern int text_draw_centered_large(int, int, unsigned long, char *, int);
 extern int sprintf(char *, char *, ...);
 extern int g_notice_owner[] __attribute__((sda));
@@ -72,11 +72,11 @@ typedef struct HudOwner {
  * bolt counter) and the "x%d" multiplier. The vtable pointers are read through
  * &a[i] + 0x30 so that every induction value is object-relative, and each
  * loop keeps its own vtable local, as in RAC2's DRAW idiom (00337210.c). */
-void func_PAL_0034FD60(void *arg)
+void draw_bolt_counter_panel_pal(void *owner)
 {
-    HudOwner *object = arg;
+    HudOwner *object = owner;
     char separator[32];
-    char multiplierText[16];
+    char multiplier_text[16];
     float *scale;
     float x, y, step;
     unsigned int color;
@@ -87,7 +87,7 @@ void func_PAL_0034FD60(void *arg)
     gfx_draw_screen_element_stored(&object->top[1]);
     gfx_draw_screen_element_stored(&object->top[2]);
     hud_draw_colored_quad_widget(object->panel148);
-    func_PAL_00338770(object->panel100);
+    text_label_draw_pal(object->panel100);
     if (!g_notice_owner[0]) {
         HudElem4C *left = &object->side[0];
         HudElem4C *right = &object->side[1];
@@ -112,7 +112,7 @@ void func_PAL_0034FD60(void *arg)
     }
     gfx_draw_screen_element_stored(&object->mid[0]);
     gfx_draw_screen_element_stored(&object->mid[1]);
-    func_PAL_00338770(&object->text);
+    text_label_draw_pal(&object->text);
     hud_draw_colored_quad_widget(object->panel2A0);
     x = object_get_first_field(&object->text)[0];
     y = object_get_first_field(&object->text)[1];
@@ -132,25 +132,25 @@ void func_PAL_0034FD60(void *arg)
             float start = x + (float)xoffset;
             do {
                 HudText *t = &object->text;
-                float drawX = start - (float)(int)(step * 11.6f);
+                float draw_x = start - (float)(int)(step * 11.6f);
                 long long style;
                 unsigned long texture;
                 step += 3.0f;
                 scale = object_get_second_field(t);
                 style = t->style;
                 texture = GetEffectTextureDescriptor((int)style);
-                func_PAL_0027FB48(drawX, y + (float)yoffset, color, separator, -1, *scale, texture, t->metrics);
+                FontPrintScaled_pal(draw_x, y + (float)yoffset, color, separator, -1, *scale, texture, t->metrics);
             } while (step < (float)digits);
         }
     }
     if (g_bolt_multiplier[0] >= 2) {
-        sprintf(multiplierText, g_str_multiplier_format, g_bolt_multiplier[0]);
+        sprintf(multiplier_text, g_str_multiplier_format, g_bolt_multiplier[0]);
         foreground = (g_mpeg_foreground_color & 0xFFFFFF) | (color & 0xFF000000);
         shadow = color & 0xFF000000;
-        text_draw_centered_large(g_movie_text_x, g_movie_text_y + 2, shadow, multiplierText, -1);
-        text_draw_centered_large(g_movie_text_x + 2, g_movie_text_y, shadow, multiplierText, -1);
-        text_draw_centered_large(g_movie_text_x + 2, g_movie_text_y + 2, shadow, multiplierText, -1);
-        text_draw_centered_large(g_movie_text_x, g_movie_text_y, foreground, multiplierText, -1);
+        text_draw_centered_large(g_movie_text_x, g_movie_text_y + 2, shadow, multiplier_text, -1);
+        text_draw_centered_large(g_movie_text_x + 2, g_movie_text_y, shadow, multiplier_text, -1);
+        text_draw_centered_large(g_movie_text_x + 2, g_movie_text_y + 2, shadow, multiplier_text, -1);
+        text_draw_centered_large(g_movie_text_x, g_movie_text_y, foreground, multiplier_text, -1);
     }
     DrawSegmentedRingMeter(object->final);
 }

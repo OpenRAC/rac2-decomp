@@ -27,26 +27,27 @@ extern void BuildObjectAttachmentTransforms();
 extern void moby_update_attached_transforms(unsigned char *, unsigned char *);
 extern float FastAddRotations(float, float);
 
-void tracked_state_update_pal(unsigned char *a0) {
-    unsigned char *s0 = a0;
-    unsigned char *s1 = *(unsigned char **)(s0 + 0x68);
-    switch (s0[0x20]) {
+/* Per-frame update of an object that follows attached transforms and spins about one axis (PAL: 50 Hz rate). */
+void tracked_state_update_pal(unsigned char *moby) {
+    unsigned char *self = moby;
+    unsigned char *state = *(unsigned char **)(self + 0x68);
+    switch (self[0x20]) {
     case 0:
-        if (*(long long *)s1 == -1) {
+        if (*(long long *)state == -1) {
             break;
         }
         {
             unsigned char stamp = 0xFF;
-            *(unsigned char *)(s0 + 0x30) = stamp;
+            *(unsigned char *)(self + 0x30) = stamp;
         }
-        BuildObjectAttachmentTransforms(s0, s1 + 0x30, 0x64, *(int *)(s1 + 4), *(int *)s1, -1, 7, 0);
-        s1[0xC5A] = 1;
-        s0[0x20] = 1;
+        BuildObjectAttachmentTransforms(self, state + 0x30, 0x64, *(int *)(state + 4), *(int *)state, -1, 7, 0);
+        state[0xC5A] = 1;
+        self[0x20] = 1;
         break;
     case 1:
-        *(float *)(s0 + 0xF4) = FastAddRotations(
-            *(float *)(s0 + 0xF4), *(float *)(s1 + 8) * 0.0003490659f);
-        moby_update_attached_transforms(s0, s1 + 0x30);
+        *(float *)(self + 0xF4) = FastAddRotations(
+            *(float *)(self + 0xF4), *(float *)(state + 8) * 0.0003490659f);
+        moby_update_attached_transforms(self, state + 0x30);
         break;
     }
 }

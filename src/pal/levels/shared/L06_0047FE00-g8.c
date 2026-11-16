@@ -14,14 +14,15 @@ typedef struct {
 extern L06State g_hero_state __attribute__((nosda));
 extern int g_current_map_index;
 
-s32 cam_volume_update_pal(s32 a0)
+/* Checks whether a camera volume moby may trigger, from its type and the game state, then runs the shared handler. */
+s32 cam_volume_update_pal(s32 moby)
 {
     s32 *row;
     s32 *entry;
     char *state;
     u16 tag;
 
-    row = (s32 *)((*(s16 *)(a0 + 0x84) << 5) + (s32)ref_L06_0047AC68_00[0]);
+    row = (s32 *)((*(s16 *)(moby + 0x84) << 5) + (s32)ref_L06_0047AC68_00[0]);
     entry = row + 7;
     state = (char *)*entry;
 
@@ -51,6 +52,6 @@ clear:
     *(u16 *)(state + 0x2E) = 0;
     return 0;
 call:
-    ref_L06_0047AC68_01(a0);
+    ref_L06_0047AC68_01(moby);
     return 0;
 }

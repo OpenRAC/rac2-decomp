@@ -13,33 +13,33 @@ extern float g_spark_explode_param_a __attribute__((sda));
 extern int g_spark_explode_color __attribute__((sda));
 
 /* a moby's three states: idle, hit, and gone */
-void spark_burst_on_hit_update_pal(char *a0)
+void spark_burst_on_hit_update_pal(char *obj)
 {
-    char *s0 = a0;
-    char *s1;
-    float buf[4];
+    char *moby = obj;
+    char *state;
+    float point[4];
 
-    s1 = *(char **)(s0 + 0x68);
+    state = *(char **)(moby + 0x68);
 
-    switch (*(unsigned char *)(s0 + 0x20)) {
+    switch (*(unsigned char *)(moby + 0x20)) {
     case 0:
-        if (*(int *)(s1 + 4) != 0)
-            *(unsigned short *)(s0 + 0x34) |= 0x8000;
-        moby_set_state(s0, 1, -1);
+        if (*(int *)(state + 4) != 0)
+            *(unsigned short *)(moby + 0x34) |= 0x8000;
+        moby_set_state(moby, 1, -1);
         break;
     case 1:
-        if (part_find_owned_effect_slot(s0, 0x4010000, 0) != 0) {
-            if (*(int *)s1 == 0)
-                moby_set_state(s0, 2, -1);
+        if (part_find_owned_effect_slot(moby, 0x4010000, 0) != 0) {
+            if (*(int *)state == 0)
+                moby_set_state(moby, 2, -1);
         }
-        *(unsigned char *)(s0 + 0xA8) = 0xFF;
+        *(unsigned char *)(moby + 0xA8) = 0xFF;
         break;
     case 2:
-        part_explode_object_into_pieces(s0, &g_spark_explode_param_a, &g_spark_explode_param_b, &g_spark_explode_param_c,
+        part_explode_object_into_pieces(moby, &g_spark_explode_param_a, &g_spark_explode_param_b, &g_spark_explode_param_c,
                           0xFFFF, 0, g_spark_explode_color, 6, 0xFFFF, 0xFF, 0);
-        moby_compute_local_point(s0, buf, 1.0f, 1.0f, 3.0f);
-        part_emit_rings(s0);
-        moby_mark_spawned(s0);
+        moby_compute_local_point(moby, point, 1.0f, 1.0f, 3.0f);
+        part_emit_rings(moby);
+        moby_mark_spawned(moby);
         break;
     }
 }

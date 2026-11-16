@@ -24,32 +24,33 @@ extern int FloatToInt(float f);
 extern void FastVecSub(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
 
-char *part_spawn_trail_2_pal(void *a0, void *a1, int a2, float f1)
+/* Spawns a spark trail particle from head_pos along direction, living for life frames. */
+char *part_spawn_trail_2_pal(void *head_pos, void *direction, int life, float width)
 {
-    V4_Fc3cb9262 vec;
-    Particle6DD8 *s0;
-    int v;
-    SplitVector *pos;
+    V4_Fc3cb9262 trail_vec;
+    Particle6DD8 *particle;
+    int size_byte;
+    SplitVector *velocity_slot;
 
-    s0 = part_alloc(0x5A);
-    if (s0 != 0) {
-        s0->x4 = 0x7FFFFFFF;
-        s0->xC = 0x7FFFFFFF;
-        v = FloatToInt(2.0f);
-        s0->b9 = (char)(v + 0x20);
-        s0->b3 = 0x48;
-        s0->b1 = 3;
-        s0->b2 = *g_part_tex_spark_trail_table;
-        pos = &s0->v30;
-        qcopy_nc(pos, a1);
-        pos->f[3] = f1;
-        qcopy_nc(&s0->v10, a0);
-        vec_scale_to_length(&vec, pos, 0.9f);
-        FastVecSub(&s0->v20, a0, &vec);
-        s0->hA = a2;
-        s0->v10.f[3] = 0.05f;
-        s0->b8 = (char)(*(unsigned char *)&s0->hA - 0xC);
-        s0->v20.f[3] = 2.0f;
+    particle = part_alloc(0x5A);
+    if (particle != 0) {
+        particle->x4 = 0x7FFFFFFF;
+        particle->xC = 0x7FFFFFFF;
+        size_byte = FloatToInt(2.0f);
+        particle->b9 = (char)(size_byte + 0x20);
+        particle->b3 = 0x48;
+        particle->b1 = 3;
+        particle->b2 = *g_part_tex_spark_trail_table;
+        velocity_slot = &particle->v30;
+        qcopy_nc(velocity_slot, direction);
+        velocity_slot->f[3] = width;
+        qcopy_nc(&particle->v10, head_pos);
+        vec_scale_to_length(&trail_vec, velocity_slot, 0.9f);
+        FastVecSub(&particle->v20, head_pos, &trail_vec);
+        particle->hA = life;
+        particle->v10.f[3] = 0.05f;
+        particle->b8 = (char)(*(unsigned char *)&particle->hA - 0xC);
+        particle->v20.f[3] = 2.0f;
     }
-    return (char *)s0;
+    return (char *)particle;
 }

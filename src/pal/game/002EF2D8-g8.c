@@ -9,7 +9,8 @@ extern float g_follower_height_scale __attribute__((sda));
 extern float g_follower_pull_speed __attribute__((sda));
 extern float g_follower_max_scale __attribute__((sda));
 
-void func_PAL_002EF2D8(unsigned char *owner)
+/* Loads the follow speed, pull and range settings that match the follower's current state (PAL: scaled for 50 Hz). */
+void follower_load_tuning_for_state_pal(unsigned char *owner)
 {
     char *object = moby_get_motion_data(owner);
     int state;

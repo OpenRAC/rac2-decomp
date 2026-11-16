@@ -1,12 +1,15 @@
 #include "include_asm.h"
+#include "names.h"
 
-unsigned int func_US2_0026F808(void)
+/* Does nothing and returns zero. */
+unsigned int stub_empty_31_us2(void)
 {
     return 0;
 }
 
 
-unsigned int func_US2_0026F810(void)
+/* Returns zero (the actuator power calculation is stubbed out). */
+unsigned int actuator_calc_power_us2(void)
 {
     return 0;
 }

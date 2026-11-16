@@ -24,7 +24,7 @@ extern int D_L26_001A9430_gp SDATA(D_L26_001A9430);
 extern int g_part_duration_range[] __attribute__((sda));
 extern int g_part_size_range[] __attribute__((sda));
 extern void anim_start_startup_animations(void);
-extern void func_US2_002E72D8(void *);
+extern void UpdateEquipmentPieces_us2(void *);
 extern void math_store_angle_update_result(char *, float *, int, int, float);
 extern void moby_transform_joint_point(char *, int, char *);
 extern void transform_vector(void *, void *, void *);
@@ -37,7 +37,7 @@ extern int math_random_int_range(int, int);
 
 /* func_US2_L26_002FD970, the USA v2.00 copy of func_L26_002FCCC0: the same C, where the id 4000 call
    to func_L00_00326048 also requires D_001A79F0 != 51, and func_002E64A0 becomes func_US2_002E72D8. */
-void func_US2_L26_002FD970(void) {
+void hero_update_part_objects_us2(void) {
     Vec transform[4];
     Vec position;
     Vec velocity;
@@ -61,8 +61,8 @@ void func_US2_L26_002FD970(void) {
         if (object && ((Object *)object)->id == 0xE29) {
             ((Object *)object)->flags |= 0x800;
         }
-        if (((Object *)object)->id == 0xD54) func_US2_002E72D8(object);
-        if (object && *(short *)(object + 0xAA) == 4000 && g_current_map_index[0] != 51 && *(char **)(object + 0x68))
+        if (((Object *)object)->id == 0xD54) UpdateEquipmentPieces_us2(object);
+        if (object && *(short *)(object + 0xAA) == MOBY_CLASS_TV_SCREENS && g_current_map_index[0] != 51 && *(char **)(object + 0x68))
             math_store_angle_update_result(object, (float *)(*(char **)(object + 0x68) + 0xC),
                               (int)0x80AAAAD2, (int)0x80396464, 0.061086535f);
     }

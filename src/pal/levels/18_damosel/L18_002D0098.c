@@ -63,7 +63,7 @@ extern s32 FloatToInt(float);
 extern void hero_clear_tracked_slots(void);
 extern void FastVecSub(void *, void *, void *);
 extern void hero_build_relative_point(void *, s32, float, float, float);
-extern s32 func_PAL_L18_002E01E0(s32, s32);
+extern s32 hero_l18_set_action_pal(s32, s32);
 extern u8 *part_find_owned_effect_slot(u8 *, s32, s32);
 extern void AdjustPlayerHealth_pal(s32);
 extern int hero_play_sound(s32, s32);
@@ -75,13 +75,14 @@ extern float vec_distance_xy(void *, void *);
 extern float ApproachValue(float *, float, float);
 extern float math_spring_float_to_goal(float *, float *, float, float, float, float);
 
-s32 hero_handle_hit_object_contact_pal(s32 arg0) {
-    TI16 vec;
-    Entry_002D01B0 *e;
-    u8 *moby;
-    u8 *other;
-    s32 flag;
-    s32 bits;
+/* Handles the hero touching a hit object: checks if the touch counts, then pushes the hero and picks the reaction animation (PAL: other timings). */
+s32 hero_handle_hit_object_contact_pal(s32 apply_push) {
+    TI16 push_vec;
+    Entry_002D01B0 *entry;
+    u8 *touched_moby;
+    u8 *hit_moby;
+    s32 is_special;
+    s32 unused_bits;
 
     if (g_hero_state.f229C == 20 || g_hero_state.f229C == 7) {
         return 0;
@@ -96,75 +97,75 @@ s32 hero_handle_hit_object_contact_pal(s32 arg0) {
         return 0;
     }
     g_hero_state.f249C = 0;
-    moby = g_hero_state.f2290;
-    if (moby[0xA8] == 0xFF) {
+    touched_moby = g_hero_state.f2290;
+    if (touched_moby[0xA8] == 0xFF) {
         return 0;
     }
-    e = &g_hero_contact_table[moby[0xA8]];
-    if (e->f38 != moby) {
+    entry = &g_hero_contact_table[touched_moby[0xA8]];
+    if (entry->f38 != touched_moby) {
         return 0;
     }
     if (g_hero_state.f22B4 == 4) {
         if (g_hero_frozen_flag != 0 || g_hero_state.f2294 == 0x6F) {
             return 0;
         }
-    } else if ((e->f24 & 9) == 0) {
+    } else if ((entry->f24 & 9) == 0) {
         return 0;
     }
-    if (e->f2C != 0.0f) {
+    if (entry->f2C != 0.0f) {
         g_contact_hit_flag = 0;
         g_bolt_multiplier = 1;
     }
     if (fade_get_value() != 0.0f && g_hero_state.f22B4 == 0) {
-        e->f2C = fade_reduce_value_pal(e->f2C);
-        if (e->f2C == 0.0f) {
+        entry->f2C = fade_reduce_value_pal(entry->f2C);
+        if (entry->f2C == 0.0f) {
             return 0;
         }
     }
-    g_hero_state.f249C = e->f20;
+    g_hero_state.f249C = entry->f20;
     if (g_hero_state.f229C == 15) {
-        g_hero_state.f6C4 = e;
+        g_hero_state.f6C4 = entry;
         g_hero_state.f68E = 1;
         return 0;
     }
     if (g_hero_state.f22B4 == 4 && g_hero_frozen_flag == 0 && g_hero_state.f2294 != 0x6F) {
-        u8 *m = *(u8 **)(g_hero_state.f2290 + 0x68);
-        *(s16 *)(m + 0x3BC) -= 0x96;
-        if (*(s16 *)(m + 0x3BC) < 0) {
-            *(s16 *)(m + 0x3BC) = 0;
+        u8 *moby_vars = *(u8 **)(g_hero_state.f2290 + 0x68);
+        *(s16 *)(moby_vars + 0x3BC) -= 0x96;
+        if (*(s16 *)(moby_vars + 0x3BC) < 0) {
+            *(s16 *)(moby_vars + 0x3BC) = 0;
         }
     }
-    if (arg0 == 0) {
+    if (apply_push == 0) {
         return 1;
     }
-    flag = 0;
+    is_special = 0;
     hero_clear_tracked_slots();
-    if (e->f30 & 1) {
-        qcopy(&vec, &e->f10);
-        if (e->f1C == 5627.9248046875f) {
-            flag = 1;
+    if (entry->f30 & 1) {
+        qcopy(&push_vec, &entry->f10);
+        if (entry->f1C == 5627.9248046875f) {
+            is_special = 1;
         }
-    } else if (e->f20 != 0) {
-        FastVecSub(&vec, &g_hero_state.f80, e->f20 + 0x10);
+    } else if (entry->f20 != 0) {
+        FastVecSub(&push_vec, &g_hero_state.f80, entry->f20 + 0x10);
     } else {
-        hero_build_relative_point(&vec, 0, -1.0f, 0.0f, 0.0f);
+        hero_build_relative_point(&push_vec, 0, -1.0f, 0.0f, 0.0f);
     }
     switch (g_hero_state.f22B4) {
     case 0:
-        other = g_hero_state.f249C;
-        if (other != 0 && (*(s16 *)(other + 0xAA) == 0x4EB || *(s16 *)(other + 0xAA) == 0x558)) {
-            func_PAL_L18_002E01E0(0x7D, 1);
+        hit_moby = g_hero_state.f249C;
+        if (hit_moby != 0 && (*(s16 *)(hit_moby + 0xAA) == 0x4EB || *(s16 *)(hit_moby + 0xAA) == 0x558)) {
+            hero_l18_set_action_pal(0x7D, 1);
             return 1;
         }
         if ((g_hero_state.f2294 == 1 || g_hero_state.f2294 == 0x1D || g_hero_state.f1500 != 0)
-            && !(e->f24 & 8)) {
-            u8 *r = part_find_owned_effect_slot(g_hero_state.f2290, 1, 0);
+            && !(entry->f24 & 8)) {
+            u8 *effect_slot = part_find_owned_effect_slot(g_hero_state.f2290, 1, 0);
 
-            if (r != 0) {
-                AdjustPlayerHealth_pal(FloatToInt(*(float *)(r + 0x2C)));
+            if (effect_slot != 0) {
+                AdjustPlayerHealth_pal(FloatToInt(*(float *)(effect_slot + 0x2C)));
             }
             if (g_hero_state.f24CC == 0) {
-                func_PAL_L18_002E01E0(0x16, 1);
+                hero_l18_set_action_pal(0x16, 1);
             }
             g_hero_state.f1DC = 0x40;
             if (g_hero_state.f21C == 0) {
@@ -174,40 +175,41 @@ s32 hero_handle_hit_object_contact_pal(s32 arg0) {
             return 0;
         }
         if (g_hero_state.f229C == 0x12) {
-            func_PAL_L18_002E01E0(0x72, 1);
+            hero_l18_set_action_pal(0x72, 1);
         } else if (g_hero_state.f229C == 0x11) {
-            func_PAL_L18_002E01E0(0x73, 1);
-        } else if (e->f24 & 8) {
-            func_PAL_L18_002E01E0(0x8C, 1);
+            hero_l18_set_action_pal(0x73, 1);
+        } else if (entry->f24 & 8) {
+            hero_l18_set_action_pal(0x8C, 1);
         } else {
-            func_PAL_L18_002E01E0(0x16, 1);
+            hero_l18_set_action_pal(0x16, 1);
         }
         if (g_hero_state.f2294 == 0x8C) {
-            qzero(&vec);
+            qzero(&push_vec);
         } else {
-            hero_flatten_push_vector(&vec, flag, g_hero_state.f1497 ? 0.0f : 0.06600001f, 0.034f);
-            if (flag != 0 && e->f28 == 4) {
-                cam_scale_view_space_height(&vec, &vec, 2.0f);
+            hero_flatten_push_vector(&push_vec, is_special, g_hero_state.f1497 ? 0.0f : 0.06600001f, 0.034f);
+            if (is_special != 0 && entry->f28 == 4) {
+                cam_scale_view_space_height(&push_vec, &push_vec, 2.0f);
             }
         }
         break;
     case 4:
-        func_PAL_L18_002E01E0(0x90, 1);
-        hero_flatten_push_vector(&vec, flag, 0.10000001f, 0.060000002f);
+        hero_l18_set_action_pal(0x90, 1);
+        hero_flatten_push_vector(&push_vec, is_special, 0.10000001f, 0.060000002f);
         break;
     }
-    FastVecAdd(&g_hero_state.fF0, &g_hero_state.fF0, &vec);
-    FastVecAdd(&g_hero_state.f110, &g_hero_state.f110, &vec);
+    FastVecAdd(&g_hero_state.fF0, &g_hero_state.fF0, &push_vec);
+    FastVecAdd(&g_hero_state.f110, &g_hero_state.f110, &push_vec);
     return 1;
 }
 
 
 /* func_PAL_L18_002D0738, the PAL copy of func_L18_002D0850: the same C, where the step 0.02f becomes
    0.024f and the last call takes 0.0288f, 0.432f and 0.08f. */
-void func_PAL_L18_002D0738(void) {
-    int a3;
-    int v1;
-    float r;
+/* Sets the hero's movement speed targets for the current state and eases the current speeds toward them (PAL: 50 Hz step). */
+void hero_l18_update_speed_targets_pal(void) {
+    int mode;
+    int anim_state;
+    float dist;
 
     if (((Hero *)&g_hero_state)->b[0x22B4] == 0 || ((Hero *)&g_hero_state)->b[0x22B4] == 4) {
         ((Hero *)&g_hero_state)->f[0x258 / 4] = 0.8f;
@@ -215,20 +217,20 @@ void func_PAL_L18_002D0738(void) {
         ((Hero *)&g_hero_state)->f[0x260 / 4] = 0.45f;
     }
 
-    a3 = ((Hero *)&g_hero_state)->i[0x229C / 4];
-    if (a3 == 4) {
+    mode = ((Hero *)&g_hero_state)->i[0x229C / 4];
+    if (mode == 4) {
         if (((Hero *)&g_hero_state)->h[0x4AC / 2] < ((Hero *)&g_hero_state)->i[0x1B8 / 4]) {
             if (((Hero *)&g_hero_state)->b[0x49E] == 0) {
                 ((Hero *)&g_hero_state)->f[0x25C / 4] = ((Hero *)&g_hero_state)->f[0x4B8 / 4];
             }
         }
     } else {
-        v1 = ((Hero *)&g_hero_state)->i[0x2294 / 4];
-        if (v1 == 6) {
+        anim_state = ((Hero *)&g_hero_state)->i[0x2294 / 4];
+        if (anim_state == 6) {
             ((Hero *)&g_hero_state)->f[0x25C / 4] = 0.5f;
-        } else if (v1 == 4) {
+        } else if (anim_state == 4) {
             ((Hero *)&g_hero_state)->f[0x258 / 4] = 0.35000002384185791f;
-        } else if ((u32)(a3 - 0x11) < 2) {
+        } else if ((u32)(mode - 0x11) < 2) {
             ((Hero *)&g_hero_state)->i[0x258 / 4] = 0;
             ((Hero *)&g_hero_state)->i[0x25C / 4] = 0;
         } else if (((Hero *)&g_hero_state)->b[0x1492] != 0 && ((Hero *)&g_hero_state)->i[0x340 / 4] != 0) {
@@ -254,8 +256,8 @@ void func_PAL_L18_002D0738(void) {
     if (((Hero *)&g_hero_state)->b[0x1494] != 0)
         goto slow;
 
-    r = vec_distance_xy((u8 *)&g_hero_state + 0x240, (u8 *)&g_hero_state + 0x80);
-    if (r > ((Hero *)&g_hero_state)->f[0x264 / 4] * 0.5f)
+    dist = vec_distance_xy((u8 *)&g_hero_state + 0x240, (u8 *)&g_hero_state + 0x80);
+    if (dist > ((Hero *)&g_hero_state)->f[0x264 / 4] * 0.5f)
         goto slow;
     return;
 
@@ -263,13 +265,13 @@ slow:
     {
         /* The channel block sits 0x250 into the runtime block; the block pointer
            is taken first and the runtime block is reached back from it. */
-        u8 *p = (u8 *)&g_hero_state + 0x250;
+        u8 *channels = (u8 *)&g_hero_state + 0x250;
         float step = 0.024f;
-        ApproachValue((float *)p, ((Hero *)&g_hero_state)->f[0x258 / 4], step);
-        ApproachValue((float *)(p + 4), ((Hero *)&g_hero_state)->f[0x25C / 4], step);
+        ApproachValue((float *)channels, ((Hero *)&g_hero_state)->f[0x258 / 4], step);
+        ApproachValue((float *)(channels + 4), ((Hero *)&g_hero_state)->f[0x25C / 4], step);
         math_spring_float_to_goal(
-            (float *)(p + 0x14),
-            (float *)(p + 0x18),
+            (float *)(channels + 0x14),
+            (float *)(channels + 0x18),
             ((Hero *)&g_hero_state)->f[0x260 / 4],
             0.028800001f,
             0.43200004f,

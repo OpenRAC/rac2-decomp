@@ -14,13 +14,14 @@ extern float math_random_signed_float_range(float, float);
 extern float math_random_float_range(float, float);
 extern float FastAddRotations(float, float);
 extern void vec_build_spherical_offset(void *, float, float, float);
-extern unsigned char *func_PAL_002BE9A8(float, float, float, float,
+extern unsigned char *part_spawn_spinning_spark_pal(float, float, float, float,
                                     void *, int, void *, int, int);
 extern int math_random_int_range(int, int);
 extern int FloatToInt(float);
 extern float IntToFloat(int);
 
-void func_PAL_L10_0041C7A0(char *object, int joint, float radius) {
+/* Spawns one dark smoke particle around an object, thrown away from the camera (PAL copy of part_spawn_dark_smoke_radius, 50 Hz timings). */
+void part_spawn_dark_smoke_radius_pal(char *object, int joint, float radius) {
     float initial[4], point[4], velocity[4];
     float heading, speed, tilt, yaw;
     unsigned char *particle;
@@ -37,7 +38,7 @@ void func_PAL_L10_0041C7A0(char *object, int joint, float radius) {
     tilt = math_random_signed_float_range(0, 1.396263599395752f);
     yaw = FastAddRotations(heading, math_random_signed_float_range(0, 1.5707964897155762f));
     vec_build_spherical_offset(velocity, speed, yaw, tilt);
-    particle = func_PAL_002BE9A8(0, 1.0f, 1.01f, radius * 210000.0f,
+    particle = part_spawn_spinning_spark_pal(0, 1.0f, 1.01f, radius * 210000.0f,
                              point, -1, velocity, 0x307F7F7F, 0);
     if (particle != 0) {
         particle[3] = 0x48;

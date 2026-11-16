@@ -9,7 +9,7 @@
 extern void joba_menu_draw_help_prompts(char *, int);
 extern char *GetLocalizedString(int);
 extern long long GetEffectTextureDescriptor(int);
-extern void func_PAL_0027FB48(float, float, long long, char *, float, int, long long, char *);
+extern void FontPrintScaled_pal(float, float, long long, char *, float, int, long long, char *);
 extern void FontSetWindow(char *, int, int, int, int, int, int, int, int);
 extern int arena_get_challenge_flag_index(int);
 extern unsigned int func_001157AC(char *);
@@ -53,7 +53,9 @@ static __inline__ int scaled_coord(int value, float scale, float half, int activ
     return result;
 }
 
-void func_PAL_L11_0044B0B0(char *a0) {
+/* Draws the header box of the Joba menu: the title and the count line for the selected
+   challenge (PAL copy of joba_menu_draw_header_count_box). */
+void joba_menu_draw_header_count_box_pal(char *object) {
     char buf1[0x20];
     char buf2[0x70];
     char *state;
@@ -62,15 +64,15 @@ void func_PAL_L11_0044B0B0(char *a0) {
     float x, s, half;
     int r0, r1, r2, r3, one;
 
-    joba_menu_draw_help_prompts(a0, 0);
+    joba_menu_draw_help_prompts(object, 0);
     half = 0.5f;
-    state = *(char **)(a0 + 0x68);
+    state = *(char **)(object + 0x68);
     text = (char *)GetLocalizedString(0xe6a);
     one = 1;
     s = g_hud_label_y_param;
     x = (float)g_header_box_title_x[g_pal_region_mode];
     r0 = scaled_coord(g_header_box_title_y, s, half, one);
-    func_PAL_0027FB48(x, (float)r0, g_header_box_title_color, text, g_header_box_title_scale, -1,
+    FontPrintScaled_pal(x, (float)r0, g_header_box_title_color, text, g_header_box_title_scale, -1,
                   GetEffectTextureDescriptor(1), g_str_header_count_box);
     s = g_hud_label_y_param;
     r1 = scaled_coord(g_header_box_x, s, half, one);

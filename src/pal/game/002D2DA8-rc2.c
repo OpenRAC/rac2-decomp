@@ -14,18 +14,19 @@ extern f32 g_menu_alpha_scale;
 extern s32 g_001ABA5C __attribute__((sda));
 extern s32 g_001ABA58 __attribute__((sda));
 
+/* Draws the 18-page viewer with its title and left and right page arrows. (PAL) */
 s32 page_viewer_draw_long_pal(void) {
-    f32 z;
-    s32 r;
+    f32 depth;
+    s32 sprite;
 
     SetupGifPaging(0);
-    z = 0.0f;
-    r = table_find_by_id(g_resident_data_base + 0x8710, 0xDE);
-    gfx_draw_scaled_object_two_axes(r, 0x60442D00, (f32)(g_screen_width / 2), (f32)g_001ABA5C, 1.0f, g_menu_alpha_scale, z);
-    r = table_find_by_id(g_resident_data_base + 0x8710, 0xDF);
-    gfx_draw_scaled_object_two_axes(r, 0x60241700, (f32)(g_screen_width / 2), (f32)g_001ABA5C, 1.0f, g_menu_alpha_scale, z);
-    r = table_find_by_id(g_resident_data_base + 0x8710, 0xE0);
-    gfx_draw_scaled_object_two_axes(r, 0x55F0C070, (f32)(g_screen_width / 2), (f32)g_001ABA5C, 1.0f, g_menu_alpha_scale, z);
+    depth = 0.0f;
+    sprite = table_find_by_id(g_resident_data_base + 0x8710, 0xDE);
+    gfx_draw_scaled_object_two_axes(sprite, 0x60442D00, (f32)(g_screen_width / 2), (f32)g_001ABA5C, 1.0f, g_menu_alpha_scale, depth);
+    sprite = table_find_by_id(g_resident_data_base + 0x8710, 0xDF);
+    gfx_draw_scaled_object_two_axes(sprite, 0x60241700, (f32)(g_screen_width / 2), (f32)g_001ABA5C, 1.0f, g_menu_alpha_scale, depth);
+    sprite = table_find_by_id(g_resident_data_base + 0x8710, 0xE0);
+    gfx_draw_scaled_object_two_axes(sprite, 0x55F0C070, (f32)(g_screen_width / 2), (f32)g_001ABA5C, 1.0f, g_menu_alpha_scale, depth);
     DrawMenuNavigationFramesAndLabels(g_001ABA58 != 0, g_001ABA58 != 0x11);
     text_draw_centered_small(0x1B0, 0x177, (u64)0x80F0F0F0, GetLocalizedString(0xB60), -1);
     DoGifPaging();

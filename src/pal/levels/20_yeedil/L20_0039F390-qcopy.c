@@ -14,42 +14,44 @@ extern void gfx_draw_projectile_trail(void);
 extern void moby_mark_spawned(int);
 extern char g_spark_position[];
 
-void projectile_l20_update_pal(char *arg0) {
-    char *s0 = arg0 + 0x10;
-    char *s3 = *(char **)(arg0 + 0x68);
-    char *s1;
+/* Flies a shot forward each frame, checks what it hits, and on a hit makes sparks and removes the shot. (PAL version) */
+void projectile_l20_update_pal(char *moby) {
+    char *position = moby + 0x10;
+    char *vars = *(char **)(moby + 0x68);
+    char *velocity;
     char buf[0x30];
 
-    *(TI128 *)s3 = *(TI128 *)s0;
-    s1 = s3 + 0x10;
-    FastVecAdd(s0, s0, s1);
-    make_hit_descriptor(buf, (int)arg0, 0x10001, s1, *(float *)(s3 + 0x2C));
-    if (CollLine(s3, s0, 0, *(int *)(arg0 + 0xB8), buf) != 0
-        || math_fast_float_d(s3 + 0x20) != 0) {
+    *(TI128 *)vars = *(TI128 *)position;
+    velocity = vars + 0x10;
+    FastVecAdd(position, position, velocity);
+    make_hit_descriptor(buf, (int)moby, 0x10001, velocity, *(float *)(vars + 0x2C));
+    if (CollLine(vars, position, 0, *(int *)(moby + 0xB8), buf) != 0
+        || math_fast_float_d(vars + 0x20) != 0) {
         part_l20_spawn_spark_burst_pal(g_spark_position, 0x14, 1);
-        snd_play_from_class_bank(2, 0, arg0, 0x12EF);
-        moby_mark_spawned((int)arg0);
+        snd_play_from_class_bank(2, 0, moby, 0x12EF);
+        moby_mark_spawned((int)moby);
     } else {
-        EmitJitteredParticleTrail_pal(arg0);
-        gfx_add_draw_callback_third(gfx_draw_projectile_trail, (int)arg0);
+        EmitJitteredParticleTrail_pal(moby);
+        gfx_add_draw_callback_third(gfx_draw_projectile_trail, (int)moby);
     }
 }
 
 extern char *CreateMoby(int);
 
 /* Spawns an object of type 0x12F2 and fills its position and its sub-record vector. */
-char *projectile_l20_spawn_pal(char *arg0, char *arg1, char *arg2, float f12) {
-    char *v;
-    char *o = CreateMoby(0x12F2);
+/* Creates a Yeedil shot at a position with a direction and a size, owned by another object. (PAL version) */
+char *projectile_l20_spawn_pal(char *moby, char *position, char *direction, float radius) {
+    char *vars;
+    char *shot = CreateMoby(0x12F2);
 
-    if (o != 0) {
-        *(int *)(o + 0xB8) = (int)arg0;
-        *(TI128 *)(o + 0x10) = *(TI128 *)arg1;
-        v = *(char **)(o + 0x68);
-        *(unsigned char *)(o + 0x30) = 0xFF;
-        *(TI128 *)(v + 0x10) = *(TI128 *)arg2;
-        *(float *)(v + 0x2C) = f12;
-        *(int *)(v + 0x20) = 0xFA;
+    if (shot != 0) {
+        *(int *)(shot + 0xB8) = (int)moby;
+        *(TI128 *)(shot + 0x10) = *(TI128 *)position;
+        vars = *(char **)(shot + 0x68);
+        *(unsigned char *)(shot + 0x30) = 0xFF;
+        *(TI128 *)(vars + 0x10) = *(TI128 *)direction;
+        *(float *)(vars + 0x2C) = radius;
+        *(int *)(vars + 0x20) = 0xFA;
     }
-    return o;
+    return shot;
 }

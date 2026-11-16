@@ -13,30 +13,31 @@ extern int g_oozla_intro_stage __attribute__((sda));
 extern int g_platform_pulse_color_a __attribute__((sda));
 extern int g_platform_pulse_color_b;
 
-void func_PAL_L01_003D6ECC(unsigned char *m) {
+/* Moves a path-following moby along its route and carries anything riding on it (PAL: 50 Hz pulse). */
+void path_platform_update_pal(unsigned char *moby) {
     float pos[4], rot[4], delta[4];
-    char *p = *(char **)(m + 0x68);
-    qcopy_nc(pos, m + 0x10);
-    qcopy_nc(rot, m + 0xF0);
-    switch ((unsigned char)m[0x20]) {
+    char *vars = *(char **)(moby + 0x68);
+    qcopy_nc(pos, moby + 0x10);
+    qcopy_nc(rot, moby + 0xF0);
+    switch ((unsigned char)moby[0x20]) {
     case 0:
-    *(unsigned short *)(m + 0x34) |= 0x1000;
-    *(int *)(p + 0xDC) |= 1;
-    m[0x20] = 1;
-    if (*(short *)(m + 0xAA) == 0xE2A) *(float *)(p + 0x88) = 12.0f;
+    *(unsigned short *)(moby + 0x34) |= 0x1000;
+    *(int *)(vars + 0xDC) |= 1;
+    moby[0x20] = 1;
+    if (*(short *)(moby + 0xAA) == 0xE2A /* moby class 3626 */) *(float *)(vars + 0x88) = 12.0f;
     break;
     case 1: {
-    float scale = *(float *)(m + 0x2C)/ *(float *)(*(char **)(m + 0x24) + 0x24);
-    pushable_moby_update_pal(m, p + 0x50, *(int *)(p + 0xE0), *(float *)(p + 0xEC)*scale, *(float *)(p + 0xE4)*scale, *(float *)(p + 0xE8)*scale);
-    if (g_target_moby == m && g_current_map_index == 2) g_path_platform_id = 0xFFFF;
+    float scale = *(float *)(moby + 0x2C)/ *(float *)(*(char **)(moby + 0x24) + 0x24);
+    pushable_moby_update_pal(moby, vars + 0x50, *(int *)(vars + 0xE0), *(float *)(vars + 0xEC)*scale, *(float *)(vars + 0xE4)*scale, *(float *)(vars + 0xE8)*scale);
+    if (g_target_moby == moby && g_current_map_index == 2) g_path_platform_id = 0xFFFF;
     break;
     }
     }
-    if ((unsigned char)m[0x31]) {
+    if ((unsigned char)moby[0x31]) {
     float angle = IntToFloat(g_oozla_intro_stage%50);
     angle = angle*6.2831854820251465f/IntToFloat(50)-3.1415927410125732f;
-    *(int *)(m + 0x78) = PulseColor(g_platform_pulse_color_a, g_platform_pulse_color_b, angle);
+    *(int *)(moby + 0x78) = PulseColor(g_platform_pulse_color_a, g_platform_pulse_color_b, angle);
     }
-    FastVecSub(delta, m + 0x10, pos);
-    mat_combine_and_store(p + 0xA0, delta, rot, m + 0xF0);
+    FastVecSub(delta, moby + 0x10, pos);
+    mat_combine_and_store(vars + 0xA0, delta, rot, moby + 0xF0);
 }

@@ -10,7 +10,7 @@ extern int math_fast_helper_a(void *, float);
 extern float fast_vec_dist(void *, void *);
 extern float FastVecDot(void *, void *);
 extern float math_fast_angle_helper(float);
-extern void func_PAL_L16_0040B0C8(char *, char *);
+extern void part_l16_spawn_explosion_burst_pal(char *, char *);
 extern char g_scalar_transition_state[];
 typedef struct SpawnState {
     short life;
@@ -43,17 +43,18 @@ extern void cam_compute_view_direction(char *a0, void *a1, int a2);
 
 /* func_L00_0040D058 is defined in L00_0040D058-ribbon.c. */
 
-char *func_PAL_L16_0040AC00(float size, char *position, int trigger, int kind, int red, int green, int blue, int enabled, int flags, int extra, int control)
+/* Spawns a flash effect facing the camera, sets its colors and timers, and starts the explosion burst when on screen (PAL timings). */
+char *part_create_flash_pal(float size, char *position, int trigger, int kind, int red, int green, int blue, int enabled, int flags, int extra, int control)
 {
     Vector128 direction[1], up[1], sphere[1], difference[1];
     char *object = CreateMoby(0xEC1);
     SpawnState *state;
-    SpawnObject *m;
+    SpawnObject *moby;
     char *camera;
     float angle;
     if (object != 0) {
-        m = (SpawnObject *)object;
-        state = m->state;
+        moby = (SpawnObject *)object;
+        state = moby->state;
         *(unsigned char *)(object + 0x30) = 0xff;
         *(short *)(object + 0x32) = 0xff;
         object[0x20] = 0;
@@ -67,7 +68,7 @@ char *func_PAL_L16_0040AC00(float size, char *position, int trigger, int kind, i
         FastVecCross(object + 0xd0, object + 0xc0, up);
         vec_scale_to_length(object + 0xd0, object + 0xd0, 1.0f);
         FastVecCross(object + 0xe0, object + 0xd0, object + 0xc0);
-        m->forward[3] = m->right[3] = m->up[3] = 0.0f;
+        moby->forward[3] = moby->right[3] = moby->up[3] = 0.0f;
         /* Both countdowns start together. */
         state->timer = state->life = 50;
         state->outer = size + size;
@@ -105,7 +106,7 @@ char *func_PAL_L16_0040AC00(float size, char *position, int trigger, int kind, i
             state->delay = 0;
             state->flags = 0;
         }
-        func_PAL_L16_0040B0C8(object, (char *)up);
+        part_l16_spawn_explosion_burst_pal(object, (char *)up);
     }
     return object;
 }

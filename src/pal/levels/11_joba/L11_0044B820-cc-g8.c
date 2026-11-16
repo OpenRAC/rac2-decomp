@@ -13,9 +13,11 @@ extern s32 math_fast_float_d(void *);
 extern s32 math_random_int_below(s32);
 extern int arena_queue_voice_line(char *, int);
 
-void func_PAL_L11_0044B820(char *a0, s32 a1, float a2, float a3) {
-    char *state = *(char **)(a0 + 0x68);
-    char *g = g_music_state;
+/* Picks one of the boss's voice lines that has not been played yet and queues it once the
+   accumulated counters pass their limits (PAL copy of joba_boss_start_random_action). */
+void joba_boss_start_random_action_pal(char *object, s32 count_delta, float amount_delta, float level) {
+    char *state = *(char **)(object + 0x68);
+    char *music = g_music_state;
     char *hero;
     char *hero2;
     s32 id23;
@@ -29,15 +31,15 @@ void func_PAL_L11_0044B820(char *a0, s32 a1, float a2, float a3) {
     s32 count;
     float acc;
 
-    if (*(s32 *)(g + 0x68) != 0)
+    if (*(s32 *)(music + 0x68) != 0)
         return;
-    if (*(s32 *)(g + 0x24) != -1)
+    if (*(s32 *)(music + 0x24) != -1)
         return;
     if (*(s32 *)(state + 0x190) != 0)
         return;
     n = 0;
-    acc = *(float *)(state + 0x194) + a2;
-    count = *(s32 *)(state + 0x198) + a1;
+    acc = *(float *)(state + 0x194) + amount_delta;
+    count = *(s32 *)(state + 0x198) + count_delta;
     *(s32 *)(state + 0x198) = count;
     *(float *)(state + 0x194) = acc;
     if (ref_L11_00445DF8_00 < acc || ref_L11_00445DF8_01 < count) {
@@ -57,7 +59,7 @@ void func_PAL_L11_0044B820(char *a0, s32 a1, float a2, float a3) {
         *(s32 *)(state + 0x1B0) = 250;
         *(s32 *)(state + 0x194) = 0;
     }
-    if (ref_L11_00445DF8_02 < a3) {
+    if (ref_L11_00445DF8_02 < level) {
         lp = list;
         for (k = 0; k < 2; k++) {
             s32 id = k + 0x12;
@@ -80,7 +82,7 @@ void func_PAL_L11_0044B820(char *a0, s32 a1, float a2, float a3) {
             list[n++] = id24;
     }
     if (n != 0) {
-        arena_queue_voice_line(a0, list[math_random_int_below(n)]);
+        arena_queue_voice_line(object, list[math_random_int_below(n)]);
         *(s32 *)(state + 0x190) = (((int)(ref_L11_00445DF8_04 + math_random_int_below(ref_L11_00445DF8_04)) * 5 + 2) / 6);
     }
 }

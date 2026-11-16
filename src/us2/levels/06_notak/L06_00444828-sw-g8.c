@@ -35,6 +35,7 @@ extern void marker_update_pulse(char *);
 #define B(p,o) (*(unsigned char *)((p)+(o)))
 #define I(p,o) (*(int *)((p)+(o)))
 
+/* Updates a walking creature: it picks animations, wanders, turns toward its target and switches between its states (USA v2.00). */
 void wandering_l06_creature_update_us2(char *obj)
 {
     char *st = *(char **)(obj + 0x68);

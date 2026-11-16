@@ -10,7 +10,8 @@ extern void *memset(void *, int, unsigned int);
 extern char *GetLocalizedString(int);
 extern void text_draw_window_medium(TextLayout *, unsigned long long, unsigned char *, int);
 
-void func_US2_L00_0037A2C8(void) {
+/* Draws a text box telling the player whether the selected item is at its limit. */
+void shop_draw_item_limit_text_box_us2(void) {
     TextLayout copy;
     TextLayout layout;
     char *model;

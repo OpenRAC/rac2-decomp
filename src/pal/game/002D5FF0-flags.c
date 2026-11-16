@@ -1,14 +1,15 @@
 #include "include_asm.h"
 #include "names.h"
 
-int func_PAL_002D6730(short param_1, int param_2, int *param_3);
+int menu_process_request_pal(short request, int param_2, int *param_3);
 
-void func_PAL_002D6A70(int param_1)
+/* Processes the request stored in a menu entry with a throwaway result slot (PAL). */
+void menu_start_action_pal(int request)
 {
-  int auStack_20[4];
+  int result[4];
 
-  auStack_20[0] = 0;
-  func_PAL_002D6730(*(short *)(param_1 + 2), *(int *)(param_1 + 4), &auStack_20[0]);
+  result[0] = 0;
+  menu_process_request_pal(*(short *)(request + 2), *(int *)(request + 4), &result[0]);
   return;
 }
 
@@ -22,7 +23,8 @@ extern unsigned char g_map_selection_flag;
 extern void load_request_disc_read_break(void);
 extern void load_request_disc_read_break(void);
 
-int func_PAL_002D7AA8(void)
+/* Cancels the pending map selection: toggles its flag, or stops the disc read when a level load was started (PAL). */
+int menu_cancel_map_selection_pal(void)
 {
     if (g_music_state.mode == 0) {
         Map2D6E78 *map = &g_map_overlay_state;
@@ -54,12 +56,13 @@ typedef struct { char pad[0x34]; int f34; int f38; int f3C; } Base2D75E8;
 extern Base2D75E8 g_page_preview;
 extern int g_level_page_entry_value[];
 
-int func_PAL_002D8228(int *arg0)
+/* Refreshes the entry states of a level page and copies the selected map target values to the page preview (PAL). */
+int menu_preview_entry_init_pal(int *menu)
 {
-    menu_update_entry_states(arg0);
-    *(int *)((char *)arg0 + 0xA0) = menu_list_active_entries(0x70000000, 0, 0x70000100, 1);
+    menu_update_entry_states(menu);
+    *(int *)((char *)menu + 0xA0) = menu_list_active_entries(0x70000000, 0, 0x70000100, 1);
     {
-        char *base = (char *)arg0 + 0x30;
+        char *base = (char *)menu + 0x30;
         int index = g_selected_map_index;
 
         if (*(int *)(base + (index << 2)) != -1) {
@@ -68,26 +71,29 @@ int func_PAL_002D8228(int *arg0)
             *(int *)g_level_page_entry_value = *(int *)(0x70000100 + 4 * *(int *)(base + (index << 2)));
         }
     }
-    *(int *)((char *)arg0 + 0xA4) = 0;
+    *(int *)((char *)menu + 0xA4) = 0;
     return 0;
 }
 
-unsigned int func_PAL_002D61B0(void)
+/* Menu page callback that does nothing and returns 0 (PAL). */
+unsigned int menu_page_noop_first_pal(void)
 {
     return 0;
 }
 
-unsigned int func_PAL_002D6540(void)
+/* Menu page callback that does nothing and returns 0 (PAL). */
+unsigned int menu_page_noop_second_pal(void)
 {
     return 0;
 }
 
 extern int g_menu_input_flags;
-extern int func_PAL_0029CD38(int);
+extern int menu_update_map_screen_pal(int);
 extern int g_menu_input_flags;
-extern int func_PAL_0029CD38(int);
+extern int menu_update_map_screen_pal(int);
 
+/* Passes the current pad buttons to the alternate page button handler (PAL). */
 int menu_handle_buttons_alt_pal(void) {
-    func_PAL_0029CD38(g_menu_input_flags);
+    menu_update_map_screen_pal(g_menu_input_flags);
     return 0;
 }

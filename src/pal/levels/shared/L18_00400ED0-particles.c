@@ -5,11 +5,11 @@ typedef int s32;
 typedef float f32;
 typedef int Quad __attribute__((mode(TI)));
 typedef struct ParticleSettings {
-    void *colorRange;
-    void *sizeRange;
-    short *frameRange;
+    void *color_range;
+    void *size_range;
+    short *frame_range;
     s32 reserved;
-    s32 frameCount;
+    s32 frame_count;
     f32 speed;
 } ParticleSettings;
 extern f32 g_upward_particle_offset[4] __attribute__((sda));

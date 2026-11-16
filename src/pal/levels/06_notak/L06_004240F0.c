@@ -4,19 +4,20 @@
 extern int math_fast_float_d(char *);
 extern int math_random_int_below(int);
 extern int FloatToInt(float);
-extern void func_PAL_002AC3C0(char *, char *);
+extern void gfx_update_color_fade_pal(char *, char *);
 extern int math_random_int_range(int, int);
-extern char *func_PAL_002BE9A8(char *, float, float, float, int, char *, float, unsigned int, int);
+extern char *part_spawn_spinning_spark_pal(char *, float, float, float, int, char *, float, unsigned int, int);
 
 /* func_L06_0041FC58 is matched in its own unit, src/levels/06_notak/L06_0041FC58-qcopy.c (-frac2-qcopy -frac2-qcopy-barrier). */
 
-void func_PAL_L06_004240F0(unsigned char *obj)
+/* Counts down the actor's timers and puffs out a few dust particles each frame (PAL: 50 Hz timings). */
+void actor_tick_timers_spawn_dust_pal(unsigned char *obj)
 {
     char *data = *(char **)(obj + 0x68);
     float velocity[4], position[4];
     int count;
     unsigned char *first, *particle;
-    func_PAL_002AC3C0(obj, data + 0x50);
+    gfx_update_color_fade_pal(obj, data + 0x50);
     if (obj[0xBC]) {
         obj[0xBC] = 0;
         if (*(int *)(data + 0x248) < 250)
@@ -35,7 +36,7 @@ void func_PAL_L06_004240F0(unsigned char *obj)
     if (math_random_int_below(2)) count = -count;
     qcopy(position, obj + 0x10);
     position[2] -= 0.2f;
-    first = func_PAL_002BE9A8((char *)position, .1f, 1, .9f, count, (char *)velocity, 315000, 0xDF204080, 0);
+    first = part_spawn_spinning_spark_pal((char *)position, .1f, 1, .9f, count, (char *)velocity, 315000, 0xDF204080, 0);
     if (first) {
         unsigned char *state;
         *(short *)(first + 0xA) = 7;
@@ -46,7 +47,7 @@ void func_PAL_L06_004240F0(unsigned char *obj)
         state[0xB] = first[0xA];
     }
     {
-        unsigned char *second = func_PAL_002BE9A8((char *)position, .1f, 1, .9f, count, (char *)velocity, 315000, 0xDF204080, 0);
+        unsigned char *second = part_spawn_spinning_spark_pal((char *)position, .1f, 1, .9f, count, (char *)velocity, 315000, 0xDF204080, 0);
         if (second) {
             unsigned char *state = second + 0x20;
             /* Retail reuses the first particle header here. */
@@ -57,7 +58,7 @@ void func_PAL_L06_004240F0(unsigned char *obj)
             state[0xB] = first[0xA];
         }
     }
-    particle = func_PAL_002BE9A8((char *)position, .05f, 1, .97f, 16, (char *)velocity, 157500, 0x8FFFFFFF, 0);
+    particle = part_spawn_spinning_spark_pal((char *)position, .05f, 1, .97f, 16, (char *)velocity, 157500, 0x8FFFFFFF, 0);
     if (particle) {
         unsigned char *state;
         state = particle + 0x20;

@@ -14,39 +14,40 @@ extern int door_check_close_condition(u8 *,u8 *);
 #define W(p,o) (*(int *)((p)+(o)))
 #define F(p,o) (*(float *)((p)+(o)))
 
-void sliding_l18_door_update_pal(u8 *a) {
- u8 *s=*(u8 **)(a+0x68);
- switch(a[0x20]) {
+/* Slides the object along a straight line in one of two directions, switching direction when a trigger fires or the hero's presence changes. (PAL: 50 Hz timings) */
+void sliding_l18_door_update_pal(u8 *moby) {
+ u8 *state=*(u8 **)(moby+0x68);
+ switch(moby[0x20]) {
  case 0:
-  qcopy(s+0x40,a+0x10);
-  W(s,0x6c)=(int)(F(s,0x60)/(F(s,0x64)*0.020000001f));
-  vec_scale_to_length(s+0x50,s+0x30,F(s,0x60)/(float)W(s,0x6c));
-  moby_set_state(a,1,-1);
-  W(s,0x68)=0; W(s,0x74)=0;
+  qcopy(state+0x40,moby+0x10);
+  W(state,0x6c)=(int)(F(state,0x60)/(F(state,0x64)*0.020000001f));
+  vec_scale_to_length(state+0x50,state+0x30,F(state,0x60)/(float)W(state,0x6c));
+  moby_set_state(moby,1,-1);
+  W(state,0x68)=0; W(state,0x74)=0;
   break;
  case 1:
-  if(W(s,0x68)>=2) {
-   FastVecSub(a+0x10,a+0x10,s+0x50);
-   W(s,0x68)--;
-  } else if(W(s,0x68)>0) {
-   qcopy_nc(a+0x10,s+0x40); W(s,0x68)--;
+  if(W(state,0x68)>=2) {
+   FastVecSub(moby+0x10,moby+0x10,state+0x50);
+   W(state,0x68)--;
+  } else if(W(state,0x68)>0) {
+   qcopy_nc(moby+0x10,state+0x40); W(state,0x68)--;
   }
   if(!(g_frame_l18_counter[0]&15)) {
-   if(door_check_open_condition(a,W(s,0x70)!=-1?g_moby_l18_table+(W(s,0x70)<<8)+0x10:g_hero_position))
-    moby_set_state(a,2,-1);
+   if(door_check_open_condition(moby,W(state,0x70)!=-1?g_moby_l18_table+(W(state,0x70)<<8)+0x10:g_hero_position))
+    moby_set_state(moby,2,-1);
   }
-  if(flag_is_third_pending_set(a)) { a[0xbe]&=0xfb; moby_set_state(a,2,-1); }
+  if(flag_is_third_pending_set(moby)) { moby[0xbe]&=0xfb; moby_set_state(moby,2,-1); }
   break;
  case 2:
-  if(W(s,0x68)<W(s,0x6c)) {
-   FastVecAdd(a+0x10,a+0x10,s+0x50); W(s,0x68)++;
+  if(W(state,0x68)<W(state,0x6c)) {
+   FastVecAdd(moby+0x10,moby+0x10,state+0x50); W(state,0x68)++;
   }
   if(!(g_frame_l18_counter[0]&15)) {
-   if(door_check_close_condition(a,W(s,0x70)!=-1?g_moby_l18_table+(W(s,0x70)<<8)+0x10:g_hero_position))
-    moby_set_state(a,1,-1);
+   if(door_check_close_condition(moby,W(state,0x70)!=-1?g_moby_l18_table+(W(state,0x70)<<8)+0x10:g_hero_position))
+    moby_set_state(moby,1,-1);
   }
-  if(flag_is_third_pending_set(a)) { a[0xbe]&=0xfb; moby_set_state(a,1,-1); }
+  if(flag_is_third_pending_set(moby)) { moby[0xbe]&=0xfb; moby_set_state(moby,1,-1); }
   break;
  }
- if(*(u16 *)(a+0x96)<=0xfffe) ++*(u16 *)(a+0x96);
+ if(*(u16 *)(moby+0x96)<=0xfffe) ++*(u16 *)(moby+0x96);
 }

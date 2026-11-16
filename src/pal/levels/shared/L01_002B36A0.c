@@ -7,11 +7,11 @@ extern float vec_distance_xy(void *, void *);
 extern float ApproachValue(float *, float, float);
 extern float math_spring_float_to_goal(float *, float *, float, float, float, float);
 
-/* func_PAL_L01_002B3C40, the PAL copy of func_L01_002B3D28: the same C with the step and rates at 50 Hz. */
-void func_PAL_L01_002B3C40(void) {
-    int a3;
-    int v1;
-    float r;
+/* Sets and eases the three hero blend channel targets from the hero state; PAL copy of func_L01_002B3D28: the same C with the step and rates at 50 Hz. */
+void hero_l01_update_blend_channels_pal(void) {
+    int mode;
+    int state;
+    float distance;
 
     if (g_hero_state[0x22B4] == 0) {
         *(float *)(g_hero_state + 0x258) = 0.8f;
@@ -19,20 +19,20 @@ void func_PAL_L01_002B3C40(void) {
         *(float *)(g_hero_state + 0x260) = 0.45f;
     }
 
-    a3 = *(int *)(g_hero_state + 0x229C);
-    if (a3 == 4) {
+    mode = *(int *)(g_hero_state + 0x229C);
+    if (mode == 4) {
         if (*(short *)(g_hero_state + 0x4AC) < *(int *)(g_hero_state + 0x1B8)) {
             if (g_hero_state[0x49E] == 0) {
                 *(float *)(g_hero_state + 0x25C) = *(float *)(g_hero_state + 0x4B8);
             }
         }
     } else {
-        v1 = *(int *)(g_hero_state + 0x2294);
-        if (v1 == 6) {
+        state = *(int *)(g_hero_state + 0x2294);
+        if (state == 6) {
             *(float *)(g_hero_state + 0x25C) = 0.5f;
-        } else if (v1 == 4) {
+        } else if (state == 4) {
             *(float *)(g_hero_state + 0x258) = 0.35000002384185791f;
-        } else if (v1 == 0x7C) {
+        } else if (state == 0x7C) {
             *(float *)(g_hero_state + 0x260) = 0.8f;
         }
     }
@@ -52,8 +52,8 @@ void func_PAL_L01_002B3C40(void) {
     if (g_hero_state[0x1494] != 0)
         goto slow;
 
-    r = vec_distance_xy(g_hero_state + 0x240, g_hero_state + 0x80);
-    if (r > *(float *)(g_hero_state + 0x264) * 0.5f)
+    distance = vec_distance_xy(g_hero_state + 0x240, g_hero_state + 0x80);
+    if (distance > *(float *)(g_hero_state + 0x264) * 0.5f)
         goto slow;
     return;
 
@@ -61,15 +61,15 @@ slow:
     {
         /* The channel block sits 0x250 into the runtime block; the block pointer
            is taken first and the runtime block is reached back from it. */
-        u8 *p = g_hero_state + 0x250;
-        u8 *s = p - 0x250;
+        u8 *channels = g_hero_state + 0x250;
+        u8 *hero = channels - 0x250;
         float step = 0.024f;
-        ApproachValue((float *)p, *(float *)(s + 0x258), step);
-        ApproachValue((float *)(p + 4), *(float *)(s + 0x25C), step);
+        ApproachValue((float *)channels, *(float *)(hero + 0x258), step);
+        ApproachValue((float *)(channels + 4), *(float *)(hero + 0x25C), step);
         math_spring_float_to_goal(
-            (float *)(p + 0x14),
-            (float *)(p + 0x18),
-            *(float *)(s + 0x260),
+            (float *)(channels + 0x14),
+            (float *)(channels + 0x18),
+            *(float *)(hero + 0x260),
             0.028800001f,
             0.43200004f,
             0.080000006f);
@@ -81,6 +81,7 @@ extern u8 g_hero_state[];
 extern float g_hero_speed_params[] MACRO_ADDR;
 extern void hero_resolve_stick_direction(int, float);
 
+/* Recomputes the hero speed from the timer while it is positive (PAL: 50 Hz). */
 void hero_refresh_speed_from_timer_pal(void)
 {
     hero_resolve_stick_direction(0, 1.0f);
@@ -121,8 +122,8 @@ void ClipHeroVelocityAgainstWall_pal(int force)
 {
     float origin[4] __attribute__((aligned(16)));
     float endpoint[4] __attribute__((aligned(16)));
-    float lowOrigin[4] __attribute__((aligned(16)));
-    float farEndpoint[4] __attribute__((aligned(16)));
+    float low_origin[4] __attribute__((aligned(16)));
+    float far_endpoint[4] __attribute__((aligned(16)));
     float height, radius, slope;
     int material;
     char *base;
@@ -138,22 +139,22 @@ void ClipHeroVelocityAgainstWall_pal(int force)
         radius = 0.7f;
     }
     hero_build_relative_point(origin, 0, 0, height, 1);
-    hero_build_relative_point(lowOrigin, 0, 0, height * 0.3f, 1);
+    hero_build_relative_point(low_origin, 0, 0, height * 0.3f, 1);
     if (force || vec_length_xy(velocity) < 0.01f) {
         vec_scale_to_length(endpoint, base, radius);
-        vec_scale_to_length(farEndpoint, base, radius * 1.4f);
+        vec_scale_to_length(far_endpoint, base, radius * 1.4f);
     } else {
         cam_set_view_space_height(endpoint, velocity, 0);
         vec_scale_to_length(endpoint, endpoint, radius);
-        FastVecScale(farEndpoint, endpoint, 1.4f);
+        FastVecScale(far_endpoint, endpoint, 1.4f);
     }
     FastVecAdd(endpoint, endpoint, origin);
     material = -1;
-    FastVecAdd(farEndpoint, farEndpoint, lowOrigin);
+    FastVecAdd(far_endpoint, far_endpoint, low_origin);
     {
         char *hero = g_hero_l01_state_block;
 
-        if (CollLine(lowOrigin, farEndpoint, 2, ((ProbeHero *)hero)->moby, 0) && g_collision_hit_count > 0)
+        if (CollLine(low_origin, far_endpoint, 2, ((ProbeHero *)hero)->moby, 0) && g_collision_hit_count > 0)
             material = GetCollHitMaterial();
     }
     slope = 0;

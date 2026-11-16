@@ -22,7 +22,7 @@ extern int FastDecTimer(void *);
 extern int math_fast_float_d(void *);
 extern float math_random_float_range(float, float);
 extern int FloatToInt(float);
-extern void func_PAL_002A7E68(void *, int, int, int);
+extern void anim_start_blended_pal(void *, int, int, int);
 extern float vec_distance_xy(void *, void *);
 extern float mat_fast_helper_a(float, float);
 extern float FastDiffRots(float, float);
@@ -56,11 +56,13 @@ typedef struct {
 extern JobaPlayerView g_hero_state;
 extern char g_hero_target_point[];
 
-void func_PAL_L11_003FCA30(unsigned char *moby) {
+/* Updates the Joba Deser Rider who talks with the player. It waits until the player is near, plays two
+   dialogue scenes, then leaves. While talking it turns its head to follow the player (PAL: 50 Hz timings). */
+void joba_dialogue_actor_update_pal(unsigned char *moby) {
     float target[4] __attribute__((aligned(16)));
     float origin[4] __attribute__((aligned(16)));
     float delta[4] __attribute__((aligned(16)));
-    unsigned char *data = *(unsigned char **)(moby + 0x68);
+    unsigned char *vars = *(unsigned char **)(moby + 0x68);
     int track;
     float speed, blend, angle, pitch, heading;
 
@@ -80,7 +82,7 @@ void func_PAL_L11_003FCA30(unsigned char *moby) {
         }
         break;
     case 1:
-        if (IsPointInCuboid(g_hero_state.position, *(int *)(data + 0x120))) {
+        if (IsPointInCuboid(g_hero_state.position, *(int *)(vars + 0x120))) {
             level_apply_index_for_key((int)moby);
             if (req_push_queue(g_request_l11_queue, 0x70)) {
                 req_launch_queued(g_request_l11_queue);
@@ -103,7 +105,7 @@ void func_PAL_L11_003FCA30(unsigned char *moby) {
         break;
     case 3:
         if (g_level_event_flag_c &&
-            IsPointInCuboid(g_hero_state.position, *(int *)(data + 0x120))) {
+            IsPointInCuboid(g_hero_state.position, *(int *)(vars + 0x120))) {
             level_apply_index_for_key((int)moby);
             if (req_push_queue(g_request_l11_queue, 0x71)) {
                 req_launch_queued(g_request_l11_queue);
@@ -141,10 +143,10 @@ void func_PAL_L11_003FCA30(unsigned char *moby) {
     }
 
     if (moby[0x20] != 0) {
-        if (moby[0x43] == 1 && FastDecTimer(data + 0x11E)) {
-            *(u16 *)(data + 0x11E) = FloatToInt((math_random_float_range(1200.0f, 2400.0f) * 5.0f + 2.0f) * 0.16666667f);
+        if (moby[0x43] == 1 && FastDecTimer(vars + 0x11E)) {
+            *(u16 *)(vars + 0x11E) = FloatToInt((math_random_float_range(1200.0f, 2400.0f) * 5.0f + 2.0f) * 0.16666667f);
         } else if ((moby[0x60] & 2) && moby[0x43] != 1) {
-            func_PAL_002A7E68(moby, 1, 0, 8);
+            anim_start_blended_pal(moby, 1, 0, 8);
         }
     }
 
@@ -158,27 +160,27 @@ void func_PAL_L11_003FCA30(unsigned char *moby) {
                 mat_fast_helper_a(g_hero_state.aim[0] - *(float *)(moby + 0x10),
                               g_hero_state.aim[1] - *(float *)(moby + 0x14))) < 1.5707964897155762f) {
             if (FastVecLength(g_hero_state.velocity) > 0.01f)
-                *(int *)(data + 0x114) = 100;
+                *(int *)(vars + 0x114) = 100;
             else
-                math_fast_float_d(data + 0x114);
-        } else if (*(int *)(data + 0x114)) {
-            *(int *)(data + 0x114) = 0;
-            qcopy(data + 0x100, g_hero_target_point);
+                math_fast_float_d(vars + 0x114);
+        } else if (*(int *)(vars + 0x114)) {
+            *(int *)(vars + 0x114) = 0;
+            qcopy(vars + 0x100, g_hero_target_point);
         }
-        if (math_fast_float_d(data + 0x118)) {
-            *(int *)(data + 0x118) = FloatToInt((math_random_float_range(180.0f, 300.0f) * 5.0f + 2.0f) * 0.16666667f);
+        if (math_fast_float_d(vars + 0x118)) {
+            *(int *)(vars + 0x118) = FloatToInt((math_random_float_range(180.0f, 300.0f) * 5.0f + 2.0f) * 0.16666667f);
             heading = FastAddRotations(*(float *)(moby + 0xF8),
                 math_random_float_range(-90.0f, 90.0f) * 0.01745329424738884f);
             angle = math_random_float_range(0.0f, 30.0f);
-            vec_build_spherical_offset(data + 0x100, 6.0f, heading, angle * 0.01745329424738884f);
-            FastVecAdd(data + 0x100, data + 0x100, moby + 0x10);
+            vec_build_spherical_offset(vars + 0x100, 6.0f, heading, angle * 0.01745329424738884f);
+            FastVecAdd(vars + 0x100, vars + 0x100, moby + 0x10);
         }
-        if (*(int *)(data + 0x114)) {
+        if (*(int *)(vars + 0x114)) {
             qcopy(target, g_hero_target_point);
             speed = 0.04f;
             blend = 0.3f;
         } else {
-            qcopy(target, data + 0x100);
+            qcopy(target, vars + 0x100);
         }
     }
 
@@ -196,17 +198,17 @@ void func_PAL_L11_003FCA30(unsigned char *moby) {
             pitch = 0.523598849773407f;
         else if (pitch < -0.523598849773407f)
             pitch = -0.523598849773407f;
-        *(float *)(data + 0x64) = pitch;
-        *(float *)(data + 0x68) = angle * 0.6f;
-        *(float *)(data + 0xE8) = angle * 0.4f;
+        *(float *)(vars + 0x64) = pitch;
+        *(float *)(vars + 0x68) = angle * 0.6f;
+        *(float *)(vars + 0xE8) = angle * 0.4f;
     }
     if (g_unlocked_item_flags)
-        *(float *)(data + 0x70) = 2.75f;
+        *(float *)(vars + 0x70) = 2.75f;
     {
         float scale = 1.44f;
         float step = speed * scale;
         float rate = blend * scale;
-        moby_update_eased_node(moby, data, 0, step, rate);
-        moby_update_eased_node(moby, data + 0x80, 1, step, rate);
+        moby_update_eased_node(moby, vars, 0, step, rate);
+        moby_update_eased_node(moby, vars + 0x80, 1, step, rate);
     }
 }

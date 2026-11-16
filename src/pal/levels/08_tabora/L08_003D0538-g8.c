@@ -15,15 +15,16 @@ extern u8 g_item_enabled_flags[] MACRO_ADDR;
 extern int g_orb_update_flag __attribute__((sda));
 extern float g_orb_pickup_distance __attribute__((sda)), g_orb_fly_speed_near __attribute__((sda)), g_orb_fly_speed_far __attribute__((sda));
 extern float g_orb_ease_rate __attribute__((sda)), g_orb_reset_value __attribute__((sda)), g_orb_shrink_rate __attribute__((sda));
-extern void moby_set_state(void *,int,int), func_PAL_002A7E68(void *,int,int,int);
-extern void func_PAL_L08_003D0280(void *);
+extern void moby_set_state(void *,int,int), anim_start_blended_pal(void *,int,int,int);
+extern void gfx_draw_glowing_spark_rings_pal(void *);
 extern float vec_distance_xy(void *,void *), vec_length_xy(void *);
 extern void FastVecSub(void *,void *,void *), vec_fast_divide_helper(void *,void *,float), FastVecAdd(void *,void *,void *);
 extern int snd_play_from_class_bank(int,int,void *,int);
 extern int snd_play_from_global_bank(int, int, void *);
 extern void moby_mark_spawned(void *), value_set_entry_by_index_pal(int, int);
 extern int level_get_saved_count(void);
-void func_PAL_L08_003D0538(char *object) {
+/* Collectible that waits until the hero is close, then flies to the hero, shrinks, and is collected with a sound and a saved flag (PAL: 50 Hz timings). */
+void orb_update_pal(char *object) {
     char *state;
     float vector[4] __attribute__((aligned(16)));
     float distance, speed, threshold;
@@ -34,16 +35,16 @@ void func_PAL_L08_003D0538(char *object) {
         F(object,u8,0x23) = 0x50;
         F(object,u16,0x34) |= 0x800;
         moby_set_state(object,1,-1);
-        if (F(object,u8,0x43)) func_PAL_002A7E68(object,0,0,0);
+        if (F(object,u8,0x43)) anim_start_blended_pal(object,0,0,0);
         break;
     case 1:
         if (vec_distance_xy(object+0x10,g_hero_position) < g_orb_pickup_distance) {
             F(state,float,0) = g_orb_reset_value;
-            if (F(object,u8,0x43) != 1) func_PAL_002A7E68(object,1,0,0x14);
+            if (F(object,u8,0x43) != 1) anim_start_blended_pal(object,1,0,0x14);
             F(object,float,0x48) = F(state,float,0) + F(state,float,0);
             moby_set_state(object,2,-1);
         }
-        if (F(object,u8,0x31)) func_PAL_L08_003D0280(object);
+        if (F(object,u8,0x31)) gfx_draw_glowing_spark_rings_pal(object);
         break;
     case 2:
         F(state,float,0) += (1.0f - F(state,float,0)) * g_orb_ease_rate;
@@ -93,7 +94,7 @@ void func_PAL_L08_003D0538(char *object) {
                 value_set_entry_by_index_pal(0x1233,-1);
                 g_orb_update_flag = 1;
             }
-        } else func_PAL_L08_003D0280(object);
+        } else gfx_draw_glowing_spark_rings_pal(object);
         break;
     }
 }

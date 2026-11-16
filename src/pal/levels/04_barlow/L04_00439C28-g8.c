@@ -9,39 +9,39 @@ extern int flag_is_byte_set(void);
 extern int PlayMobySound(int, int, char *);
 
 /* A pickup's states: 0 takes the hero's flags, 1 waits until none of its four
-   links is alive (or the zone byte says go), 2 fades it out, 4 is done. */
-void barlow_linked_fade_out_update_pal(u8 *obj)
+   vars is alive (or the zone byte says go), 2 fades it out, 4 is done. */
+void barlow_linked_fade_out_update_pal(u8 *moby)
 {
-    u8 *links = *(u8 **)(obj + 0x68);
+    u8 *vars = *(u8 **)(moby + 0x68);
     s32 i;
 
-    if (obj[0x20] == 0) {
-        *(u64 *)(obj + 0x38) = *(u64 *)(g_pHeroMoby[0] + 0x38);
-        *(u16 *)(obj + 0x34) |= 0x800;
-        obj[0x20] = 1;
+    if (moby[0x20] == 0) {
+        *(u64 *)(moby + 0x38) = *(u64 *)(g_pHeroMoby[0] + 0x38);
+        *(u16 *)(moby + 0x34) |= 0x800;
+        moby[0x20] = 1;
     }
-    if (obj[0x20] == 1) {
+    if (moby[0x20] == 1) {
         s32 found = 0;
         for (i = 0; i < 4; i++) {
-            if (moby_count_group_not_in_state(*(u32 *)(links + 4 * i), -1))
+            if (moby_count_group_not_in_state(*(u32 *)(vars + 4 * i), -1))
                 found = 1;
         }
-        if (*(u32 *)(links + 0x10) != 0) {
+        if (*(u32 *)(vars + 0x10) != 0) {
             if (flag_is_byte_set() != 0) {
-                if (moby_count_group_not_in_state(*(u32 *)links, -1) == 0)
+                if (moby_count_group_not_in_state(*(u32 *)vars, -1) == 0)
                     found = 0;
             }
         }
-        if (found == 0 || (g_moby_group_flags[obj[0xB0] + (g_current_map_index << 4)] & 0x80)) {
-            PlayMobySound(0, 0, (char *)obj);
-            obj[0x20] = 2;
+        if (found == 0 || (g_moby_group_flags[moby[0xB0] + (g_current_map_index << 4)] & 0x80)) {
+            PlayMobySound(0, 0, (char *)moby);
+            moby[0x20] = 2;
         }
     }
-    if (obj[0x20] == 2) {
-        f32 t = *(f32 *)(obj + 0x18);
-        if (t >= 30.0f)
-            *(f32 *)(obj + 0x18) = t - 0.34000003f;
-        if (*(f32 *)(obj + 0x18) < 30.0f)
-            obj[0x20] = 4;
+    if (moby[0x20] == 2) {
+        f32 height = *(f32 *)(moby + 0x18);
+        if (height >= 30.0f)
+            *(f32 *)(moby + 0x18) = height - 0.34000003f;
+        if (*(f32 *)(moby + 0x18) < 30.0f)
+            moby[0x20] = 4;
     }
 }

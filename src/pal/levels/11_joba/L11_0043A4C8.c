@@ -15,6 +15,8 @@ extern int FloatToInt(float);
 extern char g_hero_l11_position[];
 extern float math_random_float_range(float a, float b);
 
+/* Spawns count ground-effect particles (a coloured spark and a grey puff each) that fly away from
+   the hero, scattered around pos (PAL: 50 Hz timings). */
 void part_l11_spawn_impact_burst_pal(float *pos, int count) {
     float velocity[4], origin[4], direction[4], axis[4], offset[4];
     float size, angle;

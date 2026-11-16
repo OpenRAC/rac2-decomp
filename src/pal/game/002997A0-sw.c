@@ -107,6 +107,7 @@ extern void save_reset_slot_ids(void);
 extern int sceMcSeek(int, int, int);
 extern int save_verify_block_checksum(void *);
 
+/* Runs one step of the memory card state machine: checks cards, reads the directory, loads, saves and formats files. */
 void mc_update_state_pal(void)
 {
     union {

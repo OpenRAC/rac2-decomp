@@ -41,6 +41,7 @@ extern void cam_set_mode_state(int);
 
 typedef union { float f[0x40]; int i[0x40]; s16 h[0x80]; u16 uh[0x80]; } Fields;
 
+/* Spinning collectible: sets up the spin, bobs and sparkles, and is collected when the hero gets near (v2.00 copy). */
 void spinning_collectible_update_us2(u8 *actor)
 {
     u8 *state = *(u8 **)(actor + 0x68);

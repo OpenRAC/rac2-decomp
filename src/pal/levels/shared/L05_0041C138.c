@@ -12,11 +12,11 @@ extern void FastVecAdd(char *dst, char *src, char *src2);
 
 /* Spawns the object's effect: marks the object, takes one record of the shared
    128-byte table by the global index and gives it a random position. */
-void func_PAL_L05_0041C138(char *object)
+void moby_init_spawned_effect_pal(char *object)
 {
     char *sub = *(char **)(object + 0x68);
     char *table;
-    float a, b, c;
+    float radius, yaw, pitch;
 
     *(unsigned char *)(object + 0x20) = 1;
     *(unsigned short *)(object + 0x34) = *(unsigned short *)(object + 0x34) | 0x100;
@@ -27,10 +27,10 @@ void func_PAL_L05_0041C138(char *object)
     *(int *)(sub + 0x1C0) = -1;
     *(int *)(sub + 0x1C4) = -1;
     *(float *)(sub + 0x180) = 1.0f;
-    a = math_random_float_range(0.0f, *(float *)table);
-    b = math_random_angle();
-    c = math_random_angle();
-    vec_build_spherical_offset(object + 0x10, a, b, c);
+    radius = math_random_float_range(0.0f, *(float *)table);
+    yaw = math_random_angle();
+    pitch = math_random_angle();
+    vec_build_spherical_offset(object + 0x10, radius, yaw, pitch);
     FastVecAdd(object + 0x10, table + 0x30, object + 0x10);
     *(int *)(sub + 0x1B8) = 0;
     *(float *)(object + 0x2C) = 0.02f;

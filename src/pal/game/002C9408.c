@@ -13,6 +13,8 @@ extern float math_fast_sin_or_cos_b(float);
 extern void FastVecScale(void *, void *, float);
 extern void FastVecAdd(void *, void *, void *);
 
+/* Spinning particle that fades out below the water level and otherwise fades in, then drifts
+   and sways. */
 void part_update_fading_spin_pal(char *obj)
 {
     float v[4];

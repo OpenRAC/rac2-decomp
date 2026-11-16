@@ -16,7 +16,7 @@ extern void EmitTexturedRectangle(float x, float y, float draw_width, float draw
 
 /* func_PAL_0027FB48, the PAL copy of func_0027F640: the same C, with the func_002FC560 call that
    USA's func_0027F2A8 makes before its loop. */
-void func_PAL_0027FB48(float x, float y, u64 color, u8 *text, s32 character_limit, float scale,
+void FontPrintScaled_pal(float x, float y, u64 color, u8 *text, s32 character_limit, float scale,
                    u64 texture, u8 *metrics) {
     struct Glyph_F6668 *glyphs = (struct Glyph_F6668 *)metrics;
     unsigned int colors[4];

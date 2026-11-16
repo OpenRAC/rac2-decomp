@@ -31,7 +31,7 @@ extern void vec_random_direction(float *, float, float);
 extern float math_random_float_range(float, float);
 extern void vec_transform_and_set_height(char *, float *, float *, int, float);
 extern char *cam_moby_create(char *, int, int, int, void *, void *, void *, unsigned char, float, float);
-extern void func_US2_00320A20(void *);
+extern void UpdateWeaponAmmoPickup_us2(void *);
 extern float gravity_get_center_distance(float *);
 extern void func_002A0F48(void *);
 extern void hero_copy_field_to_moby(char *);
@@ -72,7 +72,7 @@ char *SpawnWeaponAmmoPickup_us2(float *position, int weapon, int amount, int ext
                           255, spread, speed);
     if (spawn) {
         spawn[0x20] = 1;
-        *(void (**)(void *))(spawn + 0x64) = func_US2_00320A20;
+        *(void (**)(void *))(spawn + 0x64) = UpdateWeaponAmmoPickup_us2;
         data = *(AmmoSpawnData **)(spawn + 0x68);
         if (amount == -1)
             data->amount = ((AmmoSpawnWeapon *)((char *)weapons

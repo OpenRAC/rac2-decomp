@@ -81,7 +81,7 @@ extern float g_tabora_rotation_angles[4] MACRO_ADDR;
 extern float g_cutscene_rotation_speed_x __attribute__((sda));
 extern float g_cutscene_rotation_speed_y, g_cutscene_rotation_speed_z, g_cutscene_rotation_speed_w;
 extern void anim_start_startup_animations(void);
-extern void func_PAL_002E7270(void *);
+extern void update_equipment_pieces_pal(void *);
 extern void math_store_angle_update_result(void *, void *, int, int, float);
 extern void moby_copy_group_word_to_members(void);
 extern void FastVecAdd(void *, void *, void *);
@@ -102,13 +102,14 @@ extern float math_random_signed_float_range(float, float);
 extern void vec_random_direction(void *, float, float);
 extern void vec_add_random_offset(void *, float);
 extern char *SpawnExplosion_pal(void *, int, int, int, int, int, int, int, int, int, int, int, float, float);
-extern TaboraParticle *func_PAL_002BE9A8(void *, float, float, float, int, void *, int, float, int);
-extern void func_PAL_L00_00328480(int, void *, int, int, void *, int, int, float, float, float, float);
+extern TaboraParticle *part_spawn_spinning_spark_pal(void *, float, float, float, int, void *, int, float, int);
+extern void part_spawn_glow_fade_effects_pal(int, void *, int, int, void *, int, int, float, float, float, float);
 extern char *part_spawn_fading_drift(void *, void *, int, int, int, int, int, int, float, float, float);
 extern void *part_spawn_hero_relative(void *, void *, int, int, int, int, float);
 extern unsigned char *part_spawn_fading(void *, int, int, int, int, int, int, float);
 
-void func_PAL_L08_0030A2B8(void) {
+/* Runs the Tabora cutscene effects each frame: explosions, falling dust and the final swirling particles around the hero, by scene phase. */
+void tabora_cutscene_update_effects_pal(void) {
     float v[4] __attribute__((aligned(16)));
     float w[4] __attribute__((aligned(16)));
     /* Adjacent in the frame: func_002833F0 fills all three as rows of one matrix. */
@@ -125,7 +126,7 @@ void func_PAL_L08_0030A2B8(void) {
         for (; j < g_tabora_scene.count; ++j) {
             p = g_tabora_scene.objects[j];
             if (p && p->classId==0xE29) p->flags |= 0x800;
-            if (p->classId==0xD54) func_PAL_002E7270(p);
+            if (p->classId==0xD54) update_equipment_pieces_pal(p);
             if (p && p->classId==0xFA0 && g_current_map_index!=0x33 && p->vars)
                 math_store_angle_update_result(p,p->vars+12,0x80AAAAD2,0x80396464,0.07330384f);
         }
@@ -159,7 +160,7 @@ void func_PAL_L08_0030A2B8(void) {
             int i;
             int colour, life, alpha, spin, packed;
             TaboraParticle *r;
-            float scale, size, angle, frameStep;
+            float scale, size, angle, frame_step;
             p=0;
             moby_copy_group_word_to_members();
             n=0;
@@ -170,7 +171,7 @@ void func_PAL_L08_0030A2B8(void) {
                 *(u128 *)v = 0;
                 v[2]=0.01f;
                 v[3]=1.0f;
-                frameStep=0.010000001f;
+                frame_step=0.010000001f;
                 for (i=0;i<n;++i) {
                     life=math_random_int_range(75,97);
                     qzero(w);
@@ -187,17 +188,17 @@ void func_PAL_L08_0030A2B8(void) {
                     size=math_random_float_range(0.1f,0.3f);
                     v[0]=math_random_signed_float_range(0.0f,0.014f);
                     v[1]=math_random_signed_float_range(0.0f,0.014f);
-                    v[2]=math_random_float_range(frameStep*0.1f,0.010000001f);
+                    v[2]=math_random_float_range(frame_step*0.1f,0.010000001f);
                     FastVecScale(v,v,scale);
-                    r=func_PAL_002BE9A8(w,0.1f,1.0f,angle,spin,v,colour,size*210000.0f,0);
+                    r=part_spawn_spinning_spark_pal(w,0.1f,1.0f,angle,spin,v,colour,size*210000.0f,0);
                     if (r) {
-                        TaboraParticleData *particleData=&r->data;
+                        TaboraParticleData *particle_data=&r->data;
                         if (math_random_int_below(2)) r->kind=0x44;
                         r->lifetime=life;
                         {
-                            particleData->kind=2;
-                            particleData->alpha=alpha;
-                            particleData->lifetime=life;
+                            particle_data->kind=2;
+                            particle_data->alpha=alpha;
+                            particle_data->lifetime=life;
                         }
                     }
                 }
@@ -212,7 +213,7 @@ void func_PAL_L08_0030A2B8(void) {
         FastVecSub(w,first->position,second->position);
         vec_scale_to_length(w,w,0.042f);
         w[2]=0.050000004f;
-        func_PAL_L00_00328480(0,v,40,0,w,0x39969696,0,0.75f,1.3f,0.2f,0.37f);
+        part_spawn_glow_fade_effects_pal(0,v,40,0,w,0x39969696,0,0.75f,1.3f,0.2f,0.37f);
         g_hero_l08_extra_state.amount2=0.047f;
         g_hero_l08_extra_state.duration2=29;
         g_hero_l08_extra_state.amount0=0.037f;
@@ -262,17 +263,17 @@ void func_PAL_L08_0030A2B8(void) {
     {
         float amount=6.0f;
         float rate=0.0f;
-        float frameStep, timeScale, t, scale;
+        float frame_step, time_scale, t, scale;
         float size;
         int alpha;
         int j;
-        int duration, lifeStep;
+        int duration, life_step;
         *(u128 *)w=*(u128 *)v;
         w[2]+=1.0f;
         if (math_random_int_below(4)==0) {
             FastVecSub(forward,g_hero_position_vec,w);
-            timeScale=0.020000001f;
-            frameStep=0.010000001f;
+            time_scale=0.020000001f;
+            frame_step=0.010000001f;
             vec_scale_to_length(forward,forward,5.0f);
             FastVecAdd(w,forward,w);
             vec_random_direction(matrix,rate,rate);
@@ -280,17 +281,17 @@ void func_PAL_L08_0030A2B8(void) {
             size*=0.080000006f;
             alpha=math_random_int_below(255)&255;
             duration=60;
-            lifeStep=0;
+            life_step=0;
             part_spawn_hero_relative(w,matrix,0x50804080,duration,alpha,0,size);
             for (j=0;j<1;++j) {
-                t=rate*timeScale;
+                t=rate*time_scale;
                 vec_random_direction(offset,t,t);
                 FastVecAdd(matrix,matrix,offset);
-                t=0.0f; /* Second set in the loop: keeps rate*timeScale from being hoisted and folded. */
-                scale=amount*frameStep*(g_tabora_scene.frame-480);
+                t=0.0f; /* Second set in the loop: keeps rate*time_scale from being hoisted and folded. */
+                scale=amount*frame_step*(g_tabora_scene.frame-480);
                 alpha=math_random_int_below(255)&255;
                 part_spawn_hero_relative(w,matrix,0x40804080,duration,alpha,0,scale);
-                duration+=lifeStep;
+                duration+=life_step;
             }
         }
     }

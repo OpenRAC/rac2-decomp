@@ -45,8 +45,8 @@ extern void SetupGifPaging(int);
 extern long GetEffectTextureDescriptor(int);
 extern void DoGifPaging(void), gfx_disable_screen_flag(void), gfx_enable_screen_flag(void);
 extern char *GetLocalizedString(int);
-extern void func_PAL_00280A30(void *, long, char *, long, long, unsigned char *);
-extern void func_PAL_002804A8(void *, long, char *, long, long, unsigned char *, float);
+extern void text_window_print_unit_scale(void *, long, char *, long, long, unsigned char *);
+extern void FontPrintWindow_pal(void *, long, char *, long, long, unsigned char *, float);
 extern char g_hud_screen_data[];
 extern char g_hud_screen_default[];
 extern void gfx_draw_box_outline(int, int, int, int, int);
@@ -69,17 +69,17 @@ static inline void set_window_vertical(Win *p, unsigned short top, unsigned shor
 #pragma rac2_sched1_order 1589 1699 1614
 /* FAKEMATCH: the #pragma rac2_sched2_order list fixes the post-reload order of the same blocks */
 #pragma rac2_sched2_order 1398 1401 1404 1697 1571 1693 1665
-int func_PAL_002CD520(unsigned char *w) {
+int render_configured_text_label_pal(unsigned char *text_label) {
     char buf[0x40];
     int id;
     int helpResult;
     int originY, originX;
     Win win;
-    Win tmp;
+    Win base_win;
     char *text = g_str_label_text_a;
     unsigned char *glyphs = g_font_glyphs_small;
     int font;
-    int f0, flags, g, f, content, variant = 0, a21, a23, colour, t, wflags;
+    int font_flags, flags, text_flags, draw_flags, content, variant = 0, center_y, center_x, colour, t, wflags;
     /* func_0027C878's TEX0 is 64 bits, and FontPrintWindow reads all of them: on the console the
        register keeps them whatever the C says, on a PC an int keeps only the low half. */
     long tex;
@@ -87,19 +87,19 @@ int func_PAL_002CD520(unsigned char *w) {
     int k;       /* FAKEMATCH: shift stand-in, then the 0x20000 mask */
 
     font = 1;
-    f0 = *(int *)(w + 0x30);
-    if (f0 & 8) {
+    font_flags = *(int *)(text_label + 0x30);
+    if (font_flags & 8) {
         font = 3;
         glyphs = g_font_glyphs_large;
     }
-    if (f0 & 0x10) {
+    if (font_flags & 0x10) {
         font = 2;
         glyphs = g_font_glyphs_medium;
     }
     VU1_addGSregister(0x42, 0x44);
     ((void (*)(int, long))VU1_addGSregister)(0x47, 0x2004B);
 
-    flags = *(int *)(w + 0x30);
+    flags = *(int *)(text_label + 0x30);
     if (flags & 0x20) {
         content = g_current_map_index - 1;
         if ((unsigned int)content >= 0x12) {
@@ -108,12 +108,12 @@ int func_PAL_002CD520(unsigned char *w) {
     } else if (flags & 0x40) {
         content = g_selected_map_index - 1;
     } else if (flags & 4) {
-        if (*(int *)(w + 0x44) < pal_frames(g_label_default_color, 6)) {
-            *(int *)(w + 0x44) = pal_frames(g_label_default_color, 6);
+        if (*(int *)(text_label + 0x44) < pal_frames(g_label_default_color, 6)) {
+            *(int *)(text_label + 0x44) = pal_frames(g_label_default_color, 6);
         }
         content = 0;
-        *(int *)(w + 0x48) = 0;
-        *(int *)(w + 0x4C) = 0;
+        *(int *)(text_label + 0x48) = 0;
+        *(int *)(text_label + 0x4C) = 0;
     } else if (flags & 0x80) {
         content = *(int *)(ST + 0x40);
         if (flags & 0x8000) {
@@ -136,8 +136,8 @@ int func_PAL_002CD520(unsigned char *w) {
         char *st = ST;
         content = *(int *)(st + 0x40);
         id = *(short *)(*(char **)(st + 0x34) + content * 12);
-        *(int *)(w + 0x34) = 0xFFFF;
-        text_find_pair_in_table(id, 0, (unsigned short *)(w + 0x34));
+        *(int *)(text_label + 0x34) = 0xFFFF;
+        text_find_pair_in_table(id, 0, (unsigned short *)(text_label + 0x34));
     } else {
         char *cell;
         int k;
@@ -149,60 +149,60 @@ int func_PAL_002CD520(unsigned char *w) {
         content = k;
     }
 
-    if (*(int *)(w + 0x44) == -1) {
-        *(int *)(w + 0x44) = pal_frames(g_label_default_color, 6);
-        *(int *)(w + 0x48) = content;
-        *(int *)(w + 0x4C) = variant;
+    if (*(int *)(text_label + 0x44) == -1) {
+        *(int *)(text_label + 0x44) = pal_frames(g_label_default_color, 6);
+        *(int *)(text_label + 0x48) = content;
+        *(int *)(text_label + 0x4C) = variant;
     }
-    if (content != *(int *)(w + 0x48)) {
+    if (content != *(int *)(text_label + 0x48)) {
         int fade;
         t = pal_frames(g_label_default_color, 6);
-        if (t < *(int *)(w + 0x44)) {
-            *(int *)(w + 0x44) = pal_frames(g_label_default_color, 6);
+        if (t < *(int *)(text_label + 0x44)) {
+            *(int *)(text_label + 0x44) = pal_frames(g_label_default_color, 6);
         }
-        fade = *(int *)(w + 0x44);
+        fade = *(int *)(text_label + 0x44);
         { int was = fade < 1; fade--; if (was) fade = 0; }
         { int was = fade < 1; fade--; if (was) fade = 0; }
         { int was = fade < 1; fade--; if (was) fade = 0; }
-        *(int *)(w + 0x44) = fade;
+        *(int *)(text_label + 0x44) = fade;
         if (fade != 0) {
-            content = *(int *)(w + 0x48);
-            variant = *(int *)(w + 0x4C);
+            content = *(int *)(text_label + 0x48);
+            variant = *(int *)(text_label + 0x4C);
         } else {
-            *(int *)(w + 0x48) = content;
-            *(int *)(w + 0x4C) = variant;
-            *(int *)(w + 0x30) &= ~0x400;
-            *(int *)(w + 0x3C) = 0;
+            *(int *)(text_label + 0x48) = content;
+            *(int *)(text_label + 0x4C) = variant;
+            *(int *)(text_label + 0x30) &= ~0x400;
+            *(int *)(text_label + 0x3C) = 0;
         }
     } else {
-        *(int *)(w + 0x44) += 3;
+        *(int *)(text_label + 0x44) += 3;
     }
 
-    g = *(int *)(w + 0x30);
-    if (g & 4) {
-        if (*(int *)(w + 0x34) == 0) {
+    text_flags = *(int *)(text_label + 0x30);
+    if (text_flags & 4) {
+        if (*(int *)(text_label + 0x34) == 0) {
             return 1;
         }
-        text = TEXT(*(int *)(w + 0x34));
-    } else if (g & 0x1000) {
-        if (*(int *)(w + 0x34) == 0xFFFF) {
+        text = TEXT(*(int *)(text_label + 0x34));
+    } else if (text_flags & 0x1000) {
+        if (*(int *)(text_label + 0x34) == 0xFFFF) {
             return 1;
         }
-        if (*(int *)(w + 0x34) == 0) return 1;
-        text = TEXT(*(int *)(w + 0x34));
-    } else if ((g & 0x100) && content == -1) {
+        if (*(int *)(text_label + 0x34) == 0) return 1;
+        text = TEXT(*(int *)(text_label + 0x34));
+    } else if ((text_flags & 0x100) && content == -1) {
         text = g_str_label_text_b;
-    } else if (*(int *)(w + 0x34) != 0) {
-        unsigned int at = (unsigned int)(content * *(int *)(w + 0x38)) >> 2 << 2;
-        char *table = *(char **)(w + 0x34);
+    } else if (*(int *)(text_label + 0x34) != 0) {
+        unsigned int at = (unsigned int)(content * *(int *)(text_label + 0x38)) >> 2 << 2;
+        char *table = *(char **)(text_label + 0x34);
         text = TEXT(*(int *)(at + (unsigned int)(table + variant * 4)));
     }
-    if ((*(int *)(w + 0x30) & 0x11E4) == 0 && ((unsigned char *)&g_item_owned_flags)[content] == 0) {
+    if ((*(int *)(text_label + 0x30) & 0x11E4) == 0 && ((unsigned char *)&g_item_owned_flags)[content] == 0) {
         text = g_str_label_text_b;
     }
-    if (*(int *)(w + 0x30) & 0x200) {
-        unsigned int at = (unsigned int)(content * *(int *)(w + 0x38)) >> 2 << 2;
-        char *table = *(char **)(w + 0x34);
+    if (*(int *)(text_label + 0x30) & 0x200) {
+        unsigned int at = (unsigned int)(content * *(int *)(text_label + 0x38)) >> 2 << 2;
+        char *table = *(char **)(text_label + 0x34);
         int id = *(int *)(at + (unsigned int)table);
         if (id != 0xB4B && id != 0xB52 && id != 0xB56) {
             do { /* FAKEMATCH: loop group weights the text references (allocation priority) */
@@ -211,76 +211,76 @@ int func_PAL_002CD520(unsigned char *w) {
             } while (0);
         }
     }
-    f = *(int *)(w + 0x30);
-    a23 = *(int *)(w + 0x18) + *(int *)(w + 0x20) / 2;
-    a21 = *(int *)(w + 0x1C) + *(int *)(w + 0x24) / 2;
-    if ((f & 0x4004) == 0x4004 && *(int *)(w + 0x34) == 0x112D) {
+    draw_flags = *(int *)(text_label + 0x30);
+    center_x = *(int *)(text_label + 0x18) + *(int *)(text_label + 0x20) / 2;
+    center_y = *(int *)(text_label + 0x1C) + *(int *)(text_label + 0x24) / 2;
+    if ((draw_flags & 0x4004) == 0x4004 && *(int *)(text_label + 0x34) == 0x112D) {
         menu_list_active_entries((int *)0x70000000, (unsigned int *)&helpResult, 0, 0);
         if (helpResult < 0) text = TEXT(0x112C);
-        a21 += 8;
+        center_y += 8;
     }
-    if (*(int *)(w + 0x30) & 0x800) if (g_item_enabled_flags[content] == 0) {
+    if (*(int *)(text_label + 0x30) & 0x800) if (g_item_enabled_flags[content] == 0) {
         text = TEXT(0xBD1);
-        f |= 3;
+        draw_flags |= 3;
     }
     if (text == 0) {
         text = g_str_label_text_c;
     }
-    do { /* FAKEMATCH: nested loop groups weight the wflags/a23 references (allocation priority) */
+    do { /* FAKEMATCH: nested loop groups weight the wflags/center_x references (allocation priority) */
     wflags = 8;
     do {
-    if (f & 1) {
+    if (draw_flags & 1) {
         wflags = 9;
-        a23 = *(int *)(w + 0x20) / 2;
+        center_x = *(int *)(text_label + 0x20) / 2;
     }
     } while (0);
     } while (0);
-    if (f & 2) {
+    if (draw_flags & 2) {
         wflags |= 2;
-        a21 = *(int *)(w + 0x24) / 2;
+        center_y = *(int *)(text_label + 0x24) / 2;
     }
 
     SetupGifPaging(0);
     tex = GetEffectTextureDescriptor(font);
-    if (SCREEN == g_pause_page_c || g_label_centered_flag != 0) { do { originY = a21; do originX = a23 + 1; while (0); } while (0); /* FAKEMATCH: loop groups weight a21/a23 */ } else { originX = 1; originY = g_label_origin_y; }
-    memset(&tmp, 0, 0x18);
-    tmp.s[0] = originY;
-    tmp.s[1] = *(unsigned short *)(w + 0x24) + originY;
-    tmp.s[2] = originX;
-    tmp.s[3] = translated_edge(*(unsigned short *)(w + 0x20), originX - 4);
-    tmp.s[4] = a23;
-    tmp.s[5] = a21 - (*(int *)(w + 0x3C) >> 4);
-    tmp.s[8] = *(int *)&g_label_line_height;
-    tmp.s[9] = wflags;
-    tmp.s[11] = -(*(unsigned short *)(w + 0x3C) & 0xF);
-    win = tmp;
+    if (SCREEN == g_pause_page_c || g_label_centered_flag != 0) { do { originY = center_y; do originX = center_x + 1; while (0); } while (0); /* FAKEMATCH: loop groups weight center_y/center_x */ } else { originX = 1; originY = g_label_origin_y; }
+    memset(&base_win, 0, 0x18);
+    base_win.s[0] = originY;
+    base_win.s[1] = *(unsigned short *)(text_label + 0x24) + originY;
+    base_win.s[2] = originX;
+    base_win.s[3] = translated_edge(*(unsigned short *)(text_label + 0x20), originX - 4);
+    base_win.s[4] = center_x;
+    base_win.s[5] = center_y - (*(int *)(text_label + 0x3C) >> 4);
+    base_win.s[8] = *(int *)&g_label_line_height;
+    base_win.s[9] = wflags;
+    base_win.s[11] = -(*(unsigned short *)(text_label + 0x3C) & 0xF);
+    win = base_win;
     if (g_label_outline_flag) gfx_draw_box_outline(win.s[0], win.s[1], win.s[2], win.s[3], 0x40303030);
-    if (*(int *)(w + 0x30) & 0x10000) {
-        win.s[1] = *(unsigned short *)(w + 0x24) - 1;
+    if (*(int *)(text_label + 0x30) & 0x10000) {
+        win.s[1] = *(unsigned short *)(text_label + 0x24) - 1;
     }
     colour = 0x80F0F0F0;
     win.s[9] |= 4;
     DRAW_SCALED(colour, text);
     win.s[9] ^= 4;
-    if (!(*(int *)(w + 0x30) & 0x2000) && !(win.s[7] + 4 < win.s[1] - win.s[0])) {
-        if (!(*(int *)(w + 0x30) & 0x400)) {
-            *(int *)(w + 0x30) |= 0x400;
+    if (!(*(int *)(text_label + 0x30) & 0x2000) && !(win.s[7] + 4 < win.s[1] - win.s[0])) {
+        if (!(*(int *)(text_label + 0x30) & 0x400)) {
+            *(int *)(text_label + 0x30) |= 0x400;
 
         }
     } else {
-        if (*(int *)(w + 0x30) & 0x400)
-            *(int *)(w + 0x30) ^= 0x400;
-        *(int *)(w + 0x3C) = 0;
+        if (*(int *)(text_label + 0x30) & 0x400)
+            *(int *)(text_label + 0x30) ^= 0x400;
+        *(int *)(text_label + 0x3C) = 0;
     }
 
-    id = *(int *)(w + 0x3C);
+    id = *(int *)(text_label + 0x3C);
     id >>= 4;
-    id = a21 - id;
+    id = center_y - id;
     set_anchor(&win, id);
     /* FAKEMATCH: dead shift/unshift on stand-in globals (v1.01 func_002CC6B0's win_shift/win_unshift) */
     m = g_label_origin_y; k = g_label_centered_flag;
     win.s[5] += m; win.s[5] += k; win.s[5] -= m;
-    m = *(int *)(w + 0x30);
+    m = *(int *)(text_label + 0x30);
     set_top(&win, win.s[0]);
     win.s[5] -= k; /* FAKEMATCH: unshift after the s[0] copy */
     k = 0x20000; /* FAKEMATCH: mask kept in the reused stand-in */
@@ -289,10 +289,10 @@ int func_PAL_002CD520(unsigned char *w) {
         gfx_disable_screen_flag();
     }
     DRAW_SCALED(colour, text);
-    if (*(int *)(w + 0x30) & 0x20000) {
+    if (*(int *)(text_label + 0x30) & 0x20000) {
         gfx_enable_screen_flag();
     }
-    if (*(int *)(w + 0x30) & 0x400) {
+    if (*(int *)(text_label + 0x30) & 0x400) {
         /* FAKEMATCH: y holds gap*3 and then the s[0] copy */
         y = *(int *)&g_label_line_height << 1; y += *(int *)&g_label_line_height;
         x = (unsigned short)win.s[7] + y;
@@ -307,9 +307,9 @@ int func_PAL_002CD520(unsigned char *w) {
         { int sa = g_label_outline_flag, sb = g_label_default_color, sc = g_current_map_index, sd = g_selected_map_index;
         win.s[5] += sa + sb; win.s[5] -= sa + sb; win.s[0] += sc + sd; win.s[0] -= sc + sd; }
         DRAW_SCALED(colour, text);
-        if (*(int *)(w + 0x30) & 0x400) {
-            ((LabelSO *)w)->so += (g_pad_pressed_flags[0] & 0xF) == 0xF ? 10 : 3;
-            ((LabelSO *)w)->so %= (win.s[7] + *(int *)&g_label_line_height * 3) << 4;
+        if (*(int *)(text_label + 0x30) & 0x400) {
+            ((LabelSO *)text_label)->so += (g_pad_pressed_flags[0] & 0xF) == 0xF ? 10 : 3;
+            ((LabelSO *)text_label)->so %= (win.s[7] + *(int *)&g_label_line_height * 3) << 4;
         }
     }
     DoGifPaging();

@@ -40,6 +40,7 @@ extern void gfx_wait_for_dma_status_bits(int);
 extern int sceGsSyncV(int);
 extern void cutscene_end_scripted(void);
 
+/* Plays the bonus reel while the game loop keeps running (USA v2.00). */
 int PlayBonusReelWithGameLoop_us2(int unused)
 {
     SceneEntry *prev;

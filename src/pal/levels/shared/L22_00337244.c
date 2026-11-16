@@ -5,24 +5,25 @@ extern void part_kill(char *);
 extern s32 math_fast_float_d(void *);
 extern void vec_transform_or_copy(char *, char *);
 
-void func_PAL_L22_00337244(u8 *a0)
+/* Frees the particle record when it is finished, otherwise moves it and fades it (PAL: fade over 5 frames). */
+void part_update_fade_record_pal(u8 *object)
 {
-    u8 *s0 = a0;
-    u8 *s1 = a0 + 0x20;
+    u8 *rec = object;
+    u8 *extra = object + 0x20;
 
-    if (math_fast_float_d((char *)s1) != 0) {
-        part_kill((char *)s0);
+    if (math_fast_float_d((char *)extra) != 0) {
+        part_kill((char *)rec);
         return;
     }
     {
-        u8 *p = s0 + 0x10;
+        u8 *vec_ptr = rec + 0x10;
 
-        vec_transform_or_copy((char *)p, (char *)p);
+        vec_transform_or_copy((char *)vec_ptr, (char *)vec_ptr);
     }
-    *(f32 *)(s0 + 0xC) = *(f32 *)(s0 + 0xC) + *(f32 *)(s1 + 4);
-    if (*(s32 *)(s1) < 5) {
-        *(unsigned int *)(s0 + 4) = (*(unsigned int *)(s0 + 4) & 0xFFFFFF)
-            | ((unsigned int)(*(s32 *)(s1) * 127 / 5) << 24);
+    *(f32 *)(rec + 0xC) = *(f32 *)(rec + 0xC) + *(f32 *)(extra + 4);
+    if (*(s32 *)(extra) < 5) {
+        *(unsigned int *)(rec + 4) = (*(unsigned int *)(rec + 4) & 0xFFFFFF)
+            | ((unsigned int)(*(s32 *)(extra) * 127 / 5) << 24);
     }
 }
 

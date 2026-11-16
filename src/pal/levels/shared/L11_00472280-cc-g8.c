@@ -23,20 +23,20 @@ extern void DrawScrollingRibbonWithHaloAlpha(int a0, int a1, int a2, int a3, flo
 
 /* Clamps the level's timer and hands two table entries to the level's helper:
  * the first at the table's head, the second one record further on. */
-void func_PAL_L11_00472280(char *a0)
+void draw_object_ribbon_pair_pal(char *moby)
 {
-    char *s2 = *(char **)(a0 + 0x68);
-    float v;
+    char *vars = *(char **)(moby + 0x68);
+    float scroll;
 
-    v = g_trail_l11_uv_scroll - ((g_trail_scroll_step) * 1.2f);
-    g_trail_l11_uv_scroll = v;
-    if (v <= -8.0f) {
-        g_trail_l11_uv_scroll = v + 8.0f;
+    scroll = g_trail_l11_uv_scroll - ((g_trail_scroll_step) * 1.2f);
+    g_trail_l11_uv_scroll = scroll;
+    if (scroll <= -8.0f) {
+        g_trail_l11_uv_scroll = scroll + 8.0f;
     }
-    DrawScrollingRibbonWithHaloAlpha(*(int *)(s2 + 0x38) * 640 + (int)g_ribbon_row_table,
-                      g_trail_int_param_a, g_trail_int_param_b, *(int *)(s2 + 0x2C) - 2,
+    DrawScrollingRibbonWithHaloAlpha(*(int *)(vars + 0x38) * 640 + (int)g_ribbon_row_table,
+                      g_trail_int_param_a, g_trail_int_param_b, *(int *)(vars + 0x2C) - 2,
                       g_trail_width_scale, g_trail_float_param_a, g_trail_float_param_d);
-    DrawScrollingRibbonWithHaloAlpha(*(int *)(s2 + 0x38) * 640 + (int)(g_ribbon_row_table + 0x140),
-                      g_trail_int_param_c, g_trail_int_param_d, *(int *)(s2 + 0x2C),
+    DrawScrollingRibbonWithHaloAlpha(*(int *)(vars + 0x38) * 640 + (int)(g_ribbon_row_table + 0x140),
+                      g_trail_int_param_c, g_trail_int_param_d, *(int *)(vars + 0x2C),
                       g_trail_float_param_b, g_trail_float_param_c, g_trail_float_param_e);
 }

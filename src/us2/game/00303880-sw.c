@@ -16,7 +16,8 @@ extern void surface_grid_draw(void *);
 extern void gfx_register_early_draw_callback(void (*)(void *), void *);
 extern float g_surface_grid_noise_table[];
 
-void func_US2_00303880(unsigned char *object)
+/* Runs the surface grid object's state machine: ramps the wave height up, holds it, lets it fall, then updates and draws the grid (v2.00 copy). */
+void moby_update_rise_hold_fall_us2(unsigned char *object)
 {
     char *work=FIELD(char *,object,0x68);
     int i,ticks;

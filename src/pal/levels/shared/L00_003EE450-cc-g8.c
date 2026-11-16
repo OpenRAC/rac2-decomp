@@ -25,7 +25,8 @@ extern char *part_spawn_ground_effect(void *, int, float, float, unsigned int, i
 extern int FloatToInt(float);
 
 
-void func_PAL_L00_003EE450(void *position, int count, float brightness)
+/* Throws out paired sparks sideways from a point, facing the camera (PAL: 50 Hz timings, brightness scaled by 1.44). */
+void part_spawn_sparks_pal(void *position, int count, float brightness)
 {
     float velocity[4], lateral[4], axis[4], projected[4];
     FastVecSub(lateral, g_camera_l00_position, position);

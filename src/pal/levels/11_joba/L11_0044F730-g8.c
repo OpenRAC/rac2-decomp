@@ -11,7 +11,7 @@ extern void enemy_spawn_child_parts(char *, char *, s32, s32);
 extern void enemy_attach_turn_child_parts_pal(char *, char *, s32, void *, float);
 extern void group_sync_counter(char *, char *);
 extern char *part_find_owned_effect_slot(char *, s32, s32);
-extern s32 func_PAL_002B1A50(char *, char *, s32);
+extern s32 moby_apply_damage_to_object_pal(char *, char *, s32);
 extern void matrix_from_basis_rows(char *, char *);
 extern void cam_compute_view_direction(char *, char *, s32);
 extern s32 arena_is_point_in_inner_zone(s32, char *);
@@ -78,7 +78,7 @@ void smasher_robot_update_aim_and_init_pal(char *object)
             if (*(short *)(other + 0xAA) == 0xA03 || *(short *)(other + 0xAA) == 0xB89)
                 *(int *)(hit + 0x2C) = 0;
         }
-        if (func_PAL_002B1A50(object, state + 0x50, 0) == 5) {
+        if (moby_apply_damage_to_object_pal(object, state + 0x50, 0) == 5) {
             *(int *)(state + 0xE0) = 0;
             *(float *)(state + 0xE4) = 1.0053098f;
         }

@@ -46,6 +46,7 @@ typedef struct { char pad[0x4c]; short minimum, maximum; } MuseumParticleBounds;
 
 typedef unsigned short u16;
 
+/* Updates the particle tester: opens the tuning menu on a button press and emits a test particle at random intervals. */
 void UpdateMuseumParticleTester_us2(char *obj) {
     char *st = *(char **)(obj + 0x68);
     MuseumParticleBounds *bounds = (MuseumParticleBounds *)st;

@@ -31,6 +31,7 @@ typedef struct {
     s32 configuration;
 } InitializationFields;
 
+/* Sets up a new Protopet: its timings, speeds, sizes and starting animation. */
 void protopet_init_pal(u8 *object)
 {
     u8 *state = *(u8 **)(object + 0x68);
@@ -79,7 +80,7 @@ void protopet_init_pal(u8 *object)
 
 
 extern void *part_find_owned_effect_slot(void *, u32, s32);
-extern s32 func_PAL_002B1A50(void *, void *, s32);
+extern s32 moby_apply_damage_to_object_pal(void *, void *, s32);
 extern void group_update_members(u8 *);
 extern void protopet_end_action(u8 *, s32);
 extern void SetDeathBits_pal(u8 *, s32, s32);
@@ -88,6 +89,7 @@ extern s32 weapon_select_aim_target(u8 *, s32, void *, s32, float, float);
 extern void protopet_set_ready_flag(u8 *);
 extern s32 g_game_mode;
 
+/* Checks if the Protopet was hit or lost its target, and switches its state when needed. */
 void protopet_check_hit_target_pal(u8 *object)
 {
     u8 *state = *(u8 **)(object + 0x68);
@@ -95,13 +97,13 @@ void protopet_check_hit_target_pal(u8 *object)
     u8 saved;
     u64 mode;
     contact = part_find_owned_effect_slot(object, 0x10000, 1);
-    if (contact && *(u8 **)(contact + 0x20) && *(s16 *)(*(u8 **)(contact + 0x20) + 0xAA) == 0xF9E) {
+    if (contact && *(u8 **)(contact + 0x20) && *(s16 *)(*(u8 **)(contact + 0x20) + 0xAA) == 0xF9E /* moby class 3998 */) {
         if (object[0x20] < 6 || object[0x20] == 19 || object[0x20] == 18) return;
         moby_set_state(object, 18, -1);
         return;
     }
     saved = object[0x94];
-    if (func_PAL_002B1A50(object, state + 0x50, 0)) {
+    if (moby_apply_damage_to_object_pal(object, state + 0x50, 0)) {
         if (object[0x94] == 17 || object[0x94] == 8 || object[0x94] == 9 || object[0x94] == 16 || object[0x94] == 10 || object[0x94] == 7) object[0x94] = saved;
         if (object[0x94] != 14) group_update_members(object);
     }
@@ -112,7 +114,7 @@ void protopet_check_hit_target_pal(u8 *object)
         return;
     }
     contact = *(u8 **)(state + 0x188);
-    if (contact && *(s16 *)(contact + 0xAA) == 0xF59) {
+    if (contact && *(s16 *)(contact + 0xAA) == 0xF59 /* moby class 3929 */) {
         SetDeathBits_pal(object, 0, 1);
         goto stop;
     }

@@ -1,6 +1,6 @@
 /* func_PAL_L22_003BCCAC, the PAL copy of func_L22_003B9450: the same C, where (all 50 Hz values)
    the charge divisor 0.033333335f becomes 0.039473683f, the light argument 20 becomes 17,
-   0.33333334f becomes 0.40000004f, the launch 0.6666667f becomes 0.8000001f, ctx+0x50's 1.0f becomes 1.2f,
+   0.33333334f becomes 0.40000004f, the launch 0.6666667f becomes 0.8000001f, vars+0x50's 1.0f becomes 1.2f,
    the >=6 test becomes >=5, 0.39999998f becomes 0.27999997f, the 50 limit and countdown become 42,
    the >5 clamp becomes >4, 0.016666668f becomes 0.020000001f and the 45 argument becomes 37. */
 #include "common.h"
@@ -37,7 +37,7 @@ extern int FloatToInt(float), math_random_int_range(int,int), math_random_int_be
 extern float math_random_float_range(float,float), math_fast_sin_or_cos_a(float), math_fast_sin_or_cos_b(float), square_root(float);
 extern void vec_scale_to_length(void *,void *,float), FastVecScale(void *,void *,float);
 extern void add_vectors(void *,void *,void *), FastVecAdd(void *,void *,void *), FastVecSub(void *,void *,void *);
-extern void func_PAL_L22_0033BBB0(int,void *,void *), part_spawn_glow_record(void *,int,int,int,int,float,float);
+extern void part_spawn_homing_trail_pal(int,void *,void *), part_spawn_glow_record(void *,int,int,int,int,float,float);
 extern int gfx_add_point_light(void *,float,float,int);
 extern void snd_stop_voice(int), moby_mark_spawned(char *), gfx_free_point_light(int);
 extern int snd_start_in_slot(int,int,int);
@@ -53,25 +53,25 @@ extern char *SpawnExplosion_pal(void *,int,int,int,float,float,int,int,int,int,i
 extern void *SpawnJointFollowParticle(void *,int,int,int,float);
 extern void part_spawn_random_direction_effect(void *,float,float);
 /* Same registers as its definition: integers a0-t3 then one stack word, the float in $f12. */
-extern void *func_PAL_002BD790(void *,void *,int,int,float,int,int,int,int,int);
-extern char *func_PAL_L08_0034C4A8(void *,void *,int,void *);
+extern void *part_spawn_spark_pal(void *,void *,int,int,float,int,int,int,int,int);
+extern char *part_spawn_short_lived_pal(void *,void *,int,void *);
 typedef struct { char prefix[0x10]; float inverse; char gap[2]; short kind; int color; } ParticleTail;
-void func_PAL_L22_003BCCAC(char *obj) {
+void charged_shot_update_pal(char *moby) {
     struct { Vec point, velocity, ground, motion, matrix[3], rotation, direction, scratch, intercept, result, predicted; } frame;
-    char *ctx = *(char **)(obj+0x68);
+    char *vars = *(char **)(moby+0x68);
     char **slot = &g_player_slot_flag_other;
     int hit;
     float radius, scale, length, turn;
-    if (I32(obj,0xB8)==g_hero_state.object) slot=&g_player_slot_flag_hero;
-    switch (U8(obj,0x20)) {
+    if (I32(moby,0xB8)==g_hero_state.object) slot=&g_player_slot_flag_hero;
+    switch (U8(moby,0x20)) {
     case 0: {
         float charge, intensity, size;
         int r, g, b, count;
-        if (S16(ctx,0x2E) && (g_hero_state.state==2 || !S16(ctx,0x40))) {
-            if (!I32(ctx,0x10) && slot==&g_player_slot_flag_other) { g_charged_shot_screen_effect.enabled=1; g_charged_shot_screen_effect.color=0xFFFF00; }
-            charge=IntToFloat(++I32(ctx,0x10))*0.039473683f;
+        if (S16(vars,0x2E) && (g_hero_state.state==2 || !S16(vars,0x40))) {
+            if (!I32(vars,0x10) && slot==&g_player_slot_flag_other) { g_charged_shot_screen_effect.enabled=1; g_charged_shot_screen_effect.color=0xFFFF00; }
+            charge=IntToFloat(++I32(vars,0x10))*0.039473683f;
             if(charge>1.0f) charge=1.0f;
-            if(S16(ctx,0x40)) charge *= charge*10.0f;
+            if(S16(vars,0x40)) charge *= charge*10.0f;
             else charge *= charge*5.0f;
             { int i; for(i=0;i<FloatToInt(charge);i++) {
                 int r, g, b;
@@ -81,117 +81,117 @@ void func_PAL_L22_003BCCAC(char *obj) {
                 frame.velocity.f[1]=math_random_float_range(-1.0f,1.0f);
                 frame.velocity.f[2]=math_random_float_range(-1.0f,1.0f);
                 frame.point.q=frame.velocity.q;
-                if(S16(ctx,0x40)) {r=79;g=175;b=255;} else {r=111;g=31;b=15;}
+                if(S16(vars,0x40)) {r=79;g=175;b=255;} else {r=111;g=31;b=15;}
                 g=math_random_int_range(r,g); b=math_random_int_range(r,b);
                 if(b>255)b=255; if(g>255)g=255;
                 vec_scale_to_length(&frame.point,&frame.point,math_random_float_range(15.0f,30.0f));
-                add_vectors(&frame.velocity,&frame.point,obj+0x10);
+                add_vectors(&frame.velocity,&frame.point,moby+0x10);
                 color=((u32)g<<8)|0x7F000000;
-                func_PAL_L22_0033BBB0(((u32)b<<16|color)|r,&frame.point,obj);
+                part_spawn_homing_trail_pal(((u32)b<<16|color)|r,&frame.point,moby);
             } }
-            if(I32(ctx,0x10)<50) {
+            if(I32(vars,0x10)<50) {
                 int alpha=g_charged_shot_screen_effect.color>>24;
                 if(!g_charged_shot_screen_effect.command && alpha==255) alpha=37;
                 g_charged_shot_screen_effect.command=0x1F00000042ULL;
                 { int previous=alpha; alpha++; if (previous>=36) alpha=37; }
                 g_charged_shot_screen_effect.color=(g_charged_shot_screen_effect.color&0xFFFF00)|(alpha<<24);
             } else g_charged_shot_screen_effect.color |= 0xFF000000;
-            if(S16(ctx,0x2C)!=-1) {
+            if(S16(vars,0x2C)!=-1) {
                 Effect *effects=g_effect_l22_light_table; char *lights,*light;
-                effects[S16(ctx,0x2C)].position[0]=F32(obj,0x10);
-                effects[S16(ctx,0x2C)].position[1]=F32(obj,0x14);
-                effects[S16(ctx,0x2C)].position[2]=F32(obj,0x18);
-                count=I32(ctx,0x10); if(count>50)count=50; if(count<0)count=0;
-                effects[S16(ctx,0x2C)].radius=IntToFloat(count)*0.14f;
-                intensity=IntToFloat(I32(ctx,0x10))*0.039473683f; if(intensity>1.0f)intensity=1.0f;
-                lights=(char *)effects->position; light=lights+S16(ctx,0x2C)*32;
+                effects[S16(vars,0x2C)].position[0]=F32(moby,0x10);
+                effects[S16(vars,0x2C)].position[1]=F32(moby,0x14);
+                effects[S16(vars,0x2C)].position[2]=F32(moby,0x18);
+                count=I32(vars,0x10); if(count>50)count=50; if(count<0)count=0;
+                effects[S16(vars,0x2C)].radius=IntToFloat(count)*0.14f;
+                intensity=IntToFloat(I32(vars,0x10))*0.039473683f; if(intensity>1.0f)intensity=1.0f;
+                lights=(char *)effects->position; light=lights+S16(vars,0x2C)*32;
                 r=math_random_int_range(15,47)&255;g=math_random_int_range(47,63)&255;b=math_random_int_range(63,127)&255;
                 part_spawn_glow_record(light,r,g,b,17,intensity*840000.0f,0.0f);
-                effects[S16(ctx,0x2C)].size=math_random_float_range(effects[S16(ctx,0x2C)].size*0.8f,effects[S16(ctx,0x2C)].radius*2.0f*0.14285715f);
-                size=effects[S16(ctx,0x2C)].size;
+                effects[S16(vars,0x2C)].size=math_random_float_range(effects[S16(vars,0x2C)].size*0.8f,effects[S16(vars,0x2C)].radius*2.0f*0.14285715f);
+                size=effects[S16(vars,0x2C)].size;
                 {
-                    float secondary=effects[S16(ctx,0x2C)].secondary*0.8f;
-                    effects[S16(ctx,0x2C)].secondary=math_random_float_range(secondary>size?size:secondary,size);
+                    float secondary=effects[S16(vars,0x2C)].secondary*0.8f;
+                    effects[S16(vars,0x2C)].secondary=math_random_float_range(secondary>size?size:secondary,size);
                 }
-            } else if(!(g_frame_l22_counter&3)) S16(ctx,0x2C)=gfx_add_point_light(obj+0x10,0.0f,0.0f,0);
+            } else if(!(g_frame_l22_counter&3)) S16(vars,0x2C)=gfx_add_point_light(moby+0x10,0.0f,0.0f,0);
         } else {
-            g_charged_shot_active=0; g_charged_shot_screen_effect.enabled=0;I32(ctx,0x10)=0;
+            g_charged_shot_active=0; g_charged_shot_screen_effect.enabled=0;I32(vars,0x10)=0;
             snd_start_in_slot(22,0,0);
-            if(S16(ctx,0x40)) { if(g_charge_voice_player!=-1) {snd_stop_voice(g_charge_voice_player);g_charge_voice_player=snd_start_in_slot(21,0,0);} }
+            if(S16(vars,0x40)) { if(g_charge_voice_player!=-1) {snd_stop_voice(g_charge_voice_player);g_charge_voice_player=snd_start_in_slot(21,0,0);} }
             else if(g_charge_voice_other!=-1) {snd_stop_voice(g_charge_voice_other);g_charge_voice_other=snd_start_in_slot(21,0,0);}
             if(!g_hero_flag_a) {
-                F32(ctx,0)=math_fast_sin_or_cos_a(g_hero_state.angle)*0.8000001f;
-                F32(ctx,4)=math_fast_sin_or_cos_b(g_hero_state.angle)*0.8000001f;F32(ctx,8)=0.0f;U8(obj,0x20)=1;
-            } else {FastVecScale(ctx,obj+0xC0,2.0f);U8(obj,0x20)=1;}
-            I32(ctx,0x14)=0;
+                F32(vars,0)=math_fast_sin_or_cos_a(g_hero_state.angle)*0.8000001f;
+                F32(vars,4)=math_fast_sin_or_cos_b(g_hero_state.angle)*0.8000001f;F32(vars,8)=0.0f;U8(moby,0x20)=1;
+            } else {FastVecScale(vars,moby+0xC0,2.0f);U8(moby,0x20)=1;}
+            I32(vars,0x14)=0;
         }
     } break;
     case 1: {
-        radius=IntToFloat(I32(ctx,0x14))*0.40000004f+1.3f;
-        I32(ctx,0x14)++;scale=radius+3.5f;radius*=0.5f;
-        cam_compute_view_direction(obj+0x10,&frame.ground,1);
-        if (S16(ctx,0x40)) vec_scale_to_length(&frame.motion,obj+0xC0,2.0f);
-        else vec_scale_to_length(&frame.motion,obj+0xC0,g_charged_shot_speed);
+        radius=IntToFloat(I32(vars,0x14))*0.40000004f+1.3f;
+        I32(vars,0x14)++;scale=radius+3.5f;radius*=0.5f;
+        cam_compute_view_direction(moby+0x10,&frame.ground,1);
+        if (S16(vars,0x40)) vec_scale_to_length(&frame.motion,moby+0xC0,2.0f);
+        else vec_scale_to_length(&frame.motion,moby+0xC0,g_charged_shot_speed);
         vec_scale_to_length(&frame.direction,&frame.ground,1.0f);
-        FastVecCross(&frame.rotation,obj+0xE0,&frame.direction);
-        turn=S16(ctx,0x40)?g_charged_shot_turn_alt:g_charged_shot_turn_normal;
+        FastVecCross(&frame.rotation,moby+0xE0,&frame.direction);
+        turn=S16(vars,0x40)?g_charged_shot_turn_alt:g_charged_shot_turn_normal;
         FastVecScale(&frame.rotation,&frame.rotation,turn);
         length=FastVecLength(&frame.rotation);
         frame.rotation.f[3]=-square_root(1.0f-length*length);
         quaternion_to_rotation_basis(&frame.rotation,frame.matrix);
-        multiply_matrix3x3(obj+0xC0,frame.matrix,obj+0xC0);
-        if(S16(ctx,0x40)) {
-            if(fast_vec_dist(&g_hero_state.position,obj+0x10)<g_charged_shot_hero_range) { I32(ctx,0x44)=0;S16(ctx,0x42)=0; }
-        } else {FastVecScale(&frame.motion,ctx+0x50,1.2f);vec_scale_to_length(&frame.scratch,&frame.motion,1.0f);qcopy(obj+0xC0,&frame.scratch);}
-        if(I32(ctx,0x44) && S16(ctx,0x40) && S16(ctx,0x42) && I32(ctx,0x14)>=5) {
-            FastVecSub(&frame.scratch,obj+0x10,*(char **)(ctx+0x44)+0x10);
+        multiply_matrix3x3(moby+0xC0,frame.matrix,moby+0xC0);
+        if(S16(vars,0x40)) {
+            if(fast_vec_dist(&g_hero_state.position,moby+0x10)<g_charged_shot_hero_range) { I32(vars,0x44)=0;S16(vars,0x42)=0; }
+        } else {FastVecScale(&frame.motion,vars+0x50,1.2f);vec_scale_to_length(&frame.scratch,&frame.motion,1.0f);qcopy(moby+0xC0,&frame.scratch);}
+        if(I32(vars,0x44) && S16(vars,0x40) && S16(vars,0x42) && I32(vars,0x14)>=5) {
+            FastVecSub(&frame.scratch,moby+0x10,*(char **)(vars+0x44)+0x10);
             if(FastVecDot(&frame.scratch,&frame.motion)<0.0f) {
-                FastVecScale(&frame.predicted,*(char **)(ctx+0x44)+0xE0,g_charged_shot_vec_scale);
-                FastVecAdd(&frame.result,*(char **)(ctx+0x44)+0x10,&frame.predicted);
-                vec_turn_toward_target(obj+0x10,obj+0xC0,&frame.result,ctx+0x48,g_charged_shot_turn_arg,g_charged_shot_turn_limit,0.0f,&frame.ground,0.0f,&frame.intercept);
-                vec_scale_to_length(obj+0xC0,obj+0xC0,1.0f);FastVecScale(&frame.motion,obj+0xC0,2.0f);
+                FastVecScale(&frame.predicted,*(char **)(vars+0x44)+0xE0,g_charged_shot_vec_scale);
+                FastVecAdd(&frame.result,*(char **)(vars+0x44)+0x10,&frame.predicted);
+                vec_turn_toward_target(moby+0x10,moby+0xC0,&frame.result,vars+0x48,g_charged_shot_turn_arg,g_charged_shot_turn_limit,0.0f,&frame.ground,0.0f,&frame.intercept);
+                vec_scale_to_length(moby+0xC0,moby+0xC0,1.0f);FastVecScale(&frame.motion,moby+0xC0,2.0f);
             }
         }
-        *(Quad *)ctx=frame.motion.q;
-        if(S16(ctx,0x2C)!=-1) {
+        *(Quad *)vars=frame.motion.q;
+        if(S16(vars,0x2C)!=-1) {
             Effect *effects=g_effect_l22_light_table;
-            effects[S16(ctx,0x2C)].radius*=0.27999997f;
-            if(effects[S16(ctx,0x2C)].radius<0.0001f) {gfx_free_point_light(S16(ctx,0x2C));S16(ctx,0x2C)=-1;}
+            effects[S16(vars,0x2C)].radius*=0.27999997f;
+            if(effects[S16(vars,0x2C)].radius<0.0001f) {gfx_free_point_light(S16(vars,0x2C));S16(vars,0x2C)=-1;}
         }
-        if(I32(ctx,0x14)>42 || g_hero_state.state!=2) {
-            if(I32(obj,0xB8)==g_hero_state.object) {if(g_charge_voice_player!=-1){snd_stop_voice(g_charge_voice_player);g_charge_voice_player=-1;}}
+        if(I32(vars,0x14)>42 || g_hero_state.state!=2) {
+            if(I32(moby,0xB8)==g_hero_state.object) {if(g_charge_voice_player!=-1){snd_stop_voice(g_charge_voice_player);g_charge_voice_player=-1;}}
             else if(g_charge_voice_other!=-1){snd_stop_voice(g_charge_voice_other);g_charge_voice_other=-1;}
             moby_mark_spawned(*slot);*slot=0;return;
         }
-        add_vectors(&frame.ground,obj+0x10,ctx);
-        if(!S16(ctx,0x40) && gravity_get_center_distance(obj+0x10)-g_planet_radius<1.3f) arena_push_point_out(obj+0x10,1.3f);
-        if(F32(obj,0x10)<2.0f || F32(obj,0x10)>1021.0f || F32(obj,0x14)<2.0f || F32(obj,0x14)>1021.0f || F32(obj,0x18)<2.0f || F32(obj,0x18)>1021.0f) {
-            if(I32(obj,0xB8)==g_hero_state.object) {if(g_charge_voice_player!=-1){snd_stop_voice(g_charge_voice_player);g_charge_voice_player=-1;}}
+        add_vectors(&frame.ground,moby+0x10,vars);
+        if(!S16(vars,0x40) && gravity_get_center_distance(moby+0x10)-g_planet_radius<1.3f) arena_push_point_out(moby+0x10,1.3f);
+        if(F32(moby,0x10)<2.0f || F32(moby,0x10)>1021.0f || F32(moby,0x14)<2.0f || F32(moby,0x14)>1021.0f || F32(moby,0x18)<2.0f || F32(moby,0x18)>1021.0f) {
+            if(I32(moby,0xB8)==g_hero_state.object) {if(g_charge_voice_player!=-1){snd_stop_voice(g_charge_voice_player);g_charge_voice_player=-1;}}
             else if(g_charge_voice_other!=-1){snd_stop_voice(g_charge_voice_other);g_charge_voice_other=-1;}
             moby_mark_spawned(*slot);*slot=0;return;
         }
-        if(S16(ctx,0x40)) {
+        if(S16(vars,0x40)) {
             int count,i; float emission; char *particle;
-            hit=coll_process_hit(obj+0x10,16,obj,0,radius);
-            frame.ground.q=*(Quad *)(obj+0x10);
-            moby_queue_knockback_for_nodes(obj,&frame.ground,g_hit_l22_moby_list,hit,0,0x8B0000,2,1,g_space_ship_param_z,1.0f,1.0f);
-            if(hit)SpawnExplosion_pal(obj+0x10,0,25,20,1.0f,20.0f,20,20,45,1,1,0,0,0);
-            count=42-I32(ctx,0x14);if(count>4)count=4;
+            hit=coll_process_hit(moby+0x10,16,moby,0,radius);
+            frame.ground.q=*(Quad *)(moby+0x10);
+            moby_queue_knockback_for_nodes(moby,&frame.ground,g_hit_l22_moby_list,hit,0,0x8B0000,2,1,g_space_ship_param_z,1.0f,1.0f);
+            if(hit)SpawnExplosion_pal(moby+0x10,0,25,20,1.0f,20.0f,20,20,45,1,1,0,0,0);
+            count=42-I32(vars,0x14);if(count>4)count=4;
             emission=scale*105000.0f;
             { int r=math_random_int_range(63,127),g=math_random_int_range(47,63),b=math_random_int_range(15,47);
-            u32 x=(u32)g<<8|0x4F000000; SpawnJointFollowParticle(obj,((u32)r<<16|x)|b,count,-1,emission); }
+            u32 x=(u32)g<<8|0x4F000000; SpawnJointFollowParticle(moby,((u32)r<<16|x)|b,count,-1,emission); }
             part_spawn_random_direction_effect(&frame.point,scale*0.020000001f,(scale+scale)*0.020000001f);
             { int r=math_random_int_range(63,127),g=math_random_int_range(47,63),b=math_random_int_range(15,47); u32 x=(u32)g<<8|0x7F000000;
-            func_PAL_002BD790(obj+0x10,&frame.point,((u32)r<<16|x)|b,0x4F7F4F2F,210000.0f,37,1,*g_spark_texture,-1,0); }
+            part_spawn_spark_pal(moby+0x10,&frame.point,((u32)r<<16|x)|b,0x4F7F4F2F,210000.0f,37,1,*g_spark_texture,-1,0); }
             for(i=5;i>=0;i--) {
                 part_spawn_random_direction_effect(&frame.point,scale*0.020000001f,(scale+scale)*0.020000001f);
                 part_spawn_random_direction_effect(&frame.velocity,0.0f,scale*0.5f);
-                add_vectors(&frame.ground,&frame.velocity,obj+0x10);
-                particle=func_PAL_L08_0034C4A8(&frame.velocity,&frame.point,127,obj);
+                add_vectors(&frame.ground,&frame.velocity,moby+0x10);
+                particle=part_spawn_short_lived_pal(&frame.velocity,&frame.point,127,moby);
                 if(particle)F32(particle,0xC)=math_random_float_range(6000.0f,32000.0f)*scale*0.4f;
             }
             for(i=0;i<8;i++) {
-                particle=func_PAL_L08_0034C4A8(obj+0x10,g_effect_position_params,127,obj);
+                particle=part_spawn_short_lived_pal(moby+0x10,g_effect_position_params,127,moby);
                 if(particle) {
                     ParticleTail *tail=(ParticleTail *)(particle+0x20);
                     if(i==2 && !math_random_int_below(8))F32(particle,0xC)=180000.0f;
@@ -202,21 +202,21 @@ void func_PAL_L22_003BCCAC(char *obj) {
             }
         } else {
             int count; float emission;
-            hit=coll_process_hit(obj+0x10,16,*(void **)(obj+0xB8),0,radius);
-            frame.ground.q=*(Quad *)(obj+0x10);
-            moby_queue_knockback_for_nodes(obj,&frame.ground,g_hit_l22_moby_list,hit,0,0x8B0007,2,1,g_space_ship_param_z,1.0f,1.0f);
-            if(hit)SpawnExplosion_pal(obj+0x10,0,25,20,1.0f,20.0f,20,20,45,1,1,0,0,0);
-            count=42-I32(ctx,0x14);if(count>4)count=4;
+            hit=coll_process_hit(moby+0x10,16,*(void **)(moby+0xB8),0,radius);
+            frame.ground.q=*(Quad *)(moby+0x10);
+            moby_queue_knockback_for_nodes(moby,&frame.ground,g_hit_l22_moby_list,hit,0,0x8B0007,2,1,g_space_ship_param_z,1.0f,1.0f);
+            if(hit)SpawnExplosion_pal(moby+0x10,0,25,20,1.0f,20.0f,20,20,45,1,1,0,0,0);
+            count=42-I32(vars,0x14);if(count>4)count=4;
             emission=scale*105000.0f;
             { int r=math_random_int_range(15,47),g=math_random_int_range(47,63),b=math_random_int_range(63,127);
-            u32 x=(u32)g<<8|0x4F000000; SpawnJointFollowParticle(obj,((u32)r<<16|x)|b,count,-1,emission); }
+            u32 x=(u32)g<<8|0x4F000000; SpawnJointFollowParticle(moby,((u32)r<<16|x)|b,count,-1,emission); }
             part_spawn_random_direction_effect(&frame.point,scale*0.020000001f,(scale+scale)*0.020000001f);
             { int r=math_random_int_range(15,47),g=math_random_int_range(31,47),b=math_random_int_range(63,127); u32 x=(u32)g<<8|0x7F000000;
-            func_PAL_002BD790(obj+0x10,&frame.point,((u32)r<<16|x)|b,0x4F1F1F7F,210000.0f,37,1,*g_spark_texture,-1,0); }
+            part_spawn_spark_pal(moby+0x10,&frame.point,((u32)r<<16|x)|b,0x4F1F1F7F,210000.0f,37,1,*g_spark_texture,-1,0); }
         }
     } break;
     default: break;
     }
-    if(g_hero_flag_a) {cam_compute_view_direction(obj+0x10,ctx+0x30,0);vec_negate_and_forward(obj+0xC0,ctx+0x30,0);}
-    S16(ctx,0x2E)=0;
+    if(g_hero_flag_a) {cam_compute_view_direction(moby+0x10,vars+0x30,0);vec_negate_and_forward(moby+0xC0,vars+0x30,0);}
+    S16(vars,0x2E)=0;
 }

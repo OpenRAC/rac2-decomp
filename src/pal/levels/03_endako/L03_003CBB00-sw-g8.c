@@ -40,7 +40,7 @@ extern void moby_init_effect_track(char *);
 extern s32 flag_set_first_pending(char *);
 extern s32 FastDecTimer(void *);
 extern int coll_sweep_from_object(char *,char *,s32,s32,s32,s32,f32,f32,f32);
-extern char *func_PAL_0032F3B8(char *,char *,char *,f32);
+extern char *part_spawn_blast_effect_moby_pal(char *,char *,char *,f32);
 extern s32 coll_test_point(char *,s32,char *,f32);
 extern s32 moby_fuse_linked_objects(char *,char *,char *,s32,s32);
 extern s32 math_fast_float_d(void *);
@@ -64,142 +64,143 @@ typedef struct {
    the private pointer live across the whole switch.
    &p->displacement and &p->velocity are written out each time: gcse keeps the first computation
    in a saved register. */
-void func_PAL_L03_003CBE60(char *a0)
+/* Updates an explosive crate: rests, falls when it loses its ground, flashes, blows up and respawns later. (PAL: 50 Hz timings) */
+void explosive_crate_update_pal(char *object)
 {
     char buf[0x10] __attribute__((aligned(16)));
     char direction[0x10] __attribute__((aligned(16)));
     char hit[0x10] __attribute__((aligned(16)));
-    Actor7E20 *actor=(Actor7E20 *)a0;
-    Private7E20 *p = actor->privateData;
+    Actor7E20 *actor=(Actor7E20 *)object;
+    Private7E20 *vars = actor->privateData;
     switch (actor->state) {
     case 0: {
         u16 id;
-        p->drawFlags=actor->drawFlags;
-        p->ground=actor->position[2];
-        qcopy((char *)&p->home,(char *)actor->position);
-        p->flags|=1;
+        vars->drawFlags=actor->drawFlags;
+        vars->ground=actor->position[2];
+        qcopy((char *)&vars->home,(char *)actor->position);
+        vars->flags|=1;
         if (actor->type==0xB85) {
             id=(u16)actor->uid;
             if (g_trigger_l03_flags.flags[(s16)id] ||
                 ((g_moby_nibble_table[((s16)id>>1)+(g_current_map_index<<10)] >> ((id&1)?4:0))&7)) {
-                qcopy((char *)actor->position,g_linked_effect_records[p->index].position);
+                qcopy((char *)actor->position,g_linked_effect_records[vars->index].position);
             }
         }
-        moby_set_state(a0,1,-1);
+        moby_set_state(object,1,-1);
         break;
     }
     case 1: {
         u16 id;
         if (!(g_frame_l03_counter&7)) {
             if (coll_probe_ground_height_below((char *)actor->position,0,0.5f)+0.05f<=actor->position[2])
-                moby_set_state(a0,3,-1);
+                moby_set_state(object,3,-1);
         }
         if (actor->type==0xCFC) {
-            char *v=part_find_owned_effect_slot(a0,0x10001,0);
-            if (v) {
-                moby_set_state(a0,4,-1);
-                if (*(char **)(v+0x20) && *(s16 *)(*(char **)(v+0x20)+0xAA)==0xB85)
-                    p->delay=1;
-                else p->delay=8;
+            char *effect=part_find_owned_effect_slot(object,0x10001,0);
+            if (effect) {
+                moby_set_state(object,4,-1);
+                if (*(char **)(effect+0x20) && *(s16 *)(*(char **)(effect+0x20)+0xAA)==0xB85)
+                    vars->delay=1;
+                else vars->delay=8;
             }
-            if (g_hero_state.object26C==a0 || g_hero_state.object33C==a0 ||
-                g_hero_state.object270==a0 || g_hero_state.object588==a0)
-                moby_set_state(a0,4,-1);
-        } else if (p->pending && g_game_mode[0]!=0x31) {
-            p->pending=0;
-            if (IsPointInCuboid((char *)actor->position,p->index)) {
-                qcopy((char *)actor->position,g_linked_effect_records[p->index].position);
+            if (g_hero_state.object26C==object || g_hero_state.object33C==object ||
+                g_hero_state.object270==object || g_hero_state.object588==object)
+                moby_set_state(object,4,-1);
+        } else if (vars->pending && g_game_mode[0]!=0x31) {
+            vars->pending=0;
+            if (IsPointInCuboid((char *)actor->position,vars->index)) {
+                qcopy((char *)actor->position,g_linked_effect_records[vars->index].position);
                 id=(u16)actor->uid;
                 if (id&1) {
-                    u8 *b=&g_moby_nibble_table[((s16)id>>1)+(g_current_map_index<<10)];
-                    if (((*b>>4)&7)!=7) *b+=16;
+                    u8 *nibble=&g_moby_nibble_table[((s16)id>>1)+(g_current_map_index<<10)];
+                    if (((*nibble>>4)&7)!=7) *nibble+=16;
                 } else {
-                    u8 *b=&g_moby_nibble_table[((s16)id>>1)+(g_current_map_index<<10)];
-                    if ((*b&7)!=7) *b+=1;
+                    u8 *nibble=&g_moby_nibble_table[((s16)id>>1)+(g_current_map_index<<10)];
+                    if ((*nibble&7)!=7) *nibble+=1;
                 }
-            } else path_push_point_away(p->effect,(char *)actor->position,(char *)actor->position,2.5f);
+            } else path_push_point_away(vars->effect,(char *)actor->position,(char *)actor->position,2.5f);
         }
         break;
     }
     case 2: {
         f32 length;
         f32 offset=2.3f;
-        p->displacement[2]+=offset;
-        length=FastVecLength((char *)&p->displacement);
+        vars->displacement[2]+=offset;
+        length=FastVecLength((char *)&vars->displacement);
         if (length!=0.0f) {
-            math_approach_target_with_braking(&p->damping,length,0.00040000002f,0.00040000002f,0.020000001f);
-            length-=p->damping;
+            math_approach_target_with_braking(&vars->damping,length,0.00040000002f,0.00040000002f,0.020000001f);
+            length-=vars->damping;
             if (length<0.0f) length=0.0f;
-            vec_scale_to_length((char *)&p->displacement,(char *)&p->displacement,length);
+            vec_scale_to_length((char *)&vars->displacement,(char *)&vars->displacement,length);
         }
-        p->displacement[2]-=offset;
-        moby_transform_joint_to_world(p->node,2,buf);
-        FastVecAdd((char *)actor->position,buf,(char *)&p->displacement);
+        vars->displacement[2]-=offset;
+        moby_transform_joint_to_world(vars->node,2,buf);
+        FastVecAdd((char *)actor->position,buf,(char *)&vars->displacement);
         break;
     }
     case 3: {
-        p->velocity[2]-=0.012f;
-        FastVecAdd((char *)actor->position,(char *)actor->position,(char *)&p->velocity);
-        path_push_point_away(p->effect,(char *)actor->position,(char *)actor->position,1.25f);
-        p->ground=coll_probe_ground_height_below((char *)actor->position,0,0.5f);
-        if (actor->position[2]<=p->ground) {
+        vars->velocity[2]-=0.012f;
+        FastVecAdd((char *)actor->position,(char *)actor->position,(char *)&vars->velocity);
+        path_push_point_away(vars->effect,(char *)actor->position,(char *)actor->position,1.25f);
+        vars->ground=coll_probe_ground_height_below((char *)actor->position,0,0.5f);
+        if (actor->position[2]<=vars->ground) {
             if (actor->type==0xCFC) {
-                if (GetCollHitMaterial()==1) moby_set_state(a0,5,-1);
-                else moby_set_state(a0,4,-1);
-            } else moby_set_state(a0,1,-1);
-            snd_play_from_class_bank(3,0,a0,0x94A);
-            p->effectTimer=2;
-            vec_clear_128((char *)&p->velocity);
-            actor->position[2]=p->ground;
-            p->pending=1;
+                if (GetCollHitMaterial()==1) moby_set_state(object,5,-1);
+                else moby_set_state(object,4,-1);
+            } else moby_set_state(object,1,-1);
+            snd_play_from_class_bank(3,0,object,0x94A);
+            vars->effectTimer=2;
+            vec_clear_128((char *)&vars->velocity);
+            actor->position[2]=vars->ground;
+            vars->pending=1;
         }
-        moby_init_effect_track(a0);
+        moby_init_effect_track(object);
         break;
     }
     case 4:
-        if (flag_set_first_pending(a0) && !p->delay) p->delay=108;
-        if (FastDecTimer((char *)&p->delay)) moby_set_state(a0,5,-1);
-        if (p->delay%50<8) {
-            snd_play_from_class_bank(0,0,a0,0xCFC);
+        if (flag_set_first_pending(object) && !vars->delay) vars->delay=108;
+        if (FastDecTimer((char *)&vars->delay)) moby_set_state(object,5,-1);
+        if (vars->delay%50<8) {
+            snd_play_from_class_bank(0,0,object,0xCFC);
             actor->drawFlags=0x800000C0;
-        } else actor->drawFlags=p->drawFlags;
+        } else actor->drawFlags=vars->drawFlags;
         break;
     case 5: {
         char *position=(char *)actor->position;
         qcopy(buf,position);
         *(f32 *)(buf+8)+=1.0f;
-        snd_play_from_class_bank(1,0,a0,0xCFC);
+        snd_play_from_class_bank(1,0,object,0xCFC);
         FastVecSub(direction,g_camera_pose_buffer,buf);
         vec_scale_to_length(direction,direction,1.0f);
         *(TI128 *)(hit)=0;
         *(f32 *)(hit+8)=1.0f;
         FastVecAdd(hit,hit,position);
-        coll_sweep_from_object(a0,hit,0x10001,0,1,0,4.0f,4.0f,1.0f);
-        func_PAL_0032F3B8(a0,buf,direction,0.0f);
+        coll_sweep_from_object(object,hit,0x10001,0,1,0,4.0f,4.0f,1.0f);
+        part_spawn_blast_effect_moby_pal(object,buf,direction,0.0f);
         actor->collision=0;
         actor->flags=(actor->flags|0x41)&~0x1000;
-        moby_set_state(a0,6,-1);
+        moby_set_state(object,6,-1);
         break;
     }
     case 6:
-        if (flag_set_first_pending(a0)) p->respawnDelay=50;
-        if (FastDecTimer((char *)&p->respawnDelay)) {
-            qcopy((char *)actor->position,(char *)&p->home);
+        if (flag_set_first_pending(object)) vars->respawnDelay=50;
+        if (FastDecTimer((char *)&vars->respawnDelay)) {
+            qcopy((char *)actor->position,(char *)&vars->home);
             qcopy(buf,(char *)actor->position);
             *(f32 *)(buf+8)+=1.3f;
-            if (!coll_test_point(buf,0,a0,1.2f) &&
-                (*(f32 *)(buf+8)+=1.0f,!coll_test_point(buf,0,a0,1.2f))) {
-                moby_set_state(a0,1,-1);
-                actor->drawFlags=p->drawFlags;
+            if (!coll_test_point(buf,0,object,1.2f) &&
+                (*(f32 *)(buf+8)+=1.0f,!coll_test_point(buf,0,object,1.2f))) {
+                moby_set_state(object,1,-1);
+                actor->drawFlags=vars->drawFlags;
                 actor->flags=(actor->flags&~0x41)|0x1000;
-                actor->collision=*(s32 *)(*(char **)(a0+0x24)+0x10);
-                moby_fuse_linked_objects(a0,(char *)&p->home,(char *)actor->rotation,0,0);
+                actor->collision=*(s32 *)(*(char **)(object+0x24)+0x10);
+                moby_fuse_linked_objects(object,(char *)&vars->home,(char *)actor->rotation,0,0);
                 actor->alpha=255;
-            } else p->respawnDelay=25;
+            } else vars->respawnDelay=25;
         }
         break;
     }
-    if (math_fast_float_d((char *)&p->effectTimer)==2) {
+    if (math_fast_float_d((char *)&vars->effectTimer)==2) {
         g_hero_l03_state_alias.f180=0.1f;
         g_hero_l03_state_alias.i188=50;
         g_hero_l03_state_alias.f160=0.1f;

@@ -13,6 +13,7 @@ extern int PlayMobySound(int,int,char *);
 extern void FastVecSub(void *,void *,void *);
 extern void mat_combine_and_store(void *,void *,void *,void *);
 
+/* Moves and turns a platform when its switch is on, and carries a linked object along with it (PAL: 50 Hz speeds). */
 void rotating_platform_update_pal(char *object)
 {
     RotatingMoverWorkspace local;

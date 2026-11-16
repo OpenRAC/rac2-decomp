@@ -15,8 +15,8 @@ extern float math_random_signed_float_range(float, float);
 extern float FastAddRotations(float, float);
 extern void vec_build_spherical_offset(float *, float, float, float);
 extern int math_random_int_below(int);
-extern char *func_PAL_002BE9A8(float *, float, float, int, float *, float, float, unsigned, int);
-extern char *func_PAL_002C23B8(float *, float *, int, int, unsigned, int, float, float, float, float, float);
+extern char *part_spawn_spinning_spark_pal(float *, float, float, int, float *, float, float, unsigned, int);
+extern char *part_spawn_burst_pal(float *, float *, int, int, unsigned, int, float, float, float, float, float);
 extern char g_camera_l00_position[];
 extern void FastVecSub(char *dst, char *src, char *arg);
 extern float mat_fast_helper_a(float, float);
@@ -45,7 +45,7 @@ void part_l00_spawn_spark_burst_3_pal(float *pos, int unused, int extra)
         out[0] = pos[0] + math_random_signed_float_range(0.0f, 0.2f);
         out[1] = pos[1] + math_random_signed_float_range(0.0f, 0.2f);
         out[2] = pos[2] + math_random_signed_float_range(0.0f, 0.2f);
-        p = func_PAL_002BE9A8(out, 0.0f, 1.0f, id, dir, 1.01f, speed, 0x7F202020, 1);
+        p = part_spawn_spinning_spark_pal(out, 0.0f, 1.0f, id, dir, 1.01f, speed, 0x7F202020, 1);
         if (p) {
             p[3] = 68;
             *(short *)(p + 10) = 75;
@@ -63,16 +63,16 @@ void part_l00_spawn_spark_burst_3_pal(float *pos, int unused, int extra)
         out[0] = pos[0] + math_random_signed_float_range(0.0f, 0.1f);
         out[1] = pos[1] + math_random_signed_float_range(0.0f, 0.1f);
         out[2] = pos[2] + math_random_signed_float_range(0.0f, 0.1f);
-        func_PAL_002C23B8(out, dir, 25, 127, 0x7F7F7F, id,
+        part_spawn_burst_pal(out, dir, 25, 127, 0x7F7F7F, id,
             math_random_float_range(0.1f, 0.5f) * 210000.0f, 500.0f, 1.0f, 0.0f, 1.0f);
     }
     if (extra == 1) {
         char *last;
         speed = 525000.0f;
         n = math_random_int_below(255);
-        last = func_PAL_002C23B8(pos, (float *)D_L00_001A8F20_1, 4, 127, 0x207080, n, speed, 0.0f, 1.0f, 0.0f, 1.0f);
+        last = part_spawn_burst_pal(pos, (float *)D_L00_001A8F20_1, 4, 127, 0x207080, n, speed, 0.0f, 1.0f, 0.0f, 1.0f);
         if (last) last[2] = *g_effect_param_pointer_b;
-        last = func_PAL_002C23B8(pos, (float *)D_L00_001A8F20_1, 4, 127, 0x207080, (n + 128) & 255, speed, 0.0f, 1.0f, 0.0f, 1.0f);
+        last = part_spawn_burst_pal(pos, (float *)D_L00_001A8F20_1, 4, 127, 0x207080, (n + 128) & 255, speed, 0.0f, 1.0f, 0.0f, 1.0f);
         if (last) last[2] = *g_effect_param_pointer_b;
     }
 }

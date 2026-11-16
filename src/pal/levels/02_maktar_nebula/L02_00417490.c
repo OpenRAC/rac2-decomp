@@ -27,28 +27,28 @@ extern void *part_spawn_hero_relative(void *, void *, int, int, int, int, float)
 
 /* func_PAL_L02_00417490, the PAL copy of func_L02_00412808: the same C, where the per-frame
    0.016666668f becomes 0.020000001f and the spark kind is scaled to 50 Hz. */
-void func_PAL_L02_00417490(u8 *a0) {
+void part_throw_front_sparks_pal(u8 *moby) {
     SparkRange range = g_spark_l02_range_2;
     SparkSizes sizes = g_spark_sizes;
     SparkColours colours = g_spark_colours;
     SparkKinds kinds = g_spark_kinds;
-    float vel[4];
+    float velocity[4];
     float front[4];
     float spot[4];
 
     *(TI128 *)front = 0;
     front[2] = 1.5f;
-    matrix_mul_vec3(front, front, a0 + 0xC0);
-    FastVecAdd(front, front, a0 + 0x10);
-    vec_random_direction(vel, range.f[0] * 0.020000001f, range.f[1] * 0.020000001f);
-    part_spawn_hero_relative(front, vel, colours.i[0],
+    matrix_mul_vec3(front, front, moby + 0xC0);
+    FastVecAdd(front, front, moby + 0x10);
+    vec_random_direction(velocity, range.f[0] * 0.020000001f, range.f[1] * 0.020000001f);
+    part_spawn_hero_relative(front, velocity, colours.i[0],
                   (u8)(((s32)math_random_int_range(kinds.b[0], kinds.b[1]) * 5 + 2) / 6),
                   (u8)math_random_int_below(0xFF), 0, sizes.f[0]);
-    vec_clear_128(vel);
+    vec_clear_128(velocity);
     vec_random_direction(spot, 0.0f, 1.5f);
     FastVecAdd(spot, spot, front);
-    vel[2] = -(math_random_float_range(range.f[2], range.f[3]) * 0.020000001f);
-    part_spawn_hero_relative(spot, vel, colours.i[1],
+    velocity[2] = -(math_random_float_range(range.f[2], range.f[3]) * 0.020000001f);
+    part_spawn_hero_relative(spot, velocity, colours.i[1],
                   (u8)(((s32)math_random_int_range(kinds.b[2], kinds.b[3]) * 5 + 2) / 6),
                   (u8)math_random_int_below(0xFF), 0, sizes.f[1]);
 }

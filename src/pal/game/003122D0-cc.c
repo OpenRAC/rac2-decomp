@@ -142,7 +142,7 @@ extern float coll_probe_ground_height_below(void *, int, float);
 extern int PlayMobySound(int, int, CrateMoby *);
 extern void set_moby_color(CrateMoby *, int, int, int);
 
-void func_PAL_003122D0(CrateMoby *moby)
+void crate_update_pal(CrateMoby *moby)
 {
     CrateBurst burst;
     float position[4] __attribute__((aligned(16)));
@@ -177,7 +177,7 @@ void func_PAL_003122D0(CrateMoby *moby)
         vec_clear_128(vars->f90);
         moby->state = 1;
         vars->fA8 = 0;
-        if (moby->oClass == 0x1FF) {
+        if (moby->oClass == MOBY_CLASS_AMMO_CRATE) {
             vars->frame++;
         }
         if (vars->fCC == 0) {
@@ -187,11 +187,11 @@ void func_PAL_003122D0(CrateMoby *moby)
             }
         }
         vars->linked = 0;
-        if (moby->oClass == 0x1FF) {
+        if (moby->oClass == MOBY_CLASS_AMMO_CRATE) {
             vars->fC6 = 100;
-        } else if (moby->oClass == 0x1F5) {
+        } else if (moby->oClass == MOBY_CLASS_NANOTECH_CRATE) {
             vars->linked = moby_spawn_linked_child(moby, 0);
-        } else if (moby->oClass == 0x200) {
+        } else if (moby->oClass == MOBY_CLASS_PURPLE_NANOTECH_CRATE) {
             vars->linked = moby_spawn_linked_child(moby, 1);
         }
         break;
@@ -199,7 +199,7 @@ void func_PAL_003122D0(CrateMoby *moby)
         if (flag_set_first_pending(moby)) {
             vars->f100 = 0;
         }
-        if (moby->oClass == 0x1F9 &&
+        if (moby->oClass == MOBY_CLASS_EXPLOSIVE_CRATE &&
             (((CrateHero *)g_hero_state)->f270 == moby || ((CrateHero *)g_hero_state)->collHitMoby == moby ||
              (((CrateHero *)g_hero_state)->groundMoby == moby && ((CrateHero *)g_hero_state)->airFrames == 0) ||
              ((CrateHero *)g_hero_state)->ledgeMoby == moby || touched)) {
@@ -213,12 +213,12 @@ void func_PAL_003122D0(CrateMoby *moby)
             break;
         }
         if (hit != 0 && hit->f2C > 0.0f) {
-            int doHit = 1;
+            int do_hit = 1;
 
             if (moby->oClass == 0x1F6 && !(hit->flags & 0x20000)) {
-                doHit = 0;
+                do_hit = 0;
             }
-            if (moby->oClass == 0x1F9) {
+            if (moby->oClass == MOBY_CLASS_EXPLOSIVE_CRATE) {
                 moby->state = 5;
                 if (hit->flags & 0x20000) {
                     moby->command = 1;
@@ -226,10 +226,10 @@ void func_PAL_003122D0(CrateMoby *moby)
                     moby->command = FloatToInt(((math_random_float_range(5.0f, 15.0f)) * 5.0f + 2.0f) * 0.16666667f);
                 }
                 vars->savedColor = moby->color;
-                doHit = 0;
+                do_hit = 0;
             }
-            if (doHit) {
-                DestroyCrate_pal(moby, moby->oClass == 0x1F9, hit);
+            if (do_hit) {
+                DestroyCrate_pal(moby, moby->oClass == MOBY_CLASS_EXPLOSIVE_CRATE, hit);
                 crate_drop_loot_pal(moby);
             }
             moby->hitSlot = 255;
@@ -242,7 +242,7 @@ void func_PAL_003122D0(CrateMoby *moby)
         }
         break;
     case 3:
-        if (moby->oClass == 0x1F9 && vars->burstFrame < 18) {
+        if (moby->oClass == MOBY_CLASS_EXPLOSIVE_CRATE && vars->burstFrame < 18) {
             float radius;
             int target;
 

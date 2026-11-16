@@ -28,7 +28,7 @@ extern int g_current_map_index __attribute__((sda));
 
 extern void anim_start_startup_animations(void);
 
-extern void func_US2_002E72D8(void *);
+extern void UpdateEquipmentPieces_us2(void *);
 
 extern void math_store_angle_update_result(void *, void *, int, int, float);
 
@@ -39,7 +39,7 @@ extern void cutscene_draw_intro_overlays(void *);
 /* func_US2_L02_00301998, the USA v2.00 copy of func_L02_00300CE8: the same C, where the 0xFA0 mobs' call
    is skipped in game state 0x33, func_002E64A0 becomes func_US2_002E72D8, and the mob pointer is read as
    base + i * 4 + 0x18C rather than D_L02_001BE200.mobs[i], as in func_US2_L14_00305238. */
-void func_US2_L02_00301998(void) {
+void level_update_moby_list_effects_us2(void) {
     int i;
 
     anim_start_startup_animations();
@@ -49,7 +49,7 @@ void func_US2_L02_00301998(void) {
         if (mob != 0 && mob->type == 0xE29)
             mob->flags |= 0x800;
         if (mob->type == 0xD54)
-            func_US2_002E72D8(mob);
+            UpdateEquipmentPieces_us2(mob);
         if (mob != 0 && mob->type == 0xFA0 && g_current_map_index != 0x33 && mob->p68 != 0)
             math_store_angle_update_result(mob, (u8 *)mob->p68 + 0xC, 0x80AAAAD2, 0x80396464, 0.061086535f);
     }

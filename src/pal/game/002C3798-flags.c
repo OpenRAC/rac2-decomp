@@ -4,7 +4,7 @@
 extern void vec_add_random_offset(void *, float);
 extern float vec_distance_xy(void *, void *);
 extern void part_queue_impact_effect(void *, int, int, void *, void *, float);
-extern char *func_PAL_002C3798(void *, int, int, int, int, int, int, float, float);
+extern char *part_spawn_debris_pal(void *, int, int, int, int, int, int, float, float);
 extern unsigned char *g_part_tex_burst_ember_table;
 extern char *g_particle_pool_base[] __attribute__((sda));
 extern char g_hero_position[];
@@ -37,7 +37,10 @@ extern void vec_scale_to_length(void *, void *, float);
 
 /* func_PAL_002C3798 uses the quadword-copy profile in 002C2A88-qcopy.c. */
 
-void func_PAL_002C3990(char *p) {
+/* Updates a burst effect in three modes: 0 fades in, then becomes a debris emitter or dies;
+   1 spawns debris each frame and pushes the hero when close; 2 is flying debris that fades
+   its colour and size. */
+void part_update_burst_effect_pal(char *p) {
  char *q=p+32; SplitVector v; int i; float f, a, speed;
  switch(*(unsigned char *)(q+20)) {
  case 0: {
@@ -54,7 +57,7 @@ void func_PAL_002C3990(char *p) {
    vec_add_random_offset(&v,0.05f);
    speed=1.0f;
    if(*(short *)(p+10)<8)speed=IntToFloat(*(short *)(p+10))*0.125f;
-   func_PAL_002C3798(&v,2,*(unsigned char *)(q+17),*(unsigned char *)(q+18),*(unsigned char *)(q+19),*(unsigned char *)(q+21),*(int *)(q+24),*(float *)(q+28),speed);
+   part_spawn_debris_pal(&v,2,*(unsigned char *)(q+17),*(unsigned char *)(q+18),*(unsigned char *)(q+19),*(unsigned char *)(q+21),*(int *)(q+24),*(float *)(q+28),speed);
   }
   if(FastDecTimer((short *)(p+10)))part_kill(p);
   { char *pos=g_hero_position; ParticleHero2C2C80 *hero;

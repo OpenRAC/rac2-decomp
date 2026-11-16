@@ -59,14 +59,14 @@ extern float math_spring_float_to_goal(void *, void *, float, float, float, floa
 extern int weapon_spend_ammo(int, int);
 extern int snd_is_voice_playing_for_owner(void *, int);
 extern int PlayMobySound(int, int, void *);
-extern void func_PAL_002A7E68(void *, int, int, int);
+extern void anim_start_blended_pal(void *, int, int, int);
 extern int coll_process_hit(float, void *, int, void *, int);
 extern void FastVecSub(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
 extern void make_hit_descriptor(void *, void *, int, float, void *);
 extern void QueueMobyImpact(void *, void *);
 extern int StartAttachedEffect_pal(void *, int, void *);
-extern s32 func_PAL_L18_002E01E0(int, int);
+extern s32 hero_l18_set_action_pal(int, int);
 extern void vec_clear_128(void *);
 extern void matrix_mul_vec3(void *, void *, void *);
 extern void vec_compute_object_to_target(void *, void *, void *, float);
@@ -80,7 +80,8 @@ extern void part_l00_update_effect_slots_2_pal(void *);
 extern void gfx_add_draw_callback_third(void (*)(char *), void *);
 extern void lava_gun_draw_shot(char *);
 
-void func_PAL_L18_0044C9C0(u8 *obj)
+/* Updates the lava gun: spends ammo, damages what the flame touches, and draws the shot (PAL: 50 Hz timings). */
+void lava_l18_gun_update_pal(u8 *obj)
 {
     float velocity[4] __attribute__((aligned(16)));
     float direction[4] __attribute__((aligned(16)));
@@ -142,7 +143,7 @@ void func_PAL_L18_0044C9C0(u8 *obj)
         if (*(int *)(state + 0x60) % 10 == 0) weapon_spend_ammo(-1, 1);
         ++*(int *)(state + 0x60);
         if (!snd_is_voice_playing_for_owner(obj, *(int *)(state + 0x38))) *(int *)(state + 0x38) = PlayMobySound(0, 4, obj);
-        if (obj[0x43] != 2) func_PAL_002A7E68(obj, 2, 0, 0);
+        if (obj[0x43] != 2) anim_start_blended_pal(obj, 2, 0, 0);
         count = coll_process_hit(0.5f, state, 16, obj, 0);
         if (count > 0) {
             targets = g_nearby_hit_targets;
@@ -180,7 +181,7 @@ void func_PAL_L18_0044C9C0(u8 *obj)
         math_spring_float_to_goal(state + 0x50, state + 0x54, 0.0f, 0.072000004f, 0.012f, 0.15f);
         *(int *)(state + 0x60) = 0;
     }
-    if (g_hero_state.action == 1) func_PAL_L18_002E01E0(29, 1);
+    if (g_hero_state.action == 1) hero_l18_set_action_pal(29, 1);
     moby_transform_joint_to_world(obj, 0, state);
     vec_clear_128(velocity);
     velocity[1] = -1.0f;

@@ -63,6 +63,7 @@ extern float fast_subtract_rotations(float, float);
 extern float vec_length_xy(void *);
 extern void moby_update_eased_node(char *, u8 *, char *, float, float);
 
+/* Updates the Shady Salesman (moby class 3733): he waits for the hero, offers an item for bolts, takes payment, and turns his head to watch the hero. (USA v2.00) */
 void UpdateJobaPurchaseController_us2(u8 *object) {
     float destination[4] __attribute__((aligned(16)));
     float origin[4] __attribute__((aligned(16)));

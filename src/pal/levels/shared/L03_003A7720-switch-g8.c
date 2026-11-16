@@ -27,7 +27,8 @@ extern void *part_spawn_hero_relative(void *, void *, int, int, int, int, float)
 extern void cam_update_aim_target_candidate(void *);
 extern int moby_fuse_linked_objects(void *, void *, void *, int, int);
 
-void func_PAL_L03_003A7720(unsigned char *object) {
+/* Updates a Swingshot node moby: sets it up, aims it at the hero, shoots sparks, and re-arms it when its trigger turns on. (PAL: 50 Hz turn rates and spark times) */
+void swingshot_l03_node_update_pal(unsigned char *object) {
     unsigned char *state = *(unsigned char **)(object + 0x68);
     unsigned char *related;
     SwitchVector position;
@@ -35,8 +36,8 @@ void func_PAL_L03_003A7720(unsigned char *object) {
     float angle, direction;
     int color, random;
     unsigned short flags;
-    float *anglePointer;
-    int m;
+    float *angle_pointer;
+    int frame;
     switch (object[0x20]) {
     case 0:
         flags = *(unsigned short *)(object + 0x34) | 0x1000;
@@ -55,15 +56,15 @@ void func_PAL_L03_003A7720(unsigned char *object) {
         }
         break;
     case 1:
-        if (*(short *)(object + 0xAA) == 0x323) {
-            anglePointer = (float *)(object + 0xF8);
+        if (*(short *)(object + 0xAA) == 0x323 /* moby class 803 */) {
+            angle_pointer = (float *)(object + 0xF8);
             angle = mat_fast_helper_a(((SwitchPlayer *)g_hero_l03_state_block)->x - *(float *)(object + 0x10),
                                   ((SwitchPlayer *)g_hero_l03_state_block)->y - *(float *)(object + 0x14));
-            math_approach_target_with_direction_mode(anglePointer, angle, 0.0025132746f, 0.0025132746f, 0.25132746f, state + 0x38, 0);
-            m = g_frame_l03_counter[0];
-            if ((m & 1) && object[0x31]) {
+            math_approach_target_with_direction_mode(angle_pointer, angle, 0.0025132746f, 0.0025132746f, 0.25132746f, state + 0x38, 0);
+            frame = g_frame_l03_counter[0];
+            if ((frame & 1) && object[0x31]) {
                 direction = 1.0f;
-                if (m & 4)
+                if (frame & 4)
                     direction = -1.0f;
                 vec_scale_to_length(&position, object + 0xD0, direction * g_swingshot_offset_scale);
                 vec_scale_to_length(&velocity, &position, -2.0f / ((g_swingshot_particle_scale * 5.0f + 2.0f) * 0.16666667f));

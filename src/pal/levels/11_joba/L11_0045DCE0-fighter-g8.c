@@ -1,7 +1,7 @@
 #include "names.h"
 /* func_PAL_L11_0045DCE0 (2,500 bytes): the PAL copy of func_L11_004580E8
  * (src/levels/11_joba/L11_004580E8-fighter-g8.c). 50 Hz changes: gravity 1/360 -> 0.004, particle
- * life 120 -> 100, spark frame count n -> (n * 5 + 2) / 6, case 5 rates and the spin clamp
+ * life 120 -> 100, spark frame count spin -> (spin * 5 + 2) / 6, case 5 rates and the spin clamp
  * (0.004..0.12) rescaled. A `Quad *c` for scratch.v.c makes gcse PRE number sp+0x40 before sp+0x30.
  * -frac2-sched-fp-const-temp-first orders the particle-loop preheader constants (1.0 first);
  * -frac2-ga-addr-equiv-no-new-save keeps `axis` out of $fp so reload rematerialises it as `la`
@@ -49,7 +49,8 @@ extern int g_joba_shot_max_bounces SDATA(D_L11_001B1F90);
 extern int g_joba_shot_duration SDATA(D_L11_001B1FA4);
 typedef struct { float x,y,z; } FadeColor;
 extern FadeColor g_joba_shot_fade_color;
-void func_PAL_L11_0045DCE0(char *p) {
+/* Per-frame update of the Joba bouncing shot (moby class 3616): it flies and bounces with a spark trail, fades, then explodes (PAL: 50 Hz timings). */
+void joba_shot_update_pal(char *p) {
  char *q=*(char **)(p+0x68),*other,*entry;
  union { struct { float a[4],b[4],c[4]; } v; char damage[48]; } scratch;
  float f; int i,n; unsigned int r,g,blue;

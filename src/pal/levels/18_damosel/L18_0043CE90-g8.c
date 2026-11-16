@@ -17,46 +17,47 @@ extern int g_debris_piece_offset __attribute__((sda));
 extern int math_random_int_below(int);
 extern void moby_compute_local_point(void *, void *, float, float, float);
 extern void matrix_mul_vec3(void *,void *,void *);
-extern void *func_PAL_L06_00469110(void *,void *,void *,int,float,float);
+extern void *part_spawn_spark_moby_pal(void *,void *,void *,int,float,float);
 
-void func_PAL_L18_00441F00(u8 *o) {
-    u8 *s=*(u8 **)(o+0x68), *hit;
-    int n, i;
-    float a[4] __attribute__((aligned(16))), b[4] __attribute__((aligned(16)));
+/* Breakable debris: when its effect slot is hit, breaks into pieces and shoots out lower few sparks (PAL: 50 Hz speeds). */
+void breakable_l18_debris_update_pal(u8 *moby) {
+    u8 *vars=*(u8 **)(moby+0x68), *hit;
+    int spark_count, i;
+    float lower[4] __attribute__((aligned(16))), upper[4] __attribute__((aligned(16)));
     float spread[4] __attribute__((aligned(16)));
-    switch(o[0x20]) {
-    case 0: moby_set_state(o,1,-1); break;
+    switch(moby[0x20]) {
+    case 0: moby_set_state(moby,1,-1); break;
     case 1:
-        hit=part_find_owned_effect_slot(o,0x4010000,0);
-        if(hit && !*(int *)s) {
+        hit=part_find_owned_effect_slot(moby,0x4010000,0);
+        if(hit && !*(int *)vars) {
             *(Quad *)spread=0;
             spread[0]=3.0f;
             spread[1]=3.0f;
             *(float *)(hit+0x18)=0.75f;
-            FastVecScale(a,hit+0x10,math_random_float_range(6.0f,8.0f));
-            qcopy(b,a);
-            FastVecSub(a,a,spread);
-            FastVecAdd(b,b,spread);
-            part_explode_object_into_pieces_pal(o,a,&g_debris_piece_spread_range,&g_debris_piece_speed_range,65535,-1,g_debris_piece_lifetime,9,2,255,0);
-            moby_set_state(o,2,-1);
+            FastVecScale(lower,hit+0x10,math_random_float_range(6.0f,8.0f));
+            qcopy(upper,lower);
+            FastVecSub(lower,lower,spread);
+            FastVecAdd(upper,upper,spread);
+            part_explode_object_into_pieces_pal(moby,lower,&g_debris_piece_spread_range,&g_debris_piece_speed_range,65535,-1,g_debris_piece_lifetime,9,2,255,0);
+            moby_set_state(moby,2,-1);
         }
-        o[0xA8]=255;
+        moby[0xA8]=255;
         break;
     case 2:
-        part_explode_object_into_pieces_pal(o,&g_debris_piece_offset,&g_debris_piece_spread_range,&g_debris_piece_speed_range,65535,0,g_debris_piece_lifetime,6,61,255,0);
-        n=math_random_int_below(5);
-        moby_compute_local_point(o,a,0.35f,0.0f,1.8f);
-        for(i=0;i<n;i++) {
+        part_explode_object_into_pieces_pal(moby,&g_debris_piece_offset,&g_debris_piece_spread_range,&g_debris_piece_speed_range,65535,0,g_debris_piece_lifetime,6,61,255,0);
+        spark_count=math_random_int_below(5);
+        moby_compute_local_point(moby,lower,0.35f,0.0f,1.8f);
+        for(i=0;i<spark_count;i++) {
             float x,y;
-            b[0]=math_random_float_range(8.0f,12.0f)*(0.020000001f);
-            b[1]=(2*i-n+1)*(0.080000006f);
-            b[2]=math_random_float_range(0.0f,2.0f)*(0.020000001f);
-            matrix_mul_vec3(b,b,o+0xC0);
+            upper[0]=math_random_float_range(8.0f,12.0f)*(0.020000001f);
+            upper[1]=(2*i-spark_count+1)*(0.080000006f);
+            upper[2]=math_random_float_range(0.0f,2.0f)*(0.020000001f);
+            matrix_mul_vec3(upper,upper,moby+0xC0);
             x=math_random_float_range(0.75f,1.25f);
             y=math_random_float_range(0.75f,1.25f);
-            func_PAL_L06_00469110(o,a,b,1,x,y);
+            part_spawn_spark_moby_pal(moby,lower,upper,1,x,y);
         }
-        moby_mark_spawned(o);
+        moby_mark_spawned(moby);
         break;
     }
 }

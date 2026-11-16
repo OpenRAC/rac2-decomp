@@ -10,6 +10,7 @@ extern void prompt_bar_set_text_offsets(void *, float, float, float, float, floa
 extern int onoff_menu_update(void *, int);
 extern int g_onoff_menu_prompt_ids[2] __attribute__((sda));
 
+/* Sets up the on/off option menu: prompt bar, texts and first update. */
 void onoff_menu_init_us2(char *object, void *argument)
 {
     int *allocation;

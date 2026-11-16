@@ -68,49 +68,50 @@ static __inline__ int TaboraStageComplete(void)
     return 0;
 }
 
-void func_US2_L08_003F82AC(u8 *o)
+/* Per-frame update of the level's progress controller moby (class 3114): checks which goals are done, plays the talk lines, moves between states and retires its helper mobys (USA v2.00). */
+void tabora_progress_update_us2(u8 *moby)
 {
-    u8 *s = *(u8 **)(o+0x68);
-    TaboraMoby *p;
+    u8 *state = *(u8 **)(moby+0x68);
+    TaboraMoby *child;
     int mode;
     int bits;
     unsigned int seen;
-    switch ((u8)o[0x20]) {
+    switch ((u8)moby[0x20]) {
     case 0:
-        o[0x30]=255;
-        *(u16 *)(o+0x96)=0;
+        moby[0x30]=255;
+        *(u16 *)(moby+0x96)=0;
         if (!g_game_flag_table[0x1C]) state_set_flag_one();
-        if (*(int *)(s+4)!=-1 && g_hero_state.value < g_init_context.value) {
-            p=(g_moby_array+*(int *)(s+4));
-            if (p->state || (g_moby_group_flags[p->id+(g_current_map_index<<4)]&128) ||
-                g_moby_spawn_state_flags_b.flags[p->index])
+        if (*(int *)(state+4)!=-1 && g_hero_state.value < g_init_context.value) {
+            child=(g_moby_array+*(int *)(state+4));
+            if (child->state || (g_moby_group_flags[child->id+(g_current_map_index<<4)]&128) ||
+                g_moby_spawn_state_flags_b.flags[child->index])
                 goto relocate_child;
-            bits = g_moby_nibble_table[(p->index>>1)+(g_current_map_index<<10)];
-            if (((u16)p->index & 1) ? ((bits >> 4) & 7) : (bits & 7)) {
+            bits = g_moby_nibble_table[(child->index>>1)+(g_current_map_index<<10)];
+            if (((u16)child->index & 1) ? ((bits >> 4) & 7) : (bits & 7)) {
 relocate_child:
                 STUB_printf(g_str_tabora_debug);
-                hero_reset_position_and_direction((u8 *)p+0x10,(u8 *)p+0xF0,0,1);
-                moby_set_state(o,5,-1);
+                hero_reset_position_and_direction((u8 *)child+0x10,(u8 *)child+0xF0,0,1);
+                moby_set_state(moby,5,-1);
             }
         }
         if (TaboraStageComplete()) {
-            if (*(int *)(s+0x30)!=-1) {
-                moby_mark_spawned((g_moby_array+*(int *)(s+0x30)));
-                *(int *)(s+0x30)=-1;
+            if (*(int *)(state+0x30)!=-1) {
+                moby_mark_spawned((g_moby_array+*(int *)(state+0x30)));
+                *(int *)(state+0x30)=-1;
             }
             if (g_hero_state.value < g_init_context.value) {
                 mode=0;
                 STUB_printf(g_str_tabora_progress_first);
                 g_tabora_progress_mode=0;
                 state_set_flag_one();
-                moby_set_state(o,5,-1);
+                moby_set_state(moby,5,-1);
             } else {
                 mode=1;
                 STUB_printf(g_str_tabora_progress_second);
                 g_tabora_progress_mode=mode;
-                moby_set_state(o,5,-1);
+                moby_set_state(moby,5,-1);
             }
-            moby_replace_tracked(o);
+            moby_replace_tracked(moby);
         } else if (!(g_request_flag_table.flags[0]&0x80000) || !(g_request_flag_table.flags[1]&0x100000)) {
             mode=1;
             STUB_printf(g_str_tabora_progress_third);
@@ -119,34 +120,34 @@ relocate_child:
                 req_launch_queued(g_request_l08_queue);
                 game_set_slowdown_factor();
                 state_set_flag_one();
-                moby_set_state(o,1,-1);
+                moby_set_state(moby,1,-1);
             }
         } else if (g_request_flag_table.flags[1]&0x200000) {
             mode=0;
             STUB_printf(g_str_tabora_progress_fourth);
             g_tabora_progress_mode=0;
             state_set_flag_one();
-            moby_set_state(o,3,-1);
+            moby_set_state(moby,3,-1);
         } else {
             mode=0;
             STUB_printf(g_str_tabora_progress_fifth);
             state_set_flag_one();
-            moby_set_state(o,1,-1);
-            *(u16 *)(o+0x96)=6;
+            moby_set_state(moby,1,-1);
+            *(u16 *)(moby+0x96)=6;
         }
-        if (g_item_owned_flags[0x15] && *(int *)(s+0x20)!=-1 &&
-            (g_moby_array+*(int *)(s+0x20))->state!=0xFE &&
-            (g_moby_array+*(int *)(s+0x20))->state!=0xFD &&
-            *(int *)(s+0x24)!=-1 &&
-            (g_moby_array+*(int *)(s+0x24))->state!=0xFE &&
-            (g_moby_array+*(int *)(s+0x24))->state!=0xFD) {
+        if (g_item_owned_flags[0x15] && *(int *)(state+0x20)!=-1 &&
+            (g_moby_array+*(int *)(state+0x20))->state!=0xFE &&
+            (g_moby_array+*(int *)(state+0x20))->state!=0xFD &&
+            *(int *)(state+0x24)!=-1 &&
+            (g_moby_array+*(int *)(state+0x24))->state!=0xFE &&
+            (g_moby_array+*(int *)(state+0x24))->state!=0xFD) {
             STUB_printf(g_str_tabora_progress_sixth);
-            if (!g_level_progress_flags[*(int *)g_moby_array[*(int *)(s+0x24)].data+(g_current_map_index<<2)]) {
+            if (!g_level_progress_flags[*(int *)g_moby_array[*(int *)(state+0x24)].data+(g_current_map_index<<2)]) {
                 mode=1;
                 g_tabora_progress_mode=mode;
                 STUB_printf(g_str_tabora_progress_seventh);
                 {
-                    TaboraMoby *replacement = g_moby_array + *(int *)(s+0x20);
+                    TaboraMoby *replacement = g_moby_array + *(int *)(state+0x20);
                     hero_reset_position_and_direction((u8 *)replacement+0x10,(u8 *)replacement+0xF0,0,1);
                 }
                 state_set_flag_one();
@@ -156,15 +157,15 @@ relocate_child:
                 else menu_seek_chain_entry(10,1);
                 gfx_run_screen_update_steps(1);
             }
-            moby_set_state(o,5,-1);
+            moby_set_state(moby,5,-1);
         }
         STUB_printf(g_str_tabora_progress_mode,mode);
         load_scene_chunk(mode,0);
-        moby_set_far_target_point(o);
-        part_start_sparkle_burst(o);
+        moby_set_far_target_point(moby);
+        part_start_sparkle_burst(moby);
         break;
     case 1:
-        if (!game_is_either_mode_two() && *(u16 *)(o+0x96)>=6) {
+        if (!game_is_either_mode_two() && *(u16 *)(moby+0x96)>=6) {
             g_game_flag_table[0x19]=1;
             if (req_push_queue(g_request_l08_queue,0x55)) {
                 req_launch_queued(g_request_l08_queue);
@@ -175,61 +176,61 @@ relocate_child:
                 g_tabora_float_param=1.2f;
                 moby_disable_object_list_flags();
                 load_scene_chunk(0,0);
-                moby_set_state(o,2,-1);
+                moby_set_state(moby,2,-1);
             }
         }
         break;
     case 2:
-        if (!game_is_either_mode_two() && *(u16 *)(o+0x96)>=6) {
+        if (!game_is_either_mode_two() && *(u16 *)(moby+0x96)>=6) {
             g_game_flag_table[0x1A]=1;
             STUB_printf(g_str_tabora_progress_ninth);
             MemcardSave(0,-1);
-            moby_set_state(o,3,-1);
+            moby_set_state(moby,3,-1);
         }
         break;
     case 3:
-        if (coll_point_inside_region(g_hero_position,*(int *)s)) {
+        if (coll_point_inside_region(g_hero_position,*(int *)state)) {
             if (req_push_queue(g_request_l08_queue,0x56)) {
                 req_launch_queued(g_request_l08_queue);
                 STUB_printf(g_str_tabora_progress_tenth);
-                moby_set_state(o,4,-1);
+                moby_set_state(moby,4,-1);
             }
         }
         break;
     case 4:
-        if (g_cutscene_l08_active_flag==2 && *(int *)(s+0x30)!=-1) {
-            moby_mark_spawned((g_moby_array+*(int *)(s+0x30)));
-            *(int *)(s+0x30)=-1;
+        if (g_cutscene_l08_active_flag==2 && *(int *)(state+0x30)!=-1) {
+            moby_mark_spawned((g_moby_array+*(int *)(state+0x30)));
+            *(int *)(state+0x30)=-1;
         }
-        if (!game_is_either_mode_two() && *(u16 *)(o+0x96)>=6) {
+        if (!game_is_either_mode_two() && *(u16 *)(moby+0x96)>=6) {
             if (flag_is_byte_set()) menu_seek_chain_entry(10,4);
             else menu_seek_chain_entry(10,1);
             gfx_run_screen_update_steps(1);
             help_show_message_for_id(10);
-            moby_replace_tracked(o);
-            if (*(int *)(s+8)!=-1) {
-                p=g_moby_array + *(int *)(s+8);
+            moby_replace_tracked(moby);
+            if (*(int *)(state+8)!=-1) {
+                child=g_moby_array + *(int *)(state+8);
                 STUB_printf(g_str_tabora_progress_eleventh);
-                g_moby_spawn_state_flags_a.flags[p->index]=p->id+2;
+                g_moby_spawn_state_flags_a.flags[child->index]=child->id+2;
                 {
-                    int id = p->id;
+                    int id = child->id;
                     if (id == 255 || (!(g_moby_state_flags[(u8)id] & 128) &&
                         (g_moby_group_flags[(u8)id + (g_current_map_index << 4)] & 128)))
-                        g_moby_spawn_state_flags_b.flags[p->index]=id+2;
+                        g_moby_spawn_state_flags_b.flags[child->index]=id+2;
                 }
             }
             STUB_printf(g_str_tabora_progress_twelfth);
             MemcardSave(0,-1);
-            moby_set_state(o,5,-1);
+            moby_set_state(moby,5,-1);
         }
         break;
     }
-    ++*(u16 *)(o+0x96);
+    ++*(u16 *)(moby+0x96);
     if (g_game_flag_table[0x1C]) {
         seen = (unsigned)g_tabora_seen_mask & (1 << g_current_map_index);
         if (!seen) subtitle_request_voice_line(0x9F9,0x50);
     }
-    TriggerSubtitleInCuboid(0xA3A,0x91,0,*(int *)(s+0xC),-1);
+    TriggerSubtitleInCuboid(0xA3A,0x91,0,*(int *)(state+0xC),-1);
     if (g_hero_state.mode==0x31 && g_hero_state.object && *(short *)(g_hero_state.object+0xAA)==0xEEF) {
         if (g_voice_line_trigger_flag>=0) subtitle_request_voice_line(0xA40,0x97);
         {
@@ -238,7 +239,7 @@ relocate_child:
         }
     }
     if (g_init_context.state==1) {
-        g_tabora_ground_height=level_get_height_map_ground(o);
-        gfx_add_draw_callback_first(gfx_l08_draw_lens_flare,o);
+        g_tabora_ground_height=level_get_height_map_ground(moby);
+        gfx_add_draw_callback_first(gfx_l08_draw_lens_flare,moby);
     }
 }

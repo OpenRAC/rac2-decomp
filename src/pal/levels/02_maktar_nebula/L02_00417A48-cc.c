@@ -51,7 +51,7 @@ extern char g_str_lift_distance[];
 extern u8 g_camera_l02_position[];
 extern void math_trap_always(void);
 extern void moby_set_state(u8 *, s32, s32);
-extern void func_PAL_002A7E68(void *, s32, s32, s32);
+extern void anim_start_blended_pal(void *, s32, s32, s32);
 extern void scale_vector(void *, void *, float);
 extern s32 math_fast_helper_a(void *, float);
 extern void moby_mark_spawned(void *);
@@ -62,7 +62,7 @@ extern float vec_length_xy(void *);
 extern void vec_transform_by_object_or_given(char *, char *, char *, char *);
 extern double __extendsfdf2(float);
 extern void STUB_printf(const char *, ...);
-extern int func_PAL_L00_002C4480(s32, s32);
+extern int hero_l00_set_action_pal(s32, s32);
 extern float vec_distance_xy(void *, void *);
 extern void cam_set_mode_state(s32);
 extern s32 flag_set_first_pending(u8 *);
@@ -82,7 +82,7 @@ extern void euler_rotation_basis(void *, void *);
 extern void FastVecScale(void *, void *, float);
 extern void hero_reset_position_and_direction_pal(void *, void *, s32, s32);
 extern void cam_reset_entry(s32);
-extern void func_PAL_L02_00418428(u8 *);
+extern void lift_apply_wobble_pal(u8 *);
 extern void mat_combine_and_store(void *, void *, void *, void *);
 
 /*
@@ -91,7 +91,7 @@ extern void mat_combine_and_store(void *, void *, void *, void *);
  * func_002AA800 returns a float (it ends by calling func_002AA738, like its sibling
  * func_002AA898): the ignored call_value is what orders the yaw loads.
  */
-void func_PAL_L02_00417A48(u8 *object)
+void lift_l02_update_pal(u8 *object)
 {
     LiftVector old_position;
     LiftVector old_rotation;
@@ -135,7 +135,7 @@ void func_PAL_L02_00417A48(u8 *object)
         } else
             moby_set_state(object, 1, -1);
         if (object[0x43] != 2)
-            func_PAL_002A7E68(object, 2, 0, 1);
+            anim_start_blended_pal(object, 2, 0, 1);
         index = state->stops[0];
         qcopy_nc(&state->position, &g_matrix_l02_record_table[index].position);
         qcopy_nc(&state->rotation, &g_matrix_l02_record_table[index].rotation);
@@ -170,7 +170,7 @@ void func_PAL_L02_00417A48(u8 *object)
             vec_transform_by_object_or_given((char *)object, (char *)&delta, (char *)&delta, 0);
             if (delta.f[2] < -0.6f) {
                 STUB_printf(g_str_lift_distance, __extendsfdf2(distance));
-                func_PAL_L00_002C4480(0x6F, 1);
+                hero_l00_set_action_pal(0x6F, 1);
                 moby_set_state(object, 2, -1);
             }
         } else if ((g_frame_l02_counter[0] & 0x3F) == 0) {
@@ -211,7 +211,7 @@ void func_PAL_L02_00417A48(u8 *object)
             g_hero_state.boarding = 1;
             PlayMobySound(1, 0, (char *)object);
             if (object[0x43])
-                func_PAL_002A7E68(object, 0, 0, 37);
+                anim_start_blended_pal(object, 0, 0, 37);
         }
         ApproachValue(&state->speed, g_lift_target_speed * 0.020000001f, g_lift_accel_step * 0.00040000002f);
         vec_scale_to_length(&delta, object + 0xC0, state->speed);
@@ -251,7 +251,7 @@ void func_PAL_L02_00417A48(u8 *object)
                 s32 slot;
                 u8 *sound_record;
                 if ((u16)ticks == 37)
-                    func_PAL_L00_002C4480(0x6F, 1);
+                    hero_l00_set_action_pal(0x6F, 1);
                 slot = state->sound;
                 sound_record = (u8 *)&g_sound_state[slot];
                 if (*(u8 **)(sound_record + 0x88) != object || !sound_record[0x74])
@@ -260,7 +260,7 @@ void func_PAL_L02_00417A48(u8 *object)
         }
         if (g_grab_highlight_level[0] >= 1.0f) {
             s32 slot;
-            func_PAL_L00_002C4480(0, 1);
+            hero_l00_set_action_pal(0, 1);
             slot = state->sound;
             if (slot != -1) {
                 u8 *sound_record = (u8 *)&g_sound_state[slot];
@@ -285,7 +285,7 @@ void func_PAL_L02_00417A48(u8 *object)
             hero_start_target_state(&record->position, 1, record->rotation.f[2]);
             cam_set_mode_state(0);
             cam_reset_entry(state->cameras[state->side]);
-            func_PAL_L02_00418428(object);
+            lift_apply_wobble_pal(object);
         }
         break;
     }
@@ -298,7 +298,7 @@ void func_PAL_L02_00417A48(u8 *object)
         break;
     }
     if (object[0x31])
-        func_PAL_L02_00418428(object);
+        lift_apply_wobble_pal(object);
     FastVecSub(&delta, object + 0x10, &old_position);
     mat_combine_and_store((u8 *)state + 0x20, &delta, &old_rotation, object + 0xF0);
 }

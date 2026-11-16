@@ -7,9 +7,9 @@ extern u8 *g_level_entry_lists[] __attribute__((nosda));
 extern void entry_spawn_list_objects_with_flag(void *, void *);
 
 /* Offers every live entry to the handler that takes one pointer through the loop. */
-void level_offer_entries_ptr_pal(u8 *a0) {
+void level_offer_entries_ptr_pal(u8 *ptr) {
     s32 i;
     for (i = 0; i < g_level_offer_entry_count; i++) {
-        entry_spawn_list_objects_with_flag(g_level_entry_lists[i], a0);
+        entry_spawn_list_objects_with_flag(g_level_entry_lists[i], ptr);
     }
 }

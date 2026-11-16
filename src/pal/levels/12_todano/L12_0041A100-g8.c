@@ -178,12 +178,15 @@ extern int guard_is_line_of_sight_blocked(void *, int, int, int);
 extern void guard_aim_hand_helper_at_target(void *);
 extern void guard_update_attack_sequence(void *);
 
-void func_PAL_L12_0041A100(GuardMoby *moby)
+/* The guard's per-frame driver: the zone gate, the alarm and release of its
+   two bound helpers, then the behaviour switch and the animation switch on its state
+   (PAL: 50 Hz timings). */
+void todano_guard_update_pal(GuardMoby *moby)
 {
     GuardVars *vars;
     GuardMoby *list[3];
     s32 sx, sy, sz;
-    s32 n;
+    s32 helper_count;
     s8 alarm;
 
     if (g_guard_zone.kind != 0) {
@@ -244,16 +247,16 @@ void func_PAL_L12_0041A100(GuardMoby *moby)
         vars->f31C = 1;
         guard_handle_hit_handover(moby);
         *(TI128 *)&moby->x = *(TI128 *)(g_path_zone_table[vars->f2C0] + 0x10);
-        n = 0;
+        helper_count = 0;
         if (vars->f2F8 != 0) {
             list[0] = vars->f2F8;
-            n = 1;
+            helper_count = 1;
         }
         if (vars->f2F0[0] != 0)
-            list[n++] = vars->f2F0[0];
+            list[helper_count++] = vars->f2F0[0];
         if (vars->f2F0[1] != 0)
-            list[n++] = vars->f2F0[1];
-        moby_fuse_linked_objects(moby, &moby->x, (char *)moby + 0xF0, list, n);
+            list[helper_count++] = vars->f2F0[1];
+        moby_fuse_linked_objects(moby, &moby->x, (char *)moby + 0xF0, list, helper_count);
     }
 
     if (vars->f4A0 != 0) {
@@ -279,15 +282,15 @@ void func_PAL_L12_0041A100(GuardMoby *moby)
             moby->f31 = 0;
             moby->f34 = moby->f34 | 1;
             head = vars->f2F8;
-            if (head != 0 && head->fAA == 0x114B && head->state != 0xFE && head->state != 0xFD) {
+            if (head != 0 && head->fAA == 0x114B /* moby class 4427 */ && head->state != 0xFE && head->state != 0xFD) {
                 head->f34 = head->f34 | 1;
                 vars->f2F8->f31 = 0;
                 vars->f2F8->f98 = 0;
             }
             for (i = 0; i < 2; i++) {
-                GuardMoby *h = vars->f2F0[i];
-                if (h != 0 && h->fAA == 0xD66 && h->state != 0xFE && h->state != 0xFD) {
-                    h->f34 = h->f34 | 1;
+                GuardMoby *helper = vars->f2F0[i];
+                if (helper != 0 && helper->fAA == 0xD66 /* moby class 3430 */ && helper->state != 0xFE && helper->state != 0xFD) {
+                    helper->f34 = helper->f34 | 1;
                     vars->f2F0[i]->f31 = 0;
                 }
             }
@@ -307,15 +310,15 @@ void func_PAL_L12_0041A100(GuardMoby *moby)
             moby->f98 = moby->f24->f10;
             set_moby_color(moby, g_guard_color_red, g_guard_color_green, g_guard_color_blue);
             head = vars->f2F8;
-            if (head != 0 && head->fAA == 0x114B && head->state != 0xFE && head->state != 0xFD) {
+            if (head != 0 && head->fAA == 0x114B /* moby class 4427 */ && head->state != 0xFE && head->state != 0xFD) {
                 head->f34 = head->f34 & 0xFFFE;
                 vars->f2F8->f31 = 1;
                 vars->f2F8->f98 = vars->f2F8->f24->f10;
             }
             for (i = 0; i < 2; i++) {
-                GuardMoby *h = vars->f2F0[i];
-                if (h != 0 && h->fAA == 0xD66 && h->state != 0xFE && h->state != 0xFD) {
-                    h->f34 = h->f34 & 0xFFFE;
+                GuardMoby *helper = vars->f2F0[i];
+                if (helper != 0 && helper->fAA == 0xD66 /* moby class 3430 */ && helper->state != 0xFE && helper->state != 0xFD) {
+                    helper->f34 = helper->f34 & 0xFFFE;
                     vars->f2F0[i]->f31 = 1;
                 }
             }
@@ -519,16 +522,16 @@ void func_PAL_L12_0041A100(GuardMoby *moby)
         break;
     }
     case 9: {
-        f32 d;
+        f32 distance;
         s32 near, close, ahead, picked, tried;
 
         near = 1;
-        d = vec_distance_xy(&moby->x, &vars->f200->x);
-        if (!(d <= g_guard_close_distance))
+        distance = vec_distance_xy(&moby->x, &vars->f200->x);
+        if (!(distance <= g_guard_close_distance))
             near = 0;
         close = 1;
         ahead = *vars->f304 < vars->f2CC;
-        if (!(d < g_guard_near_distance))
+        if (!(distance < g_guard_near_distance))
             close = 0;
         if (vars->f303 == 0) {
             picked = 0;

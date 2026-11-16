@@ -12,7 +12,7 @@ extern void part_spawn_scaled_bolts_pal(char *, s32, float);
 extern char *SpawnExplosion_pal(void *, s32, s32, s32, float, float, s32, s32, s32, s32, s32, s32, s32, s32);
 extern float FastAddRotations(float, float);
 extern void euler_rotation_basis(void *, void *);
-extern void func_PAL_002B15D8(char *, s32, float *, float, float, float, float, s32);
+extern void part_spawn_masked_debris_pal(char *, s32, float *, float, float, float, float, s32);
 extern void moby_mark_spawned(char *);
 
 /* Three-state effect object: arms its emitter, waits for the trigger, then spins a burst of four sprites and retires. */
@@ -46,7 +46,7 @@ void spinning_sprite_burst_update_pal(char *obj)
             i--;
             *(float *)(obj + 0xF8) = FastAddRotations(*(float *)(obj + 0xF8), 1.5707964f);
             euler_rotation_basis(pos, rot);
-            func_PAL_002B15D8(obj, 0xF, &g_default_l13_effect_vector, 3.0f, 6.0f, 3.0f, 6.0f, 0xFF);
+            part_spawn_masked_debris_pal(obj, 0xF, &g_default_l13_effect_vector, 3.0f, 6.0f, 3.0f, 6.0f, 0xFF);
             *(short *)(obj + 0x7C) = 0;
         } while (i >= 0);
         moby_mark_spawned(obj);

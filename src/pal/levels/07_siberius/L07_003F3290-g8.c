@@ -17,13 +17,15 @@ extern f32 g_motion_rate __attribute__((sda)), g_motion_maximum __attribute__((s
 extern f32 g_motion_scale __attribute__((sda)), g_turn_l07_limit __attribute__((sda));
 extern f32 g_turn_accel_limit __attribute__((sda));
 
-f32 SteerTowardTarget_pal(u8 *object)
+/* Moves the object toward its target point with eased speed, spins and bobs it, then returns the
+   distance left to the target. */
+f32 SteerTowardTarget_pal(u8 *moby)
 {
-    Vector oldPosition, oldRotation, target, difference, step, correction, delta;
-    u8 *state = *(u8 **)(object + 0x68), *support;
-    f32 rate, distance, amount, maximum, value, nextAngle, nextStep;
-    qcopy(&oldPosition, object + 0x10);
-    qcopy(&oldRotation, object + 0xF0);
+    Vector old_position, old_rotation, target, difference, step, correction, delta;
+    u8 *state = *(u8 **)(moby + 0x68), *support;
+    f32 rate, distance, amount, maximum, value, next_angle, next_step;
+    qcopy(&old_position, moby + 0x10);
+    qcopy(&old_rotation, moby + 0xF0);
     support = *(u8 **)(state + 0x110);
     if (support) {
         FastVecAdd(state + 0xF0, state + 0xF0, (u8 *)moby_get_private_value_2(support) + 0x10);
@@ -44,27 +46,27 @@ f32 SteerTowardTarget_pal(u8 *object)
     vec_clamp_length(&correction, rate);
     FastVecAdd(state + 0xC0, state + 0xC0, &correction);
     FastVecAdd(state + 0xF0, state + 0xF0, state + 0xC0);
-    value = FastVecDot(object + 0xD0, state + 0xC0);
+    value = FastVecDot(moby + 0xD0, state + 0xC0);
     math_step_value_toward_target((f32 *)(state + 0xE0), (f32 *)(state + 0x11C), value * g_motion_scale,
                  g_turn_l07_limit * 6.981318e-06f, g_turn_l07_limit * 6.981318e-06f,
                  g_turn_accel_limit * 0.0003490659f);
-    qcopy(object + 0x10, state + 0xF0);
-    qcopy(object + 0xF0, state + 0xE0);
+    qcopy(moby + 0x10, state + 0xF0);
+    qcopy(moby + 0xF0, state + 0xE0);
     value = FastAddRotations(F(state, 0x100), g_rotation_base_step * 0.0003490659f);
-    nextStep = g_rotation_step_a * 0.0003490659f;
-    nextAngle = F(state, 0x104);
+    next_step = g_rotation_step_a * 0.0003490659f;
+    next_angle = F(state, 0x104);
     F(state, 0x100) = value;
-    value = FastAddRotations(nextAngle, nextStep);
-    nextStep = g_rotation_step_b * 0.0003490659f;
-    nextAngle = F(state, 0x108);
+    value = FastAddRotations(next_angle, next_step);
+    next_step = g_rotation_step_b * 0.0003490659f;
+    next_angle = F(state, 0x108);
     F(state, 0x104) = value;
-    F(state, 0x108) = FastAddRotations(nextAngle, nextStep);
+    F(state, 0x108) = FastAddRotations(next_angle, next_step);
     value = math_fast_sin_or_cos_b(F(state, 0x100)) * 0.017453294f;
-    F(object, 0xF0) = FastAddRotations(F(object, 0xF0), g_spin_x_rate * value);
+    F(moby, 0xF0) = FastAddRotations(F(moby, 0xF0), g_spin_x_rate * value);
     value = math_fast_sin_or_cos_b(F(state, 0x104)) * 0.017453294f;
-    F(object, 0xF4) = FastAddRotations(F(object, 0xF4), g_spin_y_rate * value);
-    F(object, 0x18) += g_bob_l07_amplitude * math_fast_sin_or_cos_b(F(state, 0x108)) + F(state, 0x118);
-    FastVecSub(&delta, object + 0x10, &oldPosition);
-    mat_combine_and_store(state + 0x50, &delta, &oldRotation, object + 0xF0);
+    F(moby, 0xF4) = FastAddRotations(F(moby, 0xF4), g_spin_y_rate * value);
+    F(moby, 0x18) += g_bob_l07_amplitude * math_fast_sin_or_cos_b(F(state, 0x108)) + F(state, 0x118);
+    FastVecSub(&delta, moby + 0x10, &old_position);
+    mat_combine_and_store(state + 0x50, &delta, &old_rotation, moby + 0xF0);
     return vec_distance_xy(state + 0xF0, &target);
 }

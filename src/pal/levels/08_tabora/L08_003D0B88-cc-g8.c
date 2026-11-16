@@ -74,17 +74,18 @@ extern void water_stop_effect(float, float, float, float);
 extern void *part_spawn_drifting(void *, int, int, float, float);
 extern void *part_spawn_trail(void *, void *, void *, int, int, int, int, int, int);
 
-void func_PAL_L08_003D0B88(char * object) {
+/* Waterfall: opens and closes with its linked switch, spins its texture, and sprays mist and drops while flowing (PAL: 50 Hz timings). */
+void waterfall_update_pal(char * object) {
     char * state = FIELD(object, char *, 0x68), *sound;
-    int rotationDelta;
+    int rotation_delta;
     int slot;
     float first, second;
-    float velocityX, velocityY, accelerationX, accelerationY;
+    float velocity_x, velocity_y, acceleration_x, acceleration_y;
     float velocity[4] __attribute__((aligned(16)));
     float acceleration[4] __attribute__((aligned(16)));
     float position[4] __attribute__((aligned(16)));
     float offset[4] __attribute__((aligned(16)));
-    float inverseBasis[12] __attribute__((aligned(16)));
+    float inverse_basis[12] __attribute__((aligned(16)));
     float delta[4] __attribute__((aligned(16)));
 
     if (!FIELD(object, u8, 0x20)) {
@@ -121,16 +122,16 @@ void func_PAL_L08_003D0B88(char * object) {
     FIELD(object, u8, 0x23) = FIELD(state, u8, 0x1E) + FloatToInt(IntToFloat(255 - FIELD(state, u8, 0x1E)) * FIELD(state, float, 8));
     if (FIELD(state, float, 8) < 1) {
         if (FIELD(state, u8, 0x1D)) {
-            rotationDelta = -FloatToInt(IntToFloat(FIELD(state, s16, 4)) * (1.0f - FIELD(state, float, 8)));
-            FIELD(state, s16, 6) += rotationDelta;
+            rotation_delta = -FloatToInt(IntToFloat(FIELD(state, s16, 4)) * (1.0f - FIELD(state, float, 8)));
+            FIELD(state, s16, 6) += rotation_delta;
             if (FIELD(state, s16, 6) > 4096) {
                 FIELD(state, s16, 6) -= 4096;
-                rotationDelta -= 4096;
+                rotation_delta -= 4096;
             } else if (FIELD(state, s16, 6) < 0) {
                 FIELD(state, s16, 6) += 4096;
-                rotationDelta += 4096;
+                rotation_delta += 4096;
             }
-            offset_moby_class_point_pairs(FIELD(object, void *, 0x24), 0, rotationDelta);
+            offset_moby_class_point_pairs(FIELD(object, void *, 0x24), 0, rotation_delta);
         }
         if (!math_random_int_below(g_waterfall_spawn_chance_base + FloatToInt(g_waterfall_spawn_chance_scale * FIELD(state, float, 8)) - 1)) {
             vec_scale_to_length(acceleration, object + 0xC0, math_random_float_range(-g_waterfall_accel_range_a, g_waterfall_accel_range_a));
@@ -165,28 +166,28 @@ void func_PAL_L08_003D0B88(char * object) {
                     FastVecSub(position, g_hero_position_vec, object + 0x10);
                     vec_scale_to_length(position, position, 1);
                     position[2] = 0;
-                    mat_fast_helper_c(inverseBasis, object + 0xC0);
-                    matrix_mul_vec3(position, position, inverseBasis);
+                    mat_fast_helper_c(inverse_basis, object + 0xC0);
+                    matrix_mul_vec3(position, position, inverse_basis);
                     position[0] *= math_random_float_range(g_waterfall_position_x_scale_low, g_waterfall_position_x_scale_high);
                     position[1] *= math_random_float_range(0, g_waterfall_position_y_range);
                     position[2] = math_random_float_range(0, g_waterfall_position_z_range);
                     matrix_mul_vec3(position, position, object + 0xC0);
                     add_vectors(delta, position, object + 0x10);
                 }
-                velocityX = math_fast_sin_or_cos_a(math_random_angle());
-                velocityX *= math_random_float_range(0, g_waterfall_velocity_xy_range * 0.020000001f);
-                velocity[0] = velocityX;
-                velocityY = math_fast_sin_or_cos_b(math_random_angle());
-                velocityY *= math_random_float_range(0, g_waterfall_velocity_xy_range * 0.020000001f);
-                velocity[1] = velocityY;
+                velocity_x = math_fast_sin_or_cos_a(math_random_angle());
+                velocity_x *= math_random_float_range(0, g_waterfall_velocity_xy_range * 0.020000001f);
+                velocity[0] = velocity_x;
+                velocity_y = math_fast_sin_or_cos_b(math_random_angle());
+                velocity_y *= math_random_float_range(0, g_waterfall_velocity_xy_range * 0.020000001f);
+                velocity[1] = velocity_y;
                 velocity[2] = 0;
                 velocity[2] = math_random_float_range(g_waterfall_velocity_z_low, g_waterfall_velocity_z_high) * 0.020000001f;
-                accelerationX = math_fast_sin_or_cos_a(math_random_angle());
-                accelerationX *= math_random_float_range(0, g_waterfall_accel_xy_range * 0.020000001f);
-                acceleration[0] = accelerationX;
-                accelerationY = math_fast_sin_or_cos_b(math_random_angle());
-                accelerationY *= math_random_float_range(0, g_waterfall_accel_xy_range * 0.020000001f);
-                acceleration[1] = accelerationY;
+                acceleration_x = math_fast_sin_or_cos_a(math_random_angle());
+                acceleration_x *= math_random_float_range(0, g_waterfall_accel_xy_range * 0.020000001f);
+                acceleration[0] = acceleration_x;
+                acceleration_y = math_fast_sin_or_cos_b(math_random_angle());
+                acceleration_y *= math_random_float_range(0, g_waterfall_accel_xy_range * 0.020000001f);
+                acceleration[1] = acceleration_y;
                 acceleration[2] = 0;
                 acceleration[2] = math_random_float_range(g_waterfall_accel_z_low, g_waterfall_accel_z_high) * 0.020000001f;
                 part_spawn_trail(position, velocity, acceleration, g_waterfall_trail_param_a, g_waterfall_trail_param_b, g_waterfall_trail_param_c, g_waterfall_trail_param_d, g_waterfall_trail_param_e, -1);
@@ -194,14 +195,14 @@ void func_PAL_L08_003D0B88(char * object) {
         }
         FIELD(object, int, 0x98) = 0;
     } else {
-        int stopSlot;
+        int stop_slot;
         if (FIELD(object, s16, 0xAA) == 0x8F9 && FIELD(state, s8, 0x1F) != -1) {
-            stopSlot = FIELD(state, s8, 0x1F);
-            sound = g_sound_state + stopSlot * 0x70;
+            stop_slot = FIELD(state, s8, 0x1F);
+            sound = g_sound_state + stop_slot * 0x70;
             if (FIELD(sound, void *, 0x88) == object && FIELD(sound, u8, 0x74))
-                snd_stop_voice(stopSlot);
-            stopSlot = -1;
-            FIELD(state, s8, 0x1F) = stopSlot;
+                snd_stop_voice(stop_slot);
+            stop_slot = -1;
+            FIELD(state, s8, 0x1F) = stop_slot;
         }
         FIELD(object, int, 0x98) = FIELD(FIELD(object, char *, 0x24), int, 0x10);
     }

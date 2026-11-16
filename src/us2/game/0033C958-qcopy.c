@@ -16,6 +16,7 @@ extern int text_draw_centered_small(int, int, unsigned long, char *, int);
 extern void FontSetWindow(void *, int, int, int, int, int, int, int, int);
 extern void text_draw_window_small(void *, unsigned long, char *, int);
 
+/* Draws the on/off option menu: the prompt bar, the widescreen option line and the help text. (USA v2.00) */
 void onoff_menu_draw_with_help_us2(char *object)
 {
     char buffer[64];

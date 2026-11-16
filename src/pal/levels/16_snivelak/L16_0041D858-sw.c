@@ -16,6 +16,7 @@ extern float vec_distance_xy(void *,void *);
 extern float math_fabs(float);
 extern void mat_combine_and_store(void *,void *,void *,void *);
 
+/* Moves an object along a path of points, waits, then walks back along the path in reverse (PAL: 50 Hz timings). */
 void path_l16_follower_update_pal(char *object)
 {
     MovingPathWorkspace local;
@@ -26,10 +27,10 @@ void path_l16_follower_update_pal(char *object)
     qcopy(&local.angles,(object+0xf0));
     switch(*(unsigned char *)(object+0x20)) {
     case 0: {
-        char *initialPath;
+        char *initial_path;
         index=*(int *)(state+0x60);
-        initialPath=g_path_l16_table[index];
-        qcopy((object+0x10),(initialPath+0x10));
+        initial_path=g_path_l16_table[index];
+        qcopy((object+0x10),(initial_path+0x10));
         *(int *)(state+0x6c)=0;
         *(float *)(state+0x68)*=0.020000001f;
         if(index==-1) STUB_printf(g_str_path_missing_warning,*(short *)(object+0xaa),*(short *)(object+0xb2));
@@ -55,14 +56,14 @@ void path_l16_follower_update_pal(char *object)
         path=g_path_l16_table[*(int *)(state+0x60)];
 
         if(g_hero_state[34]<*(float *)(object+0x18)) {
-            if(vec_distance_xy(object+0x10,g_hero_state+32)<3.0f && math_fabs(*(float *)(object+0x18)-g_hero_state[34])<2.5f) goto skipMovement;
+            if(vec_distance_xy(object+0x10,g_hero_state+32)<3.0f && math_fabs(*(float *)(object+0x18)-g_hero_state[34])<2.5f) goto skip_movement;
         }
         {
             FastVecSub(&local.delta,path+*(int *)(state+0x6c)*0x10,object+0x10);
             vec_scale_to_length(&local.delta,&local.delta,*(float *)(state+0x68));
             FastVecAdd(object+0x10,object+0x10,&local.delta);
         }
-        skipMovement:
+        skip_movement:
         if(fast_vec_dist(object+0x10,path+*(int *)(state+0x6c)*0x10)<=*(float *)(state+0x68)*0.88f) (*(int *)(state+0x6c))--;
         if(*(int *)(state+0x6c)<=0) {
             object[0xbc]=0;

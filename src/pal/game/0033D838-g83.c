@@ -8,7 +8,7 @@ extern void prompt_bar_init_pal(void *, void *, void *);
 extern char *GetLocalizedString(int);
 extern void prompt_bar_set_texts_pal(void *, int, int, int);
 extern void prompt_bar_set_text_offsets_pal(void *, float, float, float, float, float, float);
-extern int func_PAL_0033EEF8(void *, int);
+extern int audio_menu_update_pal(void *, int);
 extern int g_audio_menu_prompt_ids[2] __attribute__((sda));
 extern char g_circle_menu_icon_data[];
 extern void object_init_derived_b(void *, int, int, void *, void *);
@@ -20,10 +20,11 @@ extern void object_set_second_pair(void *, int, int);
 extern void text_set_alignment(void *, int);
 extern void widget_store_field(void *, int);
 
-void func_PAL_0033EC98(char *object, void *argument)
+/* Sets up the audio menu: prompt bar, two volume meters and the first update (PAL). */
+void audio_menu_init_pal(char *object, void *argument)
 {
     int *allocation;
-    char *child, *widget, *secondWidget;
+    char *child, *widget, *second_widget;
     void *table;
     int text, second;
     *(void **)object = argument;
@@ -39,7 +40,7 @@ void func_PAL_0033EC98(char *object, void *argument)
     (*(float **)(object + 0x36C))[1] = 195.0f;
     child = object + 8;
     widget = object + 0x2DC;
-    secondWidget = object + 0x324;
+    second_widget = object + 0x324;
     prompt_bar_init_pal(child, argument, g_audio_menu_prompt_ids);
     text = GetLocalizedString(0xBA8);
     second = GetLocalizedString(0xB5F);
@@ -55,25 +56,26 @@ void func_PAL_0033EC98(char *object, void *argument)
     object_set_second_pair(widget, 0x60442D00, 0x60442D00);
     text_set_alignment(widget, 0x20FFFFFF);
     widget_store_field(widget, 0);
-    object_init_derived_b(secondWidget, 150, 1, table, argument);
-    widget_set_pos_y(secondWidget, 16);
-    func_PAL_003388E8(secondWidget, 0x400);
-    meter_set_value(secondWidget, 0);
-    object_set_first_pair(secondWidget, 0x55F0C070, 0x55F0C070);
-    object_set_second_pair(secondWidget, 0x60442D00, 0x60442D00);
-    text_set_alignment(secondWidget, 0x20FFFFFF);
-    widget_store_field(secondWidget, 0);
+    object_init_derived_b(second_widget, 150, 1, table, argument);
+    widget_set_pos_y(second_widget, 16);
+    func_PAL_003388E8(second_widget, 0x400);
+    meter_set_value(second_widget, 0);
+    object_set_first_pair(second_widget, 0x55F0C070, 0x55F0C070);
+    object_set_second_pair(second_widget, 0x60442D00, 0x60442D00);
+    text_set_alignment(second_widget, 0x20FFFFFF);
+    widget_store_field(second_widget, 0);
     *(int *)(object + 0x2D8) = 0;
-    func_PAL_0033EEF8(object, 0);
+    audio_menu_update_pal(object, 0);
 }
 
-extern int func_PAL_00340348(void *, int);
+extern int list_page_update_pal(void *, int);
 extern int g_list_page_prompt_ids[2] __attribute__((sda));
 extern void list_menu_reset_attach_items_pal(void *, void *);
 extern void menu_set_settings_pal(void *, int, int);
-extern void func_PAL_0034A2B0(void *, int);
+extern void menu_set_field_c8_pal(void *, int);
 
-void func_PAL_00340158(char *object, void *argument)
+/* Sets up the list page: prompt bar, the option list and the first update (PAL). */
+void list_page_init_pal(char *object, void *argument)
 {
     int *allocation;
     char *child, *widget;
@@ -100,8 +102,8 @@ void func_PAL_00340158(char *object, void *argument)
     *(int *)(object + 0x2D8) = 0;
     list_menu_reset_attach_items_pal(widget, argument);
     menu_set_settings_pal(widget, -83, 32);
-    func_PAL_0034A2B0(widget, 1);
-    func_PAL_00340348(object, 0);
+    menu_set_field_c8_pal(widget, 1);
+    list_page_update_pal(object, 0);
 }
 
 extern void prompt_bar_draw_pal(char *);
@@ -110,19 +112,21 @@ extern void option_list_draw_rows_pal(char *);
 extern unsigned char g_language;
 extern int g_list_page_field_table[2] __attribute__((sda));
 
-void func_PAL_00340418(char *object)
+/* Draws the list page: the prompt bar and the option list rows (PAL). */
+void list_page_draw_pal(char *object)
 {
-    char *p;
+    char *list;
     prompt_bar_draw_pal(object + 8);
-    p = object + 0x2E0;
-    menu_set_field_bc_pal(p, g_list_page_field_table[g_language]);
-    option_list_draw_rows_pal(p);
+    list = object + 0x2E0;
+    menu_set_field_bc_pal(list, g_list_page_field_table[g_language]);
+    option_list_draw_rows_pal(list);
 }
 
-extern int func_PAL_003405B0(void *, int);
+extern int simple_page_update_pal(void *, int);
 extern int g_simple_page_prompt_ids[2] __attribute__((sda));
 
-void func_PAL_003404B0(char *object, void *argument)
+/* Sets up the simple page: prompt bar with its text and the first update (PAL). */
+void simple_page_init_pal(char *object, void *argument)
 {
     int *allocation;
     char *child;
@@ -143,7 +147,7 @@ void func_PAL_003404B0(char *object, void *argument)
     text = GetLocalizedString(0xC31);
     prompt_bar_set_texts_pal(child, text, 0, GetLocalizedString(0xB60));
     prompt_bar_set_text_offsets_pal(child, -128.0f, -183.0f, 112.0f, 110.0f, 102.0f, 110.0f);
-    func_PAL_003405B0(object, 0);
+    simple_page_update_pal(object, 0);
 }
 
 extern void object_set_first_float4(char *p, float x, float y, float zero, float zero2);
@@ -160,7 +164,8 @@ struct pos {
     float y;
 };
 
-void func_PAL_00340C88(char *self)
+/* Places the four counter text objects relative to the info panel position (PAL). */
+void info_panel_place_counters_pal(char *self)
 {
     float zero = 0.0f;
 

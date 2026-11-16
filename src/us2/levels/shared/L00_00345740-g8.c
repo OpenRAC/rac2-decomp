@@ -13,14 +13,14 @@ extern int ref_US2_L00_00345740_11[];
 extern unsigned char g_hero_state[];
 extern int level_is_mode_twenty_five(void), level_is_mode_in_set(void), level_run_mode_update_zero(void), level_is_special_global_value(void), level_is_special_mode_active(void), level_get_global_word(void), stub_l00_return_one(void);
 extern int ref_US2_L00_00345740_07(void);
-extern void func_US2_003492A8(char *, int), func_US2_003492B0(char *, int), menu_load_sprites_from_values(char *, int *), func_US2_00349368(char *, int, int), func_US2_00349378(char *, int, int *);
-extern int func_US2_00349728(char *, int);
+extern void func_US2_003492A8(char *, int), func_US2_003492B0(char *, int), menu_load_sprites_from_values(char *, int *), func_US2_00349368(char *, int, int), menu_page_set_labels_us2(char *, int, int *);
+extern int menu_choice_list_update_widgets_us2(char *, int);
 void ConfigureMenuChoiceList_l00_us2(void)
 {
     if (!g_resident_data_base[0]) return;
     if (level_is_special_mode_active()) {
         func_US2_003492B0((g_resident_data_base[0] + 0x39160), 1);
-        func_US2_00349378((g_resident_data_base[0] + 0x39160), 5, ref_US2_L00_00345740_00);
+        menu_page_set_labels_us2((g_resident_data_base[0] + 0x39160), 5, ref_US2_L00_00345740_00);
         menu_load_sprites_from_values((g_resident_data_base[0] + 0x39160), ref_US2_L00_00345740_01);
         { char *p = (g_resident_data_base[0] + 0x39160);
         *(int **)(p + 0x484) = ref_US2_L00_00345740_02;
@@ -34,7 +34,7 @@ void ConfigureMenuChoiceList_l00_us2(void)
         { char *p = (g_resident_data_base[0] + 0x39160); *(int *)(p + 0x4AC) = 0; }
     } else if (level_is_mode_in_set() && level_run_mode_update_zero()) {
         func_US2_003492B0((g_resident_data_base[0] + 0x39160), 1);
-        func_US2_00349378((g_resident_data_base[0] + 0x39160), 5, ref_US2_L00_00345740_03);
+        menu_page_set_labels_us2((g_resident_data_base[0] + 0x39160), 5, ref_US2_L00_00345740_03);
         menu_load_sprites_from_values((g_resident_data_base[0] + 0x39160), ref_US2_L00_00345740_01);
         { char *p = (g_resident_data_base[0] + 0x39160);
         *(int **)(p + 0x484) = ref_US2_L00_00345740_04;
@@ -48,7 +48,7 @@ void ConfigureMenuChoiceList_l00_us2(void)
         { char *p = (g_resident_data_base[0] + 0x39160); *(int *)(p + 0x4AC) = 0; }
     } else if (level_is_special_global_value()) {
         func_US2_003492B0((g_resident_data_base[0] + 0x39160), 1);
-        func_US2_00349378((g_resident_data_base[0] + 0x39160), 3, ref_US2_L00_00345740_05);
+        menu_page_set_labels_us2((g_resident_data_base[0] + 0x39160), 3, ref_US2_L00_00345740_05);
         menu_load_sprites_from_values((g_resident_data_base[0] + 0x39160), ref_US2_L00_00345740_01);
         { char *p = (g_resident_data_base[0] + 0x39160);
         *(int **)(p + 0x484) = ref_US2_L00_00345740_06;
@@ -60,7 +60,7 @@ void ConfigureMenuChoiceList_l00_us2(void)
         { char *p = (g_resident_data_base[0] + 0x39160); *(int *)(p + 0x4AC) = 0; }
     } else if (level_get_global_word() == 0x31 || ref_US2_L00_00345740_07() || level_get_global_word() == 0x1C) {
         func_US2_003492B0((g_resident_data_base[0] + 0x39160), 1);
-        func_US2_00349378((g_resident_data_base[0] + 0x39160), 2, ref_US2_L00_00345740_08);
+        menu_page_set_labels_us2((g_resident_data_base[0] + 0x39160), 2, ref_US2_L00_00345740_08);
         menu_load_sprites_from_values((g_resident_data_base[0] + 0x39160), ref_US2_L00_00345740_01);
         { char *p = (g_resident_data_base[0] + 0x39160);
         *(int **)(p + 0x484) = ref_US2_L00_00345740_09;
@@ -71,7 +71,7 @@ void ConfigureMenuChoiceList_l00_us2(void)
         { char *p = (g_resident_data_base[0] + 0x39160); *(int *)(p + 0x4AC) = 0; }
     } else {
         func_US2_003492B0((g_resident_data_base[0] + 0x39160), 1);
-        func_US2_00349378((g_resident_data_base[0] + 0x39160), 7, ref_US2_L00_00345740_10);
+        menu_page_set_labels_us2((g_resident_data_base[0] + 0x39160), 7, ref_US2_L00_00345740_10);
         menu_load_sprites_from_values((g_resident_data_base[0] + 0x39160), ref_US2_L00_00345740_01);
         { char *p = (g_resident_data_base[0] + 0x39160);
         *(int **)(p + 0x484) = ref_US2_L00_00345740_11;
@@ -98,5 +98,5 @@ void ConfigureMenuChoiceList_l00_us2(void)
         if (g_hero_state[0x22B4] == 1) { char *p = (g_resident_data_base[0] + 0x39160); *(int *)(p + 0x4AC) = 3; }
         else { char *p = (g_resident_data_base[0] + 0x39160); *(int *)(p + 0x4AC) = 0; }
     }
-    func_US2_00349728((g_resident_data_base[0] + 0x39160), 0);
+    menu_choice_list_update_widgets_us2((g_resident_data_base[0] + 0x39160), 0);
 }

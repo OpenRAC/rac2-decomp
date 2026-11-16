@@ -2,7 +2,7 @@
 
 #include "common.h"
 extern int g_menu_input_flags;
-extern int func_PAL_0029CB00(int);
+extern int menu_update_choice_list_pal(int);
 extern unsigned int stub_empty_26(void);
 extern unsigned int stub_empty_26(void);
 extern unsigned int stub_empty_26(void);
@@ -12,44 +12,45 @@ extern unsigned int stub_empty_29(void);
 extern int menu_handle_step_simple(int);
 extern int menu_handle_mode_action(int);
 extern int menu_run_action_by_index(int);
-extern int func_PAL_002CC7B8(int);
+extern int menu_handle_command_pal(int);
 extern int snd_play_from_global_bank(int, unsigned int, void *);
 extern unsigned int stub_empty_24(void);
 extern unsigned int stub_empty_25(void);
 extern unsigned int stub_empty_27(void);
 
+/* Reads the menu input flags and runs the handler for the current menu kind, playing a click when the input was handled (PAL). */
 int menu_handle_button_input_pal(void)
 {
     unsigned int flags = g_menu_input_flags;
-    int res = 0;
+    int result = 0;
 
     if (flags & 0x910) {
-        res = 1;
+        result = 1;
     } else if (flags & 0x40) {
-        res = func_PAL_0029CB00(flags);
+        result = menu_update_choice_list_pal(flags);
         if (stub_empty_24() && stub_empty_25()) {
-            res = func_PAL_002CC7B8(res);
+            result = menu_handle_command_pal(result);
         } else if (stub_empty_27()) {
-            res = menu_handle_mode_action(res);
+            result = menu_handle_mode_action(result);
         } else if (stub_empty_26()) {
-            res = func_PAL_002CC8C8(res);
+            result = menu_handle_step_with_reset_pal(result);
         } else if (stub_empty_29() == 0x31) {
-            res = menu_handle_step_simple(res);
+            result = menu_handle_step_simple(result);
         } else if (stub_empty_28()) {
-            res = menu_handle_step_simple(res);
+            result = menu_handle_step_simple(result);
         } else if (stub_empty_29() == 0x1C) {
-            res = menu_handle_step_simple(res);
+            result = menu_handle_step_simple(result);
         } else {
-            res = menu_run_action_by_index(res);
+            result = menu_run_action_by_index(result);
         }
     } else {
-        func_PAL_0029CB00(flags);
+        menu_update_choice_list_pal(flags);
     }
 
-    if (res) {
+    if (result) {
         snd_play_from_global_bank(0x12, 0, 0);
     }
-    return res;
+    return result;
 }
 
 
@@ -61,6 +62,7 @@ void DoGifPaging(void);
 extern void SetupGifPaging(long arg0);
 extern void SetupGifPaging(long param_1);
 
+/* Runs the menu setup calls between SetupGifPaging and DoGifPaging (PAL). */
 int menu_run_setup_calls_pal(void)
 {
   SetupGifPaging(0);

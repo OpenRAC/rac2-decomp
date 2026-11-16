@@ -20,7 +20,7 @@ extern u8 *CreateMoby(int);
 extern void moby_init_child_from_parent(void *, void *), hero_copy_field_to_moby(void *), moby_fade_out_update(void *);
 extern float coll_probe_ground_height_below(void *, int, float);
 extern char *part_l13_spawn_flash(void *, int, int, int, int, int, int, int, float, int, int);
-extern void func_US2_002A7AA8(void *, int, int), moby_mark_spawned(void *);
+extern void SetDeathBits_us2(void *, int, int), moby_mark_spawned(void *);
 extern int math_is_value_within_step_us2(void *, float);
 extern void FastVecSub(void *, void *, void *);
 extern void moby_transform_joint_to_world(char *, int, char *);
@@ -106,7 +106,7 @@ void UpdateSnivelakActivationAndDebris_us2(u8 *moby)
             child = cam_moby_create(moby, 3, 0xecb, 0, moby + 0x10,
                 moby + 0xf0, velocity, 255, 180.0f, 25.0f);
             hero_copy_field_to_moby(child);
-            func_US2_002A7AA8(moby, 0, 3);
+            SetDeathBits_us2(moby, 0, 3);
             moby_mark_spawned(moby);
             return;
         }

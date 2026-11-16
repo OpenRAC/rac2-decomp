@@ -5,15 +5,15 @@ extern int FastDecTimer(void *p);
 extern int FastTweenColor(int a0, int a1, float f12);
 
 /* Toggle the lamp and hand the new state to the colour routine. */
-void func_PAL_L02_00390950(char *arg0) {
-    char *s0 = *(char **)(arg0 + 0x68);
+void blinking_lamp_update_pal(char *moby) {
+    char *vars = *(char **)(moby + 0x68);
 
-    if (*(short *)(arg0 + 0xAA) != 0x9B0)
+    if (*(short *)(moby + 0xAA) != 0x9B0)
         return;
-    if (FastDecTimer(s0 + 0x74) != 0) {
-        *(unsigned short *)(s0 + 0x74) = 0x2A;
-        *(unsigned int *)(s0 + 0x8C) = (*(unsigned int *)(s0 + 0x8C) == 0);
+    if (FastDecTimer(vars + 0x74) != 0) {
+        *(unsigned short *)(vars + 0x74) = 0x2A;
+        *(unsigned int *)(vars + 0x8C) = (*(unsigned int *)(vars + 0x8C) == 0);
     }
-    *(int *)(arg0 + 0x78) = FastTweenColor(*(int *)(arg0 + 0x78),
-        *(unsigned int *)(s0 + 0x8C) != 0 ? 0x50787878 : 0x50141414, 0.18f);
+    *(int *)(moby + 0x78) = FastTweenColor(*(int *)(moby + 0x78),
+        *(unsigned int *)(vars + 0x8C) != 0 ? 0x50787878 : 0x50141414, 0.18f);
 }

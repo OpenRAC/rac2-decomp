@@ -49,25 +49,26 @@ extern void ref_L00_003DD6A8_37(char *, char *);
 extern int ref_L00_003DD6A8_38(char *, char *, char *, char *, char *, char *);
 extern void ref_L00_003DD6A8_39(char *, char *), ref_L00_003DD6A8_40(char *, float);
 
-void func_US2_00326F90(char *object)
+/* Updates the spider bot: it is thrown, flies, lands and walks around with a timer, then is removed (USA v2.00 copy of the level 0 bot code). */
+void thrown_object_update_us2(char *moby)
 {
-    char oldpos[16], ahead[16], behind[16];
-    char *data = *(char **)(object + 0x68);
-    PlayerState *player;
+    char old_pos[16], ahead[16], behind[16];
+    char *vars = *(char **)(moby + 0x68);
+    PlayerState *hero;
     int i, result;
     float (*randoms)[2];
-    if ((unsigned char)object[0x20] >= 2) {
-        ref_L00_003DD6A8_00(object, g_spider_bot_vector, 1);
+    if ((unsigned char)moby[0x20] >= 2) {
+        ref_L00_003DD6A8_00(moby, g_spider_bot_vector, 1);
     } else {
-        char *p = object + 0x10;
-        ref_L00_003DD6A8_01(p, g_spider_bot_vector);
+        char *pos_ptr = moby + 0x10;
+        ref_L00_003DD6A8_01(pos_ptr, g_spider_bot_vector);
     }
     ref_L00_003DD6A8_02(g_spider_bot_vector, g_spider_bot_vector, -1.0f);
-    ref_L00_003DD6A8_02(ahead, object + 0xE0, g_ground_probe_distance);
-    ref_L00_003DD6A8_03(ahead, object + 0x10, ahead);
-    ref_L00_003DD6A8_02(behind, object + 0xE0, -1.0f);
-    ref_L00_003DD6A8_03(behind, object + 0x10, behind);
-    if (ref_L00_003DD6A8_04(ahead, behind, 2, object, 0)) {
+    ref_L00_003DD6A8_02(ahead, moby + 0xE0, g_ground_probe_distance);
+    ref_L00_003DD6A8_03(ahead, moby + 0x10, ahead);
+    ref_L00_003DD6A8_02(behind, moby + 0xE0, -1.0f);
+    ref_L00_003DD6A8_03(behind, moby + 0x10, behind);
+    if (ref_L00_003DD6A8_04(ahead, behind, 2, moby, 0)) {
         if (ref_L00_003DD6A8_05() == 2) {
             ref_L00_003DD6A8_02(g_spider_bot_vector, g_hero_l00_velocity, 0.0009765625f);
             ref_L00_003DD6A8_06(g_spider_bot_vector, g_spider_bot_vector, -1.0f);
@@ -83,13 +84,13 @@ void func_US2_00326F90(char *object)
     ref_L00_003DD6A8_07(6, 0, 1);
     /* Each case is its own block: the address-taken locals leave their stack slots when the
      * switch ends, and the attachment block below reuses that space. */
-    switch ((unsigned char)object[0x20]) {
+    switch ((unsigned char)moby[0x20]) {
     case 0: {
-        object[0x20] = 1;
-        *(int *)(data + 0x18) = 0;
-        *(float *)(object + 0x2C) = 0.00025f;
+        moby[0x20] = 1;
+        *(int *)(vars + 0x18) = 0;
+        *(float *)(moby + 0x2C) = 0.00025f;
         g_spider_bot_timer = 1800;
-        *(int *)(object + 0x98) = 0;
+        *(int *)(moby + 0x98) = 0;
         randoms = g_wobbling_ball_angles;
         i = 97;
         do {
@@ -102,68 +103,68 @@ void func_US2_00326F90(char *object)
     }
         /* fall through */
     case 1: {
-        player = &D_00189E20_9;
-        if (player->state == 98 || g_game_l00_mode == 2 || player->state == 111 || player->state == 100 || player->state == 99 ||
-            player->state == 23 || player->state == 24 || player->state == 129 || player->state == 39) {
+        hero = &D_00189E20_9;
+        if (hero->state == 98 || g_game_l00_mode == 2 || hero->state == 111 || hero->state == 100 || hero->state == 99 ||
+            hero->state == 23 || hero->state == 24 || hero->state == 129 || hero->state == 39) {
             ref_L00_003DD6A8_11();
-            object[0x20] = 7;
+            moby[0x20] = 7;
             ref_L00_003DD6A8_12();
-            *(int *)(data + 0x20) = 0;
+            *(int *)(vars + 0x20) = 0;
             break;
         }
-        *(float *)(object + 0x2C) += 0.01f;
-        if (*(float *)(object + 0x2C) > 0.0181099995970726f)
-            *(float *)(object + 0x2C) = 0.0181099995970726f;
-        qcopy(oldpos, object + 0x10);
-        ref_L00_003DD6A8_03(object + 0x10, object + 0x10, data);
-        ref_L00_003DD6A8_13(g_spider_bot_effect_slot[0], data, 0);
-        ref_L00_003DD6A8_14(object + 0x10, object + 0x10);
-        ref_L00_003DD6A8_15(data, data);
-        ref_L00_003DD6A8_16(object + 0x10, data, 0.003055555745959282f);
-        if (ref_L00_003DD6A8_04(oldpos, object + 0x10, 2, object, 0)) {
-            char *hitinfo = g_collision_result;
-            char *hit = *(char **)(hitinfo + 0x18);
-            if (hit && (hit == player->target || *(short *)(hit + 0xAA) == 0x907)) break;
-            qcopy(object + 0x10, hitinfo + 0x20);
-            ref_L00_003DD6A8_17(data);
+        *(float *)(moby + 0x2C) += 0.01f;
+        if (*(float *)(moby + 0x2C) > 0.0181099995970726f)
+            *(float *)(moby + 0x2C) = 0.0181099995970726f;
+        qcopy(old_pos, moby + 0x10);
+        ref_L00_003DD6A8_03(moby + 0x10, moby + 0x10, vars);
+        ref_L00_003DD6A8_13(g_spider_bot_effect_slot[0], vars, 0);
+        ref_L00_003DD6A8_14(moby + 0x10, moby + 0x10);
+        ref_L00_003DD6A8_15(vars, vars);
+        ref_L00_003DD6A8_16(moby + 0x10, vars, 0.003055555745959282f);
+        if (ref_L00_003DD6A8_04(old_pos, moby + 0x10, 2, moby, 0)) {
+            char *hit_info = g_collision_result;
+            char *hit = *(char **)(hit_info + 0x18);
+            if (hit && (hit == hero->target || *(short *)(hit + 0xAA) == MOBY_CLASS_SPIDERBOT_GLOVE)) break;
+            qcopy(moby + 0x10, hit_info + 0x20);
+            ref_L00_003DD6A8_17(vars);
             ref_L00_003DD6A8_07(6, 0, 1);
             ref_L00_003DD6A8_18(28, 1);
-            ref_L00_003DD6A8_19(object + 0x10, object + 0xF0, object);
-            object[0x20] = 2;
-            ref_L00_003DD6A8_20(object, 1, 0, 10);
-            *(int *)(object + 0x48) = 0;
+            ref_L00_003DD6A8_19(moby + 0x10, moby + 0xF0, moby);
+            moby[0x20] = 2;
+            ref_L00_003DD6A8_20(moby, 1, 0, 10);
+            *(int *)(moby + 0x48) = 0;
             return;
         }
         break;
     }
     case 2: {
-        object[0x20] = 3;
-        ref_L00_003DD6A8_21(2, 0, object);
+        moby[0x20] = 3;
+        ref_L00_003DD6A8_21(2, 0, moby);
         if (g_game_mode[0] != 28 || g_game_l00_mode == 2) {
             ref_L00_003DD6A8_11();
-            object[0x20] = 9;
-            *(int *)(data + 0x20) = 0;
+            moby[0x20] = 9;
+            *(int *)(vars + 0x20) = 0;
         }
         break;
     }
     case 3: {
-        ref_L00_003DD6A8_22(object);
-        ref_L00_003DD6A8_23(object);
-        ref_L00_003DD6A8_24(object);
-        ref_L00_003DD6A8_25(object);
+        ref_L00_003DD6A8_22(moby);
+        ref_L00_003DD6A8_23(moby);
+        ref_L00_003DD6A8_24(moby);
+        ref_L00_003DD6A8_25(moby);
         ref_L00_003DD6A8_26();
         if (ref_L00_003DD6A8_27((char *)&g_spider_bot_timer)) {
-            object[0x20] = 9;
-            *(int *)(data + 0x20) = 10;
+            moby[0x20] = 9;
+            *(int *)(vars + 0x20) = 10;
         }
         if (g_pad_held_flags[0] & 0x20) {
-            object[0x20] = 9;
-            *(int *)(data + 0x20) = 10;
+            moby[0x20] = 9;
+            *(int *)(vars + 0x20) = 10;
         }
         if (g_game_mode[0] != 28 || g_game_l00_mode == 2) {
             ref_L00_003DD6A8_11();
-            object[0x20] = 9;
-            *(int *)(data + 0x20) = 0;
+            moby[0x20] = 9;
+            *(int *)(vars + 0x20) = 0;
         }
         break;
     }
@@ -175,70 +176,70 @@ void func_US2_00326F90(char *object)
             float radius, friction, elasticity;
             int field48, field4c, enabled, surface, field58;
         } collision;
-        qcopy(oldpos, object + 0x10);
-        ref_L00_003DD6A8_03(object + 0x10, object + 0x10, data);
-        ref_L00_003DD6A8_16(object + 0x10, data, 0.006111111491918564f);
-        ref_L00_003DD6A8_14(object + 0x10, object + 0x10);
-        ref_L00_003DD6A8_15(data, data);
-        qcopy(collision.start, oldpos);
-        qcopy(collision.end, object + 0x10);
-        qcopy(collision.velocity, data);
+        qcopy(old_pos, moby + 0x10);
+        ref_L00_003DD6A8_03(moby + 0x10, moby + 0x10, vars);
+        ref_L00_003DD6A8_16(moby + 0x10, vars, 0.006111111491918564f);
+        ref_L00_003DD6A8_14(moby + 0x10, moby + 0x10);
+        ref_L00_003DD6A8_15(vars, vars);
+        qcopy(collision.start, old_pos);
+        qcopy(collision.end, moby + 0x10);
+        qcopy(collision.velocity, vars);
         collision.radius = 0.2f;
         collision.friction = 0.85f;
         collision.elasticity = 0.75f;
         collision.enabled = 1;
-        collision.owner = object;
+        collision.owner = moby;
         collision.flags = 0;
         collision.mode = 0;
         collision.field48 = 0;
         collision.field4c = 0;
         collision.field58 = 0;
         result = ref_L00_003DD6A8_28((char *)&collision);
-        qcopy(object + 0x10, collision.end);
-        qcopy(data, collision.velocity);
+        qcopy(moby + 0x10, collision.end);
+        qcopy(vars, collision.velocity);
         if (result == 2) {
             if (ref_L00_003DD6A8_29(collision.surface) || collision.surface == 12) {
-                object[0x20] = 9;
-                *(int *)(data + 0x20) = 10;
+                moby[0x20] = 9;
+                *(int *)(vars + 0x20) = 10;
             } else {
-                object[0x20] = result;
-                ref_L00_003DD6A8_17(data);
+                moby[0x20] = result;
+                ref_L00_003DD6A8_17(vars);
             }
-        } else if (ref_L00_003DD6A8_30(data) > 0.4f) {
-            object[0x20] = 9;
-            *(int *)(data + 0x20) = 10;
+        } else if (ref_L00_003DD6A8_30(vars) > 0.4f) {
+            moby[0x20] = 9;
+            *(int *)(vars + 0x20) = 10;
         }
         break;
     }
     case 9: {
-        object[0x20] = 5;
+        moby[0x20] = 5;
         ref_L00_003DD6A8_12();
     }
         /* fall through */
     case 5: {
         char direction[16];
-        if (ref_L00_003DD6A8_27(data + 0x20)) {
-            ref_L00_003DD6A8_06(direction, object + 0xC0, 1.0f);
-            ref_L00_003DD6A8_31(object, object + 0x10, direction, *(float *)(object + 0x18));
-            ref_L00_003DD6A8_21(1, 0, object);
-            object[0x20] = 6;
-            *(unsigned short *)(object + 0x34) |= 0x41;
+        if (ref_L00_003DD6A8_27(vars + 0x20)) {
+            ref_L00_003DD6A8_06(direction, moby + 0xC0, 1.0f);
+            ref_L00_003DD6A8_31(moby, moby + 0x10, direction, *(float *)(moby + 0x18));
+            ref_L00_003DD6A8_21(1, 0, moby);
+            moby[0x20] = 6;
+            *(unsigned short *)(moby + 0x34) |= 0x41;
             if (g_game_mode[0] != 28 || g_game_l00_mode == 2) {
                 ref_L00_003DD6A8_11();
-                *(int *)(data + 0x20) = 0;
-            } else *(int *)(data + 0x20) = g_spider_bot_state_value;
-            *(int *)(data + 0x24) = 0;
+                *(int *)(vars + 0x20) = 0;
+            } else *(int *)(vars + 0x20) = g_spider_bot_state_value;
+            *(int *)(vars + 0x24) = 0;
         }
         break;
     }
     case 6: {
-        ref_L00_003DD6A8_32(object);
-        *(float *)(data + 0x24) += g_spider_bot_timer_rate * (1.0f / 60.0f);
-        if (ref_L00_003DD6A8_27(data + 0x20) && !*(int *)(data + 0x28)) object[0x20] = 8;
+        ref_L00_003DD6A8_32(moby);
+        *(float *)(vars + 0x24) += g_spider_bot_timer_rate * (1.0f / 60.0f);
+        if (ref_L00_003DD6A8_27(vars + 0x20) && !*(int *)(vars + 0x28)) moby[0x20] = 8;
         break;
     }
     case 7: {
-        if (ref_L00_003DD6A8_27(data + 0x20)) object[0x20] = 8;
+        if (ref_L00_003DD6A8_27(vars + 0x20)) moby[0x20] = 8;
         break;
     }
     case 8: {
@@ -247,17 +248,17 @@ void func_US2_00326F90(char *object)
         g_spider_bot_moby = 0;
         ref_L00_003DD6A8_10(0, 0);
         ref_L00_003DD6A8_33((int)D_L00_001B2B4C_gp);
-        ref_L00_003DD6A8_34(object);
+        ref_L00_003DD6A8_34(moby);
         return;
     }
     }
-    ref_L00_003DD6A8_35(ref_L00_003DD6A8_42, object);
-    if ((unsigned char)object[0x20] >= 2 && g_active_tether_object[0]) {
+    ref_L00_003DD6A8_35(ref_L00_003DD6A8_42, moby);
+    if ((unsigned char)moby[0x20] >= 2 && g_active_tether_object[0]) {
         char angles[16], adjusted[16], matrix[64];
-        ref_L00_003DD6A8_36(matrix, object + 0xC0);
+        ref_L00_003DD6A8_36(matrix, moby + 0xC0);
         ref_L00_003DD6A8_37(matrix, angles);
-        ref_L00_003DD6A8_38(object, g_active_tether_object[0], object + 0x10, angles, object + 0x10, adjusted);
-        ref_L00_003DD6A8_39(object + 0xC0, adjusted);
+        ref_L00_003DD6A8_38(moby, g_active_tether_object[0], moby + 0x10, angles, moby + 0x10, adjusted);
+        ref_L00_003DD6A8_39(moby + 0xC0, adjusted);
     }
-    ref_L00_003DD6A8_40(object, g_ground_probe_length);
+    ref_L00_003DD6A8_40(moby, g_ground_probe_length);
 }

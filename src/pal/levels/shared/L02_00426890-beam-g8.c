@@ -16,8 +16,8 @@ extern void FastVecAdd(void *,void *,void *);
 extern void vec_scale_to_length(void *,void *,float);
 extern int CollLine(void *,void *,int,void *,int);
 extern int PlayMobySound(int,int,void *);
-extern void func_PAL_L02_00426DF8(void *,int,int);
-extern void func_PAL_L02_00427320(u8 *,void *);
+extern void part_spawn_impact_particles_pal(void *,int,int);
+extern void part_spawn_spark_ring_burst_pal(u8 *,void *);
 extern void part_init_effect_record(char *,int,int,float);
 extern int coll_process_hit(void *,int,void *,void *,float);
 extern int math_fast_float_d(int *);
@@ -31,7 +31,7 @@ extern void moby_update_spinning_frame_orientation_pal(u8 *);
 
 /* Move and test the beam endpoint, then emit its fading or impact particles.
  * The interleaved particle arguments preserve the EE integer/FP register banks. */
-void func_PAL_L02_00426890(u8 *object)
+void beam_update_endpoint_and_particles_pal(u8 *object)
 {
     BeamQuery query;
     ImpactInfo impact;
@@ -54,9 +54,9 @@ void func_PAL_L02_00426890(u8 *object)
         query.impact.type=*(u16 *)(object+0xAA);
         if(CollLine(&query.start,object+0x10,0,object,0) && g_collision_l02_result.other!=*(u8 **)(state+0x50)) {
             PlayMobySound(0,0,object);
-            if(!g_collision_l02_result.other) func_PAL_L02_00426DF8(&g_collision_l02_result.position,5,0);
-            else if(*(int *)(g_collision_l02_result.other+0x98)) func_PAL_L02_00426DF8(&g_collision_l02_result.position,10,1);
-            func_PAL_L02_00427320(object,&g_collision_l02_result.position);
+            if(!g_collision_l02_result.other) part_spawn_impact_particles_pal(&g_collision_l02_result.position,5,0);
+            else if(*(int *)(g_collision_l02_result.other+0x98)) part_spawn_impact_particles_pal(&g_collision_l02_result.position,10,1);
+            part_spawn_spark_ring_burst_pal(object,&g_collision_l02_result.position);
             part_init_effect_record((char *)&impact,(int)object,0x810001,*(float *)(state+0x64));
             impact.kind=2;impact.enabled=1;
             impact.type=*(u16 *)(*(u8 **)(state+0x50)+0xAA);

@@ -31,8 +31,9 @@ extern void matrix_mul_vec3(void *, void *, void *), vec_fast_divide_helper(void
 extern float math_fast_sin_or_cos_b(float), IntToFloat(int), math_random_angle(void);
 extern void vec_build_spherical_offset(void *, float, float, float);
 extern int func_001163B0(void);
-extern char *func_PAL_L08_0034C4A8(void *, void *, int, void *);
+extern char *part_spawn_short_lived_pal(void *, void *, int, void *);
 
+/* Draws one glowing beam link between two points, with a bright core and a soft glow, and sometimes throws sparks. */
 void DrawBeamLinkStrip_pal(int tex0, int tex1, void *points, int inner, int outer, int alpha, int slot, int spark)
 {
     Packet packets[2];
@@ -156,7 +157,7 @@ void DrawBeamLinkStrip_pal(int tex0, int tex1, void *points, int inner, int oute
                 vec_build_spherical_offset(vel, r0, r1, r2 * .25f);
                 matrix_mul_vec3(vel, vel, &g_sound_slot_matrices[slot][0]);
                 vec_fast_divide_helper(vel, vel, 0.040000003f);
-                particle = func_PAL_L08_0034C4A8(&packets[0].vertex[func_001163B0() & 3], vel, alpha * 64 / 100,
+                particle = part_spawn_short_lived_pal(&packets[0].vertex[func_001163B0() & 3], vel, alpha * 64 / 100,
                                              g_sound_slot_ptrs[slot][0]);
                 if (particle) {
                     particle[2] = *g_spark_bank.bank;
@@ -164,7 +165,7 @@ void DrawBeamLinkStrip_pal(int tex0, int tex1, void *points, int inner, int oute
                     output->inverse = 1.0f / IntToFloat(*(short *)(particle + 0xA));
                     output->color = 0x7F3F20;
                     *(float *)(particle + 0xC) = 150000.0f;
-                    particle = func_PAL_L08_0034C4A8(&packets[0].vertex[func_001163B0() & 3], vel, alpha * 127 / 100,
+                    particle = part_spawn_short_lived_pal(&packets[0].vertex[func_001163B0() & 3], vel, alpha * 127 / 100,
                                                  g_sound_slot_ptrs[slot][0]);
                     if (particle) {
                         particle[2] = *g_spark_bank.bank;

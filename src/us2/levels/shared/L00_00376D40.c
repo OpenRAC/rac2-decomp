@@ -32,7 +32,8 @@ extern void draw_large_text_edge_faded_us2(float,float,unsigned long,float,char 
 
 #define screen_y(y) ((int)(D_001B2280[0] * (y) + 0.5f) + (D_001A7B90 ? 4 : 0))
 
-void func_US2_L00_00376D40(void)
+/* Draws the vendor's scrolling list of items with their icons, fading at the edges, and the owned or sold-out label. */
+void shop_draw_vendor_item_select_list_us2(void)
 {
     int pulse;
     int i, index, y, icon, kind, special, alpha0, alpha1;

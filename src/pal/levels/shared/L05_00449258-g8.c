@@ -14,7 +14,8 @@ extern int FastDecTimer(void *);
 extern void vec_fast_normalize3(void *,void *,void *,float);
 extern void quaternion_to_rotation_basis(void *,void *);
 extern int g_ship_turn_anim_early __attribute__((sda)), g_ship_turn_anim_default __attribute__((sda));
-int func_PAL_L05_00449258(char *object)
+/* Runs the ship's turn animation: when it is facing upside down it starts a timed blend of the ship's basis, returning 1 while it plays (PAL: 50 Hz). */
+int ship_update_turn_animation_pal(char *object)
 {
  TurnVector up, first, second, third, result;
  char *state = *(char **)(object+0x70)+0x50;

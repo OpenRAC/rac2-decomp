@@ -11,6 +11,7 @@ extern int g_selection_menu_index[];
 extern int g_selected_item_material __attribute__((sda));
 extern int snd_play_from_global_bank(int, int, int);
 
+/* Handles pad input on the two-entry selection menu: moves the cursor, plays a sound and records the chosen item and its material. (PAL) */
 void selection_menu_handle_two_entry_input_pal(char *o, int buttons) {
 #define I(off) (*(int *)(o+(off)))
     int index;

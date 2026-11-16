@@ -19,23 +19,24 @@ extern void snd_stop_voice(int);
 extern int math_fast_float_d(void *);
 extern void FadeToBlack(int);
 extern void level_store_value_pair_pal(int, void *);
-extern s32 func_PAL_L15_00435B68(void);
+extern s32 gorn_reward_panel_draw_pal(void);
 extern void snd_clamp_copy_volumes(void);
 extern int MemcardSave(int,int);
 extern void hero_set_state_value_c(int);
 extern void ResetGornStageCounters(void *);
 extern int request_begin_slot(int,int,int,int,int);
 
-void func_PAL_L15_00436118(char *self, int stage)
+/* Ends a Gorn challenge stage: stops the stage sound, pays the bolt reward, saves, and lets the player retry or leave. */
+void gorn_finish_challenge_stage_pal(char *self, int stage)
 {
     char *state = *(char **)(self + 0x68);
-    char *obj = g_moby_base + (*(int *)(state + 0x20) << 8);
-    GornData *data = *(GornData **)(obj + 0x68);
-    int id = data->id;
-    if (id != -1) {
-        char *entry = g_sound_state + id * 0x70;
-        if (*(char **)(entry + 0x88) == obj && *(unsigned char *)(entry + 0x74))
-            snd_stop_voice(id);
+    char *owner = g_moby_base + (*(int *)(state + 0x20) << 8);
+    GornData *data = *(GornData **)(owner + 0x68);
+    int voice_id = data->id;
+    if (voice_id != -1) {
+        char *entry = g_sound_state + voice_id * 0x70;
+        if (*(char **)(entry + 0x88) == owner && *(unsigned char *)(entry + 0x74))
+            snd_stop_voice(voice_id);
     }
     data->id = -1;
     if (g_challenge_mode == 2) {
@@ -45,18 +46,18 @@ void func_PAL_L15_00436118(char *self, int stage)
         return;
     }
     if (g_challenge_menu_data && !g_gorn_stage_finished_flag) {
-        int count, value;
+        int count, reward;
         FadeToBlack(25);
-        level_store_value_pair_pal(0, func_PAL_L15_00435B68);
+        level_store_value_pair_pal(0, gorn_reward_panel_draw_pal);
         count = g_challenge_completed_a[stage];
-        value = g_gorn_reward_table[stage][count < 3 ? count : 2];
+        reward = g_gorn_reward_table[stage][count < 3 ? count : 2];
         g_gorn_stage_finished_flag = 1;
         g_gorn_finished_stage_num = stage;
         g_gorn_challenge_active_flag = 0;
         g_challenge_menu_loaded = 0;
-        if (g_extras_unlocked_flag) value *= 10;
+        if (g_extras_unlocked_flag) reward *= 10;
         g_challenge_completed_a[stage] = count + 1;
-        g_player_bolts = g_player_bolts + value;
+        g_player_bolts = g_player_bolts + reward;
         snd_clamp_copy_volumes();
         MemcardSave(0, -1);
     }

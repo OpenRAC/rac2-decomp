@@ -22,7 +22,7 @@ extern unsigned char *g_part_tex_burst;
 
 /* Another func_002C2210-style effect record (kind 0x2C): the colour split into its bytes in
    the payload, a byte count from `count` and the remaining sizes as given. */
-Particle *func_PAL_002C23B8(Quad *position, float *vector, int size, int alpha, int rgb, int count,
+Particle *part_spawn_burst_pal(Quad *position, float *vector, int size, int alpha, int rgb, int count,
                         float life, float second, float third, float fourth, float phase)
 {
     Particle *p = part_alloc(0x2C);

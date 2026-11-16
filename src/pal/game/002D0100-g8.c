@@ -10,6 +10,7 @@ extern int func_0029C560(int);
 extern char *tab_menu_get_selected_entry(void *);
 extern void menu_start_action(int);
 
+/* Handles input on the pause menu list: starts the selected entry's action on confirm, closes or refuses on cancel, and plays the refuse sound for an entry with no value. (PAL copy) */
 int menu_handle_input_send_selection_or_refuse_pal(void)
 {
     struct { short reserved; unsigned short key; int value; } message;

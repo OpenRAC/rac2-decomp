@@ -18,25 +18,25 @@ extern void EmitTexturedRectangle(float, float, float, float, int, int, int, int
    each glyph's left and right edges out with their distance from the screen centre (215 on
    the second screen layout, 256 elsewhere, three quarters as fast). Characters 0x80..0xa7
    draw their entry 0x40 later; control characters below 0x20 draw a grey 24-pixel sprite. */
-void func_PAL_002FA720(u64 color, u8 *text, int limit, float x, float y, float scale)
+void draw_large_text_edge_faded_pal(u64 color, u8 *text, int limit, float x, float y, float scale)
 {
     u32 colors[4];
     u32 gray[4];
     Glyph_002F97A0 *glyphs;
     Shop_002F9198 *shop = &g_vendor_menu_state;
-    Glyph_002F97A0 *g;
+    Glyph_002F97A0 *accent;
     u64 texture;
     int count = 0;
     float size;
     float top;
     float dx;
     float dy;
-    double d;
+    double dist;
     int left;
     int right;
     int shade;
     int tint;
-    u32 c;
+    u32 base_color;
     u8 *cursor;
     int accented;
 
@@ -51,46 +51,46 @@ void func_PAL_002FA720(u64 color, u8 *text, int limit, float x, float y, float s
         if (glyphs[*cursor].adv != 0) {
             top = IntToFloat(glyphs[*cursor].top) * scale;
             if (shop->mode == 2) {
-                d = 215.0f - x;
-                if (d < 0)
-                    d = -d;
-                left = 0x80 - (int)d;
-                d = 215.0f - (x + size);
-                if (d < 0)
-                    d = -d;
-                right = 0x80 - (int)d;
+                dist = 215.0f - x;
+                if (dist < 0)
+                    dist = -dist;
+                left = 0x80 - (int)dist;
+                dist = 215.0f - (x + size);
+                if (dist < 0)
+                    dist = -dist;
+                right = 0x80 - (int)dist;
             } else {
-                d = 256.0f - x;
-                if (d < 0)
-                    d = -d;
-                left = 0x80 - (int)(d * 0.75);
-                d = 256.0f - (x + size);
-                if (d < 0)
-                    d = -d;
-                right = 0x80 - (int)(d * 0.75);
+                dist = 256.0f - x;
+                if (dist < 0)
+                    dist = -dist;
+                left = 0x80 - (int)(dist * 0.75);
+                dist = 256.0f - (x + size);
+                if (dist < 0)
+                    dist = -dist;
+                right = 0x80 - (int)(dist * 0.75);
             }
             if (left < 0)
                 left = 0;
-            c = color;
+            base_color = color;
             if (right < 0)
                 right = 0;
             accented = (u8)(*cursor + 0x80) < 0x28;
             left <<= 24;
             right <<= 24;
-            colors[0] = left | c;
-            colors[1] = right | c;
-            colors[2] = left | c;
-            colors[3] = right | c;
+            colors[0] = left | base_color;
+            colors[1] = right | base_color;
+            colors[2] = left | base_color;
+            colors[3] = right | base_color;
             if (accented) {
-                g = (Glyph_002F97A0 *)((((u8)*cursor + 0x40) << 2) + (int)glyphs);
-                dx = IntToFloat(g->adv) * scale;
-                dy = IntToFloat(g->top) * scale;
-                EmitTexturedRectangle(x + dx, y + dy, size, size, g->u, g->v, 16, 16, colors, texture);
+                accent = (Glyph_002F97A0 *)((((u8)*cursor + 0x40) << 2) + (int)glyphs);
+                dx = IntToFloat(accent->adv) * scale;
+                dy = IntToFloat(accent->top) * scale;
+                EmitTexturedRectangle(x + dx, y + dy, size, size, accent->u, accent->v, 16, 16, colors, texture);
             }
             if (*cursor < 0x20) {
                 tint = colors[0];
-                c = tint;
-                shade = (c & 0xFF) + ((c >> 8) & 0xFF) + ((c >> 16) & 0xFF);
+                base_color = tint;
+                shade = (base_color & 0xFF) + ((base_color >> 8) & 0xFF) + ((base_color >> 16) & 0xFF);
                 shade /= 3;
                 tint &= 0xFF000000;
                 tint += shade << 16;

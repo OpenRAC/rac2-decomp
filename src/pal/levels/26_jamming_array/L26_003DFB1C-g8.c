@@ -12,7 +12,7 @@ extern int g_hero_tether_enabled;
 extern ActionChoices g_creature_action_choices;
 extern float g_creature_float_threshold __attribute__((sda));
 extern float g_hero_position[4];
-extern int func_PAL_L26_003E0168(unsigned char *);
+extern int flying_creature_update_state_pal(unsigned char *);
 extern void moby_set_state(unsigned char *, int, int);
 extern unsigned long moby_dispatch_action_by_kind(void *, void *);
 extern void group_destroy_attached_parts(char *, char *);
@@ -23,21 +23,21 @@ extern int PlayMobySound(int, int, char *);
 extern void *SpawnExplosion_pal(void *, int, int, int, int, int, int, int, int, int, int, void *, float, float);
 extern void mat_get_euler_angles(float *, float *);
 extern void vec_scale_to_length(void *, void *, float);
-extern void func_PAL_002B15D8(char *, int, float *, float, float, float, float, unsigned char);
+extern void part_spawn_masked_debris_pal(char *, int, float *, float, float, float, float, unsigned char);
 extern void moby_mark_spawned(void *);
 extern int math_random_int_range(int, int);
 extern int flag_set_first_pending(unsigned char *);
 extern int math_random_int_below(int);
-extern void func_PAL_002A7E68(void *, int, int, int);
+extern void anim_start_blended_pal(void *, int, int, int);
 extern int moby_check_target_point_from_offset(char *, void *);
 extern void moby_aim_at_target_offset_pal(char *, char *);
 extern float coll_sample_height_at_position(unsigned char *, void *, void *);
 extern float math_fabs(float);
 extern float moby_get_anim_value(char *);
 extern int coll_sweep_from_object(void *, void *, int, int, int, int, float, float, float);
-extern void func_PAL_L26_003E03D0(void *);
+extern void creature_tick_timers_pal(void *);
 
-void func_PAL_L26_003DFB1C(unsigned char *object) {
+void creature_update_pal(unsigned char *object) {
     /* Mutually exclusive uses of the same 16-byte retail workspace. */
     union { ActionChoices choices; Vector position; } workspace;
     Vector seed;
@@ -49,7 +49,7 @@ void func_PAL_L26_003DFB1C(unsigned char *object) {
     int i;
     if (!g_hero_tether_enabled) return;
     private = *(char **)(object + 0x68);
-    if (func_PAL_L26_003E0168(object)) { moby_mark_spawned(object); return; }
+    if (flying_creature_update_state_pal(object)) { moby_mark_spawned(object); return; }
     switch (object[0x95]) {
     case 0:
         if (*(short *)(private + 0x224) == 1) {
@@ -87,7 +87,7 @@ void func_PAL_L26_003DFB1C(unsigned char *object) {
             SpawnExplosion_pal(&workspace.position, 0, 25, 20, 20, 20, 45, 0, 0, 1, 0, 0, 0.8f, 20.0f);
             mat_get_euler_angles((float *)(object + 0xC0), (float *)(object + 0xF0));
             vec_scale_to_length(&velocity, private + 0xD0, 0.10000001f);
-            func_PAL_002B15D8((char *)object, 0x3F8, velocity.f, 3.0f, 6.0f, 3.0f, 6.0f, 0xFF);
+            part_spawn_masked_debris_pal((char *)object, 0x3F8, velocity.f, 3.0f, 6.0f, 3.0f, 6.0f, 0xFF);
             moby_mark_spawned(object);
             return;
         }
@@ -100,27 +100,27 @@ void func_PAL_L26_003DFB1C(unsigned char *object) {
     switch (object[0x20]) {
     case 2:
         if (flag_set_first_pending(object) && object[0x43] != 2)
-            func_PAL_002A7E68(object, 2, 0, 17);
+            anim_start_blended_pal(object, 2, 0, 17);
         break;
     case 3:
         workspace.choices = g_creature_action_choices;
         if (flag_set_first_pending(object) && object[0x43] != workspace.choices.action[math_random_int_below(4)])
-            func_PAL_002A7E68(object, workspace.choices.action[math_random_int_below(4)], 0, 17);
+            anim_start_blended_pal(object, workspace.choices.action[math_random_int_below(4)], 0, 17);
         moby_check_target_point_from_offset((char *)object, g_hero_position);
         if (object[0x60] & 2) {
             next = workspace.choices.action[math_random_int_below(4)];
             if (next == object[0x43]) next = (next + math_random_int_below(3)) % 4;
-            if (object[0x43] != next) func_PAL_002A7E68(object, next, 0, 17);
+            if (object[0x43] != next) anim_start_blended_pal(object, next, 0, 17);
         }
         break;
     case 4:
         if (flag_set_first_pending(object) && object[0x43] != 4)
-            func_PAL_002A7E68(object, 4, 0, 8);
+            anim_start_blended_pal(object, 4, 0, 8);
         if (object[0x60] & 2) moby_set_state(object, 5, -1);
         break;
     case 5:
         if (flag_set_first_pending(object) && object[0x43] != 8)
-            func_PAL_002A7E68(object, 8, 0, 17);
+            anim_start_blended_pal(object, 8, 0, 17);
         moby_aim_at_target_offset_pal((char *)object, private + 0x1F0);
         if ((*(float *)(private + 0x1CC) < g_creature_float_threshold) &&
             (math_fabs(coll_sample_height_at_position(object, private + 0x1F0, private + 0x230)) < 0.17453295f))
@@ -128,7 +128,7 @@ void func_PAL_L26_003DFB1C(unsigned char *object) {
         break;
     case 6:
         if (flag_set_first_pending(object) && object[0x43] != 9)
-            func_PAL_002A7E68(object, 9, 8, 17);
+            anim_start_blended_pal(object, 9, 8, 17);
         if (object[0x60] & 2) moby_set_state(object, 5, -1);
         time = moby_get_anim_value((char *)object);
         if (object[0x42] == object[0x43] && time >= 18.0f && time <= 24.0f) {
@@ -138,6 +138,6 @@ void func_PAL_L26_003DFB1C(unsigned char *object) {
         }
         break;
     }
-    func_PAL_L26_003E03D0(object);
+    creature_tick_timers_pal(object);
     return;
 }

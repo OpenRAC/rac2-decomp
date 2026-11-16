@@ -54,6 +54,7 @@ extern unsigned int stub_empty_9_pal(int, int);
 extern void stub_empty_12();
 extern int stub_empty_7(int);
 
+/* Updates the hero's item thrower. It holds the item in the hand, shows the aim, and throws it when fire is pressed (PAL build). */
 void UpdateProjectileThrower_pal(unsigned char *self)
 {
     typedef unsigned int Quad __attribute__((mode(TI)));
@@ -71,7 +72,7 @@ void UpdateProjectileThrower_pal(unsigned char *self)
 #define aim frame.aim
 #define velocity frame.velocity
 #define temp frame.temp
-    unsigned char *data, *heldData, *player;
+    unsigned char *data, *held_data, *player;
     float angle, pitch, slope, distance, height, power;
     int hit;
     if (!self) return;
@@ -96,7 +97,7 @@ void UpdateProjectileThrower_pal(unsigned char *self)
         THROW_PTR(data,0x50)=0;
     if (g_hero_state.mode==1) stub_empty_9_pal(0x1D,1);
     if (THROW_PTR(data,0x50) && !g_hero_state.locked) {
-        heldData=THROW_PTR(THROW_PTR(data,0x50),0x68);
+        held_data=THROW_PTR(THROW_PTR(data,0x50),0x68);
         velocity.q=0;
         velocity.f[0]=(g_pad_state.buttons&4)?0.120000005f:0.080000006f;
         aim.q=velocity.q;
@@ -123,14 +124,14 @@ void UpdateProjectileThrower_pal(unsigned char *self)
             if(pitch< -1.396263599f) pitch=-1.396263599f;
             vec_build_spherical_offset(&velocity,(g_pad_state.buttons&4)?6.0f:4.0f,angle,pitch);
             {
-                float planarLength=vec_length_xy(&velocity);
+                float planar_length=vec_length_xy(&velocity);
                 float z = velocity.f[2];
-                if(planarLength!=0) slope=z/planarLength;
+                if(planar_length!=0) slope=z/planar_length;
                 else slope=z*100.0f;
             }
             {
-                float fallTime=square_root((g_pad_state.buttons&4)?0.01176f:0.00784f);
-                distance=((fallTime+fallTime)*fallTime)*(1.0f-slope)*255.10204f;
+                float fall_time=square_root((g_pad_state.buttons&4)?0.01176f:0.00784f);
+                distance=((fall_time+fall_time)*fall_time)*(1.0f-slope)*255.10204f;
             }
             height=slope*distance;
             if(distance>0) {
@@ -152,7 +153,7 @@ void UpdateProjectileThrower_pal(unsigned char *self)
             }
         }
         power=(g_pad_state.buttons&4)?6.0f:4.0f;
-        moby_compute_throw_velocity(&launch,&end,heldData,0.00392f,1.0f,power);
+        moby_compute_throw_velocity(&launch,&end,held_data,0.00392f,1.0f,power);
     }
     vec_fast_helper_b(data+0x58);
     switch(self[0x20]) {

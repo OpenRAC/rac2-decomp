@@ -13,23 +13,24 @@ extern void DrawBoltCounterPanel(void *);
 extern void text_panel_draw_scaled(void *);
 extern void func_0029CB80(void);
 
-void hud_item_bolt_draw_pal(char *object)
+/* Draws the item and bolt HUD once, using a temporary setting that is put back afterwards (PAL layout). */
+void hud_item_bolt_draw_pal(char *hud)
 {
-    float saved;
-    char *camera;
+    float saved_scale;
+    char *view;
     char *state = g_hud_float_params;
-    saved = *(float *)(state + 0xB0);
+    saved_scale = *(float *)(state + 0xB0);
     *(float *)(state + 0xB0) = 0.62f;
     UpdateViewContext();
     if (g_input_block_flag == 0)
-        radial_menu_layout_items(object, g_radial_menu_layout_x, g_radial_menu_layout_y, menu_get_label_color_alpha(object + 0x7A0) >> 24);
-    menu_noop_hook(object);
-    DrawBoltCounterPanel(object + 0x7A0);
-    camera = g_bolt_counter_base + 0x38000;
-    *(int *)(camera + 0x7A8C) = 0;
-    *(int *)(camera + 0x7A90) = 0;
-    text_panel_draw_scaled(object + 0x1FDC);
+        radial_menu_layout_items(hud, g_radial_menu_layout_x, g_radial_menu_layout_y, menu_get_label_color_alpha(hud + 0x7A0) >> 24);
+    menu_noop_hook(hud);
+    DrawBoltCounterPanel(hud + 0x7A0);
+    view = g_bolt_counter_base + 0x38000;
+    *(int *)(view + 0x7A8C) = 0;
+    *(int *)(view + 0x7A90) = 0;
+    text_panel_draw_scaled(hud + 0x1FDC);
     func_0029CB80();
-    *(float *)(state + 0xB0) = saved;
+    *(float *)(state + 0xB0) = saved_scale;
     UpdateViewContext();
 }

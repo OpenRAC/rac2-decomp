@@ -20,58 +20,59 @@ extern void matrix_mul_vec3(void *, void *, void *);
 extern void FastVecAdd(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
 extern char *cam_moby_create_pal(char *, int, int, int, char *, char *, float *, float, float, int);
-extern void func_PAL_L00_00328480(char *, char *, float, int, int, char *, float, int, int, float, float);
-extern void func_PAL_L02_004288E8(u8 *, float, float);
+extern void part_spawn_glow_fade_effects_pal(char *, char *, float, int, int, char *, float, int, int, float, float);
+extern void part_throw_spark_burst_pal(u8 *, float, float);
 
-void func_PAL_L02_004285CC(u8 *a0) {
-    u8 *state = *(u8 **)(a0 + 0x68);
-    float v[4];
-    float w[4];
-    int p20, p24, p28, p2c;
+/* Updates a breakable piece: when it breaks it throws pieces, bolts and a spark burst, then goes to its final state. */
+void breakable_piece_update_pal(u8 *moby) {
+    u8 *state = *(u8 **)(moby + 0x68);
+    float pos[4];
+    float back[4];
+    int anim_count, anim_unused, piece_mask, piece_unused;
     int i;
-    float r1, r2;
+    float piece_size, piece_spin;
 
-    switch (a0[0x20]) {
+    switch (moby[0x20]) {
     case 0:
-        moby_get_anim_entry_count(a0, &p20, &p24);
-        *(u16 *)(a0 + 0x7C) = p20;
-        *(u16 *)(a0 + 0x34) = *(u16 *)(a0 + 0x34) | 0x1000;
-        moby_set_state(a0, 1, -1);
+        moby_get_anim_entry_count(moby, &anim_count, &anim_unused);
+        *(u16 *)(moby + 0x7C) = anim_count;
+        *(u16 *)(moby + 0x34) = *(u16 *)(moby + 0x34) | 0x1000;
+        moby_set_state(moby, 1, -1);
         break;
     case 1:
-        if (part_find_owned_effect_slot(a0, 0x4010000, 0) != 0) {
+        if (part_find_owned_effect_slot(moby, 0x4010000, 0) != 0) {
             g_hovering_object_count = g_hovering_object_count - 1;
-            moby_set_state(a0, 2, -1);
+            moby_set_state(moby, 2, -1);
         }
         break;
     case 2:
-        *(u16 *)(a0 + 0x7C) = 0;
+        *(u16 *)(moby + 0x7C) = 0;
         *(int *)state = 0x64;
-        *(int *)(a0 + 0x98) = 0;
-        part_spawn_scaled_bolts_pal(a0, 1, 1.0f);
-        moby_get_anim_entry_count(a0, &p28, &p2c);
-        PlayMobySound(0, 0, a0);
+        *(int *)(moby + 0x98) = 0;
+        part_spawn_scaled_bolts_pal(moby, 1, 1.0f);
+        moby_get_anim_entry_count(moby, &piece_mask, &piece_unused);
+        PlayMobySound(0, 0, moby);
         for (i = 0; i < 16; i++) {
-            if ((p28 >> i) & 1) {
-                r1 = math_random_float_range(g_breakable_piece_size_min, D_L02_001B2040_1[1]);
-                r2 = math_random_float_range(D_L02_001B2040_1[2], D_L02_001B2040_1[3]);
-                v[0] = math_random_float_range(g_breakable_piece_speed_min, D_L02_001B2020_1[4]) * 0.020000001f;
-                v[1] = math_random_signed_float_range(D_L02_001B2020_1[1], D_L02_001B2020_1[5]) * 0.020000001f;
-                v[2] = math_random_float_range(D_L02_001B2020_1[2], D_L02_001B2020_1[6]) * 0.020000001f;
-                matrix_mul_vec3(v, v, a0 + 0xC0);
-                cam_moby_create_pal((char *)a0, 2, 0xD0D, i, (char *)(a0 + 0x10), (char *)(a0 + 0xF0), v, r2, r1, 0xFF);
+            if ((piece_mask >> i) & 1) {
+                piece_size = math_random_float_range(g_breakable_piece_size_min, D_L02_001B2040_1[1]);
+                piece_spin = math_random_float_range(D_L02_001B2040_1[2], D_L02_001B2040_1[3]);
+                pos[0] = math_random_float_range(g_breakable_piece_speed_min, D_L02_001B2020_1[4]) * 0.020000001f;
+                pos[1] = math_random_signed_float_range(D_L02_001B2020_1[1], D_L02_001B2020_1[5]) * 0.020000001f;
+                pos[2] = math_random_float_range(D_L02_001B2020_1[2], D_L02_001B2020_1[6]) * 0.020000001f;
+                matrix_mul_vec3(pos, pos, moby + 0xC0);
+                cam_moby_create_pal((char *)moby, 2, 0xD0D, i, (char *)(moby + 0x10), (char *)(moby + 0xF0), pos, piece_spin, piece_size, 0xFF);
             }
         }
-        *(TI128 *)v = 0;
-        v[0] = -0.8f;
-        v[2] = 1.5f;
-        matrix_mul_vec3(v, v, a0 + 0xC0);
-        FastVecAdd(v, v, a0 + 0x10);
-        vec_scale_to_length(w, a0 + 0xC0, -0.10000001f);
-        func_PAL_L00_00328480((char *)a0, (char *)v, 0.25f, 4, 1, (char *)w, 5.0f, 0x50404040, 0, 0.5f, 1.0f);
-        func_PAL_L02_004288E8(a0, -0.10000001f, -0.3f);
-        moby_set_state(a0, 3, -1);
+        *(TI128 *)pos = 0;
+        pos[0] = -0.8f;
+        pos[2] = 1.5f;
+        matrix_mul_vec3(pos, pos, moby + 0xC0);
+        FastVecAdd(pos, pos, moby + 0x10);
+        vec_scale_to_length(back, moby + 0xC0, -0.10000001f);
+        part_spawn_glow_fade_effects_pal((char *)moby, (char *)pos, 0.25f, 4, 1, (char *)back, 5.0f, 0x50404040, 0, 0.5f, 1.0f);
+        part_throw_spark_burst_pal(moby, -0.10000001f, -0.3f);
+        moby_set_state(moby, 3, -1);
         break;
     }
-    a0[0xA8] = 0xFF;
+    moby[0xA8] = 0xFF;
 }

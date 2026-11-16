@@ -11,6 +11,7 @@ extern char *hud_construct_widget_base(char *);
 extern void *object_construct_derived_b(void *);
 extern void *object_construct_derived_c(void *);
 
+/* Constructs the sub-objects of a small menu and returns it. */
 u8 *small_menu_construct_us2(u8 *self)
 {
     object_construct_derived_a(self);
@@ -85,23 +86,23 @@ extern char *func_L00_0042C290_6(u8 *);
 extern unsigned long long func_00347EA0_1(u8 *);
 
 /* initialises eight in-place sub-records of one object by four routines, then returns the object pointer */
-u8 *tab_menu_construct_us2(u8 *a0) {
-    func_L00_0042BAD0_6(a0);
-    func_L00_0042BAD0_6(a0 + 76);
-    func_L00_0042BAD0_6(a0 + 152);
-    func_L00_0042BAD0_6(a0 + 228);
-    func_L00_0042BAD0_6(a0 + 304);
-    func_L00_0042BFF8_5(a0 + 380);
-    func_L00_0042C290_6(a0 + 464);
-    func_00347EA0_1(a0 + 568);
-    return a0;
+u8 *tab_menu_construct_us2(u8 *menu) {
+    func_L00_0042BAD0_6(menu);
+    func_L00_0042BAD0_6(menu + 76);
+    func_L00_0042BAD0_6(menu + 152);
+    func_L00_0042BAD0_6(menu + 228);
+    func_L00_0042BAD0_6(menu + 304);
+    func_L00_0042BFF8_5(menu + 380);
+    func_L00_0042C290_6(menu + 464);
+    func_00347EA0_1(menu + 568);
+    return menu;
 }
 
 typedef int s32;
 
 /* stores three consecutive words; byte-identical across all 27 levels. */
-void tab_menu_set_tables_us2(u8 *a0, s32 a1, s32 a2, s32 a3) { *(s32 *)(a0 + 0x310) = a1; *(s32 *)(a0 + 0x314) = a2; *(s32 *)(a0 + 0x318) = a3; }
+void tab_menu_set_tables_us2(u8 *menu, s32 tables_first, s32 tables_second, s32 tables_third) { *(s32 *)(menu + 0x310) = tables_first; *(s32 *)(menu + 0x314) = tables_second; *(s32 *)(menu + 0x318) = tables_third; }
 
 /* Measured target: byte-identical across all 27 levels. */
-void tab_menu_set_enabled_us2(u8 *a0, s32 a1) { *(s32 *)(a0 + 0x230) = a1; }
+void tab_menu_set_enabled_us2(u8 *menu, s32 enabled) { *(s32 *)(menu + 0x230) = enabled; }
 

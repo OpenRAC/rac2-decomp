@@ -5,11 +5,11 @@ typedef int Quad __attribute__((mode(TI)));
 typedef struct {
     u8 pad00[0x20];
     float health;
-    s16 maxHealth;
+    s16 max_health;
     u8 pad26[2];
     u8 mode28;
     u8 pad29[0x2E - 0x29];
-    u8 hitMode;
+    u8 hit_mode;
     u8 pad2F[0x48 - 0x2F];
     u8 timer48;
     u8 pad49;
@@ -20,8 +20,8 @@ typedef struct {
     u8 pad78[0x88 - 0x78];
     int path;
     u8 pad8C[0xA4 - 0x8C];
-    int spawnRecord;
-    int startRecord;
+    int spawn_record;
+    int start_record;
     u8 padAC[0x290 - 0xAC];
     Quad home;
     u8 pad2A0[0x2B0 - 0x2A0];
@@ -29,7 +29,7 @@ typedef struct {
     u8 pad2C0[0x2CC - 0x2C0];
     int *route;
     u8 pad2D0[0x2DC - 0x2D0];
-    int routeIndex;
+    int route_index;
     u8 pad2E0[0x308 - 0x2E0];
     u8 stage;
     u8 pad309[2];
@@ -49,12 +49,12 @@ extern void moby_set_flag_bit(void *, int);
 extern void moby_mark_spawned(void *);
 extern int level_get_difficulty_scaled(int);
 extern void moby_set_state(void *, int, int);
-extern void func_PAL_002A7E68(void *, int, int, int);
+extern void anim_start_blended_pal(void *, int, int, int);
 extern void endako_boss_process_group(void *);
 extern void *part_find_owned_effect_slot(void *, int, int);
 extern float moby_update_aim_target_strength_pal(void *, void *);
 extern int PlayMobySound(int, int, void *);
-extern void func_PAL_002AC290(void *, void *);
+extern void gfx_start_color_fade_pal(void *, void *);
 extern f32 ApproachValue(void *, float, float);
 extern void matrix_mul_vec3(void *, void *, void *);
 extern u8 *cam_moby_create_pal(void *, int, int, int, void *, void *, void *, int, float, float);
@@ -67,7 +67,9 @@ extern int g_current_map_index[] __attribute__((sda));
 extern u8 *g_path_l03_entry_table[] NOT_SDA;
 extern float g_endako_boss_damage_scale __attribute__((sda));
 
-void func_PAL_L03_003F9DE0(u8 *entity) {
+/* Endako boss damage update: sets the boss up on its first frame (health by difficulty, path
+   points), then takes hits, sheds armour pieces as health drops and dies at zero. */
+void endako_boss_update_damage_pal(u8 *entity) {
     DamageState *state = *(DamageState **)(entity + 0x68);
     u8 *hit, *effect;
     EntityPath *path;
@@ -78,8 +80,8 @@ void func_PAL_L03_003F9DE0(u8 *entity) {
     if (entity[0x20] == 0) {
         state->timer48 = FloatToInt(30);
         state->timer4A = FloatToInt(32);
-        state->hitMode = 1;
-        moby_set_flag_bit(g_moby_record_base[0] + (state->startRecord << 8), 1);
+        state->hit_mode = 1;
+        moby_set_flag_bit(g_moby_record_base[0] + (state->start_record << 8), 1);
         if (g_moby_group_flags[(entity[0xB0] & 0x7F) + (g_current_map_index[0] << 4)] & 0x80) {
             moby_mark_spawned(entity);
             return;
@@ -87,14 +89,14 @@ void func_PAL_L03_003F9DE0(u8 *entity) {
         state->difficulty = level_get_difficulty_scaled(entity[0xB0]);
         switch (state->difficulty) {
         case 2:
-            state->maxHealth = FloatToInt(state->maxHealth * 0.9f);
+            state->max_health = FloatToInt(state->max_health * 0.9f);
             break;
         case 1:
-            state->maxHealth = FloatToInt(state->maxHealth * 0.7f);
+            state->max_health = FloatToInt(state->max_health * 0.7f);
             break;
         }
         state->target = -1;
-        state->health = state->maxHealth;
+        state->health = state->max_health;
         *(u16 *)(entity + 0x7C) = 0x3F;
         entity[0x30] = 255;
         *(u16 *)(entity + 0x32) += 0x40;
@@ -106,7 +108,7 @@ void func_PAL_L03_003F9DE0(u8 *entity) {
         *(u16 *)(entity + 0x34) = (*(u16 *)(entity + 0x34) | 0x41) & 0xEFFF;
         moby_set_state(entity, 1, 0);
         if (entity[0x43]) {
-            func_PAL_002A7E68(entity, 0, 0, 0);
+            anim_start_blended_pal(entity, 0, 0, 0);
         }
         state->flag30B = 1;
         state->active = 1;
@@ -120,7 +122,7 @@ void func_PAL_L03_003F9DE0(u8 *entity) {
                 }
             }
         }
-        moby_set_flag_bit(g_moby_record_base[0] + (state->spawnRecord << 8), 1);
+        moby_set_flag_bit(g_moby_record_base[0] + (state->spawn_record << 8), 1);
         endako_boss_process_group(entity);
     }
     *(float *)(entity + 0x2C) = *(float *)(*(u8 **)(entity + 0x24) + 0x24) * g_endako_boss_damage_scale;
@@ -130,12 +132,12 @@ void func_PAL_L03_003F9DE0(u8 *entity) {
         hit = 0;
     }
     amount = moby_update_aim_target_strength_pal(entity, hit);
-    if (amount != 0 || state->hitMode == 2) {
+    if (amount != 0 || state->hit_mode == 2) {
         state->timer77 = 150;
         PlayMobySound(1, 0, entity);
-        func_PAL_002AC290(entity, state->hit70);
+        gfx_start_color_fade_pal(entity, state->hit70);
         if (entity[0x95]) {
-            if (state->hitMode == 2) {
+            if (state->hit_mode == 2) {
                 state->health = 0;
             } else {
                 ApproachValue(&state->health, 0, amount);
@@ -160,17 +162,17 @@ void func_PAL_L03_003F9DE0(u8 *entity) {
                 }
                 state->stage++;
                 moby_set_state(entity, 13, 6);
-                state->threshold = (FloatToInt(state->health * 4 / state->maxHealth) * state->maxHealth) * 0.25f;
+                state->threshold = (FloatToInt(state->health * 4 / state->max_health) * state->max_health) * 0.25f;
             }
         } else if (entity[0x20] == 2) {
             moby_set_state(entity, 3, -1);
-            state->routeIndex = *state->route - 1;
+            state->route_index = *state->route - 1;
         }
     }
     if ((unsigned)(entity[0x20] - 6) < 8) {
         weapon_select_aim_target(entity, -1, 0, 0, 16, 8);
     }
-    state->hitMode = 1;
+    state->hit_mode = 1;
     endako_boss_play_voice_lines_pal(entity);
     entity[0xA8] = 255;
 }

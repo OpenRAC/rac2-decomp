@@ -12,7 +12,7 @@ extern f32 g_grulch_pull_drift_speed __attribute__((sda));
 extern f32 g_grulch_pull_min_scale __attribute__((sda));
 extern int g_grulch_pull_decay __attribute__((sda));
 extern f32 g_grulch_pull_minimum __attribute__((sda));
-extern void func_PAL_002A7E68(void *, int, int, int);
+extern void anim_start_blended_pal(void *, int, int, int);
 extern float mat_fast_helper_a(float, float);
 extern float fast_subtract_rotations(float, float);
 extern float FastAddRotations(float, float);
@@ -23,14 +23,15 @@ extern float math_fast_sin_or_cos_a(float);
 extern float math_fast_sin_or_cos_b(float);
 extern float IntToFloat(int);
 
-int func_PAL_L17_003E90E8(u8 *object) {
+/* Grulch while it is being pulled toward the target hero (PAL: 50 Hz values): moves it in, shrinks it, and returns 1 when the pull is over. */
+int grulch_update_pulled_in_pal(u8 *object) {
     float delta[4];
     u8 *data = *(u8 **)(object + 0x68);
     float heading, length, step, ratio, angle, minimum, scale, decay;
     u8 *target;
     int result;
     if (object[0x43] != g_grulch_anim_index)
-        func_PAL_002A7E68(object, g_grulch_anim_index, 0, 8);
+        anim_start_blended_pal(object, g_grulch_anim_index, 0, 8);
     if (g_grulch_target_hero) {
         heading = mat_fast_helper_a(*(float *)(object + 0x10) - *(float *)(g_grulch_target_hero + 0x10),
                                *(float *)(object + 0x14) - *(float *)(g_grulch_target_hero + 0x14));

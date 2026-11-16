@@ -34,6 +34,7 @@ extern void AppendScreenRectPacket(int, int, int, int, u64, int);
 extern void gfx_disable_screen_flag(void), gfx_enable_screen_flag(void);
 extern void text_draw_right_aligned_medium(int, int, u64, char *, int);
 
+/* Draws the item stats screen: stat bars, names, description and kill count of the selected item. */
 int DrawItemStatsMenu_us2(void)
 {
     char text[64];

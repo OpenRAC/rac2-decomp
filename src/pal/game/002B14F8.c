@@ -9,24 +9,25 @@ extern u8 g_item_slot_to_record[];
 extern u8 g_weapon_table[];
 extern u8 g_item_enabled_flags[] __attribute__((sda));
 
-/* Stores the third argument (or 1.0f) in the object's float at 0x70, and, when the fifth argument
+/* Stores the value (or 1.0f) in the object's float at 0x70, and, when the fifth argument
    is set and that float differs from the one at 0x20, calls func_002AEC48 with the object's two
    first arguments, the fourth argument and the pair 0.03f, 0.3f. */
-void func_PAL_002B14F8(void *a0, float *a1, float f12, int a2, int a3)
+void value_set_and_smooth_pal(void *moby, float *vars, float value, int target, int update_flag)
 {
     if (g_smooth_value_flag != 0) {
-        a1[28] = f12;
+        vars[28] = value;
     } else {
-        a1[28] = 1.0f;
+        vars[28] = 1.0f;
     }
-    if (a3 != 0) {
-        if (a1[28] != a1[8]) {
-            moby_update_eased_node(a0, a1, a2, 0.0432f, 0.43200004f);
+    if (update_flag != 0) {
+        if (vars[28] != vars[8]) {
+            moby_update_eased_node(moby, vars, target, 0.0432f, 0.43200004f);
         }
     }
 }
 
 
+/* Looks up a text string by number and passes it with a second value to the first menu panel (PAL). */
 void value_set_entry_by_index_pal(int first, int second)
 {
     extern char *GetLocalizedString(int);
@@ -36,6 +37,7 @@ void value_set_entry_by_index_pal(int first, int second)
 
 extern void func_0029CC50(int, int, int);
 
+/* Passes three values on to the first menu panel (PAL). */
 void value_forward_three_args_pal(int first, int second, int third) {
     func_0029CC50(first, second, third);
 }
@@ -51,9 +53,9 @@ extern char *cam_moby_create_pal(char *self, int a1, int a2, int a3, char *p4, c
                     float *buf, int b3, float fa, float fb);
 
 /* Walks selected mask bits, evaluates three stored curve components, optionally transforms the vector, and dispatches one object operation per selected bit. */
-void func_PAL_002B15D8(char *self, int mask, float *arg2,
-                                        unsigned char arg3,
-                                        float f0, float f1, float f2, float f3)
+void part_spawn_masked_debris_pal(char *self, int mask, float *origin,
+                                        unsigned char flags,
+                                        float speed_min, float speed_max, float lift_min, float lift_max)
 {
     /* Vector primitives read/write all 16 bytes; retail initializes only xyz. */
     float buf[4] __attribute__((aligned(16)));
@@ -67,18 +69,18 @@ void func_PAL_002B15D8(char *self, int mask, float *arg2,
         if (((mask >> i) ^ 1) & 1)
             continue;
         v = math_random_angle();
-        k = math_random_float_range(f0, f1) * (0.020000001f);
+        k = math_random_float_range(speed_min, speed_max) * (0.020000001f);
         buf[0] = math_fast_sin_or_cos_a(v) * k;
         buf[1] = math_fast_sin_or_cos_b(v) * k;
         buf[2] = 0.0f;
-        buf[2] = math_random_float_range(f2, f3) * (0.020000001f);
+        buf[2] = math_random_float_range(lift_min, lift_max) * (0.020000001f);
         if (D_L00_001A8FF0_1 != 0)
             matrix_mul_vec3(buf, buf, self + 192);
-        FastVecAdd(buf, buf, arg2);
+        FastVecAdd(buf, buf, origin);
         fa = math_random_float_range(90.0f, 270.0f);
         fb = math_random_float_range(10.0f, 20.0f);
         cam_moby_create_pal(self, 2, *(short *)(self + 170), i, self + 16, self + 240,
-                buf, arg3, fa, fb);
+                buf, flags, fa, fb);
     }
 }
 

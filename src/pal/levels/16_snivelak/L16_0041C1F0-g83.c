@@ -26,22 +26,22 @@ extern char *SpawnEA7Moby_pal(char *, char *, char *, s32, f32);
 /* Once the refire timer runs out while a fire button is held: places the alternating muzzle
    and the aim point in the turret's frame, aims at the hit of a ray (or the camera-line
    collision point, or the far end of the camera line), spawns the projectile and rearms. */
-void func_PAL_L16_0041C1F0(char *self) {
+void FireAlternatingMuzzleShot_pal(char *moby) {
     char muzzle[16], aim[16], far[16], near[16], velocity[16];
-    char *st = *(char **)(self + 0x68);
+    char *state = *(char **)(moby + 0x68);
     f32 speed;
 
-    if (!math_fast_float_d(st + 0x8C)) return;
+    if (!math_fast_float_d(state + 0x8C)) return;
     if (!(g_pad_pressed_flags & 0xA0)) return;
-    matrix_mul_vec3(muzzle, D_L16_001B1AD0_gp[*(s32 *)(st + 0x88)], self + 0xC0);
-    FastVecAdd(muzzle, muzzle, self + 0x10);
-    matrix_mul_vec3(aim, D_L16_001B1AF0_gp, self + 0xC0);
-    FastVecAdd(aim, aim, self + 0x10);
+    matrix_mul_vec3(muzzle, D_L16_001B1AD0_gp[*(s32 *)(state + 0x88)], moby + 0xC0);
+    FastVecAdd(muzzle, muzzle, moby + 0x10);
+    matrix_mul_vec3(aim, D_L16_001B1AF0_gp, moby + 0xC0);
+    FastVecAdd(aim, aim, moby + 0x10);
     vec_scale_to_length(near, g_scene_origin_transform + 0x230, 2.0f);
     FastVecAdd(near, near, g_scene_origin_transform);
     vec_scale_to_length(far, g_scene_origin_transform + 0x230, 120.0f);
     FastVecAdd(far, far, g_scene_origin_transform);
-    *(s32 *)(self + 0x98) = 0;
+    *(s32 *)(moby + 0x98) = 0;
     if (coll_process_hit(aim, 0, ((Hero *)g_hero_state)->ptr[0x2290 / 4], 0, g_turret_aim_params[3]) && g_aim_target_moby)
         FastVecSub(velocity, g_aim_target_moby + 0x10, muzzle);
     else if (CollLine(near, far, 0, ((Hero *)g_hero_state)->ptr[0x2290 / 4], 0))
@@ -50,9 +50,9 @@ void func_PAL_L16_0041C1F0(char *self) {
         FastVecSub(velocity, far, muzzle);
     vec_scale_to_length(velocity, velocity, g_turret_aim_velocity_scale * 0.020000001f);
     speed = g_turret_aim_speed;
-    *(s32 *)(self + 0x98) = *(s32 *)(*(char **)(self + 0x24) + 0x10);
+    *(s32 *)(moby + 0x98) = *(s32 *)(*(char **)(moby + 0x24) + 0x10);
     if (g_extras_unlocked_flag[0]) speed *= 5.0f;
-    SpawnEA7Moby_pal(self, velocity, muzzle, 0, speed);
-    *(s32 *)(st + 0x8C) = ((s32)(g_turret_aim_init_word) * 5 + 2) / 6;
-    *(s32 *)(st + 0x88) = (*(s32 *)(st + 0x88) + 1) & 1;
+    SpawnEA7Moby_pal(moby, velocity, muzzle, 0, speed);
+    *(s32 *)(state + 0x8C) = ((s32)(g_turret_aim_init_word) * 5 + 2) / 6;
+    *(s32 *)(state + 0x88) = (*(s32 *)(state + 0x88) + 1) & 1;
 }

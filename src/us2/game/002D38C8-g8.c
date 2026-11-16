@@ -16,6 +16,7 @@ extern void text_draw_small(int, int, unsigned long, char *, int);
 extern int sprintf(char *, char *, ...);
 extern int func_001157AC(char *);
 
+/* Draws the toggle option screen with the option name and its current on or off text. */
 int menu_toggle_option_draw_us2(void)
 {
     char text[64];

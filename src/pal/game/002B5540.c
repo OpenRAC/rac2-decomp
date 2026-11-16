@@ -7,6 +7,7 @@ typedef int s32;
 
 extern int g_requested_setting_a __attribute__((sda));
 
-void func_PAL_002B5540(int value) {
+/* Stores the requested setting A, scaled to 50 Hz. */
+void request_set_setting_a_pal(int value) {
     g_requested_setting_a = ((s32)(value) * 5 + 2) / 6;
 }

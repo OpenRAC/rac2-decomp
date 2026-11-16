@@ -22,11 +22,11 @@ extern void vec_scale_to_length(void *, void *, float);
 extern void FastVecCross(void *, void *, void *);
 extern void FastVecAdd(void *, void *, void *);
 extern int func_001163B0(void);
-extern void func_PAL_L00_003A6238(void *, int, float);
+extern void part_l00_spawn_spark_spray_pal(void *, int, float);
 extern void moby_transform_joint_to_world(char *, int, char *);
 
 /* Transform the weapon's animated attachment points and draw its beam network. */
-void func_PAL_L00_003A4B50(void *object)
+void weapon_draw_beam_network_pal(void *object)
 {
     float points[5][4], attachments[5][4], matrix[4][4];
     float normal[4], side[4], endpoint[4], muzzle[4];
@@ -85,7 +85,7 @@ void func_PAL_L00_003A4B50(void *object)
     beam_spawn_flare((int)moby, (int)endpoint, 0x7F7F2020, inner, 0.055f);
     beam_spawn_flare((int)moby, (int)endpoint, 0x7FFF4040, outer, 0.025f);
     if (func_001163B0() % 11 == 0 && *(float *)(state + 0xC) > g_charge_minimum)
-        func_PAL_L00_003A6238(endpoint, spark_count, 0.0f);
+        part_l00_spawn_spark_spray_pal(endpoint, spark_count, 0.0f);
     FastVecSub(side, g_beam_network_anchor, points[3]);
     vec_scale_to_length(side, side, 1.0f);
     FastVecCross(side, side, normal);
@@ -97,7 +97,7 @@ void func_PAL_L00_003A4B50(void *object)
     beam_spawn_flare((int)moby, (int)endpoint, 0x7F7F2020, inner, 0.055f);
     beam_spawn_flare((int)moby, (int)endpoint, 0x7FFF4040, outer, 0.025f);
     if (func_001163B0() % 11 == 0 && *(float *)(state + 0xC) > g_charge_minimum)
-        func_PAL_L00_003A6238(endpoint, spark_count, 0.0f);
+        part_l00_spawn_spark_spray_pal(endpoint, spark_count, 0.0f);
     FastVecSub(side, g_beam_network_anchor, points[4]);
     vec_scale_to_length(side, side, 1.0f);
     FastVecCross(side, side, normal);
@@ -109,7 +109,7 @@ void func_PAL_L00_003A4B50(void *object)
     beam_spawn_flare((int)moby, (int)endpoint, 0x7F7F2020, inner, 0.055f);
     beam_spawn_flare((int)moby, (int)endpoint, 0x7FFF4040, outer, 0.025f);
     if (func_001163B0() % 11 == 0 && *(float *)(state + 0xC) > g_charge_minimum)
-        func_PAL_L00_003A6238(endpoint, spark_count, 0.0f);
+        part_l00_spawn_spark_spray_pal(endpoint, spark_count, 0.0f);
     moby_transform_joint_to_world(moby, 1, (char *)muzzle);
     beam_draw_jittered_curve(moby, muzzle, points[2], g_beam_oscillator_table[3]);
     beam_spawn_flare((int)moby, (int)muzzle, 0x7F7F2020, inner, 0.055f);
@@ -125,7 +125,7 @@ void func_PAL_L00_003A4B50(void *object)
     if (func_001163B0() % 11 == 0) {
         int selected = func_001163B0();
         selected %= 4;
-        func_PAL_L00_003A6238(points[selected + 1], spark_count, 0.001f);
+        part_l00_spawn_spark_spray_pal(points[selected + 1], spark_count, 0.001f);
     }
     VU1_addGSregister(channel, 0x5360BULL);
 }

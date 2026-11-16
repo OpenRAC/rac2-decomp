@@ -46,77 +46,78 @@ typedef struct DamoselObject {
     float angle;
     u8 padf8[8];
 } DamoselObject;
-#define CHILD(n) (s->child[(n)/4]+((DamoselObject *)D_L18_001B281C))
-#define ACTIVE(n) (((u8 *)CHILD(n)->data)[0x14])
-void func_PAL_L18_0043A56C(DamoselObject *o) {
-    DamoselController *s=o->data;
-    float t;
-    switch(o->state) {
+#define CHILD(voice) (s->child[(voice)/4]+((DamoselObject *)D_L18_001B281C))
+#define ACTIVE(voice) (((u8 *)CHILD(voice)->data)[0x14])
+/* Fades the effect with two child objects in and out: turns, blends alpha and colors, and bursts particles (PAL: 50 Hz timings). */
+void two_child_fade_update_pal(DamoselObject *moby) {
+    DamoselController *s=moby->data;
+    float fraction;
+    switch(moby->state) {
     case 0:
-        qcopy(g_burst_origin_position,o->position);
+        qcopy(g_burst_origin_position,moby->position);
         g_fade_child_value=g_fade_saved_scale;
-        o->animation=0;
-        moby_set_state(o,1,-1);
-        o->flags|=0x200;
-        s->sound=snd_start_in_slot(16,4,o);
+        moby->animation=0;
+        moby_set_state(moby,1,-1);
+        moby->flags|=0x200;
+        s->sound=snd_start_in_slot(16,4,moby);
         break;
     case 1:
-        if(flag_set_first_pending(o)) {
-            o->enabled=0; o->flags|=1;
-            o->angle=g_fade_angle_start;
-            o->alpha=g_fade_alpha_start;
+        if(flag_set_first_pending(moby)) {
+            moby->enabled=0; moby->flags|=1;
+            moby->angle=g_fade_angle_start;
+            moby->alpha=g_fade_alpha_start;
             if(ACTIVE(4)) CHILD(4)->command=25;
             if(ACTIVE(0)) CHILD(0)->command=25;
             s->color[0]=D_L18_001B1668_GP; s->color[1]=g_fade_color_start[1];
-        } else if(ACTIVE(0)||ACTIVE(4)) moby_set_state(o,2,-1);
-        part_l18_spawn_random_burst(o);
+        } else if(ACTIVE(0)||ACTIVE(4)) moby_set_state(moby,2,-1);
+        part_l18_spawn_random_burst(moby);
         break;
     case 2:
-        if(flag_set_first_pending(o)) {
-            o->enabled=1; o->flags&=0xFFFE;
+        if(flag_set_first_pending(moby)) {
+            moby->enabled=1; moby->flags&=0xFFFE;
             s->step=FastDiffRots(g_fade_angle_end,g_fade_angle_start);
             s->step /= (float)(((s32)(g_fade_duration_frames) * 5 + 2) / 6);
         }
-        t=IntToFloat(o->timer);
-        t /= (float)(((s32)(g_fade_duration_frames) * 5 + 2) / 6);
-        o->angle=FastAddRotations(o->angle,s->step);
-        o->alpha=math_lerp_int_fraction(g_fade_alpha_start,g_fade_alpha_end,t);
-        s->color[0]=math_lerp_int_fraction(D_L18_001B1668_GP,D_L18_001B1670_GP,t);
-        s->color[1]=math_lerp_int_fraction(g_fade_color_start[1],g_fade_color_end[1],t);
-        part_l18_spawn_random_burst(o);
-        if(o->timer>(((s32)(g_fade_duration_frames) * 5 + 2) / 6)) moby_set_state(o,3,-1);
+        fraction=IntToFloat(moby->timer);
+        fraction /= (float)(((s32)(g_fade_duration_frames) * 5 + 2) / 6);
+        moby->angle=FastAddRotations(moby->angle,s->step);
+        moby->alpha=math_lerp_int_fraction(g_fade_alpha_start,g_fade_alpha_end,fraction);
+        s->color[0]=math_lerp_int_fraction(D_L18_001B1668_GP,D_L18_001B1670_GP,fraction);
+        s->color[1]=math_lerp_int_fraction(g_fade_color_start[1],g_fade_color_end[1],fraction);
+        part_l18_spawn_random_burst(moby);
+        if(moby->timer>(((s32)(g_fade_duration_frames) * 5 + 2) / 6)) moby_set_state(moby,3,-1);
         break;
     case 3:
-        if(flag_set_first_pending(o)) {
-            int n;
-            o->angle=g_fade_angle_end; o->alpha=g_fade_alpha_end;
+        if(flag_set_first_pending(moby)) {
+            int voice;
+            moby->angle=g_fade_angle_end; moby->alpha=g_fade_alpha_end;
             s->color[0]=D_L18_001B1670_GP; s->color[1]=g_fade_color_end[1];
-            o->animation=(*(int *)(o->config+16));
+            moby->animation=(*(int *)(moby->config+16));
             if(!ACTIVE(4)) CHILD(4)->command=25;
             if(!ACTIVE(0)) CHILD(0)->command=25;
-            n=s->sound;
-            if(n!=-1) {
-                DamoselSound *sound = (DamoselSound *)(g_sound_state+n*0x70);
-                if(sound->owner==o && sound->active) snd_stop_voice(n);
+            voice=s->sound;
+            if(voice!=-1) {
+                DamoselSound *sound = (DamoselSound *)(g_sound_state+voice*0x70);
+                if(sound->owner==moby && sound->active) snd_stop_voice(voice);
             }
             s->sound=-1;
-        } else if(!ACTIVE(0)||!ACTIVE(4)) moby_set_state(o,4,-1);
+        } else if(!ACTIVE(0)||!ACTIVE(4)) moby_set_state(moby,4,-1);
         break;
     case 4:
-        if(flag_set_first_pending(o)) {
-            o->animation=0;
+        if(flag_set_first_pending(moby)) {
+            moby->animation=0;
             s->step=-FastDiffRots(g_fade_angle_end,g_fade_angle_start)/(float)(((s32)(g_fade_duration_frames) * 5 + 2) / 6);
-            s->sound=snd_start_in_slot(16,4,o);
+            s->sound=snd_start_in_slot(16,4,moby);
         }
-        t=IntToFloat(o->timer);
-        t /= (float)(((s32)(g_fade_duration_frames) * 5 + 2) / 6);
-        o->angle=FastAddRotations(o->angle,s->step);
-        o->alpha=math_lerp_int_fraction(g_fade_alpha_end,g_fade_alpha_start,t);
-        s->color[0]=math_lerp_int_fraction(D_L18_001B1670_GP,D_L18_001B1668_GP,t);
-        s->color[1]=math_lerp_int_fraction(g_fade_color_end[1],g_fade_color_start[1],t);
-        part_l18_spawn_random_burst(o);
-        if(o->timer>(((s32)(g_fade_duration_frames) * 5 + 2) / 6)) moby_set_state(o,1,-1);
+        fraction=IntToFloat(moby->timer);
+        fraction /= (float)(((s32)(g_fade_duration_frames) * 5 + 2) / 6);
+        moby->angle=FastAddRotations(moby->angle,s->step);
+        moby->alpha=math_lerp_int_fraction(g_fade_alpha_end,g_fade_alpha_start,fraction);
+        s->color[0]=math_lerp_int_fraction(D_L18_001B1670_GP,D_L18_001B1668_GP,fraction);
+        s->color[1]=math_lerp_int_fraction(g_fade_color_end[1],g_fade_color_start[1],fraction);
+        part_l18_spawn_random_burst(moby);
+        if(moby->timer>(((s32)(g_fade_duration_frames) * 5 + 2) / 6)) moby_set_state(moby,1,-1);
         break;
     }
-    if(o->timer<65535) o->timer++;
+    if(moby->timer<65535) moby->timer++;
 }

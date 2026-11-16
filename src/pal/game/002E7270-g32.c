@@ -70,9 +70,9 @@ extern void matrix_mul_vec3(void *, void *, void *), mat_get_euler_angles(void *
 extern void mat_combine_and_store(void *, void *, void *, void *), moby_update_sway_pal(void *, void *, void *);
 
 /* Spawns the equipment pieces if needed, then makes each piece follow the base object. */
-void func_PAL_002E7270(Object *object)
+void update_equipment_pieces_pal(Object *object)
 {
-    float p[4], old[4], matrix[16], previous[4], delta[4], offset[4];
+    float point[4], old[4], matrix[16], previous[4], delta[4], offset[4];
     char *target;
     int i, j;
     unsigned char blocked;
@@ -90,29 +90,29 @@ void func_PAL_002E7270(Object *object)
     }
     target = 0;
     if (!g_current_game_mode[0]) {
-        scale_vector(p, object, 0.0009765625f);
-        p[3] += 1.0f;
-        if (math_fast_helper_a(p, 50.0f) == -1)
+        scale_vector(point, object, 0.0009765625f);
+        point[3] += 1.0f;
+        if (math_fast_helper_a(point, 50.0f) == -1)
             return;
         if (!D_001A8BB0_gp) {
             blocked = 0;
             if (vec_distance_xy(object->position, ((char *)&g_hero_state.hero)) < 6.0f) {
                 if (object->blocked) {
-                    qcopy(p, ((char *)&g_hero_state.hero) + 0x60);
-                    p[2] += 2.0f;
-                    if (CollLine(((char *)&g_hero_state.hero) + 0x60, p, 0, g_hero_state.collision, 0))
+                    qcopy(point, ((char *)&g_hero_state.hero) + 0x60);
+                    point[2] += 2.0f;
+                    if (CollLine(((char *)&g_hero_state.hero) + 0x60, point, 0, g_hero_state.collision, 0))
                         blocked = 1;
                     else {
                         FastVecSub(old, object->position, ((char *)&g_hero_state.hero));
                         old[2] = 0;
                         vec_scale_to_length(old, old, 0.4f);
-                        FastVecAdd(p, p, old);
-                        blocked = CollLine(((char *)&g_hero_state.hero) + 0x60, p, 0, g_hero_state.collision, 0) != 0;
+                        FastVecAdd(point, point, old);
+                        blocked = CollLine(((char *)&g_hero_state.hero) + 0x60, point, 0, g_hero_state.collision, 0) != 0;
                     }
                 } else {
-                    qcopy(p, ((char *)&g_hero_state.hero) + 0x60);
-                    p[2] += 2.0f;
-                    blocked = CollLine(((char *)&g_hero_state.hero) + 0x60, p, 0, *(int *)(((char *)&g_hero_state.hero) + 0x2210), 0) != 0;
+                    qcopy(point, ((char *)&g_hero_state.hero) + 0x60);
+                    point[2] += 2.0f;
+                    blocked = CollLine(((char *)&g_hero_state.hero) + 0x60, point, 0, *(int *)(((char *)&g_hero_state.hero) + 0x2210), 0) != 0;
                 }
             }
             object->blocked = blocked;
@@ -123,7 +123,7 @@ void func_PAL_002E7270(Object *object)
         }
     }
     moby_transform_joint_point(object, 1, matrix);
-    moby_transform_joint_to_world(object, 1, p);
+    moby_transform_joint_to_world(object, 1, point);
     for (i = 0; g_equipment_pieces[i]; i++) {
         if (object->flags & 1) {
             g_equipment_pieces[i]->render = 0;
@@ -152,7 +152,7 @@ void func_PAL_002E7270(Object *object)
             offset[1] = -0.5364f;
             offset[2] = -1.79489f;
             matrix_mul_vec3(offset, offset, g_equipment_pieces[i]->basis);
-            FastVecAdd(delta, p, offset);
+            FastVecAdd(delta, point, offset);
             qcopy(g_equipment_pieces[i]->position, delta);
         }
         mat_get_euler_angles(g_equipment_pieces[i]->basis, g_equipment_pieces[i]->previous);

@@ -18,16 +18,17 @@ extern void gfx_draw_screen_rectangle(int, int, int, int, int, void *);
 extern void object_set_first_float4(void *, float, float, float, float);
 extern void object_set_second_float4(void *, float, float, float, float);
 extern void gfx_draw_screen_element_stored(void *);
-extern float func_PAL_0033A598(void *, int);
-extern void func_PAL_0027FE88(float, float, long, signed char *, int, float);
+extern float text_panel_mode_scale_pal(void *, int);
+extern void text_draw_small_scaled(float, float, long, signed char *, int, float);
 
-void func_PAL_0033A9B0(char *object)
+/* Draws the bordered text panel: background box, border pieces, then the text lines (PAL version). */
+void text_panel_draw_pal(char *object)
 {
     unsigned int colors[4];
     BorderOffset_00338AD8 corner;
     BorderOffset_00338AD8 edge;
     float x, y;
-    int i = 0, textX, textY;
+    int i = 0, text_x, text_y;
     char *top = object + 0x10;
     char *side = object + 0x5c;
     colors[0] = **(unsigned int **)(object + 8);
@@ -66,15 +67,15 @@ void func_PAL_0033A9B0(char *object)
     gfx_draw_screen_element_stored(side);
     x = (*(float **)object)[0];
     y = (*(float **)object)[1];
-    textX = (int)((x - (float)*(int *)(object + 0x1a8)) + (float)*(int *)(object + 0x1bc));
-    textY = (int)(y - (float)*(int *)(object + 0x1ac));
+    text_x = (int)((x - (float)*(int *)(object + 0x1a8)) + (float)*(int *)(object + 0x1bc));
+    text_y = (int)(y - (float)*(int *)(object + 0x1ac));
     if (*(int *)(object + 0x1d8)) {
         for (; i < *(int *)(object + 0x1b0); i++) {
             int mode = *(int *)(object + 0x1c4);
-            func_PAL_0027FE88((float)(textX + ref_00338AD8_02_gp[mode].x),
-                              (float)(textY + ref_00338AD8_02[mode].y + i * 16),
+            text_draw_small_scaled((float)(text_x + ref_00338AD8_02_gp[mode].x),
+                              (float)(text_y + ref_00338AD8_02[mode].y + i * 16),
                               **(unsigned int **)(object + 12), ((signed char **)(object + 0x1d8))[i], -1,
-                              func_PAL_0033A598(object, mode));
+                              text_panel_mode_scale_pal(object, mode));
         }
     }
 }

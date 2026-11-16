@@ -4,6 +4,7 @@
 extern void FastVecSub(void *, void *, void *);
 extern int coll_update_controller_pal(char *, char *, void *);
 
+/* Checks the move of the moby to a point (PAL). */
 int coll_check_move_to_point_pal(char *object, void *point)
 {
     char *target = object + 0x10;

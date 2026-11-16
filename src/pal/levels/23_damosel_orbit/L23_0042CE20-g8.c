@@ -70,10 +70,10 @@ extern void blast_projectile_draw_glow(u8 *);
 void flying_l23_shot_update_pal(u8 *moby) {
     L23Flight *vars = *(L23Flight **)(moby + 0x68);
     TI16 target[1];
-    L23Probe q1;
-    TI16 vecA[1];
-    TI16 vecB[1];
-    L23Probe q2;
+    L23Probe hit_desc_1;
+    TI16 vec_a[1];
+    TI16 vec_b[1];
+    L23Probe hit_desc_2;
 
     if (moby[0xBC] == 0) {
         vars->frames += 1;
@@ -85,39 +85,39 @@ void flying_l23_shot_update_pal(u8 *moby) {
         switch (moby[0x20]) {
         case 0: {
             FastVecAdd(target, moby + 0x10, vars);
-            make_hit_descriptor(&q1, moby, 0x90003, vars, vars->radius);
-            q1.id = *(u16 *)(moby + 0xAA);
+            make_hit_descriptor(&hit_desc_1, moby, 0x90003, vars, vars->radius);
+            hit_desc_1.id = *(u16 *)(moby + 0xAA);
             if (CollLine(moby + 0x10, target, 0, moby, 0) != 0) {
                 float dist = fast_vec_dist(g_player_target_point, g_last_ray_hit.point);
                 u8 *player = D_00189E20_2.player;
-                s32 isPlayer = g_last_ray_hit.hit == player;
+                s32 is_player = g_last_ray_hit.hit == player;
 
-                if (isPlayer || dist < g_flying_shot_hit_distance) {
-                    TI16 t;
+                if (is_player || dist < g_flying_shot_hit_distance) {
+                    TI16 origin;
                     s32 radius;
 
-                    FastVecScale(vecA, player + 0xE0, 3.5f);
-                    FastVecAdd(vecA, vecA, D_00189E20_2.camera);
-                    SpawnExplosion(vecA, 1, 5, 5, 5, 0x19, 0x4B, 0, 1.5f, 20.0f, 0, 1, 0, 0);
+                    FastVecScale(vec_a, player + 0xE0, 3.5f);
+                    FastVecAdd(vec_a, vec_a, D_00189E20_2.camera);
+                    SpawnExplosion(vec_a, 1, 5, 5, 5, 0x19, 0x4B, 0, 1.5f, 20.0f, 0, 1, 0, 0);
                     radius = (s32)vars->radius;
-                    t = *(TI16 *)(moby + 0x10);
-                    vecB[0] = t;
-                    cam_play_effect_on_target(moby, 0x10007, radius, vecB, 0, 0);
-                    if (isPlayer) {
+                    origin = *(TI16 *)(moby + 0x10);
+                    vec_b[0] = origin;
+                    cam_play_effect_on_target(moby, 0x10007, radius, vec_b, 0, 0);
+                    if (is_player) {
                         snd_start_in_slot(0x20, 0, 0);
                     }
                     if (moby[0xBC] == 0) {
                         moby_set_state(moby, 1, -1);
                     }
                 } else {
-                    vecA[0] = *(TI16 *)vars;
-                    FastVecScale(vecA, vecA, 3.0f);
-                    ((float *)vecA)[2] = 1.0f;
-                    ((float *)vecA)[3] = 5627.9248046875f;
-                    make_hit_descriptor(&q2, moby, 0x90003, vecA, vars->radius);
-                    q2.b19 = 1;
-                    q2.id = *(u16 *)(moby + 0xAA);
-                    q2.b18 = 0;
+                    vec_a[0] = *(TI16 *)vars;
+                    FastVecScale(vec_a, vec_a, 3.0f);
+                    ((float *)vec_a)[2] = 1.0f;
+                    ((float *)vec_a)[3] = 5627.9248046875f;
+                    make_hit_descriptor(&hit_desc_2, moby, 0x90003, vec_a, vars->radius);
+                    hit_desc_2.b19 = 1;
+                    hit_desc_2.id = *(u16 *)(moby + 0xAA);
+                    hit_desc_2.b18 = 0;
                     if (moby[0xBC] == 0) {
                         moby_set_state(moby, 1, -1);
                     }
@@ -127,8 +127,8 @@ void flying_l23_shot_update_pal(u8 *moby) {
             if (moby[0xBC] == 0) {
                 *(TI16 *)(moby + 0x10) = target[0];
             }
-            FastVecScale(vecA, vars, -0.5f);
-            vec_clear_128(vecB);
+            FastVecScale(vec_a, vars, -0.5f);
+            vec_clear_128(vec_b);
             break;
         }
         case 1:

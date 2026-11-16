@@ -70,7 +70,9 @@ typedef struct BurstObject {
     u8 pad6C[0x54];
     float forward[4], right[4];
 } BurstObject;
-void func_PAL_L13_004175B8(BurstObject *object)
+/* Spawns the explosion effect at the object: a flash, glowing sparks and smoke thrown outward
+ * (PAL: 50 Hz timings). */
+void part_l13_spawn_explosion_pal(BurstObject *object)
 {
     float position[4] __attribute__((aligned(16)));
     float velocity[4] __attribute__((aligned(16)));

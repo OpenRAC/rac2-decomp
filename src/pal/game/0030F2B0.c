@@ -4,13 +4,14 @@
 extern char *part_find_owned_effect_slot(char *, int, int);
 extern int math_fast_float_d(int *);
 extern int PlayMobySound(int, int, char *);
-extern void func_PAL_002AC290(char *, char *);
+extern void gfx_start_color_fade_pal(char *, char *);
 extern void vec_add_random_offset(float *, float);
 extern void SpawnExplosionEffects_pal(void *, void *, void *, float, float, int, int, int,
                          float, float, float, float, int, float, int, int, int, int, int);
-extern void func_PAL_002AC3C0(char *, char *);
+extern void gfx_update_color_fade_pal(char *, char *);
 
-void func_PAL_0030FB38(char *object)
+/* Checks whether something hit the object. It takes damage from each hit and bursts when its health runs out (PAL copy). */
+void moby_apply_hit_damage_game_pal(char *object)
 {
     char *state = *(char **)(object + 0x68);
     char *hit = part_find_owned_effect_slot(object, 0x30001, 0);
@@ -32,7 +33,7 @@ void func_PAL_0030FB38(char *object)
         }
         PlayMobySound(0, 0, object);
         *(float *)(state + 0x24) -= *(float *)(hit + 0x2C);
-        func_PAL_002AC290(object, state);
+        gfx_start_color_fade_pal(object, state);
         if (*(float *)(state + 0x24) < 0.0f) {
             vec_add_random_offset(direction, 0.6f);
             SpawnExplosionEffects_pal(object, direction, 0, 0.0f, 0.0f, 0, 0, 0,
@@ -41,7 +42,7 @@ void func_PAL_0030FB38(char *object)
         }
     }
     ((unsigned char *)object)[0xA8] = 0xFF;
-    func_PAL_002AC3C0(object, state);
+    gfx_update_color_fade_pal(object, state);
 }
 
 

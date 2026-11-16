@@ -18,7 +18,7 @@ extern void vec_transform_or_copy(void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
 extern int CollLine(void *, void *, int, void *, void *);
 extern void part_l00_spawn_impact_spark_burst_2_pal(void *, int, int);
-extern int func_PAL_00335DD0(void *, int, int);
+extern int weapon_start_health_drain_pal(void *, int, int);
 extern int PlayMobySound(int, int, char *);
 extern int math_fast_float_d(void *);
 extern void rocket_spawn_smoke_burst_pal(void *);
@@ -42,6 +42,8 @@ extern unsigned char *g_effect_param_pointer_a;
 extern int g_frame_l00_counter MACRO_ADDR;
 extern void shot_update_and_draw_trail(void *);
 
+/* Updates the homing shot: steers it at its target, tests the step for a hit, spawns the impact
+   or smoke effects and the particle trail, and ends it when it hits or leaves the world. */
 void homing_l00_shot_update_4_pal(char *obj)
 {
     float previous[4], scratch[4], delta[4], temp[4];
@@ -50,7 +52,7 @@ void homing_l00_shot_update_4_pal(char *obj)
     char *state = *(char **)(obj + 0x68);
     char *target;
     char *info;
-    char *p;
+    char *part;
     float *tracking_delta;
     float length, speed, scale;
     int work, i;
@@ -112,7 +114,7 @@ target_done:
             if (!g_collision_result.target) part_l00_spawn_impact_spark_burst_2_pal(g_collision_result.position, 15, 0);
             else if (*(int *)(g_collision_result.target + 0x98)) {
                 part_l00_spawn_impact_spark_burst_2_pal(g_collision_result.position, 10, 1);
-                func_PAL_00335DD0(g_collision_result.target, 0x3C, *(int *)(obj + 0xB8));
+                weapon_start_health_drain_pal(g_collision_result.target, 0x3C, *(int *)(obj + 0xB8));
             }
             PlayMobySound(0, 0, obj);
             *(unsigned char *)(obj + 0x20) = 1;
@@ -127,13 +129,13 @@ target_done:
             *(int *)(state + 0x38) = 5;
         }
         work = math_random_int_below(255);
-        p = part_spawn_gravity_fade(obj + 0x10, g_default_vector, 2, 0x205080, work, 64, 16, 420000.0f, 420000.0f, 0.0f, 1);
-        if (p) p[2] = *g_effect_param_pointer_b;
+        part = part_spawn_gravity_fade(obj + 0x10, g_default_vector, 2, 0x205080, work, 64, 16, 420000.0f, 420000.0f, 0.0f, 1);
+        if (part) part[2] = *g_effect_param_pointer_b;
         work = (work + 128) % 255;
-        p = part_spawn_gravity_fade(obj + 0x10, g_default_vector, 2, 0x205080, work, 64, 16, 420000.0f, 420000.0f, 0.0f, 1);
-        if (p) p[2] = *g_effect_param_pointer_b;
-        p = part_spawn_gravity_fade(obj + 0x10, g_default_vector, 2, 0xFFFFFF, (work + 64) % 255, 48, 16, 252000.02f, 252000.02f, 0.0f, 1);
-        if (p) p[2] = *g_effect_param_pointer_b;
+        part = part_spawn_gravity_fade(obj + 0x10, g_default_vector, 2, 0x205080, work, 64, 16, 420000.0f, 420000.0f, 0.0f, 1);
+        if (part) part[2] = *g_effect_param_pointer_b;
+        part = part_spawn_gravity_fade(obj + 0x10, g_default_vector, 2, 0xFFFFFF, (work + 64) % 255, 48, 16, 252000.02f, 252000.02f, 0.0f, 1);
+        if (part) part[2] = *g_effect_param_pointer_b;
         work = (int)delta;
         FastVecSub((void *)work, obj + 0x10, previous);
         FastVecScale((char *)work, (char *)work, 0.4f);
@@ -149,8 +151,8 @@ target_done:
             FastVecAdd(temp, temp, tracking_delta);
         }
         if (g_frame_l00_counter % 10 == 0) {
-            p = part_spawn_gravity_fade(obj + 0x10, g_default_vector, 25, 0x202080, 0, 32, 0, 2100.0f, 420000.0f, 0.0f, 1);
-            if (p) p[2] = *g_effect_param_pointer_a;
+            part = part_spawn_gravity_fade(obj + 0x10, g_default_vector, 25, 0x202080, 0, 32, 0, 2100.0f, 420000.0f, 0.0f, 1);
+            if (part) part[2] = *g_effect_param_pointer_a;
         }
         ref_L00_0041EE58_00(shot_update_and_draw_trail, obj);
         break;

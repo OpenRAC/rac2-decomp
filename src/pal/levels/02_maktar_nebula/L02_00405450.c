@@ -17,34 +17,34 @@ extern void moby_mark_spawned(char *);
 /* Walks the list of objects at D_L02_001B35A8 (linked through +0x28) and hands each one to the
    handler of its kind, the half-word at +0xAA. */
 void arena_notify_mobys_challenge_start_pal(void) {
-    char *e;
+    char *moby;
 
-    for (e = g_moby_l02_list_head; e != 0; e = *(char **)(e + 0x28)) {
-        switch (*(s16 *)(e + 0xAA)) {
+    for (moby = g_moby_l02_list_head; moby != 0; moby = *(char **)(moby + 0x28)) {
+        switch (*(s16 *)(moby + 0xAA)) {
         case 0xE7D:
-            explosion_effect_update(e);
+            explosion_effect_update(moby);
             break;
         case 0xEB0:
-            moby_explode_and_hurt_nearby(e);
+            moby_explode_and_hurt_nearby(moby);
             break;
         case 0xCB2:
-            moby_copy_sub_byte_40_to_25(e);
+            moby_copy_sub_byte_40_to_25(moby);
             break;
         case 0xB02:
-            moby_copy_vars_byte_40_to_25(e);
+            moby_copy_vars_byte_40_to_25(moby);
             break;
         case 0x1366:
-            moby_raise_state_to_eight(e);
+            moby_raise_state_to_eight(moby);
             break;
         case 0x1367:
-            moby_raise_state_to_eight_copy(e);
+            moby_raise_state_to_eight_copy(moby);
             break;
         case 0x326:
-            moby_release_slots_retire(e);
+            moby_release_slots_retire(moby);
             break;
         case 0xA5C:
         case 0x1192:
-            moby_call_helper_10000(e);
+            moby_call_helper_10000(moby);
             break;
         case 0xAE0:
         case 0xAE1:
@@ -63,7 +63,7 @@ void arena_notify_mobys_challenge_start_pal(void) {
         case 0xCC8:
         case 0xCC9:
         case 0xCDB:
-            moby_mark_spawned(e);
+            moby_mark_spawned(moby);
             break;
         }
     }

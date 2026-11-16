@@ -2,6 +2,7 @@
 #include "names.h"
 extern void UpdateShopMenuInput(void);
 
+/* Runs one frame of the shop menu input. */
 void shop_run_menu_input_pal(void)
 {
     UpdateShopMenuInput();
@@ -33,11 +34,13 @@ extern void gfx_select_packet_buffer_setup(void);
 extern int PlayMobySound(int, int, void *);
 extern void tex_load_level_pack_pal(int);
 extern char *GetLocalizedString(int);
-extern void func_PAL_0029D630(int, int);
+extern void resident_msg_box_init_short(int, int);
 extern void load_disc_table_entry_for_draw_pal(int);
 extern void LoadDiscTableTexture_pal(int);
 extern void SpawnEquipmentPieces(int);
 
+/* Leaves the shop sub menu: restores the saved camera, zoom and colours, and puts back the equipment or
+   armor that was being previewed. */
 void shop_close_sub_menu_pal(void)
 {
     Shop_002F9198 *s = &g_vendor_menu_state;
@@ -63,7 +66,7 @@ void shop_close_sub_menu_pal(void)
         if (g_shop_bolts_level_override) g_player_bolts.level = g_shop_bolts_level_alt; else g_player_bolts.level = g_shop_saved_bolts_level;
         tex_load_level_pack_pal(g_player_bolts.level);
         table = g_shop_close_table;
-        if (g_shop_bolts_level_override) func_PAL_0029D630(GetLocalizedString(table.words[g_player_bolts.level]), -1);
+        if (g_shop_bolts_level_override) resident_msg_box_init_short(GetLocalizedString(table.words[g_player_bolts.level]), -1);
     }
     if (g_vendor_menu_state.mode == 2) {
         if (g_hero_moby_default.a != g_equipment_bits) {

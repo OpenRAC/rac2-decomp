@@ -30,22 +30,23 @@ typedef struct {
 } MenuOption;
 extern MenuOption g_unlockable_shop_table[] MACRO_ADDR;
 
+/* Draws the unlockable options menu: twelve options with on or off, or the skill points still needed to unlock them. (PAL) */
 int DrawUnlockableOptionsMenu_pal(void)
 {
     char buf[64];
     int r, i, y, color, limit, available;
     u64 style;
-    float z;
+    float depth;
 
     available = save_count_nonzero_flags();
-    z = 0.84f;
+    depth = 0.84f;
     SetupGifPaging(0);
     r = table_find_by_id(g_resident_data_base + 0x8710, 0x8B);
-    gfx_draw_scaled_object_two_axes((char *)r, 0x60442D00, (float)(g_screen_width / 2), (float)g_menu_title_y_b, 1.0f, g_menu_alpha_scale, z);
+    gfx_draw_scaled_object_two_axes((char *)r, 0x60442D00, (float)(g_screen_width / 2), (float)g_menu_title_y_b, 1.0f, g_menu_alpha_scale, depth);
     r = table_find_by_id(g_resident_data_base + 0x8710, 0x8C);
-    gfx_draw_scaled_object_two_axes((char *)r, 0x55F0C070, (float)(g_screen_width / 2), (float)g_menu_title_y_b, 1.0f, g_menu_alpha_scale, z);
+    gfx_draw_scaled_object_two_axes((char *)r, 0x55F0C070, (float)(g_screen_width / 2), (float)g_menu_title_y_b, 1.0f, g_menu_alpha_scale, depth);
     r = table_find_by_id(g_resident_data_base + 0x8710, 0x8D);
-    gfx_draw_scaled_object_two_axes((char *)r, 0x55F0C070, (float)(g_screen_width / 2), (float)g_menu_title_y_b, 1.0f, g_menu_alpha_scale, z);
+    gfx_draw_scaled_object_two_axes((char *)r, 0x55F0C070, (float)(g_screen_width / 2), (float)g_menu_title_y_b, 1.0f, g_menu_alpha_scale, depth);
     text_draw_centered_small(g_screen_width / 2, 0x41, 0x80F0F0F0ULL, GetLocalizedString(0xC22), -1);
     text_draw_centered_small(g_screen_width / 2, 0x141, 0x80F0F0F0ULL, GetLocalizedString(0xB5F), -1);
     text_draw_centered_small(g_screen_width / 2, 0x15A, 0x80F0F0F0ULL, GetLocalizedString(0xB60), -1);

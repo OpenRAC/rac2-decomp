@@ -13,19 +13,20 @@ extern void vec_clear_128(void *);
 extern void FastVecScale(void *, void *, float);
 extern void vec_scale_to_length(void *, void *, float);
 extern float FastAddRotations(float, float), fast_vec_dist(void *, void *);
-extern void part_claim_spark_record(void *), func_PAL_0032A898(void *, void *, float);
+extern void part_claim_spark_record(void *), SpawnObjectParticle_pal(void *, void *, float);
 extern int moby_place_at_collision_point(void *, void *);
 extern void hero_check_hit_by_object(void *);
 extern int PlayMobySound(int, int, void *);
 extern float math_random_angle(void), math_random_float_range(float, float);
 extern void vec_build_spherical_offset(void *, float, float, float);
-extern void func_PAL_002BEF58(void *, void *, int, float);
+extern void part_spawn_white_flash_pal(void *, void *, int, float);
 extern int math_fast_float_d(int *);
 extern void moby_mark_spawned(void *), part_update_orbiting_sparks_pal(void *), part_update_object_particles(void *);
 extern void gfx_register_overlay_draw_callback(void *, void *);
 extern void DrawObjectSpriteEffects_pal(void);
 
-void func_PAL_003299B8(char *self)
+/* Updates a thrown ball-like object: it flies and falls, bursts into sparks when it hits something, then fades away and is deleted (PAL: 50 Hz timings). */
+void thrown_burst_update_pal(char *self)
 {
     float previous[4], velocity[4];
     char *state = *(char **)(self + 0x68);
@@ -60,7 +61,7 @@ void func_PAL_003299B8(char *self)
         *(float *)(self + 0xF4) = FastAddRotations(*(float *)(self + 0xF4), *(float *)(state + 0x14));
         *(float *)(self + 0xF8) = FastAddRotations(*(float *)(self + 0xF8), *(float *)(state + 0x18));
         part_claim_spark_record(self);
-        func_PAL_0032A898(self, self + 0x10, fast_vec_dist(previous, self + 0x10) * 0.5f);
+        SpawnObjectParticle_pal(self, self + 0x10, fast_vec_dist(previous, self + 0x10) * 0.5f);
         if (moby_place_at_collision_point(self, previous)) {
             *(unsigned char *)(self + 0x20) = 2;
             *(int *)(state + 0x44) = 17;
@@ -79,13 +80,13 @@ void func_PAL_003299B8(char *self)
                     angle = math_random_angle();
                     elevation = math_random_float_range(0.392699093f, 3.14159274f);
                     vec_build_spherical_offset(v, 0.16000001f, angle, elevation);
-                    func_PAL_002BEF58(self + 0x10, v, 0, -1.0f);
+                    part_spawn_white_flash_pal(self + 0x10, v, 0, -1.0f);
                 }
             }
         }
         break;
     case 2:
-        func_PAL_0032A898(self, self + 0x10, 0.1f);
+        SpawnObjectParticle_pal(self, self + 0x10, 0.1f);
         FastVecAdd(self + 0x10, self + 0x10, state);
         *(float *)(state + 8) -= 0.0022f;
         *(unsigned char *)(self + 0x23) -= 4;

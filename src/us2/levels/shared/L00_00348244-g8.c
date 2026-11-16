@@ -11,7 +11,7 @@ extern int g_right_text_extra_y;
 
 /* func_US2_L00_00348244, the USA v2.00 relative of func_002CDA20: the same draw sequence,
    with the text id 0x2BE5, the position read from a level pair (not the boot unit's D_001ABA90 pair) and func_0027F980 drawing it. */
-int func_US2_L00_00348244(void)
+int menu_draw_centered_prompt_l00_us2(void)
 {
     SetupGifPaging(0);
     module_l00_call_handler_12_us2();

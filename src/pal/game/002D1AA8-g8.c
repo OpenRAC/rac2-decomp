@@ -19,30 +19,31 @@ extern int g_movie_list_cursor __attribute__((sda));
 extern int g_movie_list_title_y __attribute__((sda));
 extern short g_movie_entries[][3];
 
+/* Draws the list of movies with five rows around the cursor; locked movies show a placeholder. (PAL) */
 int movie_list_draw_pal(void) {
-    int i, y, k, color;
-    int r;
+    int i, y, index, color;
+    int sprite;
     char *text;
-    float z;
+    float depth;
     SetupGifPaging(0);
-    z = 0.0f;
-    r = table_find_by_id(g_resident_data_base + 0x8710, 0xD7);
-    gfx_draw_scaled_object_two_axes(r, 0x60442D00, (float)(g_screen_width / 2), (float)g_movie_list_title_y, 1.0f, g_menu_alpha_scale, z);
-    r = table_find_by_id(g_resident_data_base + 0x8710, 0xD8);
-    gfx_draw_scaled_object_two_axes(r, 0x60241700, (float)(g_screen_width / 2), (float)g_movie_list_title_y, 1.0f, g_menu_alpha_scale, z);
-    r = table_find_by_id(g_resident_data_base + 0x8710, 0xD9);
-    gfx_draw_scaled_object_two_axes(r, 0x55F0C070, (float)(g_screen_width / 2), (float)g_movie_list_title_y, 1.0f, g_menu_alpha_scale, z);
-    r = table_find_by_id(g_resident_data_base + 0x8710, 0xDD);
-    gfx_draw_scaled_object_two_axes(r, 0x55F0C070, (float)(g_screen_width / 2), (float)g_movie_list_title_y, 1.0f, g_menu_alpha_scale, z);
+    depth = 0.0f;
+    sprite = table_find_by_id(g_resident_data_base + 0x8710, 0xD7);
+    gfx_draw_scaled_object_two_axes(sprite, 0x60442D00, (float)(g_screen_width / 2), (float)g_movie_list_title_y, 1.0f, g_menu_alpha_scale, depth);
+    sprite = table_find_by_id(g_resident_data_base + 0x8710, 0xD8);
+    gfx_draw_scaled_object_two_axes(sprite, 0x60241700, (float)(g_screen_width / 2), (float)g_movie_list_title_y, 1.0f, g_menu_alpha_scale, depth);
+    sprite = table_find_by_id(g_resident_data_base + 0x8710, 0xD9);
+    gfx_draw_scaled_object_two_axes(sprite, 0x55F0C070, (float)(g_screen_width / 2), (float)g_movie_list_title_y, 1.0f, g_menu_alpha_scale, depth);
+    sprite = table_find_by_id(g_resident_data_base + 0x8710, 0xDD);
+    gfx_draw_scaled_object_two_axes(sprite, 0x55F0C070, (float)(g_screen_width / 2), (float)g_movie_list_title_y, 1.0f, g_menu_alpha_scale, depth);
     text_draw_centered_small(0xB3, 0x1B, 0x80F0F0F0ULL, GetLocalizedString(0xC23), -1);
     text_draw_centered_small(0x161, 0x177, 0x80F0F0F0ULL, GetLocalizedString(0xB60), -1);
     text_draw_centered_small(0xB5, 0x177, 0x80F0F0F0ULL, GetLocalizedString(0xB86), -1);
     menu_draw_scroll_arrows_and_frame();
     for (i = 0, y = 0x112; i < 5; i++, y += 20) {
-        k = i + g_movie_list_cursor - 2;
-        if (k < 0) k += 33;
-        if (k >= 33) k -= 33;
-        text = GetLocalizedString(g_movie_entries[k][2] ? g_movie_entries[k][0] : 0xBD1);
+        index = i + g_movie_list_cursor - 2;
+        if (index < 0) index += 33;
+        if (index >= 33) index -= 33;
+        text = GetLocalizedString(g_movie_entries[index][2] ? g_movie_entries[index][0] : 0xBD1);
         if (i == 0 || i == 4) color = 0x10F0F0F0;
         else if (i == 1 || i == 3) color = 0x50F0F0F0;
         else {

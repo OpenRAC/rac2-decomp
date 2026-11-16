@@ -2,36 +2,36 @@
 
 #include "common.h"
 extern float math_random_angle(void);
-extern float math_random_float_range(float a, float b);
-extern float math_fast_sin_or_cos_a(float a);
-extern float math_fast_sin_or_cos_b(float a);
-extern int math_random_int_range(int a, int b);
-extern int math_random_int_below(int a);
-extern void *func_PAL_002C0838(char *p, float *q, int a, int b);
+extern float math_random_float_range(float angle, float speed);
+extern float math_fast_sin_or_cos_a(float angle);
+extern float math_fast_sin_or_cos_b(float angle);
+extern int math_random_int_range(int angle, int speed);
+extern int math_random_int_below(int angle);
+extern void *part_spawn_spark_2_pal(char *p, float *q, int angle, int speed);
 
 /* func_00329768 uses small data in 00329768-g8.c. */
 
 
 
 /* Per frame: scales the value one helper returns by the factor another helper returns, stores both scaled samples and a third sample into a three-float record, and hands the record to a setter with two selector results. */
-void part_emit_spark_burst_pal(char *a0)
+void part_emit_spark_burst_pal(char *self)
 {
-    float v[3];
-    float a;
-    float b;
+    float velocity[3];
+    float angle;
+    float speed;
     int i;
-    int m;
-    int n;
+    int life;
+    int kind;
 
     for (i = 47; i >= 0; i--) {
-        a = math_random_angle();
-        b = math_random_float_range(0.0f, 0.060000002f);
-        v[0] = math_fast_sin_or_cos_a(a) * b;
-        v[1] = math_fast_sin_or_cos_b(a) * b;
-        v[2] = math_random_float_range(0.060000002f, 0.13000001f);
-        m = math_random_int_range(90, 120);
-        n = math_random_int_below(2);
-        func_PAL_002C0838(a0 + 16, v, n, m);
+        angle = math_random_angle();
+        speed = math_random_float_range(0.0f, 0.060000002f);
+        velocity[0] = math_fast_sin_or_cos_a(angle) * speed;
+        velocity[1] = math_fast_sin_or_cos_b(angle) * speed;
+        velocity[2] = math_random_float_range(0.060000002f, 0.13000001f);
+        life = math_random_int_range(90, 120);
+        kind = math_random_int_below(2);
+        part_spawn_spark_2_pal(self + 16, velocity, kind, life);
     }
 }
 
@@ -46,18 +46,20 @@ extern int g_surface_height_tiles[] __attribute__((sda));
 extern int g_surface_box_count[] __attribute__((sda));
 extern int SampleSurfaceHeightMap(float *, float *, float, float, float);
 extern void RippleDisturb(int, int, int, float, float, float, float);
-extern int func_PAL_0026F670(void);
+extern int stub_empty_30_pal(void);
 
+/* Checks whether a falling chunk is over the hero: the chunk lands on the hero, ripples the
+   water, counts the hit and may resume the music (PAL: same as USA v1.01). */
 void hero_check_under_falling_object_pal(char *self)
 {
     unsigned char *target = g_hit_result[0];
     char *state = *(char **)(self + 0x68);
     unsigned char *object;
     unsigned char *obj_state;
-    char *probe;
-    float aux[4];
-    float result[4];
-    char *context;
+    char *object_vars;
+    float unused_hit[4];
+    float surface_point[4];
+    char *music;
     int mode;
 
     if (target == 0) {
@@ -72,24 +74,24 @@ void hero_check_under_falling_object_pal(char *self)
         obj_state = *(unsigned char **)(object + 0x68);
         if (obj_state != 0) {
             if (*(short *)(obj_state + 0x16) == 0) {
-                *(int *)&result[0] = 0;
+                *(int *)&surface_point[0] = 0;
                 if (mode != 2)
-                    SampleSurfaceHeightMap(result, aux, *(float *)(self + 0x10), *(float *)(self + 0x14), *(float *)(self + 0x18));
+                    SampleSurfaceHeightMap(surface_point, unused_hit, *(float *)(self + 0x10), *(float *)(self + 0x14), *(float *)(self + 0x18));
                 else
-                    SampleSurfaceHeightMap(result, aux, *(float *)(state + 0x20), *(float *)(state + 0x24), *(float *)(state + 0x28));
-                probe = *(char **)(object + 0x68);
-                if (*(float *)(self + 0x18) > result[0] && *(float *)(probe + 0xC) == 0.0f) {
+                    SampleSurfaceHeightMap(surface_point, unused_hit, *(float *)(state + 0x20), *(float *)(state + 0x24), *(float *)(state + 0x28));
+                object_vars = *(char **)(object + 0x68);
+                if (*(float *)(self + 0x18) > surface_point[0] && *(float *)(object_vars + 0xC) == 0.0f) {
                     *(unsigned char **)(state + 0x48) = object;
                     *(int *)(state + 0x38) = 2;
                     return;
                 }
                 if (obj_state[0x14] == 0) {
                     RippleDisturb(g_surface_height_tiles[0], g_surface_box_count[0], 1, *(float *)(self + 0x10), *(float *)(self + 0x14), 0.5f, -0.03f);
-                    if (func_PAL_0026F670() == 0) {
+                    if (stub_empty_30_pal() == 0) {
                         object[0xBC] += 1;
                         if (object[0xBC] >= 25) {
-                            context = g_music_state;
-                            if (*(short *)(context + 0x72) == 3 && *(short *)(context + 0x6C) < 6000)
+                            music = g_music_state;
+                            if (*(short *)(music + 0x72) == 3 && *(short *)(music + 0x6C) < 6000)
                                 snd_resume_music_stream();
                         }
                         if (object[0x21] != 255)
@@ -110,6 +112,7 @@ void hero_check_under_falling_object_pal(char *self)
 }
 
 
-void func_PAL_0032B920(void)
+/* Empty overlay draw callback; does nothing. */
+void moby_do_nothing_pal(void)
 {
 }

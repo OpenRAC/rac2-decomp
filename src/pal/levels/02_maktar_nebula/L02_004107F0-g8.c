@@ -17,7 +17,7 @@ extern void vec_scale_to_length(float *, float *, float);
 extern void vec_random_direction(float *, float, float);
 extern void FastVecAdd(float *, float *, float *);
 extern float FastAddRotations(float, float);
-extern void func_PAL_002AC290(s32, char *);
+extern void gfx_start_color_fade_pal(s32, char *);
 extern void moby_set_state(u8 *, s32, s32);
 extern void blade_ball_update_targeting(u8 *);
 extern u8 g_camera_l02_position[];
@@ -30,7 +30,7 @@ extern float g_blade_ball_angle_spread_min __attribute__((sda));
 extern float g_blade_ball_angle_spread_max __attribute__((sda));
 
 /* Maintain the held effect slot and react to contacts with another actor. */
-void func_PAL_L02_00411720(u8 *object)
+void blade_ball_update_common_pal(u8 *object)
 {
     float velocity[4];
     float random[4];
@@ -105,7 +105,7 @@ void func_PAL_L02_00411720(u8 *object)
         *(float *)(state + 0x170) = FastAddRotations(*(float *)(state + 0x170), random[0]);
         *(float *)(state + 0x174) = FastAddRotations(*(float *)(state + 0x174), random[1]);
         *(float *)(state + 0x178) = FastAddRotations(*(float *)(state + 0x178), random[2]);
-        func_PAL_002AC290((s32)object, (char *)(state + 0x50));
+        gfx_start_color_fade_pal((s32)object, (char *)(state + 0x50));
         moby_set_state(object, 13, 4);
     }
     if (object[0x20] >= 2 && state[0x2E] == 2)

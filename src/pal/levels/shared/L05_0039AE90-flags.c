@@ -9,7 +9,7 @@ extern char g_effect_records[];
 
 /* Claims the first free record of the twenty-four 0xB0-byte records at D_L05_00233560 for the
    owner, starts it at the owner and fills it with eighteen drawn values. */
-void func_PAL_L05_0039B1F0(char *owner, char *vel, int life)
+void record_claim_effect_slot_pal(char *owner, char *vel, int life)
 {
     char *base = g_effect_records;
     char *origin = owner + 0x10;

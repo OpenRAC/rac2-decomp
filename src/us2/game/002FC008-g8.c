@@ -89,7 +89,8 @@ extern void load_start_disc_entry_by_id(int, int);
 typedef char PreviewMobySize[(sizeof(PreviewMoby) == 0x100) ? 1 : -1];
 typedef char PreviewStateSize[(sizeof(PreviewState) == 0x760) ? 1 : -1];
 
-void func_US2_002FC008(void)
+/* Sets up the 3D preview for the selected vendor entry: armor sets, equipment parts, items or ammo (USA v2.00 copy). */
+void PrepareVendorSelectionPreview_us2(void)
 {
     PreviewClasses classes;
     int parts[20] __attribute__((aligned(16)));

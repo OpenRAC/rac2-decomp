@@ -6,21 +6,21 @@
 
 /* The instance data of the bobbing object. */
 typedef struct {
-    float bobPhase;             /* 0x00 */
-    float bobOffset;            /* 0x04 */
-    float swayPhase;            /* 0x08 */
-    float tiltPhase;            /* 0x0C */
+    float bob_phase;             /* 0x00 */
+    float bob_offset;            /* 0x04 */
+    float sway_phase;            /* 0x08 */
+    float tilt_phase;            /* 0x0C */
     float rise;                 /* 0x10: height of the upper rest above the lower one */
     int state;                  /* 0x14 */
     int timer;                  /* 0x18 */
-    float baseZ;                /* 0x1C */
-    float minRise;              /* 0x20 */
-    float maxRise;              /* 0x24 */
-    float minWait;              /* 0x28: seconds */
-    float maxWait;              /* 0x2C */
-    float riseTime;             /* 0x30 */
-    float fallTime;             /* 0x34 */
-    float spinSpeed;            /* 0x38: radians per frame */
+    float base_z;                /* 0x1C */
+    float min_rise;              /* 0x20 */
+    float max_rise;              /* 0x24 */
+    float min_wait;              /* 0x28: seconds */
+    float max_wait;              /* 0x2C */
+    float rise_time;             /* 0x30 */
+    float fall_time;             /* 0x34 */
+    float spin_speed;            /* 0x38: radians per frame */
     int sound;                  /* 0x3C */
     int stopped;                /* 0x40 */
 } BobberVars;
@@ -33,7 +33,7 @@ typedef struct {
     u8 pad6C[0x78 - 0x6C];
     int color;                  /* 0x78 */
     u8 pad7C[0xA8 - 0x7C];
-    u8 impactSlot;              /* 0xA8 */
+    u8 impact_slot;              /* 0xA8 */
     u8 padA9[0xB2 - 0xA9];
     s16 uid;                    /* 0xB2 */
     u8 padB4[0xF0 - 0xB4];
@@ -89,7 +89,7 @@ extern void moby_mark_spawned(void *);
 /* Rests at a low and a high height in turn, easing each move along a cosine,
    while bobbing, swaying and spinning; plays its sound while the hero is near
    and is destroyed when hit. */
-void func_PAL_L17_003C7F18(Moby *moby)
+void bobbing_spinning_object_update_pal(Moby *moby)
 {
     BobberVars *vars = moby->vars;
     float spin;
@@ -107,12 +107,12 @@ void func_PAL_L17_003C7F18(Moby *moby)
     switch (vars->state) {
     case 0:
         /* First update: pick the rise, the spin and a random point in the cycle. */
-        vars->baseZ = moby->position[2];
-        vars->rise = math_random_float_range(vars->minRise, vars->maxRise);
+        vars->base_z = moby->position[2];
+        vars->rise = math_random_float_range(vars->min_rise, vars->max_rise);
         spin = math_random_float_range(0.0052359886f, 0.015707966f);
         if (math_random_int_below(2))
             spin = -spin;
-        vars->spinSpeed = spin;
+        vars->spin_speed = spin;
         vars->sound = -1;
         if (math_random_int_below(2)) {
             moby->position[2] += vars->rise;
@@ -120,30 +120,30 @@ void func_PAL_L17_003C7F18(Moby *moby)
         } else {
             vars->state = 1;
         }
-        vars->timer = math_random_int_range(FloatToInt((vars->minWait * 300.0f + 2.0f) * 0.16666667f),
-                                    FloatToInt((vars->maxWait * 300.0f + 2.0f) * 0.16666667f));
+        vars->timer = math_random_int_range(FloatToInt((vars->min_wait * 300.0f + 2.0f) * 0.16666667f),
+                                    FloatToInt((vars->max_wait * 300.0f + 2.0f) * 0.16666667f));
         vars->timer = math_random_int_range(0, vars->timer);
         break;
 
     case 1:
         /* Resting low. */
         if (math_fast_float_d(&vars->timer)) {
-            vars->timer = FloatToInt((vars->riseTime * 300.0f + 2.0f) * 0.16666667f);
+            vars->timer = FloatToInt((vars->rise_time * 300.0f + 2.0f) * 0.16666667f);
             vars->state = 2;
         }
-        moby->position[2] = vars->baseZ;
+        moby->position[2] = vars->base_z;
         break;
 
     case 2:
         /* Rising. */
         if (math_fast_float_d(&vars->timer)) {
-            moby->position[2] = vars->baseZ + vars->rise;
+            moby->position[2] = vars->base_z + vars->rise;
             vars->state = 3;
-            vars->timer = math_random_int_range(FloatToInt((vars->minWait * 300.0f + 2.0f) * 0.16666667f),
-                                        FloatToInt((vars->maxWait * 300.0f + 2.0f) * 0.16666667f));
+            vars->timer = math_random_int_range(FloatToInt((vars->min_wait * 300.0f + 2.0f) * 0.16666667f),
+                                        FloatToInt((vars->max_wait * 300.0f + 2.0f) * 0.16666667f));
         } else {
-            ratio = IntToFloat(vars->timer) / ((vars->riseTime * 300.0f + 2.0f) * 0.16666667f);
-            moby->position[2] = vars->baseZ +
+            ratio = IntToFloat(vars->timer) / ((vars->rise_time * 300.0f + 2.0f) * 0.16666667f);
+            moby->position[2] = vars->base_z +
                 vars->rise * (math_fast_sin_or_cos_a(ratio * 3.141593f) * 0.5f) +
                 vars->rise * 0.5f;
         }
@@ -152,22 +152,22 @@ void func_PAL_L17_003C7F18(Moby *moby)
     case 3:
         /* Resting high. */
         if (math_fast_float_d(&vars->timer)) {
-            vars->timer = FloatToInt((vars->fallTime * 300.0f + 2.0f) * 0.16666667f);
+            vars->timer = FloatToInt((vars->fall_time * 300.0f + 2.0f) * 0.16666667f);
             vars->state = 4;
         }
-        moby->position[2] = vars->baseZ + vars->rise;
+        moby->position[2] = vars->base_z + vars->rise;
         break;
 
     case 4:
         /* Falling. */
         if (math_fast_float_d(&vars->timer)) {
-            moby->position[2] = vars->baseZ;
+            moby->position[2] = vars->base_z;
             vars->state = 1;
-            vars->timer = math_random_int_range(FloatToInt((vars->minWait * 300.0f + 2.0f) * 0.16666667f),
-                                        FloatToInt((vars->maxWait * 300.0f + 2.0f) * 0.16666667f));
+            vars->timer = math_random_int_range(FloatToInt((vars->min_wait * 300.0f + 2.0f) * 0.16666667f),
+                                        FloatToInt((vars->max_wait * 300.0f + 2.0f) * 0.16666667f));
         } else {
-            ratio = IntToFloat(vars->timer) / ((vars->fallTime * 300.0f + 2.0f) * 0.16666667f);
-            moby->position[2] = vars->baseZ +
+            ratio = IntToFloat(vars->timer) / ((vars->fall_time * 300.0f + 2.0f) * 0.16666667f);
+            moby->position[2] = vars->base_z +
                 vars->rise * (math_fast_sin_or_cos_a((1.0f - ratio) * 3.141593f) * 0.5f) +
                 vars->rise * 0.5f;
         }
@@ -175,12 +175,12 @@ void func_PAL_L17_003C7F18(Moby *moby)
     }
 
     /* The periods are in seconds: 0.0003490659 is one degree per second, in radians per 50 Hz frame. */
-    math_update_wrapped_angle_offset(moby, &vars->bobPhase, &vars->bobOffset, g_motion_bob_amplitude,
+    math_update_wrapped_angle_offset(moby, &vars->bob_phase, &vars->bob_offset, g_motion_bob_amplitude,
                   360.0f / g_motion_bob_period * 0.0003490659f, moby->position[2]);
-    moby_scale_owner_words_by_angles(moby, &vars->swayPhase, &vars->tiltPhase, g_motion_sway_amplitude,
+    moby_scale_owner_words_by_angles(moby, &vars->sway_phase, &vars->tilt_phase, g_motion_sway_amplitude,
                   360.0f / g_motion_sway_period * 0.0003490659f,
                   360.0f / g_motion_tilt_period * 0.0003490659f);
-    moby->rotation[2] = FastAddRotations(moby->rotation[2], vars->spinSpeed);
+    moby->rotation[2] = FastAddRotations(moby->rotation[2], vars->spin_speed);
 
     if (vec_distance_xy(moby->position, g_hero_position) < 80.0f) {
         SoundVoice *voice = (SoundVoice *)&g_sound_state[vars->sound];
@@ -202,6 +202,6 @@ void func_PAL_L17_003C7F18(Moby *moby)
         part_spawn_scaled_bolts(moby, 9, 0);
         moby_mark_spawned(moby);
     } else {
-        moby->impactSlot = 255;
+        moby->impact_slot = 255;
     }
 }

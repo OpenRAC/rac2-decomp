@@ -33,57 +33,57 @@ extern char g_intro_overlay_quad[8] __attribute__((sda));
    next line's `li` above it) makes the assembler pad it with the two nops retail has, and the second
    div.s, which has no label in front of it, stays unpadded. */
 void cutscene_draw_intro_overlays_pal(void *unused) {
-    L02_Table10 tab;
-    int k, n, alpha, id, id2, extra;
+    L02_Table10 frame_table;
+    int entry, fade_frames, alpha, overlay_id, old_overlay_id, extra;
     float frac;
 
     if (g_current_map_index == 2) {
         int first_end = 0x102, second_end = 0x13D, third_end = 0x14D;
 
-        tab = g_intro_frame_table;
+        frame_table = g_intro_frame_table;
         if (g_mob_list.time >= 0xDE) {
             if (g_mob_list.time < 0xE8) {
-                k = g_mob_list.time - 0xDE;
-                if (k < 10)
-                    g_intro_overlay_value = tab.v[k];
+                entry = g_mob_list.time - 0xDE;
+                if (entry < 10)
+                    g_intro_overlay_value = frame_table.v[entry];
             }
         }
-        id = -1;
-        id2 = -1;
+        overlay_id = -1;
+        old_overlay_id = -1;
         alpha = 0x80;
         extra = 0;
         if (g_mob_list.time > 0 && g_mob_list.time <= first_end) {
-            n = g_mob_list.time - 0xE1;
-            id = 0x46;
-            if (n > 0) {
-                id = 0x47;
-                frac = IntToFloat(n);
+            fade_frames = g_mob_list.time - 0xE1;
+            overlay_id = 0x46;
+            if (fade_frames > 0) {
+                overlay_id = 0x47;
+                frac = IntToFloat(fade_frames);
                 frac = frac / IntToFloat(0x21);
-                id2 = 0x46;
+                old_overlay_id = 0x46;
                 alpha = FloatToInt(frac * 127.0f);
             }
         } else if (g_mob_list.time > first_end && g_mob_list.time <= second_end) {
-            id = 0x47;
+            overlay_id = 0x47;
         } else if (g_mob_list.time > second_end && g_mob_list.time < third_end) {
             extra = math_random_int_range(0, 3);
-            id = 0x49;
+            overlay_id = 0x49;
         } else if (g_mob_list.time > third_end && g_mob_list.time < 0x16C) {
-            n = g_mob_list.time - 0x15C;
-            id = 0x48;
-            if (n > 0) {
-                frac = IntToFloat(n);
+            fade_frames = g_mob_list.time - 0x15C;
+            overlay_id = 0x48;
+            if (fade_frames > 0) {
+                frac = IntToFloat(fade_frames);
                 frac = frac / IntToFloat(0xC);
                 alpha = 0x7F - FloatToInt(frac * 127.0f);
             }
             if (alpha < 0)
                 alpha = 0;
         }
-        if (id != -1) {
-            if (id2 == -1 || id == id2) {
-                DrawQuadWithRotatedUVs(g_intro_overlay_quad, id, 0, (alpha << 24) | 0x808080, extra);
+        if (overlay_id != -1) {
+            if (old_overlay_id == -1 || overlay_id == old_overlay_id) {
+                DrawQuadWithRotatedUVs(g_intro_overlay_quad, overlay_id, 0, (alpha << 24) | 0x808080, extra);
             } else {
-                DrawQuadWithRotatedUVs(g_intro_overlay_quad, id, 0, (alpha << 24) | 0x808080, extra);
-                DrawQuadWithRotatedUVs(g_intro_overlay_quad, id2, 0, ((0x7F - alpha) << 24) | 0x808080, extra);
+                DrawQuadWithRotatedUVs(g_intro_overlay_quad, overlay_id, 0, (alpha << 24) | 0x808080, extra);
+                DrawQuadWithRotatedUVs(g_intro_overlay_quad, old_overlay_id, 0, ((0x7F - alpha) << 24) | 0x808080, extra);
             }
         }
     }

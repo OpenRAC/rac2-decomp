@@ -2,9 +2,9 @@
 /* func_PAL_L08_003D1540, the PAL copy of func_L08_003CD708: the same C, where the smoothing
  * rates are scaled by 1.44 and the limits by 1.2 for 50 Hz, and the angle constants change. */
 #include "common.h"
-typedef struct { unsigned char pad[0x108]; float x,y,z,baseX,baseY,baseZ; unsigned char gap[0x80]; int flags; } SteeringInputs;
+typedef struct { unsigned char pad[0x108]; float x,y,z,base_x,base_y,base_z; unsigned char gap[0x80]; int flags; } SteeringInputs;
 extern SteeringInputs g_pad_state;
-typedef struct { unsigned char pad[0x1FB4]; float bank; unsigned char gap[0x24B8-0x1FB8]; float tickScale; } SteeringHero;
+typedef struct { unsigned char pad[0x1FB4]; float bank; unsigned char gap[0x24B8-0x1FB8]; float tick_scale; } SteeringHero;
 extern SteeringHero g_hero_state;
 extern int g_vehicle_steering_flag __attribute__((sda)),g_vehicle_active_flag __attribute__((sda));
 extern float g_vehicle_bank_limit_a __attribute__((sda));
@@ -45,12 +45,12 @@ typedef struct { unsigned char pad[0x20]; unsigned char mode; } SteeringObject;
 /* Smooth the steering and orientation targets from the combined controls.
  * mode is 64-bit: its (zero_extend:DI (mem:QI)) differs from the (zero_extend:SI) of the first
  * test, so gcse keeps the second read of the field that retail has. */
-void func_PAL_L08_003D1540(SteeringObject *object,char *state,float inputScale)
+void vehicle_update_steering_pal(SteeringObject *object,char *state,float input_scale)
 {
     u64 mode;
 
     float gain=g_vehicle_steer_gain_a;
-    float targetX,targetY,bias=0.0f;
+    float target_x,target_y,bias=0.0f;
     float limit=g_vehicle_steer_limit_a;
     float bound,value,step;
     float magnitude;
@@ -59,17 +59,17 @@ void func_PAL_L08_003D1540(SteeringObject *object,char *state,float inputScale)
         limit=g_vehicle_steer_limit_c;
         if (I(state,0x50)==0) bias=-2.0f;
     }
-    targetX=(g_pad_state.x-g_pad_state.baseX+g_pad_state.z)*inputScale;
-    targetY=(g_pad_state.y-g_pad_state.baseY+g_pad_state.baseZ+bias)*inputScale;
-    if (targetX>inputScale) targetX=inputScale;
-    else if (targetX < -inputScale) targetX=-inputScale;
-    if (targetY>inputScale) targetY=inputScale;
-    else if (targetY < -inputScale) targetY=-inputScale;
+    target_x=(g_pad_state.x-g_pad_state.base_x+g_pad_state.z)*input_scale;
+    target_y=(g_pad_state.y-g_pad_state.base_y+g_pad_state.base_z+bias)*input_scale;
+    if (target_x>input_scale) target_x=input_scale;
+    else if (target_x < -input_scale) target_x=-input_scale;
+    if (target_y>input_scale) target_y=input_scale;
+    else if (target_y < -input_scale) target_y=-input_scale;
     if (g_pad_state.flags&0x200) {
-        targetX/=g_vehicle_steer_divisor_x;
-        targetY/=g_vehicle_steer_divisor_y;
-        targetX*=g_vehicle_steer_multiplier_x;
-        targetY*=g_vehicle_steer_multiplier_y;
+        target_x/=g_vehicle_steer_divisor_x;
+        target_y/=g_vehicle_steer_divisor_y;
+        target_x*=g_vehicle_steer_multiplier_x;
+        target_y*=g_vehicle_steer_multiplier_y;
         gain=g_vehicle_steer_gain_b;
         limit=g_vehicle_steer_limit_b;
     }
@@ -77,13 +77,13 @@ void func_PAL_L08_003D1540(SteeringObject *object,char *state,float inputScale)
     if (mode==7 || mode<6) goto update_pitch;
     if (g_vehicle_steering_flag) {
         if (mode!=8) {
-            math_spring_float_to_goal((float *)(state+0x60),(float *)(state+0x44),targetY,
+            math_spring_float_to_goal((float *)(state+0x60),(float *)(state+0x44),target_y,
                           g_vehicle_steer_limit_low*1.44f,g_vehicle_steer_limit_high*1.44f,limit*1.2f);
             if (g_vehicle_active_flag)
                 F(state,0x14)=fast_subtract_rotations(F(state,0x14),(F(state,0x60)*0.0003490659f)*g_vehicle_steer_divisor_y);
             bound=g_vehicle_bank_limit_a;
         } else {
-            math_spring_float_to_goal((float *)(state+0x60),(float *)(state+0x44),targetY,
+            math_spring_float_to_goal((float *)(state+0x60),(float *)(state+0x44),target_y,
                           g_vehicle_steer_limit2_low*1.44f,g_vehicle_steer_limit2_high*1.44f,limit*1.2f);
             if (g_vehicle_active_flag)
                 F(state,0x14)=fast_subtract_rotations(F(state,0x14),(F(state,0x60)*0.0003490659f)*g_vehicle_steer_rotation_scale_y);
@@ -105,7 +105,7 @@ void func_PAL_L08_003D1540(SteeringObject *object,char *state,float inputScale)
             if (value>bound) value=bound;
             else if (value<-bound) value=-bound;
             ApproachValue((float *)(state+0x44),value,
-                         g_vehicle_tick_turn_scale*(g_hero_state.tickScale*6.981318e-06f));
+                         g_vehicle_tick_turn_scale*(g_hero_state.tick_scale*6.981318e-06f));
             F(state,0x14)=FastAddRotations(F(state,0x14),F(state,0x44));
         } else {
             math_approach_with_velocity((float *)(state+0x14),0.0f,(float *)(state+0x44),
@@ -113,7 +113,7 @@ void func_PAL_L08_003D1540(SteeringObject *object,char *state,float inputScale)
         }
     }
 update_pitch:
-    math_spring_float_to_goal((float *)(state+0x5C),(float *)(state+0x48),targetX,
+    math_spring_float_to_goal((float *)(state+0x5C),(float *)(state+0x48),target_x,
                   g_vehicle_steer_gain_low*1.44f,g_vehicle_steer_gain_high*1.44f,gain*1.2f);
     if (g_vehicle_active_flag)
         math_approach_with_velocity((float *)(state+0x10),F(state,0x5C)*g_vehicle_steer_target_scale,

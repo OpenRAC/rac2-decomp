@@ -44,37 +44,37 @@ extern void stub_empty_12(void), stub_empty_12(void), gfx_free_point_light(int);
 extern void stub_empty_11(void), stub_empty_11(void), gfx_free_point_light(int);
 
 /* Maintains two beam targets, their acquisition delays, ammunition and the light/sound state. */
-void func_US2_0030A510(char *actor) {
+void tesla_claw_update_us2(char *moby) {
     Vector direction, offset;
-    float local[4] __attribute__((aligned(16)));
+    float beam_dir[4] __attribute__((aligned(16)));
     DualBeamState *beam;
     char *entry;
     u8 *sound;
-    int stopping, active, permitted, ammo, limit;
+    int stopping, active, permitted, ammo_count, limit;
     float fade;
 
     stopping = g_hero_state.i[0x1244 / 4] == 3;
-    beam = *(DualBeamState **)(actor + 0x68);
+    beam = *(DualBeamState **)(moby + 0x68);
     if ((g_pad_state[0x1A4 / 4] & g_hero_state.u[0x1230 / 4]) && !g_hero_state.b[0x22BC]) beam->length = 0.8f;
     g_beam_scale_factor = 0.9f;
     active = 0;
     permitted = 1;
-    ammo = stub_empty_7(-1);
+    ammo_count = stub_empty_7(-1);
     if (g_hero_state.i[0x2294 / 4] == 1) {
         if (!math_fast_float_d(&g_hero_state.i[0x2534 / 4])) permitted = 0;
-        else hud_add_moby_marker(actor, !stub_empty_7(-1) ? 0x600000FF : 0x600FFF0F, 0, 31, -1, 4, 1, 0, 90);
+        else hud_add_moby_marker(moby, !stub_empty_7(-1) ? 0x600000FF : 0x600FFF0F, 0, 31, -1, 4, 1, 0, 90);
     } else g_hero_state.i[0x2534 / 4] = 40;
-    if ((g_pad_state[0x1A0 / 4] & g_hero_state.u[0x1230 / 4]) && (u8)actor[0x20] != 4 && (u8)actor[0x20] &&
+    if ((g_pad_state[0x1A0 / 4] & g_hero_state.u[0x1230 / 4]) && (u8)moby[0x20] != 4 && (u8)moby[0x20] &&
         !g_hero_state.b[0x22BC] && g_hero_state.i[0x2294 / 4] != 0x6F && g_hero_state.i[0x1240 / 4] >= 23 && permitted) {
         if (!beam->timer) {
-            if (ammo > 0) {
+            if (ammo_count > 0) {
             if (FastDecTimer(&beam->ammoTimer)) {
                 FastDecTimer(&beam->targetTimer);
                 FastDecTimer(&beam->secondaryTimer);
                 stub_empty_6(-1, 1);
                 beam->ammoTimer = 10;
             }
-            if (beam->light == -1) beam->light = gfx_add_point_light(actor + 0x10, 0, 7.5f, 0);
+            if (beam->light == -1) beam->light = gfx_add_point_light(moby + 0x10, 0, 7.5f, 0);
             else if (beam->fade < 10) beam->fade++;
             active = 1;
             if (beam->target) {
@@ -96,7 +96,7 @@ void func_US2_0030A510(char *actor) {
                 }
             }
             cam_compute_view_direction(beam, &direction, 1);
-            qcopy(&beam->start, actor + 0x10);
+            qcopy(&beam->start, moby + 0x10);
             FastVecScale(&offset, &direction, 0.7f);
             FastVecAdd(&beam->start, &beam->start, &offset);
             qcopy(&beam->end, &beam->start);
@@ -122,20 +122,20 @@ void func_US2_0030A510(char *actor) {
             } else beam->secondaryAge = 0;
             beam->length += (((g_weapon_table + g_tesla_claw_weapon_index[0])->flag ? 18.0f : 12.0f) - beam->length) * 0.07f;
             if (g_hero_state.h[0x24EC / 2] == 1) {
-                moby_transform_joint_to_world(actor, 0, &beam->start);
-                local[0] = 0;
-                local[1] = -beam->length;
-                local[2] = 0;
-                matrix_mul_vec3(local, local, actor + 0xC0);
-                FastVecAdd(&beam->end, &beam->start, local);
+                moby_transform_joint_to_world(moby, 0, &beam->start);
+                beam_dir[0] = 0;
+                beam_dir[1] = -beam->length;
+                beam_dir[2] = 0;
+                matrix_mul_vec3(beam_dir, beam_dir, moby + 0xC0);
+                FastVecAdd(&beam->end, &beam->start, beam_dir);
             } else {
-                moby_transform_joint_to_world(actor, 0, &beam->start);
+                moby_transform_joint_to_world(moby, 0, &beam->start);
                 vec_scale_to_length(&beam->end, &g_hero_state.f[0x730 / 4], beam->length);
                 FastVecAdd(&beam->end, &beam->start, &beam->end);
             }
-            InitializeElectricWaterBoltEffect(actor);
-            lock_on_update_tether_chain(actor);
-            gfx_register_overlay_draw_callback(beam_draw_ribbons, actor);
+            InitializeElectricWaterBoltEffect(moby);
+            lock_on_update_tether_chain(moby);
+            gfx_register_overlay_draw_callback(beam_draw_ribbons, moby);
             } else {
                 beam->target = 0;
                 beam->secondary = 0;
@@ -156,11 +156,11 @@ void func_US2_0030A510(char *actor) {
         if (beam->fade > 0) beam->fade--;
         if (beam->sound != -1) {
             sound = g_sound_state + beam->sound * 0x70;
-            if (*(char **)(sound + 0x88) == actor && sound[0x74]) snd_stop_voice(beam->sound);
+            if (*(char **)(sound + 0x88) == moby && sound[0x74]) snd_stop_voice(beam->sound);
         }
         beam->sound = -1;
     } else {
-        if (!snd_is_voice_playing_for_owner(actor, beam->sound)) beam->sound = PlayMobySound(4, 4, actor);
+        if (!snd_is_voice_playing_for_owner(moby, beam->sound)) beam->sound = PlayMobySound(4, 4, moby);
     }
     if (!beam->target || (u8)beam->target[0x20] == 0xFE || (u8)beam->target[0x20] == 0xFD ||
         !(*(u16 *)(beam->target + 0x34) & 0x1000))
@@ -168,12 +168,12 @@ void func_US2_0030A510(char *actor) {
     if (!beam->secondary || (u8)beam->secondary[0x20] == 0xFE || (u8)beam->secondary[0x20] == 0xFD ||
         !(*(u16 *)(beam->secondary + 0x34) & 0x1000))
         beam->secondaryReady = 1;
-    switch ((u8)actor[0x20]) {
+    switch ((u8)moby[0x20]) {
     case 0:
         beam->timer = 16;
         beam->light = gfx_add_point_light(&beam->start, 0, 0, 0);
         g_tether_reset_flag = 1;
-        actor[0x20] = 1;
+        moby[0x20] = 1;
         beam->cooldown = 20;
         beam->sound = -1;
         beam->secondary = 0;
@@ -188,7 +188,7 @@ void func_US2_0030A510(char *actor) {
         math_fast_float_d(&beam->timer);
         if (active) {
             stub_empty_11();
-            actor[0x20] = 3;
+            moby[0x20] = 3;
         }
         if ((g_pad_state[0x1A4 / 4] & g_hero_state.u[0x1230 / 4]) && !g_hero_state.b[0x22BC]) {
             if (active) {
@@ -196,14 +196,14 @@ void func_US2_0030A510(char *actor) {
                 if (g_frame_counter > g_statistics_table[18].maximum) g_statistics_table[18].maximum = g_frame_counter;
                 g_statistics_table[18].levels = (g_statistics_table[18].levels | (1u << g_current_map_index)) | 0x80000000u;
                 stub_empty_11();
-                actor[0x20] = 3;
+                moby[0x20] = 3;
             } else {
                 beam->target = 0;
                 beam->secondary = 0;
                 beam->targetReady = 0;
                 beam->secondaryReady = 0;
-                actor[0x20] = 1;
-                PlayMobySound(0, 0, actor);
+                moby[0x20] = 1;
+                PlayMobySound(0, 0, moby);
                 stub_empty_12();
             }
         }
@@ -223,7 +223,7 @@ void func_US2_0030A510(char *actor) {
         beam->secondaryReady = 0;
         beam->length = 0;
         stub_empty_12();
-        actor[0x20] = 1;
+        moby[0x20] = 1;
         break;
     case 2:
     case 4:
@@ -248,5 +248,5 @@ void func_US2_0030A510(char *actor) {
             beam->light = -1;
         }
     }
-    if (stopping && beam->light == -1) actor[0x20] = 4;
+    if (stopping && beam->light == -1) moby[0x20] = 4;
 }

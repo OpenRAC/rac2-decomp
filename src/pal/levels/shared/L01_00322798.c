@@ -9,32 +9,33 @@ extern void moby_set_light_color(void *a0, int a1);
 extern float FastAddRotations(float, float);
 extern float math_random_float_range(float low, float high);
 
-void glow_flicker_update_pal(void *a0, float *a1, int a2) {
-    unsigned char *p = (unsigned char *)a0;
-    float r;
-    int i;
+/* Flickers the glow light colour of a moby and fades its brightness byte up (when on) or down (when off) (PAL). */
+void glow_flicker_update_pal(void *moby, float *phase, int enable) {
+    unsigned char *bytes = (unsigned char *)moby;
+    float wave;
+    int color;
 
-    if (p[0x23] == 0 && a2 == 0)
+    if (bytes[0x23] == 0 && enable == 0)
         return;
 
-    r = FastAddRotations(*a1, 0.17453296f);
-    *a1 = r;
-    r = math_fast_sin_or_cos_b(r);
-    i = FastTweenColor(0x8000C020, 0x80008000, (r + 0.5f) * 0.5f);
+    wave = FastAddRotations(*phase, 0.17453296f);
+    *phase = wave;
+    wave = math_fast_sin_or_cos_b(wave);
+    color = FastTweenColor(0x8000C020, 0x80008000, (wave + 0.5f) * 0.5f);
     if (math_random_float_range(0.0f, 1.0f) < 0.05f)
-        i = FastTweenColor(i, 0x8080FFFF, 0.3f);
-    moby_set_light_color(a0, i);
+        color = FastTweenColor(color, 0x8080FFFF, 0.3f);
+    moby_set_light_color(moby, color);
 
-    if (a2 != 0) {
-        if (p[0x23] < 0x3D)
-            p[0x23] = p[0x23] + 3;
+    if (enable != 0) {
+        if (bytes[0x23] < 0x3D)
+            bytes[0x23] = bytes[0x23] + 3;
         else
-            p[0x23] = 0x40;
+            bytes[0x23] = 0x40;
     } else {
-        if (p[0x23] >= 4)
-            p[0x23] = p[0x23] - 3;
+        if (bytes[0x23] >= 4)
+            bytes[0x23] = bytes[0x23] - 3;
         else
-            p[0x23] = 0;
+            bytes[0x23] = 0;
     }
 }
 

@@ -42,12 +42,12 @@ typedef struct {
     u8 padDC[0x18];
     int page;               /* 0xF4 */
     u8 padF8[8];
-    u8 *savedOwner;         /* 0x100 */
-    int savedCurrent;       /* 0x104 */
+    u8 *saved_owner;         /* 0x100 */
+    int saved_current;       /* 0x104 */
     u8 pad108[0x2C];
     int lock;               /* 0x134 */
     u8 pad138[8];
-    int savedMode;          /* 0x140 */
+    int saved_mode;          /* 0x140 */
 } PageRoot;
 
 typedef struct {
@@ -95,7 +95,8 @@ extern void menu_restore_saved_screen_image(int);
 extern int req_push_queue(char *, int);
 extern int req_launch_queued(char *);
 
-int func_PAL_002D82D8(PageMenu *menu)
+/* Level page menu input: changes the shown page, moves the row selection, goes back and opens the page's special screen. */
+int level_page_menu_update_input_pal(PageMenu *menu)
 {
     int previous, count, old, next, mapped;
 
@@ -198,10 +199,10 @@ done:
             if (g_request_flag_table[word] & bit) {
                 g_vram_frame_base = ((PageRoot *)g_pause_menu_state)->saved;
                 menu_restore_saved_screen_image(0);
-                ((PageRoot *)g_pause_menu_state)->savedMode = g_loader_state_word;
-                ((PageRoot *)g_pause_menu_state)->savedOwner = ((PageRoot *)g_pause_menu_state)->owner;
+                ((PageRoot *)g_pause_menu_state)->saved_mode = g_loader_state_word;
+                ((PageRoot *)g_pause_menu_state)->saved_owner = ((PageRoot *)g_pause_menu_state)->owner;
                 ((PageRoot *)g_pause_menu_state)->page = ((PageMap *)g_map_overlay_state)->page;
-                ((PageRoot *)g_pause_menu_state)->savedCurrent = ((PageRoot *)g_pause_menu_state)->field8;
+                ((PageRoot *)g_pause_menu_state)->saved_current = ((PageRoot *)g_pause_menu_state)->field8;
                 g_loader_state_word = 2;
                 req_push_queue(g_loader_movie, mapped);
                 req_launch_queued(g_loader_movie);

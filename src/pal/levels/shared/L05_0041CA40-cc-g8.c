@@ -30,50 +30,50 @@ extern void wobbling_light_update(void *);
 extern void load_forward_resident_address(void *);
 
 typedef struct {
-    int f0;
-    int f4;
-    short f8;
-    short fA;
+    int unk_0;
+    int unk_4;
+    short unk_8;
+    short unk_A;
     char padC[0x8];
-    int f14;
-    int f18;
-    int f1C;
+    int unk_14;
+    int unk_18;
+    int unk_1C;
     char pad20[0x10];
-    int f30;
-    int f34;
-    int f38;
-    int f3C;
-    char * f40;
-    char * f44;
-    char * f48;
-    char * f4C;
-    char * f50;
-    int f54;
-    int f58;
-    int f5C;
+    int unk_30;
+    int unk_34;
+    int unk_38;
+    int unk_3C;
+    char * unk_40;
+    char * unk_44;
+    char * unk_48;
+    char * unk_4C;
+    char * unk_50;
+    int unk_54;
+    int unk_58;
+    int unk_5C;
     char pad60[0x40];
-    int fA0;
+    int unk_A0;
     char padA4[0x8];
-    char * fAC;
+    char * unk_AC;
     char padB0[0x140];
-    char * f1F0;
-    char * f1F4;
-    char * f1F8;
-    char * f1FC;
-    char * f200;
-    char * f204;
-    char * f208;
-    int f20C;
-    int f210;
+    char * unk_1F0;
+    char * unk_1F4;
+    char * unk_1F8;
+    char * unk_1FC;
+    char * unk_200;
+    char * unk_204;
+    char * unk_208;
+    int unk_20C;
+    int unk_210;
     char pad214[0x4C];
-    int f260;
-    int f264;
-    int f268;
-    int f26C;
-    int f270;
-    char * f274;
-    char * f278;
-    int f27C;
+    int unk_260;
+    int unk_264;
+    int unk_268;
+    int unk_26C;
+    int unk_270;
+    char * unk_274;
+    char * unk_278;
+    int unk_27C;
 } State_L05_00417D48;
 
 typedef struct {
@@ -81,111 +81,111 @@ typedef struct {
     char pos[0x10];
     unsigned char state;
     char pad21[0x13];
-    unsigned short modeBits;
+    unsigned short mode_bits;
     char pad36[0x32];
-    State_L05_00417D48 *pVar;
+    State_L05_00417D48 *vars;
 } Obj_L05_00417D48;
 
 /* State 0 spawns the equipment parts chosen by the D_001A7AF0 selector bits; state 1 updates timers and the
  * position copy. */
-void equipment_holder_update_pal(Obj_L05_00417D48 *o)
+void equipment_holder_update_pal(Obj_L05_00417D48 *obj)
 {
-    State_L05_00417D48 *st = o->pVar;
-    int mode = o->state;
-    int id;
-    unsigned int flags;
+    State_L05_00417D48 *state = obj->vars;
+    int mode = obj->state;
+    int part_class;
+    unsigned int selector;
 
     switch (mode) {
     case 0:
-        st->f30 = -1;
-        st->f270 = -1;
-        st->f260 = 1;
-        st->f264 = 0x2ee0;
-        st->f0 = 0;
-        st->f4 = 0;
-        st->f8 = 0;
-        st->fA = 0;
-        st->f20C = 0;
-        st->f210 = 0;
-        st->f14 = 0;
-        st->f18 = 0;
-        st->f1C = 0;
-        st->f34 = 0;
-        st->f38 = 0;
-        st->f3C = 0;
-        st->f268 = 0;
-        st->f26C = 0;
-        st->f27C = 0;
-        o->state = 1;
-        o->modeBits |= 0x100;
-        func_L05_00418200(o);
+        state->unk_30 = -1;
+        state->unk_270 = -1;
+        state->unk_260 = 1;
+        state->unk_264 = 0x2ee0;
+        state->unk_0 = 0;
+        state->unk_4 = 0;
+        state->unk_8 = 0;
+        state->unk_A = 0;
+        state->unk_20C = 0;
+        state->unk_210 = 0;
+        state->unk_14 = 0;
+        state->unk_18 = 0;
+        state->unk_1C = 0;
+        state->unk_34 = 0;
+        state->unk_38 = 0;
+        state->unk_3C = 0;
+        state->unk_268 = 0;
+        state->unk_26C = 0;
+        state->unk_27C = 0;
+        obj->state = 1;
+        obj->mode_bits |= 0x100;
+        func_L05_00418200(obj);
         vec_clear_128(g_light_spot_sum);
-        g_held_object_ptr[0] = o;
-        flags = g_equipment_bits & 3;
+        g_held_object_ptr[0] = obj;
+        selector = g_equipment_bits & 3;
         g_light_spot_count = 0;
-        o->modeBits |= 0x41;
-        st->f40 = equipment_spawn_part_moby(o, 0.05f, 0, g_equipment_part_class_a[flags]);
-        if (st->f40) *(int *)(st->f40 + 0x98) = 0;
-        flags = (g_equipment_bits >> 2) & 3;
-        id = g_equipment_part_class_b[flags];
-        st->f44 = equipment_spawn_part_moby(o, 0.05f, 0, id);
-        st->f48 = equipment_spawn_part_moby(o, 0.05f, 1, id);
-        if (st->f44) *(int *)(st->f44 + 0x98) = 0;
-        if (st->f48) *(int *)(st->f48 + 0x98) = 0;
-        flags = (g_equipment_bits >> 4) & 3;
-        st->f4C = equipment_spawn_part_moby(o, 0.05f, 0, g_equipment_part_class_c[flags]);
-        if (st->f4C) *(int *)(st->f4C + 0x98) = 0;
-        st->f50 = CreateTransformClone(o, 0.05f);
-        flags = (g_equipment_bits >> 6) & 1;
-        id = g_equipment_part_class_d[flags];
-        st->fAC = equipment_spawn_part_moby(o, 0.05f, 0, id);
-        st->f1F0 = equipment_spawn_part_moby(o, 0.05f, 1, id);
-        if (st->fAC) *(int *)(st->fAC + 0x98) = 0;
-        if (st->f1F0) *(int *)(st->f1F0 + 0x98) = 0;
-        flags = (g_equipment_bits >> 9) & 1;
-        id = g_equipment_part_class_f[flags];
-        st->f1F4 = equipment_spawn_part_moby(o, 0.05f, 0, id);
-        st->f1F8 = equipment_spawn_part_moby(o, 0.05f, 1, id);
-        if (st->f1F4) *(int *)(st->f1F4 + 0x98) = 0;
-        if (st->f1F8) *(int *)(st->f1F8 + 0x98) = 0;
+        obj->mode_bits |= 0x41;
+        state->unk_40 = equipment_spawn_part_moby(obj, 0.05f, 0, g_equipment_part_class_a[selector]);
+        if (state->unk_40) *(int *)(state->unk_40 + 0x98) = 0;
+        selector = (g_equipment_bits >> 2) & 3;
+        part_class = g_equipment_part_class_b[selector];
+        state->unk_44 = equipment_spawn_part_moby(obj, 0.05f, 0, part_class);
+        state->unk_48 = equipment_spawn_part_moby(obj, 0.05f, 1, part_class);
+        if (state->unk_44) *(int *)(state->unk_44 + 0x98) = 0;
+        if (state->unk_48) *(int *)(state->unk_48 + 0x98) = 0;
+        selector = (g_equipment_bits >> 4) & 3;
+        state->unk_4C = equipment_spawn_part_moby(obj, 0.05f, 0, g_equipment_part_class_c[selector]);
+        if (state->unk_4C) *(int *)(state->unk_4C + 0x98) = 0;
+        state->unk_50 = CreateTransformClone(obj, 0.05f);
+        selector = (g_equipment_bits >> 6) & 1;
+        part_class = g_equipment_part_class_d[selector];
+        state->unk_AC = equipment_spawn_part_moby(obj, 0.05f, 0, part_class);
+        state->unk_1F0 = equipment_spawn_part_moby(obj, 0.05f, 1, part_class);
+        if (state->unk_AC) *(int *)(state->unk_AC + 0x98) = 0;
+        if (state->unk_1F0) *(int *)(state->unk_1F0 + 0x98) = 0;
+        selector = (g_equipment_bits >> 9) & 1;
+        part_class = g_equipment_part_class_f[selector];
+        state->unk_1F4 = equipment_spawn_part_moby(obj, 0.05f, 0, part_class);
+        state->unk_1F8 = equipment_spawn_part_moby(obj, 0.05f, 1, part_class);
+        if (state->unk_1F4) *(int *)(state->unk_1F4 + 0x98) = 0;
+        if (state->unk_1F8) *(int *)(state->unk_1F8 + 0x98) = 0;
         if (table_find_last_used_entry(3)) {
-            flags = (g_equipment_bits >> 7) & 3;
-            id = g_equipment_part_class_e[flags];
-            if (id) {
-                st->f1FC = equipment_spawn_part_moby(o, 0.05f, 0, id);
-                st->f200 = equipment_spawn_part_moby(o, 0.05f, 1, id);
-                if (st->f1FC) *(int *)(st->f1FC + 0x98) = 0;
-                if (st->f200) *(int *)(st->f200 + 0x98) = 0;
+            selector = (g_equipment_bits >> 7) & 3;
+            part_class = g_equipment_part_class_e[selector];
+            if (part_class) {
+                state->unk_1FC = equipment_spawn_part_moby(obj, 0.05f, 0, part_class);
+                state->unk_200 = equipment_spawn_part_moby(obj, 0.05f, 1, part_class);
+                if (state->unk_1FC) *(int *)(state->unk_1FC + 0x98) = 0;
+                if (state->unk_200) *(int *)(state->unk_200 + 0x98) = 0;
             }
         }
-        flags = (g_equipment_bits >> 10) & 3;
-        id = g_equipment_part_class_g[flags];
-        st->f204 = equipment_spawn_part_moby(o, 0.05f, 0, id);
-        st->f208 = equipment_spawn_part_moby(o, 0.05f, 1, id);
-        if (st->f204) *(int *)(st->f204 + 0x98) = 0;
-        if (st->f208) *(int *)(st->f208 + 0x98) = 0;
+        selector = (g_equipment_bits >> 10) & 3;
+        part_class = g_equipment_part_class_g[selector];
+        state->unk_204 = equipment_spawn_part_moby(obj, 0.05f, 0, part_class);
+        state->unk_208 = equipment_spawn_part_moby(obj, 0.05f, 1, part_class);
+        if (state->unk_204) *(int *)(state->unk_204 + 0x98) = 0;
+        if (state->unk_208) *(int *)(state->unk_208 + 0x98) = 0;
         if (table_find_last_used_entry(4) != -1) {
-            st->f274 = equipment_spawn_part_moby(o, 0.05f, 0, 0x10E2);
-            if (st->f274) *(int *)(st->f274 + 0x98) = 0;
+            state->unk_274 = equipment_spawn_part_moby(obj, 0.05f, 0, 0x10E2);
+            if (state->unk_274) *(int *)(state->unk_274 + 0x98) = 0;
         }
         if (table_find_last_used_entry(5) != -1) {
-            st->f278 = equipment_spawn_part_moby(o, 0.05f, 0, 0x10E4);
-            if (st->f278) *(int *)(st->f278 + 0x98) = 0;
+            state->unk_278 = equipment_spawn_part_moby(obj, 0.05f, 0, 0x10E4);
+            if (state->unk_278) *(int *)(state->unk_278 + 0x98) = 0;
         }
-        st->f58 = 70;
-        st->f54 = 60;
-        st->f5C = 0;
-        st->fA0 = 0;
+        state->unk_58 = 70;
+        state->unk_54 = 60;
+        state->unk_5C = 0;
+        state->unk_A0 = 0;
         break;
     case 1:
-        if (hero_get_shield_value() < hero_get_shield_limit()) st->f260 = mode;
-        if (st->f260) {
-            if (math_fast_float_d((char *)&st->f264)) st->f268 = mode;
+        if (hero_get_shield_value() < hero_get_shield_limit()) state->unk_260 = mode;
+        if (state->unk_260) {
+            if (math_fast_float_d((char *)&state->unk_264)) state->unk_268 = mode;
         }
-        if (!snd_is_voice_playing_for_owner(o, st->f30)) st->f30 = PlayMobySound(0, 4, o);
-        wobbling_light_update(o);
-        qcopy(g_light_spot_position, o->pos);
-        load_forward_resident_address(o);
+        if (!snd_is_voice_playing_for_owner(obj, state->unk_30)) state->unk_30 = PlayMobySound(0, 4, obj);
+        wobbling_light_update(obj);
+        qcopy(g_light_spot_position, obj->pos);
+        load_forward_resident_address(obj);
         break;
     }
 }

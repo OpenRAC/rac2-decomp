@@ -110,7 +110,7 @@ extern char *part_find_owned_effect_slot(void *,u32,int);
 extern int moby_apply_damage_to_object(void *,void *,int);
 extern int weapon_select_aim_target(void *,int,void *,int,float,float);
 /* Initializes the fighter's complete parameter groups, then handles proximity and damage. */
-void func_PAL_L17_003ED568(char *object)
+void snapper_init_state_check_hits_pal(char *object)
 {
     FighterState *state=(FighterState *)P(object,0x68);
     char *hit;

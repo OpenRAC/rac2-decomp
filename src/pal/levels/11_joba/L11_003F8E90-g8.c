@@ -26,7 +26,7 @@ extern float g_joba_spark_ground_effect_param __attribute__((sda));
 extern float g_joba_spark_size_min __attribute__((sda));
 extern float g_joba_spark_size_max __attribute__((sda));
 
-void func_PAL_L11_003F8E90(char *pos, int count) {
+void part_spawn_beam_hit_sparks_pal(char *pos, int count) {
     float velocity[4] __attribute__((aligned(16)));
     float point[4] __attribute__((aligned(16)));
     float direction[4] __attribute__((aligned(16)));

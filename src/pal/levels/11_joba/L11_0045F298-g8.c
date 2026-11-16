@@ -30,14 +30,15 @@ extern float g_effect_size_max __attribute__((sda));
 extern int g_ground_effect_kind_a __attribute__((sda));
 extern int g_ground_effect_kind_b __attribute__((sda));
 
-void func_PAL_L11_0045F298(float *p, int count, int mode)
+/* Sprays smoke puffs and spinning sparks from a point away from the player; mode 1 is the smaller burst (PAL: 50 Hz timings). */
+void part_spray_smoke_and_sparks_pal(float *origin, int count, int mode)
 {
-    float vel[4], pos[4], axis[4], up[4], a[4], b[4], out[4];
+    float vel[4], pos[4], axis[4], up[4], to_hero[4], step[4], out[4];
     int i, j, sign;
     char *effect;
-    float size, speed, angle, r;
+    float size, speed, angle, azimuth;
 
-    FastVecSub(axis, g_hero_l11_position, p);
+    FastVecSub(axis, g_hero_l11_position, origin);
     axis[2] = 0;
     up[0] = 0;
     up[1] = 0;
@@ -53,7 +54,7 @@ void func_PAL_L11_0045F298(float *p, int count, int mode)
         speed = math_random_float_range(g_smoke_spray_speed_min, g_smoke_spray_speed_max) * 0.020000001f;
         vec_scale_to_length((char *)vel, vel, speed);
         vel[2] = math_random_float_range(g_smoke_spray_rise_min, g_smoke_spray_rise_max) * 0.020000001f;
-        qcopy(pos, p);
+        qcopy(pos, origin);
         pos[0] += math_random_signed_float_range(0, 0.15f);
         pos[1] += math_random_signed_float_range(0, 0.15f);
         pos[2] += math_random_signed_float_range(0, 0.15f);
@@ -65,9 +66,9 @@ void func_PAL_L11_0045F298(float *p, int count, int mode)
                     effect[9] = FloatToInt(4.0f) + 112;
                 effect = part_spawn_ground_effect(pos, 50, g_ground_effect_kind_b, size * 0.245f, size * 0.7f, g_ground_effect_param * 1.44f, 1, -sign, vel, 0);
             } else {
-                FastVecSub(a, g_hero_l11_position, pos);
-                vec_scale_to_length((char *)a, a, speed);
-                FastVecAdd(vel, vel, a);
+                FastVecSub(to_hero, g_hero_l11_position, pos);
+                vec_scale_to_length((char *)to_hero, to_hero, speed);
+                FastVecAdd(vel, vel, to_hero);
                 effect = part_spawn_ground_effect(pos, 33, g_ground_effect_kind_a, size * 2.05f, size, g_ground_effect_param * 1.44f, 0, sign, vel, 0);
                 if (effect)
                     effect[9] = FloatToInt(4.0f) + 112;
@@ -81,9 +82,9 @@ void func_PAL_L11_0045F298(float *p, int count, int mode)
                     effect[9] = FloatToInt(4.0f) + 112;
                 effect = part_spawn_ground_effect(pos, 50, g_ground_effect_kind_b, size * (0.3f * 0.7f), size * 0.7f, g_ground_effect_param * 1.44f, 1, -sign, vel, 0);
             } else {
-                FastVecSub(a, g_hero_l11_position, pos);
-                vec_scale_to_length((char *)a, a, speed);
-                FastVecAdd(vel, vel, a);
+                FastVecSub(to_hero, g_hero_l11_position, pos);
+                vec_scale_to_length((char *)to_hero, to_hero, speed);
+                FastVecAdd(vel, vel, to_hero);
                 effect = part_spawn_ground_effect(pos, 33, g_ground_effect_kind_a, size * 0.25f, size, g_ground_effect_param * 1.44f, 0, sign, vel, 0);
                 if (effect)
                     effect[9] = FloatToInt(4.0f) + 112;
@@ -95,18 +96,18 @@ void func_PAL_L11_0045F298(float *p, int count, int mode)
     }
     for (j = 1; j >= 0; j--) {
         angle = math_random_float_range(-0.9599312f, -1.3962636f);
-        r = math_random_angle();
-        vec_build_spherical_offset(a, math_random_float_range(0, 0.5f) * 0.020000001f, r, angle);
-        FastVecSub(b, g_hero_l11_position, p);
-        vec_scale_to_length((char *)b, b, 0.15f);
-        FastVecAdd(p, p, b);
+        azimuth = math_random_angle();
+        vec_build_spherical_offset(to_hero, math_random_float_range(0, 0.5f) * 0.020000001f, azimuth, angle);
+        FastVecSub(step, g_hero_l11_position, origin);
+        vec_scale_to_length((char *)step, step, 0.15f);
+        FastVecAdd(origin, origin, step);
         size = math_random_float_range(30000, 60000);
-        out[0] = p[0] + math_random_signed_float_range(0, 0.15f);
-        out[1] = p[1] + math_random_signed_float_range(0, 0.15f);
-        out[2] = p[2] + math_random_signed_float_range(0, 0.15f);
+        out[0] = origin[0] + math_random_signed_float_range(0, 0.15f);
+        out[1] = origin[1] + math_random_signed_float_range(0, 0.15f);
+        out[2] = origin[2] + math_random_signed_float_range(0, 0.15f);
         if (mode)
-            part_spawn_spinning_particle(out, a, 0x4F93E5FF, 0x102434EE, size, 0.5f, math_random_int_range(8, 17), 1, -1, -1, 0);
+            part_spawn_spinning_particle(out, to_hero, 0x4F93E5FF, 0x102434EE, size, 0.5f, math_random_int_range(8, 17), 1, -1, -1, 0);
         else
-            part_spawn_spinning_particle(out, a, 0x4F93E5FF, 0x102434EE, size, 0.5f, math_random_int_range(21, 50), 1, -1, -1, 0);
+            part_spawn_spinning_particle(out, to_hero, 0x4F93E5FF, 0x102434EE, size, 0.5f, math_random_int_range(21, 50), 1, -1, -1, 0);
     }
 }

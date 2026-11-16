@@ -35,7 +35,8 @@ extern void FastVecAdd(void *, void *, void *);
 /* func_00331238 is in 0032EB28-spark.c. */
 
 
-void part_spawn_spark_burst_2_pal(TI128 *a0, void *dir)
+/* Spawns eight pairs of coloured puffs around a point halfway along direction (PAL: same as USA v1.01). */
+void part_spawn_spark_burst_2_pal(TI128 *position, void *direction)
 {
     EffectVector base;
     float vel[4];
@@ -45,8 +46,8 @@ void part_spawn_spark_burst_2_pal(TI128 *a0, void *dir)
     int rnd;
     unsigned char *p;
 
-    qcopy(&base, a0);
-    FastVecScale(vel, dir, 0.5f);
+    qcopy(&base, position);
+    FastVecScale(vel, direction, 0.5f);
     FastVecAdd(&base, &base, vel);
     i = 8;
     do {
@@ -67,9 +68,10 @@ void part_spawn_spark_burst_2_pal(TI128 *a0, void *dir)
 
 extern s32 FastTweenColor(s32, s32, f32);
 extern s32 FloatToInt(f32 value);
-extern u8 *func_PAL_002C23B8(f32 *pos, f32 *sym, s32 a2, s32 a3, u32 color, s32 alpha, f32 f12, f32 f13, f32 f14, f32 f15, f32 f16);
+extern u8 *part_spawn_burst_pal(f32 *pos, f32 *sym, s32 a2, s32 a3, u32 color, s32 alpha, f32 f12, f32 f13, f32 f14, f32 f15, f32 f16);
 extern u8 *g_part_tex_flash_puffs_table;
 
+/* Spawns two flash puffs and one coloured puff near pos, sized by scale. */
 void part_spawn_flash_puffs_pal(f32 *pos, f32 scale)
 {
     f32 v[3];
@@ -80,9 +82,9 @@ void part_spawn_flash_puffs_pal(f32 *pos, f32 scale)
     v[0] = pos[0] + math_random_signed_float_range(0.0f, 0.04f);
     v[1] = pos[1] + math_random_signed_float_range(0.0f, 0.04f);
     v[2] = pos[2] + math_random_signed_float_range(0.0f, 0.04f);
-    func_PAL_002C23B8(v, g_default_effect_vector, 12, 0x5F, 0x7F7F7F, FloatToInt(math_random_signed_float_range(1.0f, 3.0f)), size, 500.0f, 1.0f, 0.0f, 0.0f);
+    part_spawn_burst_pal(v, g_default_effect_vector, 12, 0x5F, 0x7F7F7F, FloatToInt(math_random_signed_float_range(1.0f, 3.0f)), size, 500.0f, 1.0f, 0.0f, 0.0f);
     }
-    effect = func_PAL_002C23B8(v, g_default_effect_vector, 12, 0x7F, 0x407FFF, FloatToInt(math_random_signed_float_range(1.0f, -1.0f)), size * 0.8f, 500.0f, 1.0f, 0.0f, 0.0f);
+    effect = part_spawn_burst_pal(v, g_default_effect_vector, 12, 0x7F, 0x407FFF, FloatToInt(math_random_signed_float_range(1.0f, -1.0f)), size * 0.8f, 500.0f, 1.0f, 0.0f, 0.0f);
     if (effect != 0) {
         effect[2] = g_part_tex_flash_puffs_table[5];
     }

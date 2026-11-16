@@ -3,77 +3,79 @@
 
 typedef struct {
     char pad0[0x8];
-    int unk08;
-    int *unk0C;
+    int max_value;
+    int *value_ptr;
     char pad10[0x38];
-    short unk48;
-    short unk4A;
+    short unk_48;
+    short unk_4A;
     char pad4C[0x4];
-    int unk50;
-    int unk54;
-    int w;
-    int h;
+    int unk_50;
+    int unk_54;
+    int width;
+    int height;
     int flags;
     char pad64[0x8];
-    int unk6C;
-    unsigned char cnt[4];
-    int unk74;
-    int unk78;
-    int unk7C;
-    void *unk80;
+    int unk_6C;
+    unsigned char counter_bytes[4];
+    int shown_value;
+    int target_value;
+    int show_timer;
+    void *unk_80;
 } HudElem;
 typedef unsigned char u8;
 
-void hud_init_counter_element_pal(HudElem *a0) { a0->unk7C = 0xB4; a0->unk48 = 0; a0->unk4A = 0; hud_init_counter_values((u8 *)a0); }
+/* Starts a counter element: shows it for 180 frames and sets up its counter values. */
+void hud_init_counter_element_pal(HudElem *element) { element->show_timer = 0xB4; element->unk_48 = 0; element->unk_4A = 0; hud_init_counter_values((u8 *)element); }
 
 extern float IntToFloat(int);
 extern int FloatToInt(float);
 extern float square_root(float);
-extern int func_PAL_0028E800(void *);
+extern int hud_pick_anim_frame_pal(void *);
 
-void hud_update_counter_element_pal(HudElem *p)
+/* Moves the shown counter value toward the real one and fades the element in and out (PAL: 50 Hz timings). */
+void hud_update_counter_element_pal(HudElem *element)
 {
-    unsigned char *c = p->cnt;
+    unsigned char *counter = element->counter_bytes;
     int delta, limit, step;
-    if (p->unk0C) {
-        int value = *p->unk0C;
+    if (element->value_ptr) {
+        int value = *element->value_ptr;
         if (value < 0) value = 0;
-        p->unk78 = value;
-        if (p->unk08 < value) p->unk78 = p->unk08;
+        element->target_value = value;
+        if (element->max_value < value) element->target_value = element->max_value;
     }
-    if (p->unk74 != p->unk78) {
-        p->unk7C = 150;
-        if (p->unk6C >= 24) {
-            delta = __builtin_abs(p->unk74 - p->unk78);
+    if (element->shown_value != element->target_value) {
+        element->show_timer = 150;
+        if (element->unk_6C >= 24) {
+            delta = __builtin_abs(element->shown_value - element->target_value);
             if (delta) {
                 step = FloatToInt(square_root(IntToFloat(delta) * 0.04f) * 5.0f);
                 limit = delta / 4;
                 if (step < limit) step = limit;
                 if (step > 121) step = 121;
                 else if (step < 1) step = 1;
-                c[3] += step;
-                if (c[3] >= 3) {
-                    step = c[3] / 2;
-                    if (p->unk78 < p->unk74) p->unk74 -= step;
-                    else p->unk74 += step;
-                    c[3] -= step * 2;
+                counter[3] += step;
+                if (counter[3] >= 3) {
+                    step = counter[3] / 2;
+                    if (element->target_value < element->shown_value) element->shown_value -= step;
+                    else element->shown_value += step;
+                    counter[3] -= step * 2;
                 }
             }
         }
     }
-    if (p->unk7C >= 4) {
-        if (c[0] < 7) c[0]++;
-        else if (c[1] < 7) c[1]++;
+    if (element->show_timer >= 4) {
+        if (counter[0] < 7) counter[0]++;
+        else if (counter[1] < 7) counter[1]++;
     } else {
-        if (c[1] != 0 || c[0] != 0) p->unk6C = 1;
+        if (counter[1] != 0 || counter[0] != 0) element->unk_6C = 1;
         {
-            int fade = c[1];
-            if (fade) c[1] = fade - 1;
+            int fade = counter[1];
+            if (fade) counter[1] = fade - 1;
             else {
-                if (c[0]) c[0]--;
+                if (counter[0]) counter[0]--;
             }
         }
     }
-    func_PAL_0028E800((char *)p + 0x40);
+    hud_pick_anim_frame_pal((char *)element + 0x40);
 }
 

@@ -29,10 +29,10 @@ extern int CollLine(void *, void *, int, void *, int);
 extern int GetCollHitMaterial(void);
 extern void vec_clamp_length(void *, float);
 extern int PlayMobySound(int, int, void *);
-extern void func_PAL_002A7E68(void *, int, int, int);
+extern void anim_start_blended_pal(void *, int, int, int);
 extern void make_hit_descriptor(void *, void *, int, void *, float);
 extern void QueueMobyImpact(void *, void *);
-extern void func_PAL_L04_00410678(void *, void *, int, int);
+extern void part_l04_spawn_burst_pal(void *, void *, int, int);
 #define I(p, o) (*(int *)((u8 *)(p) + (o)))
 #define F(p, o) (*(float *)((u8 *)(p) + (o)))
 #define S(p, o) (*(short *)((u8 *)(p) + (o)))
@@ -41,20 +41,20 @@ extern void func_PAL_L04_00410678(void *, void *, int, int);
 
 /* Moves a vehicle along its velocity in steps shorter than its collision radius,
    handles each hit by what was struck, and slides the velocity along the surface. */
-int func_PAL_L04_00418180(u8 *object, Vec *pos, Vec *vel, Vec *prev, Vec *hitpos,
-                      Vec *bounce, Vec *normalOut, int *flag, int mode, int *wall,
-                      float friction, float slope, float slopeLimit, float height, float radius)
+int resolve_vehicle_movement_collisions_pal(u8 *object, Vec *pos, Vec *vel, Vec *prev, Vec *hitpos,
+                      Vec *bounce, Vec *normal_out, int *flag, int mode, int *wall,
+                      float friction, float slope, float slope_limit, float height, float radius)
 {
     Vec oldpos, cur, direction, step, up, horizontal, normal;
     u8 damage[0x30] __attribute__((aligned(16)));
-    int result = 0, ground, savedHit, type;
-    float remaining, segment, dot, vertical, oldVertical, angle;
+    int result = 0, ground, saved_hit, type;
+    float remaining, segment, dot, vertical, old_vertical, angle;
     int animation;
     u8 *a, *b, *other, *anim;
 
     cur.q = oldpos.q = pos->q;
     ground = 1;
-    savedHit = 0;
+    saved_hit = 0;
     if (mode && g_race_mode_active_flag) {
         g_race_mode_active_flag = 0;
         return 2;
@@ -86,24 +86,24 @@ int func_PAL_L04_00418180(u8 *object, Vec *pos, Vec *vel, Vec *prev, Vec *hitpos
                 cur.f[2] = vertical;
                 horizontal.f[2] = 0;
                 func_001290E0(&horizontal, &horizontal);
-                if (!savedHit) {
+                if (!saved_hit) {
                     hitpos->q = ((Vec *)(&g_probe_hit.point))->q;
-                    savedHit = 1;
+                    saved_hit = 1;
                 }
                 type = 0xA1F;
                 result = 1;
                 if (S(g_probe_hit.object, 0xAA) == type) {
                     result = 2;
-                } else if (!mode && S(g_probe_hit.object, 0xAA) == 0xB2D) {
+                } else if (!mode && S(g_probe_hit.object, 0xAA) == MOBY_CLASS_ENEMY_HOVERBIKE) {
                     a = P(g_probe_hit.object, 0x68);
                     I(a, 0x178) = 33;
                     FastVecScale(a + 0x100, &horizontal, -0.05f);
                     a = P(object, 0x68);
                     I(a, 0x178) = 33;
                     FastVecScale(a + 0x100, &horizontal, 0.05f);
-                } else if ((mode && S(g_probe_hit.object, 0xAA) == 0xB2D)
+                } else if ((mode && S(g_probe_hit.object, 0xAA) == MOBY_CLASS_ENEMY_HOVERBIKE)
                            || (!mode && S(g_probe_hit.object, 0xAA) == 0xBBC)) {
-                    func_PAL_L04_00410678(&g_probe_hit.point, vel, 2, 0);
+                    part_l04_spawn_burst_pal(&g_probe_hit.point, vel, 2, 0);
                     if (mode) {
                         b = P(object, 0x68);
                         other = g_probe_hit.object;
@@ -133,7 +133,7 @@ int func_PAL_L04_00418180(u8 *object, Vec *pos, Vec *vel, Vec *prev, Vec *hitpos
                             } else {
                                 I(b, 0x36C) = 25;
                                 S(b, 0x34A) = animation;
-                                func_PAL_002A7E68(anim, animation, 3, 2);
+                                anim_start_blended_pal(anim, animation, 3, 2);
                             }
                         }
                     }
@@ -173,26 +173,26 @@ int func_PAL_L04_00418180(u8 *object, Vec *pos, Vec *vel, Vec *prev, Vec *hitpos
                         F(a, 0x1E8) = 1;
                     }
                     *flag = 2;
-                } else if (S(g_probe_hit.object, 0xAA) == 0x8BA || S(g_probe_hit.object, 0xAA) == 0xA77) {
+                } else if (S(g_probe_hit.object, 0xAA) == 0x8BA || S(g_probe_hit.object, 0xAA) == MOBY_CLASS_HOVERBIKE_RACE_BOMB) {
                     *flag = 3;
                     make_hit_descriptor(damage, object, 0x30000, &step, 1.0f);
                     B(damage, 0x18) = 0;
                     B(damage, 0x19) = 1;
                     S(damage, 0x1A) = S(object, 0xAA);
                     QueueMobyImpact(g_probe_hit.object, damage);
-                    if (friction > 0.3f || S(g_probe_hit.object, 0xAA) == 0xA77) result = 2;
+                    if (friction > 0.3f || S(g_probe_hit.object, 0xAA) == MOBY_CLASS_HOVERBIKE_RACE_BOMB) result = 2;
                 }
             } else {
                 cur.q = ((Vec *)(&g_probe_hit.position))->q;
                 result = 1;
-                if (!savedHit) {
+                if (!saved_hit) {
                     hitpos->q = ((Vec *)(&g_probe_hit.point))->q;
-                    savedHit = 1;
+                    saved_hit = 1;
                 }
                 dot = FastVecDot(&direction, &normal);
                 if (dot < -0.2f) *wall = 1;
                 else *wall = 0;
-                if ((slopeLimit < slope && dot < -0.866f) || GetCollHitMaterial() == 1 || GetCollHitMaterial() == 3) {
+                if ((slope_limit < slope && dot < -0.866f) || GetCollHitMaterial() == 1 || GetCollHitMaterial() == 3) {
                     cur.q = ((Vec *)(&g_probe_hit.position))->q;
                     vec_fast_normalize(bounce, vel, &normal);
                     result = 2;
@@ -202,9 +202,9 @@ int func_PAL_L04_00418180(u8 *object, Vec *pos, Vec *vel, Vec *prev, Vec *hitpos
                 if (GetCollHitMaterial() == 2 || GetCollHitMaterial() == 4) *flag = 1;
             }
             if (normal.f[2] > 0.707f && !g_probe_hit.object) {
-                normalOut->q = normal.q;
-                dot = FastVecDot(vel, normalOut);
-                FastVecScale(&step, normalOut, -dot);
+                normal_out->q = normal.q;
+                dot = FastVecDot(vel, normal_out);
+                FastVecScale(&step, normal_out, -dot);
                 FastVecAdd(vel, vel, &step);
                 vertical = vel->f[2];
                 vel->f[2] = 0;
@@ -244,16 +244,16 @@ int func_PAL_L04_00418180(u8 *object, Vec *pos, Vec *vel, Vec *prev, Vec *hitpos
             pos->q = ((Vec *)(&g_probe_hit.position))->q;
             angle = mat_fast_helper_a(g_probe_hit.normal.f[2], vec_length_xy(&g_probe_hit.normal));
             if (angle < 0.785398245f) {
-                oldVertical = vel->f[2];
-                vec_scale_to_length(normalOut, &g_probe_hit.normal, 1.0f);
-                dot = FastVecDot(vel, normalOut);
-                FastVecScale(&step, normalOut, -dot);
+                old_vertical = vel->f[2];
+                vec_scale_to_length(normal_out, &g_probe_hit.normal, 1.0f);
+                dot = FastVecDot(vel, normal_out);
+                FastVecScale(&step, normal_out, -dot);
                 FastVecAdd(vel, vel, &step);
                 vertical = vel->f[2];
                 vel->f[2] = 0;
                 vec_clamp_length(vel, friction);
                 if (!g_probe_hit.object || vertical < 0) vel->f[2] = vertical;
-                if (oldVertical < 0 && vel->f[2] > 0) vel->f[2] = 0;
+                if (old_vertical < 0 && vel->f[2] > 0) vel->f[2] = 0;
                 prev->f[2] = vel->f[2];
             } else if (vel->f[2] > 0) {
                 vel->f[2] = 0;

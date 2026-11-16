@@ -12,7 +12,7 @@ extern int FastDecTimer(char *a0);
 extern void value_set_and_smooth(int a0, void *a1, int a2, int a3, f32 f12);
 
 /* Re-arms the frame's four spawn slots, bumps the object's counter and re-runs the stage. */
-void func_PAL_L09_003FD248(char *object) {
+void trooper_rearm_spawn_timers_pal(char *object) {
     char *frame = *(char **)(object + 0x68);
 
     if (*(unsigned char *)(frame + 0x2EA) != 0) {

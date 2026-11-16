@@ -21,12 +21,12 @@ extern void object_set_second_float4(void *, float, float, float, float);
    253.0 and 200.0 in it, names the four children at +0x00, +0x4C, +0xE4 and
    +0x130, gives each of them its colour and its metric, and ends with the
    object's own fields at +0x170, +0x174, +0x178 and +0x17C. */
-void list_menu_init_pal(char *object, void *arg)
+void list_menu_init_pal(char *object, void *parent)
 {
     int *allocation;
-    *(void **)(object + 0x184) = arg;
-    if (arg != 0) {
-        allocation = ui_return_second_arg(16, pool_alloc_cell(arg));
+    *(void **)(object + 0x184) = parent;
+    if (parent != 0) {
+        allocation = ui_return_second_arg(16, pool_alloc_cell(parent));
         *(int **)(object + 0x180) = allocation;
         allocation[1] = 0;
         allocation[2] = 0;
@@ -36,11 +36,11 @@ void list_menu_init_pal(char *object, void *arg)
     *(int *)(object + 0x170) = 1;
     (*(float **)(object + 0x180))[0] = 253.0f;
     (*(float **)(object + 0x180))[1] = 200.0f;
-    object_init_derived_arrays(object, g_menu_widget_desc_first, arg);
-    object_init_derived_arrays(object + 0x4C, g_menu_widget_desc_third, arg);
-    object_init_derived_arrays(object + 0xE4, g_menu_frame_desc, arg);
-    object_init_derived_c(object + 0x130, g_menu_small_icon_desc, arg);
-    list_menu_reset_attach_items(object + 0x188, arg);
+    object_init_derived_arrays(object, g_menu_widget_desc_first, parent);
+    object_init_derived_arrays(object + 0x4C, g_menu_widget_desc_third, parent);
+    object_init_derived_arrays(object + 0xE4, g_menu_frame_desc, parent);
+    object_init_derived_c(object + 0x130, g_menu_small_icon_desc, parent);
+    list_menu_reset_attach_items(object + 0x188, parent);
     *object_get_fourth_field(object) = 0x60442D00;
     *object_get_fourth_field(object + 0x4C) = 0x55F0C070;
     *object_get_fourth_field(object + 0xE4) = 0x70FFFEED;

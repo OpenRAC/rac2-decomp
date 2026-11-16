@@ -3,8 +3,8 @@
 
 typedef unsigned char u8;
 
-extern void func_PAL_002A7E68(void *, int, int, int);
-extern void func_PAL_002A7E68(void *, int, int, int);
+extern void anim_start_blended_pal(void *, int, int, int);
+extern void anim_start_blended_pal(void *, int, int, int);
 extern int FastDecTimer(void *);
 extern float math_random_float_range(float, float);
 extern int FloatToInt(float);
@@ -47,23 +47,23 @@ extern int FloatToInt(float);
 /* func_L02_0042EDD0 is matched in L02_0042EDD0-g8.c (built with -frac2-no-annulled-wide-stores -frac2-zero-ti-barrier). */
 
 /* Picks the evasive state the object should take while the resident timer runs. */
-void func_PAL_L02_00445550(u8 *a0) {
-    u8 *s0 = a0;
-    u8 *s1 = *(u8 **)(s0 + 0x68);
-    int m;
+void moby_pick_evasive_anim_state_pal(u8 *moby) {
+    u8 *self = moby;
+    u8 *effect = *(u8 **)(self + 0x68);
+    int state;
 
-    if (FastDecTimer(s1 + 0x48) == 0)
+    if (FastDecTimer(effect + 0x48) == 0)
         return;
-    if (*(int *)(s1 + 0x44) != 0 || math_random_float_range(0.0f, 1.0f) < 0.8f) {
-        if (*(u8 *)(s0 + 0x42) != 1)
-            m = 1;
+    if (*(int *)(effect + 0x44) != 0 || math_random_float_range(0.0f, 1.0f) < 0.8f) {
+        if (*(u8 *)(self + 0x42) != 1)
+            state = 1;
         else
-            m = 2;
-        if (*(u8 *)(s0 + 0x43) != m)
-            func_PAL_002A7E68(s0, m, 0, 0x19);
+            state = 2;
+        if (*(u8 *)(self + 0x43) != state)
+            anim_start_blended_pal(self, state, 0, 0x19);
     } else {
-        if (*(u8 *)(s0 + 0x43) != 0)
-            func_PAL_002A7E68(s0, 0, 0, 0x19);
+        if (*(u8 *)(self + 0x43) != 0)
+            anim_start_blended_pal(self, 0, 0, 0x19);
     }
-    *(short *)(s1 + 0x48) = (((int)(FloatToInt(math_random_float_range(135.0f, 225.0f))) * 5 + 2) / 6);
+    *(short *)(effect + 0x48) = (((int)(FloatToInt(math_random_float_range(135.0f, 225.0f))) * 5 + 2) / 6);
 }

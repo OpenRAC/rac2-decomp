@@ -1,9 +1,9 @@
 #include "names.h"
 /* func_US2_L11_00445CB4: v2.00's copy of func_L11_00444400 (src/levels/11_joba/L11_00444400-g8.c),
  * the Joba six-box HUD, with the same changes as its Maktar Nebula twin func_US2_L02_003FFEDC
- * (src/us2/levels/02_maktar_nebula/L02_003FFEDC-g8.c): text ids lowered by 0x16A, the rB0 title
- * drawn with func_00280200, the r70 title's routine picked by func_US2_L02_003FF750, and the r70 and
- * rB0 boxes read from two-row tables indexed by it. Names as in v1.01; each table keeps the name of
+ * (src/us2/levels/02_maktar_nebula/L02_003FFEDC-g8.c): text ids lowered by 0x16A, the box_d title
+ * drawn with func_00280200, the box_b title's routine picked by func_US2_L02_003FF750, and the box_b and
+ * box_d boxes read from two-row tables indexed by it. Names as in v1.01; each table keeps the name of
  * the x it replaced. Built with -frac2-frame-pointer-liveness, as the twin: the flag lets flow2 drop
  * a dead set-once store left in $fp. */
 #include "common.h"
@@ -86,7 +86,7 @@ extern void UpdateViewContext(void);
 extern void text_draw_window_small(Rect *, u64, char *, s32);
 extern void text_draw_window_medium(Rect *, u64, char *, s32);
 extern void text_draw_window_large(Rect *, u64, char *, s32);
-extern int func_US2_L02_003FF750(void);
+extern int language_at_least_two_us2(void);
 extern void FontSetWindow(Rect *, s32, s32, s32, s32, s32, s32, s32, s32);
 extern f32 IntToFloat(s32);
 extern char *GetLocalizedString(s32);
@@ -170,15 +170,16 @@ static __inline__ int hud_coord(float value, float scale, float half, int active
     return result;
 }
 
-void func_US2_L11_00445CB4(u8 *moby)
+/* Draws the Joba six-box challenge HUD. (USA v2.00) */
+void joba_hud_draw_challenge_us2(u8 *moby)
 {
     char buf[0x40];
-    Rect r50;
-    Rect r70;
-    Rect r90;
-    Rect rB0;
-    Rect rD0;
-    Rect rF0;
+    Rect box_a;
+    Rect box_b;
+    Rect box_c;
+    Rect box_d;
+    Rect box_e;
+    Rect box_f;
     u8 *data;
     u8 *obj;
     u8 *pv;
@@ -208,32 +209,32 @@ void func_US2_L11_00445CB4(u8 *moby)
     y = hud_coord((f32)g_challenge_hud_f_y[0], g_hud_label_y_param, half, 1);
     h = hud_coord((f32)g_challenge_hud_f_height, g_hud_label_y_param, half, 1);
     three = 3;
-    FontSetWindow(&r50, x, y, g_challenge_hud_f_window_left[0], g_challenge_hud_f_window_right[0], g_challenge_hud_f_window_flags, h, 0, three);
+    FontSetWindow(&box_a, x, y, g_challenge_hud_f_window_left[0], g_challenge_hud_f_window_right[0], g_challenge_hud_f_window_flags, h, 0, three);
     {
     s32 x, y;
-    x = label_y(&r70, (f32)g_challenge_hud_e_x[func_US2_L02_003FF750()][0], g_hud_label_y_param, half, 1);
-    y = label_y(data, (f32)g_challenge_hud_e_y[func_US2_L02_003FF750()][0], g_hud_label_y_param, half, 1);
-    FontSetWindow(&r70, x, y, g_challenge_hud_e_window_left[func_US2_L02_003FF750()][0], g_challenge_hud_e_window_right[func_US2_L02_003FF750()][0], g_challenge_hud_e_window_flags, hud_coord((f32)g_challenge_hud_e_height, g_hud_label_y_param, half, 1), 0, three);
+    x = label_y(&box_b, (f32)g_challenge_hud_e_x[language_at_least_two_us2()][0], g_hud_label_y_param, half, 1);
+    y = label_y(data, (f32)g_challenge_hud_e_y[language_at_least_two_us2()][0], g_hud_label_y_param, half, 1);
+    FontSetWindow(&box_b, x, y, g_challenge_hud_e_window_left[language_at_least_two_us2()][0], g_challenge_hud_e_window_right[language_at_least_two_us2()][0], g_challenge_hud_e_window_flags, hud_coord((f32)g_challenge_hud_e_height, g_hud_label_y_param, half, 1), 0, three);
     }
     x = hud_coord((f32)g_challenge_hud_b_x, g_hud_label_y_param, half, 1);
     do { t = (f32)g_challenge_hud_b_y[0] * g_hud_label_y_param + half; y = t; } while (0);
     h = hud_coord((f32)g_challenge_hud_b_height, g_hud_label_y_param, half, 1);
-    FontSetWindow(&r90, x, y, g_challenge_hud_b_window_left[0], g_challenge_hud_b_window_right[0], g_challenge_hud_b_window_flags, h, 0, three);
+    FontSetWindow(&box_c, x, y, g_challenge_hud_b_window_left[0], g_challenge_hud_b_window_right[0], g_challenge_hud_b_window_flags, h, 0, three);
     three2 = 3;
     {
     s32 x, y;
-    x = label_y(moby, (f32)g_challenge_hud_a_x[func_US2_L02_003FF750()][0], g_hud_label_y_param, half, 1);
+    x = label_y(moby, (f32)g_challenge_hud_a_x[language_at_least_two_us2()][0], g_hud_label_y_param, half, 1);
     do { k3 = 1; } while (0);
-    y = label_y(&rB0, (f32)g_challenge_hud_a_y[func_US2_L02_003FF750()][0], g_hud_label_y_param, half, k3);
-    FontSetWindow(&rB0, x, y, g_challenge_hud_a_window_left[func_US2_L02_003FF750()][0], g_challenge_hud_a_window_right[func_US2_L02_003FF750()][0], g_challenge_hud_a_window_flags, hud_coord((f32)g_challenge_hud_a_height, g_hud_label_y_param, half, k3), 0, three);
+    y = label_y(&box_d, (f32)g_challenge_hud_a_y[language_at_least_two_us2()][0], g_hud_label_y_param, half, k3);
+    FontSetWindow(&box_d, x, y, g_challenge_hud_a_window_left[language_at_least_two_us2()][0], g_challenge_hud_a_window_right[language_at_least_two_us2()][0], g_challenge_hud_a_window_flags, hud_coord((f32)g_challenge_hud_a_height, g_hud_label_y_param, half, k3), 0, three);
     }
     x = hud_coord((f32)g_challenge_hud_d_x, g_hud_label_y_param, half, 1);
     y = hud_coord((f32)g_challenge_hud_d_y[0], g_hud_label_y_param, half, 1);
-    FontSetWindow(&rF0, x, y, g_challenge_hud_d_window_left[0], g_challenge_hud_d_window_right[0], g_challenge_hud_d_window_flags, hud_coord((f32)g_challenge_hud_d_height, g_hud_label_y_param, half, 1), 0, three2);
+    FontSetWindow(&box_f, x, y, g_challenge_hud_d_window_left[0], g_challenge_hud_d_window_right[0], g_challenge_hud_d_window_flags, hud_coord((f32)g_challenge_hud_d_height, g_hud_label_y_param, half, 1), 0, three2);
     x = hud_coord((f32)g_challenge_hud_c_x, g_hud_label_y_param, half, k3);
     do { t = (f32)g_challenge_hud_c_y[0] * g_hud_label_y_param + half; y = t; } while (0);
     three3 = 3;
-    FontSetWindow(&rD0, x, y, g_challenge_hud_c_window_left[0], g_challenge_hud_c_window_right[0], g_challenge_hud_c_window_flags, hud_coord((f32)g_challenge_hud_c_height, g_hud_label_y_param, half, k3), 0, three3);
+    FontSetWindow(&box_e, x, y, g_challenge_hud_c_window_left[0], g_challenge_hud_c_window_right[0], g_challenge_hud_c_window_flags, hud_coord((f32)g_challenge_hud_c_height, g_hud_label_y_param, half, k3), 0, three3);
     one = 1;
     k2 = 1;
     save = ((HudRenderState *)g_hud_l11_render_state)->text_scale;
@@ -243,25 +244,25 @@ void func_US2_L11_00445CB4(u8 *moby)
         s32 ofs = 0x8710;
         TITLE( k3, 1);
         sprintf_n(buf, g_str_number_format, 0x5A - *(s32 *)(data + 0x188) / 60);
-        DRAWBUF(text_draw_window_large, &r90);
-        DRAW(text_draw_window_medium, &rB0, ((char *)GetLocalizedString(0x2DF9)));
+        DRAWBUF(text_draw_window_large, &box_c);
+        DRAW(text_draw_window_medium, &box_d, ((char *)GetLocalizedString(0x2DF9)));
         LABEL( k3, k2);
         SUM();
         sprintf_n(buf, g_str_number_format, g_arena_wave_kill_targets_a[*(s16 *)(data + 0x1F2)] + sum - *(s32 *)(data + 0x140));
-        DRAWBUF(text_draw_window_large, &r50);
+        DRAWBUF(text_draw_window_large, &box_a);
         str = (char *)GetLocalizedString(0x2DF7);
-        if (func_US2_L02_003FF750()) {
-            text_draw_window_medium(&r70, g_challenge_hud_text_color, str, func_001157AC(str));
+        if (language_at_least_two_us2()) {
+            text_draw_window_medium(&box_b, g_challenge_hud_text_color, str, func_001157AC(str));
         } else {
-            text_draw_window_small(&r70, g_challenge_hud_text_color, str, func_001157AC(str));
+            text_draw_window_small(&box_b, g_challenge_hud_text_color, str, func_001157AC(str));
         }
     } else if (*(s16 *)(data + 0x1F0) == 9) {
         s32 ofs = 0x8710;
         TITLE( k3, one);
         tm = *(s32 *)(data + 0x188);
         { s32 hh = 2 - tm / 3600; s32 m = 0x3B - tm / 60 % 60; sprintf_n(buf, g_str_time_format, hh, m); }
-        DRAWBUF(text_draw_window_medium, &r90);
-        DRAW(text_draw_window_medium, &rB0, ((char *)GetLocalizedString(0x2DF9)));
+        DRAWBUF(text_draw_window_medium, &box_c);
+        DRAW(text_draw_window_medium, &box_d, ((char *)GetLocalizedString(0x2DF9)));
         LABEL( k3, one);
         LABEL50( one);
         pv = *(u8 **)(*(u8 **)(data + 0x180) + 0x68);
@@ -271,17 +272,17 @@ void func_US2_L11_00445CB4(u8 *moby)
         s32 ofs = 0x8710;
         TITLE( k3, 1);
         sprintf_n(buf, g_str_number_format, 0x3C - *(s32 *)(data + 0x188) / 60);
-        DRAWBUF(text_draw_window_large, &r90);
-        DRAW(text_draw_window_medium, &rB0, ((char *)GetLocalizedString(0x2DF9)));
+        DRAWBUF(text_draw_window_large, &box_c);
+        DRAW(text_draw_window_medium, &box_d, ((char *)GetLocalizedString(0x2DF9)));
         LABEL( k2, 1);
         SUM();
         sprintf_n(buf, g_str_number_format, g_arena_wave_kill_targets_b[*(s16 *)(data + 0x1F2)] + sum - *(s32 *)(data + 0x140));
-        DRAWBUF(text_draw_window_large, &r50);
+        DRAWBUF(text_draw_window_large, &box_a);
         str = (char *)GetLocalizedString(0x2DF7);
-        if (func_US2_L02_003FF750()) {
-            text_draw_window_medium(&r70, g_challenge_hud_text_color, str, func_001157AC(str));
+        if (language_at_least_two_us2()) {
+            text_draw_window_medium(&box_b, g_challenge_hud_text_color, str, func_001157AC(str));
         } else {
-            text_draw_window_small(&r70, g_challenge_hud_text_color, str, func_001157AC(str));
+            text_draw_window_small(&box_b, g_challenge_hud_text_color, str, func_001157AC(str));
         }
     } else if (*(s16 *)(data + 0x1F0) == 0xC) {
         s32 ofs = 0x8710;
@@ -289,27 +290,27 @@ void func_US2_L11_00445CB4(u8 *moby)
         n = 100 - *(s32 *)(data + 0x188) / 60;
         sprintf_n(buf, g_str_number_format, n);
         if (n >= 100) {
-            DRAWBUF(text_draw_window_small, &r90);
+            DRAWBUF(text_draw_window_small, &box_c);
         } else {
-            do { DRAWBUF(text_draw_window_large, &r90); } while (0);
+            do { DRAWBUF(text_draw_window_large, &box_c); } while (0);
         }
-        DRAW(text_draw_window_medium, &rB0, ((char *)GetLocalizedString(0x2DF9)));
+        DRAW(text_draw_window_medium, &box_d, ((char *)GetLocalizedString(0x2DF9)));
         if (moby[0xBC] != 0) {
             s32 ofs = 0x8710; f32 half = 0.5f;
             LABEL( one, one);
             SUM();
             if (moby[0xBC] < 2) {
                 sprintf_n(buf, g_str_number_format, g_arena_wave_kill_targets_c[*(s16 *)(data + 0x1F2)] + sum - *(s32 *)(data + 0x140));
-                DRAWBUF(text_draw_window_large, &r50);
+                DRAWBUF(text_draw_window_large, &box_a);
             } else {
                 sprintf_n(buf, g_str_number_format, 100);
-                DRAWBUF(text_draw_window_small, &r50);
+                DRAWBUF(text_draw_window_small, &box_a);
             }
             str = (char *)GetLocalizedString(0x2DF7);
-        if (func_US2_L02_003FF750()) {
-            text_draw_window_medium(&r70, g_challenge_hud_text_color, str, func_001157AC(str));
+        if (language_at_least_two_us2()) {
+            text_draw_window_medium(&box_b, g_challenge_hud_text_color, str, func_001157AC(str));
         } else {
-            text_draw_window_small(&r70, g_challenge_hud_text_color, str, func_001157AC(str));
+            text_draw_window_small(&box_b, g_challenge_hud_text_color, str, func_001157AC(str));
         }
         }
     } else {
@@ -343,8 +344,8 @@ void func_US2_L11_00445CB4(u8 *moby)
         } else {
             sprintf_n(buf, g_str_wave_name_format, *(s16 *)(data + 0x1F2) + 1, *g_arena_challenge_table[*(s16 *)(data + 0x1F0)]);
         }
-        DRAWBUF(text_draw_window_large, &rF0);
-        DRAW(text_draw_window_small, &rD0, ((char *)GetLocalizedString(0x2DF6)));
+        DRAWBUF(text_draw_window_large, &box_f);
+        DRAW(text_draw_window_small, &box_e, ((char *)GetLocalizedString(0x2DF6)));
     }
     VU1_addGSregister(0x47, 0x5360B);
     VU1_addGSregister(0x47, 0x5360B);

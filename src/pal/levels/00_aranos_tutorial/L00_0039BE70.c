@@ -5,44 +5,45 @@
 extern char *part_find_owned_effect_slot(char *, int, int);
 extern int math_fast_float_d(int *);
 extern int PlayMobySound(int, int, char *);
-extern void func_PAL_002AC290(char *, char *);
+extern void gfx_start_color_fade_pal(char *, char *);
 extern void vec_add_random_offset(float *, float);
 extern void SpawnExplosionEffects_pal(void *, void *, void *, float, float, int, int, int,
                          float, float, float, float, int, float, int, int, int, int, int);
-extern void func_PAL_002AC3C0(char *, char *);
+extern void gfx_update_color_fade_pal(char *, char *);
 
-void moby_apply_hit_damage_pal(char *object)
+/* Checks whether something hit the object. It takes damage from each hit and bursts when its health runs out (PAL). */
+void moby_apply_hit_damage_pal(char *moby)
 {
-    char *state = *(char **)(object + 0x68);
-    char *hit = part_find_owned_effect_slot(object, 0x30001, 0);
-    float direction[4];
+    char *vars = *(char **)(moby + 0x68);
+    char *hit_effect = part_find_owned_effect_slot(moby, 0x30001, 0);
+    float blast_dir[4];
 
-    math_fast_float_d((int *)(state + 0x28));
-    math_fast_float_d((int *)(state + 0x2C));
-    if (hit != 0 && (*(int *)(hit + 0x20) != *(int *)(state + 0x34) ||
-                     *(int *)(state + 0x28) == 0)) {
-        *(int *)(state + 0x34) = *(int *)(hit + 0x20);
-        *(int *)(state + 0x28) = 25;
-        if (*(int *)(state + 0x2C) == 0) {
-            if (*(unsigned short *)(hit + 0x28) == 0x101 && *(int *)(state + 0x30) == 0) {
-                *(int *)(state + 0x2C) = 83;
-                *(int *)(state + 0x30) = 1;
+    math_fast_float_d((int *)(vars + 0x28));
+    math_fast_float_d((int *)(vars + 0x2C));
+    if (hit_effect != 0 && (*(int *)(hit_effect + 0x20) != *(int *)(vars + 0x34) ||
+                     *(int *)(vars + 0x28) == 0)) {
+        *(int *)(vars + 0x34) = *(int *)(hit_effect + 0x20);
+        *(int *)(vars + 0x28) = 25;
+        if (*(int *)(vars + 0x2C) == 0) {
+            if (*(unsigned short *)(hit_effect + 0x28) == 0x101 && *(int *)(vars + 0x30) == 0) {
+                *(int *)(vars + 0x2C) = 83;
+                *(int *)(vars + 0x30) = 1;
             } else {
-                *(int *)(state + 0x30) = 0;
+                *(int *)(vars + 0x30) = 0;
             }
         }
-        PlayMobySound(0, 0, object);
-        *(float *)(state + 0x24) -= *(float *)(hit + 0x2C);
-        func_PAL_002AC290(object, state);
-        if (*(float *)(state + 0x24) < 0.0f) {
-            vec_add_random_offset(direction, 0.6f);
-            SpawnExplosionEffects_pal(object, direction, 0, 0.0f, 0.0f, 0, 0, 0,
+        PlayMobySound(0, 0, moby);
+        *(float *)(vars + 0x24) -= *(float *)(hit_effect + 0x2C);
+        gfx_start_color_fade_pal(moby, vars);
+        if (*(float *)(vars + 0x24) < 0.0f) {
+            vec_add_random_offset(blast_dir, 0.6f);
+            SpawnExplosionEffects_pal(moby, blast_dir, 0, 0.0f, 0.0f, 0, 0, 0,
                          4.0f, 3.0f, 9.0f, 1.0f, 2, 12.0f, 1, 1, -1, 0, 0x810001);
-            object[0x20] = 6;
+            moby[0x20] = 6;
         }
     }
-    ((unsigned char *)object)[0xA8] = 0xFF;
-    func_PAL_002AC3C0(object, state);
+    ((unsigned char *)moby)[0xA8] = 0xFF;
+    gfx_update_color_fade_pal(moby, vars);
 }
 
 /* func_PAL_L00_0039C018, level 00's copy of func_PAL_0030FCE8. */
@@ -62,92 +63,93 @@ extern int CollLine(float *, float *, int, int, int);
 extern float math_spring_float_to_goal(void *, float, void *, float, float, float);
 extern int moby_move_and_collide(char *, float *, float, float, float, int);
 
-void moby_spring_away_from_player_pal(char *obj)
+/* Pushes a springy object down when the player stands on it and lets it bounce back up. Keeps it above the floor (PAL). */
+void moby_spring_away_from_player_pal(char *moby)
 {
-    char *e = *(char **)(obj + 0x68);
-    char *d = g_hero_state;
-    short flag = *(short *)(d + 0x202);
-    float v0[4] __attribute__((aligned(16)));
-    float v1[4] __attribute__((aligned(16)));
-    float v2[4] __attribute__((aligned(16)));
-    float v3[4] __attribute__((aligned(16)));
-    float v4[4] __attribute__((aligned(16)));
-    float v5[4] __attribute__((aligned(16)));
-    float v6[4] __attribute__((aligned(16)));
-    float v7[4] __attribute__((aligned(16)));
-    float v8[4] __attribute__((aligned(16)));
-    float v9[4] __attribute__((aligned(16)));
-    float f;
+    char *vars = *(char **)(moby + 0x68);
+    char *hero = g_hero_state;
+    short hero_flag = *(short *)(hero + 0x202);
+    float facing[4] __attribute__((aligned(16)));
+    float to_hero[4] __attribute__((aligned(16)));
+    float side[4] __attribute__((aligned(16)));
+    float along[4] __attribute__((aligned(16)));
+    float ray_end[4] __attribute__((aligned(16)));
+    float ray_start[4] __attribute__((aligned(16)));
+    float ground_point[4] __attribute__((aligned(16)));
+    float ground_along[4] __attribute__((aligned(16)));
+    float push[4] __attribute__((aligned(16)));
+    float to_ground[4] __attribute__((aligned(16)));
+    float goal;
     float projection;
-    int mode;
-    float l3, l2, step, acc, x;
+    int ground_mode;
+    float along_len, side_len, step, ground_dist, fall_speed;
 
-    if (*(int *)(e + 0x44) == 0 && flag == 0)
+    if (*(int *)(vars + 0x44) == 0 && hero_flag == 0)
         return;
-    moby_get_facing_direction(obj + 0x10, v0);
-    acc = 0.0f;
-    FastVecSub(v1, obj + 0x10, d + 0x80);
-    projection = FastVecDot(v1, v0);
-    FastVecScale(v3, v0, projection);
-    FastVecSub(v2, v1, v3);
-    l3 = FastVecLength(v3);
-    l2 = FastVecLength(v2);
-    FastVecScale(v4, v0, -2.5f);
-    FastVecAdd(v4, obj + 0x10, v4);
-    FastVecScale(v5, v0, 0.5f);
-    FastVecAdd(v5, obj + 0x10, v5);
-    if (CollLine(v5, v4, 2, 0, 0)) {
-        qcopy(v6, ref_PAL_L00_0039C018_00);
-        mode = 0;
+    moby_get_facing_direction(moby + 0x10, facing);
+    ground_dist = 0.0f;
+    FastVecSub(to_hero, moby + 0x10, hero + 0x80);
+    projection = FastVecDot(to_hero, facing);
+    FastVecScale(along, facing, projection);
+    FastVecSub(side, to_hero, along);
+    along_len = FastVecLength(along);
+    side_len = FastVecLength(side);
+    FastVecScale(ray_end, facing, -2.5f);
+    FastVecAdd(ray_end, moby + 0x10, ray_end);
+    FastVecScale(ray_start, facing, 0.5f);
+    FastVecAdd(ray_start, moby + 0x10, ray_start);
+    if (CollLine(ray_start, ray_end, 2, 0, 0)) {
+        qcopy(ground_point, ref_PAL_L00_0039C018_00);
+        ground_mode = 0;
     } else {
-        mode = 1;
+        ground_mode = 1;
     }
-    if (mode == 0) {
-        FastVecSub(v8, v6, obj + 0x10);
-        projection = FastVecDot(v8, v0);
-        FastVecScale(v7, v0, projection);
-        acc = FastVecLength(v7);
+    if (ground_mode == 0) {
+        FastVecSub(push, ground_point, moby + 0x10);
+        projection = FastVecDot(push, facing);
+        FastVecScale(ground_along, facing, projection);
+        ground_dist = FastVecLength(ground_along);
     }
-    if (*(int *)(e + 0x44) == 0) {
-        if (!(l2 < 1.0f))
+    if (*(int *)(vars + 0x44) == 0) {
+        if (!(side_len < 1.0f))
             return;
-        if (!(l3 < 1.3f))
+        if (!(along_len < 1.3f))
             return;
-        *(int *)(e + 0x44) = 1;
+        *(int *)(vars + 0x44) = 1;
     }
-    qcopy(v8, v2);
-    f = l2 - 1.4f;
-    if (f > 0.0f)
-        f = 0.0f;
-    if (flag == 0)
-        f = 0.0f;
-    math_spring_float_to_goal(&f, 0.0f, (float *)(e + 0x48), 0.0288000014f, 0.432000041f, 0.080000006f);
-    if (f == 0.0f && *(float *)(e + 0x48) == 0.0f && acc < 0.02f)
-        *(int *)(e + 0x44) = 0;
-    if (l2 < *(float *)(e + 0x48))
-        *(float *)(e + 0x48) = l2;
-    if (*(float *)(e + 0x48) < l2)
-        vec_scale_to_length(v8, v8, *(float *)(e + 0x48));
-    moby_move_and_collide(obj, v8, 0.5f, 0.4f, 0.0f, 0);
-    if (mode == 0) {
-        if (FastVecDot(v7, v0) > 0.0f) {
-            qcopy(obj + 0x10, v6);
-            *(float *)(e + 0x4C) = 0.0f;
+    qcopy(push, side);
+    goal = side_len - 1.4f;
+    if (goal > 0.0f)
+        goal = 0.0f;
+    if (hero_flag == 0)
+        goal = 0.0f;
+    math_spring_float_to_goal(&goal, 0.0f, (float *)(vars + 0x48), 0.0288000014f, 0.432000041f, 0.080000006f);
+    if (goal == 0.0f && *(float *)(vars + 0x48) == 0.0f && ground_dist < 0.02f)
+        *(int *)(vars + 0x44) = 0;
+    if (side_len < *(float *)(vars + 0x48))
+        *(float *)(vars + 0x48) = side_len;
+    if (*(float *)(vars + 0x48) < side_len)
+        vec_scale_to_length(push, push, *(float *)(vars + 0x48));
+    moby_move_and_collide(moby, push, 0.5f, 0.4f, 0.0f, 0);
+    if (ground_mode == 0) {
+        if (FastVecDot(ground_along, facing) > 0.0f) {
+            qcopy(moby + 0x10, ground_point);
+            *(float *)(vars + 0x4C) = 0.0f;
         } else {
-            x = *(float *)(e + 0x4C) - 0.0096000005f;
-            *(float *)(e + 0x4C) = x;
-            FastVecScale(v8, v0, x);
-            FastVecAdd(obj + 0x10, v8, obj + 0x10);
-            FastVecSub(v9, v6, obj + 0x10);
-            if (FastVecDot(v9, v0) > 0.0f) {
-                qcopy(obj + 0x10, v6);
-                *(float *)(e + 0x4C) = 0.0f;
+            fall_speed = *(float *)(vars + 0x4C) - 0.0096000005f;
+            *(float *)(vars + 0x4C) = fall_speed;
+            FastVecScale(push, facing, fall_speed);
+            FastVecAdd(moby + 0x10, push, moby + 0x10);
+            FastVecSub(to_ground, ground_point, moby + 0x10);
+            if (FastVecDot(to_ground, facing) > 0.0f) {
+                qcopy(moby + 0x10, ground_point);
+                *(float *)(vars + 0x4C) = 0.0f;
             }
         }
     } else {
-        *(float *)(e + 0x4C) -= 0.0096000005f;
-        FastVecScale(v8, v0, *(float *)(e + 0x4C));
-        FastVecAdd(obj + 0x10, v8, obj + 0x10);
+        *(float *)(vars + 0x4C) -= 0.0096000005f;
+        FastVecScale(push, facing, *(float *)(vars + 0x4C));
+        FastVecAdd(moby + 0x10, push, moby + 0x10);
     }
 }
 

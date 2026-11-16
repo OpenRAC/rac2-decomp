@@ -22,7 +22,8 @@ void* menu_init_two_sub_objects(void* param_1);
 /* Store the two scalar floating arguments through the supplied pointer cell; original game role is unknown. */
 /* Return the measured signed-word getter result for the owner subview at 0x 298. */
 /* Invoke the measured cleanup helper on the owner subview at 0x 298. */
-void func_US2_L00_0043A4B8(unsigned char *owner)
+/* Clears the state of the list sub-object embedded in the owner. */
+void sub_object_cleanup_us2(unsigned char *owner)
 {
     menu_list_clear_state(owner + 0x2c8);
 }

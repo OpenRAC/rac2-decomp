@@ -21,7 +21,8 @@ extern int g_hero_moby;
 extern Vec4_BE400 g_coll_hit_position;
 extern int g_ground_check_inhibit __attribute__((sda));
 
-void func_PAL_002BF0E0(Particle_BE400 *particle)
+/* Updates a hot colliding particle: it moves, stops on hitting a wall, cools its colour toward black and dies when faded out (PAL: 50 Hz timings). */
+void part_update_colliding_pal(Particle_BE400 *particle)
 {
     Vec4_BE400 next, correction;
     Vec4_BE400 *position, *collisionPosition, *direction;

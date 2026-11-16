@@ -19,13 +19,14 @@ extern int subtract_integer_with_clamp(int);
 extern void vec_store_helper(char *);
 extern void transform_vector(char *, char *, char *);
 
-void func_PAL_L20_003A1940(char *obj) {
+/* Swings the object back and forth along an arc around its anchor, reversing at each end (PAL: 50 Hz speeds). */
+void object_swing_along_arc_pal(char *obj) {
     char *state = FLD(obj, char *, 0x68);
     char *entry;
     float turn;
     float spin;
     float target;
-    float r;
+    float angle_diff;
 
     entry = (char *)((FLD(state, int, 0x84) << 7) + (unsigned int)g_linked_moby_table);
     turn = g_swing_turn_speed * 0.00040000002f;
@@ -34,15 +35,15 @@ void func_PAL_L20_003A1940(char *obj) {
     if (FLD(state, int, 0x190) < 0) {
         target = FastAddRotations(target, 3.1415927f);
     }
-    r = FastDiffRots(FLD(obj, float, 0xF8), target);
-    if (r > 0.017453294f) {
+    angle_diff = FastDiffRots(FLD(obj, float, 0xF8), target);
+    if (angle_diff > 0.017453294f) {
         math_approach_target_with_direction_mode(obj + 0xF8, target, 0.0012566373f, 0.0012566373f, 0.062831864f,
                       state + 0x19C, 0);
     } else {
         math_step_value_toward_target(state + 0x194, state + 0x198, (float)FLD(state, int, 0x190), turn,
                       turn, spin);
-        r = FLD(state, float, 0x194) * (float)FLD(state, int, 0x190);
-        if (r > 0.0f) {
+        angle_diff = FLD(state, float, 0x194) * (float)FLD(state, int, 0x190);
+        if (angle_diff > 0.0f) {
             target = math_fabs(FLD(state, float, 0x194));
             if ((float)subtract_integer_with_clamp(FLD(state, int, 0x190)) <= target) {
                 FLD(state, int, 0x190) = -FLD(state, int, 0x190);

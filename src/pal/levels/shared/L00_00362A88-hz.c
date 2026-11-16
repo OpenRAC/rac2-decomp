@@ -26,7 +26,7 @@ extern char g_hero_position[];
 extern unsigned int g_pad_held_flags;
 extern char g_hero_moby_default[];
 extern int g_pickup_request_pending __attribute__((sda));
-extern void func_PAL_002E7270(void *);
+extern void update_equipment_pieces_pal(void *);
 extern void ref_L00_003603C0_00(DrawCallback, void *);
 extern void gfx_add_draw_callback_first(DrawCallback, void *);
 extern void render_environment_mapped_object(void *);
@@ -46,7 +46,9 @@ extern int level_release_matching_resource(int);
     ((*(unsigned char **)(D_00189EA0 + 0x2BC)) && *(short *)((*(unsigned char **)(D_00189EA0 + 0x2BC)) + 0xAA) == 0xD54 && \
      (unsigned char)(*(unsigned char **)(D_00189EA0 + 0x2BC))[0x20] != 254 && (unsigned char)(*(unsigned char **)(D_00189EA0 + 0x2BC))[0x20] != 253)
 
-void func_PAL_L00_00362A88(unsigned char *object) {
+/* Updates an interactive pickup: pulses its glow, shows a prompt when the hero is close and
+   spawns the item when the pad button is pressed. */
+void pickup_update_interactive_pal(unsigned char *object) {
     Vector position;
     Vector offset;
     Vector angles;
@@ -57,7 +59,7 @@ void func_PAL_L00_00362A88(unsigned char *object) {
     char *spawn;
     unsigned int shade;
     int available;
-    if (!g_game_l00_mode) func_PAL_002E7270(object);
+    if (!g_game_l00_mode) update_equipment_pieces_pal(object);
     if ((unsigned char)object[0x31]) {
         private[0xE] = (unsigned char)private[0xE] + 2;
         key = g_pickup_key_ids[(g_equipment_bits >> 4) & 1];

@@ -40,7 +40,7 @@ extern void moby_update_eased_node(void *,void *,int,float,float);
 extern int moby_apply_damage_to_object(void *,void *,int);
 extern void moby_rebuild_scale_matrix(void *);
 extern void shooter_flag_group(void *,int);
-extern void func_US2_002A7AA8(void *,int,int);
+extern void SetDeathBits_us2(void *,int,int);
 extern void spawner_activate_nearest_enemy(void *);
 extern void moby_set_state(void *,int,int);
 extern int weapon_select_aim_target(void *, int, float, float, void *, int);
@@ -49,7 +49,7 @@ extern void level_store_value_pair_us2(int,int);
 extern void SetCamera5Pose(void *,void *,int,int,int);
 extern void object_copy_vector_to_selected(void *);
 extern void cam_set_state_rotation(void *);
-extern s32 func_US2_L18_002E02E8(int,int);
+extern s32 hero_l18_set_action_us2(int,int);
 extern float vec_distance_xy(void *,void *);
 extern void moby_set_flag_bit(void *,int);
 extern void moby_start_or_forward_anim(void *,int,int,float);
@@ -83,7 +83,7 @@ void receiver_bot_update_targeting_us2(u8 *o) {
             moby_rebuild_scale_matrix(o);
             shooter_flag_group(o,o[0x21]);
             if (hit == 4) {
-                func_US2_002A7AA8(o,0,3);
+                SetDeathBits_us2(o,0,3);
                 spawner_activate_nearest_enemy(o);
                 moby_set_state(o,12,10);
             }
@@ -102,7 +102,7 @@ void receiver_bot_update_targeting_us2(u8 *o) {
             object_copy_vector_to_selected(&g_camera_l18_position);
             cam_set_state_rotation(g_camera_l18_position.b+0x10);
             if (g_hero_state.i[0x2294/4] == 1 || g_hero_state.i[0x2294/4] == 29)
-                func_US2_L18_002E02E8(0, 1);
+                hero_l18_set_action_us2(0, 1);
             g_hero_state.h[0x1E0/2] = 20;
             s->f[0x3B8/4] = (vec_distance_xy(o+0x10,&g_camera_l18_position)-g_receiver_targeting_distance) / g_receiver_targeting_frames;
             if (g_statistics_table.uh[0x294/2] < 65535)

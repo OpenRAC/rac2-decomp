@@ -25,12 +25,13 @@ extern void DoGifPaging(void);
 extern void text_draw_window_medium(TextBox_002D99E8 *, int, signed char *, int);
 extern void DrawMenuCheckBox(int, int, int);
 
+/* Draws a checklist menu: a title, then one row of text per active entry with a check box, scrolling to keep the selected row in view. */
 int DrawMenuCheckList_pal(Menu_002D99E8 *menu)
 {
     TextBox_002D99E8 draw, initial;
     int mask;
-    int x, y, count, i, selected, color, rows, iconY;
-    int iconX, iconTop, limit;
+    int x, y, count, i, selected, color, rows, icon_y;
+    int icon_x, icon_top, limit;
     int *list;
     int *base;
 
@@ -58,8 +59,8 @@ int DrawMenuCheckList_pal(Menu_002D99E8 *menu)
     if (g_menu_flag_b)
         gfx_draw_rounded_box(y, menu->height, x, menu->width, 64, 0x202020);
     for (i = 0; i < count; i++) {
-        iconX = x + 4;
-        iconY = y + 10;
+        icon_x = x + 4;
+        icon_y = y + 10;
         base = g_map_overlay_state;
         selected = menu->selected[base[0x230 / 4]] == i;
         color = selected ? 0x8020FFFF : 0x80FFA888;
@@ -78,10 +79,10 @@ int DrawMenuCheckList_pal(Menu_002D99E8 *menu)
         }
         rows = (s16)draw.height / (s16)draw.line;
         if (rows == 2)
-            iconY += 6;
-        iconTop = iconY - menu->scroll;
-        if ((s16)draw.top + 4 <= iconTop && iconTop <= (s16)draw.bottom - 4)
-            DrawMenuCheckBox(iconX + 5, iconTop, (mask >> i) & 1);
+            icon_y += 6;
+        icon_top = icon_y - menu->scroll;
+        if ((s16)draw.top + 4 <= icon_top && icon_top <= (s16)draw.bottom - 4)
+            DrawMenuCheckBox(icon_x + 5, icon_top, (mask >> i) & 1);
         y += rows * 16;
     }
     DoGifPaging();

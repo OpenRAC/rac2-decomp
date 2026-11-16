@@ -20,6 +20,7 @@ extern char g_unlocked_item_flags[] __attribute__((sda));
 extern unsigned char g_cheat_unlocked_flags[] __attribute__((sda));
 extern CheatEntry_25FC90 g_cheat_list[];
 
+/* Builds the list of cheats the player has unlocked from two small lookup tables, and ends the list with a blank entry. */
 int menu_build_unlocked_cheat_list_us2(void)
 {
     IdTable_1AB938 ids = g_cheat_id_table;

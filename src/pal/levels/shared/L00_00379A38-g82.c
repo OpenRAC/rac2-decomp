@@ -10,7 +10,8 @@ extern int g_buy_back_label_y;
 extern char *GetLocalizedString(int);
 extern int text_draw_centered_medium(int, int, unsigned long long, unsigned char *, int);
 
-void func_PAL_L00_0037AFB0(void)
+/* Draws the buy and back button labels of the selected item. */
+void shop_draw_buy_back_labels_pal(void)
 {
     char *model = g_purchase_menu_model;
 

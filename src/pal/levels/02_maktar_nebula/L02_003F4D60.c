@@ -15,7 +15,7 @@ extern void enemy_spawn_child_parts(void *, void *, int, int);
 extern void enemy_attach_turn_child_parts_pal(float, void *, void *, int, void *);
 extern void group_sync_counter(void *, void *);
 extern void *part_find_owned_effect_slot(void *, int, int);
-extern int func_PAL_002B1A50(void *, void *, int);
+extern int moby_apply_damage_to_object_pal(void *, void *, int);
 extern void actor_tear_down_pal(char *);
 extern void actor_update_loop_effect(char *);
 extern char g_zero_l02_vector[] __attribute__((sda));
@@ -70,61 +70,61 @@ extern u8 g_actor_match_key;
    the player is within 24 units, turns the angle by the rate at +0x4CC, updates the effect,
    and for a visible actor of state 3 or more looks for the object of class 0xA03 / 0xB89 that
    it is attached to and releases it. */
-void swaying_actor_update_pal(char *arg0) {
-    St003F1298 *s = *(St003F1298 **)(arg0 + 0x68);
-    float f;
+void swaying_actor_update_pal(char *moby) {
+    St003F1298 *state = *(St003F1298 **)(moby + 0x68);
+    float sway_angle;
 
-    if (*(u8 *)(arg0 + 0x20) == 0) {
-        s->p18 = (char *)&s->f110;
-        f = math_random_float_range(15.0f, 40.0f) * 0.017453294f;
-        s->f4B4 = (math_random_int_below(2) != 0) ? -f : f;
-        s->b48 = FloatToInt(15.0f);
-        s->b4A = FloatToInt(12.0f);
+    if (*(u8 *)(moby + 0x20) == 0) {
+        state->p18 = (char *)&state->f110;
+        sway_angle = math_random_float_range(15.0f, 40.0f) * 0.017453294f;
+        state->f4B4 = (math_random_int_below(2) != 0) ? -sway_angle : sway_angle;
+        state->b48 = FloatToInt(15.0f);
+        state->b4A = FloatToInt(12.0f);
         if (math_random_int_below(2) == 1)
-            *(u16 *)(arg0 + 0x34) |= 0x8000;
-        s->f4CC = 8.0f;
-        s->f90 = 0.8f;
-        s->b70 = 10;
-        s->fA8 = 5;
-        s->f94 = 0.8f;
-        s->f9C = 0.4f;
-        s->f118 = 0.4f;
-        s->f110 = 0.6f;
-        s->f114 = 0.2f;
-        s->f11C = 0.4f;
-        s->f4BC = 0.0f;
-        s->f120 = 1.5707965f;
-        s->f140 = 0.52359885f;
-        s->f13C = 0.008f;
-        s->b28 = 3;
-        s->b2E = 1;
-        enemy_spawn_child_parts(arg0, s->x4C0, 0, 1);
-        s->s4EA = 0;
-        actor_tear_down_pal(arg0);
+            *(u16 *)(moby + 0x34) |= 0x8000;
+        state->f4CC = 8.0f;
+        state->f90 = 0.8f;
+        state->b70 = 10;
+        state->fA8 = 5;
+        state->f94 = 0.8f;
+        state->f9C = 0.4f;
+        state->f118 = 0.4f;
+        state->f110 = 0.6f;
+        state->f114 = 0.2f;
+        state->f11C = 0.4f;
+        state->f4BC = 0.0f;
+        state->f120 = 1.5707965f;
+        state->f140 = 0.52359885f;
+        state->f13C = 0.008f;
+        state->b28 = 3;
+        state->b2E = 1;
+        enemy_spawn_child_parts(moby, state->x4C0, 0, 1);
+        state->s4EA = 0;
+        actor_tear_down_pal(moby);
     }
-    if (*(u8 *)(arg0 + 0x31) != 0) {
-        if (fast_vec_dist(arg0 + 0x10, &g_camera_l02_position) < 24.0f) {
-            moby_update_ground_check(arg0);
-            *(u8 *)(arg0 + 0x6F) = 0x16;
+    if (*(u8 *)(moby + 0x31) != 0) {
+        if (fast_vec_dist(moby + 0x10, &g_camera_l02_position) < 24.0f) {
+            moby_update_ground_check(moby);
+            *(u8 *)(moby + 0x6F) = 0x16;
         }
     }
-    s->f4BC = FastAddRotations(s->f4BC, s->f4CC * 0.017453294f);
-    enemy_attach_turn_child_parts_pal(s->f4BC, arg0, s->x4C0, 1, g_zero_l02_vector);
-    group_sync_counter(arg0, s->x4DC);
-    if (*(u8 *)(arg0 + 0x31) != 0 && *(u8 *)(arg0 + 0x20) >= 3) {
-        char *t = part_find_owned_effect_slot(arg0, 0x10000, 1);
+    state->f4BC = FastAddRotations(state->f4BC, state->f4CC * 0.017453294f);
+    enemy_attach_turn_child_parts_pal(state->f4BC, moby, state->x4C0, 1, g_zero_l02_vector);
+    group_sync_counter(moby, state->x4DC);
+    if (*(u8 *)(moby + 0x31) != 0 && *(u8 *)(moby + 0x20) >= 3) {
+        char *hit_slot = part_find_owned_effect_slot(moby, 0x10000, 1);
 
-        if (t != 0 && *(char **)(t + 0x20) != 0 && *(u8 *)(arg0 + 0x31) == 0 &&
-            (*(short *)(*(char **)(t + 0x20) + 0xAA) == 0xA03 ||
-             *(short *)(*(char **)(t + 0x20) + 0xAA) == 0xB89))
-            *(int *)(t + 0x2C) = 0;
-        if (func_PAL_002B1A50(arg0, s->x60, 0) == 5) {
-            s->fF0 = 0;
-            s->fF4 = 1.0053098f;
+        if (hit_slot != 0 && *(char **)(hit_slot + 0x20) != 0 && *(u8 *)(moby + 0x31) == 0 &&
+            (*(short *)(*(char **)(hit_slot + 0x20) + 0xAA) == 0xA03 ||
+             *(short *)(*(char **)(hit_slot + 0x20) + 0xAA) == 0xB89))
+            *(int *)(hit_slot + 0x2C) = 0;
+        if (moby_apply_damage_to_object_pal(moby, state->x60, 0) == 5) {
+            state->fF0 = 0;
+            state->fF4 = 1.0053098f;
         }
-        if (*(u8 *)(arg0 + 0x20) >= 2 && s->b2E == 2)
-            actor_tear_down_pal(arg0);
-        actor_update_loop_effect(arg0);
+        if (*(u8 *)(moby + 0x20) >= 2 && state->b2E == 2)
+            actor_tear_down_pal(moby);
+        actor_update_loop_effect(moby);
     }
 }
 

@@ -62,7 +62,8 @@ extern void ref_L00_002AEB18_3(int,void *);
 extern float ApproachValue(float *,float,float);
 extern char g_hero_status_overlay_buffer[];
 
-void func_PAL_L00_002AEA00(void)
+/* Shows or hides a small icon over the hero, picking the picture by what the hero is doing, and fades it (PAL). */
+void hero_update_status_icon_overlay_pal(void)
 {
     int enabled=0,id=0,mode;
     float opacity=1.0f;

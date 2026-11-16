@@ -47,10 +47,10 @@ typedef struct {
 /* Scrolls the textures, draws the two halo ribbons and two child effects, then draws rows
  * 2 to 11 of a 20-column ring mesh, culling faces turned from the camera; each face is drawn
  * twice with its own scrolling V. Same mesh loop as RAC1's suck_beam_draw_mesh. */
-void func_PAL_L00_0040BA28(char *arg)
+void scrolling_ring_mesh_draw_pal(char *moby)
 {
     BeamPacket packet;
-    float e[4], f[4], g[4], h[4];
+    float edge_a[4], edge_b[4], face_normal[4], to_camera[4];
     float x, y, z;
     int color, i, j;
 
@@ -58,8 +58,8 @@ void func_PAL_L00_0040BA28(char *arg)
     if (g_beam_ribbon_uv_offset <= -8.0f) g_beam_ribbon_uv_offset += 8.0f;
     DrawScrollingRibbonWithHalo(g_sheepinator_ribbon_inner_points, g_beam_ribbon_param_a, g_beam_ribbon_param_b, 12, g_beam_ribbon_width_scale, g_beam_ribbon_halo_scale, g_beam_ribbon_scroll_speed, g_beam_ribbon_halo_color_idle);
     DrawScrollingRibbonWithHalo(g_sheepinator_ribbon_outer_points, g_beam_ribbon_param_a, g_beam_ribbon_param_b, 12, g_beam_ribbon_width_scale, g_beam_ribbon_halo_scale, g_beam_ribbon_scroll_speed, g_beam_ribbon_halo_color_active);
-    DrawLightningArcSparks(arg);
-    DrawTwoPassCameraQuad(arg);
+    DrawLightningArcSparks(moby);
+    DrawTwoPassCameraQuad(moby);
     color = g_weapon_l00_table[(unsigned char)g_weapon_active_index[0]].state ? g_beam_packet_color_active : g_beam_packet_color_idle;
     packet.tags[1] = GetEffectTextureDescriptor(g_beam_packet_texture_id);
     packet.tags[2] = 0xff9000000260ULL;
@@ -81,11 +81,11 @@ void func_PAL_L00_0040BA28(char *arg)
             qcopy(&packet.q[1], g_sheepinator_ribbon_surface_a[i][(j + 1) % 20]);
             qcopy(&packet.q[2], g_sheepinator_ribbon_surface_b[i][j]);
             qcopy(&packet.q[3], g_sheepinator_ribbon_surface_b[i][(j + 1) % 20]);
-            FastVecSub(e, &packet.q[0], &packet.q[1]);
-            FastVecSub(f, &packet.q[2], &packet.q[1]);
-            FastVecCross(g, f, e);
-            FastVecSub(h, &packet.q[1], g_camera_l00_position);
-            if (FastVecDot(g, h) >= 0.0f) {
+            FastVecSub(edge_a, &packet.q[0], &packet.q[1]);
+            FastVecSub(edge_b, &packet.q[2], &packet.q[1]);
+            FastVecCross(face_normal, edge_b, edge_a);
+            FastVecSub(to_camera, &packet.q[1], g_camera_l00_position);
+            if (FastVecDot(face_normal, to_camera) >= 0.0f) {
                 y += g_sheepinator_beam_uv_y_step;
                 z += g_sheepinator_beam_uv_y_step;
                 continue;

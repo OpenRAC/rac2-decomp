@@ -36,22 +36,23 @@ extern SceneManager g_ship_trail_state;
 extern TrailCamera g_trail_camera;
 
 extern void anim_start_startup_animations(void);
-extern void func_PAL_002E7270(char *);
+extern void update_equipment_pieces_pal(char *);
 extern void math_store_angle_update_result(char *, float *, int, int, float);
 extern void mem_clear(void *, unsigned int, int);
 extern void euler_rotation_basis(void *, void *);
 extern void moby_transform_joint_to_world(char *, int, char *);
 extern void vec_scale_to_length(void *, void *, float);
 extern void FastVecAdd(void *, void *, void *);
-extern void func_PAL_0030DEC0(char *);
-extern void func_PAL_0030E0E0(char *);
-extern void func_PAL_0030E850(void *);
+extern void initialize_bolt_point_chain_pal(char *);
+extern void beam_update_chain_points_pal(char *);
+extern void beam_draw_ribbons_level_pal(void *);
 extern void ship_build_trail_mesh(void *);
 extern void gfx_add_draw_callback_third(void (*)(void *), void *);
 extern void gfx_add_draw_callback_first(void (*)(void *), void *);
 extern char *tv_screen_find_nearest(float, float, float);
 
-void func_PAL_L01_002F3E90(void)
+/* Per-frame update of the Oozla intro scene: sets up the scene objects and moves the ship trail camera (PAL: 50 Hz frame limits). */
+void oozla_intro_scene_update_pal(void)
 {
     int i;
     char *actor;
@@ -65,9 +66,9 @@ void func_PAL_L01_002F3E90(void)
             *(unsigned short *)(actor + 0x34) |= 0x800;
         }
         if (*(short *)(actor + 0xAA) == 0xD54)
-            func_PAL_002E7270(actor);
+            update_equipment_pieces_pal(actor);
         if (actor) {
-            int kind = 0xFA0;
+            int kind = 0xFA0; /* MOBY_CLASS_TV_SCREENS */
             if (*(short *)(actor + 0xAA) == kind && g_current_map_index != 0x33 && *(char **)(actor + 0x68))
                 math_store_angle_update_result(actor, (float *)(*(char **)(actor + 0x68) + 0xC),
                                  0x80AAAAD2, 0x80396464, 0.07330384f);
@@ -95,9 +96,9 @@ void func_PAL_L01_002F3E90(void)
                              camera->distance);
                 FastVecAdd(camera->position, camera->target,
                              camera->position);
-                func_PAL_0030DEC0(trail);
-                func_PAL_0030E0E0(trail);
-                gfx_add_draw_callback_third(func_PAL_0030E850, trail);
+                initialize_bolt_point_chain_pal(trail);
+                beam_update_chain_points_pal(trail);
+                gfx_add_draw_callback_third(beam_draw_ribbons_level_pal, trail);
             } else {
                 g_hero_state.camera = 0;
             }

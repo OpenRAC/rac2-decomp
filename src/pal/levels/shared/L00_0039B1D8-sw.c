@@ -15,7 +15,7 @@ typedef struct {
 extern int g_hero_action_blocked_flag MACRO_ADDR;
 extern Vector g_hero_l00_velocity;
 extern u16 g_decoy_moby_index_list[] MACRO_ADDR;
-extern void func_PAL_002A7E68(char *, int, int, int), moby_get_facing_direction(void *, float *);
+extern void anim_start_blended_pal(char *, int, int, int), moby_get_facing_direction(void *, float *);
 extern void vec_scale_to_length(void *, void *, float), FastVecCross(void *, void *, void *);
 extern float FastVecDot(void *, void *), math_fast_sin_or_cos_b(float), math_fast_sin_or_cos_a(float);
 extern void FastVecScale(void *, void *, float), quaternion_to_rotation_basis(void *, void *), multiply_matrix3x3(void *, void *, void *);
@@ -31,7 +31,7 @@ extern void copy_matrix_rotation(void *, void *), mat_get_euler_angles(float *, 
 extern int moby_transform_point_and_rotation_by_parent(int, int, void *, void *, void *, void *);
 
 /* Steers a moving projectile, resolves its collision, then follows a struck actor. */
-void func_PAL_L00_0039B4C8(char *actor) {
+void decoy_update_pal(char *actor) {
     /* The 96-byte collision query and following attachment transform have
      * disjoint lifetimes and occupy the same measured stack workspace. */
     struct {
@@ -49,20 +49,20 @@ void func_PAL_L00_0039B4C8(char *actor) {
     switch (((u8 *)actor)[0x20]) {
     case 0:
         actor[0x20] = 1;
-        if (((u8 *)actor)[0x43]) func_PAL_002A7E68(actor, 0, 0, 0);
+        if (((u8 *)actor)[0x43]) anim_start_blended_pal(actor, 0, 0, 0);
         *(int *)(actor + 0x98) = 0;
         /* fall through */
     case 1: {
         int collision;
         char *hit;
-        float halfAngle;
+        float half_angle;
         short type;
         moby_get_facing_direction(actor + 0x10, scratch.desired.f);
         vec_scale_to_length(&scratch.forward, actor + 0xE0, 1.0f);
         FastVecCross(&scratch.axis, &scratch.forward, &scratch.desired);
-        halfAngle = FastVecDot(&scratch.forward, &scratch.desired) * 0.5f;
-        FastVecScale(&scratch.quaternion, &scratch.axis, math_fast_sin_or_cos_b(halfAngle));
-        scratch.quaternion.f[3] = math_fast_sin_or_cos_a(halfAngle);
+        half_angle = FastVecDot(&scratch.forward, &scratch.desired) * 0.5f;
+        FastVecScale(&scratch.quaternion, &scratch.axis, math_fast_sin_or_cos_b(half_angle));
+        scratch.quaternion.f[3] = math_fast_sin_or_cos_a(half_angle);
         quaternion_to_rotation_basis(&scratch.quaternion, scratch.rotation);
         multiply_matrix3x3(actor + 0xC0, scratch.rotation, actor + 0xC0);
         qcopy(&scratch.oldPosition, (actor + 0x10));
@@ -99,13 +99,13 @@ void func_PAL_L00_0039B4C8(char *actor) {
             vec_scale_to_length(&scratch.desired, &scratch.desired, 1);
             vec_scale_to_length(&scratch.forward, actor + 0xE0, 1);
             FastVecCross(&scratch.axis, &scratch.forward, &scratch.desired);
-            halfAngle = FastVecDot(&scratch.forward, &scratch.desired) * 0.5f;
-            FastVecScale(&scratch.quaternion, &scratch.axis, math_fast_sin_or_cos_b(halfAngle));
-            scratch.quaternion.f[3] = math_fast_sin_or_cos_a(halfAngle);
+            half_angle = FastVecDot(&scratch.forward, &scratch.desired) * 0.5f;
+            FastVecScale(&scratch.quaternion, &scratch.axis, math_fast_sin_or_cos_b(half_angle));
+            scratch.quaternion.f[3] = math_fast_sin_or_cos_a(half_angle);
             quaternion_to_rotation_basis(&scratch.quaternion, scratch.rotation);
             multiply_matrix3x3(actor + 0xC0, scratch.rotation, actor + 0xC0);
             actor[0x20] = collision;
-            if (((u8 *)actor)[0x43] != 1) func_PAL_002A7E68(actor, 1, 0, 8);
+            if (((u8 *)actor)[0x43] != 1) anim_start_blended_pal(actor, 1, 0, 8);
             *(int *)(actor + 0x98) = *(int *)(*(char **)(actor + 0x24) + 0x10);
         }
         goto response_done;
@@ -123,7 +123,7 @@ response_done:
     case 2: actor[0x20] = 3; break;
     case 3:
         if (((u8 *)actor)[0x60] & 2) {
-            if (((u8 *)actor)[0x43] != 2) func_PAL_002A7E68(actor, 2, 0, 8);
+            if (((u8 *)actor)[0x43] != 2) anim_start_blended_pal(actor, 2, 0, 8);
             *(float *)(actor + 0x48) = math_random_float_range(0.7f, 1.05f);
         }
         moby_spring_away_from_player(actor); moby_apply_hit_damage_pal(actor);

@@ -28,6 +28,7 @@ extern void part_spawn_two_flare_effects(void *);
 extern char g_hit_l12_result[];
 extern float g_spin_rotation_degrees __attribute__((sda));
 
+/* Updates a spinning blast projectile: it flies, checks for hits, damages what it touches and blows up after 240 frames or on impact. */
 void UpdateSpinningBlastProjectile_pal(char *object)
 {
     ProjectileWorkspace local;

@@ -10,10 +10,10 @@ extern int g_hero_locked_flag;
 extern void FastVecAdd(char *, char *, char *);
 extern float FastAddRotations(float, float);
 extern void TranslateObjectAndView_pal(char *, float *);
-extern void func_PAL_L00_00427960(char *);
+extern void cam_follow_update_pal(char *);
 extern void cam_follow_update_collision(char *);
 extern void cam_follow_run_frame_pal(int);
-extern void func_PAL_L00_004276D8(char *);
+extern void weapon_reset_view_state_pal(char *);
 
 /* Builds the hero's 16-byte block from the hero record and the parameter block, stores the
    table's current blend weight in the global, refines the block's last float with the
@@ -38,8 +38,8 @@ void hero_refresh_linked_object_pal(char *object)
     }
     *(float *)(local + 12) = FastAddRotations(first, *(float *)(parameters + 12));
     TranslateObjectAndView_pal(self, (float *)local);
-    func_PAL_L00_00427960(self);
+    cam_follow_update_pal(self);
     cam_follow_update_collision(self);
     cam_follow_run_frame_pal((int)self);
-    func_PAL_L00_004276D8(self);
+    weapon_reset_view_state_pal(self);
 }

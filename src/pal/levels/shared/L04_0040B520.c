@@ -28,12 +28,13 @@ extern void math_build_axis_angle_quat(void *, void *, float);
 extern void mat_from_rotation(void *, void *);
 extern void mat_get_euler_angles(void *, void *);
 extern float g_scratch_direction_quad[];
-extern void func_PAL_L04_0040B8B8(void *);
+extern void racer_draw_trail_pal(void *);
 extern void FastVecAdd(void *, void *, void *);
 
-void func_PAL_L04_0040BC70(unsigned char *m)
+/* Updates a debris piece: counts down its life, spins and falls, bounces off surfaces, then explodes or fades out and removes itself (PAL: 50 Hz timings). */
+void debris_l04_piece_update_pal(unsigned char *moby)
 {
-    float oldpoint[4];
+    float old_point[4];
     float rot[12];
     float point[4];
     float delta[4];
@@ -41,61 +42,61 @@ void func_PAL_L04_0040BC70(unsigned char *m)
     float matrix[13];
     float bounce[4];
     float axis[4];
-    unsigned char *p = *(unsigned char **)(m + 0x68);
+    unsigned char *vars = *(unsigned char **)(moby + 0x68);
     float speed, dot;
     float radius;
-    *(unsigned short *)(p + 0x32) += 1;
-    switch (m[0x20]) {
+    *(unsigned short *)(vars + 0x32) += 1;
+    switch (moby[0x20]) {
     case 1:
-        if (FastDecTimer(p + 0x30)) {
-            m[0x20] = (*(int *)(p + 0x34) & 1) ? 3 : 2;
-            *(short *)(p + 0x30) = FloatToInt(8.666667f);
+        if (FastDecTimer(vars + 0x30)) {
+            moby[0x20] = (*(int *)(vars + 0x34) & 1) ? 3 : 2;
+            *(short *)(vars + 0x30) = FloatToInt(8.666667f);
             return;
         }
-        if (*(int *)(p + 0x34) & 4) gfx_add_draw_callback_third(func_PAL_L04_0040B8B8, m);
+        if (*(int *)(vars + 0x34) & 4) gfx_add_draw_callback_third(racer_draw_trail_pal, moby);
         break;
     case 2:
-        matrix_mul_vec3(oldpoint, p + 0x20, m + 0xc0);
-        FastVecAdd(oldpoint, oldpoint, m + 0x10);
-        if (*(int *)(p + 0x34) & 2) part_l00_spawn_explosion_burst_pal(m, oldpoint, 0.3f, 10.0f, -1);
-        else SpawnExplosion_pal(m + 0x10, 0.5f, 0.0f, 0, 25, 20, 20, 20, 45, 0, 0, 0, 0, 0);
+        matrix_mul_vec3(old_point, vars + 0x20, moby + 0xc0);
+        FastVecAdd(old_point, old_point, moby + 0x10);
+        if (*(int *)(vars + 0x34) & 2) part_l00_spawn_explosion_burst_pal(moby, old_point, 0.3f, 10.0f, -1);
+        else SpawnExplosion_pal(moby + 0x10, 0.5f, 0.0f, 0, 25, 20, 20, 20, 45, 0, 0, 0, 0, 0);
         goto destroy;
     case 3:
-        if (FastDecTimer(p + 0x30)) {
+        if (FastDecTimer(vars + 0x30)) {
         case 0:
         destroy:
-            moby_mark_spawned(m);
+            moby_mark_spawned(moby);
             return;
         }
-        m[0x23] = FloatToInt((float)*(short *)(p + 0x30) * 14.76923f);
+        moby[0x23] = FloatToInt((float)*(short *)(vars + 0x30) * 14.76923f);
         break;
     }
-    euler_rotation_basis(rot, p + 0x10);
-    matrix_mul_vec3(oldpoint, p + 0x20, m + 0xc0);
-    multiply_matrix3x3(m + 0xc0, rot, m + 0xc0);
-    matrix_mul_vec3(point, p + 0x20, m + 0xc0);
-    FastVecSub(delta, point, oldpoint);
-    FastVecSub(m + 0x10, m + 0x10, delta);
-    FastVecAdd(m + 0x10, m + 0x10, p);
-    *(float *)(p + 8) -= *(float *)(p + 0x38);
-    radius = *(float *)(p + 0x2c);
-    matrix_mul_vec3(probe, p + 0x20, m + 0xc0);
-    FastVecAdd(probe, probe, m + 0x10);
-    if (coll_test_point(probe, 0, radius, m)) {
+    euler_rotation_basis(rot, vars + 0x10);
+    matrix_mul_vec3(old_point, vars + 0x20, moby + 0xc0);
+    multiply_matrix3x3(moby + 0xc0, rot, moby + 0xc0);
+    matrix_mul_vec3(point, vars + 0x20, moby + 0xc0);
+    FastVecSub(delta, point, old_point);
+    FastVecSub(moby + 0x10, moby + 0x10, delta);
+    FastVecAdd(moby + 0x10, moby + 0x10, vars);
+    *(float *)(vars + 8) -= *(float *)(vars + 0x38);
+    radius = *(float *)(vars + 0x2c);
+    matrix_mul_vec3(probe, vars + 0x20, moby + 0xc0);
+    FastVecAdd(probe, probe, moby + 0x10);
+    if (coll_test_point(probe, 0, radius, moby)) {
         vec_scale_to_length(g_scratch_direction_quad, g_scratch_direction_quad, 1.0f);
-        speed = FastVecLength(p);
-        dot = FastVecDot(p, g_scratch_direction_quad);
+        speed = FastVecLength(vars);
+        dot = FastVecDot(vars, g_scratch_direction_quad);
         if (dot < 0.0f) {
-            vec_fast_normalize(p, p, g_scratch_direction_quad);
+            vec_fast_normalize(vars, vars, g_scratch_direction_quad);
             vec_scale_to_length(bounce, g_scratch_direction_quad, dot * 0.5f);
-            FastVecAdd(p, p, bounce);
-            vec_scale_to_length(p, p, speed);
-            FastVecCross(axis, g_scratch_direction_quad, p);
+            FastVecAdd(vars, vars, bounce);
+            vec_scale_to_length(vars, vars, speed);
+            FastVecCross(axis, g_scratch_direction_quad, vars);
             vec_scale_to_length(axis, axis, 1.0f);
-            math_build_axis_angle_quat(axis, axis, FastVecLength(p + 0x10));
+            math_build_axis_angle_quat(axis, axis, FastVecLength(vars + 0x10));
             mat_from_rotation(axis, matrix);
-            mat_get_euler_angles(matrix, p + 0x10);
-            if (*(short *)(p + 0x32) >= 13) *(short *)(p + 0x30) = 0;
+            mat_get_euler_angles(matrix, vars + 0x10);
+            if (*(short *)(vars + 0x32) >= 13) *(short *)(vars + 0x30) = 0;
         }
     }
 }

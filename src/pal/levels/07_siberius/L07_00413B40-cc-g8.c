@@ -32,46 +32,47 @@ extern f32 g_ship_rider_bend __attribute__((sda));
 typedef struct {u8 pad[0x80];f32 pos[4];u8 rest[0x31c-0x90];f32 health;u8 pad320[0x33c-0x320];s32 mode;u8 pad340[0x3a0-0x340];u8 *object;} Player;
 extern Player g_hero_state;
 typedef struct {u8 pad[0xe0];f32 pathpos[5];u8 *objects[5];u8 pad108[0x1a0-0x108];f32 target;f32 speed;} State;
-void ship_move_riders_along_path_pal(u8 *obj)
+/* Moves the five path riders along their path every frame and updates their sounds and effects. Also handles the player standing on one of them (PAL: 50 Hz timings). */
+void ship_move_riders_along_path_pal(u8 *moby)
 {
- f32 oldpos[4],oldrot[4],delta[4],relative[4];
- s32 j,id;
+ f32 old_position[4],old_rotation[4],delta[4],relative[4];
+ s32 wheel,sound_id;
  f32 step,target,speed,bend;
- u8 *child,*state;
- u8 *p=*(u8 **)(obj+0x68),*sound;
- s32 pathid=*(s32 *)(p+0x90);
+ u8 *child,*child_vars;
+ u8 *vars=*(u8 **)(moby+0x68),*sound_slot;
+ s32 path_id=*(s32 *)(vars+0x90);
  s32 *path;
- State *ps=(State *)p;
+ State *ship_state=(State *)vars;
  g_snowfall_target_moby=0;
- path=g_path_l07_table[pathid];
- target=ps->target;
- speed=ps->speed;
- ApproachValue(p+0x11c,target,speed);
- sound=g_sound_state+*(s32 *)(p+0x1ac)*0x70;
- if(*(u8 **)(sound+0x88)!=obj || !sound[0x74]) *(s32 *)(p+0x1ac)=PlayMobySound(2,12,obj);
- id=*(s32 *)(p+0x1ac);
- if(id!=-1) qcopy(g_ship_sound_table+id*0x70,g_hero_position_block);
+ path=g_path_l07_table[path_id];
+ target=ship_state->target;
+ speed=ship_state->speed;
+ ApproachValue(vars+0x11c,target,speed);
+ sound_slot=g_sound_state+*(s32 *)(vars+0x1ac)*0x70;
+ if(*(u8 **)(sound_slot+0x88)!=moby || !sound_slot[0x74]) *(s32 *)(vars+0x1ac)=PlayMobySound(2,12,moby);
+ sound_id=*(s32 *)(vars+0x1ac);
+ if(sound_id!=-1) qcopy(g_ship_sound_table+sound_id*0x70,g_hero_position_block);
  {
  s32 i;
  for(i=0;i<5;i++) {
-  child=ps->objects[i];
-  state=*(u8 **)(child+0x68);
-  qcopy_nc(oldpos,child+0x10);
-  qcopy_nc(oldrot,child+0xf0);
-  path_sample_position(path,1,child+0x10,child+0xf0,0,ps->pathpos[i]);
+  child=ship_state->objects[i];
+  child_vars=*(u8 **)(child+0x68);
+  qcopy_nc(old_position,child+0x10);
+  qcopy_nc(old_rotation,child+0xf0);
+  path_sample_position(path,1,child+0x10,child+0xf0,0,ship_state->pathpos[i]);
   bend=g_ship_rider_bend;
   *(f32 *)(child+0x18)+=g_ship_rider_height_step;
-  path_compute_heading_and_tilt(path,ps->pathpos[i],child+0xf0,bend);
+  path_compute_heading_and_tilt(path,ship_state->pathpos[i],child+0xf0,bend);
   func_002A0F48(child);
-  ps->pathpos[i]+=*(f32 *)(p+0x11c);
-  if(ps->pathpos[i]>=(f32)path[0]) ps->pathpos[i]-=(f32)path[0];
+  ship_state->pathpos[i]+=*(f32 *)(vars+0x11c);
+  if(ship_state->pathpos[i]>=(f32)path[0]) ship_state->pathpos[i]-=(f32)path[0];
   step=g_ship_rider_turn_step*0.0003490659f;
-  for(j=0;j<8;j++) *(f32 *)(state+0x15b4+j*0x20)=FastAddRotations(*(f32 *)(state+0x15b4+j*0x20),step);
-  FastVecSub(delta,child+0x10,oldpos);
-  mat_combine_and_store(state+0x20,delta,oldrot,child+0xf0);
-  if(g_hero_state.object==child || (*(u8 **)(state+0x108) && g_hero_state.object==*(u8 **)(state+0x108)) || (*(u8 **)(state+0x10c) && g_hero_state.object==*(u8 **)(state+0x10c))) {
+  for(wheel=0;wheel<8;wheel++) *(f32 *)(child_vars+0x15b4+wheel*0x20)=FastAddRotations(*(f32 *)(child_vars+0x15b4+wheel*0x20),step);
+  FastVecSub(delta,child+0x10,old_position);
+  mat_combine_and_store(child_vars+0x20,delta,old_rotation,child+0xf0);
+  if(g_hero_state.object==child || (*(u8 **)(child_vars+0x108) && g_hero_state.object==*(u8 **)(child_vars+0x108)) || (*(u8 **)(child_vars+0x10c) && g_hero_state.object==*(u8 **)(child_vars+0x10c))) {
    g_snowfall_target_moby=child;
-   snow_emitter_update_effect(ps->pathpos[i]);
+   snow_emitter_update_effect(ship_state->pathpos[i]);
   }
   cam_mode_noop(child);
   swingshot_nodes_update_attached(child);

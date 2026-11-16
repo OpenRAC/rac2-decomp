@@ -27,11 +27,11 @@ extern unsigned int ui_get_item_color(int);
 extern void hud_draw_sprite_gradient(int,int,int,int,int,unsigned int *);
 extern char *GetLocalizedString(int);
 extern int text_measure_width_small_scaled(char *,int,float);
-extern void func_PAL_002FA720(float,float,unsigned long,float,char *,int);
+extern void draw_large_text_edge_faded_pal(float,float,unsigned long,float,char *,int);
 
 #define screen_y(y) ((int)(D_001B2280[0] * (y) + 0.5f) + (D_001A7B90 ? 4 : 0))
 
-void func_PAL_002FACD0(void)
+void DrawVendorItemSelectList_pal(void)
 {
     int pulse;
     int i, index, y, icon, kind, special, alpha0, alpha1;
@@ -76,11 +76,11 @@ void func_PAL_002FACD0(void)
             if (g_vendor_menu_state.rows[index].owned) {
                 char *text = GetLocalizedString(0x1b2d);
                 int tx = (text_measure_width_small_scaled(text,-1,0.75f) >> 1) - 25;
-                func_PAL_002FA720((float)(y - tx),(float)screen_y(366),0x80f0f0f0UL,0.75f,text,-1);
+                draw_large_text_edge_faded_pal((float)(y - tx),(float)screen_y(366),0x80f0f0f0UL,0.75f,text,-1);
             } else if (g_vendor_menu_state.rows[index].kind == 1) {
                 char *text = GetLocalizedString(0xbda);
                 int tx = (text_measure_width_small_scaled(text,-1,0.75f) >> 1) - 25;
-                func_PAL_002FA720((float)(y - tx),(float)screen_y(366),0x80f0f0f0UL,0.75f,text,-1);
+                draw_large_text_edge_faded_pal((float)(y - tx),(float)screen_y(366),0x80f0f0f0UL,0.75f,text,-1);
             }
         }
         i++;

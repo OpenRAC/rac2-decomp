@@ -39,19 +39,19 @@ extern void EmitScaledObjectParticles(int);
 /* func_PAL_L14_00306108, the PAL copy of func_L14_00304588: the same C, where the 0xFA0 mobs' call
    is skipped in game state 0x33 and its float argument scales by 6/5. As in func_PAL_L02_00302948,
    the mob pointer is read as base + i * 4 + 0x18C rather than ref_L14_00304588_00.mobs[i]. */
-void func_PAL_L14_00306108(void) {
+void level_process_mob_list_pal(void) {
     int i;
 
     anim_start_startup_animations();
     for (i = 0; i < ref_L14_00304588_00.count; i++) {
-        Mob_L14_00304588 *mob = ((MobList_L14_00304588 *)((u8 *)&ref_L14_00304588_00 + i * 4))->mobs[0];
+        Mob_L14_00304588 *moby = ((MobList_L14_00304588 *)((u8 *)&ref_L14_00304588_00 + i * 4))->mobs[0];
 
-        if (mob != 0 && mob->type == 0xE29)
-            mob->flags |= 0x800;
-        if (mob->type == 0xD54)
-            UpdateEquipmentPieces(mob);
-        if (mob != 0 && mob->type == 0xFA0 && g_current_map_index != 0x33 && mob->p68 != 0)
-            math_store_angle_update_result(mob, (u8 *)mob->p68 + 0xC, 0x80AAAAD2, 0x80396464, 0.07330384f);
+        if (moby != 0 && moby->type == 0xE29)
+            moby->flags |= 0x800;
+        if (moby->type == 0xD54)
+            UpdateEquipmentPieces(moby);
+        if (moby != 0 && moby->type == MOBY_CLASS_TV_SCREENS && g_current_map_index != 0x33 && moby->p68 != 0)
+            math_store_angle_update_result(moby, (u8 *)moby->p68 + 0xC, 0x80AAAAD2, 0x80396464, 0.07330384f);
     }
     if (g_current_map_index == 0xE && ref_L14_00304588_00.mode == 0) {
         moby_copy_group_word_to_members();

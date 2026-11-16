@@ -44,42 +44,42 @@ extern void gfx_add_draw_callback_first(void *, void *);
    first colour pair and, when its stamp is not the current one, refreshes every live class-0x112B
    entity of its group (joint 0 position into +0x220, then the stamp) and queues
    func_L14_00428BA0 for the owner. */
-void group_marker_update_pulse_pal(L14Obj *self)
+void group_marker_update_pulse_pal(L14Obj *moby)
 {
-    L14Cfg *state = self->cfg;
+    L14Cfg *vars = moby->cfg;
     L14ColorPair colors = g_group_marker_colors[0];
-    unsigned short *p;
-    L14Obj *e;
-    L14Cfg *s0;
+    unsigned short *list;
+    L14Obj *member;
+    L14Cfg *member_vars;
     float angle;
     float blend;
 
-    angle = FastAddRotations(state->angle, 0.25132746f);
-    state->angle = angle;
+    angle = FastAddRotations(vars->angle, 0.25132746f);
+    vars->angle = angle;
     blend = math_fast_sin_or_cos_b(angle) * 0.5f + 0.5f;
-    state->blend = blend;
-    self->tint = FastTweenColor(colors.a, colors.b, blend);
-    if (state->stamp != g_frame_tick_counter) {
-        for (p = g_group_entity_lists[self->group];
-             self->group != 0xFF && self->group <= g_group_link_limit && p != 0 &&
-             ((p != 0 && (short)p[-1] >= 0) || p == g_group_entity_lists[self->group]);
-             p++) {
-            e = (L14Obj *)(D_L14_001B259C_base[0] + ((*p & 0x7FFF) << 8));
-            if (e == 0)
+    vars->blend = blend;
+    moby->tint = FastTweenColor(colors.a, colors.b, blend);
+    if (vars->stamp != g_frame_tick_counter) {
+        for (list = g_group_entity_lists[moby->group];
+             moby->group != 0xFF && moby->group <= g_group_link_limit && list != 0 &&
+             ((list != 0 && (short)list[-1] >= 0) || list == g_group_entity_lists[moby->group]);
+             list++) {
+            member = (L14Obj *)(D_L14_001B259C_base[0] + ((*list & 0x7FFF) << 8));
+            if (member == 0)
                 break;
-            if (e->live != 0) {
-                if (e->cls == 0x112B) {
+            if (member->live != 0) {
+                if (member->cls == 0x112B) {
                     /* two tests, as retail has them: `!= 0xFE && != 0xFD` is folded into one */
-                    if (e->kind != 0xFE) {
-                        if (e->kind != 0xFD) {
-                            s0 = e->cfg;
-                            moby_transform_joint_point(e, 0, &s0->vec);
-                            s0->stamp = g_frame_tick_counter;
+                    if (member->kind != 0xFE) {
+                        if (member->kind != 0xFD) {
+                            member_vars = member->cfg;
+                            moby_transform_joint_point(member, 0, &member_vars->vec);
+                            member_vars->stamp = g_frame_tick_counter;
                         }
                     }
                 }
             }
         }
-        gfx_add_draw_callback_first((void *)group_marker_draw, self);
+        gfx_add_draw_callback_first((void *)group_marker_draw, moby);
     }
 }

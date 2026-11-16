@@ -33,6 +33,7 @@ static __inline__ void joint_step(char *obj,char *joint,int index,float speed,fl
     moby_update_eased_node(obj,joint,index,speed,limit);
 }
 
+/* Updates a coin-gated door: waits for the hero, asks for payment, takes the coins and opens (USA v2.00). */
 void coin_gated_door_update_us2(char *obj)
 {
     float target[4], origin[4], delta[4];

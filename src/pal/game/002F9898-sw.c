@@ -33,15 +33,16 @@ extern int help_start_entry(int);
 extern void script_queue_hint_for_event(int);
 extern void set_animation_parameter(int, int);
 extern void level_forward_pair(int, int);
-extern void func_PAL_002FC1D0(void);
+extern void PrepareVendorSelectionPreview_pal(void);
 #define ITEM (D_00239BA0[D_00139568[D_0021F240.rows[D_0021F240.index].item]])
 #define ROW (D_0021F240.rows[D_0021F240.index])
 #define BUTTONS (D_00138180.buttons)
 extern int ref_PAL_002F9898_00(int, int);
 
+/* Runs the buy dialog in the vendor screen: works out how many the player can afford, reads the buttons, and completes or cancels the purchase. */
 void VendorPurchaseDialogUpdate_pal(int *cancel, int *confirm)
 {
-    PurchaseItem result;
+    PurchaseItem help_record;
     int item, special, used;
     if (g_vendor_menu_state.state == 1) {
         {
@@ -143,13 +144,13 @@ void VendorPurchaseDialogUpdate_pal(int *cancel, int *confirm)
                         if (special) {
                             PurchaseState *shop = &g_vendor_menu_state;
                             PurchaseRow *rows = shop->rows;
-                            if (help_copy_record_at_depth(&result, rows[shop->index].item, 1) && result.price)
-                                g_item_ammo_counts[rows[shop->index].item] = result.capacity;
+                            if (help_copy_record_at_depth(&help_record, rows[shop->index].item, 1) && help_record.price)
+                                g_item_ammo_counts[rows[shop->index].item] = help_record.capacity;
                         } else {
                             PurchaseState *shop = &g_vendor_menu_state;
                             PurchaseRow *rows = shop->rows;
-                            if (help_copy_record_at_depth(&result, rows[shop->index].item, 2) && result.price)
-                                g_item_ammo_counts[rows[shop->index].item] = result.capacity;
+                            if (help_copy_record_at_depth(&help_record, rows[shop->index].item, 2) && help_record.price)
+                                g_item_ammo_counts[rows[shop->index].item] = help_record.capacity;
                         }
                     }
                     if (item != 31 && item != 61) moby_handle_request_slot_state(item);
@@ -171,6 +172,6 @@ void VendorPurchaseDialogUpdate_pal(int *cancel, int *confirm)
             }
         } else PlayMobySound(0, 17, g_vendor_menu_state.moby);
         g_vendor_menu_state.state = 0;
-        func_PAL_002FC1D0();
+        PrepareVendorSelectionPreview_pal();
     }
 }

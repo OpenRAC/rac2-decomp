@@ -33,7 +33,8 @@ extern int ref_L00_002CA898_01(int);
 extern void vec_clamp_length(void *, float);
 extern int g_hero_landing_anim_id __attribute__((sda));
 
-void func_PAL_L00_002CAC40(void)
+/* Picks what the hero does next after a landing or a stop, such as starting to run or idling. */
+void hero_l00_choose_next_move_after_landing_pal(void)
 {
     g_hero_state.reset_24a0 = 0;
     if (g_hero_state.flag_1492 != 0 && 0.010000001f < g_hero_state.elapsed_174) {

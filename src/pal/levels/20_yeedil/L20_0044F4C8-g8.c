@@ -33,14 +33,15 @@ typedef struct {
     u32 xAC;
 } State;
 
-void pop_target_update_pal(char *arg0) {
-    State *state = *(State **)(arg0 + 0x68);
+/* Update handler for moby class 4819: it sets itself up, waits quietly, and pops with an effect when the player targets it or comes close. */
+void pop_target_update_pal(char *moby) {
+    State *state = *(State **)(moby + 0x68);
     int mode;
 
-    if (g_hero_vehicle_mode == 2 && *(u8 *)(arg0 + 0x20) != 1) {
-        moby_reset_to_idle(arg0);
+    if (g_hero_vehicle_mode == 2 && *(u8 *)(moby + 0x20) != 1) {
+        moby_reset_to_idle(moby);
     }
-    mode = *(u8 *)(arg0 + 0x20);
+    mode = *(u8 *)(moby + 0x20);
     switch (mode) {
     case 0:
         state->x20 = 1.0f;
@@ -48,23 +49,23 @@ void pop_target_update_pal(char *arg0) {
         state->x70 |= 6;
         state->x84 = g_pop_target_param_a;
         state->x88 = g_pop_target_param_b;
-        moby_reset_to_idle(arg0);
+        moby_reset_to_idle(moby);
         return;
     case 1:
         return;
     case 2:
-        pushable_moby_update_pal(arg0, state->x50, 0.0f, 0.5f, 0.6f, state->xA0);
+        pushable_moby_update_pal(moby, state->x50, 0.0f, 0.5f, 0.6f, state->xA0);
         break;
     }
-    if (g_target_moby == arg0) {
+    if (g_target_moby == moby) {
         state->xAC = 1;
     }
-    if (((g_frame_l20_counter & 0xF) == (((int)arg0 >> 8) & 0xF)
-         && 5.0f < math_fabs(*(float *)(arg0 + 0x18)
-                                 - coll_probe_ground_height_below(arg0 + 0x10, 0, 0.5f)))
+    if (((g_frame_l20_counter & 0xF) == (((int)moby >> 8) & 0xF)
+         && 5.0f < math_fabs(*(float *)(moby + 0x18)
+                                 - coll_probe_ground_height_below(moby + 0x10, 0, 0.5f)))
         || (state->xAC != 0 && math_fast_float_d(&state->xA8) != 0)) {
-        moby_vanish_with_effect(arg0);
+        moby_vanish_with_effect(moby);
     } else {
-        path_follow_pop_on_touch(arg0);
+        path_follow_pop_on_touch(moby);
     }
 }

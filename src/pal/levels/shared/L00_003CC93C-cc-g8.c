@@ -69,7 +69,7 @@ extern u8 g_charge_sound_records[];
 extern u8 g_default_vector[] __attribute__((sda));
 
 extern int vec_fast_helper_b(void *);
-extern int func_PAL_L00_002C4480(int, int);
+extern int hero_l00_set_action_pal(int, int);
 extern int math_fast_float_d(void *);
 extern void FastVecScale(void *, void *, float);
 extern void FastVecAdd(void *, void *, void *);
@@ -81,17 +81,17 @@ extern float fast_vec_dist(void *, void *);
 extern float math_fabs(float);
 extern void hud_add_moby_marker(void *, float, unsigned int, void *, int, float, int, float, int);
 extern int get_ammo(int);
-extern void func_PAL_L00_002AF458(void);
+extern void start_equipped_item_animation_pal(void);
 extern int coll_process_hit(float, void *, int, void *, void *);
 extern int moby_is_in_special_class_range(void *);
 extern int PlayMobySound(int, int, void *);
-extern void func_PAL_L00_003CD388(void *);
+extern void weapon_spawn_muzzle_burst_pal(void *);
 extern void anim_start_blended_with_flags(void *, int, int, int, int);
 extern int slot_copy_records_to_free(void *);
 extern void matrix_mul_vec3(void *, void *, void *);
 extern char *pair_choose_owner_for_key(void *, void *, int, int *, int);
 extern void KeyOwnerTableInsert(void *, void *, int);
-extern Moby *func_PAL_L00_0040E9F0(void *, void *, void *, void *, float, float, float, float);
+extern Moby *aimed_projectile_spawn_pal(void *, void *, void *, void *, float, float, float, float);
 extern int weapon_spend_ammo(int, int);
 extern void slot_reset_active(int);
 extern void cancel_hero_item_animation_pal(void);
@@ -106,7 +106,7 @@ static __inline__ void MarkTarget(void *moby, float alpha, unsigned int color, v
     hud_add_moby_marker(moby, alpha, color, position, kind, a, b, c, d);
 }
 
-void func_PAL_L00_003CC93C(Moby *moby)
+void UpdateLockOnWeapon_pal(Moby *moby)
 {
     Vars *vars = moby->vars;
     Vector direction, origin, aim;
@@ -128,7 +128,7 @@ void func_PAL_L00_003CC93C(Moby *moby)
     }
     vec_fast_helper_b(vars);
     if (((Hero *)g_hero_state)->i[0x2294 / 4] == 1)
-        func_PAL_L00_002C4480(0x1D, 1);
+        hero_l00_set_action_pal(0x1D, 1);
     ready = 1;
     if (((Hero *)g_hero_state)->i[0x2294 / 4] == 0x1D) {
         if (math_fast_float_d(&((Hero *)g_hero_state)->i[0x2534 / 4]) == 0)
@@ -188,7 +188,7 @@ void func_PAL_L00_003CC93C(Moby *moby)
             float *info;
             Moby *shot;
 
-            func_PAL_L00_002AF458();
+            start_equipped_item_animation_pal();
             FastVecScale(start, &moby->forward, -1.0f);
             FastVecAdd(start, start, &moby->position);
             FastVecScale(step, &moby->right, 0.275f);
@@ -211,7 +211,7 @@ void func_PAL_L00_003CC93C(Moby *moby)
             strength = 0.0f;
             PlayMobySound(1, 0, moby);
             vars->timer = 0xc;
-            func_PAL_L00_003CD388(moby);
+            weapon_spawn_muzzle_burst_pal(moby);
             anim_start_blended_with_flags(moby, 2, 0, 1, 0);
             moby->scale = 0.9f;
             vars->sound = slot_copy_records_to_free(g_charge_sound_records);
@@ -236,9 +236,9 @@ void func_PAL_L00_003CC93C(Moby *moby)
                 strength = info[4];
         fire:
             if (((Hero *)g_hero_state)->ptr[0xBF8 / 4] != 0)
-                shot = func_PAL_L00_0040E9F0(moby, muzzle, ((Hero *)g_hero_state)->ptr[0xBF8 / 4], g_default_vector, strength, 2.0f, 5.0f, 0.6f);
+                shot = aimed_projectile_spawn_pal(moby, muzzle, ((Hero *)g_hero_state)->ptr[0xBF8 / 4], g_default_vector, strength, 2.0f, 5.0f, 0.6f);
             else
-                shot = func_PAL_L00_0040E9F0(moby, muzzle, target, g_default_vector, strength, 2.0f, 5.0f, 0.6f);
+                shot = aimed_projectile_spawn_pal(moby, muzzle, target, g_default_vector, strength, 2.0f, 5.0f, 0.6f);
             if (shot != 0)
                 shot->owner = moby;
             weapon_spend_ammo(-1, 1);

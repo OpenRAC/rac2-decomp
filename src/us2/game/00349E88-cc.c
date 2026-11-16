@@ -60,7 +60,8 @@ s32 menu_get_selected_index(u8 *a0);
 
 /* func_003489E8 is built from 00345358-list-g8.c. */
 
-void *func_US2_00349E88(void *object) {
+/* Returns its argument unchanged. */
+void *menu_return_object_us2(void *object) {
     return object;
 }
 

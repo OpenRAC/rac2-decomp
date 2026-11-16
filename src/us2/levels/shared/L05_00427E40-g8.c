@@ -11,7 +11,8 @@ extern int snd_play_from_class_bank(int, int, char *, int);
 extern void moby_mark_spawned(void *);
 extern void glow_ring_draw_sprites(char *);
 
-void func_US2_L05_00427E40(char *object)
+/* Flies the pickup toward the player; on arrival adds 10 to value slot 2 and plays a sound. */
+void glow_pickup_collect_slot2_us2(char *object)
 {
     char *state = *(char **)(object + 0x68);
     float scale;
@@ -25,14 +26,14 @@ void func_US2_L05_00427E40(char *object)
             goto check_scale;
         }
         if (scale < 60.0f) {
-            float *p = *(float **)(object + 0x24);
-            float v = p[9] * 0.02222222276031971f * scale;
+            float *class_data = *(float **)(object + 0x24);
+            float scaled = class_data[9] * 0.02222222276031971f * scale;
 
-            *(float *)(object + 0x2C) = v;
+            *(float *)(object + 0x2C) = scaled;
             {
-                float cap = p[9] * 0.30000001192092896f;
+                float cap = class_data[9] * 0.30000001192092896f;
 
-                if (v < cap)
+                if (scaled < cap)
                     *(float *)(object + 0x2C) = cap;
             }
             vec_spring_to_target(object + 0x10, (void *)(g_glow_effect_target_moby + 0x10), state + 0x40,

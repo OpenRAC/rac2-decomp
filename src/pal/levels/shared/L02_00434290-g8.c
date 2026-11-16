@@ -15,24 +15,25 @@ extern float g_spinning_parts_timer_rate __attribute__((sda));
 extern void euler_rotation_basis(void *, void *);
 extern void multiply_matrix3x3(void *, void *, void *);
 
-void spinning_parts_group_update_pal(u8 *a0) {
-    int *s = *(int **)(a0 + 0x68);
+/* Spins a group of parts: doubles their weight at the start, then turns them every frame. */
+void spinning_parts_group_update_pal(u8 *moby) {
+    int *vars = *(int **)(moby + 0x68);
 
-    switch (a0[0x20]) {
+    switch (moby[0x20]) {
     case 0: {
         unsigned short *p;
         Rec32 *e;
         u8 none = 0xFF;
 
-        if (s[0] == -1)
+        if (vars[0] == -1)
             break;
-        a0[0x30] = none;
-        for (p = g_record_lists[s[0]];
-             p != 0 && ((p != 0 && (short)p[-1] >= 0) || p == g_record_lists[s[0]]) &&
+        moby[0x30] = none;
+        for (p = g_record_lists[vars[0]];
+             p != 0 && ((p != 0 && (short)p[-1] >= 0) || p == g_record_lists[vars[0]]) &&
              (e = g_sky_records + (*p & 0x7FFF)) != 0;
              p++)
             e->w = e->w + e->w;
-        a0[0x20] = 1;
+        moby[0x20] = 1;
         break;
     }
     case 1: {
@@ -43,8 +44,8 @@ void spinning_parts_group_update_pal(u8 *a0) {
         float x;
         u8 *g;
 
-        for (p = g_record_lists[s[0]];
-             p != 0 && ((p != 0 && (short)p[-1] >= 0) || p == g_record_lists[s[0]]) &&
+        for (p = g_record_lists[vars[0]];
+             p != 0 && ((p != 0 && (short)p[-1] >= 0) || p == g_record_lists[vars[0]]) &&
              (e = g_record_table + ((*p & 0x7FFF) << 6)) != 0;
              p++) {
             *(TI128 *)v = 0;

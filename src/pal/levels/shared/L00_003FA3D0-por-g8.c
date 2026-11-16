@@ -39,7 +39,7 @@ extern void cam_compute_view_direction(void *, void *, int);
 extern void FastVecCross(void *, void *, void *);
 extern void FastVecAdd(void *, void *, void *);
 
-void func_PAL_L00_003FA3D0(Actor *self)
+void vaporizer_bolt_start_trail_sample_pal(Actor *self)
 {
     Slot *slots;
     Source *source;

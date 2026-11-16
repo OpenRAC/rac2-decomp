@@ -23,7 +23,8 @@ typedef struct {
 } PoolRecord64;
 extern PoolRecord64 g_cam_l16_override_slots[];
 
-PoolRecord64 *cam_alloc_override_slot_pal(int a)
+/* Finds a free camera override slot, fills it with starting values and returns it, or returns 0 if all are used. */
+PoolRecord64 *cam_alloc_override_slot_pal(int kind)
 {
     PoolRecord64 *p = g_cam_l16_override_slots;
     int i;
@@ -36,7 +37,7 @@ PoolRecord64 *cam_alloc_override_slot_pal(int a)
             p->f12 = -1.0f;
             p->f16 = -1.0f;
             p->f20 = -1.0f;
-            p->f28 = a;
+            p->f28 = kind;
             p->f52 = 6;
             p->f50 = 100;
             p->f29 = 1;

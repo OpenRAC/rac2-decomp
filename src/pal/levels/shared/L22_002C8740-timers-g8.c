@@ -106,8 +106,9 @@ extern void hero_build_relative_point(void *, int, float, float, float), hero_ap
 
 /* Corresponds to RAC1 update_hero_timers_and_reach_state in
  * src/overlays/shared/hero_vehicle_and_collision.c. */
+/* Counts up the hero's frame timers every frame, tracks how long the hero has been standing still, and sets how far the hero can reach for objects (PAL: 50 Hz timings). */
 void hero_update_timers_and_reach_pal(void) {
-    unsigned char *m, *pos, *hero;
+    unsigned char *nearby_moby, *moby_pos, *hero;
     float sum[4], delta[4];
     int i, count, history_index, first_index, second_index;
     if (!g_hero_state.tilt_disabled) hero_ease_lean_to_upright_pal();
@@ -186,15 +187,15 @@ void hero_update_timers_and_reach_pal(void) {
         }
     }
     if (g_hero_state.field_224) {
-        for (i = 0;(m = g_nearby_l22_moby_list[i]) != 0;i++) {
-            if (moby_is_in_special_class_range(m) || (m && BP(m, 0x24) && BS(BP(m, 0x24), 0x46) == 22)) {
-                if ((g_frame_l22_counter&7) == (((int)m>>8)&7) || !math_random_int_below(4)) {
+        for (i = 0;(nearby_moby = g_nearby_l22_moby_list[i]) != 0;i++) {
+            if (moby_is_in_special_class_range(nearby_moby) || (nearby_moby && BP(nearby_moby, 0x24) && BS(BP(nearby_moby, 0x24), 0x46) == 22)) {
+                if ((g_frame_l22_counter&7) == (((int)nearby_moby>>8)&7) || !math_random_int_below(4)) {
                     hero = (unsigned char *)&g_hero_state+0x80;
-                    pos = m+0x10;
-                    if (fast_vec_dist(hero, pos)<15.37f) {
-                        FastVecSub(sum, pos, hero);
+                    moby_pos = nearby_moby+0x10;
+                    if (fast_vec_dist(hero, moby_pos)<15.37f) {
+                        FastVecSub(sum, moby_pos, hero);
                         vec_scale_to_length(sum, sum, 1.7f);
-                        part_queue_impact_effect(m, g_hero_state.field_2290, 0x4000000, hero, sum, 1.0f);
+                        part_queue_impact_effect(nearby_moby, g_hero_state.field_2290, 0x4000000, hero, sum, 1.0f);
                     }
                 }
             }

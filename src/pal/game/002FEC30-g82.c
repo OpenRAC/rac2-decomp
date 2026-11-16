@@ -20,6 +20,7 @@ extern void FastVecScale(float *, float *, float);
 extern void vec_scale_to_length(float *, float *, float);
 extern void table_clear_entry_flag(int);
 
+/* Flies a small test effect from the start point along the motion direction until it hits something, then reports the hit spot, surface direction and what was hit. */
 int coll_trace_projectile_to_impact_pal(float *start, float *motion, float *destination, float *normal,
                  void *owner, int *object_out, int *type_out, float scale)
 {

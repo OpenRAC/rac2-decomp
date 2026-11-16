@@ -39,7 +39,8 @@ extern void vec_build_spherical_offset(float *, float, float, float);
 extern u8 *SpawnSpinningSparkParticle(void *, float, float, int, void *, int, int, float, float);
 extern float IntToFloat(int);
 
-void func_PAL_L00_00419448(u8 *object, void *unused, float *drift)
+/* Sets off an explosion with fire, sparks, smoke and a shockwave. All the pieces also drift with the given speed (PAL: 50 Hz speeds and lifetimes). */
+void part_spawn_explosion_burst_with_drift_pal(u8 *object, void *unused, float *drift)
 {
     Vec4 position;
     Vec4 velocity;
@@ -47,7 +48,7 @@ void func_PAL_L00_00419448(u8 *object, void *unused, float *drift)
     u8 *state = *(u8 **)(object + 0x68);
     float inner, outer, angle, speed;
     u8 *effect;
-    int na, nb, nc, ne, ng, nh, nk, sign;
+    int core_idx, glow_idx, bright_idx, large_idx, small_idx, debris_idx, smoke_idx, sign;
 
     inner = g_explosion_burst_inner_scale * F(state, 0x14) * 210000.0f;
     outer = g_explosion_burst_outer_scale * F(state, 0x14) * 210000.0f;
@@ -61,21 +62,21 @@ void func_PAL_L00_00419448(u8 *object, void *unused, float *drift)
         if (effect)
             effect[2] = g_effect_definitions.fireColors[0];
     }
-    for (na = 0; na < 2; na++) {
+    for (core_idx = 0; core_idx < 2; core_idx++) {
         {
             effect = part_spawn_gravity_fade(object + 0x10, drift, (g_explosion_burst_particle_texture * 5 + 2) / 6, 0xF78E38, 0, 127, 0, inner, outer, 0.0f, 0);
             if (effect)
                 effect[2] = g_effect_definitions.fireColors[5];
         }
     }
-    for (nb = 0; nb < 2; nb++) {
+    for (glow_idx = 0; glow_idx < 2; glow_idx++) {
         {
             effect = part_spawn_gravity_fade(object + 0x10, drift, (g_explosion_burst_particle_texture * 5 + 2) / 6, 0xF78E38, 0, 127, 0, inner, outer, 0.0f, 0);
             if (effect)
                 effect[2] = g_effect_definitions.fireColors[6];
         }
     }
-    for (nc = 0; nc < I(state, 0x20); nc++) {
+    for (bright_idx = 0; bright_idx < I(state, 0x20); bright_idx++) {
         float heading, angle, size, speed;
         int lifetime, phase;
         heading = mat_fast_helper_a(g_scalar_transition_state.target[0] - F(object, 0x10), g_scalar_transition_state.target[1] - F(object, 0x14));
@@ -100,7 +101,7 @@ void func_PAL_L00_00419448(u8 *object, void *unused, float *drift)
                 effect[2] = g_effect_definitions.sparkColors[0];
         }
     }
-    for (ne = 0; ne < I(state, 0x24); ne++) {
+    for (large_idx = 0; large_idx < I(state, 0x24); large_idx++) {
         float heading, angle, size, speed;
         int lifetime, phase;
         heading = mat_fast_helper_a(g_scalar_transition_state.target[0] - F(object, 0x10), g_scalar_transition_state.target[1] - F(object, 0x14));
@@ -120,7 +121,7 @@ void func_PAL_L00_00419448(u8 *object, void *unused, float *drift)
         FastVecAdd(velocity, velocity, drift);
         part_spawn_fading_drift(position, velocity, (lifetime * 5 + 2) / 6, 0xFF8F00, phase, 127, 127, size * 210000.0f, F(state, 0x14) * 2100.0f, 0.00584f, 5);
     }
-    for (ng = 0; ng < I(state, 0x28); ng++) {
+    for (small_idx = 0; small_idx < I(state, 0x28); small_idx++) {
         float heading, angle, size, speed;
         int lifetime, phase;
         heading = mat_fast_helper_a(g_scalar_transition_state.target[0] - F(object, 0x10), g_scalar_transition_state.target[1] - F(object, 0x14));
@@ -140,7 +141,7 @@ void func_PAL_L00_00419448(u8 *object, void *unused, float *drift)
         FastVecAdd(velocity, velocity, drift);
         part_spawn_fading_drift(position, velocity, (lifetime * 5 + 2) / 6, 0xFF6430, phase, 127, 127, size * 210000.0f, F(state, 0x14) * 2100.0f, 0.00584f, 3);
     }
-    for (nh = 0; nh < I(state, 0x30); nh++) {
+    for (debris_idx = 0; debris_idx < I(state, 0x30); debris_idx++) {
         float roll, turn;
         speed = math_random_float_range(15.0f, 20.0f) * F(state, 0x14) * 0.020000001f;
         FastVecScale(position, object + 0xC0, speed);
@@ -164,7 +165,7 @@ void func_PAL_L00_00419448(u8 *object, void *unused, float *drift)
         SpawnExplosionEffects(object, g_default_vector, object + 0x10, 0.0f, 0.0f, 0, 0, 0, 0.0f, 0.0f, 9.0f, 0.0f, -1, 0, 0, -1, 0, 0x810001, F(state, 0x14) * 20.0f);
     sign = 1;
     angle = mat_fast_helper_a(g_scalar_transition_state.target[0] - F(object, 0x10), g_scalar_transition_state.target[1] - F(object, 0x14));
-    for (nk = 0; nk < I(state, 0x2C); nk++) {
+    for (smoke_idx = 0; smoke_idx < I(state, 0x2C); smoke_idx++) {
         float radius, roll, turn;
         position[0] = F(object, 0x10) + math_random_signed_float_range(0.0f, 1.0f) * F(state, 0x14);
         sign = -sign;

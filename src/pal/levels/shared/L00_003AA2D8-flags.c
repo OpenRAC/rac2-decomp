@@ -8,7 +8,7 @@ extern void vec_transform_or_copy(void *, void *);
 extern void beam_l00_effect_update(char *);
 extern void FastVecAdd(void *, void *, void *);
 extern void lerp_vector(void *, void *, void *, float);
-extern void func_PAL_L00_003ABDC8(void *, int);
+extern void beam_spawn_particle_pal(void *, int);
 extern int beam_test_segment_hit_pal(char *, void *);
 extern int FastDecTimer(void *);
 
@@ -40,9 +40,9 @@ void moving_beam_update_pal(char *moby)
     if (*(unsigned char *)(moby + 0x20) == 0)
         *(unsigned char *)(moby + 0x20) = 1;
     else
-        func_PAL_L00_003ABDC8(previous, *(short *)(state + 0x1A));
+        beam_spawn_particle_pal(previous, *(short *)(state + 0x1A));
     lerp_vector(midpoint, previous, position, 0.5f);
-    func_PAL_L00_003ABDC8(midpoint, *(short *)(state + 0x1A));
+    beam_spawn_particle_pal(midpoint, *(short *)(state + 0x1A));
     if (*(float *)(moby + 0x10) < 2.0f || *(float *)(moby + 0x10) > 1021.0f ||
         *(float *)(moby + 0x14) < 2.0f || *(float *)(moby + 0x14) > 1021.0f ||
         *(float *)(moby + 0x18) < 2.0f || *(float *)(moby + 0x18) > 1021.0f ||

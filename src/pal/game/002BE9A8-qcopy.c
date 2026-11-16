@@ -14,7 +14,7 @@ extern unsigned char *g_part_tex_trail;
 
 /* Spawns a spinning spark near position (jittered by up to jitter on each axis)
    turning about axis at a random speed between lo and hi, in either direction. */
-char *func_PAL_002BE9A8(TI128 *position, int spin, TI128 *axis, int colour, int count,
+char *part_spawn_spinning_spark_pal(TI128 *position, int spin, TI128 *axis, int colour, int count,
                      float jitter, float lo, float hi, float size)
 {
     char *p = part_alloc(0x17);

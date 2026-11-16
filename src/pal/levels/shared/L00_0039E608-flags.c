@@ -25,7 +25,7 @@ extern void moby_transform_joint_to_world(char *, int, char *);
 extern void CalculateAimedLaunchVelocity(void *, void *, void *, float, float, float, float, void *);
 extern int coll_trace_projectile_to_impact_pal(void *, void *, void *, void *, void *, int, int, float);
 extern int math_fast_float_d(int *), weapon_spend_ammo(int, int);
-extern void cancel_hero_item_animation_pal(void), func_PAL_L00_002AF458(void);
+extern void cancel_hero_item_animation_pal(void), start_equipped_item_animation_pal(void);
 extern int PlayMobySound(int, int, char *);
 extern char *decoy_create_projectile(char *, char *);
 extern void ref_L00_0039D110_00(void *, void *);
@@ -55,7 +55,7 @@ void UpdateProjectileLauncher_pal(char *actor)
     case 1:
         if ((g_pad_pressed_flags & g_hero_state.buttons) == 0 || g_hero_state.busy || g_hero_state.resource < 8 || !ready) break;
         if (weapon_spend_ammo(-1, 1)) {
-            func_PAL_L00_002AF458();
+            start_equipped_item_animation_pal();
             *(unsigned char *)(actor + 0x20) = 2;
             *(int *)(state + 0x20) = 17;
             break;

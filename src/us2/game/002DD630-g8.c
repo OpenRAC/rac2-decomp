@@ -8,11 +8,12 @@ extern void popup_set_flag_on(void *);
 extern volatile int g_menu_panel_active;
 extern char *g_resident_data_base __attribute__((sda));
 
-int menu_preview_page_init_us2(char *object)
+/* Prepares a menu page when it opens and clears its two image slots. */
+int menu_preview_page_init_us2(char *menu)
 {
     menu_stream_chunk_table_init(1);
-    *(int *)(object + 0x48) = menu_stream_chunk_claim_free(0);
-    *(int *)(object + 0x4C) = 0;
+    *(int *)(menu + 0x48) = menu_stream_chunk_claim_free(0);
+    *(int *)(menu + 0x4C) = 0;
     menu_clear_block_fields();
     menu_clear_counter();
     if (g_menu_panel_active != 0 && g_resident_data_base != 0)
@@ -47,27 +48,27 @@ extern int text_draw_centered_small(int, int, unsigned long, char *, int);
 
 /* Menu line for the current slot: prints its name (and the follow-up line)
    while the menu is in its listing state. */
-int func_US2_002DD630(int *box)
+int save_slot_location_text_draw_us2(int *box)
 {
-    char buf[64];
-    char *g = g_pause_menu_state;
-    Slots_002DC900 *s = &g_memcard_state;
-    int idx;
-    int next;
-    int y;
+    char name_buffer[64];
+    char *menu_state = g_pause_menu_state;
+    Slots_002DC900 *slots = &g_memcard_state;
+    int location_index;
+    int second_line_id;
+    int y_offset;
 
-    idx = s->entries[*(int *)(*(char **)(*(char **)(g + 0x14) + 0xE8) + 0x40)].first % 0x1C;
+    location_index = slots->entries[*(int *)(*(char **)(*(char **)(menu_state + 0x14) + 0xE8) + 0x40)].first % 0x1C;
     SetupGifPaging(0);
-    if (s->mode < 3 && s->selected < 0 && *(int *)(g + 0x164) >= 11 && s->state == 2) {
-        if (idx == -1) {
+    if (slots->mode < 3 && slots->selected < 0 && *(int *)(menu_state + 0x164) >= 11 && slots->state == 2) {
+        if (location_index == -1) {
             text_draw_centered_small(box[6], box[7] + g_save_location_line_height / 2, 0x80F0F0F0, GetLocalizedString(0x2DAA), -1);
         } else {
-            next = g_menu_text_id_table[idx * 2 + 1];
-            y = 0;
-            if (next < 0) y = g_save_location_line_height >> 1;
-            text_draw_centered_small(box[6], box[7] + y, 0x80F0F0F0, text_format_location_name(buf, idx), -1);
-            if (next >= 0) {
-                text_draw_centered_small(box[6], box[7] + g_save_location_line_height, 0x80F0F0F0, GetLocalizedString(g_menu_text_id_table[idx * 2 + 1]), -1);
+            second_line_id = g_menu_text_id_table[location_index * 2 + 1];
+            y_offset = 0;
+            if (second_line_id < 0) y_offset = g_save_location_line_height >> 1;
+            text_draw_centered_small(box[6], box[7] + y_offset, 0x80F0F0F0, text_format_location_name(name_buffer, location_index), -1);
+            if (second_line_id >= 0) {
+                text_draw_centered_small(box[6], box[7] + g_save_location_line_height, 0x80F0F0F0, GetLocalizedString(g_menu_text_id_table[location_index * 2 + 1]), -1);
             }
         }
     }

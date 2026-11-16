@@ -8,33 +8,34 @@ extern char *GetLocalizedString(int);
 extern void hud_set_widget_field_b(void *, unsigned int);
 extern void object_set_value_float(void *, float);
 
-void tab_menu_switch_tab_us2(char *self, int idx)
+/* Switches a tab menu to the given tab: loads its records, title and look. */
+void tab_menu_switch_tab_us2(char *self, int tab_index)
 {
     float *records;
-    float f;
+    float tab_value;
     unsigned char *child;
-    if ((unsigned int)idx > 2) return;
-    *(int *)(self + 0x1C4) = ((int *)&g_tab_menu_tab_values)[idx];
-    *(int *)(self + 0x1C8) = (int)(g_tab_menu_records + idx * 0x20);
-    *(int *)(self + 0x1CC) = (idx == 0) ? 7 : ((idx == 1) ? 8 : 6);
-    if (idx != 0) {
-        if (idx == 2) f = 2.0f;
-        else f = 1.0f;
+    if ((unsigned int)tab_index > 2) return;
+    *(int *)(self + 0x1C4) = ((int *)&g_tab_menu_tab_values)[tab_index];
+    *(int *)(self + 0x1C8) = (int)(g_tab_menu_records + tab_index * 0x20);
+    *(int *)(self + 0x1CC) = (tab_index == 0) ? 7 : ((tab_index == 1) ? 8 : 6);
+    if (tab_index != 0) {
+        if (tab_index == 2) tab_value = 2.0f;
+        else tab_value = 1.0f;
     } else {
-        f = 0.0f;
+        tab_value = 0.0f;
     }
     child = (unsigned char *)self + 0x238;
     {
-        int *p = (int *)(self + idx * 4);
-        menu_set_selected_index(child, p[0x6E]);
+        int *tab_slots = (int *)(self + tab_index * 4);
+        menu_set_selected_index(child, tab_slots[0x6E]);
     }
-    records = (idx == 0) ? *(float **)(self + 0x310) : ((idx == 1) ? *(float **)(self + 0x314) : *(float **)(self + 0x318));
+    records = (tab_index == 0) ? *(float **)(self + 0x310) : ((tab_index == 1) ? *(float **)(self + 0x314) : *(float **)(self + 0x318));
     menu_set_entry_table(child, records);
-    hud_set_widget_field_b(self + 0x1D0, GetLocalizedString((idx == 0) ? 0x2BEB : ((idx == 1) ? 0x2BEC : 0x3094)));
-    object_set_value_float(self, f);
-    object_set_value_float(self + 0x4C, f);
-    object_set_value_float(self + 0xE4, f);
-    *(int *)(self + 0x31C) = idx;
+    hud_set_widget_field_b(self + 0x1D0, GetLocalizedString((tab_index == 0) ? 0x2BEB : ((tab_index == 1) ? 0x2BEC : 0x3094)));
+    object_set_value_float(self, tab_value);
+    object_set_value_float(self + 0x4C, tab_value);
+    object_set_value_float(self + 0xE4, tab_value);
+    *(int *)(self + 0x31C) = tab_index;
 }
 
 extern float g_tab_menu_cursor_step_y __attribute__((sda));
@@ -42,6 +43,7 @@ extern float g_tab_menu_cursor_base_y;
 extern float g_tab_menu_cursor_offset_x __attribute__((sda));
 extern void object_set_first_float4(void *, float, float, float, float);
 
+/* Moves the cursor to the selected row of the current tab. */
 void tab_menu_position_cursor_us2(char *self)
 {
     int index = *(int *)(self + 0x31C);

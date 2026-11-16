@@ -115,9 +115,9 @@ extern int cam_is_hero_in_trigger(char *, char *);
 /* Store the supplied unsigned 32-bit word at owner byte offset 0x 44. */
 /* Store the supplied unsigned 32-bit word at owner byte offset 0x 40. */
 /* Store the supplied unsigned 32-bit word at owner byte offset 0x 40. */
-void func_US2_L00_0042DA48(int param_1, unsigned int param_2)
+void moby_set_field_40_b_us2(int moby, unsigned int value)
 {
-  *(unsigned int *)(param_1 + 0x40) = param_2;
+  *(unsigned int *)(moby + 0x40) = value;
   return;
 }
 

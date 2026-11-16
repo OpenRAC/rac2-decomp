@@ -70,6 +70,7 @@ static __inline__ int label_y(void *handle, float value, float scale, float half
                       b, c);                                                                        \
     }
 
+/* Draws the mission HUD sprites: the icon, the timed map badge with its fade and the two label sprites (PAL: 250-frame timer). */
 void hud_draw_feltzin_mission_sprites_pal(s32 first, s32 timed, s32 third, s32 fourth)
 {
     HudTimerVars *vars = *(HudTimerVars **)(g_feltzin_controller_moby + 0x68);
@@ -120,9 +121,9 @@ void hud_draw_feltzin_mission_sprites_pal(s32 first, s32 timed, s32 third, s32 f
             }
             sprintf(text, g_str_feltzin_map_label, g_current_map_index[3]);
             {
-                s32 textX = g_feltzin_hud_badge_x + 5;
+                s32 text_x = g_feltzin_hud_badge_x + 5;
 
-                text_draw_medium(textX, label_y((void *)textX, (f32)(g_feltzin_hud_badge_y + 2), g_screen_l05_scale, 0.5f, 1),
+                text_draw_medium(text_x, label_y((void *)text_x, (f32)(g_feltzin_hud_badge_y + 2), g_screen_l05_scale, 0.5f, 1),
                               0x80808080, text, 128);
             }
         timed_done:;

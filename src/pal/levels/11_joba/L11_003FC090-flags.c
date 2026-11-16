@@ -10,7 +10,8 @@ extern float math_fast_sin_or_cos_a(float);
 extern void vec_scale_to_length(float *, float *, float);
 extern void FastVecAdd(float *, float *, float *);
 
-void func_PAL_L11_003FC478(u8 *object) {
+/* Makes the object bob out and back along its direction in a smooth wave, restarting its sound each cycle (PAL: 50 Hz step sizes). */
+void bobbing_l11_platform_update_pal(u8 *object) {
     float movement[4];
     u8 *vars = *(u8 **)(object + 0x68);
     if (vars == 0) {

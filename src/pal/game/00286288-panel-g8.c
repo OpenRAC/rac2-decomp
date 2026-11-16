@@ -128,7 +128,7 @@ extern unsigned long long GetFrameTexture(int);
 extern void DrawRotatedSprite(float, float, float, float, float, int, int, long long);
 extern void *memset(void *, int, int);
 extern int flag_get_word(void);
-extern int func_PAL_00299518(void);
+extern int menu_get_pending_value_pal(void);
 extern int g_save_menu_flags;
 extern int menu_is_confirm_pending(void);
 extern int sprintf(char *, const char *, ...);
@@ -142,12 +142,13 @@ extern void DoGifPaging(void);
 
 #define SPR ((unsigned char *)0x70000000)
 
-void func_PAL_00286288(void)
+/* Draws the HUD message panel (save, load and confirm prompts) for the current modal mode, with PAL text ids and 50 Hz fade and countdown. */
+void menu_draw_message_panel_pal(void)
 {
     char buf[0x300];
     MenuBox box;
-    MenuBox tmp;
-    MenuBox tmp2;
+    MenuBox box_template;
+    MenuBox box_template_b;
     char buf2[0x100];
 
     if (g_modal_state.f7E == 0)
@@ -205,15 +206,15 @@ void func_PAL_00286288(void)
                 p++;
             }
             id = g_modal_state.f44 ? 0 : 0x1137;
-            memset(&tmp, 0, sizeof(tmp));
-            tmp.f02 = g_screen_height;
-            tmp.f04 = 0x60;
-            tmp.f06 = 0x1A0;
-            tmp.f08 = 0x100;
-            tmp.f0A = 0x68;
-            tmp.f10 = 0x10;
-            tmp.flags = 1;
-            box = tmp;
+            memset(&box_template, 0, sizeof(box_template));
+            box_template.f02 = g_screen_height;
+            box_template.f04 = 0x60;
+            box_template.f06 = 0x1A0;
+            box_template.f08 = 0x100;
+            box_template.f0A = 0x68;
+            box_template.f10 = 0x10;
+            box_template.flags = 1;
+            box = box_template;
             level_forward_draw_args(&box, 0x80F0F0F0, p, 1, 1, -1, 0, id ? GetLocalizedString(id) : 0, 0, 0);
         }
         break;
@@ -224,15 +225,15 @@ void func_PAL_00286288(void)
 
             text = GetLocalizedString(g_modal_state.f80 ? 0xC15 : 0xC14);
             id = g_modal_state.f44 ? 0 : 0x1137;
-            memset(&tmp2, 0, sizeof(tmp2));
-            tmp2.f02 = g_screen_height;
-            tmp2.f04 = 0x60;
-            tmp2.f06 = 0x1A0;
-            tmp2.f08 = 0x100;
-            tmp2.f0A = 0x68;
-            tmp2.f10 = 0x10;
-            tmp2.flags = 1;
-            box = tmp2;
+            memset(&box_template_b, 0, sizeof(box_template_b));
+            box_template_b.f02 = g_screen_height;
+            box_template_b.f04 = 0x60;
+            box_template_b.f06 = 0x1A0;
+            box_template_b.f08 = 0x100;
+            box_template_b.f0A = 0x68;
+            box_template_b.f10 = 0x10;
+            box_template_b.flags = 1;
+            box = box_template_b;
             level_forward_draw_args(&box, 0x80F0F0F0, text, 1, 1, -1, 0, id ? GetLocalizedString(id) : 0, 0, 0);
         }
         break;
@@ -245,7 +246,7 @@ void func_PAL_00286288(void)
             text = g_str_message_text;
             id1 = 0;
             id2 = 0;
-            if (flag_get_word() || ((g_save_menu_flags & 0x600) && func_PAL_00299518())) {
+            if (flag_get_word() || ((g_save_menu_flags & 0x600) && menu_get_pending_value_pal())) {
                 id1 = 0x1137;
                 text = GetLocalizedString(0xC15);
             } else {
@@ -356,15 +357,15 @@ void func_PAL_00286288(void)
                 }
             }
             if (show) {
-                memset(&tmp, 0, sizeof(tmp));
-                tmp.f02 = g_screen_height;
-                tmp.f04 = 0x60;
-                tmp.f06 = 0x1A0;
-                tmp.f08 = 0x100;
-                tmp.f0A = 0x68;
-                tmp.f10 = 0x10;
-                tmp.flags = 1;
-                box = tmp;
+                memset(&box_template, 0, sizeof(box_template));
+                box_template.f02 = g_screen_height;
+                box_template.f04 = 0x60;
+                box_template.f06 = 0x1A0;
+                box_template.f08 = 0x100;
+                box_template.f0A = 0x68;
+                box_template.f10 = 0x10;
+                box_template.flags = 1;
+                box = box_template;
                 level_forward_draw_args(&box, 0x80F0F0F0, text, 1, 1, -1, 0,
                               id1 ? GetLocalizedString(id1) : 0, id2 ? GetLocalizedString(id2) : 0, 0);
             }
@@ -405,39 +406,39 @@ void func_PAL_00286288(void)
         break;
     }
     case 9: {
-        char *a, *b, *c;
+        char *accept_label, *back_label, *message;
 
         FontSetWindow(&box, 0xF0, 0x1E0, 0x60, 0x1A0, 0x100,
                       (int)(g_hud_scale * 100.0f + 0.5f), 0x10, 3);
-        a = g_message_panel_icon_a;
-        if (!a)
-            a = GetLocalizedString(0x113B);
-        b = g_message_panel_icon_b;
-        if (!b)
-            b = GetLocalizedString(0x1138);
-        c = g_message_panel_text;
-        if (!c)
-            c = GetLocalizedString(0xBDE);
-        level_forward_draw_args(&box, 0x80F0F0F0, c, 1, 1, -1, 0, a, b, g_message_panel_extra);
+        accept_label = g_message_panel_icon_a;
+        if (!accept_label)
+            accept_label = GetLocalizedString(0x113B);
+        back_label = g_message_panel_icon_b;
+        if (!back_label)
+            back_label = GetLocalizedString(0x1138);
+        message = g_message_panel_text;
+        if (!message)
+            message = GetLocalizedString(0xBDE);
+        level_forward_draw_args(&box, 0x80F0F0F0, message, 1, 1, -1, 0, accept_label, back_label, g_message_panel_extra);
         break;
     }
     case 10: {
-        char *a, *c;
+        char *accept_label, *message;
 
         FontSetWindow(&box, 0xF0, 0x1E0, 0x60, 0x1A0, 0x100,
                       (int)(g_hud_scale * 100.0f + 0.5f), 0x10, 3);
-        a = g_message_panel_icon_a;
-        if (!a)
-            a = GetLocalizedString(0x113B);
-        c = g_message_panel_text;
-        if (!c)
-            c = GetLocalizedString(0xBDE);
-        level_forward_draw_args(&box, 0x80F0F0F0, c, 1, 1, -1, 0, a, 0, g_message_panel_extra);
+        accept_label = g_message_panel_icon_a;
+        if (!accept_label)
+            accept_label = GetLocalizedString(0x113B);
+        message = g_message_panel_text;
+        if (!message)
+            message = GetLocalizedString(0xBDE);
+        level_forward_draw_args(&box, 0x80F0F0F0, message, 1, 1, -1, 0, accept_label, 0, g_message_panel_extra);
         break;
     }
     case 11: {
         int enabled;
-        char *a;
+        char *accept_label;
         float k, sc, h;
         int n;
         MenuBox *pb;
@@ -452,12 +453,12 @@ void func_PAL_00286288(void)
         case 0:
             break;
         case 1: {
-            char *b;
+            char *back_label;
 
-            a = GetLocalizedString(0x1137);
-            b = GetLocalizedString(0x1BCA);
+            accept_label = GetLocalizedString(0x1137);
+            back_label = GetLocalizedString(0x1BCA);
             sprintf(buf2, GetLocalizedString(0x13D4), 15);
-            level_forward_draw_args(&box, 0x80F0F0F0, buf2, enabled, enabled, -1, 0, a, b, 0);
+            level_forward_draw_args(&box, 0x80F0F0F0, buf2, enabled, enabled, -1, 0, accept_label, back_label, 0);
             break;
         }
         case 2:
@@ -466,8 +467,8 @@ void func_PAL_00286288(void)
             g_modal_state.f60 = g_modal_state.f5C / 50 + 1;
             sprintf(buf2, g_str_message_format_two, GetLocalizedString(0x10FF), GetLocalizedString(0x1100),
                           g_modal_state.f60, GetLocalizedString(0x1101));
-            a = GetLocalizedString(0x113B);
-            level_forward_draw_args(&box, 0x80F0F0F0, buf2, enabled, enabled, -1, 0, a,
+            accept_label = GetLocalizedString(0x113B);
+            level_forward_draw_args(&box, 0x80F0F0F0, buf2, enabled, enabled, -1, 0, accept_label,
                           GetLocalizedString(0x1138), 0);
             break;
         }

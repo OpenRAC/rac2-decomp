@@ -17,7 +17,8 @@ extern void item_menu_set_title_mode(u8 *, u32);
 
 /* constructor: stores the owner at +0x28C, allocates the 16-byte position at +0x288 and initialises the
    sub-objects at +0x0, +0x4C, +0x98, +0xE4, +0x1B0, +0x1F8, +0x240 and +0x298 */
-int func_US2_00344480(unsigned char *owner)
+/* Returns the id of the entry selected in the menu's list (USA v2.00 item_menu_get_selected_id). */
+int item_menu_get_selected_id_us2(unsigned char *owner)
 {
     return menu_list_get_selected_id(owner + 0x2c8);
 }

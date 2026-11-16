@@ -34,7 +34,7 @@ extern int pickup_check_stock_increase(char *value);
  * of 0xFE or 0xFD, or a null next pointer, ends the walk. */
 void moby_trigger_nearby_response_us2(char *object)
 {
-    L00_0038BD00_Node *s0;
+    L00_0038BD00_Node *node;
     float limit;
     float step;
     float value;
@@ -45,45 +45,45 @@ void moby_trigger_nearby_response_us2(char *object)
     limit = 2.7f;
     if (g_hero_override_flag != 0)
         limit = 10.0f;
-    s0 = (L00_0038BD00_Node *)g_moby_l00_list_head;
-    if (s0 == 0)
+    node = (L00_0038BD00_Node *)g_moby_l00_list_head;
+    if (node == 0)
         return;
     step = 0.01745329424738884f;
     while (1) {
-        mode = s0->mode;
+        mode = node->mode;
         if (mode == 0xFE)
             return;
         if (mode == 0xFD)
             return;
-        if (s0 != 0 && (kind = s0->kind) != 0 && kind->type == 0x13) {
-            value = fast_vec_dist((char *)s0 + 0x10, object + 0x10);
+        if (node != 0 && (kind = node->kind) != 0 && kind->type == 0x13) {
+            value = fast_vec_dist((char *)node + 0x10, object + 0x10);
             if (value < limit) {
                 value = func_002A7878_1(-30.0f, 30.0f);
-                result = pickup_start_fly_to_target((char *)s0, g_hero_state.value, value * step, 0.0f);
+                result = pickup_start_fly_to_target((char *)node, g_hero_state.value, value * step, 0.0f);
             } else {
-                s0 = s0->next;
+                node = node->next;
                 goto next;
             }
         } else {
-            if (moby_is_ammo((char *)s0) == 0) {
-                s0 = s0->next;
+            if (moby_is_ammo((char *)node) == 0) {
+                node = node->next;
                 goto next;
             }
-            value = fast_vec_dist((char *)s0 + 0x10, object + 0x10);
+            value = fast_vec_dist((char *)node + 0x10, object + 0x10);
             if (value < limit) {
-                result = pickup_check_stock_increase((char *)s0);
+                result = pickup_check_stock_increase((char *)node);
             } else {
-                s0 = s0->next;
+                node = node->next;
                 goto next;
             }
         }
         if (result != 0)
             return;
-        s0 = s0->next;
+        node = node->next;
 next:
         /* The walk's end test: the goto above reaches it with the next pointer
          * already loaded, which is the shape retail's code has. */
-        if (s0 == 0)
+        if (node == 0)
             return;
     }
 }

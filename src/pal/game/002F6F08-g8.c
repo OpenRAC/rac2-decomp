@@ -31,7 +31,7 @@ extern int ref_L00_002F5FB8_14 __attribute__((sda));
 extern int ref_L00_002F5FB8_16[];
 extern int g_memcard_state[];
 extern char g_str_movie_name[];
-extern void func_PAL_0029D630(int, int);
+extern void resident_msg_box_init_short(int, int);
 extern void req_flush_queue(void *);
 extern int request_end_slot(int,int);
 extern void gfx_wait_for_dma_status_bits(int);
@@ -49,7 +49,7 @@ extern int req_pop_queue(void *,int *,int *);
 extern int func_00126DC0(void *);
 extern void gfx_reset_record_list(void);
 extern int request_begin_slot(int,int,int,int,unsigned char *);
-void func_PAL_002F6F08(void)
+void mpeg_play_movie_pal(void)
 {
     long packet[12] __attribute__((aligned(16)));
     long low, dimensions, high;
@@ -64,7 +64,7 @@ void func_PAL_002F6F08(void)
     Stream_5FB8 *stream;
     Display_5FB8 *slot;
     if (ref_L00_002F5FB8_00 == 0) {
-        func_PAL_0029D630((int)ref_L00_002F5FB8_04,-1);
+        resident_msg_box_init_short((int)ref_L00_002F5FB8_04,-1);
         req_flush_queue(ref_L00_002F5FB8_05);
         request_end_slot(0,0);
         return;

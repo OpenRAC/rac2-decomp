@@ -154,33 +154,34 @@ static inline void MotionLandingSpeed(float *speed, float rising, float falling)
     }
 }
 
-void pushable_moby_update_pal(char *m, MotionState *state, int path, float height, float radius, float extent)
+/* Moves a crate-like moby that the hero can push or drag: applies friction, gravity, pushback from walls and plays its sliding sound (PAL: 50 Hz rates). */
+void pushable_moby_update_pal(char *moby, MotionState *state, int path, float height, float radius, float extent)
 {
     MotionVec old, start, delta, turn, target, change, samples[8], matrix[3], actual;
     float speed, gain, limit, accel, ground;
     int i, handle;
     int phase = g_oozla_intro_stage[0];
 
-    if ((phase & 15) == (((int)m >> 8) & 15)) {
-        float dist = fast_vec_dist(&motionHero.position, m + 0x10);
+    if ((phase & 15) == (((int)moby >> 8) & 15)) {
+        float dist = fast_vec_dist(&motionHero.position, moby + 0x10);
 
-        if (*(unsigned short *)(m + 0x34) & 0x1000) {
+        if (*(unsigned short *)(moby + 0x34) & 0x1000) {
             if (state->distance < dist) {
-                *(unsigned short *)(m + 0x34) &= 0xEFFF;
+                *(unsigned short *)(moby + 0x34) &= 0xEFFF;
             }
         } else if (dist < state->distance) {
-            *(unsigned short *)(m + 0x34) |= 0x1000;
+            *(unsigned short *)(moby + 0x34) |= 0x1000;
         }
     }
-    qcopy(&old, m + 0x10);
-    if (motionHero.held == m) {
-        qcopy(&start, m + 0x10);
+    qcopy(&old, moby + 0x10);
+    if (motionHero.held == moby) {
+        qcopy(&start, moby + 0x10);
         start.v[2] += 0.5f;
-        if (CollLine(&start, &motionHero.probeEnd, 2, m, 0)) {
+        if (CollLine(&start, &motionHero.probeEnd, 2, moby, 0)) {
             motionHero.held = 0;
         }
-        FastVecSub(&delta, m + 0x10, &motionHero.position);
-        if (state->frame != -1 && IsPointInCuboid(m + 0x10, state->frame)) {
+        FastVecSub(&delta, moby + 0x10, &motionHero.position);
+        if (state->frame != -1 && IsPointInCuboid(moby + 0x10, state->frame)) {
             matrix_mul_vec3(&delta, &delta, g_swamp_patrol_positions[0][state->frame].inverse);
             delta.v[1] = 0;
             matrix_mul_vec3(&delta, &delta, g_swamp_patrol_positions[0][state->frame].forward);
@@ -199,18 +200,18 @@ void pushable_moby_update_pal(char *m, MotionState *state, int path, float heigh
         vec_scale_to_length(&delta, &delta, gain);
         FastVecAdd(&delta, &delta, &motionHero.position);
         if (state->flags & 4) {
-            gain = vec_distance_xy(m + 0x10, &delta) * 0.64000005f;
+            gain = vec_distance_xy(moby + 0x10, &delta) * 0.64000005f;
             accel = 0.020000001f;
             limit = 0.32000002f;
         } else {
-            gain = vec_distance_xy(m + 0x10, &delta) * 0.080000006f;
+            gain = vec_distance_xy(moby + 0x10, &delta) * 0.080000006f;
             accel = 0.008f;
             limit = 0.16000001f;
         }
         if (limit < gain) {
             gain = limit;
         }
-        FastVecSub(&target, &delta, m + 0x10);
+        FastVecSub(&target, &delta, moby + 0x10);
         target.v[2] = 0;
         vec_scale_to_length(&target, &target, gain);
         FastVecSub(&change, &target, state);
@@ -224,25 +225,25 @@ void pushable_moby_update_pal(char *m, MotionState *state, int path, float heigh
     }
     if (0.001f < FastVecLength(state)) {
         if (!(state->flags & 2)) {
-            qcopy(&start, m + 0x10);
-            qcopy(&delta, m + 0x10);
+            qcopy(&start, moby + 0x10);
+            qcopy(&delta, moby + 0x10);
             start.v[2] += 0.25f;
             delta.v[2] -= 1;
             ground = 0;
-            if (CollLine(&start, &delta, 16, m, 0)) {
+            if (CollLine(&start, &delta, 16, moby, 0)) {
                 ground = g_ground_l01_height;
             }
-            if (*(float *)(m + 0x18) < ground) {
-                *(float *)(m + 0x18) = ground;
+            if (*(float *)(moby + 0x18) < ground) {
+                *(float *)(moby + 0x18) = ground;
                 MotionLandingSpeed(&state->velocity.v[2], 0, 0);
             } else {
                 state->velocity.v[2] -= 0.008f;
             }
         }
-        if (!(state->flags & 4) && vec_distance_xy(m + 0x10, &motionHero.position) < radius + 2.5f) {
+        if (!(state->flags & 4) && vec_distance_xy(moby + 0x10, &motionHero.position) < radius + 2.5f) {
             float toward;
 
-            FastVecSub(&start, &motionHero.position, m + 0x10);
+            FastVecSub(&start, &motionHero.position, moby + 0x10);
             start.v[2] = 0;
             vec_scale_to_length(&start, &start, 1);
             toward = FastVecDot(&start, state);
@@ -253,31 +254,31 @@ void pushable_moby_update_pal(char *m, MotionState *state, int path, float heigh
         }
         turn.q = 0;
         turn.v[2] = 0.7853982449f;
-        FastVecAdd(m + 0x10, m + 0x10, state);
-        qcopy(&delta, m + 0x10);
+        FastVecAdd(moby + 0x10, moby + 0x10, state);
+        qcopy(&delta, moby + 0x10);
         delta.v[2] += 0.25f;
         euler_rotation_basis(matrix, &turn);
         vec_fast_normalize_helper(&start, state, radius);
         for (i = 0; i < 8; i++) {
             matrix_mul_vec3(&start, &start, matrix);
-            FastVecAdd(&samples[i], m + 0x10, &start);
+            FastVecAdd(&samples[i], moby + 0x10, &start);
             samples[i].v[2] += 0.25f;
-            moby_push_out_of_wall(m, state, &delta, &samples[i]);
+            moby_push_out_of_wall(moby, state, &delta, &samples[i]);
         }
         FastVecScale(&target, state, 5);
-        FastVecAdd(&target, &target, m + 0x10);
+        FastVecAdd(&target, &target, moby + 0x10);
         target.v[2] += radius;
-        coll_sweep_from_object(m, &target, 0x4000000, 0, 1, 0, radius + 0.2f, 1, 1);
-        qcopy(&change, m + 0x10);
+        coll_sweep_from_object(moby, &target, 0x4000000, 0, 1, 0, radius + 0.2f, 1, 1);
+        qcopy(&change, moby + 0x10);
         change.v[2] += height;
-        if (func_L00_002E0200(&change, radius, extent, 0, m)) {
-            *(float *)(m + 0x10) = motionCollision.hitX;
-            *(float *)(m + 0x14) = motionCollision.hitY;
+        if (func_L00_002E0200(&change, radius, extent, 0, moby)) {
+            *(float *)(moby + 0x10) = motionCollision.hitX;
+            *(float *)(moby + 0x14) = motionCollision.hitY;
         }
         if (path != -1) {
-            path_push_point_away(path, m + 0x10, m + 0x10, radius);
+            path_push_point_away(path, moby + 0x10, moby + 0x10, radius);
         }
-        FastVecSub(&actual, m + 0x10, &old);
+        FastVecSub(&actual, moby + 0x10, &old);
         gain = vec_length_xy(&actual);
         if (gain < vec_length_xy(state)) {
             state->velocity.v[0] = actual.v[0];
@@ -286,15 +287,15 @@ void pushable_moby_update_pal(char *m, MotionState *state, int path, float heigh
         if (vec_length_xy(state) != 0) {
             char *sound = g_sound_state + state->sound * 0x70;
 
-            if (*(char **)(sound + 0x88) != m || !((unsigned char *)sound)[0x74]) {
-                state->sound = PlayMobySound(0, 4, m);
+            if (*(char **)(sound + 0x88) != moby || !((unsigned char *)sound)[0x74]) {
+                state->sound = PlayMobySound(0, 4, moby);
             }
         } else {
             handle = state->sound;
             if (handle != -1) {
                 unsigned char *sound = (unsigned char *)g_sound_state + handle * 0x70;
 
-                if (*(char **)(sound + 0x88) == m && sound[0x74]) {
+                if (*(char **)(sound + 0x88) == moby && sound[0x74]) {
                     snd_stop_voice(handle);
                 }
             }
@@ -305,7 +306,7 @@ void pushable_moby_update_pal(char *m, MotionState *state, int path, float heigh
         if (handle != -1) {
             char *sound = g_sound_state + handle * 0x70;
 
-            if (*(char **)(sound + 0x88) == m && ((unsigned char *)sound)[0x74]) {
+            if (*(char **)(sound + 0x88) == moby && ((unsigned char *)sound)[0x74]) {
                 snd_stop_voice(handle);
             }
         }

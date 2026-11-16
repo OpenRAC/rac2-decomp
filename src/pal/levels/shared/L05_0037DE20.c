@@ -9,46 +9,46 @@ extern int g_feltzin_challenge_state[];
 extern int g_feltzin_challenge_state[];
 
 /* looks up an object, then sets flags, arms a stored value and calls one of two helper pairs before building a timer */
-void func_PAL_L05_0037DE20(char *obj)
+void follower_start_wander_pal(char *obj)
 {
-    char *s;
+    char *vars;
 
-    s = (char *)moby_get_motion_data(obj);
-    if (s == 0)
+    vars = (char *)moby_get_motion_data(obj);
+    if (vars == 0)
         return;
-    if (*(int *)(s + 288) == 0)
+    if (*(int *)(vars + 288) == 0)
         return;
-    if (*(int *)(s + 284) != 0) {
+    if (*(int *)(vars + 284) != 0) {
         int *p = g_feltzin_challenge_state;
         int one = 1;
 
-        *(int *)(s + 280) = one;
+        *(int *)(vars + 280) = one;
         p[3] += one;
         if (moby_get_state_value(obj) != 5) {
             follower_set_state(obj, 4);
-            *(float *)(s + 120) = (func_001163B0() & 1) ? -1.0f : 1.0f;
+            *(float *)(vars + 120) = (func_001163B0() & 1) ? -1.0f : 1.0f;
             if (func_001163B0() & 1)
-                *(float *)(s + 116) = -1.0f;
+                *(float *)(vars + 116) = -1.0f;
             else
-                *(float *)(s + 116) = 1.0f;
-            *(int *)(s + 252) = one;
-            *(int *)(s + 112) = 0;
-            *(int *)(s + 124) = 0;
+                *(float *)(vars + 116) = 1.0f;
+            *(int *)(vars + 252) = one;
+            *(int *)(vars + 112) = 0;
+            *(int *)(vars + 124) = 0;
         } else {
             follower_set_state(obj, 7);
         }
-        *(int *)(s + 304) = ((s32)(math_random_int_range(120, 500)) * 5 + 2) / 6;
+        *(int *)(vars + 304) = ((s32)(math_random_int_range(120, 500)) * 5 + 2) / 6;
     } else {
         int *p = g_feltzin_challenge_state;
 
-        *(int *)(s + 280) = 1;
+        *(int *)(vars + 280) = 1;
         p[3] += 1;
         if (moby_get_state_value(obj) != 5)
             follower_set_state(obj, 4);
         else
             follower_set_state(obj, 7);
-        *(int *)(s + 304) = ((s32)(math_random_int_range(120, 500)) * 5 + 2) / 6;
-        *(int *)(s + 252) = 0;
+        *(int *)(vars + 304) = ((s32)(math_random_int_range(120, 500)) * 5 + 2) / 6;
+        *(int *)(vars + 252) = 0;
     }
 }
 

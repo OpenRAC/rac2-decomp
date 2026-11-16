@@ -106,7 +106,8 @@ static __inline__ void turn(u8 *object, float rate, float speed)
 }
 
 /* Update the Joba sentry's patrol, alert, attack and launch states. */
-void func_US2_L11_00452BAC(u8 *object)
+/* Updates the Joba sentry's patrol, alert, attack and launch states. (USA v2.00) */
+void flamethrower_l11_robot_update_us2(u8 *object)
 {
     ActorVector target;
     ActorVector work[6];

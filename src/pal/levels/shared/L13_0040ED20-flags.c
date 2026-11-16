@@ -13,19 +13,19 @@ extern float math_fabs(float f);
    before folding the starter's result against the state's own reading of that float: the
    twin of func_L00_003BFF68 with fixed turn rates. One `char scratch[0x50]` gives retail's
    frame. */
-float creature_turn_toward_target_pal(char *a0, char *a1, char *a2, char *a3)
+float creature_turn_toward_target_pal(char *moby, char *state, char *input, char *transform)
 {
     char scratch[0x50];
-    float f;
+    float heading;
 
-    *(Rac2TI128 *)scratch = *(Rac2TI128 *)a2;
-    f = vec_get_heading_angle(a0, scratch, a3);
+    *(Rac2TI128 *)scratch = *(Rac2TI128 *)input;
+    heading = vec_get_heading_angle(moby, scratch, transform);
     *(int *)(scratch + 0x40) = 0;
-    math_approach_target_with_direction_mode(scratch + 0x40, f, 0.005026549f, 0.005026549f,
-                  0.35744348f, a1 + 0xB4, 0);
+    math_approach_target_with_direction_mode(scratch + 0x40, heading, 0.005026549f, 0.005026549f,
+                  0.35744348f, state + 0xB4, 0);
     *(Rac2TI128 *)scratch = 0;
-    *(float *)(scratch + 8) = *(float *)(a1 + 0xB4);
+    *(float *)(scratch + 8) = *(float *)(state + 0xB4);
     euler_rotation_basis(scratch + 0x10, scratch);
-    multiply_matrix3x3(a0 + 0xC0, a0 + 0xC0, scratch + 0x10);
-    return math_fabs(f) - math_fabs(*(float *)(a1 + 0xB4));
+    multiply_matrix3x3(moby + 0xC0, moby + 0xC0, scratch + 0x10);
+    return math_fabs(heading) - math_fabs(*(float *)(state + 0xB4));
 }

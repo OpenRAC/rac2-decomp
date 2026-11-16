@@ -34,6 +34,7 @@ typedef struct {
 extern MissionRecord g_mission_records[];
 extern MissionMenuItem g_mission_menu_items[];
 
+/* Refreshes the four mission menu items from the mission ids: a known mission's item gets its count, id and color, an unknown one is marked empty. */
 void RefreshMissionMenuItems_pal(void) {
     int i;
     int *ids;

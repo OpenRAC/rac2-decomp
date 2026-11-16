@@ -13,7 +13,9 @@ extern void vec_scale_to_length(void *, void *, float);
 extern float math_fabs(float);
 extern void FastVecScale(void *, void *, float);
 
-int func_PAL_L00_00428C98(char *object, void *input, int constrained, int preserve)
+/* Clamps the camera distance to the hero: pulls the camera vector in when it would get longer
+   or shorter than the allowed range; returns whether the vector was kept. */
+int cam_follow_constrain_distance_pal(char *object, void *input, int constrained, int preserve)
 {
     char *state = *(char **)(object + 0x70);
     char *vector = state + 0x160;

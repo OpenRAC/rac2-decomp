@@ -29,7 +29,7 @@ extern int flag_set_second_pending(char *), math_random_int_below(int), moby_dis
 extern void SetDeathBits_pal(char *, int, int), part_queue_moby_for_glow(char *, int, void (*)(char *));
 extern void moby_enter_state_six(char *), moby_set_state(char *, int, int);
 extern int flag_set_first_pending(char *);
-extern void func_PAL_002A7E68(char *, int, int, int);
+extern void anim_start_blended_pal(char *, int, int, int);
 extern float vec_distance_xy(void *, void *);
 extern int moby_turn_toward_target_and_step_pal(char *, void *, float);
 extern int yeedil_small_enemy_can_attack(char *);
@@ -37,7 +37,7 @@ extern float moby_get_anim_value(char *);
 extern int moby_l01_turn_toward_target_pal(char *, void *);
 extern float mat_fast_helper_a(float, float);
 extern int moby_start_effect_from_entry(char *, float);
-extern int func_PAL_002AF6C0(char *, float);
+extern int math_is_value_within_step_pal(char *, float);
 extern void matrix_mul_vec3(void *, void *, void *), FastVecAdd(void *, void *, void *);
 extern int coll_sweep_from_object(void *, void *, int, int, float, float, float, int, int);
 extern void euler_rotation_basis(void *, void *);
@@ -48,6 +48,7 @@ extern f32 ApproachValue(void *, float, float);
 extern float coll_probe_ground_height_below(void *, int, float);
 extern void moby_advance_frame_counter(char *);
 
+/* Runs the small Yeedil enemy each frame (moby class 4510). It circles the hero, chases, shoots when lined up, and falls over when it is hurt. (PAL: 50 Hz timings) */
 void yeedil_small_enemy_update_pal(char *obj) {
     Vector v;
     Q matrix[3];
@@ -79,7 +80,7 @@ void yeedil_small_enemy_update_pal(char *obj) {
     case 2: {
         float distance;
         if (flag_set_first_pending(obj)) {
-            if (*(u8 *)(obj + 0x43) != 2) func_PAL_002A7E68(obj, 2, 0, 17);
+            if (*(u8 *)(obj + 0x43) != 2) anim_start_blended_pal(obj, 2, 0, 17);
             *(float *)(st + 0x78) = g_yeedil_small_speed_a * 0.020000001f;
             *(float *)(st + 0x288) = 1.0471977f;
         }
@@ -99,7 +100,7 @@ void yeedil_small_enemy_update_pal(char *obj) {
     }
     case 3:
         if (flag_set_first_pending(obj)) {
-            if (*(u8 *)(obj + 0x43) != 2) func_PAL_002A7E68(obj, 2, 0, 8);
+            if (*(u8 *)(obj + 0x43) != 2) anim_start_blended_pal(obj, 2, 0, 8);
             *(float *)(st + 0x78) = g_yeedil_small_speed_b * 0.020000001f;
         }
         moby_turn_toward_target_and_step_pal(obj, g_hero_position, 0.0f);
@@ -108,7 +109,7 @@ void yeedil_small_enemy_update_pal(char *obj) {
     case 4: {
         float distance;
         if (flag_set_first_pending(obj)) {
-            if (*(u8 *)(obj + 0x43) != 4) func_PAL_002A7E68(obj, 4, (int)g_yeedil_small_blend_frames, 8);
+            if (*(u8 *)(obj + 0x43) != 4) anim_start_blended_pal(obj, 4, (int)g_yeedil_small_blend_frames, 8);
         }
         distance = moby_get_anim_value(obj);
         if (*(u8 *)(obj + 0x42) == *(u8 *)(obj + 0x43) && distance >= 9.0f && distance <= 17.0f) {
@@ -130,7 +131,7 @@ void yeedil_small_enemy_update_pal(char *obj) {
             *(float *)(st + 0x78) = speed;
             *(float *)(st + 0x70) = accel;
         }
-        if (*(u8 *)(obj + 0x42) == *(u8 *)(obj + 0x43) && func_PAL_002AF6C0(obj, 14.0f)) {
+        if (*(u8 *)(obj + 0x42) == *(u8 *)(obj + 0x43) && math_is_value_within_step_pal(obj, 14.0f)) {
             matrix_mul_vec3(&v, &g_yeedil_small_local_vec, obj + 0xC0);
             FastVecAdd(&v, &v, obj + 0x10);
             coll_sweep_from_object(obj, &v, 0x04000001, 0, 0.333f, 2.0f, 1.0f, 1, 0);
@@ -173,7 +174,7 @@ void yeedil_small_enemy_update_pal(char *obj) {
             *(float *)(obj + 0xF8) = mat_fast_helper_a(
                 g_hero_state.pos[0] - *(float *)(obj + 0x10),
                 g_hero_state.pos[1] - *(float *)(obj + 0x14));
-            if (*(u8 *)(obj + 0x43) != 3) func_PAL_002A7E68(obj, 3, 0, 4);
+            if (*(u8 *)(obj + 0x43) != 3) anim_start_blended_pal(obj, 3, 0, 4);
         }
         if (*(u8 *)(obj + 0x60) & 2) moby_set_state(obj, 2, 1);
         break;

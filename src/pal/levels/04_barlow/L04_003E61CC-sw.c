@@ -17,10 +17,10 @@ extern float math_random_float_range(float, float);
 extern float fast_vec_dist(void *, void *);
 extern void moby_update_ground_check(void *);
 extern char *part_find_owned_effect_slot(void *, int, int);
-extern int func_PAL_002B1A50(void *, void *, int);
+extern int moby_apply_damage_to_object_pal(void *, void *, int);
 extern void gfx_free_point_light(int);
 extern int weapon_select_aim_target(void *, int, float, float, int, int);
-extern void func_PAL_002A7E68(void *, int, int, int);
+extern void anim_start_blended_pal(void *, int, int, int);
 extern void object_set_linked_states(unsigned char *, int, int, int, int);
 extern void find_point_across_line(void *, void *);
 extern void object_release_linked_pal(unsigned char *);
@@ -28,7 +28,8 @@ extern void moby_l04_set_group_alert_flag(void *);
 extern char *g_linked_record_table __attribute__((sda));
 extern char g_tether_zero_vec[];
 
-int func_PAL_L04_003E8A70(unsigned char *moby)
+/* Barlow enemy core: sets the creature up on its first frame, handles hits and death, and picks aim targets; returns 1 when it should be removed (PAL). */
+int barlow_enemy_update_core_pal(unsigned char *moby)
 {
     unsigned char *vars = *(unsigned char **)(moby + 0x68);
     char *hit;
@@ -125,7 +126,7 @@ int func_PAL_L04_003E8A70(unsigned char *moby)
             vars[0x307]--;
         }
     }
-    result = func_PAL_002B1A50(moby, vars + 0x60, 0);
+    result = moby_apply_damage_to_object_pal(moby, vars + 0x60, 0);
     if (result) {
         *(int *)(vars + 0x2D0) = 0;
         if (*(int *)(vars + 0x2E0) >= 0) {
@@ -140,11 +141,11 @@ int func_PAL_L04_003E8A70(unsigned char *moby)
             switch (result) {
             case 2:
             case 3:
-                func_PAL_002A7E68(*(char **)(vars + 0x2AC), 8, 0, 2);
+                anim_start_blended_pal(*(char **)(vars + 0x2AC), 8, 0, 2);
                 break;
             case 4:
             case 5:
-                func_PAL_002A7E68(*(char **)(vars + 0x2AC), 9, 0, 2);
+                anim_start_blended_pal(*(char **)(vars + 0x2AC), 9, 0, 2);
                 *(int *)(*(char **)(*(char **)(vars + 0x2AC) + 0x68) + 0x27C) = 0;
                 break;
             case 1:

@@ -8,15 +8,16 @@ extern float FastAddRotations(float, float);
 extern void FastVecScale(void *, void *, float);
 extern void *part_spawn_object_following_effect(void *, void *, int, int, int, float, float, int, int, int);
 
+/* Per frame for the twin trail effect: starts it, then spawns two following particle trails at fixed offsets on the object, scaled by its progress (PAL: same as v1.01). */
 void twin_trail_effect_update_pal(char *self)
 {
-    Vec_3f9368 v1;
-    Vec_3f9368 v2;
-    char *p;
-    float f20;
-    float f21;
-    float f22;
-    float f;
+    Vec_3f9368 offset_a;
+    Vec_3f9368 offset_b;
+    char *vars;
+    float scale;
+    float fade_step;
+    float lifetime_scale;
+    float angle;
 
     if (*(unsigned char *)(self + 0x20) == 0) {
         *(int *)(self + 0x78) = 0x150000FF;
@@ -25,22 +26,22 @@ void twin_trail_effect_update_pal(char *self)
     if (*(unsigned char *)(self + 0x20) != 1) {
         return;
     }
-    p = *(char **)(self + 0x24);
-    f20 = *(float *)(self + 0x2C) / *(float *)(p + 0x24);
-    f22 = 243600.0f;
-    f21 = 0.1f;
-    f = FastAddRotations(*(float *)(self + 0xF4), 0.062831864f);
-    *(float *)(self + 0xF4) = f;
+    vars = *(char **)(self + 0x24);
+    scale = *(float *)(self + 0x2C) / *(float *)(vars + 0x24);
+    lifetime_scale = 243600.0f;
+    fade_step = 0.1f;
+    angle = FastAddRotations(*(float *)(self + 0xF4), 0.062831864f);
+    *(float *)(self + 0xF4) = angle;
 
-    v1.q = 0;
-    v1.f[1] = 0.5378739833831787f;
-    v1.f[2] = -0.3785569965839386f;
-    FastVecScale(&v1, &v1, f20);
-    part_spawn_object_following_effect(&v1, self, 0x150000FF, -1, 1, f22, f21, 2, 1, -1);
+    offset_a.q = 0;
+    offset_a.f[1] = 0.5378739833831787f;
+    offset_a.f[2] = -0.3785569965839386f;
+    FastVecScale(&offset_a, &offset_a, scale);
+    part_spawn_object_following_effect(&offset_a, self, 0x150000FF, -1, 1, lifetime_scale, fade_step, 2, 1, -1);
 
-    v2.q = 0;
-    v2.f[1] = 0.5123069882392883f;
-    v2.f[2] = 0.37711501121520996f;
-    FastVecScale(&v2, &v2, f20);
-    part_spawn_object_following_effect(&v2, self, 0x150000FF, -1, 1, f22, f21, 2, 1, -1);
+    offset_b.q = 0;
+    offset_b.f[1] = 0.5123069882392883f;
+    offset_b.f[2] = 0.37711501121520996f;
+    FastVecScale(&offset_b, &offset_b, scale);
+    part_spawn_object_following_effect(&offset_b, self, 0x150000FF, -1, 1, lifetime_scale, fade_step, 2, 1, -1);
 }

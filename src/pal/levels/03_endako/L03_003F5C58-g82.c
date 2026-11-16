@@ -20,7 +20,9 @@ extern float g_height_threshold NOT_SDA;
 extern float g_endako_boss_path_approach_speed __attribute__((sda)), g_endako_boss_path_speed_target __attribute__((sda)), g_endako_boss_path_tilt_target __attribute__((sda));
 extern float g_endako_boss_path_step_rate __attribute__((sda)), g_endako_boss_path_tilt_scale __attribute__((sda)), g_endako_boss_path_turn_speed __attribute__((sda)), g_endako_boss_forced_behaviour __attribute__((sda));
 
-void func_PAL_L03_003FA3C0(u8 *entity) {
+/* Moves the Endako boss along its path with braking, bobs it up and down, and turns and tilts it
+   toward where it is going (PAL: 50 Hz rates). */
+void endako_boss_move_along_path_pal(u8 *entity) {
     u8 *state = *(u8 **)(entity+0x68);
     float delta[4];
     int next;

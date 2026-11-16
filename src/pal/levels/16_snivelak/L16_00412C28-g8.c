@@ -24,7 +24,8 @@ extern s32 g_smoke_spark_count __attribute__((sda));
 extern u32 math_random_int_below(s32);
 extern u8 *part_spawn_hero_relative(void *, void *, s32, u32, u32, s32, float);
 extern void vec_clear_128(void *);
-void func_PAL_L16_00412C28(u8 *arg) {
+/* Emits a puff of smoke and a few sparks from the object each frame (PAL: 50 Hz tick). */
+void snivelak_emit_smoke_sparks_pal(u8 *moby) {
   float velocity[4];
   float pos[4];
   float tick = 0.020000001f;
@@ -34,7 +35,7 @@ void func_PAL_L16_00412C28(u8 *arg) {
   u32 random;
   u8 *particle;
   u8 *origin;
-  origin = arg + 0x10;
+  origin = moby + 0x10;
   vec_random_direction(velocity, g_smoke_spark_dir_min * tick, g_smoke_spark_dir_max[0] * tick);
   color = (((s32)(math_random_int_range(g_smoke_color_a_min, g_smoke_color_a_max[0])) * 5 + 2) / 6) & 255;
   random = math_random_int_below(255) & 255;
@@ -45,7 +46,7 @@ void func_PAL_L16_00412C28(u8 *arg) {
   for (i = 0; i < g_smoke_spark_count; i++) {
     origin = pos;
     vec_random_direction(origin, 0.0f, 0.25f);
-    FastVecAdd(origin, origin, arg + 0x10);
+    FastVecAdd(origin, origin, moby + 0x10);
     velocity[2] = -(math_random_float_range(g_smoke_spark_speed_min[0], g_smoke_spark_speed_max[0]) * tick);
     alpha = (((s32)(math_random_int_range(g_smoke_color_b_min[0], g_smoke_color_b_max[0])) * 5 + 2) / 6) & 255;
     random = math_random_int_below(255) & 255;

@@ -25,15 +25,15 @@ extern s32 *g_path_zone_table[];
 extern s32 point_in_path_xy(void *, void *, s32);
 
 /* Advances the measured state machine of the given object. */
-void rising_object_update_pal(u8 *object) {
-    switch (object[0x20]) {
+void rising_object_update_pal(u8 *moby) {
+    switch (moby[0x20]) {
     case 0:
-        if (flag_is_third_pending_set(object) != 0)
-            moby_set_state(object, 1, -1);
+        if (flag_is_third_pending_set(moby) != 0)
+            moby_set_state(moby, 1, -1);
         break;
     case 1:
-        if (*(f32 *)(object + 0x18) < 160.0f)
-            *(f32 *)(object + 0x18) = *(f32 *)(object + 0x18) + 0.10000001f;
+        if (*(f32 *)(moby + 0x18) < 160.0f)
+            *(f32 *)(moby + 0x18) = *(f32 *)(moby + 0x18) + 0.10000001f;
         break;
     }
 }

@@ -49,6 +49,8 @@ static __inline__ int EffectThird(int kind)
     return result;
 }
 
+/* Starts a timed effect on an object in the first free slot, with a colour taken from the
+   object; returns 0 when started (PAL: 50 Hz tick counts). */
 int StartAttachedEffect_pal(char *self, int index, int arg)
 {
     int kind = g_weapon_table[index].kind;

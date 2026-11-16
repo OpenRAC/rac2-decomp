@@ -6,6 +6,7 @@ extern char *g_resident_data_base[] __attribute__((sda));
 extern char *g_resident_data_base[] __attribute__((sda));
 extern void *tab_menu_get_selected_value(void *);
 
+/* Stores the selected tab menu value in the preview object (PAL). */
 int menu_item_set_preview_pal(char *object) {
     if (g_resident_data_base[0] != 0)
         *(void **)(object + 0x34) = tab_menu_get_selected_value(g_resident_data_base[0] + 0x3C210);

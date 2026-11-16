@@ -26,6 +26,7 @@ extern float FastDiffRots(float, float);
 extern int TryClaimNotice(int, int, int);
 extern int request_begin_slot(int, int, int, int, unsigned char *);
 
+/* Interaction prompt moby: when the player stands close and faces it, a button press starts the action. */
 void interact_prompt_update_us2(unsigned char *object)
 {
     unsigned int permitted;

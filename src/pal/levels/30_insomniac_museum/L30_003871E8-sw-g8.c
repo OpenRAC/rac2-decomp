@@ -11,6 +11,7 @@ extern int ForceClaimNotice(int,int,int);
 extern int museum_find_active_exhibit_entry(void *),museum_start_exhibit_entry_timer(void *),museum_schedule_next_exhibit_entry(void *),IsPointInCuboid(void *,int);
 extern void gfx_queue_draw_callback(void *,void *),museum_draw_selected_exhibit_entry_pal(char *);
 
+/* Updates the museum exhibit selector. It finds an active entry, shows it, and steps through the show and wait states (PAL version). */
 void museum_exhibit_selector_update_pal(unsigned char *obj) {
     char *st=*(char **)(obj+0x68);
     switch(obj[0x20]) {

@@ -18,18 +18,19 @@ extern u8   g_unused_byte_d;
 extern u8   g_unused_byte_b;
 extern u8   g_unused_byte_e;
 
-void attached_effect_update_pal(char *a0)
+/* Starts an effect attached to the object and keeps it following the object each frame. */
+void attached_effect_update_pal(char *moby)
 {
-    char *moby = *(char **)(a0 + 0x68);
+    char *vars = *(char **)(moby + 0x68);
 
-    switch (*(u8 *)(a0 + 0x20)) {
+    switch (*(u8 *)(moby + 0x20)) {
     case 0:
-        *(s32 *)(moby + 0x5C) |= 1;
-        func_32C010(a0, moby + 0x60, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-        moby_set_state(a0, 1, -1);
+        *(s32 *)(vars + 0x5C) |= 1;
+        func_32C010(moby, vars + 0x60, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+        moby_set_state(moby, 1, -1);
         break;
     case 1:
-        func_32C328(a0, moby + 0x60, 0);
+        func_32C328(moby, vars + 0x60, 0);
         break;
     }
 }

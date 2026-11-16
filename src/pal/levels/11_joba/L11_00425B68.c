@@ -68,40 +68,42 @@ extern void vec_scale_to_length(void *, void *, f32);
 extern void FastVecAdd(void *, void *, void *);
 extern int moby_move_over_ground(void *, void *, void *, f32, f32, f32, f32, int);
 
-int func_PAL_L11_0042A858(u8 *object, void *target, f32 desiredHeading, f32 speed, f32 stopDistance, f32 margin) {
+/* Walks the object toward a target point while turning to face it. Returns 1 once it has
+   arrived or has been stuck too long (PAL: 50 Hz rates). */
+int tribesman_turn_toward_point_pal(u8 *object, void *target, f32 desired_heading, f32 speed, f32 stop_distance, f32 margin) {
     f32 delta[4], displacement[4], destination[4];
-    f32 angle, frameSpeed = 0.0f;
-    u8 *data = *(u8 **)(object + 0x68);
+    f32 angle, frame_speed = 0.0f;
+    u8 *vars = *(u8 **)(object + 0x68);
     int done = 0;
     f32 distance, acceleration;
     FastVecSub(delta, target, object + 0x10);
     delta[2] = 0.0f;
     distance = FastVecLength(delta);
     acceleration = speed * 0.0012f;
-    if (stopDistance < distance) {
-        int collision = *(int *)(data + 0x520);
+    if (stop_distance < distance) {
+        int collision = *(int *)(vars + 0x520);
         angle = 0.0f;
-        ComputeRegionRouteHeading(object + 0x10, target, &angle, data + 0x320, collision, data + 0x530, data + 0x534, margin, 0.4f);
-        math_approach_target_with_direction_mode(object + 0xF8, angle, 0.010053098f, 0.005026549f, 0.25132746f, data + 0x27C, 0);
+        ComputeRegionRouteHeading(object + 0x10, target, &angle, vars + 0x320, collision, vars + 0x530, vars + 0x534, margin, 0.4f);
+        math_approach_target_with_direction_mode(object + 0xF8, angle, 0.010053098f, 0.005026549f, 0.25132746f, vars + 0x27C, 0);
         if (FastDiffRots(*(f32 *)(object + 0xF8), angle) < 0.523598849773407f) {
-            math_step_value_toward_target(&frameSpeed, data + 0x538, distance, acceleration, acceleration, speed * 0.020000001f);
+            math_step_value_toward_target(&frame_speed, vars + 0x538, distance, acceleration, acceleration, speed * 0.020000001f);
         } else {
-            *(f32 *)(data + 0x538) = 0.0f;
+            *(f32 *)(vars + 0x538) = 0.0f;
         }
     } else {
-        math_approach_target_with_direction_mode(object + 0xF8, desiredHeading, 0.010053098f, 0.28800002f, 0.25132746f, data + 0x27C, 0);
-        ApproachValue((f32 *)(data + 0x538), 0.0f, acceleration);
-        if (*(f32 *)(data + 0x538) == 0.0f && FastDiffRots(*(f32 *)(object + 0xF8), desiredHeading) < 0.0872664749622345f) {
-            *(f32 *)(data + 0x27C) = 0.0f;
+        math_approach_target_with_direction_mode(object + 0xF8, desired_heading, 0.010053098f, 0.28800002f, 0.25132746f, vars + 0x27C, 0);
+        ApproachValue((f32 *)(vars + 0x538), 0.0f, acceleration);
+        if (*(f32 *)(vars + 0x538) == 0.0f && FastDiffRots(*(f32 *)(object + 0xF8), desired_heading) < 0.0872664749622345f) {
+            *(f32 *)(vars + 0x27C) = 0.0f;
             done = 1;
         }
     }
-    vec_scale_to_length(displacement, object + 0xC0, *(f32 *)(data + 0x538));
+    vec_scale_to_length(displacement, object + 0xC0, *(f32 *)(vars + 0x538));
     FastVecAdd(destination, displacement, object + 0x10);
     if (!moby_move_over_ground(object, object + 0x10, destination, 0.75f, 0.75f, 0.4f, 0.523598849773407f, 0))
-        *(int *)(data + 0x53C) += 1;
-    if (*(int *)(data + 0x53C) >= 30) {
-        *(int *)(data + 0x53C) = 0;
+        *(int *)(vars + 0x53C) += 1;
+    if (*(int *)(vars + 0x53C) >= 30) {
+        *(int *)(vars + 0x53C) = 0;
         done = 1;
     }
     return done;
@@ -109,22 +111,22 @@ int func_PAL_L11_0042A858(u8 *object, void *target, f32 desiredHeading, f32 spee
 
 
 typedef unsigned short u16;
-extern void func_PAL_002AC3C0(char *object, char *p);
+extern void gfx_update_color_fade_pal(char *object, char *p);
 extern int FastDecTimer(char *p);
 extern void moby_update_eased_node(char *object, char *p, int kind, float f12, float f13);
-extern void func_PAL_002B14F8(char *object, char *p, int kind, int a3, float f12);
+extern void value_set_and_smooth_pal(char *object, char *p, int kind, int a3, float f12);
 
 /* re-arms the object's two guard nodes and restarts its measurement window */
-void func_PAL_L11_0042AB20(char *object)
+void tribesman_rearm_guard_nodes_pal(char *object)
 {
-    char *p = *(char **)(object + 0x68);
+    char *vars = *(char **)(object + 0x68);
 
-    func_PAL_002AC3C0(object, p + 0x50);
-    FastDecTimer(p + 0x260);
-    FastDecTimer(p + 0x26);
+    gfx_update_color_fade_pal(object, vars + 0x50);
+    FastDecTimer(vars + 0x260);
+    FastDecTimer(vars + 0x26);
     if (*(u16 *)(object + 0x96) <= 0xFFFE)
         *(u16 *)(object + 0x96) = *(u16 *)(object + 0x96) + 1;
-    moby_update_eased_node(object, p + 0x2A0, 4, 0.0432f, 0.43200004f);
-    func_PAL_002B14F8(object, p + 0x2A0, 4, 1, 3.5f);
+    moby_update_eased_node(object, vars + 0x2A0, 4, 0.0432f, 0.43200004f);
+    value_set_and_smooth_pal(object, vars + 0x2A0, 4, 1, 3.5f);
 }
 

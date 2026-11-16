@@ -3,7 +3,8 @@
 extern char *g_resident_data_base;
 extern int g_notice_owner;
 
-void func_PAL_0029D7D0(void)
+/* If the menu system exists and the game is not paused, updates the record timers and runs the level callbacks. */
+void resident_notice_timers_update(void)
 {
     extern int g_notice_owner;
     extern int hud_update_record_timers(int);

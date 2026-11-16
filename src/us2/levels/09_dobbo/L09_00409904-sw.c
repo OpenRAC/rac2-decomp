@@ -38,12 +38,13 @@ extern void moby_mark_table_entry_flagged(int);
 extern void level_capture_checkpoint_state(char *, char *);
 extern int MemcardSave(int, int);
 
-void func_US2_L09_00409904(u8 *obj)
+/* Per-frame update of the Dobbo character who sells an item for bolts: it waits for the hero, makes the offer, takes the bolts and saves the game. (USA v2.00) */
+void dobbo_paid_offer_npc_update_us2(u8 *obj)
 {
     char *p = *(char **)(obj + 0x68);
     char *entry;
-    int startCurrency;
-    int offerCurrency;
+    int start_currency;
+    int offer_currency;
     int currency;
     int balance;
     int remaining;
@@ -56,14 +57,14 @@ void func_US2_L09_00409904(u8 *obj)
         }
         if (g_request_flag_table.flags & 1) {
             STUB_printf(g_str_dobbo_setting_a);
-            startCurrency = g_player_bolts;
+            start_currency = g_player_bolts;
             if (g_item_owned_flags[0x197]) {
-                if (startCurrency < g_dobbo_currency_limit_high)
+                if (start_currency < g_dobbo_currency_limit_high)
                     goto start_six;
                 else
                     moby_set_state(obj, 7, 1);
             } else {
-                if (startCurrency < g_dobbo_currency_limit_low) {
+                if (start_currency < g_dobbo_currency_limit_low) {
                 start_six:
                     moby_set_state(obj, 6, 1);
                 } else
@@ -150,14 +151,14 @@ void func_US2_L09_00409904(u8 *obj)
         obj[0x31] = 1;
         *(u16 *)(obj + 0x34) &= 0xfffe;
         g_dobbo_setting_flag_b[0] = 1;
-        offerCurrency = g_player_bolts;
+        offer_currency = g_player_bolts;
         if (g_item_owned_flags[0x197]) {
-            if (offerCurrency < g_dobbo_currency_limit_high)
+            if (offer_currency < g_dobbo_currency_limit_high)
                 goto offer_six;
             else
                 moby_set_state(obj, 7, -1);
         } else {
-            if (offerCurrency < g_dobbo_currency_limit_low) {
+            if (offer_currency < g_dobbo_currency_limit_low) {
             offer_six:
                 moby_set_state(obj, 6, -1);
             } else

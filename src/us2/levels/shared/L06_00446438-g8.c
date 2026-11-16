@@ -29,7 +29,7 @@ extern int g_bouncer_timer;
 typedef struct { float f00[4]; float f10[4]; char pad20[4]; int result; int handle; int timer; } AimState;
 typedef struct { char pad00[0x54]; float rate; char pad58[0xE0 - 0x58]; } AimEntry;
 extern AimEntry g_weapon_l00_table[];
-extern s32 func_US2_L00_002C4560(int a0, int a1);
+extern s32 hero_l00_change_action_us2(int a0, int a1);
 extern void anim_start_blended_with_flags(void *, int, int, int, int);
 extern int math_fast_float_d(int *);
 extern int vec_fast_helper_b(float *);
@@ -53,11 +53,12 @@ extern void moby_draw_attached_effect(void *);
 
 /* Coordinate the multi-object interaction and its repeat/cooldown timers. */
 
-void func_US2_L06_00446438(unsigned char *object) {
+/* Bouncer weapon update: aims, fires on button press while ammo lasts, and manages the reload timer and fire sound (v2.00). */
+void bouncer_update_l06_us2(unsigned char *object) {
     float origin[4];
     float aim[4];
-    AimEntry *entry;
-    AimEntry *first;
+    AimEntry *current_entry;
+    AimEntry *first_entry;
     AimState *state = *(AimState **)(object + 0x68);
     char *target;
     s32 target_data;
@@ -68,14 +69,14 @@ void func_US2_L06_00446438(unsigned char *object) {
 
     if (object[0x20] == 0) {
         object[0x20] = 1;
-        first = g_weapon_l00_table + g_bouncer_weapon_index[0];
-        rate = 1.0f / first->rate;
+        first_entry = g_weapon_l00_table + g_bouncer_weapon_index[0];
+        rate = 1.0f / first_entry->rate;
         if (rate < ref_US2_L06_00446438_00 || ref_US2_L06_00446438_00 < 0.0f) ref_US2_L06_00446438_00 = 0.0f;
         state->timer = 0;
         state->handle = -1;
         g_bouncer_timer = 20;
     }
-    if (g_hero_state.level == 1) func_US2_L00_002C4560(29, 1);
+    if (g_hero_state.level == 1) hero_l00_change_action_us2(29, 1);
     if (object[0x42] == object[0x43] && (object[0x60] & 2)) anim_start_blended_with_flags(object, 1, 0, 2, 0);
     moby_compute_offset_point(object, (char *)origin);
     target = 0;
@@ -117,8 +118,8 @@ void func_US2_L06_00446438(unsigned char *object) {
                 state->handle = -1;
             }
         }
-        entry = g_weapon_l00_table + g_bouncer_weapon_index[0];
-        ref_US2_L06_00446438_00 = 1.0f / entry->rate;
+        current_entry = g_weapon_l00_table + g_bouncer_weapon_index[0];
+        ref_US2_L06_00446438_00 = 1.0f / current_entry->rate;
     }
     ref_L00_003FDE48_00(moby_draw_attached_effect, object);
 }

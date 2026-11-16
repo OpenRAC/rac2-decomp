@@ -34,24 +34,24 @@ extern void *part_spawn_effect_record(void *, int, float);
    would hoist D_L10_0026CEA0's high half out of the list loop, which retail recomputes.
    The initial values of k, entry, prim, transform and case 0's i only size gcse's
    expression table (185 buckets), which orders the matrix pointers' registers as retail. */
-void cloud_sparkle_field_update_pal(char *p) {
+void cloud_sparkle_field_update_pal(char *object) {
     union {
         struct { float m[3][12]; CloudVec rotations[3]; } init;
         struct { CloudVec temp, visible, direction, position, offset; } update;
     } scratch;
     CloudVec points[18], temp;
-    char *st = *(char **)(p + 0x68);
+    char *st = *(char **)(object + 0x68);
     int n, k = 0;
     unsigned short *entry = 0;
     char *prim = 0, *transform = 0;
-    float a,b,c,t,weight;
+    float angle_a,angle_b,cos_b,angle,weight;
     int color;
-    switch ((unsigned char)p[0x20]) {
+    switch ((unsigned char)object[0x20]) {
     case 0: {
         int i = 0;
         int index = *(int *)st;
         if (index >= g_cloud_sparkle_list_count[0] || !g_cloud_sparkle_lists[index] || index == -1) {
-            moby_mark_spawned(p);
+            moby_mark_spawned(object);
             return;
         }
         {
@@ -67,7 +67,7 @@ void cloud_sparkle_field_update_pal(char *p) {
         scratch.init.rotations[0].v.z=angle0;
         scratch.init.rotations[1].v.z=angle1;
         scratch.init.rotations[2].v.z=angle2;
-        p[0x30] = alpha;
+        object[0x30] = alpha;
         }
         euler_rotation_basis(scratch.init.m[0],scratch.init.rotations);
         euler_rotation_basis(scratch.init.m[1],scratch.init.rotations+1);
@@ -110,7 +110,7 @@ void cloud_sparkle_field_update_pal(char *p) {
             entry = next;
             }
         }
-        p[0x20]=1;
+        object[0x20]=1;
         break;
     }
     case 1: {
@@ -124,21 +124,21 @@ void cloud_sparkle_field_update_pal(char *p) {
             float one=1.0f, lower=1.396263599395752f, lowEnd, highStart, upper;
             weight=0.0f;
             lowEnd=1.466076731681824f;
-            a=math_wrap_angle_to_pi(*(float *)(st+4)*0.392699122f);
+            angle_a=math_wrap_angle_to_pi(*(float *)(st+4)*0.392699122f);
             highStart=1.65806293f;
             upper=2.26892829f;
-            b=math_wrap_angle_to_pi(*(float *)(st+4)*0.581194639f);
-            c=math_fast_sin_or_cos_b(b);
-            scratch.update.direction.v.x=c*math_fast_sin_or_cos_a(a);
-            scratch.update.direction.v.y=c*math_fast_sin_or_cos_b(a);
-            scratch.update.direction.v.z=math_fast_sin_or_cos_a(b);
-            vec_subtract_vec4(&scratch.update.position,&scratch.update.temp,p+0x10);
+            angle_b=math_wrap_angle_to_pi(*(float *)(st+4)*0.581194639f);
+            cos_b=math_fast_sin_or_cos_b(angle_b);
+            scratch.update.direction.v.x=cos_b*math_fast_sin_or_cos_a(angle_a);
+            scratch.update.direction.v.y=cos_b*math_fast_sin_or_cos_b(angle_a);
+            scratch.update.direction.v.z=math_fast_sin_or_cos_a(angle_b);
+            vec_subtract_vec4(&scratch.update.position,&scratch.update.temp,object+0x10);
             vec_scale_to_length(&scratch.update.position,&scratch.update.position,one);
-            t=1.57079637f-math_fast_angle_helper(FastVecDot(&scratch.update.position,&scratch.update.direction));
-            if(t>lower) {
-                if(t<=lowEnd) weight=math_smooth_step((t-lower)/0.0698131323f);
-                else if(t<=highStart) weight=one;
-                else if(t<=upper) weight=one-math_smooth_step((t-highStart)/0.610865355f);
+            angle=1.57079637f-math_fast_angle_helper(FastVecDot(&scratch.update.position,&scratch.update.direction));
+            if(angle>lower) {
+                if(angle<=lowEnd) weight=math_smooth_step((angle-lower)/0.0698131323f);
+                else if(angle<=highStart) weight=one;
+                else if(angle<=upper) weight=one-math_smooth_step((angle-highStart)/0.610865355f);
             }
             color=32;
             if(weight!=0) {

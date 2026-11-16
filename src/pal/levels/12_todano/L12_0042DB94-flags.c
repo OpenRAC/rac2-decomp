@@ -3,7 +3,7 @@
 #include "common.h"
 extern int math_random_int_below(int);
 extern int FloatToInt(float);
-extern unsigned char *func_PAL_002BE9A8(void *,float,float,float,int,void *,float,unsigned int,int);
+extern unsigned char *part_spawn_spinning_spark_pal(void *,float,float,float,int,void *,float,unsigned int,int);
 struct SparkPayloadPrefix {
     unsigned char reserved00[4];
     unsigned int mode;
@@ -12,12 +12,13 @@ struct SparkPayloadPrefix {
     unsigned char lifetime;
 };
 
-void func_PAL_L12_0042EC00(unsigned char *object,int positive)
+/* Spawns a small spray of sparks below the object, going up or down. */
+void part_l12_spawn_spark_spray_pal(unsigned char *object,int positive)
 {
     float velocity[4] __attribute__((aligned(16)));
     float position[4] __attribute__((aligned(16)));
     int rotation;
-    unsigned char *first,*particle;
+    unsigned char *first_spark,*white_spark;
     velocity[0]=0.0f;
     velocity[2]=positive?0.5f:-0.5f;
     velocity[1]=0.0f;
@@ -27,37 +28,37 @@ void func_PAL_L12_0042EC00(unsigned char *object,int positive)
         rotation=-rotation;
     qcopy(position,object+0x10);
     position[2]-=0.25f;
-    first=func_PAL_002BE9A8(position,0.1f,1.0f,0.9f,rotation,velocity,420000.0f,0xDF204080u,0);
-    if(first) {
-        unsigned char *state;
-        *(unsigned short *)(first+0xA)=8;
-        state=first+0x20;
-        first[9]=FloatToInt(4.0f)+0x70;
-        *(int *)(state+4)=2;
-        state[0xA]=0xDF;
-        state[0xB]=first[0xA];
+    first_spark=part_spawn_spinning_spark_pal(position,0.1f,1.0f,0.9f,rotation,velocity,420000.0f,0xDF204080u,0);
+    if(first_spark) {
+        unsigned char *data;
+        *(unsigned short *)(first_spark+0xA)=8;
+        data=first_spark+0x20;
+        first_spark[9]=FloatToInt(4.0f)+0x70;
+        *(int *)(data+4)=2;
+        data[0xA]=0xDF;
+        data[0xB]=first_spark[0xA];
     }
     {
-        unsigned char *second=func_PAL_002BE9A8(position,0.1f,1.0f,0.9f,rotation,velocity,420000.0f,0xDF204080u,0);
-        if(second) {
-            unsigned char *state=second+0x20;
-            /* The retail second allocation updates the first header. */
-            *(unsigned short *)(first+0xA)=8;
-            first[9]=FloatToInt(4.0f)+0x70;
-            *(int *)(state+4)=2;
-            state[0xA]=0xDF;
-            state[0xB]=first[0xA];
+        unsigned char *second_spark=part_spawn_spinning_spark_pal(position,0.1f,1.0f,0.9f,rotation,velocity,420000.0f,0xDF204080u,0);
+        if(second_spark) {
+            unsigned char *data=second_spark+0x20;
+            /* The retail second_spark allocation updates the first_spark header. */
+            *(unsigned short *)(first_spark+0xA)=8;
+            first_spark[9]=FloatToInt(4.0f)+0x70;
+            *(int *)(data+4)=2;
+            data[0xA]=0xDF;
+            data[0xB]=first_spark[0xA];
         }
     }
-    particle=func_PAL_002BE9A8(position,0.05f,1.0f,0.97f,16,velocity,210000.0f,0xDFFFFFFFu,0);
-    if(particle) {
-        struct SparkPayloadPrefix *state=(struct SparkPayloadPrefix *)(particle+0x20);
+    white_spark=part_spawn_spinning_spark_pal(position,0.05f,1.0f,0.97f,16,velocity,210000.0f,0xDFFFFFFFu,0);
+    if(white_spark) {
+        struct SparkPayloadPrefix *data=(struct SparkPayloadPrefix *)(white_spark+0x20);
         int brightness=FloatToInt(4.0f);
-        *(unsigned short *)(particle+0xA)=4;
-        particle[9]=brightness+0x70;
-        particle[8]=math_random_int_below(255);
-        state->mode=2;
-        state->alpha=0xDF;
-        state->lifetime=first[0xA];
+        *(unsigned short *)(white_spark+0xA)=4;
+        white_spark[9]=brightness+0x70;
+        white_spark[8]=math_random_int_below(255);
+        data->mode=2;
+        data->alpha=0xDF;
+        data->lifetime=first_spark[0xA];
     }
 }

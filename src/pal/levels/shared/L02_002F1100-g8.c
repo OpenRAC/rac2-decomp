@@ -21,7 +21,8 @@ extern void FastVecAdd(void *, void *, void *);
 extern int FastTweenColor(int, int, float);
 extern void *part_spawn_trail(void *, void *, void *, int, int, int, int, int, int);
 
-void func_PAL_L02_002F1100(void *owner, void *from, void *to, int count, int *colour, float speed) {
+/* Throws a burst of colored sparks along a line between two points. Each spark gets a random brightness, position on the line and speed (PAL: 50 Hz scaling). */
+void part_spawn_spark_burst_line_pal(void *owner, void *from, void *to, int count, int *colour, float speed) {
     Vec4 direction;
     Vec4 position;
     Vec4 velocity;

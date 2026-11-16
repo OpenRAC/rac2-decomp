@@ -48,62 +48,62 @@ typedef struct {
 
 /* Per-frame fire step: on its cooldown and frame slot, looks for a target (skipping some
  * classes), aims, spawns two particles, fires one of two shot kinds (the first while charges
- * remain) and restarts the cooldown from the weapon table's rate at +0x54. */
-void func_PAL_L00_003D8170(unsigned char *p, EffectLauncherState *s)
+ * remain) and restarts the cooldown from the weapon table'state rate at +0x54. */
+void kilonoid_fire_shot_pal(unsigned char *moby, EffectLauncherState *state)
 {
     float pos[4], delta[4], target[4], step[4], velocity[4];
-    char *obj;
-    int n;
+    char *target_moby;
+    int sound_seed;
     float angle;
 
-    if (!ref_L00_003D40D8_00(&s->cooldown))
+    if (!ref_L00_003D40D8_00(&state->cooldown))
         return;
-    if (g_frame_l00_counter % 4 != s->frame)
+    if (g_frame_l00_counter % 4 != state->frame)
         return;
-    ref_L00_003D40D8_01(p, 1, pos);
-    s->alternate ^= 1;
-    obj = ref_L00_003D40D8_02(pos, g_cam_follow_matrix, 0,
+    ref_L00_003D40D8_01(moby, 1, pos);
+    state->alternate ^= 1;
+    target_moby = ref_L00_003D40D8_02(pos, g_cam_follow_matrix, 0,
                               g_kilonoid_aim_yaw_degrees * 0.017453294f, g_kilonoid_aim_pitch_degrees * 0.017453294f,
                               g_kilonoid_shot_float_param,
                               g_kilonoid_aim_yaw_degrees * 0.017453294f, g_kilonoid_aim_pitch_degrees * 0.017453294f);
-    if (obj) {
-        if ((*(short *)(obj + 0xaa) == 0xee1 || *(short *)(obj + 0xaa) == 0xec0
-             || *(short *)(obj + 0xaa) == 0xed4)
-            && *(unsigned char *)(*(char **)(obj + 0x68) + 0x3b1) == 255) {
-            s->target = 0;
+    if (target_moby) {
+        if ((*(short *)(target_moby + 0xaa) == 0xee1 || *(short *)(target_moby + 0xaa) == 0xec0
+             || *(short *)(target_moby + 0xaa) == 0xed4)
+            && *(unsigned char *)(*(char **)(target_moby + 0x68) + 0x3b1) == 255) {
+            state->target = 0;
             return;
         }
-        if (*(short *)(obj + 0xaa) == 0xef4) {
-            s->target = 0;
+        if (*(short *)(target_moby + 0xaa) == 0xef4) {
+            state->target = 0;
             return;
         }
-        s->target = obj;
-        if ((unsigned char)p[0x43] != 2)
-            ref_L00_003D40D8_03(p, 2, 0, 4);
-        ref_L00_003D40D8_04(delta, p + 0x10, g_hero_position);
-        angle = ref_L00_003D40D8_05(delta, p + 0xe0);
-        if (g_game_l00_mode == 2 || p[0x42] != p[0x43] || (unsigned char)p[0x42] != 2
+        state->target = target_moby;
+        if ((unsigned char)moby[0x43] != 2)
+            ref_L00_003D40D8_03(moby, 2, 0, 4);
+        ref_L00_003D40D8_04(delta, moby + 0x10, g_hero_position);
+        angle = ref_L00_003D40D8_05(delta, moby + 0xe0);
+        if (g_game_l00_mode == 2 || moby[0x42] != moby[0x43] || (unsigned char)moby[0x42] != 2
             || !(angle > 1.1f))
             return;
-        qcopy(target, obj + 0x10);
+        qcopy(target, target_moby + 0x10);
         {
-            char *v = ref_L00_003D40D8_06(obj);
+            char *v = ref_L00_003D40D8_06(target_moby);
 
             if (v)
                 target[2] += *(float *)(v + 0x10);
             else
                 target[2] += g_kilonoid_target_height_offset;
         }
-        n = ref_L00_003D40D8_07(255);
+        sound_seed = ref_L00_003D40D8_07(255);
         {
-            char *result = ref_L00_003D40D8_08(pos, g_default_vector, 2, 0x202080, n, 127, 16,
+            char *result = ref_L00_003D40D8_08(pos, g_default_vector, 2, 0x202080, sound_seed, 127, 16,
                                                420000.0f, 420000.0f, 0.0f, 0);
 
             if (result)
                 result[2] = *g_effect_param_pointer_b;
         }
         {
-            char *result = ref_L00_003D40D8_08(pos, g_default_vector, 2, 0x601080, (n + 128) % 255,
+            char *result = ref_L00_003D40D8_08(pos, g_default_vector, 2, 0x601080, (sound_seed + 128) % 255,
                                                127, 16, 420000.0f, 420000.0f, 0.0f, 0);
 
             if (result)
@@ -112,34 +112,34 @@ void func_PAL_L00_003D8170(unsigned char *p, EffectLauncherState *s)
         ref_L00_003D40D8_04(step, target, pos);
         ref_L00_003D40D8_09(step, step, g_kilonoid_shot_velocity_scale);
         ref_L00_003D40D8_10(pos, pos, step);
-        if (s->charges && !ref_L00_003D40D8_07(g_kilonoid_shot_sound_id)) {
+        if (state->charges && !ref_L00_003D40D8_07(g_kilonoid_shot_sound_id)) {
             float f;
             char *result;
 
-            if (--s->charges < 0)
-                s->charges = 0;
+            if (--state->charges < 0)
+                state->charges = 0;
             f = ref_L00_003D40D8_11(pos, target, 0, g_kilonoid_shot_speed * 0.020000001f,
                                     -(g_kilonoid_projectile_speed * 0.00040000002f));
             ref_L00_003D40D8_04(velocity, target, pos);
             velocity[2] = 0;
             ref_L00_003D40D8_09(velocity, velocity, g_kilonoid_shot_speed * 0.020000001f);
             velocity[2] = f;
-            result = ref_L00_003D40D8_12(p, pos, velocity, 150, g_kilonoid_projectile_speed * 0.00040000002f);
-            ref_L00_003D40D8_13(3, 0, p);
+            result = ref_L00_003D40D8_12(moby, pos, velocity, 150, g_kilonoid_projectile_speed * 0.00040000002f);
+            ref_L00_003D40D8_13(3, 0, moby);
             *(float *)(result + 0x2c) = g_kilonoid_projectile_param;
         } else {
-            ref_L00_003D40D8_14(pos, p, obj);
-            ref_L00_003D40D8_13(0, 0, p);
+            ref_L00_003D40D8_14(pos, moby, target_moby);
+            ref_L00_003D40D8_13(0, 0, moby);
         }
         {
             char *v = g_weapon_l00_table + g_kilonoid_weapon_index * 0xe0;
             float f = ref_L00_003D40D8_15(0.0f, 0.17f);
             float delay = 1.0f / *(float *)(v + 0x54);
 
-            ++s->shots;
-            s->cooldown = delay + f;
+            ++state->shots;
+            state->cooldown = delay + f;
         }
         return;
     }
-    s->target = 0;
+    state->target = 0;
 }

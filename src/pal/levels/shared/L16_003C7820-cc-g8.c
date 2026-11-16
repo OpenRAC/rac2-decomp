@@ -15,7 +15,8 @@ extern float g_debris_spin_min __attribute__((sda));
 extern float g_debris_spin_max __attribute__((nosda));
 extern int g_debris_l16_life_min __attribute__((sda));
 extern int g_debris_l16_life_max __attribute__((nosda));
-char *func_PAL_L16_003C7820(char *parent,char *position,char *rotation)
+/* Spawns a bouncing debris piece from a parent moby with random scale, spin, angle and lifetime (PAL: 50 Hz lifetime). */
+char *bouncing_debris_create_pal(char *parent,char *position,char *rotation)
 {
     char *object=CreateMoby(0xa80);
     char *state;

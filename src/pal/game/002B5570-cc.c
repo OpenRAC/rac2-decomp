@@ -20,7 +20,8 @@ extern Record_2B4038 g_effect_record_table_2[];
 
 extern int g_requested_setting_b __attribute__((sda));
 
-void func_PAL_002B5570(int value) {
+/* Stores the requested setting B. */
+void request_set_setting_b_pal(int value) {
     g_requested_setting_b = value;
 }
 

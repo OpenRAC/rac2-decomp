@@ -7,28 +7,30 @@ extern f32 mat_fast_helper_a(f32, f32);
 extern f32 vec_length_xy(f32 *);
 extern f32 g_trail_projectile_scale __attribute__((sda));
 
-char *func_PAL_L03_003D5A98(char *a0, char *a1, f32 *a2, s32 a3)
+/* Spawns a trail projectile from a parent object at the given position, with the given velocity
+   and damage, aimed along its velocity. Returns the new moby or 0. */
+char *trail_projectile_spawn_pal(char *parent, char *position, f32 *velocity, s32 damage)
 {
-    char *s1 = CreateMoby(0xA02);
-    char *s0;
+    char *moby = CreateMoby(0xA02);
+    char *vars;
 
-    if (s1 != 0) {
-        s0 = *(char **)(s1 + 0x68);
-        moby_init_child_from_parent(s1, a0);
-        qcopy(s1 + 0x10, a1);
-        qcopy(s0, a2);
-        *(f32 *)(s1 + 0xF8) = mat_fast_helper_a(a2[0], a2[1]);
+    if (moby != 0) {
+        vars = *(char **)(moby + 0x68);
+        moby_init_child_from_parent(moby, parent);
+        qcopy(moby + 0x10, position);
+        qcopy(vars, velocity);
+        *(f32 *)(moby + 0xF8) = mat_fast_helper_a(velocity[0], velocity[1]);
         {
-            f32 t = vec_length_xy(a2);
-            f32 angle = -mat_fast_helper_a(t, a2[2]);
+            f32 xy_length = vec_length_xy(velocity);
+            f32 angle = -mat_fast_helper_a(xy_length, velocity[2]);
             f32 scale = g_trail_projectile_scale;
 
-            *(f32 *)(s1 + 0xF4) = angle;
-            *(s32 *)(s0 + 0x30) = 0x64;
-            *(s32 *)(s0 + 0x38) = a3;
-            *(f32 *)(s1 + 0x2C) = *(f32 *)(*(u32 *)(s1 + 0x24) + 0x24)
+            *(f32 *)(moby + 0xF4) = angle;
+            *(s32 *)(vars + 0x30) = 0x64;
+            *(s32 *)(vars + 0x38) = damage;
+            *(f32 *)(moby + 0x2C) = *(f32 *)(*(u32 *)(moby + 0x24) + 0x24)
                 * scale;
         }
     }
-    return s1;
+    return moby;
 }

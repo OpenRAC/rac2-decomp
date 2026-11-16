@@ -9,7 +9,8 @@ extern int math_random_int_below(int);
 extern int math_random_int_range(int, int);
 extern unsigned char *g_dark_puff_effect_byte;
 
-unsigned char *func_PAL_L00_00342DA8(Quadword *position, float *velocity, int flags, int lifetime, float scale) {
+/* Spawns a dark puff particle with the given velocity and lifetime (PAL). */
+unsigned char *part_spawn_dark_puff_pal(Quadword *position, float *velocity, int flags, int lifetime, float scale) {
     unsigned char *particle = part_alloc(0x6B);
     unsigned char *motion;
     int shade;
@@ -44,7 +45,8 @@ unsigned char *func_PAL_L00_00342DA8(Quadword *position, float *velocity, int fl
 
 extern unsigned char *g_accelerated_puff_byte;
 
-unsigned char *func_PAL_L00_00343208(Quadword *position, float *velocity, float *acceleration,
+/* Spawns a puff particle that is also pushed by an acceleration (PAL). */
+unsigned char *part_spawn_accelerated_puff_pal(Quadword *position, float *velocity, float *acceleration,
                               int flags, int lifetime, float scale) {
     unsigned char *particle = part_alloc(0x6C);
     unsigned char *motion;

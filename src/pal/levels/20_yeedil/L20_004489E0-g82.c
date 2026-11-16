@@ -11,8 +11,9 @@ extern void nanotech_crate_init(char *);
 extern int moby_fuse_linked_objects(char *, char *, char *, char **, int);
 extern char *glow_effect_create(char *, char *, int, int);
 
-char *yeedil_boss_place_group_member_pal(char *arg0, TI128 *arg1) {
-    char *state = *(char **)(arg0 + 0x68);
+/* Takes the first usable object of the enemy group, moves it to the given place and starts it with a small effect. Returns that object. (PAL) */
+char *yeedil_boss_place_group_member_pal(char *moby, TI128 *position) {
+    char *state = *(char **)(moby + 0x68);
     u16 *rec;
     char *found = 0;
     Vector431E0 buf;
@@ -21,22 +22,22 @@ char *yeedil_boss_place_group_member_pal(char *arg0, TI128 *arg1) {
          (*(int *)(state + 0x218) & 0xFF) != 0xFF && *(int *)(state + 0x218) <= g_group_count && rec != 0 &&
          ((rec != 0 && (s16)rec[-1] >= 0) || rec == g_group_l20_id_lists[*(int *)(state + 0x218)]);
          rec++) {
-        char *e = g_group_l20_member_table + ((*rec & 0x7FFF) << 8);
+        char *member = g_group_l20_member_table + ((*rec & 0x7FFF) << 8);
 
-        if (e != 0 && moby_is_state_six(e) != 0)
-            found = e;
+        if (member != 0 && moby_is_state_six(member) != 0)
+            found = member;
         break;
     }
     if (found != 0) {
-        char *p = found + 0x10;
-        char *s2;
+        char *member_pos = found + 0x10;
+        char *member_vars;
 
-        qcopy(p, arg1);
+        qcopy(member_pos, position);
         nanotech_crate_init(found);
-        moby_fuse_linked_objects(found, p, found + 0xF0, 0, 0);
-        s2 = *(char **)(found + 0x68);
-        *(int *)(s2 + 0xAC) |= 8;
-        qcopy(&buf, p);
+        moby_fuse_linked_objects(found, member_pos, found + 0xF0, 0, 0);
+        member_vars = *(char **)(found + 0x68);
+        *(int *)(member_vars + 0xAC) |= 8;
+        qcopy(&buf, member_pos);
         buf.component[2] -= 0.5f;
         glow_effect_create(found, (char *)&buf, 0x12C, 0);
     }

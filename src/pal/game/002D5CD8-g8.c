@@ -43,25 +43,25 @@ extern s32 g_001ABAA8 __attribute__((sda));
 extern s32 g_001ABAB8 __attribute__((sda));
 extern f32 g_001ABAC0 __attribute__((sda));
 
-s32 func_PAL_002D5CD8(void) {
-    s32 s0;
-    s32 s1;
+s32 menu_popup_box_draw_simple_pal(void) {
+    s32 text_y;
+    s32 text_x;
 
     SetupGifPaging(0);
     if (g_resident_data_base != 0) {
         gfx_draw_scaled_object_two_axes(table_find_by_id(g_resident_data_base + 0x8710, 0x8B), 0x60442D00, (f32)g_001ABAB0, (f32)g_popup_simple_y, 1.0f, g_menu_alpha_scale, g_001ABAC0);
         gfx_draw_scaled_object_two_axes(table_find_by_id(g_resident_data_base + 0x8710, 0x8C), 0x55F0C070, (f32)g_001ABAB0, (f32)g_popup_simple_y, 1.0f, g_menu_alpha_scale, g_001ABAC0);
         gfx_draw_scaled_object_two_axes(table_find_by_id(g_resident_data_base + 0x8710, 0x8D), 0x80FFDE8D, (f32)g_001ABAB0, (f32)g_popup_simple_y, 1.0f, g_menu_alpha_scale, 0.0f);
-        s1 = g_001ABAB0;
-        s1 = s1 + g_001ABAA8;
-        s0 = g_popup_simple_y;
-        s0 = s0 + g_popup_simple_offset_a;
-        text_draw_centered_small(s1, s0, (u64)0x80F0F0F0, GetLocalizedString(0xb72), -1);
-        s1 = g_001ABAB0;
-        s1 = s1 + g_001ABAB8;
-        s0 = g_popup_simple_y;
-        s0 = s0 + g_popup_simple_offset_b;
-        text_draw_centered_small(s1, s0, (u64)0x80F0F0F0, GetLocalizedString(0xb60), -1);
+        text_x = g_001ABAB0;
+        text_x = text_x + g_001ABAA8;
+        text_y = g_popup_simple_y;
+        text_y = text_y + g_popup_simple_offset_a;
+        text_draw_centered_small(text_x, text_y, (u64)0x80F0F0F0, GetLocalizedString(0xb72), -1);
+        text_x = g_001ABAB0;
+        text_x = text_x + g_001ABAB8;
+        text_y = g_popup_simple_y;
+        text_y = text_y + g_popup_simple_offset_b;
+        text_draw_centered_small(text_x, text_y, (u64)0x80F0F0F0, GetLocalizedString(0xb60), -1);
     }
     DoGifPaging();
     return 0;

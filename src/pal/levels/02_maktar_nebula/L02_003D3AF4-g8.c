@@ -26,7 +26,7 @@ extern int coll_sweep_from_object(void *, float, float *, int, float, float, int
 /* Full constructor: (self + 0x10), seven register words, four stack words, and two FP inputs. */
 extern void *SpawnExplosion_pal(void *, int, int, int, int, int, int, int, int, int, int, int, float, float);
 /* Drives the timed platform through activation, falling, detonation and respawn. */
-void func_PAL_L02_003D3AF4(char *self) {
+void UpdateCountdownExplosive_pal(char *self) {
     Vector point;
     char *state;
     float shake, radius;

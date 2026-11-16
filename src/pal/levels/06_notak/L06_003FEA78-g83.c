@@ -9,7 +9,8 @@ extern int PlayMobySound(int, int, char *);
 extern char *g_moby_l06_table __attribute__((nosda));
 extern float g_oscillation_speed __attribute__((sda));
 
-void func_PAL_L06_00404194(char *object)
+/* Makes an object bob up and down on a sine wave, with a sound at each end of the swing; it waits while its parent object is busy (PAL: 50 Hz timings). */
+void oscillating_height_update_pal(char *object)
 {
     char *state = *(char **)(object + 0x68);
     int advance;

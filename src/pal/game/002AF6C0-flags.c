@@ -4,7 +4,8 @@
 extern float moby_get_anim_value(void *);
 extern float math_round_to_decimal_places(int, float);
 
-int func_PAL_002AF6C0(char *object, float threshold)
+/* Tells whether the moby's animation value has reached the threshold, but is less than one step past it (PAL: step is 0.6). */
+int math_is_value_within_step_pal(char *object, float threshold)
 {
     float current = math_round_to_decimal_places(4, moby_get_anim_value(object));
     float difference = current - threshold;

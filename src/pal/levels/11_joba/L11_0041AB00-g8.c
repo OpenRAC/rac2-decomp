@@ -18,7 +18,7 @@ extern f32 mat_fast_helper_a(f32 a0, f32 a1);
 extern void euler_rotation_basis(void *a0, void *a1);
 extern s32 FloatToInt(f32 a0);
 extern void enemy_init_state_pal(u8 *a0, s32 a1, s32 a2);
-extern void func_PAL_L11_0044F150(u8 *a0, s32 a1, s32 a2);
+extern void security_robot_init_pal(u8 *a0, s32 a1, s32 a2);
 extern void smasher_robot_init_pal(u8 *a0, s32 a1, s32 a2);
 extern void flamethrower_robot_init_pal(u8 *a0, s32 a1, s32 a2);
 extern void drone_init_state_pal(u8 *a0, s32 a1, s32 a2);
@@ -28,85 +28,85 @@ extern u8 g_hero_state[];
 
 /* Places the measured point on the state's three vertices, then walks them: each one gets
    its angle to the shared origin and the class call its identifier names. */
-void func_PAL_L11_0041C088(u8 *arg0) {
-    u8 *s0 = arg0;
-    u8 *s1 = *(u8 **)(s0 + 0x68);
-    u8 *p;
-    u8 *base;
-    f32 loc[4];
-    s32 total;
+void joba_place_child_mobys_pal(u8 *moby) {
+    u8 *parent = moby;
+    u8 *vars = *(u8 **)(parent + 0x68);
+    u8 *child;
+    u8 *hero;
+    f32 spawn_point[4];
+    s32 delay;
     s32 i;
 
-    loc[0] = 0.0f;
-    loc[1] = -9.0f;
-    loc[2] = -3.0f;
-    loc[3] = 0.0f;
-    matrix_mul_vec3(loc, loc, s0 + 0xC0);
-    FastVecAdd(loc, loc, s0 + 0x10);
+    spawn_point[0] = 0.0f;
+    spawn_point[1] = -9.0f;
+    spawn_point[2] = -3.0f;
+    spawn_point[3] = 0.0f;
+    matrix_mul_vec3(spawn_point, spawn_point, parent + 0xC0);
+    FastVecAdd(spawn_point, spawn_point, parent + 0x10);
 
-    if (*(u8 **)(s1 + 0x10) != 0) {
-        *(f32 *)(*(u8 **)(s1 + 0x10) + 0x10) = loc[0] - 2.0f;
-        *(f32 *)(*(u8 **)(s1 + 0x10) + 0x14) = loc[1];
-        *(f32 *)(*(u8 **)(s1 + 0x10) + 0x18) = loc[2];
-        *(f32 *)(*(u8 **)(s1 + 0x10) + 0x1C) = loc[3];
+    if (*(u8 **)(vars + 0x10) != 0) {
+        *(f32 *)(*(u8 **)(vars + 0x10) + 0x10) = spawn_point[0] - 2.0f;
+        *(f32 *)(*(u8 **)(vars + 0x10) + 0x14) = spawn_point[1];
+        *(f32 *)(*(u8 **)(vars + 0x10) + 0x18) = spawn_point[2];
+        *(f32 *)(*(u8 **)(vars + 0x10) + 0x1C) = spawn_point[3];
     }
-    if (*(u8 **)(s1 + 0x14) != 0) {
-        *(f32 *)(*(u8 **)(s1 + 0x14) + 0x10) = loc[0];
-        *(f32 *)(*(u8 **)(s1 + 0x14) + 0x14) = loc[1] + 1.0f;
-        *(f32 *)(*(u8 **)(s1 + 0x14) + 0x18) = loc[2];
-        *(f32 *)(*(u8 **)(s1 + 0x14) + 0x1C) = loc[3];
+    if (*(u8 **)(vars + 0x14) != 0) {
+        *(f32 *)(*(u8 **)(vars + 0x14) + 0x10) = spawn_point[0];
+        *(f32 *)(*(u8 **)(vars + 0x14) + 0x14) = spawn_point[1] + 1.0f;
+        *(f32 *)(*(u8 **)(vars + 0x14) + 0x18) = spawn_point[2];
+        *(f32 *)(*(u8 **)(vars + 0x14) + 0x1C) = spawn_point[3];
     }
-    if (*(u8 **)(s1 + 0x18) != 0) {
-        *(f32 *)(*(u8 **)(s1 + 0x18) + 0x10) = loc[0];
-        *(f32 *)(*(u8 **)(s1 + 0x18) + 0x14) = loc[1] - 1.0f;
-        *(f32 *)(*(u8 **)(s1 + 0x18) + 0x18) = loc[2];
-        *(f32 *)(*(u8 **)(s1 + 0x18) + 0x1C) = loc[3];
+    if (*(u8 **)(vars + 0x18) != 0) {
+        *(f32 *)(*(u8 **)(vars + 0x18) + 0x10) = spawn_point[0];
+        *(f32 *)(*(u8 **)(vars + 0x18) + 0x14) = spawn_point[1] - 1.0f;
+        *(f32 *)(*(u8 **)(vars + 0x18) + 0x18) = spawn_point[2];
+        *(f32 *)(*(u8 **)(vars + 0x18) + 0x1C) = spawn_point[3];
     }
 
-    base = g_hero_state;
-    p = *(u8 **)(s1 + 0x10);
-    total = 0;
+    hero = g_hero_state;
+    child = *(u8 **)(vars + 0x10);
+    delay = 0;
     for (i = 0; i < 3; i++) {
         if (i == 1) {
-            p = *(u8 **)(s1 + 0x14);
+            child = *(u8 **)(vars + 0x14);
         }
         if (i == 2) {
-            p = *(u8 **)(s1 + 0x18);
+            child = *(u8 **)(vars + 0x18);
         }
-        if (p == 0) {
+        if (child == 0) {
             continue;
         }
-        *(s32 *)(p + 0xF0) = 0;
-        *(f32 *)(p + 0xF4) = 0.0f;
-        *(f32 *)(p + 0xF8) = mat_fast_helper_a(*(f32 *)(base + 0x80) - *(f32 *)(p + 0x10),
-                                          *(f32 *)(base + 0x84) - *(f32 *)(p + 0x14));
-        *(s32 *)(p + 0xFC) = 0;
-        euler_rotation_basis(p + 0xC0, p + 0xF0);
-        switch (*(s16 *)(p + 0xAA)) {
+        *(s32 *)(child + 0xF0) = 0;
+        *(f32 *)(child + 0xF4) = 0.0f;
+        *(f32 *)(child + 0xF8) = mat_fast_helper_a(*(f32 *)(hero + 0x80) - *(f32 *)(child + 0x10),
+                                          *(f32 *)(hero + 0x84) - *(f32 *)(child + 0x14));
+        *(s32 *)(child + 0xFC) = 0;
+        euler_rotation_basis(child + 0xC0, child + 0xF0);
+        switch (*(s16 *)(child + 0xAA)) {
         case 0xD98:
-            func_PAL_L11_0044F150(p, total, 0);
+            security_robot_init_pal(child, delay, 0);
             break;
         case 0xDCF:
-            smasher_robot_init_pal(p, total, 0);
+            smasher_robot_init_pal(child, delay, 0);
             break;
         case 0xDF4:
-            flamethrower_robot_init_pal(p, total, 0);
+            flamethrower_robot_init_pal(child, delay, 0);
             break;
         case 0xDF7:
-            *(f32 *)(p + 0x18) += 0.5f;
-            drone_init_state_pal(p, FloatToInt((f32)total * 0.16666667f), 0);
+            *(f32 *)(child + 0x18) += 0.5f;
+            drone_init_state_pal(child, FloatToInt((f32)delay * 0.16666667f), 0);
             break;
         case 0xDF9:
-            path_mover_reset_pal(p, total);
+            path_mover_reset_pal(child, delay);
             break;
         case 0xD37:
-            enemy_init_state_pal(p, total, 0);
+            enemy_init_state_pal(child, delay, 0);
             break;
         }
-        total += ((s32)(g_joba_child_offset_step) * 5 + 2) / 6;
+        delay += ((s32)(g_joba_child_offset_step) * 5 + 2) / 6;
     }
 
-    *(u8 **)(s1 + 0x10) = 0;
-    *(u8 **)(s1 + 0x14) = 0;
-    *(u8 **)(s1 + 0x18) = 0;
+    *(u8 **)(vars + 0x10) = 0;
+    *(u8 **)(vars + 0x14) = 0;
+    *(u8 **)(vars + 0x18) = 0;
 }

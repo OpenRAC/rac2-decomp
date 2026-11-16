@@ -11,6 +11,7 @@ extern float math_fabs(float);
 extern int PlayMobySound(int, int, void *);
 extern void snd_stop_voice(int);
 
+/* Slides a platform toward its target height, moves whatever rides on it and keeps its motion sound playing. (PAL) */
 void elevator_platform_move_to_target_pal(char *self) {
     struct { Vector argument, rotation; } work;
     char *state = *(char **)(self + 0x68);

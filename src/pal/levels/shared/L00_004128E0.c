@@ -10,7 +10,7 @@ extern int math_fast_helper_a(void *, float);
 extern float fast_vec_dist(void *, void *);
 extern float FastVecDot(void *, void *);
 extern float math_fast_angle_helper(float);
-extern void func_PAL_L00_00412C28(char *, char *);
+extern void burst_effects_spawn_pal(char *, char *);
 extern char g_scalar_transition_state[];
 typedef struct SpawnState {
     short life;
@@ -43,7 +43,8 @@ extern void cam_compute_view_direction(char *a0, void *a1, int a2);
 
 /* func_L00_0040D058 is defined in L00_0040D058-ribbon.c. */
 
-char *func_PAL_L00_004128E0(float size, char *position, int trigger, int kind, int red, int green, int blue, int enabled, int flags, int extra, int control)
+/* Creates a glowing flare effect facing the camera at a position, with the given size and colour. It also gives the camera a small shake when the flare is close. (PAL: 50 Hz timings) */
+char *flare_spawn_pal(float size, char *position, int trigger, int kind, int red, int green, int blue, int enabled, int flags, int extra, int control)
 {
     Vector128 direction[1], up[1], sphere[1], difference[1];
     char *object = CreateMoby(0xf6d);
@@ -105,7 +106,7 @@ char *func_PAL_L00_004128E0(float size, char *position, int trigger, int kind, i
             state->delay = 0;
             state->flags = 0;
         }
-        func_PAL_L00_00412C28(object, (char *)up);
+        burst_effects_spawn_pal(object, (char *)up);
     }
     return object;
 }

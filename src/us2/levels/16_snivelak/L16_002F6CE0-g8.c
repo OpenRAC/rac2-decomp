@@ -50,10 +50,12 @@ extern void matrix_mul_vec3(void *, void *, void *);
 extern void part_spawn_masked_debris(char *, int, void *, float, float, float, float, u8);
 extern void moby_mark_spawned(char *);
 
-void func_US2_L16_002F6CE0(void)
+/* Snivelak room scene update (USA v2.00): patches the scene objects and, on map 0x10, plays
+   the room fade, the particle burst and the debris spawn at the scripted frames. */
+void snivelak_room_scene_update_us2(void)
 {
     union { Quadword q; float f[4]; } position;
-    float orientation[16], step[4], randomPosition[4];
+    float orientation[16], step[4], random_position[4];
     char *object;
     int i = 0;
     anim_start_startup_animations();
@@ -64,8 +66,8 @@ void func_US2_L16_002F6CE0(void)
         if (*(short *)(entry + 0xaa) == 0xd54)
             UpdateEquipmentPieces(entry);
         if (entry) {
-            int wantedClass = 4000;
-            if (*(short *)(entry + 0xaa) == wantedClass && g_current_map_index[0] != 0x33 && *(char **)(entry + 0x68))
+            int wanted_class = 4000; /* MOBY_CLASS_TV_SCREENS */
+            if (*(short *)(entry + 0xaa) == wanted_class && g_current_map_index[0] != 0x33 && *(char **)(entry + 0x68))
                 math_store_angle_update_result(entry, (float *)(*(char **)(entry + 0x68) + 12), 0x80aaaad2, 0x80396464, 0.06108653545379639f);
         }
     }
@@ -80,7 +82,7 @@ void func_US2_L16_002F6CE0(void)
             g_snivelak_room_fade = 1.0f - fade;
         }
         if (g_snivelak_scene.frame == 0x336) {
-            int particleIndex;
+            int particle_index;
             position.q = 0;
             position.f[0] = 0.2f;
             position.f[3] = 1.0f;
@@ -89,23 +91,23 @@ void func_US2_L16_002F6CE0(void)
             FastVecScale(step, orientation + 8, 0.15f);
             FastVecAdd(&position, &position, step);
             FastVecScale(step, orientation + 8, -0.03333333507180214f);
-            particleIndex = 29;
+            particle_index = 29;
             do {
                 int random;
                 float scale;
                 char *particle;
-                randomPosition[0] = position.f[0] + math_random_signed_float_range(0.0f, 0.05f);
-                randomPosition[1] = position.f[1] + math_random_signed_float_range(0.0f, 0.05f);
-                randomPosition[2] = position.f[2] + math_random_signed_float_range(0.0f, 0.05f);
+                random_position[0] = position.f[0] + math_random_signed_float_range(0.0f, 0.05f);
+                random_position[1] = position.f[1] + math_random_signed_float_range(0.0f, 0.05f);
+                random_position[2] = position.f[2] + math_random_signed_float_range(0.0f, 0.05f);
                 random = math_random_int_below(255);
                 scale = 42000.0f;
-                part_spawn_gravity_fade(randomPosition, g_particle_template, 20, 0x808080, random, 127, 0, scale, scale, 0.0f, 0);
+                part_spawn_gravity_fade(random_position, g_particle_template, 20, 0x808080, random, 127, 0, scale, scale, 0.0f, 0);
                 scale = 273000.0f;
                 particle = part_spawn_gravity_fade(&position, g_particle_template, 30, 0x406080, random, 16, 0, scale, scale, 0.0f, 0);
                 if (particle) particle[2] = *g_scene_effect_material.material;
                 FastVecAdd(&position, &position, step);
-                particleIndex--;
-            } while (particleIndex >= 0);
+                particle_index--;
+            } while (particle_index >= 0);
         } else if (g_snivelak_scene.frame == 0x366) {
             object = CreateMoby(0xa79);
             if (object) {

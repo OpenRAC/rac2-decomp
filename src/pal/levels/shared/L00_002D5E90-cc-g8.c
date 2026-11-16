@@ -90,7 +90,7 @@ extern void copy_matrix3x4(void *, void *);
 /* Places the hero's held object (D_00189E20.object): from the weapon's mount offset and
    rotation, a turning bob angle, the blend from the transition pose while blend < 1, and a
    ground probe that limits the vertical offset to [-1.5, 0]. */
-void func_PAL_L00_002D5E90(void) {
+void UpdateHeroHeldObject_pal(void) {
     Moby5940 *obj = g_hero_state.object;
     char *mount;
     float m[16], rot[16], offset[4], temp[4], a[4], b[4];

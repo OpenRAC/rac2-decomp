@@ -57,7 +57,9 @@ extern void part_init_trail_sparkle_pairs_pal(void *), moby_mark_spawned(void *)
 extern void euler_rotation_basis(void *,void *), part_update_debris_pieces(void *), part_update_trail_nodes(void *);
 extern void part_update_ring_pieces(void *), gfx_update_screen_fade_pal(void), gfx_register_overlay_draw_callback(void (*)(void),void *);
 
-void func_PAL_0032B930(Blast *self)
+/* Per-frame update of the hero blast effect: grows a ring of pieces, damages nearby mobys when
+   it bursts, then fades the screen and frees itself (PAL: 50 Hz timings). */
+void blast_update_pal(Blast *self)
 {
     float v[4] __attribute__((aligned(16)));
     struct {

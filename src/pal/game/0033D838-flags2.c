@@ -11,7 +11,8 @@ extern char *GetLocalizedString(int);
 extern int sprintf(char *, const char *, ...);
 extern int text_draw_centered_small(int, int, unsigned long, char *, int);
 
-void func_PAL_0033EAF0(char *object)
+/* Draws the two-toggle option page: the prompt bar and one centred line per option, the selected one brighter. */
+void two_toggle_a_draw_pal(char *object)
 {
     char buffer[128];
     SolTextPair2 pair;
@@ -39,30 +40,31 @@ void func_PAL_0033EAF0(char *object)
 
 extern void prompt_bar_draw_pal();
 extern int DrawMenuPreviewImage();
-extern void func_PAL_00338770();
+extern void text_label_draw_pal();
 extern void hud_draw_colored_quad_widget();
 extern void gfx_draw_screen_element_stored();
-extern void func_PAL_00340D78();
+extern void info_panel_draw_counters_pal();
 
 /* Forwards one object pointer, eight pointer-plus-constant arguments and a null to ten calls in a fixed order. */
-void func_PAL_00341020(char *p)
+void info_panel_draw_pal(char *object)
 {
-    prompt_bar_draw_pal(p + 8);
+    prompt_bar_draw_pal(object + 8);
     DrawMenuPreviewImage(0);
-    func_PAL_00338770(p + 792);
-    func_PAL_00338770(p + 880);
-    func_PAL_00338770(p + 968);
-    hud_draw_colored_quad_widget(p + 732);
-    gfx_draw_screen_element_stored(p + 1056);
-    func_PAL_00338770(p + 1576);
-    func_PAL_00338770(p + 1488);
-    func_PAL_00340D78(p);
+    text_label_draw_pal(object + 792);
+    text_label_draw_pal(object + 880);
+    text_label_draw_pal(object + 968);
+    hud_draw_colored_quad_widget(object + 732);
+    gfx_draw_screen_element_stored(object + 1056);
+    text_label_draw_pal(object + 1576);
+    text_label_draw_pal(object + 1488);
+    info_panel_draw_counters_pal(object);
 }
 
 extern unsigned char g_pal_language_flag_a __attribute__((sda));
 extern unsigned char g_pal_language_flag_b __attribute__((sda));
 
-void func_PAL_0033F840(char *object)
+/* Draws the two-toggle option page (language flags): the prompt bar and one centred line per option, the selected one brighter. */
+void two_toggle_b_draw_pal(char *object)
 {
     char buffer[128];
     SolTextPair2 pair;

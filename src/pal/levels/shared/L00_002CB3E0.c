@@ -23,7 +23,7 @@ extern float fast_vec_dist(void *, void *);
 extern char *SelectBestEligibleTarget(void *, float, float, float, float, int, int);
 
 /* keeps the hero's held target (0x1450) while both low pad bits are set: clears it on an ineligible screen, beyond 30 units or on release, records a statistic when the target stops being eligible; with no target and both bits set plus either in the next pad word, picks one from the camera's view and then from the hero's */
-void func_PAL_L00_002CB3E0(void)
+void UpdateHeroHeldTarget_pal(void)
 {
     char *hero = D_00189E20_36;
     int screen = *(int *)(hero + 0x1248);

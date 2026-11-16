@@ -44,6 +44,7 @@ extern void dobbo_update_pulsing_tint(char *);
 #define WORD(p,o) (*(s32 *)((p)+(o)))
 #define FLOAT(p,o) (*(float *)((p)+(o)))
 
+/* Per-frame update of the wandering Dobbo creature (moby class 3472): it walks about, turns to the hero, spits and bursts when hit. (USA v2.00) */
 void dobbo_wandering_update_us2(char *obj)
 {
     DobboQuad position;

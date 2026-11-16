@@ -12,7 +12,7 @@ extern Func002DE550Slot g_menu_chunk_table[] __attribute__((sda));
 extern int menu_stream_chunk_get_size(int key);
 extern void mem_clear(void *data, unsigned int tag, int size);
 
-int func_US2_002DF368(int mode)
+int menu_stream_chunk_claim_free_us2(int mode)
 {
     int i;
     int size;

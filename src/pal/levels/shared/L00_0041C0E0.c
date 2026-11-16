@@ -36,13 +36,14 @@ typedef struct SpawnObject {
 } SpawnObject;
 extern Vector128 g_hero_l00_position;
 
+/* Creates a spark effect object (moby class 5022) that can be attached to a parent. */
 char *spark_effect_spawn_pal(Vector128 *position, int kind, char *parent)
 {
     Vector128 direction[1], up[1];
-    char *object = CreateMoby(0x139E);
+    char *object = CreateMoby(0x139E /* moby class 5022 */);
     if (object != 0) {
-        SpawnObject *m = (SpawnObject *)object;
-        AttachedSpawnState *state = (AttachedSpawnState *)m->state;
+        SpawnObject *self = (SpawnObject *)object;
+        AttachedSpawnState *state = (AttachedSpawnState *)self->state;
         char *first = object + 0x10;
         char *second;
         char *third;
@@ -60,7 +61,7 @@ char *spark_effect_spawn_pal(Vector128 *position, int kind, char *parent)
         FastVecCross(third, second, up);
         vec_scale_to_length(third, third, 1.0f);
         FastVecCross(object + 0xe0, third, second);
-        m->forward[3] = m->right[3] = m->up[3] = 0.0f;
+        self->forward[3] = self->right[3] = self->up[3] = 0.0f;
         state->life = 50;
         state->kind = kind;
         state->parent = parent;
@@ -76,7 +77,7 @@ extern int FloatToInt(float);
 extern float FastAddRotations(float, float);
 extern float math_fast_sin_or_cos_a(float);
 extern float math_fast_sin_or_cos_b(float);
-extern unsigned char *func_PAL_L00_00342480(void *, void *, int);
+extern unsigned char *part_l00_spawn_spinning_pal(void *, void *, int);
 extern char g_default_vector[] __attribute__((sda));
 typedef struct { char pad[0x140]; float x, y; } CameraHead;
 extern void part_spawn_drifting_particles(char *);
@@ -103,7 +104,7 @@ void part_spawn_drifting_particles_pal(char *object)
         spawn[4] = math_fast_sin_or_cos_a(angle) * 0.020000001f * speed;
         spawn[5] = math_fast_sin_or_cos_b(angle) * 0.020000001f * speed;
         spawn[6] = 0.09f;
-        func_PAL_L00_00342480(spawn, g_default_vector, 250);
+        part_l00_spawn_spinning_pal(spawn, g_default_vector, 250);
     }
 }
 

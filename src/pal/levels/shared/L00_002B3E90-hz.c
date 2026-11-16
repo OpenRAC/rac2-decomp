@@ -18,6 +18,7 @@ extern char g_hero_state[];
 extern int hero_slot_item_id(int index);
 extern void hero_steer_heading(int index, float a, float b, float c);
 
+/* Picks how quickly the hero turns, based on how fast the hero moves and the current state, then applies it (PAL: 50 Hz rates). */
 void hero_set_turn_rates_pal(void)
 {
     float speed = ((MovementView *)g_hero_state)->speed;

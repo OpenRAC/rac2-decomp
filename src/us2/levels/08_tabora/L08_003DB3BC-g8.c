@@ -45,14 +45,15 @@ extern u8 g_hero_position[];
 extern int g_game_mode[];
 extern void part_spawn_sparks_around(void *),part_spawn_yellow_spark_burst(void *,void *);
 extern void SpawnExplosionEffects(void *,void *,void *,float,float,int,int,int,float,float,float,float,int,float,int,int,int,int,int);
-extern void func_US2_002A7AA8(void *,int,int);
+extern void SetDeathBits_us2(void *,int,int);
 extern u8 g_str_effect_name[] MACRO_ADDR;
 typedef struct { u8 pad[0x464]; u8 flags[0]; } MobyFlags;
 extern MobyFlags g_moby_spawn_state_flags_a, g_moby_spawn_state_flags_b;
 extern u8 g_moby_state_flags[] MACRO_ADDR;
 extern u8 g_moby_group_flags[],g_moby_nibble_table[];
 extern int g_current_map_index MACRO_ADDR;
-void func_US2_L08_003DB3BC(u8 *object)
+/* Per-frame state machine of the Spitting Dune Crawler (moby class 2502): waits for its trigger, pops up, walks and chases the hero, spits, gets hurt and dies (USA v2.00). */
+void tabora_chase_enemy_update_us2(u8 *object)
 {
     u8 *state=P(object,0x68);
     float old[4], delta[4];
@@ -115,23 +116,23 @@ void func_US2_L08_003DB3BC(u8 *object)
         }
         break;
     case 4: {
-        u8 *collisionMoby;
+        u8 *collision_moby;
         GroundMoby *ground=(GroundMoby *)object;
         qcopy_nc(old,object+0x10);FastVecAdd(object+0x10,object+0x10,state+0xD0);
         F(state,0xD8)-=0.0027222223579883575f;F(object,0x18)+=1.5f;
         if(CollLine(old,object+0x10,0,object,0)) {
-            u8 *hitMoby=g_collision_l08_result.moby;
-            if(hitMoby) {
-                if(S(hitMoby,0xAA)==0x945 || S(hitMoby,0xAA)==0x9C6) goto no_ray_response;
+            u8 *hit_moby=g_collision_l08_result.moby;
+            if(hit_moby) {
+                if(S(hit_moby,0xAA)==0x945 || S(hit_moby,0xAA)==0x9C6) goto no_ray_response;
             }
             FastVecSub(delta,old,g_collision_l08_result.point);
             vec_scale_to_length(delta,delta,1.5f);FastVecAdd(object+0x10,object+0x10,delta);
         }
         no_ray_response:
         if(coll_test_point(object+0x10,0,object,1.5f)) {
-            collisionMoby=g_collision_l08_result.moby;
-            if(collisionMoby) {
-                if(S(collisionMoby,0xAA)==0x945 || S(collisionMoby,0xAA)==0x9C6) goto no_overlap_response;
+            collision_moby=g_collision_l08_result.moby;
+            if(collision_moby) {
+                if(S(collision_moby,0xAA)==0x945 || S(collision_moby,0xAA)==0x9C6) goto no_overlap_response;
             } else {
                 if(F(object,0x18)<=F(state,0x434)+1.5f+0.1f && F(state,0xD8)<0) {
                     ground->flags|=0x1000;
@@ -334,7 +335,7 @@ void func_US2_L08_003DB3BC(u8 *object)
         u8 idx;
         part_spawn_sparks_around(object);part_spawn_yellow_spark_burst(object,g_str_effect_name);
         SpawnExplosionEffects(object,g_str_effect_name,0,0,0,4,0,0,2,1,9,1,-1,0,0,0,-1,1,0x810001);
-        func_US2_002A7AA8(object,B(state,0x40C)==2?0x1000:0,3);
+        SetDeathBits_us2(object,B(state,0x40C)==2?0x1000:0,3);
         g_moby_spawn_state_flags_a.flags[S(object,0xB2)]=B(object,0xB0)+2;
         index=B(object,0xB0);
         if(index==0xFF || (idx=index, !(g_moby_state_flags[idx]&0x80) && (g_moby_group_flags[idx+(g_current_map_index<<4)]&0x80)))

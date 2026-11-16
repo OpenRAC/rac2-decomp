@@ -30,67 +30,67 @@ extern float ref_US2_00348628_06,ref_US2_00348628_07;
 extern MenuIntegerPair ref_US2_00348628_08[],ref_US2_00348628_09[];
 typedef struct {float x,y;} MenuFloatPair;
 extern MenuFloatPair ref_US2_00348628_10[],ref_US2_00348628_11[];
-void func_US2_00348628(char *o)
+void item_grid_menu_draw_us2(char *menu)
 {
- if(*(int *)(o+0x4c0)) {
+ if(*(int *)(menu+0x4c0)) {
   int row,col;
-  MenuGridEntry *t=ref_00347468_10;
+  MenuGridEntry *grid=ref_00347468_10;
 
-  gfx_draw_screen_element_stored(o);gfx_draw_screen_element_stored(o+0x4c);gfx_draw_screen_element_stored(o+0x130);
+  gfx_draw_screen_element_stored(menu);gfx_draw_screen_element_stored(menu+0x4c);gfx_draw_screen_element_stored(menu+0x130);
   for(row=0;row<6;row++) {
-   short *ids=&t->id;
-   short *id=(short *)((row<<2)*10+(int)ids);
+   short *first_id=&grid->id;
+   short *id=(short *)((row<<2)*10+(int)first_id);
    for(col=0;col<4;col++,id+=5) {
 
-    { int *color=((int *)object_get_fourth_field(o+0x354));
+    { int *color=((int *)object_get_fourth_field(menu+0x354));
       float yb=(float)ref_US2_00348628_01;
       float xs=ref_US2_00348628_06;
       float xb=(float)ref_US2_00348628_00;
       float ys=ref_US2_00348628_07;
       *color=0x60241700;
-      object_set_first_float4(o+0x354,(xs*(float)col+xb)+(*(float **)(o+0x438))[0],(ys*(float)row+yb)+(*(float **)(o+0x438))[1],0.0f,0.0f);
+      object_set_first_float4(menu+0x354,(xs*(float)col+xb)+(*(float **)(menu+0x438))[0],(ys*(float)row+yb)+(*(float **)(menu+0x438))[1],0.0f,0.0f);
     }
-    *((int *)object_get_fourth_field(o+0x98))=0x30f0c070;
-    *((int *)object_get_fourth_field((o+0x354)))=0x60241700;
-    object_set_flag_value((o+0x1c8),0);object_set_flag_value((o+0x318),0);
+    *((int *)object_get_fourth_field(menu+0x98))=0x30f0c070;
+    *((int *)object_get_fourth_field((menu+0x354)))=0x60241700;
+    object_set_flag_value((menu+0x1c8),0);object_set_flag_value((menu+0x318),0);
     if(g_item_owned_flags[*id]) {
      MenuWeaponRecord *weapons=ref_US2_00348628_04;
      unsigned char *slots=g_item_slot_to_record;
-     hud_set_widget_value_pair((o+0x318),weapons[slots[*id]].icon,0);
+     hud_set_widget_value_pair((menu+0x318),weapons[slots[*id]].icon,0);
 
-     object_set_first_float4((o+0x318),(53.5f*(float)col+(float)ref_US2_00348628_02)+(*(float **)(o+0x438))[0],(47.0f*(float)row+(float)ref_US2_00348628_03)+(*(float **)(o+0x438))[1],0.0f,0.0f);
+     object_set_first_float4((menu+0x318),(53.5f*(float)col+(float)ref_US2_00348628_02)+(*(float **)(menu+0x438))[0],(47.0f*(float)row+(float)ref_US2_00348628_03)+(*(float **)(menu+0x438))[1],0.0f,0.0f);
      if(weapons[slots[*id]].icon==0xea7e) {
-      *((int *)object_get_fourth_field((o+0x318)))=0x80808080;
+      *((int *)object_get_fourth_field((menu+0x318)))=0x80808080;
      } else {
       MenuIntegerPair base=ref_US2_00348628_08[0],stride=ref_US2_00348628_09[0];
       int a,b,color;
-      meter_set_max((o+0x1c8),weapons[slots[*id]].max);
-      meter_set_value((o+0x1c8),g_help_entry_state[*id]>>5);
+      meter_set_max((menu+0x1c8),weapons[slots[*id]].max);
+      meter_set_value((menu+0x1c8),g_help_entry_state[*id]>>5);
 
-      object_set_first_float4((o+0x1c8),(float)(stride.x*col+base.x)+(*(float **)(o+0x438))[0],(float)(stride.y*row+base.y)+(*(float **)(o+0x438))[1],0.0f,0.0f);
-      object_set_flag_value((o+0x1c8),1);
+      object_set_first_float4((menu+0x1c8),(float)(stride.x*col+base.x)+(*(float **)(menu+0x438))[0],(float)(stride.y*row+base.y)+(*(float **)(menu+0x438))[1],0.0f,0.0f);
+      object_set_flag_value((menu+0x1c8),1);
       a=0;b=0;color=0;
-      shop_choose_item_colors(*id,&a,&b,&color);object_set_first_pair((o+0x1c8),a,b);
-      *((int *)object_get_fourth_field((o+0x318)))=color;
-      if(weapons[slots[*id]].max<=0) {meter_set_max((o+0x1c8),100);meter_set_value((o+0x1c8),100);}
+      shop_choose_item_colors(*id,&a,&b,&color);object_set_first_pair((menu+0x1c8),a,b);
+      *((int *)object_get_fourth_field((menu+0x318)))=color;
+      if(weapons[slots[*id]].max<=0) {meter_set_max((menu+0x1c8),100);meter_set_value((menu+0x1c8),100);}
      }
      if(g_item_ammo_counts[*id]==0) {
-      unsigned char *currentSlots=g_item_slot_to_record;
+      unsigned char *slots2=g_item_slot_to_record;
       MenuWeaponRecord *currentWeapons=ref_US2_00348628_04;
-      if(currentWeapons[currentSlots[*id]].ammo!=0) *((int *)object_get_fourth_field(o+0x354))=0x60202080;
+      if(currentWeapons[slots2[*id]].ammo!=0) *((int *)object_get_fourth_field(menu+0x354))=0x60202080;
      }
-     object_set_flag_value((o+0x318),1);
-     if(stub_empty_19(ref_US2_00348628_05[0])==*id) *((int *)object_get_fourth_field(o+0x98))=0x80ffde8d;
+     object_set_flag_value((menu+0x318),1);
+     if(stub_empty_19(ref_US2_00348628_05[0])==*id) *((int *)object_get_fourth_field(menu+0x98))=0x80ffde8d;
     }
     {
      MenuFloatPair stride=ref_US2_00348628_10[0],base=ref_US2_00348628_11[0];
 
-     object_set_first_float4(o+0x98,(stride.x*(float)col+base.x)+(*(float **)(o+0x438))[0],(stride.y*(float)row+base.y)+(*(float **)(o+0x438))[0],0.0f,0.0f);
+     object_set_first_float4(menu+0x98,(stride.x*(float)col+base.x)+(*(float **)(menu+0x438))[0],(stride.y*(float)row+base.y)+(*(float **)(menu+0x438))[0],0.0f,0.0f);
     }
-    gfx_draw_screen_element_stored((o+0x354));hud_draw_colored_quad_widget((o+0x318));hud_draw_progress_bar((o+0x1c8));gfx_draw_screen_element_stored(o+0x98);
+    gfx_draw_screen_element_stored((menu+0x354));hud_draw_colored_quad_widget((menu+0x318));hud_draw_progress_bar((menu+0x1c8));gfx_draw_screen_element_stored(menu+0x98);
    }
   }
-  gfx_draw_screen_element_stored(o+0xe4);gfx_draw_screen_element_stored(o+0x17c);text_label_draw(o+0x210);text_label_draw(o+0x268);text_label_draw(o+0x2c0);
-  item_detail_panel_update(o);
+  gfx_draw_screen_element_stored(menu+0xe4);gfx_draw_screen_element_stored(menu+0x17c);text_label_draw(menu+0x210);text_label_draw(menu+0x268);text_label_draw(menu+0x2c0);
+  item_detail_panel_update(menu);
  }
 }

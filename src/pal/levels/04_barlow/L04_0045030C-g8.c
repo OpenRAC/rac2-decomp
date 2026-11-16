@@ -8,7 +8,7 @@ extern char *part_spawn_object_following_effect(void *, void *, unsigned int, in
 extern void moby_set_state(void *, int, int);
 extern void *part_find_owned_effect_slot(void *, int, int);
 extern void part_explode_object_into_pieces_pal(void *, void *, void *, void *, int, int, int, int, int, unsigned char, void *);
-extern void func_PAL_L03_002EE460(void *, void *, void *, void *, void *, int, unsigned char);
+extern void part_spawn_particle_burst_l03_pal(void *, void *, void *, void *, void *, int, unsigned char);
 extern void vec_local_offset_to_world(void *, void *, float, float, float);
 extern void *SpawnExplosion_pal(void *, int, int, int, int, int, int, int, float, float, int, int, int, int);
 extern void moby_mark_spawned(void *);
@@ -17,25 +17,26 @@ extern float g_barlow_emitter_pieces_b[] SDATA(D_L04_001B1828);
 extern float g_barlow_emitter_pieces_c[] SDATA(D_L04_001B1820);
 extern int g_barlow_emitter_pieces_param SDATA(D_L04_001B1850);
 
-void barlow_effect_emitter_update_pal(unsigned char *object)
+/* Launches a burst of effects from the object: it spawns a stream, waits, then fires the main burst and removes itself (PAL). */
+void barlow_effect_emitter_update_pal(unsigned char *moby)
 {
     BarlowEffectVector velocity, lower, upper, min_offset, max_offset;
-    char *state = *(char **)(object + 0x68);
+    char *vars = *(char **)(moby + 0x68);
     velocity.q = 0;
     velocity.f[0] = -21.5f;
-    switch (object[0x20]) {
+    switch (moby[0x20]) {
     case 0:
-        FastVecScale(&velocity, &velocity, *(float *)(object + 0x2c));
-        *(char **)(state + 4) = part_spawn_object_following_effect(&velocity, object, 0x40208080, -1, 1, -1, 0, -1,
-                                                *(float *)(object + 0x2c) * 5250000.0f, *(float *)(object + 0x2c) * 15.0f);
-        moby_set_state(object, 1, -1);
+        FastVecScale(&velocity, &velocity, *(float *)(moby + 0x2c));
+        *(char **)(vars + 4) = part_spawn_object_following_effect(&velocity, moby, 0x40208080, -1, 1, -1, 0, -1,
+                                                *(float *)(moby + 0x2c) * 5250000.0f, *(float *)(moby + 0x2c) * 15.0f);
+        moby_set_state(moby, 1, -1);
         break;
     case 1:
-        if (part_find_owned_effect_slot(object, 0x4010000, 0) && !*(int *)state) moby_set_state(object, 2, -1);
-        object[0xa8] = 255;
+        if (part_find_owned_effect_slot(moby, 0x4010000, 0) && !*(int *)vars) moby_set_state(moby, 2, -1);
+        moby[0xa8] = 255;
         break;
     case 2:
-        part_explode_object_into_pieces_pal(object, g_barlow_emitter_pieces_a, g_barlow_emitter_pieces_b, g_barlow_emitter_pieces_c, 65535, 0, g_barlow_emitter_pieces_param, 8, 65535, 255, 0);
+        part_explode_object_into_pieces_pal(moby, g_barlow_emitter_pieces_a, g_barlow_emitter_pieces_b, g_barlow_emitter_pieces_c, 65535, 0, g_barlow_emitter_pieces_param, 8, 65535, 255, 0);
         min_offset.q = 0;
         max_offset.q = 0;
         lower.q = 0;
@@ -46,19 +47,19 @@ void barlow_effect_emitter_update_pal(unsigned char *object)
         max_offset.f[0] = -3.0f;
         max_offset.f[1] = 5.0f;
         max_offset.f[2] = 4.0f;
-        func_PAL_L03_002EE460(object, &lower, &upper, &min_offset, &max_offset, 45, 0);
-        vec_local_offset_to_world(object, &velocity, -21.5f, 0.0f, 0.0f);
-        SpawnExplosion_pal(object + 0x10, 0, 25, 20, 20, 20, 45, 1,
-                     *(float *)(object + 0x2c) * 5.0f, 20.0f, 1, 1, 0, 0);
-        moby_mark_spawned(object);
+        part_spawn_particle_burst_l03_pal(moby, &lower, &upper, &min_offset, &max_offset, 45, 0);
+        vec_local_offset_to_world(moby, &velocity, -21.5f, 0.0f, 0.0f);
+        SpawnExplosion_pal(moby + 0x10, 0, 25, 20, 20, 20, 45, 1,
+                     *(float *)(moby + 0x2c) * 5.0f, 20.0f, 1, 1, 0, 0);
+        moby_mark_spawned(moby);
         break;
     }
 }
 
 typedef int Quad __attribute__((mode(TI)));
-#define I(p,o) (*(int *)((u8 *)(p)+(o)))
-#define H(p,o) (*(short *)((u8 *)(p)+(o)))
-#define F(p,o) (*(float *)((u8 *)(p)+(o)))
+#define I(vars,o) (*(int *)((u8 *)(vars)+(o)))
+#define H(vars,o) (*(short *)((u8 *)(vars)+(o)))
+#define F(vars,o) (*(float *)((u8 *)(vars)+(o)))
 extern u8 *g_moby_l04_pool __attribute__((sda));
 extern float g_barlow_enemy_move_time __attribute__((sda));
 extern u8 g_barlow_enemy_data_block[8] __attribute__((sda));
@@ -68,10 +69,10 @@ extern int FloatToInt(float);
 extern void MoveCtl_Init(void *);
 extern int math_random_int_range(int, int);
 extern void hero_copy_field_to_moby(void *);
-extern void func_PAL_002A7E68(void *, int, int, int);
+extern void anim_start_blended_pal(void *, int, int, int);
 extern float fast_vec_dist(void *, void *);
 extern void moby_update_ground_check(void *);
-extern int func_PAL_002B1A50(void *, void *, int);
+extern int moby_apply_damage_to_object_pal(void *, void *, int);
 extern void gadgetron_hound_flag_group(void *);
 extern int weapon_select_aim_target(void *, int, void *, int, float, float);
 typedef struct {
@@ -154,90 +155,90 @@ typedef struct {
     f32 f330;
 } D0C0Vars;
 
-/* Sets the state record up on the first update (ground height, spawn-point height,
+/* Sets the vars record up on the first update (ground height, spawn-point height,
    tuning block, timer, home position), then runs its distance, collision and
    func_PAL_002B1A50 checks on every update. */
-void func_PAL_L04_00452A80(u8 *obj)
+void barlow_enemy_update_common_pal(u8 *moby)
 {
-    D0C0Vars *p = *(D0C0Vars **)(obj + 0x68);
+    D0C0Vars *vars = *(D0C0Vars **)(moby + 0x68);
     u8 *hit;
     int result;
 
-    obj[0x23] = 128;
-    if (obj[0x20] == 0) {
-        F(obj, 0x18) = coll_probe_ground_height_below(obj + 0x10, 0, 0.5f);
-        qzero_nc(obj + 0xF0);
-        if (p->i328 != -1) {
-            F(obj, 0x18) = F(g_moby_l04_pool + p->i328 * 256, 0x18) + 1.4f;
-            H(obj, 0x34) |= 0x41;
-            I(obj, 0x98) = 0;
+    moby[0x23] = 128;
+    if (moby[0x20] == 0) {
+        F(moby, 0x18) = coll_probe_ground_height_below(moby + 0x10, 0, 0.5f);
+        qzero_nc(moby + 0xF0);
+        if (vars->i328 != -1) {
+            F(moby, 0x18) = F(g_moby_l04_pool + vars->i328 * 256, 0x18) + 1.4f;
+            H(moby, 0x34) |= 0x41;
+            I(moby, 0x98) = 0;
         }
-        p->i320 = 0;
-        p->i324 = 0;
-        p->b48 = FloatToInt(15.0f);
-        p->b4A = FloatToInt(4.0f);
-        p->b29 = 1;
-        p->b70 = 6;
-        p->iA8 = 3;
-        p->b71 = 9;
-        p->b72 = 9;
-        p->b76 = 10;
-        p->b77 = 11;
-        p->f7C = 0.120000005f;
-        p->f80 = 0.060000002f;
-        p->f84 = 0.0044f;
-        p->f88 = 0.0044f;
-        p->f8C = 0.00080000004f;
-        p->f90 = 0.35f;
-        p->f94 = 0.35f;
-        p->f9C = 0.4f;
-        p->bCC = 6;
-        p->bCD = 11;
-        p->bCE = 6;
-        p->bCF = 11;
-        p->bD2 = 6;
-        p->bD3 = 11;
-        MoveCtl_Init(&p->t140);
-        p->t140.f0C = 2.5f;
-        p->t140.f08 = 2.0f;
-        p->t140.i00 = FloatToInt(g_barlow_enemy_move_time * 1024.0f);
-        p->t140.f04 = g_barlow_enemy_move_time;
-        p->t140.f24 = p->f30C * (0.020000001f);
-        if (p->v2E0.f[3] != 12439.4f) {
-            p->v2E0.q = *(Quad *)(obj + 0x10);
-            p->v2E0.f[3] = 12439.4f;
+        vars->i320 = 0;
+        vars->i324 = 0;
+        vars->b48 = FloatToInt(15.0f);
+        vars->b4A = FloatToInt(4.0f);
+        vars->b29 = 1;
+        vars->b70 = 6;
+        vars->iA8 = 3;
+        vars->b71 = 9;
+        vars->b72 = 9;
+        vars->b76 = 10;
+        vars->b77 = 11;
+        vars->f7C = 0.120000005f;
+        vars->f80 = 0.060000002f;
+        vars->f84 = 0.0044f;
+        vars->f88 = 0.0044f;
+        vars->f8C = 0.00080000004f;
+        vars->f90 = 0.35f;
+        vars->f94 = 0.35f;
+        vars->f9C = 0.4f;
+        vars->bCC = 6;
+        vars->bCD = 11;
+        vars->bCE = 6;
+        vars->bCF = 11;
+        vars->bD2 = 6;
+        vars->bD3 = 11;
+        MoveCtl_Init(&vars->t140);
+        vars->t140.f0C = 2.5f;
+        vars->t140.f08 = 2.0f;
+        vars->t140.i00 = FloatToInt(g_barlow_enemy_move_time * 1024.0f);
+        vars->t140.f04 = g_barlow_enemy_move_time;
+        vars->t140.f24 = vars->f30C * (0.020000001f);
+        if (vars->v2E0.f[3] != 12439.4f) {
+            vars->v2E0.q = *(Quad *)(moby + 0x10);
+            vars->v2E0.f[3] = 12439.4f;
         }
-        qcopy(&p->v110, &p->v2E0);
-        p->f120 = 0.5f;
-        p->h300 = math_random_int_range(100, 583);
-        p->i31C = 0;
-        hero_copy_field_to_moby(obj);
-        p->f230 = F(obj, 0x2C);
-        p->f220 = p->f30;
-        p->b28 = 0;
-        p->i318 = 0;
-        p->p200 = g_barlow_enemy_data_block;
-        p->f330 = (float)p->b34;
-        moby_set_state(obj, 1, 0);
-        if (obj[0x43])
-            func_PAL_002A7E68(obj, 0, 0, 0);
+        qcopy(&vars->v110, &vars->v2E0);
+        vars->f120 = 0.5f;
+        vars->h300 = math_random_int_range(100, 583);
+        vars->i31C = 0;
+        hero_copy_field_to_moby(moby);
+        vars->f230 = F(moby, 0x2C);
+        vars->f220 = vars->f30;
+        vars->b28 = 0;
+        vars->i318 = 0;
+        vars->p200 = g_barlow_enemy_data_block;
+        vars->f330 = (float)vars->b34;
+        moby_set_state(moby, 1, 0);
+        if (moby[0x43])
+            anim_start_blended_pal(moby, 0, 0, 0);
     }
-    if (obj[0x31] && fast_vec_dist(obj + 0x10, g_tether_zero_vec) < 24.0f) {
-        moby_update_ground_check(obj);
-        obj[0x6F] = 22;
+    if (moby[0x31] && fast_vec_dist(moby + 0x10, g_tether_zero_vec) < 24.0f) {
+        moby_update_ground_check(moby);
+        moby[0x6F] = 22;
     }
-    hit = (u8 *)part_find_owned_effect_slot(obj, 0x230000, 0);
+    hit = (u8 *)part_find_owned_effect_slot(moby, 0x230000, 0);
     if (hit && hit[0x28] == 8) {
-        obj[0x20] = 8;
-        obj[0xBC] = 4;
+        moby[0x20] = 8;
+        moby[0xBC] = 4;
     }
-    result = func_PAL_002B1A50(obj, p->ai, 0);
+    result = moby_apply_damage_to_object_pal(moby, vars->ai, 0);
     if (result) {
         if (result == 5) {
-            p->iF0 = 0;
-            p->fF4 = 1.0053098f;
+            vars->iF0 = 0;
+            vars->fF4 = 1.0053098f;
         }
-        gadgetron_hound_flag_group(obj);
+        gadgetron_hound_flag_group(moby);
     }
-    weapon_select_aim_target(obj, -1, &p->v2E0, 0, p->f2F4, 10.0f);
+    weapon_select_aim_target(moby, -1, &vars->v2E0, 0, vars->f2F4, 10.0f);
 }

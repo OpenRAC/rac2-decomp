@@ -48,23 +48,24 @@ extern u8 func_L10_00423780(void);
 extern s32 FastTweenColor(s32 a0, s32 a1, f32 f12);
 extern s32 g_current_map_index[] __attribute__((sda));
 
-void hrugis_init_flying_piece_pal(u8 *arg0) {
-    u8 *s2 = *(u8 **)(arg0 + 0x68);
+/* Sets a flying piece up and places it at a random point around the current spot record (PAL copy of hrugis_init_flying_piece). */
+void hrugis_init_flying_piece_pal(u8 *moby) {
+    u8 *vars = *(u8 **)(moby + 0x68);
     u8 *table;
-    f32 a, b, c;
+    f32 radius, yaw, pitch;
 
-    arg0[0x20] = 1;
-    *(u16 *)(arg0 + 0x34) |= 0x100;
-    *(s32 *)((u8 *)func_0037BA88(arg0) + 0x148) = 10;
-    func_0037CCB0(arg0, 1);
+    moby[0x20] = 1;
+    *(u16 *)(moby + 0x34) |= 0x100;
+    *(s32 *)((u8 *)func_0037BA88(moby) + 0x148) = 10;
+    func_0037CCB0(moby, 1);
     table = g_spot_record_table + *(s32 *)g_mission_state * 128;
-    *(s32 *)(s2 + 0x26C) = -1;
-    *(f32 *)(s2 + 0x180) = 10.0f;
-    *(s32 *)(s2 + 0x268) = 0;
-    *(f32 *)(arg0 + 0x2C) = 0.04f;
-    a = math_random_float_range(0.0f, *(f32 *)table);
-    b = math_random_angle();
-    c = math_random_angle();
-    vec_build_spherical_offset(arg0 + 0x10, a, b, c);
-    FastVecAdd(arg0 + 0x10, table + 0x30, arg0 + 0x10);
+    *(s32 *)(vars + 0x26C) = -1;
+    *(f32 *)(vars + 0x180) = 10.0f;
+    *(s32 *)(vars + 0x268) = 0;
+    *(f32 *)(moby + 0x2C) = 0.04f;
+    radius = math_random_float_range(0.0f, *(f32 *)table);
+    yaw = math_random_angle();
+    pitch = math_random_angle();
+    vec_build_spherical_offset(moby + 0x10, radius, yaw, pitch);
+    FastVecAdd(moby + 0x10, table + 0x30, moby + 0x10);
 }

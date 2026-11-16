@@ -26,7 +26,8 @@ extern float ref_L00_003EBC68_10(float);
 extern float ref_L00_003EBC68_11(float, float);
 extern void ref_L00_003EBC68_12(void *, void *, void *, float, float, float);
 
-void func_PAL_L00_003D85E0(char *object, char *state)
+/* Moves a Synthenoid: it follows the player, keeps its distance and bobs up and down (PAL). */
+void synthenoid_l00_update_movement_pal(char *object, char *state)
 {
     float difference[4], offset[4];
     float distance, angle, correction, speed;

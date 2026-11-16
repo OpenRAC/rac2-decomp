@@ -58,7 +58,7 @@ extern float mat_fast_helper_a(float,float);
 extern float math_fabs(float);
 extern int PadPressedWithin(int,int,int);
 extern float fast_vec_dist(void *,void *);
-extern int func_PAL_L00_002C4480(int,int);
+extern int hero_l00_set_action_pal(int,int);
 extern void SetCamera5Pose(void *,void *,int,int,int);
 extern void cam_set_state_rotation(void *);
 extern void object_copy_vector_to_selected(void *);
@@ -87,7 +87,7 @@ extern float coll_probe_ground_height_below(void *,int,float);
 extern void mem_fast_helper_b(void *,int);
 
 /* Bolt crank interaction, completion tracking and player motion around the crank. */
-void func_PAL_L06_0041DED0(char *obj)
+void bolt_crank_update_pal(char *obj)
 {
     float matrix[16];
     V input, motion, facing, axis, temp, delta;
@@ -126,7 +126,7 @@ used:
                 if(fast_vec_dist(obj+0x10,nearby+0x10)<3.25f) {clear=0;break;}
             }
             if(clear) {
-                func_PAL_L00_002C4480(0x37,1);
+                hero_l00_set_action_pal(0x37,1);
                 SetCamera5Pose(g_hero_l06_position.position,g_hero_l06_position.rotation,3,0x96,0);
                 cam_set_state_rotation(g_region_table+(I(ctx,0x20)<<7)+0x70);
                 object_copy_vector_to_selected(g_region_table+(I(ctx,0x20)<<7)+0x30);
@@ -154,7 +154,7 @@ used:
         temp.q=0; temp.f[2]=g_hero_l06_position.rotation[2]; axis.q=temp.q;
         angle=mat_fast_helper_a(g_hero_state.position[0]-F(obj,0x10),g_hero_state.position[1]-F(obj,0x14));
         if((PadPressedWithin(0x80,6,0) && g_hero_state.modeTimer>=51) || F(ctx,0)==1.0f) {
-            func_PAL_L00_002C4480(0,1);
+            hero_l00_set_action_pal(0,1);
             if(I(ctx,0x38)) {U(obj,0x20)=1;}
             else
             if(F(ctx,0)==1.0f) {

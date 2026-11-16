@@ -21,6 +21,8 @@ extern void FastVecScale(void *,void *,float);
 extern void FastVecAdd(void *,void *,void *);
 extern void vec_scale_to_length(void *,void *,float);
 extern float math_random_float_range(float,float);
+/* Animates the ribbon: grows or shrinks its scale toward the target and rescales its path
+   points and rotation rows (PAL: 50 Hz phase speed). */
 void joba_update_ribbon_scale_pal(u8 *object)
 {
     u8 *state = *(u8 **)(object+0x68);

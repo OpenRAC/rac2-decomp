@@ -12,7 +12,7 @@ extern unsigned int g_race_l04_state_flag_c;
 
 extern unsigned int g_race_state_request __attribute__((sda));
 
-void func_US2_L04_0040C170(void)
+void race_set_state_flags_a_us2(void)
 {
     g_race_state_request = 1;
     g_race_state_flags = 2;
@@ -21,7 +21,7 @@ void func_US2_L04_0040C170(void)
 
 extern unsigned int g_race_state_flag_b __attribute__((sda));
 
-void func_US2_L04_0040C190(void)
+void race_set_state_flag_b_us2(void)
 {
     g_race_state_flag_b = 1;
     g_race_l04_state_flag_c = 1;

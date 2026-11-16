@@ -30,7 +30,8 @@ extern void moby_set_flag_bit(void *,int);
 extern void cam_lock_entry(int);
 extern int cam_is_trigger_ready(int);
 
-void func_PAL_L00_003D3558(unsigned char *obj) {
+/* Turns the object by a set angle when triggered, with a sound and an optional camera cut, then settles at the final angle (PAL copy). */
+void triggered_turn_update_pal(unsigned char *obj) {
     union { UpdateBits q; float f[4]; } first,second;
     int *ctx=*(int **)(obj+0x68);
     if(!ctx) return;

@@ -42,68 +42,69 @@ extern float math_fast_sin_or_cos_b(float);
 
 /* func_L12_00389988 is defined in L12_00389988-g64.c. */
 
-void func_PAL_L12_0038C940(unsigned char *object)
+/* Updates the Todano water surface: sets up the wave offsets, then animates the wave matrix and draws it when the hero is near. */
+void water_wave_update_pal(unsigned char *moby)
 {
-    float *state = *(float **)(object + 0x68);
-    float a, b, c, d;
-    int row, mode = object[0x20];
-    float *vector;
-    switch (mode) {
+    float *wave_state = *(float **)(moby + 0x68);
+    float wave_a, wave_b, wave_c, wave_d;
+    int row_count, state_id = moby[0x20];
+    float *vec;
+    switch (state_id) {
     case 0:
-        state[0] = 0.0f;
-        state[1] = 0.25f;
-        state[2] = 0.5f;
-        state[3] = 0.75f;
-        state[8] = 1.0f;
-        state[9] = 1.25f;
-        state[10] = 1.5f;
-        state[11] = 1.75f;
-        object[0x20] = 1;
-        object[0x30] = 255;
+        wave_state[0] = 0.0f;
+        wave_state[1] = 0.25f;
+        wave_state[2] = 0.5f;
+        wave_state[3] = 0.75f;
+        wave_state[8] = 1.0f;
+        wave_state[9] = 1.25f;
+        wave_state[10] = 1.5f;
+        wave_state[11] = 1.75f;
+        moby[0x20] = 1;
+        moby[0x30] = 255;
         if (matrixGP.rows[0][0] > 1000.0f) {
-            vector = matrixGP.rows[0];
-            row = 3;
+            vec = matrixGP.rows[0];
+            row_count = 3;
             do {
-                float x = vector[0] * 0.01f;
-                float y = vector[1] * 0.01f;
-                float z = vector[2] * 0.01f;
-                vector[0] = x;
-                vector[1] = y;
-                vector[2] = z;
-                vector += 4;
-            } while (--row >= 0);
+                float x = vec[0] * 0.01f;
+                float y = vec[1] * 0.01f;
+                float z = vec[2] * 0.01f;
+                vec[0] = x;
+                vec[1] = y;
+                vec[2] = z;
+                vec += 4;
+            } while (--row_count >= 0);
         }
         break;
     case 1:
-        gfx_add_draw_callback_first(gfx_draw_water_wave_strips, object);
-        g_water_wave_state_id = mode;
+        gfx_add_draw_callback_first(gfx_draw_water_wave_strips, moby);
+        g_water_wave_state_id = state_id;
         qcopy(g_water_wave_position, g_hero_position);
         *(short *)(g_hero_position + 0x17E) = 5;
         g_water_wave_position[3] = 48.0f;
         g_water_wave_position[2] = math_fast_sin_or_cos_b((float)(g_frame_l12_counter[0] % 360) * 0.01744444482028484344482421875f - 3.14f) * 0.25f + 59.5f;
-        state[4] += ((state[5]) * 1.2f);
-        if (state[4] >= 8.0f) state[4] -= 8.0f;
-        a = math_fast_sin_or_cos_b(state[0] * 3.141590118408203125f) * 0.01f;
-        b = math_fast_sin_or_cos_b(state[1] * 3.141590118408203125f) * 0.025f;
-        c = math_fast_sin_or_cos_b(state[2] * 3.141590118408203125f) * 0.01f;
-        d = math_fast_sin_or_cos_b(state[3] * 3.141590118408203125f) * 0.025f;
-        g_water_wave_matrix.rows[0][2] += a;
-        g_water_wave_matrix.rows[1][2] += b;
-        g_water_wave_matrix.rows[2][2] += c;
-        g_water_wave_matrix.rows[3][2] += d;
-        state[0] += 0.01f;
-        state[1] += 0.01f;
-        state[2] += 0.01f;
-        state[3] += 0.01f;
-        if (state[0] > 2.0f) state[0] = 0.0f;
-        if (state[1] > 2.0f) state[1] = 0.0f;
-        if (state[2] > 2.0f) state[2] = 0.0f;
-        if (state[3] > 2.0f) state[3] = 0.0f;
-        state[5] = math_random_float_range(g_water_wave_speed_min, g_water_wave_speed_max);
+        wave_state[4] += ((wave_state[5]) * 1.2f);
+        if (wave_state[4] >= 8.0f) wave_state[4] -= 8.0f;
+        wave_a = math_fast_sin_or_cos_b(wave_state[0] * 3.141590118408203125f) * 0.01f;
+        wave_b = math_fast_sin_or_cos_b(wave_state[1] * 3.141590118408203125f) * 0.025f;
+        wave_c = math_fast_sin_or_cos_b(wave_state[2] * 3.141590118408203125f) * 0.01f;
+        wave_d = math_fast_sin_or_cos_b(wave_state[3] * 3.141590118408203125f) * 0.025f;
+        g_water_wave_matrix.rows[0][2] += wave_a;
+        g_water_wave_matrix.rows[1][2] += wave_b;
+        g_water_wave_matrix.rows[2][2] += wave_c;
+        g_water_wave_matrix.rows[3][2] += wave_d;
+        wave_state[0] += 0.01f;
+        wave_state[1] += 0.01f;
+        wave_state[2] += 0.01f;
+        wave_state[3] += 0.01f;
+        if (wave_state[0] > 2.0f) wave_state[0] = 0.0f;
+        if (wave_state[1] > 2.0f) wave_state[1] = 0.0f;
+        if (wave_state[2] > 2.0f) wave_state[2] = 0.0f;
+        if (wave_state[3] > 2.0f) wave_state[3] = 0.0f;
+        wave_state[5] = math_random_float_range(g_water_wave_speed_min, g_water_wave_speed_max);
         break;
     case 2:
-        if (vec_distance_xy(object + 0x10, g_hero_position) < 64.0f)
-            gfx_add_draw_callback_third(gfx_draw_water_wave_strips, object);
+        if (vec_distance_xy(moby + 0x10, g_hero_position) < 64.0f)
+            gfx_add_draw_callback_third(gfx_draw_water_wave_strips, moby);
         break;
     }
 }

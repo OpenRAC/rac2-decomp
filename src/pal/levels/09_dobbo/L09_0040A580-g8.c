@@ -19,9 +19,9 @@ extern int math_random_int_range(int, int);
 extern int moby_dispatch_action_by_kind(char *, void *);
 extern void dobbo_destroy_with_debris_pal(char *);
 extern int flag_set_first_pending(char *);
-extern void func_PAL_002A7E68(char *, int, int, int);
-extern void func_PAL_L09_00409AC8(char *, int);
-extern void func_PAL_L09_00409B48(char *, int);
+extern void anim_start_blended_pal(char *, int, int, int);
+extern void dobbo_start_fast_move_anim_pal(char *, int);
+extern void dobbo_start_slow_move_anim_pal(char *, int);
 extern float math_random_angle(void);
 extern float math_random_float_range(float, float);
 extern float math_fast_sin_or_cos_a(float);
@@ -37,7 +37,7 @@ extern int moby_step_at_own_position_factor_pal(char *, float);
 extern int moby_count_group_side_from_object(char *, void *, int);
 extern void moby_turn_toward_target_limited(char *);
 extern int moby_start_effect_from_entry(char *, float);
-extern int func_PAL_002AF6C0(char *, float);
+extern int math_is_value_within_step_pal(char *, float);
 extern int coll_test_hit_at_bone(char *, int, int, int, int, int, float, float, float);
 extern void dobbo_tick_timers_effects_pal(char *);
 extern void dobbo_update_pulsing_tint_pal(char *);
@@ -47,7 +47,8 @@ extern void dobbo_update_pulsing_tint_pal(char *);
 #define WORD(p,o) (*(s32 *)((p)+(o)))
 #define FLOAT(p,o) (*(float *)((p)+(o)))
 
-void func_PAL_L09_0040A580(char *obj)
+/* Per-frame update of the wandering Dobbo creature (moby class 3472): it walks about, turns to the hero, spits and bursts when hit (PAL: 50 Hz timings). */
+void dobbo_wandering_update_pal(char *obj)
 {
     DobboQuad position;
     char *data;
@@ -115,16 +116,16 @@ void func_PAL_L09_0040A580(char *obj)
         if (!BYTE(obj,0x31)) break;
         if (flag_set_first_pending(obj)) {
             animation=!math_random_int_below(4);
-            if (BYTE(obj,0x43)!=animation) func_PAL_002A7E68(obj,animation,0,17);
+            if (BYTE(obj,0x43)!=animation) anim_start_blended_pal(obj,animation,0,17);
             HALF(data,0x332)=(((int)(math_random_int_range(60,120)) * 5 + 2) / 6);
         }
         if (BYTE(obj,0x43)==1) {
-            if (BYTE(obj,0x60)&2) func_PAL_002A7E68(obj,0,0,17);
+            if (BYTE(obj,0x60)&2) anim_start_blended_pal(obj,0,0,17);
         } else if (!HALF(data,0x332)) moby_set_state(obj,2,-1);
         break;
     case 2:
         if (flag_set_first_pending(obj)) {
-            func_PAL_L09_00409AC8(obj,20);
+            dobbo_start_fast_move_anim_pal(obj,20);
             angle=math_random_angle(); speed=math_random_float_range(2.0f,5.0f);
             FLOAT(data,0x310)=math_fast_sin_or_cos_a(angle)*speed;
             FLOAT(data,0x314)=math_fast_sin_or_cos_b(angle)*speed;
@@ -140,7 +141,7 @@ void func_PAL_L09_0040A580(char *obj)
         break;
     case 3:
         if (flag_set_first_pending(obj)) {
-            if (BYTE(obj,0x43)!=math_random_int_below(2)+4) func_PAL_002A7E68(obj,math_random_int_below(2)+4,0,8);
+            if (BYTE(obj,0x43)!=math_random_int_below(2)+4) anim_start_blended_pal(obj,math_random_int_below(2)+4,0,8);
         }
         if (fast_vec_dist(obj+0x10,g_dobbo_target_point)<g_dobbo_wander_range) moby_set_state(obj,4,-1);
         else if (BYTE(obj,0x60)&2) {
@@ -153,21 +154,21 @@ void func_PAL_L09_0040A580(char *obj)
         break;
     case 6:
         if (flag_set_first_pending(obj)) {
-            if (BYTE(obj,0x43)!=math_random_int_below(2)+2) func_PAL_002A7E68(obj,math_random_int_below(2)+2,0,8);
+            if (BYTE(obj,0x43)!=math_random_int_below(2)+2) anim_start_blended_pal(obj,math_random_int_below(2)+2,0,8);
         }
         moby_check_target_point_from_offset(obj,data+0x1F0);
         if (BYTE(obj,0x60)&2) moby_set_state(obj,3,-1);
         break;
     case 7:
         if (flag_set_first_pending(obj)) {
-            if (BYTE(obj,0x43)!=12) func_PAL_002A7E68(obj,12,0,8);
+            if (BYTE(obj,0x43)!=12) anim_start_blended_pal(obj,12,0,8);
         }
         moby_check_target_point_from_offset(obj,data+0x1F0);
         if (BYTE(obj,0x60)&2) moby_set_state(obj,3,-1);
         break;
     case 4:
         if (flag_set_first_pending(obj)) {
-            func_PAL_L09_00409B48(obj,10);
+            dobbo_start_slow_move_anim_pal(obj,10);
             FLOAT(data,0x238)=math_random_float_range(g_dobbo_wander_range,D_L09_001B13F8_1[1])+0.5f;
         }
         if ((dobbo_move_toward_point_pal(obj,data+0x300,0)&0x80) || FLOAT(data,0x238)<vec_distance_xy(obj+0x10,g_dobbo_target_point)) {
@@ -177,7 +178,7 @@ void func_PAL_L09_0040A580(char *obj)
         break;
     case 5:
         if (flag_set_first_pending(obj)) {
-            func_PAL_L09_00409B48(obj,20);
+            dobbo_start_slow_move_anim_pal(obj,20);
             angle=math_random_angle(); speed=math_random_float_range(2.0f,5.0f);
             FLOAT(data,0x310)=math_fast_sin_or_cos_a(angle)*speed;
             FLOAT(data,0x314)=math_fast_sin_or_cos_b(angle)*speed;
@@ -195,7 +196,7 @@ void func_PAL_L09_0040A580(char *obj)
         if (flag_set_first_pending(obj)) {
             FLOAT(data,0x114)=0.025551625f;
             FLOAT(data,0x11C)=1.2775812f;
-            if (BYTE(obj,0x43)!=math_random_int_below(2)+2) func_PAL_002A7E68(obj,math_random_int_below(2)+2,0,8);
+            if (BYTE(obj,0x43)!=math_random_int_below(2)+2) anim_start_blended_pal(obj,math_random_int_below(2)+2,0,8);
         }
         target=*(char **)(data+0x200);
         moby_step_at_own_position_factor_pal(obj,mat_fast_helper_a(FLOAT(target,0x10)-FLOAT(obj,0x10),FLOAT(target,0x14)-FLOAT(obj,0x14)));
@@ -208,7 +209,7 @@ void func_PAL_L09_0040A580(char *obj)
         }
         break;
     case 9:
-        if (flag_set_first_pending(obj)) func_PAL_L09_00409B48(obj,5);
+        if (flag_set_first_pending(obj)) dobbo_start_slow_move_anim_pal(obj,5);
         if (!(*(u16 *)(obj+0x96)&3)) FLOAT(data,0x33C)=moby_count_group_side_from_object(obj,*(void **)(data+0x200),-1)*0.08726647496f;
         dobbo_move_toward_point_pal(obj,data+0x1F0,1);
         moby_turn_toward_target_limited(obj);
@@ -217,10 +218,10 @@ void func_PAL_L09_0040A580(char *obj)
     case 10:
         if (flag_set_first_pending(obj)) {
             FLOAT(data,0x340)=mat_fast_helper_a(FLOAT(data,0x1F0)-FLOAT(obj,0x10),FLOAT(data,0x1F4)-FLOAT(obj,0x14));
-            if (BYTE(obj,0x43)!=8) func_PAL_002A7E68(obj,8,2,8);
+            if (BYTE(obj,0x43)!=8) anim_start_blended_pal(obj,8,2,8);
         }
         moby_start_effect_from_entry(obj,FLOAT(data,0x340));
-        if (func_PAL_002AF6C0(obj,13.0f)) coll_test_hit_at_bone(obj,1,0x4000001,0,1,0,0.75f,(float)BYTE(data,0x34),1.0f);
+        if (math_is_value_within_step_pal(obj,13.0f)) coll_test_hit_at_bone(obj,1,0x4000001,0,1,0,0.75f,(float)BYTE(data,0x34),1.0f);
         if (BYTE(obj,0x60)&2) moby_set_state(obj,9,-1);
         break;
     }

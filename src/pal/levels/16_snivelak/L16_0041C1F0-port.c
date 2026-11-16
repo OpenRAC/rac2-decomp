@@ -28,9 +28,9 @@ extern char g_turret_debris_vectors[];
 /* func_L16_00417210 is defined in L16_00417210-g8.c. */
 
 /* the model index the object's data block points at */
-s32 turret_get_model_index_pal(char *arg0) {
-    char *p = *(char **)(arg0 + 0x68);
-    return *(s32 *)(p + 0x60);
+s32 turret_get_model_index_pal(char *moby) {
+    char *vars = *(char **)(moby + 0x68);
+    return *(s32 *)(vars + 0x60);
 }
 
 /* func_L16_00417798 is defined in L16_00417798-g8.c. */

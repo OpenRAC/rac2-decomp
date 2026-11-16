@@ -10,10 +10,10 @@ typedef struct {
     Vector start, end;
     char *target;
     float length;
-    short targetAge, secondaryAge;
+    short target_age, secondary_age;
     int timer, light, fade;
     char *secondary;
-    short ammoTimer, cooldown, targetReady, secondaryReady, targetTimer, secondaryTimer;
+    short ammo_timer, cooldown, target_ready, secondary_ready, target_timer, secondary_timer;
     int sound;
 } DualBeamState;
 extern Hero g_hero_state;
@@ -39,12 +39,12 @@ extern void cam_compute_view_direction(void *, void *, int), FastVecScale(void *
 extern char *moby_get_private_value_0(char *);
 extern void matrix_mul_vec3(void *, void *, void *), vec_scale_to_length(void *, void *, float);
 extern void moby_transform_joint_to_world(void *, int, void *);
-extern void func_PAL_0030B4E0(char *), func_PAL_0030B6C0(char *), func_PAL_0030CE20(void *);
+extern void initialize_electric_water_bolt_effect_pal(char *), lock_on_update_tether_chain_pal(char *), beam_draw_ribbons_pal(void *);
 extern void gfx_register_overlay_draw_callback(void (*)(void *), void *), snd_stop_voice(int);
 extern void stub_empty_11(void), stub_empty_12(void), gfx_free_point_light(int);
 
 /* Maintains two beam targets, their acquisition delays, ammunition and the light/sound state. */
-void func_PAL_0030A9D8(char *actor) {
+void tesla_claw_update_pal(char *actor) {
     Vector direction, offset;
     float local[4] __attribute__((aligned(16)));
     DualBeamState *beam;
@@ -68,11 +68,11 @@ void func_PAL_0030A9D8(char *actor) {
         !g_hero_state.b[0x22BC] && g_hero_state.i[0x2294 / 4] != 0x6F && g_hero_state.i[0x1240 / 4] >= 19 && permitted) {
         if (!beam->timer) {
             if (ammo > 0) {
-            if (FastDecTimer(&beam->ammoTimer)) {
-                FastDecTimer(&beam->targetTimer);
-                FastDecTimer(&beam->secondaryTimer);
+            if (FastDecTimer(&beam->ammo_timer)) {
+                FastDecTimer(&beam->target_timer);
+                FastDecTimer(&beam->secondary_timer);
                 stub_empty_6(-1, 1);
-                beam->ammoTimer = 8;
+                beam->ammo_timer = 8;
             }
             if (beam->light == -1) beam->light = gfx_add_point_light(actor + 0x10, 0, 7.5f, 0);
             else if (beam->fade < 8) beam->fade++;
@@ -83,7 +83,7 @@ void func_PAL_0030A9D8(char *actor) {
                                                 *(float *)(beam->target + 0x14) - g_hero_state.f[0x84 / 4])) > 2.0943f ||
                     !((u8 *)beam->target)[0x31] || fast_vec_dist(beam->target + 0x10, &g_hero_state.f[0x80 / 4]) > 20) {
                     beam->target = 0;
-                    beam->targetReady = 0;
+                    beam->target_ready = 0;
                 }
             }
             if (beam->secondary) {
@@ -92,7 +92,7 @@ void func_PAL_0030A9D8(char *actor) {
                                                 *(float *)(beam->secondary + 0x14) - g_hero_state.f[0x84 / 4])) > 2.0943f ||
                     !((u8 *)beam->secondary)[0x31] || fast_vec_dist(beam->secondary + 0x10, &g_hero_state.f[0x80 / 4]) > 20) {
                     beam->secondary = 0;
-                    beam->secondaryReady = 0;
+                    beam->secondary_ready = 0;
                 }
             }
             cam_compute_view_direction(beam, &direction, 1);
@@ -100,26 +100,26 @@ void func_PAL_0030A9D8(char *actor) {
             FastVecScale(&offset, &direction, 0.7f);
             FastVecAdd(&beam->start, &beam->start, &offset);
             qcopy(&beam->end, &beam->start);
-            if (beam->target && beam->targetReady) {
+            if (beam->target && beam->target_ready) {
                 limit = 50;
-                beam->targetAge++;
+                beam->target_age++;
                 entry = moby_get_private_value_0(beam->target);
                 if (entry && *(short *)(entry + 4) == 1) limit = 5;
-                if (beam->targetAge >= ((s32)(limit) * 5 + 2) / 6) {
+                if (beam->target_age >= ((s32)(limit) * 5 + 2) / 6) {
                     beam->target = 0;
-                    beam->targetReady = 0;
+                    beam->target_ready = 0;
                 }
-            } else beam->targetAge = 0;
-            if (beam->secondary && beam->secondaryReady) {
+            } else beam->target_age = 0;
+            if (beam->secondary && beam->secondary_ready) {
                 limit = 50;
-                beam->secondaryAge++;
+                beam->secondary_age++;
                 entry = moby_get_private_value_0(beam->secondary);
                 if (entry && *(short *)(entry + 4) == 1) limit = 5;
-                if (beam->secondaryAge >= ((s32)(limit) * 5 + 2) / 6) {
+                if (beam->secondary_age >= ((s32)(limit) * 5 + 2) / 6) {
                     beam->secondary = 0;
-                    beam->secondaryReady = 0;
+                    beam->secondary_ready = 0;
                 }
-            } else beam->secondaryAge = 0;
+            } else beam->secondary_age = 0;
             beam->length += (((g_weapon_table + g_tesla_claw_weapon_index[0])->flag ? 18.0f : 12.0f) - beam->length) * 0.08400001f;
             if (g_hero_state.h[0x24EC / 2] == 1) {
                 moby_transform_joint_to_world(actor, 0, &beam->start);
@@ -133,23 +133,23 @@ void func_PAL_0030A9D8(char *actor) {
                 vec_scale_to_length(&beam->end, &g_hero_state.f[0x730 / 4], beam->length);
                 FastVecAdd(&beam->end, &beam->start, &beam->end);
             }
-            func_PAL_0030B4E0(actor);
-            func_PAL_0030B6C0(actor);
-            gfx_register_overlay_draw_callback(func_PAL_0030CE20, actor);
+            initialize_electric_water_bolt_effect_pal(actor);
+            lock_on_update_tether_chain_pal(actor);
+            gfx_register_overlay_draw_callback(beam_draw_ribbons_pal, actor);
             } else {
                 beam->target = 0;
                 beam->secondary = 0;
-                beam->targetReady = 0;
-                beam->secondaryReady = 0;
-                beam->targetTimer = 0;
-                beam->secondaryTimer = 0;
+                beam->target_ready = 0;
+                beam->secondary_ready = 0;
+                beam->target_timer = 0;
+                beam->secondary_timer = 0;
             }
         }
     } else {
         beam->target = 0;
         beam->secondary = 0;
-        beam->targetReady = 0;
-        beam->secondaryReady = 0;
+        beam->target_ready = 0;
+        beam->secondary_ready = 0;
     }
     if (!active) {
         g_tether_reset_flag = 1;
@@ -164,10 +164,10 @@ void func_PAL_0030A9D8(char *actor) {
     }
     if (!beam->target || (u8)beam->target[0x20] == 0xFE || (u8)beam->target[0x20] == 0xFD ||
         !(*(u16 *)(beam->target + 0x34) & 0x1000))
-        beam->targetReady = 1;
+        beam->target_ready = 1;
     if (!beam->secondary || (u8)beam->secondary[0x20] == 0xFE || (u8)beam->secondary[0x20] == 0xFD ||
         !(*(u16 *)(beam->secondary + 0x34) & 0x1000))
-        beam->secondaryReady = 1;
+        beam->secondary_ready = 1;
     switch ((u8)actor[0x20]) {
     case 0:
         beam->timer = 13;
@@ -178,10 +178,10 @@ void func_PAL_0030A9D8(char *actor) {
         beam->sound = -1;
         beam->secondary = 0;
         beam->target = 0;
-        beam->targetReady = 0;
-        beam->secondaryReady = 0;
-        beam->secondaryTimer = 0;
-        beam->targetTimer = 0;
+        beam->target_ready = 0;
+        beam->secondary_ready = 0;
+        beam->secondary_timer = 0;
+        beam->target_timer = 0;
         g_tether_timer = 8;
         break;
     case 1:
@@ -200,8 +200,8 @@ void func_PAL_0030A9D8(char *actor) {
             } else {
                 beam->target = 0;
                 beam->secondary = 0;
-                beam->targetReady = 0;
-                beam->secondaryReady = 0;
+                beam->target_ready = 0;
+                beam->secondary_ready = 0;
                 actor[0x20] = 1;
                 PlayMobySound(0, 0, actor);
                 stub_empty_12();
@@ -219,8 +219,8 @@ void func_PAL_0030A9D8(char *actor) {
         else g_hero_state.b[0x22C5] = 0;
         beam->target = 0;
         beam->secondary = 0;
-        beam->targetReady = 0;
-        beam->secondaryReady = 0;
+        beam->target_ready = 0;
+        beam->secondary_ready = 0;
         beam->length = 0;
         stub_empty_12();
         actor[0x20] = 1;

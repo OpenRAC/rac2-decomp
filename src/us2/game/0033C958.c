@@ -6,6 +6,7 @@ extern unsigned char g_option_flag_b __attribute__((sda));
 
 extern int Ffb202470_FUN_0033AB50(char *p);
 
+/* Destroys the prompt bar of the map screen page. (USA v2.00) */
 char *map_screen_destroy_prompt_bar_us2(char *object)
 {
     Ffb202470_FUN_0033AB50(object + 8);
@@ -18,6 +19,7 @@ extern int Fe524d931_FUN_002E5E58(int a, int b, int c);
 extern void Fe524d931_FUN_00284E40(void);
 extern short Fe524d931_D_001A6480[];
 
+/* Updates the screen adjust menu: moves the screen offset with the d-pad, clamped, and plays a sound when it changes. (USA v2.00) */
 int screen_adjust_menu_update_us2(char *object, int mask)
 {
     char *sub = object + 8;
@@ -68,6 +70,7 @@ int screen_adjust_menu_update_us2(char *object, int mask)
 }
 
 
+/* Destroys the screen adjust menu's prompt bar. (USA v2.00) */
 char *screen_adjust_menu_destroy_us2(char *object)
 {
     Ffb202470_FUN_0033AB50(object + 8);
@@ -75,6 +78,7 @@ char *screen_adjust_menu_destroy_us2(char *object)
 }
 
 
+/* Destroys the on/off menu's prompt bar. (USA v2.00) */
 char *onoff_menu_destroy_us2(char *object)
 {
     Ffb202470_FUN_0033AB50(object + 8);
@@ -83,6 +87,7 @@ char *onoff_menu_destroy_us2(char *object)
 
 
 
+/* Destroys the four option menu's prompt bar. (USA v2.00) */
 char *four_option_menu_destroy_us2(char *object)
 {
     Ffb202470_FUN_0033AB50(object + 8);
@@ -95,26 +100,27 @@ extern int Fc558ca70_FUN_002E5E58(int a, int b, int c);
 extern volatile unsigned char Fc558ca70_D_001A7B95 __attribute__((sda));
 extern volatile unsigned char Fc558ca70_D_001A7B94 __attribute__((sda));
 
-int two_toggle_a_update_us2(char *a0, int a1)
+/* Updates the two-toggle menu: up/down changes the selected row and confirm flips that row's option byte. (USA v2.00) */
+int two_toggle_a_update_us2(char *object, int buttons)
 {
-    char *p = a0 + 8;
-    float *q;
-    int v;
+    char *child = object + 8;
+    float *vec;
+    int value;
 
-    Fc558ca70_FUN_0033AE28(p);
-    q = *(float **)(a0 + 732);
-    Fc558ca70_FUN_0033B018(p, q[0], q[1]);
-    if (a1 & 0x1000) {
+    Fc558ca70_FUN_0033AE28(child);
+    vec = *(float **)(object + 732);
+    Fc558ca70_FUN_0033B018(child, vec[0], vec[1]);
+    if (buttons & 0x1000) {
         Fc558ca70_FUN_002E5E58(3, 0, 0);
-        v = *(int *)(a0 + 728);
-        *(int *)(a0 + 728) = (v + 1) % 2;
-    } else if (a1 & 0x4000) {
+        value = *(int *)(object + 728);
+        *(int *)(object + 728) = (value + 1) % 2;
+    } else if (buttons & 0x4000) {
         Fc558ca70_FUN_002E5E58(3, 0, 0);
-        v = *(int *)(a0 + 728);
-        *(int *)(a0 + 728) = (v + 1) % 2;
-    } else if (a1 & 0x40) {
+        value = *(int *)(object + 728);
+        *(int *)(object + 728) = (value + 1) % 2;
+    } else if (buttons & 0x40) {
         Fc558ca70_FUN_002E5E58(4, 0, 0);
-        switch (*(int *)(a0 + 728)) {
+        switch (*(int *)(object + 728)) {
         case 0:
             Fc558ca70_D_001A7B95 = Fc558ca70_D_001A7B95 == 0;
             break;
@@ -123,12 +129,13 @@ int two_toggle_a_update_us2(char *a0, int a1)
             break;
         }
     }
-    return (a1 >> 6) & 1;
+    return (buttons >> 6) & 1;
 }
 
 
 extern int prompt_bar_destroy(int);
 
+/* Destroys the two-toggle menu's prompt bar and its two sub-objects. (USA v2.00) */
 char *two_toggle_a_destroy_us2(char *object)
 {
     extern void *object_construct_derived_b(void *);
@@ -157,6 +164,7 @@ extern int sprintf(char *, const char *, ...);
 
 /* func_0033D028 uses small data in 0033D028-g8.c. */
 
+/* Draws the audio menu: two volume bars and a toggle line, the selected row highlighted. (USA v2.00) */
 void audio_menu_draw_us2(char *object)
 {
     char buffer[128];
@@ -186,6 +194,7 @@ void audio_menu_draw_us2(char *object)
 }
 
 
+/* Destroys the single-toggle menu's prompt bar. (USA v2.00) */
 char *single_toggle_a_destroy_us2(char *object)
 {
     Ffb202470_FUN_0033AB50(object + 8);
@@ -196,9 +205,10 @@ extern void F5979c03f_FUN_0033AE28 (char *object);
 extern void F5979c03f_FUN_0033B018 (char *object, float x, float y);
 extern int F5979c03f_FUN_002E5E58 (int a, int b, int c);
 
+/* Updates the single-toggle menu: confirm flips its option byte. (USA v2.00) */
 int single_toggle_a_update_us2 (char *object, int flags)
 {
-  unsigned char *g = &g_option_flag_a;
+  unsigned char *flag = &g_option_flag_a;
   float *vec;
   int discarded;
 
@@ -210,7 +220,7 @@ int single_toggle_a_update_us2 (char *object, int flags)
     {
       discarded = F5979c03f_FUN_002E5E58 (4, 0, 0);
       (void) discarded;
-      *g = (*g < 1);
+      *flag = (*flag < 1);
     }
 
   return (flags >> 6) & 1;
@@ -219,6 +229,7 @@ int single_toggle_a_update_us2 (char *object, int flags)
 
 extern int text_draw_centered_small(int, int, unsigned long, char *, int);
 
+/* Draws the single-toggle menu's option line. (USA v2.00) */
 void single_toggle_a_draw_us2(char *object)
 {
     char buffer[128];
@@ -238,6 +249,7 @@ void single_toggle_a_draw_us2(char *object)
 }
 
 
+/* Destroys the second single-toggle menu's prompt bar. (USA v2.00) */
 char *single_toggle_b_destroy_us2(char *object)
 {
     Ffb202470_FUN_0033AB50(object + 8);
@@ -249,7 +261,8 @@ char *single_toggle_b_destroy_us2(char *object)
 /* func_0033B540 is matched in 0033AE20-g8.c (-G8 small data). */
 
 
-char *func_US2_0033EB20(char *object)
+/* Destroys a two-toggle menu's prompt bar. (USA v2.00) */
+char *two_toggle_b_destroy_us2(char *object)
 {
     Ffb202470_FUN_0033AB50(object + 8);
     return object;
@@ -257,9 +270,10 @@ char *func_US2_0033EB20(char *object)
 
 
 
-int func_US2_0033EC80 (char *object, int flags)
+/* Updates a single-toggle menu: confirm flips its option byte. (USA v2.00) */
+int single_toggle_c_update_us2 (char *object, int flags)
 {
-  unsigned char *g = &g_option_flag_b;
+  unsigned char *flag = &g_option_flag_b;
   float *vec;
   int discarded;
 
@@ -271,7 +285,7 @@ int func_US2_0033EC80 (char *object, int flags)
     {
       discarded = F5979c03f_FUN_002E5E58 (4, 0, 0);
       (void) discarded;
-      *g = (*g < 1);
+      *flag = (*flag < 1);
     }
 
   return (flags >> 6) & 1;
@@ -282,7 +296,8 @@ int func_US2_0033EC80 (char *object, int flags)
 /* func_0033B540 is matched in 0033AE20-g8.c (-G8 small data). */
 
 
-char *func_US2_0033EDD0(char *object)
+/* Destroys a single-toggle menu's prompt bar. (USA v2.00) */
+char *single_toggle_c_destroy_us2(char *object)
 {
     Ffb202470_FUN_0033AB50(object + 8);
     return object;
@@ -290,9 +305,10 @@ char *func_US2_0033EDD0(char *object)
 
 
 
-int func_US2_0033EF30 (char *object, int flags)
+/* Updates a single-toggle menu: confirm flips its option byte. (USA v2.00) */
+int single_toggle_d_update_us2 (char *object, int flags)
 {
-  unsigned char *g = &g_option_flag_b;
+  unsigned char *flag = &g_option_flag_b;
   float *vec;
   int discarded;
 
@@ -304,7 +320,7 @@ int func_US2_0033EF30 (char *object, int flags)
     {
       discarded = F5979c03f_FUN_002E5E58 (4, 0, 0);
       (void) discarded;
-      *g = (*g < 1);
+      *flag = (*flag < 1);
     }
 
   return (flags >> 6) & 1;
@@ -314,7 +330,8 @@ int func_US2_0033EF30 (char *object, int flags)
 /* func_0033B540 is matched in 0033AE20-g8.c (-G8 small data). */
 
 
-char *func_US2_0033EFC8(char *object)
+/* Destroys a single-toggle menu's prompt bar. (USA v2.00) */
+char *single_toggle_d_destroy_us2(char *object)
 {
     Ffb202470_FUN_0033AB50(object + 8);
     return object;
@@ -322,9 +339,10 @@ char *func_US2_0033EFC8(char *object)
 
 
 
-int func_US2_0033F128 (char *object, int flags)
+/* Updates a single-toggle menu: confirm flips its option byte. (USA v2.00) */
+int single_toggle_e_update_us2 (char *object, int flags)
 {
-  unsigned char *g = &g_option_flag_b;
+  unsigned char *flag = &g_option_flag_b;
   float *vec;
   int discarded;
 
@@ -336,7 +354,7 @@ int func_US2_0033F128 (char *object, int flags)
     {
       discarded = F5979c03f_FUN_002E5E58 (4, 0, 0);
       (void) discarded;
-      *g = (*g < 1);
+      *flag = (*flag < 1);
     }
 
   return (flags >> 6) & 1;
@@ -345,33 +363,36 @@ int func_US2_0033F128 (char *object, int flags)
 
 
 
-extern int func_US2_0033F398(int);
+extern int list_menu_get_selected_index_us2(int);
 
-int func_US2_0033F360(int owner)
+/* Returns the list page's record at the selected index. (USA v2.00) */
+int list_page_get_selected_record_us2(int owner)
 {
     int result;
-    result = func_US2_0033F398(owner);
+    result = list_menu_get_selected_index_us2(owner);
     return *(int *)(owner + 0x3B8) + result * 0x14;
 }
 
 
 
-void func_US2_0033F3B8(unsigned char *owner, float *records)
+/* Gives the list widget its records and remembers them. (USA v2.00) */
+void list_page_set_records_us2(unsigned char *owner, float *records)
 {
-    extern void func_US2_00348DA0(unsigned char *, float *);
-    func_US2_00348DA0(owner + 0x2E0, records);
+    extern void list_menu_set_entry_records_us2(unsigned char *, float *);
+    list_menu_set_entry_records_us2(owner + 0x2E0, records);
     *(float **)(owner + 0x3B8) = records;
 }
 
 
 extern void prompt_bar_update_us2(char *);
 extern void menu_set_anchor_pos(char *, float, float);
-extern int func_US2_00348CB8(char *, int);
-extern void func_US2_00348E28(char *, float, float);
+extern int list_menu_update_selection_us2(char *, int);
+extern void list_menu_set_position_us2(char *, float, float);
 extern void prompt_bar_update_us2(char *p);
 extern void menu_set_anchor_pos(char *p, float x, float y);
 
-int func_US2_0033F3F0(char *object, int flags)
+/* Updates the list page: places the prompt bar and passes the input to the list. (USA v2.00) */
+int list_page_update_us2(char *object, int flags)
 {
     char *first = object + 8;
     char *second;
@@ -380,8 +401,8 @@ int func_US2_0033F3F0(char *object, int flags)
     second = object + 0x2E0;
     position = *(float **)(object + 0x3BC);
     menu_set_anchor_pos(first, position[0], position[1]);
-    func_US2_00348CB8(second, flags);
-    func_US2_00348E28(second, (*(float **)(object + 0x3BC))[0], (*(float **)(object + 0x3BC))[1]);
+    list_menu_update_selection_us2(second, flags);
+    list_menu_set_position_us2(second, (*(float **)(object + 0x3BC))[0], (*(float **)(object + 0x3BC))[1]);
     return (flags >> 6) & 1;
 }
 
@@ -389,7 +410,8 @@ int func_US2_0033F3F0(char *object, int flags)
 
 
 
-int func_US2_0033F610(char *object, int flags)
+/* Updates a simple page: places the prompt bar and returns whether confirm is pressed. (USA v2.00) */
+int simple_page_update_us2(char *object, int flags)
 {
     char *p = object + 8;
     float *v;
@@ -402,6 +424,7 @@ int func_US2_0033F610(char *object, int flags)
 
 void prompt_bar_draw(int);
 
+/* Draws the page's prompt bar. (USA v2.00) */
 void menu_draw_frame_us2(int param_1) {
   prompt_bar_draw(param_1 + 8);
 }

@@ -8,6 +8,8 @@ extern void Fa2a84657_FUN_002B9180(unsigned char *p);
 
 /* func_002C1FC0 is defined in 002BF6F0-g8.c. */
 
+/* Drifting particle that slows by 0.95 each frame, rises slowly, and fades out in alpha.
+   (PAL: 50 Hz timings) */
 void part_update_drifting_fade_pal(unsigned char *p)
 {
     float tmp[4];

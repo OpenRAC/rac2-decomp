@@ -21,7 +21,7 @@ extern void snd_stop_voice(s32);
 extern s32 math_fast_float_d(void *);
 extern void FadeToBlack(s32);
 extern void level_store_value_pair_pal(s32, void *);
-extern s32 func_PAL_L10_00429070(void);
+extern s32 menu_draw_reward_panel_pal(void);
 extern void mission_store_completion_counts(void);
 extern int MemcardSave(s32, s32);
 extern void hero_set_state_value_c(s32);
@@ -35,7 +35,7 @@ extern int request_begin_slot(s32, s32, s32, s32, s32);
    into D_L10_001B143C and calls func_L10_00423500, and bit 0x10 calls
    func_002B49E0(3, 1, 4, 0, 0). One variable, tmp, holds the state and later the 0x40
    test: retail allocates it that way (the test in $v1, the pad word kept in $v0). */
-void func_PAL_L10_00429620(u8 *obj, s32 kind) {
+void hrugis_finish_mission_reward_pal(u8 *obj, s32 kind) {
     u8 *s = *(u8 **)(obj + 0x68);
     u8 *other = g_moby_pool_base + *(s32 *)(s + 0x24) * 256;
     RewardOwnerState *os = *(RewardOwnerState **)(other + 0x68);
@@ -56,7 +56,7 @@ void func_PAL_L10_00429620(u8 *obj, s32 kind) {
         return;
     if (g_hud_sprite_table_base && !g_reward_active_flag) {
         FadeToBlack(25);
-        level_store_value_pair_pal(0, func_PAL_L10_00429070);
+        level_store_value_pair_pal(0, menu_draw_reward_panel_pal);
         n = D_L10_001B1390_gp[kind];
         capped = n < 3 ? n : 2;
         multiplier = g_extras_unlocked_flag;

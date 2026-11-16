@@ -13,32 +13,33 @@ extern u8 g_path_shooter_state[];
 extern u8 g_path_zone_table[];
 extern void func_L12_0031E1D0(s32, s32, s32);
 
-void group_try_claim_attack_slot_pal(s32 a0) {
-    s32 s0 = a0;
-    s32 s1 = *(u32 *)(s0 + 0x68);
-    s32 v = *(s32 *)(*(u32 *)(s1 + 0x294));
+/* Tries to take the shared attack slot for this group so only one member attacks at a time. */
+void group_try_claim_attack_slot_pal(s32 moby_addr) {
+    s32 moby = moby_addr;
+    s32 vars = *(u32 *)(moby + 0x68);
+    s32 owner_index = *(s32 *)(*(u32 *)(vars + 0x294));
 
-    if (v != -1) {
-        s32 base = g_moby_list_start;
-        u8 *p = (u8 *)((u32)base + (v << 8));
+    if (owner_index != -1) {
+        s32 moby_base = g_moby_list_start;
+        u8 *owner = (u8 *)((u32)moby_base + (owner_index << 8));
 
-        if (p != 0) {
-            u8 t = *(u8 *)(p + 0x20);
+        if (owner != 0) {
+            u8 state = *(u8 *)(owner + 0x20);
 
-            if (t != 0xFE) {
-                if (t != 0xFD) {
-                    if (v != ((s0 - base) >> 8))
+            if (state != 0xFE) {
+                if (state != 0xFD) {
+                    if (owner_index != ((moby - moby_base) >> 8))
                         return;
                 }
             }
         }
     }
-    func_L12_0031E1D0(s0, 0xF, 5);
+    func_L12_0031E1D0(moby, 0xF, 5);
     {
-        s32 i = (s0 - g_moby_list_start) >> 8;
+        s32 i = (moby - g_moby_list_start) >> 8;
 
-        *(u16 *)(s1 + 0x29C) = 0xFA;
-        *(s32 *)(*(u32 *)(s1 + 0x294)) = i;
+        *(u16 *)(vars + 0x29C) = 0xFA;
+        *(s32 *)(*(u32 *)(vars + 0x294)) = i;
     }
 }
 

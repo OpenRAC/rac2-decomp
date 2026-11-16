@@ -18,7 +18,8 @@ extern ResetBlock g_menu_reset_blocks[128];
 extern int g_menu_state_word_a __attribute__((sda));
 extern int g_menu_state_word_b __attribute__((sda));
 
-void func_PAL_L00_00369AF8(void) {
+/* Resets the menu state words, rows and blocks to their defaults. */
+void menu_reset_state_pal(void) {
     int i;
 
     g_menu_reset_state.words[7] = 2;

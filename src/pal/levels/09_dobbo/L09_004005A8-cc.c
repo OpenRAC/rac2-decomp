@@ -18,7 +18,7 @@ extern float math_wrap_angle_to_pi(float);
 extern float math_random_signed_float_range(float, float);
 extern int math_random_int_below(int);
 extern void vec_add_random_offset(void *, float);
-extern char *func_PAL_L08_0034C4A8(void *, void *, int, void *);
+extern char *part_spawn_short_lived_pal(void *, void *, int, void *);
 
 extern int g_beam_slot_state_2[16] MACRO_ADDR;
 extern float g_beam_slot_angle_x[16] MACRO_ADDR;
@@ -34,6 +34,7 @@ extern Vec g_sound_slot_target_positions[16];
 extern Vec g_beam_strip_buffers[][6];
 extern char g_default_particle_vec[] MACRO_ADDR;
 
+/* Updates one beam link slot: moves its two end points, draws its glow effect and fades it in and out. */
 void UpdateBeamLinkStrips_pal(void *object, int slot)
 {
     Vec delta, origin, direction, pos;
@@ -95,7 +96,7 @@ void UpdateBeamLinkStrips_pal(void *object, int slot)
         if (math_random_int_below(3)) continue;
         qcopy(&pos, g_sound_slot_ptrs[slot][first] + 0x10);
         vec_add_random_offset(&pos, 0.1f);
-        effect = func_PAL_L08_0034C4A8(&pos, g_default_particle_vec, alpha * 127 / 100, g_sound_slot_ptrs[slot][first]);
+        effect = part_spawn_short_lived_pal(&pos, g_default_particle_vec, alpha * 127 / 100, g_sound_slot_ptrs[slot][first]);
         if (effect) {
             payload = effect + 0x20;
             *(float *)(effect + 0xC) = 120000;

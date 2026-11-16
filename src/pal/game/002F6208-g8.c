@@ -21,15 +21,17 @@ extern s32_F2144bf3d g_idle_counter_check;
 extern s32_F2144bf3d g_idle_frame_marker;
 extern s32_F2144bf3d g_idle_counter_reset;
 
+/* Counts how many frames in a row the controller has had no input, and counts every frame played.
+   While the pause is shorter than 750 frames (PAL: 50 Hz) it also adds the frame to the current slot's total. */
 void game_update_idle_frame_counters_pal(void)
 {
-    Resident138180_F2144bf3d *p = (Resident138180_F2144bf3d *)g_pad_state;
+    Resident138180_F2144bf3d *pad = (Resident138180_F2144bf3d *)g_pad_state;
 
-    if (p->i1A0 != 0) goto mismatch;
-    if (p->f108 != 0.0f) goto mismatch;
-    if (p->f10C != 0.0f) goto mismatch;
-    if (p->f100 != 0.0f) goto mismatch;
-    if (p->f104 == 0.0f) goto match;
+    if (pad->i1A0 != 0) goto mismatch;
+    if (pad->f108 != 0.0f) goto mismatch;
+    if (pad->f10C != 0.0f) goto mismatch;
+    if (pad->f100 != 0.0f) goto mismatch;
+    if (pad->f104 == 0.0f) goto match;
 mismatch:
     g_idle_frame_counter = 0;
     goto gated;
@@ -125,15 +127,15 @@ extern int snd_resume_music_stream(void);
 /* Starts cutscene n: marks it seen, clears the cutscene state and buffers, sets
    up the resource bases and hero, then waits for the dialog stream and three
    frames. */
-void cutscene_start_pal(int n)
+void cutscene_start_pal(int cutscene_id)
 {
-    int index, i, v;
-    char *p, *o;
+    int index, i, buffer_size;
+    char *entry_ptr, *moby_ptr;
 
-    if ((unsigned)n < 0xB1)
-        *(g_request_flag_table + ((unsigned)n >> 2)) |= 1 << (n & 31);
+    if ((unsigned)cutscene_id < 0xB1)
+        *(g_request_flag_table + ((unsigned)cutscene_id >> 2)) |= 1 << (cutscene_id & 31);
     req_mark_queued_in_flag_table(g_loader_movie);
-    index = cutscene_map_id_to_index(n);
+    index = cutscene_map_id_to_index(cutscene_id);
     if (index < 0)
         return;
     music_Pause(0);
@@ -145,10 +147,10 @@ void cutscene_start_pal(int n)
     mem_clear(g_cutscene_scratch_state + 0x40, 0, 0x40);
     mem_clear(g_cutscene_scratch_b, 0, 0x40);
     mem_clear(g_cutscene_scratch_c, 0, 0x40);
-    p = g_cutscene_buffer;
+    entry_ptr = g_cutscene_buffer;
     for (i = 0; i < 7; i++) {
-        char *entry = p;
-        p += 0x40;
+        char *entry = entry_ptr;
+        entry_ptr += 0x40;
         mem_clear(entry, 0, 0x40);
     }
     g_cutscene_camera_scale = 1.0f;
@@ -157,12 +159,12 @@ void cutscene_start_pal(int n)
     g_scene_playback_state.unk34 = 0;
     g_scene_playback_state.unk3C = 0;
     if (g_current_map_index == 20)
-        v = g_packet_buffer_size[0] - 0x60000;
+        buffer_size = g_packet_buffer_size[0] - 0x60000;
     else
-        v = g_packet_buffer_size[0] - 0x40000;
-    g_packet_buffer_size[0] = v;
-    g_scene_playback_state.base6C = g_loader_memory.baseC + v;
-    g_scene_playback_state.base70 = g_loader_memory.base10 + v;
+        buffer_size = g_packet_buffer_size[0] - 0x40000;
+    g_packet_buffer_size[0] = buffer_size;
+    g_scene_playback_state.base6C = g_loader_memory.baseC + buffer_size;
+    g_scene_playback_state.base70 = g_loader_memory.base10 + buffer_size;
     subtitle_clear_state();
     g_screen_fade = 1.0f;
     g_current_game_mode = 2;
@@ -188,9 +190,9 @@ void cutscene_start_pal(int n)
         snd_pump_music_and_disc_read_pal(1);
     load_relocate_world_object_parts();
     gfx_empty_stub();
-    for (o = g_moby_pool_end; (unsigned char)o[0x20] != 255; o += 0x100) {
-        if (!((unsigned char)o[0x20] & 0x80) && *(short *)(o + 0xAA) == 0xCB)
-            *(unsigned short *)(o + 0x34) |= 0x80;
+    for (moby_ptr = g_moby_pool_end; (unsigned char)moby_ptr[0x20] != 255; moby_ptr += 0x100) {
+        if (!((unsigned char)moby_ptr[0x20] & 0x80) && *(short *)(moby_ptr + 0xAA) == 0xCB)
+            *(unsigned short *)(moby_ptr + 0x34) |= 0x80;
     }
     g_music_state.id = g_scene_playback_state.id;
     g_music_state.flag = 0;
@@ -235,10 +237,10 @@ extern void hero_destroy_equipment_pieces(void);
    talk and menu mobys and runs the pending end callback. */
 void cutscene_end_pal(void)
 {
-    char *o;
-    CutsceneHero *p;
-    CutsceneState *b;
-    float g, f;
+    char *moby_ptr;
+    CutsceneHero *hero;
+    CutsceneState *scene;
+    float hero_ground, scene_ground;
     int i;
 
     if ((unsigned short)(g_music_state.state - 6) >= 2)
@@ -254,32 +256,32 @@ void cutscene_end_pal(void)
     g_view_params.fov = 0.62f;
     UpdateViewContext();
     for (i = 0; i < g_scene_playback_state.count; i++) {
-        CutsceneMoby *m = g_scene_playback_state.mobys[i];
-        if (m) {
-            m->parts->n--;
-            m->parts->slots[m->parts->n] = 0;
-            moby_mark_spawned(m);
+        CutsceneMoby *scene_moby = g_scene_playback_state.mobys[i];
+        if (scene_moby) {
+            scene_moby->parts->n--;
+            scene_moby->parts->slots[scene_moby->parts->n] = 0;
+            moby_mark_spawned(scene_moby);
         }
     }
-    for (o = g_moby_pool_end; (unsigned char)o[0x20] != 255; o += 0x100) {
-        if (!((unsigned char)o[0x20] & 0x80) && *(short *)(o + 0xAA) == 0xCB)
-            *(unsigned short *)(o + 0x34) &= 0xFF7F;
+    for (moby_ptr = g_moby_pool_end; (unsigned char)moby_ptr[0x20] != 255; moby_ptr += 0x100) {
+        if (!((unsigned char)moby_ptr[0x20] & 0x80) && *(short *)(moby_ptr + 0xAA) == 0xCB)
+            *(unsigned short *)(moby_ptr + 0x34) &= 0xFF7F;
     }
-    p = &g_hero_state;
-    if (p->active) {
+    hero = &g_hero_state;
+    if (hero->active) {
         stub_empty_10(1);
-        g = coll_probe_ground_height_below(p->pos, 0, 0.5f);
-        if (2.0f < g) {
-            if (math_fabs(p->pos[2] - g) < 4.5f)
-                p->pos[2] = g;
+        hero_ground = coll_probe_ground_height_below(hero->pos, 0, 0.5f);
+        if (2.0f < hero_ground) {
+            if (math_fabs(hero->pos[2] - hero_ground) < 4.5f)
+                hero->pos[2] = hero_ground;
         }
         g_hero_state.flag = 0;
         stub_empty_5_pal();
-        b = &g_scene_playback_state;
-        if (b->restore) {
-            f = coll_probe_ground_height_below(b->pos, 0, 0.5f);
-            if (2.0f < f && math_fabs(b->pos[2] - f) < 2.0f)
-                b->pos[2] = f;
+        scene = &g_scene_playback_state;
+        if (scene->restore) {
+            scene_ground = coll_probe_ground_height_below(scene->pos, 0, 0.5f);
+            if (2.0f < scene_ground && math_fabs(scene->pos[2] - scene_ground) < 2.0f)
+                scene->pos[2] = scene_ground;
             stub_empty_15(g_scene_playback_state.pos, g_scene_playback_state.rot, 0, 1);
         }
     }

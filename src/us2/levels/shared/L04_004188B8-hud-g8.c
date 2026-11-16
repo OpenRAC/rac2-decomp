@@ -232,20 +232,20 @@ static __inline__ int hud_y3(float value)
    are loaded before the heading call's result is copied out of $f0, so local-alloc gives them $f2
    and $f1 and the result keeps $f0; in both func_002AA548 calls &tmp goes to $a0 before $a1. */
 #pragma rac2_sched1_order 3145 3151 3142 3226 3228 3283 3285
-s32 func_US2_L04_004188B8(void)
+s32 hud_draw_race_ruler_us2(void)
 {
     T4 A = g_race_ruler_quad_a;
     char *pad = g_pad_state;
-    u8 *h = g_race_controller;
+    u8 *controller = g_race_controller;
     T5 C = g_race_ruler_quad_c;
-    u8 *p;
+    u8 *vars;
     u8 *obj;
     u8 *o;
     u8 *e;
     char buf[16];
     Vec m[4];
     Vec v90[4];
-    Vec vD0, vE0, vF0;
+    Vec vec_d0, vec_e0, vec_f0;
     float tmp;
     s32 sy, sy2, sy3;
     u8 *hp;
@@ -289,15 +289,15 @@ s32 func_US2_L04_004188B8(void)
         STUB_printf(g_str_l04_debug_tune_format_2, g_debug_l04_tune_value_a_2, g_debug_l04_tune_value_b_2, g_debug_l04_tune_value_c_2, g_debug_l04_tune_value_d_2);
     }
     n20 = 1;
-    p = *(u8 **)(h + 0x68);
-    if (h[0xBC] == n20)
+    vars = *(u8 **)(controller + 0x68);
+    if (controller[0xBC] == n20)
         menu_draw_box_two_labels();
     if (g_race_banner_timer > 0) {
-        DrawRaceTimerHud(h);
+        DrawRaceTimerHud(controller);
         math_fast_float_d(&g_race_banner_timer);
         if (g_race_banner_timer == 0xAD)
-            PlayMobySound(0xD, 0, h);
-    } else if (math_fabs(F(p, 0x4A4)) > 1.5707964f) {
+            PlayMobySound(0xD, 0, controller);
+    } else if (math_fabs(F(vars, 0x4A4)) > 1.5707964f) {
         gfx_draw_rounded_box(HC(112.0f), HC(142.0f), 0xAF, g_screen_width - 0xAF, 0x60, 0x60442D00);
         level_set_rect(0x60, 0x55F0C070, (float)HC(112.0f), (float)HC(142.0f) /* FAKEMATCH: was HCN; drops one n20 ref so n20 lands at 23/250 */, 175.0f,
                       (float)(g_screen_width - 0xAF));
@@ -306,61 +306,61 @@ s32 func_US2_L04_004188B8(void)
             do { s = GetLocalizedString(0x2E2B); x = g_screen_width / 2; y = label_y((void *)x, 118.0f, g_race_hud_layout_scale, 0.5f, 1); } while (0); len = func_001157AC(s);
             text_draw_centered_large(x, y, 0x700000E4, s, len);
         }
-        if (I(p, 0x76C) == 0) {
+        if (I(vars, 0x76C) == 0) {
             OwnerContext *context = &g_music_state;
-            I(p, 0x76C) = n20;
+            I(vars, 0x76C) = n20;
             if ((context->active != 0 || context->kind != -1) && (u16)(context->state - 6) >= 2)
                 context->state = 5;
         }
-        if (I(p, 0x76C) != 0) {
+        if (I(vars, 0x76C) != 0) {
             OwnerContext *context = &g_music_state;
             if (!context->active && context->kind == -1) {
-                context->kind = I(p, 0x760) + 0xBB8;
-                context->owner = h;
+                context->kind = I(vars, 0x760) + 0xBB8;
+                context->owner = controller;
             }
             snd_resume_music_stream();
         }
     }
-    if (math_fabs(F(p, 0x4A4)) < 1.5707964f && I(p, 0x76C) != 0) {
+    if (math_fabs(F(vars, 0x4A4)) < 1.5707964f && I(vars, 0x76C) != 0) {
         OwnerContext *context = &g_music_state;
-        I(p, 0x76C) = 0;
+        I(vars, 0x76C) = 0;
         if ((u16)(context->state - 6) >= 2)
             context->state = 5;
     }
-    if ((u32)(h[0xBC] - 1) < 4 || g_race_time_ticks < 0x3C)
-        hud_draw_race_banner(h);
+    if ((u32)(controller[0xBC] - 1) < 4 || g_race_time_ticks < 0x3C)
+        hud_draw_race_banner(controller);
     if (g_popup_resource_table != 0) {
         { float q = math_fast_sin_or_cos_b(0.56217057f) / math_fast_sin_or_cos_a(0.56217057f); u8 *cam = g_water_camera; F(cam, 0xB0) = q; }
         UpdateViewContext();
         { void *spr = (void *)(u32)table_find_by_id((void *)(u32)(g_popup_resource_table + 0x8710), 0x2D); gfx_draw_scaled_object_two_axes(spr, 10.0f, 0x60442D00, (float)LY(spr, 10.0f), 1.0f, 1.0f, 0.0f); }
         { void *spr = (void *)(u32)table_find_by_id((void *)(u32)(g_popup_resource_table + 0x8710), 0x2E); gfx_draw_scaled_object_two_axes(spr, 10.0f, 0x55F0C070, (float)LY(spr, 10.0f), 1.0f, 1.0f, 0.0f); }
-        if (I(p, 0x360) != 0) {
+        if (I(vars, 0x360) != 0) {
             float fr;
-            va = A.v[I(p, 0x360) - 1];
-            vF0.i[0] = va;
-            vF0.i[1] = va;
-            vF0.i[2] = va;
-            vF0.i[3] = va;
+            va = A.v[I(vars, 0x360) - 1];
+            vec_f0.i[0] = va;
+            vec_f0.i[1] = va;
+            vec_f0.i[2] = va;
+            vec_f0.i[3] = va;
             idx = 0;
-            switch (I(p, 0x360)) {
+            switch (I(vars, 0x360)) {
             case 1: idx = 0; break;
             case 2: idx = 1; break;
             case 3: idx = 2; break;
             }
-            hud_draw_sprite_gradient(GetIconFrame(0x7568, idx), 0x3E, HC(17.0f), 0x28, HC(35.0f), &vF0);
-            fr = (float)I(p, 0x364) / (float)C.v[I(p, 0x360)];
+            hud_draw_sprite_gradient(GetIconFrame(0x7568, idx), 0x3E, HC(17.0f), 0x28, HC(35.0f), &vec_f0);
+            fr = (float)I(vars, 0x364) / (float)C.v[I(vars, 0x360)];
             if (fr > 1.0f) fr = 1.0f;
             if (fr < 0.0f) fr = 0.0f;
-            gfx_draw_screen_rectangle(0x6F, HC(28.0f), (int)(fr * 91.0f) + 0x6F, HC(41.0f), 0xFFFFF0, &vF0);
+            gfx_draw_screen_rectangle(0x6F, HC(28.0f), (int)(fr * 91.0f) + 0x6F, HC(41.0f), 0xFFFFF0, &vec_f0);
         }
-        n33 = I(p, 0x33C);
+        n33 = I(vars, 0x33C);
         if (n33 > 0) {
             if (g_race_ruler_last_value != n33) {
                 if (g_race_ruler_last_value < n33)
                     g_race_ruler_flash_timer = 0x2D;
                 else
                     g_race_ruler_flash_timer = 0;
-                g_race_ruler_last_value = I(p, 0x33C);
+                g_race_ruler_last_value = I(vars, 0x33C);
             }
             if (g_race_ruler_flash_timer > 0)
                 g_race_ruler_flash_timer = g_race_ruler_flash_timer - 1;
@@ -371,18 +371,18 @@ s32 func_US2_L04_004188B8(void)
         }
         {
         one4 = 1;
-        if (I(p, 0x278) != 0)
-            fa = (float)I(p, 0x278) / (float)I(p, 0x650);
+        if (I(vars, 0x278) != 0)
+            fa = (float)I(vars, 0x278) / (float)I(vars, 0x650);
         else
-            fa = (float)I(p, 0x338) * 0.004166667f;
+            fa = (float)I(vars, 0x338) * 0.004166667f;
         if (fa > 1.0f) fa = 1.0f;
         if (fa < 0.0f) fa = 0.0f;
-        vF0.i[0] = 0x603F00B2;
-        vF0.i[1] = 0x603F00B2;
-        vF0.i[2] = 0x603F00B2;
-        vF0.i[3] = 0x603F00B2;
+        vec_f0.i[0] = 0x603F00B2;
+        vec_f0.i[1] = 0x603F00B2;
+        vec_f0.i[2] = 0x603F00B2;
+        vec_f0.i[3] = 0x603F00B2;
         gfx_draw_screen_rectangle(0x1A, hud_y3((float)(0x62 - (int)(fa * 74.0f))), 0x26, hud_y3(98.0f), 0xFFFFF0,
-                      &vF0);
+                      &vec_f0);
         }
         { void *spr = (void *)(u32)table_find_by_id((void *)(u32)(g_popup_resource_table + 0x8710), 0x3F); gfx_draw_scaled_object_two_axes(spr, 498.0f, 0x60442D00, (float)label_y(spr, 10.0f, g_race_hud_layout_scale, 0.5f, 1), 1.0f, 1.0f, 0.0f); }
         { void *spr = (void *)(u32)table_find_by_id((void *)(u32)(g_popup_resource_table + 0x8710), 0x40); gfx_draw_scaled_object_two_axes(spr, 498.0f, 0x55F0C070, (float)label_y(spr, 10.0f, g_race_hud_layout_scale, 0.5f, 1), 1.0f, 1.0f, 0.0f); }
@@ -393,7 +393,7 @@ s32 func_US2_L04_004188B8(void)
             { void *spr = (void *)(u32)table_find_by_id((void *)(u32)(g_popup_resource_table + 0x8710), 0x30); gfx_draw_scaled_object_two_axes(spr, 498.0f, 0x55F0C070, (float)LY(spr, 10.0f), 1.0f, 1.0f, 0.0f); }
         if (g_current_map_index == 4 && (g_race_challenge_table[g_current_race_index].flags & 4))
             { void *spr = (void *)(u32)table_find_by_id((void *)(u32)(g_popup_resource_table + 0x8710), 0x43); gfx_draw_scaled_object_two_axes(spr, 498.0f, 0x60FFDE8D, (float)LY(spr, 10.0f), 1.0f, 1.0f, 0.0f); }
-        n20 = I(p, 0x320);
+        n20 = I(vars, 0x320);
         if ((u32)(n20 - 1) >= 0x14)
             n20 = 0x14;
         {
@@ -418,18 +418,18 @@ s32 func_US2_L04_004188B8(void)
         AppendScreenRectPacket(0x157, HC(36.0f), 0x1AB, HC(37.0f), 0x25F0C070, 0);
         AppendScreenRectPacket(0x151, HC(28.0f), 0x1AB, HC(29.0f), 0x25F0C070, 0);
         AppendScreenRectPacket(0x160, HC(45.0f), 0x1AB, HC(46.0f), 0x25F0C070, 0);
-        one3 = 1; /* FAKEMATCH: before i = 0 so one3 is born before the &vF0 copy dies */
+        one3 = 1; /* FAKEMATCH: before i = 0 so one3 is born before the &vec_f0 copy dies */
         i = 0;
-        FastVecScale(&vD0, h + 0xC0, F(p, 0x30C) + F(p, 0x27C));
-        hp = h + 0x10;
-        transform_vector(&vE0, &vD0, m);
-        arr = p + 0x1E4;
-        fd = FastVecDot(&vE0, &g_route_frame_delta);
-        pa = p + 0x494;
-        pb = p + 0x498;
-        FastVecScale(&vD0, &g_route_frame_delta, fd);
-        add_vectors(&vF0, &vE0, &vD0);
-        ApproachValue(&g_race_ruler_scroll_offset, vE0.f[0] * -1.25f, 0.050000004f);
+        FastVecScale(&vec_d0, controller + 0xC0, F(vars, 0x30C) + F(vars, 0x27C));
+        hp = controller + 0x10;
+        transform_vector(&vec_e0, &vec_d0, m);
+        arr = vars + 0x1E4;
+        fd = FastVecDot(&vec_e0, &g_route_frame_delta);
+        pa = vars + 0x494;
+        pb = vars + 0x498;
+        FastVecScale(&vec_d0, &g_route_frame_delta, fd);
+        add_vectors(&vec_f0, &vec_e0, &vec_d0);
+        ApproachValue(&g_race_ruler_scroll_offset, vec_e0.f[0] * -1.25f, 0.050000004f);
         psy = (s32 *)&tmp; /* FAKEMATCH: dead store, overwritten next: its &tmp, the first, gives tmp its frame slot (0xF0) ahead of sy and sy2 */
         psy = &sy; /* FAKEMATCH: set-once &sy, see decl */
         psy2 = &sy2; /* FAKEMATCH: set-once &sy2, see decl */
@@ -466,9 +466,9 @@ s32 func_US2_L04_004188B8(void)
                 AppendScreenRectPacket(sy, y1, sy + 1, hud_coord_a(55.0f, g_race_hud_layout_scale, rh, one3), mcol, 0);
             }
         }
-        FastVecSub(&vE0, hp, g_route_frame_origin);
-        transform_vector(&vD0, &vE0, m);
-        fa = vD0.f[1] * 0.2f;
+        FastVecSub(&vec_e0, hp, g_route_frame_origin);
+        transform_vector(&vec_d0, &vec_e0, m);
+        fa = vec_d0.f[1] * 0.2f;
         if (fa > 1.0f)
             fa = 1.0f;
         if (fa < -1.0f)
@@ -486,11 +486,11 @@ s32 func_US2_L04_004188B8(void)
             if (ne != none) {
                 e = g_moby_l04_pool + (ne << 8);
                 o = *(u8 **)(e + 0x68);
-                if (e[0x20] == 2 || h[0xBC] == one2 || h[0xBC] == 3) {
-                    FastVecSub(&vE0, e + 0x10, g_route_frame_origin);
-                    transform_vector(&vD0, &vE0, m);
-                    sy = (int)(vD0.f[0] + vD0.f[0]) + 0x183;
-                    vy = (int)(vD0.f[1] * 4.0f);
+                if (e[0x20] == 2 || controller[0xBC] == one2 || controller[0xBC] == 3) {
+                    FastVecSub(&vec_e0, e + 0x10, g_route_frame_origin);
+                    transform_vector(&vec_d0, &vec_e0, m);
+                    sy = (int)(vec_d0.f[0] + vec_d0.f[0]) + 0x183;
+                    vy = (int)(vec_d0.f[1] * 4.0f);
                     sy2 = vy + 0x24;
                     if ((u32)(vy + 0xD) < 0x1B && sy < 0x1A5 && sy >= 0x168) {
                         if (sy < 0x173)
@@ -535,10 +535,10 @@ s32 func_US2_L04_004188B8(void)
                                           5.8333335f);
                             OM(o)->m1D0 = (int)tmp;
                         }
-                        vD0.f[1] = OM(o)->m1D4;
-                        vD0.f[0] = 0.0f;
-                        vD0.f[2] = 0.0f;
-                        euler_to_matrix(v90, &vD0);
+                        vec_d0.f[1] = OM(o)->m1D4;
+                        vec_d0.f[0] = 0.0f;
+                        vec_d0.f[2] = 0.0f;
+                        euler_to_matrix(v90, &vec_d0);
                         FastVecScale(v90, v90, F(obj, 0xC));
                         FastVecScale(&v90[2], &v90[2], F(obj, 0xC));
                         DrawNativeQuads(obj, (float)OM(o)->m1CC, (float)label_y(o, (float)OM(o)->m1D0, g_race_hud_layout_scale, half, one2),
@@ -552,39 +552,39 @@ s32 func_US2_L04_004188B8(void)
                         OM(o)->m1DC = 0;
                     }
                     GetAnimationPathPoint(psy, psy2, I(o, 0x120), I(o, 0x124), o + 0x1C4, o + 0x1C8,
-                                      p);
+                                      vars);
                     AppendScreenRectPacket(sy - 2, hud_coord_a((float)(sy2 - 1), g_race_hud_layout_scale, half, one2), sy + 2, hud_coord_a((float)(sy2 + 3), g_race_hud_layout_scale, half, one2),
                                   0x600040E4, 0);
                 }
             }
             j++;
         } while (j < 0x15);
-        fa = fast_subtract_rotations(f21, F(h, 0xF8));
-        if (F(p, 0x4A4) == -1.0f)
-            F(p, 0x4A4) = fa;
+        fa = fast_subtract_rotations(f21, F(controller, 0xF8));
+        if (F(vars, 0x4A4) == -1.0f)
+            F(vars, 0x4A4) = fa;
         else
-            math_approach_target_with_direction_mode(p + 0x4A4, fa, 0.002327106f, 0.002327106f, 4.712389f, p + 0x4B0, 0);
-        I(p, 0x49C) = 0x183;
-        v3 = I(p, 0x4A0);
+            math_approach_target_with_direction_mode(vars + 0x4A4, fa, 0.002327106f, 0.002327106f, 4.712389f, vars + 0x4B0, 0);
+        I(vars, 0x49C) = 0x183;
+        v3 = I(vars, 0x4A0);
         if (v3 == -1) {
-            I(p, 0x4A0) = sy3;
+            I(vars, 0x4A0) = sy3;
         } else {
             tmp = (float)v3;
-            math_step_value_toward_target(&tmp, p + 0x4AC, (float)sy3, 0.1388889f, 0.1388889f, 5.8333335f);
-            I(p, 0x4A0) = (int)tmp;
+            math_step_value_toward_target(&tmp, vars + 0x4AC, (float)sy3, 0.1388889f, 0.1388889f, 5.8333335f);
+            I(vars, 0x4A0) = (int)tmp;
         }
-        vD0.f[1] = F(p, 0x4A4);
-        vD0.f[0] = 0.0f;
-        vD0.f[2] = 0.0f;
-        euler_to_matrix(m, &vD0);
+        vec_d0.f[1] = F(vars, 0x4A4);
+        vec_d0.f[0] = 0.0f;
+        vec_d0.f[2] = 0.0f;
+        euler_to_matrix(m, &vec_d0);
         FastVecScale(m, m, F(obj, 0xC));
         FastVecScale(m2, m2, F(obj, 0xC));
-        DrawNativeQuads(obj, (float)I(p, 0x49C), (float)label_y(obj, (float)I(p, 0x4A0), g_race_hud_layout_scale, 0.5f, 1), 0x8000A6E4, 0.0f, m);
-        GetAnimationPathPoint(psy, psy2, I(p, 0x314), I(p, 0x318), pa, pb, p);
+        DrawNativeQuads(obj, (float)I(vars, 0x49C), (float)label_y(obj, (float)I(vars, 0x4A0), g_race_hud_layout_scale, 0.5f, 1), 0x8000A6E4, 0.0f, m);
+        GetAnimationPathPoint(psy, psy2, I(vars, 0x314), I(vars, 0x318), pa, pb, vars);
         AppendScreenRectPacket(sy, HC((float)sy2), sy + 4, HC((float)(sy2 + 4)), 0x8000A6E4, 0);
         VU1_addGSregister(0x47, 0x5360B);
-        if (h[0x20] != 3) {
-            fe = F(p, 0x28C) * 0.008726647f;
+        if (controller[0x20] != 3) {
+            fe = F(vars, 0x28C) * 0.008726647f;
             { float q = math_fast_sin_or_cos_b(fe) / math_fast_sin_or_cos_a(fe); u8 *cam = g_water_camera; F(cam, 0xB0) = q; }
             UpdateViewContext();
         }

@@ -7,6 +7,7 @@ extern float math_random_float_range(float,float);
 extern int part_alloc_effect_slot(char *,int,float,float,float);
 extern void func_002A0F48(char *);
 
+/* Creates a Gravity Bomb projectile at the given position with the given direction and random spin. */
 char *gravity_bomb_spawn_projectile_pal(int owner, char *position, char *direction)
 {
     char *object = CreateMoby(0xCE4);

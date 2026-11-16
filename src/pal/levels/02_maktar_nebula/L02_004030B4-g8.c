@@ -79,7 +79,7 @@ extern void UpdateViewContext(void);
 extern void text_draw_window_small(Rect *, u64, char *, s32);
 extern void text_draw_window_large(Rect *, u64, char *, s32);
 extern void text_draw_window_medium(Rect *, u64, char *, s32);
-extern int func_PAL_L02_00402928(void);
+extern int pal_language_at_least_two(void);
 extern void FontSetWindow(Rect *, s32, s32, s32, s32, s32, s32, s32, s32);
 extern f32 IntToFloat(s32);
 extern char *GetLocalizedString(s32);
@@ -163,7 +163,9 @@ static __inline__ int hud_coord(float value, float scale, float half, int active
     return result;
 }
 
-void func_PAL_L02_004030B4(u8 *moby)
+/* Draws the Maktar Nebula challenge HUD: the timer, round and title boxes, the score and the boss
+   health bar, depending on the challenge state (PAL: countdowns use 50 frames per second). */
+void arena_draw_hud_pal(u8 *moby)
 {
     char buf[0x40];
     Rect r50;
@@ -175,7 +177,7 @@ void func_PAL_L02_004030B4(u8 *moby)
     u8 *data;
     u8 *obj;
     u8 *pv;
-    f32 save;
+    f32 saved_text_scale;
     s32 sum;
     s32 i;
     s32 n;
@@ -203,9 +205,9 @@ void func_PAL_L02_004030B4(u8 *moby)
     FontSetWindow(&r50, x, y, g_hud_panel_d_window_left[0], g_hud_panel_d_window_right[0], g_hud_panel_d_window_height, h, 0, three);
     {
     s32 x, y;
-    x = (f32)g_hud_panel_c_pos_x[func_PAL_L02_00402928()][0] * g_hud_label_scale + half;
-    y = label_y(moby, (f32)g_hud_panel_c_pos_y[func_PAL_L02_00402928()][0], g_hud_label_scale, half, 1);
-    FontSetWindow(&r70, x, y, g_hud_panel_c_window_left[func_PAL_L02_00402928()][0], g_hud_panel_c_window_right[func_PAL_L02_00402928()][0], g_hud_panel_c_window_height, hud_coord((f32)g_hud_panel_c_height, g_hud_label_scale, half, 1), 0, three);
+    x = (f32)g_hud_panel_c_pos_x[pal_language_at_least_two()][0] * g_hud_label_scale + half;
+    y = label_y(moby, (f32)g_hud_panel_c_pos_y[pal_language_at_least_two()][0], g_hud_label_scale, half, 1);
+    FontSetWindow(&r70, x, y, g_hud_panel_c_window_left[pal_language_at_least_two()][0], g_hud_panel_c_window_right[pal_language_at_least_two()][0], g_hud_panel_c_window_height, hud_coord((f32)g_hud_panel_c_height, g_hud_label_scale, half, 1), 0, three);
     three2 = 3;
     }
     k2 = 1;
@@ -215,10 +217,10 @@ void func_PAL_L02_004030B4(u8 *moby)
     FontSetWindow(&r90, x, y, g_hud_window_b_left[0], g_hud_window_b_top[0], g_hud_window_b_height, h, 0, three);
     {
     s32 x, y;
-    x = label_y(&rB0, (f32)g_hud_window_a_x[func_PAL_L02_00402928()][0], g_hud_label_scale, half, 1);
+    x = label_y(&rB0, (f32)g_hud_window_a_x[pal_language_at_least_two()][0], g_hud_label_scale, half, 1);
     do { k3 = 1; } while (0);
-    y = (f32)g_hud_window_a_y[func_PAL_L02_00402928()][0] * g_hud_label_scale + half;
-    FontSetWindow(&rB0, x, y, g_hud_window_a_left[func_PAL_L02_00402928()][0], g_hud_window_a_top[func_PAL_L02_00402928()][0], g_hud_window_a_height, hud_coord((f32)g_hud_window_a_box_height, g_hud_label_scale, half, k3), 0, three);
+    y = (f32)g_hud_window_a_y[pal_language_at_least_two()][0] * g_hud_label_scale + half;
+    FontSetWindow(&rB0, x, y, g_hud_window_a_left[pal_language_at_least_two()][0], g_hud_window_a_top[pal_language_at_least_two()][0], g_hud_window_a_height, hud_coord((f32)g_hud_window_a_box_height, g_hud_label_scale, half, k3), 0, three);
     }
     one = 1;
     x = hud_coord((f32)g_hud_panel_b_pos_x, g_hud_label_scale, half, k2);
@@ -228,7 +230,7 @@ void func_PAL_L02_004030B4(u8 *moby)
     x = hud_coord((f32)g_hud_window_c_x, g_hud_label_scale, half, one);
     do { t = (f32)g_hud_window_c_y[0] * g_hud_label_scale + half; y = t; } while (0);
     FontSetWindow(&rD0, x, y, g_hud_panel_a_window_left[0], g_hud_panel_a_window_right[0], g_hud_window_c_height, hud_coord((f32)g_hud_window_c_box_height, g_hud_label_scale, half, 1), 0, three2);
-    save = ((HudRenderState *)g_hud_l02_render_state)->text_scale;
+    saved_text_scale = ((HudRenderState *)g_hud_l02_render_state)->text_scale;
     ((HudRenderState *)g_hud_l02_render_state)->text_scale = 0.62f;
     UpdateViewContext();
     if (*(s16 *)(data + 0x120) == three2) {
@@ -242,7 +244,7 @@ void func_PAL_L02_004030B4(u8 *moby)
         sprintf(buf, g_str_hud_number_format, 15 * *(s16 *)(data + 0x122) + sum - *(s32 *)(data + 0x60));
         DRAWBUF(text_draw_window_large, &r50);
         str = GetLocalizedString(0xE86);
-        if (func_PAL_L02_00402928()) {
+        if (pal_language_at_least_two()) {
             text_draw_window_medium(&r70, g_hud_text_color, str, func_001157AC(str));
         } else {
             text_draw_window_small(&r70, g_hud_text_color, str, func_001157AC(str));
@@ -258,7 +260,7 @@ void func_PAL_L02_004030B4(u8 *moby)
         sprintf(buf, g_str_hud_number_format, 15 * *(s16 *)(data + 0x122) + sum - *(s32 *)(data + 0x60));
         DRAWBUF(text_draw_window_large, &r50);
         str = GetLocalizedString(0xE86);
-        if (func_PAL_L02_00402928()) {
+        if (pal_language_at_least_two()) {
             text_draw_window_medium(&r70, g_hud_text_color, str, func_001157AC(str));
         } else {
             text_draw_window_small(&r70, g_hud_text_color, str, func_001157AC(str));
@@ -303,6 +305,6 @@ void func_PAL_L02_004030B4(u8 *moby)
         DRAW(text_draw_window_small, &rD0, GetLocalizedString(0xE85));
     }
     VU1_addGSregister(0x47, 0x5360B);
-    ((HudRenderState *)g_hud_l02_render_state)->text_scale = save;
+    ((HudRenderState *)g_hud_l02_render_state)->text_scale = saved_text_scale;
     UpdateViewContext();
 }

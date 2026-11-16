@@ -68,7 +68,8 @@ typedef struct BurstObject {
     u8 pad6C[0x54];
     float forward[4], right[4];
 } BurstObject;
-void func_PAL_L05_0042A900(BurstObject *object)
+/* Spawns the large explosion: flares, smoke, sparks, trails, a shockwave ring and spinning sparks, sized by the object's settings. */
+void part_spawn_large_explosion_pal(BurstObject *object)
 {
     float position[4] __attribute__((aligned(16)));
     float velocity[4] __attribute__((aligned(16)));

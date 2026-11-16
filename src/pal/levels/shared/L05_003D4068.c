@@ -18,7 +18,7 @@ void moby_init_reach_and_position_pal(char *obj)
 {
     char *sub = *(char **)(obj + 0x68);
     char *table;
-    float a, b, c;
+    float radius, yaw, pitch;
 
     *(unsigned char *)(obj + 0x20) = 1;
     *(unsigned short *)(obj + 0x34) = *(unsigned short *)(obj + 0x34) | 0x100;
@@ -30,10 +30,10 @@ void moby_init_reach_and_position_pal(char *obj)
     *(float *)(sub + 0x180) = 1.0f;
     *(int *)(sub + 0x1B8) = 0;
     *(float *)(obj + 0x2C) = 0.06f;
-    a = math_random_float_range(0.0f, *(float *)table);
-    b = math_random_angle();
-    c = math_random_angle();
-    vec_build_spherical_offset(obj + 0x10, a, b, c);
+    radius = math_random_float_range(0.0f, *(float *)table);
+    yaw = math_random_angle();
+    pitch = math_random_angle();
+    vec_build_spherical_offset(obj + 0x10, radius, yaw, pitch);
     FastVecAdd(obj + 0x10, table + 0x30, obj + 0x10);
 }
 

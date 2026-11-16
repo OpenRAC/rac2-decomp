@@ -50,8 +50,9 @@ static __inline__ int label_y(void *handle, float value, float scale, float half
     return result;
 }
 
-void func_US2_L04_004185D8(void) {
-    float s, half, kx, ky;
+/* Draws the race timer box with the lap and elapsed time (USA v2.00). */
+void race_timer_hud_draw_us2(void) {
+    float layout_scale, half, box_x, box_y;
     int x1, y1, x4, y4, active;
     float fx, fy;
     char text[64], prefix[64];
@@ -62,15 +63,15 @@ void func_US2_L04_004185D8(void) {
         sprintf(text, g_str_race_time_label_format_alt, prefix, GetLocalizedString(0x2e19), D_L04_001B0920_gp / 216000, D_L04_001B0920_gp / 3600 % 60, D_L04_001B0920_gp / 60 % 60, D_L04_001B0920_gp / 6 % 10);
     active = 1;
     half = 0.5f;
-    kx = 112.0f;
-    s = g_race_hud_layout_scale;
-    x1 = menu_coord(kx, s, half, active);
-    ky = 142.0f;
-    y1 = menu_coord(ky, s, half, active);
+    box_x = 112.0f;
+    layout_scale = g_race_hud_layout_scale;
+    x1 = menu_coord(box_x, layout_scale, half, active);
+    box_y = 142.0f;
+    y1 = menu_coord(box_y, layout_scale, half, active);
     gfx_draw_rounded_box(x1, y1, 50, g_screen_width - 50, 96, 0x60442D00);
-    s = g_race_hud_layout_scale;
-    fx = (float)menu_coord(kx, s, half, active);
-    fy = (float)menu_coord(ky, s, half, active);
+    layout_scale = g_race_hud_layout_scale;
+    fx = (float)menu_coord(box_x, layout_scale, half, active);
+    fy = (float)menu_coord(box_y, layout_scale, half, active);
     level_set_rect_us2(fx, fy, 50.0f, (float)(g_screen_width - 50), 96, 0x55F0C070);
     x4 = g_screen_width / 2;
     y4 = label_y((void *)x4, 118.0f, g_race_hud_layout_scale, half, 1);

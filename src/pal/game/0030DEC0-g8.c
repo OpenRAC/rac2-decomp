@@ -29,7 +29,7 @@ extern Vec g_beam_ribbon_vecs[];
 extern int g_beam_ribbon_ints_a[];
 extern int g_beam_ribbon_ints_b[];
 /* Same family as func_0030A188 (RAC1 initialize_electric_water_bolt_effect). */
-void func_PAL_0030DEC0(char *obj) {
+void initialize_bolt_point_chain_pal(char *obj) {
     Vec delta, step;
     Vec *state = *(Vec **)(obj + 0x68);
     int i;

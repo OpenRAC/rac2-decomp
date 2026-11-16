@@ -151,7 +151,8 @@ extern char g_impact_effect_data[] MACRO_ADDR;
 extern void moby_raise_state_to_eight();
 extern void moby_raise_state_to_eight_copy();
 
-void func_US2_L09_002BC618(void) {
+/* Runs every frame for the player and handles whatever the current action is (walking, jumping, swinging, gliding and so on). (USA v2.00) */
+void hero_l09_update_state_machine_us2(void) {
     f32 speed62;
     s32 lim67;
     s32 *cnt32;

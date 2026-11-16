@@ -6,7 +6,7 @@ extern short g_lightning_strip_timers[4];
 extern u8 g_lightning_draw_callback_data[];
 
 /* Creates a strip-effect object with its supplied vectors and rendering parameters. */
-void *func_PAL_L10_003A0590(void *position, void *direction, s32 duration, s32 kind,
+void *energy_strip_create_pal(void *position, void *direction, s32 duration, s32 kind,
                        s32 first, s32 second, float jitter, s32 third, s32 texture,
                        float width, float height, float fade) {
     u8 *object = CreateMoby(0x133E);

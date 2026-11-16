@@ -89,6 +89,7 @@ static inline int owned(int i)
     return 0;
 }
 
+/* Checks the player's weapons and gadgets each frame: updates the item count, plays the unlock effects, and gives the final reward once everything is collected (PAL: 50 Hz timings). */
 void hero_update_collection_progress_pal(void)
 {
     int count, i, j, ok;

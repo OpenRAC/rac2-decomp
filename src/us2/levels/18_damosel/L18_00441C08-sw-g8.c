@@ -31,7 +31,7 @@ extern int hero_is_reachable_for_count(void *, int, float);
 extern void text_print_localized_formatted(int, int, int), func_L00_0030C710(int), moby_mark_table_entry_flagged(int);
 extern void help_unlock_entry(int), value_set_entry_by_index_us2(int, int);
 extern int moby_handle_request_slot_state(int);
-extern int func_US2_00289840(int, int);
+extern int subtitle_request_voice_line_us2(int, int);
 extern void level_capture_checkpoint_state(void *, void *), moby_mark_spawned(void *);
 extern int MemcardSave(int, int);
 extern int math_fast_float_d(void *), FastDecTimer(void *), FloatToInt(float);
@@ -42,6 +42,7 @@ extern void anim_start_blended(void *, int, int, int), vec_build_spherical_offse
 extern void FastVecAdd(void *, void *, void *), FastVecSub(void *, void *, void *);
 extern void moby_update_eased_node(void *, void *, int, float, float);
 
+/* Updates the ship parts shop character (moby class 4754): it checks which parts the player has, talks about the price, takes the bolts when the player buys, and turns its head toward the player (USA v2.00 copy). */
 void UpdatePartsPurchaseNpc_us2(u8 *obj)
 {
     float target[4] __attribute__((aligned(16)));
@@ -163,7 +164,7 @@ void UpdatePartsPurchaseNpc_us2(u8 *obj)
         U16_AT(obj, 0x96) = timer;
         if (elapsed >= 41) {
             value_set_entry_by_index_us2(0x1231, -1);
-            func_US2_00289840(0xA11, 0x68);
+            subtitle_request_voice_line_us2(0xA11, 0x68);
             level_capture_checkpoint_state(g_hero_position, g_hero_position + 16);
             MemcardSave(0, -1);
         remove_object:

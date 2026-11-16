@@ -34,17 +34,17 @@ extern float g_spark_quad_uv_table[] SDATA(D_L02_001B1488);
 
 /* Draws two passes of each radial strip and two facing quads at its inner end.
    UVs scroll over time while the complete set rotates. */
-void DrawRadialQuadEffect_pal(char *obj) {
+void DrawRadialQuadEffect_pal(char *moby) {
     float center[4], inner[4], outer[4], axis[4], ni[4], no[4];
     struct { float v[4][4]; unsigned color[4]; float uv[4][2]; char rest[32]; } quad;
     float temp[4];
-    char *state=*(char **)(obj + 0x68);
+    char *state=*(char **)(moby + 0x68);
     float angle=*(float *)(state + 0xDC);
     float step=6.283185482025146484375f / IntToFloat(g_spark_segment_count);
-    float alpha, size, halfSize;
+    float alpha, size, half_size;
     unsigned color;
     int i, j, kind;
-    qcopy(center, arena_get_camera_point(obj));
+    qcopy(center, arena_get_camera_point(moby));
     center[2]-=g_spark_center_drop;
     for (i = 0; i < g_spark_segment_count; i++) {
         qcopy(inner, center);
@@ -91,10 +91,10 @@ void DrawRadialQuadEffect_pal(char *obj) {
         quad.color[0]=quad.color[1]=quad.color[2]=quad.color[3]=g_spark_l02_quad_color;
         draw_world_quad(&quad, 0, 0);
         size=math_random_float_range(g_spark_l02_size_min, g_spark_l02_size_max);
-        halfSize=size*0.5f;
+        half_size=size*0.5f;
         kind=math_random_int_range(0x50, 0x60);
         alpha=math_random_angle();
-        gfx_draw_aimed_effect_packet(inner, g_spark_inner_effect_param, halfSize, alpha, kind, 0x31, 2);
+        gfx_draw_aimed_effect_packet(inner, g_spark_inner_effect_param, half_size, alpha, kind, 0x31, 2);
         size*=0.7f;
         kind=math_random_int_range(8, 0x16);
         alpha=math_random_angle();

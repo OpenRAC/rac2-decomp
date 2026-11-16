@@ -5,7 +5,7 @@ typedef unsigned char u8;
 extern void endako_boss_start_voice_line_pal(u8 *, int);
 extern int math_random_int_below(int);
 extern float math_random_float_range(float, float);
-extern void func_PAL_002A7E68(int, int, int, int);
+extern void anim_start_blended_pal(int, int, int, int);
 extern int snd_resume_music_stream(void);
 extern int math_fast_float_d(void *);
 typedef struct { u8 pad[0x1B8]; int busy; u8 pad2[0x62]; short timer; u8 pad3[0x2074]; int action; int unknown; int weapon; } Player;
@@ -14,6 +14,8 @@ typedef struct { u8 pad[0x6C]; short id; u8 pad2[4]; short mode; } Voice;
 extern Voice g_music_state;
 extern float g_endako_boss_health_ratio __attribute__((sda));
 
+/* Picks which boss voice line to play from what the boss and the hero are doing and from the
+   boss's health dropping past 80, 60, 40 and 20 percent. */
 void endako_boss_play_voice_lines_pal(u8 *entity) {
     u8 *state = *(u8 **)(entity + 0x68);
     float ratio = *(float *)(state + 0x20) / (float)*(short *)(state + 0x24);
@@ -47,7 +49,7 @@ void endako_boss_play_voice_lines_pal(u8 *entity) {
         g_endako_boss_health_ratio = ratio;
     }
     if (g_music_state.mode == 3 && g_music_state.id < 6000) {
-        func_PAL_002A7E68(*(int *)(state + 0x2C4), 1, 0, 8);
+        anim_start_blended_pal(*(int *)(state + 0x2C4), 1, 0, 8);
         snd_resume_music_stream();
     }
     math_fast_float_d(state + 0x408);

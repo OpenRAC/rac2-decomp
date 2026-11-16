@@ -7,18 +7,18 @@
    145 to 163, which `o` gets from `&o`: put_var_into_stack gives an address-taken variable a fresh
    pseudo only when the address is first taken, and purge_addressof makes it a register again before
    gcse. All other uses go through `self`, the copy in the first block, which cprop rewrites to that
-   pseudo in the later blocks. position_of() brings the pseudo count to 145 at `*&o`. */
+   pseudo in the later blocks. position_of() brings the pseudo count to 145 at `*&menu`. */
 typedef unsigned char u8;
 extern int *object_get_fourth_field(u8 *);
 extern void *ui_return_second_arg(int, int);
 extern void *pool_alloc_cell(void *);
-extern void func_US2_003377B0(void *, void *, void *);
+extern void hud_init_widget_defaults_us2(void *, void *, void *);
 extern void object_set_helper_result(char *, char *, int);
 extern void func_US2_003492B0(u8 *, int);
 extern void object_init_derived_arrays(void *, void *, void *);
 extern void hud_set_widget_field_b(void *, int);
 extern void object_set_second_float4(void *, float, float, float, float);
-extern int func_US2_00349728(void *, int);
+extern int menu_choice_list_update_widgets_us2(void *, int);
 extern char *g_resident_data_base[] __attribute__((sda));
 extern char ref_003486A8_00[];
 extern char ref_003486A8_01[];
@@ -34,21 +34,23 @@ static inline float *position_of(char *o)
     return *(float **)(o + 0x4a4);
 }
 
-void func_US2_003493E0(char *o, void *data)
+/* Builds a menu page: its position, seven labels, background pieces and seven rows with their colors and
+   text ids, then runs the first update. (USA v2.00) */
+void menu_page_construct_with_rows_us2(char *menu, void *data)
 {
-    int *v;
-    char *self = o;
+    int *cell;
+    char *self = menu;
 
     *(int *)(self + 0x4ac) = 0;
     func_US2_003492B0((u8 *)self, 0);
     *(void **)(self + 0x4a8) = data;
     if (data) {
-        v = ui_return_second_arg(16, pool_alloc_cell(data));
-        *(int **)(self + 0x4a4) = v;
-        v[1] = 0;
-        v[2] = 0;
-        v[3] = 0;
-        v[0] = 0;
+        cell = ui_return_second_arg(16, pool_alloc_cell(data));
+        *(int **)(self + 0x4a4) = cell;
+        cell[1] = 0;
+        cell[2] = 0;
+        cell[3] = 0;
+        cell[0] = 0;
     }
     {
         float *position = position_of(self);
@@ -71,7 +73,7 @@ void func_US2_003493E0(char *o, void *data)
         char *row = self + 0x218;
 
         for (i = 0; i < 7; i++) {
-            func_US2_003377B0(row, ref_003486A8_07, data);
+            hud_init_widget_defaults_us2(row, ref_003486A8_07, data);
             hud_set_widget_field_b(row, 0);
             object_set_second_float4(row, 1.0f, 0.0f, 0.0f, 0.0f);
             *(int *)(row + 0x54) = 0;
@@ -87,12 +89,12 @@ void func_US2_003493E0(char *o, void *data)
     *(int *)object_get_fourth_field((u8 *)self + 0xE4) = 0x70FFFEED;
     *(int *)object_get_fourth_field((u8 *)self + 0x17C) = 0x60442D00;
     *(int *)object_get_fourth_field((u8 *)self + 0x1C8) = 0x55F0C070;
-    object_set_helper_result(*&o, g_resident_data_base[0] + 0x8710, 28);
+    object_set_helper_result(*&menu, g_resident_data_base[0] + 0x8710, 28);
     object_set_helper_result(self + 0x130, g_resident_data_base[0] + 0x8710, 29);
     object_set_helper_result(self + 0x4C, g_resident_data_base[0] + 0x8710, 30);
     object_set_helper_result(self + 0x98, g_resident_data_base[0] + 0x8710, 31);
     object_set_helper_result(self + 0xE4, g_resident_data_base[0] + 0x8710, 32);
     object_set_helper_result(self + 0x17C, g_resident_data_base[0] + 0x8710, 115);
     object_set_helper_result(self + 0x1C8, g_resident_data_base[0] + 0x8710, 116);
-    func_US2_00349728(self, 0);
+    menu_choice_list_update_widgets_us2(self, 0);
 }

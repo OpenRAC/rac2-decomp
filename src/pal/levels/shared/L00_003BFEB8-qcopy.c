@@ -11,6 +11,7 @@ extern int math_random_int_range(int, int);
 extern void ref_L00_003BC228_00(void *, void *, void *, void *, void *, float);
 extern void ref_L00_003BC228_01(void *, int, void *, int);
 
+/* Builds a wobbly 16-point curve from a state block and draws it as a lightning bolt. (PAL) */
 void lightning_draw_curve_pal(char *object, char *state) {
     CurveVector points[17];
     CurveVector start, end, jitter;

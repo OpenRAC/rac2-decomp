@@ -29,8 +29,8 @@ extern int g_save_slot_cursor;
 extern char g_save_slot_screen_alt[];
 extern char g_save_slot_screen[];
 extern void popup_set_row_us2(char *, int);
-extern int func_US2_00299960(void);
-extern int func_US2_00299968(void);
+extern int pending_request_get_us2(void);
+extern int pending_request_take_us2(void);
 extern void save_start_to_slot(int, int);
 extern void menu_set_confirm_pending(void);
 extern int menu_send_request(int, char *);
@@ -39,9 +39,10 @@ extern int menu_get_counter(void);
 extern int menu_get_mode(void);
 extern int snd_play_from_global_bank(int, unsigned int, void *);
 
-int func_US2_002DD888(SaveMenu *menu)
+/* Handles the save-game slot menu: moves the cursor over the four slots, asks before overwriting a used slot, and updates the slot summary after a save finishes. */
+int save_slot_menu_update_us2(SaveMenu *menu)
 {
-    int old;
+    int old_cursor;
     int buttons;
 
     if (*(SaveMenu **)(g_pause_menu_state.owner + 0xE8) != menu)
@@ -53,11 +54,11 @@ int func_US2_002DD888(SaveMenu *menu)
     if (menu->stage == 1) {
         save_start_to_slot(menu->f48, menu->cursor);
         g_pause_menu_state.busy = 1;
-        func_US2_00299968();
+        pending_request_take_us2();
         g_pause_menu_state.delay = 0x2C92;
     }
     menu->stage = 2;
-    old = menu->cursor;
+    old_cursor = menu->cursor;
     if (g_pause_menu_state.busy != 0) {
         if (g_memcard_state.f15c >= 3)
             return 0;
@@ -66,7 +67,7 @@ int func_US2_002DD888(SaveMenu *menu)
         if (g_pause_menu_state.ready < 11)
             return 0;
         g_pause_menu_state.busy = 0;
-        if (g_memcard_state.f16c != 0 || g_memcard_state.f10 != 0 || func_US2_00299960() != 0) {
+        if (g_memcard_state.f16c != 0 || g_memcard_state.f10 != 0 || pending_request_get_us2() != 0) {
             g_save_menu_flags |= 0x80;
             if (g_memcard_state.f17c != 0) {
                 g_memcard_state.f17c = 0;
@@ -150,7 +151,7 @@ done:
                 menu->stage = 1;
         }
     }
-    if (menu->cursor != old)
+    if (menu->cursor != old_cursor)
         snd_play_from_global_bank(3, 0, 0);
     return 0;
 }

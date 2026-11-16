@@ -55,7 +55,8 @@ static __inline__ s32 hud_round(f32 value, f32 scale, f32 half, s32 active)
     return result;
 }
 
-s32 func_PAL_L08_003DF82C(void)
+/* Draws the counter meter on screen: it fades in, shows two centred text labels, then an icon with a number at the bottom of the screen (PAL: 50 Hz fade). */
+s32 counter_meter_draw_pal(void)
 {
     Style style;
     char text[16];

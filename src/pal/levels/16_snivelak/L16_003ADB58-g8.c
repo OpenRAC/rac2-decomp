@@ -55,17 +55,18 @@ static inline void flipCoin(int *heads)
         *heads = 0;
 }
 
-void func_PAL_L16_003ADB58(BeamMoby *object)
+/* Builds the beam's random zigzag path and its four side branches, and spawns trail particles along it (PAL: 50 Hz timings). */
+void start_vendor_beam_pulse_pal(BeamMoby *object)
 {
     Beam *beam = object->vars;
     Vector positions[32], velocities[32], scratch, jitter;
     Vector transform[4];
-    const float frameTime = 0.020000001f;
+    const float frame_time = 0.020000001f;
     float half;
-    float timeStep;
+    float time_step;
     float unit;
     float spread;
-    int i, smoothIndex, branchIndex, particleIndex, j, k;
+    int i, smooth_index, branch_index, particle_index, j, k;
     int selected;
     object->position.w = 1.0f;
     beam->lifetime = math_random_int_range((((int)(g_beam_lifetime_min) * 5 + 2) / 6),(((int)(g_vendor_beam_lifetime_max) * 5 + 2) / 6));
@@ -74,7 +75,7 @@ void func_PAL_L16_003ADB58(BeamMoby *object)
         spread = math_random_float_range(40.0f, 45.0f);
     else spread = math_random_float_range(4.0f, 8.0f);
     half = 0.5f;
-    timeStep = frameTime;
+    time_step = frame_time;
     unit = 1.0f;
     for (i = 0; i < 32; i++) {
         float height = IntToFloat(i);
@@ -88,7 +89,7 @@ void func_PAL_L16_003ADB58(BeamMoby *object)
             vec_random_direction(&positions[i], 0.0f, g_beam_spark_spread_angle);
             if (g_current_map_index == 16 || g_current_map_index == 0xd5)
                 vec_random_direction(&velocities[i], 0.0f, 0.24000001f);
-            else vec_random_direction(&velocities[i], 0.0f, g_beam_velocity_spread * timeStep);
+            else vec_random_direction(&velocities[i], 0.0f, g_beam_velocity_spread * time_step);
         }
         {
             float y = positions[i].y;
@@ -96,39 +97,39 @@ void func_PAL_L16_003ADB58(BeamMoby *object)
             positions[i].y = y + height;
         }
     }
-    for (smoothIndex = 0; smoothIndex < 32; smoothIndex++) {
-        if (smoothIndex == 0 || smoothIndex == 31) {
-            qcopy(&beam->positions[smoothIndex], &positions[smoothIndex]);
-            qcopy(&beam->velocities[smoothIndex], &velocities[smoothIndex]);
+    for (smooth_index = 0; smooth_index < 32; smooth_index++) {
+        if (smooth_index == 0 || smooth_index == 31) {
+            qcopy(&beam->positions[smooth_index], &positions[smooth_index]);
+            qcopy(&beam->velocities[smooth_index], &velocities[smooth_index]);
         } else {
-            FastVecAdd(&scratch, &positions[smoothIndex-1], &positions[smoothIndex]);
-            FastVecAdd(&scratch, &scratch, &positions[smoothIndex+1]);
-            FastVecScale(&beam->positions[smoothIndex], &scratch, 0.333f);
-            FastVecAdd(&scratch, &velocities[smoothIndex-1], &velocities[smoothIndex]);
-            FastVecAdd(&scratch, &scratch, &velocities[smoothIndex+1]);
-            FastVecScale(&beam->velocities[smoothIndex], &scratch, 0.333f);
+            FastVecAdd(&scratch, &positions[smooth_index-1], &positions[smooth_index]);
+            FastVecAdd(&scratch, &scratch, &positions[smooth_index+1]);
+            FastVecScale(&beam->positions[smooth_index], &scratch, 0.333f);
+            FastVecAdd(&scratch, &velocities[smooth_index-1], &velocities[smooth_index]);
+            FastVecAdd(&scratch, &scratch, &velocities[smooth_index+1]);
+            FastVecScale(&beam->velocities[smooth_index], &scratch, 0.333f);
         }
     }
-    for (branchIndex = 0; branchIndex < 4; branchIndex++) {
+    for (branch_index = 0; branch_index < 4; branch_index++) {
         if (g_current_map_index == 0xd5 || g_current_map_index == 16)
             vec_random_direction(&scratch, 1.0f, 1.0f);
         else vec_random_direction(&scratch, g_beam_spark_spread_angle, g_beam_spark_spread_angle);
-        selected = FloatToInt(math_random_float_range((float)branchIndex * 6.0f, (float)(branchIndex + 1) * 6.0f)) + 4;
-        beam->selected[branchIndex] = selected;
-        qcopy(&beam->branches[0][branchIndex], &beam->positions[selected]);
-        qcopy(&beam->branchVelocities[0][branchIndex], &beam->velocities[selected]);
+        selected = FloatToInt(math_random_float_range((float)branch_index * 6.0f, (float)(branch_index + 1) * 6.0f)) + 4;
+        beam->selected[branch_index] = selected;
+        qcopy(&beam->branches[0][branch_index], &beam->positions[selected]);
+        qcopy(&beam->branchVelocities[0][branch_index], &beam->velocities[selected]);
         {
-            int velOffset = (int)&((Beam *)0)->branchVelocities[0][branchIndex];
-            int curOffset = (int)&((Beam *)0)->branches[0][branchIndex];
+            int vel_offset = (int)&((Beam *)0)->branchVelocities[0][branch_index];
+            int cur_offset = (int)&((Beam *)0)->branches[0][branch_index];
             for (j = 1; j < 4; j++) {
-                Beam *column = (Beam *)(branchIndex * 16);
+                Beam *column = (Beam *)(branch_index * 16);
                 column = (Beam *)((int)column + (int)beam);
                 vec_random_direction(&jitter, 0.1f, 0.1f);
                 if (g_current_map_index == 0xd5 || g_current_map_index == 16)
-                    vec_random_direction(((Row *)((char *)beam + velOffset))[j], 0.0f, 0.24000001f);
-                else vec_random_direction(((Row *)((char *)beam + velOffset))[j], 0.0f, g_beam_velocity_spread * frameTime);
-                FastVecAdd(((Row *)((char *)beam + curOffset))[j], column->branches[j-1], &scratch);
-                FastVecAdd(((Row *)((char *)beam + curOffset))[j], ((Row *)((char *)beam + curOffset))[j], &jitter);
+                    vec_random_direction(((Row *)((char *)beam + vel_offset))[j], 0.0f, 0.24000001f);
+                else vec_random_direction(((Row *)((char *)beam + vel_offset))[j], 0.0f, g_beam_velocity_spread * frame_time);
+                FastVecAdd(((Row *)((char *)beam + cur_offset))[j], column->branches[j-1], &scratch);
+                FastVecAdd(((Row *)((char *)beam + cur_offset))[j], ((Row *)((char *)beam + cur_offset))[j], &jitter);
             }
         }
     }
@@ -139,14 +140,14 @@ void func_PAL_L16_003ADB58(BeamMoby *object)
         beam->rotation[0] = math_random_angle();
         euler_to_matrix(transform, beam->rotation);
         qcopy(&transform[3], &object->position);
-        for (particleIndex = 0; particleIndex < 32; particleIndex += 8) {
+        for (particle_index = 0; particle_index < 32; particle_index += 8) {
             int color, duration;
-            transform_vector(&scratch, &beam->positions[particleIndex], transform);
-            qcopy(&jitter, &beam->velocities[particleIndex]);
+            transform_vector(&scratch, &beam->positions[particle_index], transform);
+            qcopy(&jitter, &beam->velocities[particle_index]);
             jitter.w = g_beam_jitter_w;
             color = math_random_int_below(2) ? g_beam_color_a : g_beam_l16_color_b;
             duration = math_random_int_below(10);
-            part_spawn_trail(&scratch, &jitter, &jitter, g_beam_trail_param_a, g_beam_trail_param_b, particleIndex >> 1, 15, (((int)(duration + 20) * 5 + 2) / 6), color);
+            part_spawn_trail(&scratch, &jitter, &jitter, g_beam_trail_param_a, g_beam_trail_param_b, particle_index >> 1, 15, (((int)(duration + 20) * 5 + 2) / 6), color);
         }
         for (k = 0; k < 2; k++) {
             int duration, heads;

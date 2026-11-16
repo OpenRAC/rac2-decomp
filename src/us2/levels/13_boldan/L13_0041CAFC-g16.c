@@ -41,7 +41,7 @@ extern MotionSettings_L13 g_warp_ring_motion_settings __attribute__((sda));
 extern int g_arena_state_flag;
 extern int g_saved_map_index __attribute__((sda));
 extern int g_level_l13_once_flag __attribute__((sda));
-extern void func_US2_L13_0041CF28(Ring_L13 *);
+extern void l13_claim_notice_by_kind_us2(Ring_L13 *);
 extern int PlayMobySound(int, int, Ring_L13 *);
 extern void hero_start_target_state(float *, int, float);
 extern int coll_sweep_from_object(void *, void *, int, int, int, int, float, float, float);
@@ -53,7 +53,8 @@ extern void gfx_add_draw_callback_first(void (*)(void *), void *);
 extern float ApproachValue(float *, float, float);
 extern float math_step_value_toward_target(float *, float *, float, float, float, float);
 
-void func_US2_L13_0041CAFC(Ring_L13 *object)
+/* Updates a warp ring: when the hero targets it and presses the button, it carries the hero to the paired ring (or shows why it is locked) and animates the ring's glow. (USA v2.00) */
+void warp_ring_update_us2(Ring_L13 *object)
 {
     float position[4] __attribute__((aligned(16)));
     RingState_L13 *state = object->state;
@@ -79,7 +80,7 @@ void func_US2_L13_0041CAFC(Ring_L13 *object)
             return;
         if (g_hero_state.target != object || g_hero_state.busy != 0)
             return;
-        func_US2_L13_0041CF28(object);
+        l13_claim_notice_by_kind_us2(object);
         if (!(g_pad_held_flags[0] & 0x10))
             return;
         if (g_warp_ring_state == 11) {

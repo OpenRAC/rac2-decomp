@@ -117,7 +117,7 @@ extern void func_00291DE0(void *, int);
 extern void level_load_quadword_block(char *);
 extern void tex_rebase_pack_fill_ranges(void *, char *, void *, int);
 extern void STUB_printf(const char *, ...);
-extern char *func_PAL_L00_003021B0(int);
+extern char *LoadLevelData_pal(int);
 extern void tutorial_reset_record_values(void);
 extern void level_update_object_visibility(int);
 extern void RestoreSavedHeroState_pal(void);
@@ -125,6 +125,8 @@ extern void mem_clear_work_areas(void);
 extern void moby_scale_by_difficulty(int);
 extern void moby_update_live_mobys(void);
 
+/* Unpacks the level archive, uploads its textures, builds the GS template words and the class and
+   texture tables, and returns the next free heap pointer (PAL). */
 int LoadLevelArchiveResources_pal(int load, int resume)
 {
     Hdr *h = (Hdr *)g_level_load_context.p[0xC / 4];
@@ -380,7 +382,7 @@ int LoadLevelArchiveResources_pal(int load, int resume)
         base = (char *)((unsigned int)end & ~0x3F);
         g_level_load_context.p[0x48 / 4] = base;
     }
-    g_level_load_context.i[0x68 / 4] = func_PAL_L00_003021B0(load);
+    g_level_load_context.i[0x68 / 4] = LoadLevelData_pal(load);
     if (load)
         g_load_entry_index[0] = -1;
     if (g_tutorial_points.i[0xC / 4] != 0) {

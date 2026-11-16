@@ -42,13 +42,13 @@ extern char *g_area_hit_targets[];
 extern int g_charge_weapon_state __attribute__((sda)), g_charge_weapon_initialized __attribute__((sda)), g_charge_cooldown_timer __attribute__((sda));
 extern char *g_charge_weapon_moby __attribute__((sda));
 extern float g_charge_rate_up __attribute__((sda)), g_charge_rate_down __attribute__((sda)), g_charge_min __attribute__((sda)), g_charge_boost_rate __attribute__((sda)), g_charge_max __attribute__((sda));
-extern void func_PAL_002A7E68(void *,int,int,int);
+extern void anim_start_blended_pal(void *,int,int,int);
 extern void AttachManipulator(void *,int,void *);
 extern int AcquireEntitySlot(void *,int,void *);
 extern u8 *level_get_slot_body(int,int);
 extern float math_random_signed_float_range(float,float), math_random_float_range(float,float);
 extern void vec_clear_128(void *), sheepinator_clear_records(void);
-extern s32 func_PAL_L00_002C4480(int,int);
+extern s32 hero_l00_set_action_pal(int,int);
 extern int math_fast_float_d(void *), get_ammo(int);
 extern void hud_add_moby_marker(void *,unsigned int,float,void *,float,int,int,float,int);
 extern void moby_transform_joint_to_world(void *,int,void *);
@@ -63,35 +63,36 @@ extern int PlayMobySound(int,int,void *);
 extern void vec_scale_to_length(void *,void *,float);
 extern int coll_process_hit(void *,int,void *,int,float);
 extern void FastVecSub(void *,void *,void *);
-extern char *func_PAL_L00_003CF868(void *,int,void *,void *);
-extern void ref_L00_003E8180_00(void *,void *),func_PAL_L00_003ECD58(void);
+extern char *SpawnParticlePoolMoby_pal(void *,int,void *,void *);
+extern void ref_L00_003E8180_00(void *,void *),plasma_coil_draw_beams_pal(void);
 extern float fast_subtract_rotations(float,float),math_fast_sin_or_cos_b(float),math_fast_sin_or_cos_a(float);
 typedef struct { float timer; int handle, anim, unknown; float charge, angle; char pad[8]; ChargeWeaponVec origin; float gap, sine, gap2, cosine; } ChargeWeaponVars;
 typedef struct { char position[0x20]; unsigned char state; char pad21[0x22]; unsigned char animation; char pad44[0x1C]; unsigned char flags; char pad61[7]; ChargeWeaponVars *vars; } ChargeWeaponMoby;
 
-void func_PAL_L00_003EC43C(ChargeWeaponMoby *obj) {
+/* Updates the charge weapon: aims at a target, charges while the button is held, and fires a bolt when fully charged (PAL: 50 Hz timings). */
+void UpdateChargedWeapon_pal(ChargeWeaponMoby *moby) {
     ChargeWeaponVec velocity, origin, target, delta, point;
     int unused;
     char *hit = 0;
-    ChargeWeaponVars *st = obj->vars;
+    ChargeWeaponVars *vars = moby->vars;
     ChargeWeaponMaterial *material = &g_weapon_l00_table[g_charged_beam_weapon_index];
     float speed = material->speed * 0.020000001f;
     int i, enabled, count;
-    switch (obj->state) {
+    switch (moby->state) {
     case 0: {
         int i;
-        if (obj->animation != 0 || (obj->flags&2)) func_PAL_002A7E68(obj,1,0,0);
-        AttachManipulator(obj,0,&st->origin);
-        st->timer=0.36666667f;
-        st->unknown=-1;
-        st->charge=0;
-        st->angle=0;
-        obj->state=1;
+        if (moby->animation != 0 || (moby->flags&2)) anim_start_blended_pal(moby,1,0,0);
+        AttachManipulator(moby,0,&vars->origin);
+        vars->timer=0.36666667f;
+        vars->unknown=-1;
+        vars->charge=0;
+        vars->angle=0;
+        moby->state=1;
         g_charge_weapon_effects.reticle=-1.0f;
         g_charge_weapon_state=0;
         g_charge_weapon_initialized=0;
-        st->handle=AcquireEntitySlot(obj,0,&unused);
-        st->anim=level_get_slot_body(H(obj,0xAA),st->handle);
+        vars->handle=AcquireEntitySlot(moby,0,&unused);
+        vars->anim=level_get_slot_body(H(moby,0xAA),vars->handle);
         for (i=0;i<4;i++) {
             g_charge_weapon_effect_table[i].values[0]=0; g_charge_weapon_effect_table[i].values[1]=0; g_charge_weapon_effect_table[i].values[2]=0;
             g_charge_weapon_effect_table[i].values[3]=math_random_signed_float_range(0.05f,0.3f);
@@ -117,21 +118,21 @@ void func_PAL_L00_003EC43C(ChargeWeaponMoby *obj) {
         g_charge_weapon_effects.reticle=-1;
         if (g_hero_state.selected) g_hero_state.held=g_hero_state.selected;
         if (!g_charge_weapon_initialized) g_charge_weapon_initialized=1;
-        if (g_hero_state.mode==1) func_PAL_L00_002C4480(29,1);
+        if (g_hero_state.mode==1) hero_l00_set_action_pal(29,1);
         enabled=1;
         if (g_hero_state.mode==29) {
             if (!math_fast_float_d(&g_hero_state.timer)) enabled=0;
             {
                 unsigned int color;
-                if (st->timer!=0 && get_ammo(-1)) color=0x600000FF;
+                if (vars->timer!=0 && get_ammo(-1)) color=0x600000FF;
                 else color=0x600FFF0F;
-                hud_add_moby_marker(obj,color,1,0,0,38,-1,90,4);
+                hud_add_moby_marker(moby,color,1,0,0,38,-1,90,4);
             }
         } else g_hero_state.timer=33;
-        moby_transform_joint_to_world(obj,0,&origin);
+        moby_transform_joint_to_world(moby,0,&origin);
         if (g_hero_state.held) vec_compute_object_to_target(g_hero_state.held,&origin,&velocity,speed);
         else hit=part_start_effect_in_front_of_hero(&g_hero_state.camera,1,0.17453295f,0.17453295f,20,0.7853982448577881f,0.7853982448577881f);
-        if (st->timer==0 && hit && get_ammo(-1)) {
+        if (vars->timer==0 && hit && get_ammo(-1)) {
             char *extra;
             /* The copy only writes target; no scalar local or source field aliases it. */
             qcopy_nc(&target,hit+0x10);
@@ -143,41 +144,41 @@ void func_PAL_L00_003EC43C(ChargeWeaponMoby *obj) {
             }
             {
                 float scale=math_fabs(0.9f-fast_vec_dist(g_camera_l00_position,&target)*0.006666667f*0.65f);
-                hud_add_moby_marker(obj,0xFF0FFF0F,scale,&target,0,38,-1,90,4);
+                hud_add_moby_marker(moby,0xFF0FFF0F,scale,&target,0,38,-1,90,4);
             }
         }
-        if (vec_fast_helper_b(st) && !g_hero_state.locked) {
+        if (vec_fast_helper_b(vars) && !g_hero_state.locked) {
             if ((g_pad_state.pressed&g_hero_state.mask) && enabled && !sheepinator_is_mode_four() && g_hero_state.frame>=19) {
                 if (weapon_spend_ammo(-1,1)) {
                     g_charge_weapon_effects.active=1;
-                    PlayMobySound(2,0,obj);
+                    PlayMobySound(2,0,moby);
                     switch (g_charge_weapon_state) {
                     case 0:
-                        g_charge_weapon_state=1; st->charge=g_charge_min; st->timer=0.5f;
+                        g_charge_weapon_state=1; vars->charge=g_charge_min; vars->timer=0.5f;
                         break;
                     case 2:
-                        g_charge_weapon_state=1; st->timer=0.5f;
+                        g_charge_weapon_state=1; vars->timer=0.5f;
                         break;
                     }
                 } else if ((g_pad_state.released&g_hero_state.mask) || g_charge_weapon_effects.active==1) {
-                    PlayMobySound(7,0,obj); g_charge_weapon_effects.active=0;
+                    PlayMobySound(7,0,moby); g_charge_weapon_effects.active=0;
                 }
             }
         }
         switch (g_charge_weapon_state) {
         case 0:
-            if (st->charge<g_charge_min) {
-                st->charge+=g_charge_boost_rate;
-                if (st->charge>g_charge_min) st->charge=g_charge_min;
+            if (vars->charge<g_charge_min) {
+                vars->charge+=g_charge_boost_rate;
+                if (vars->charge>g_charge_min) vars->charge=g_charge_min;
             }
             break;
         case 1:
-            st->charge+=g_charge_rate_up;
-            if (st->charge>g_charge_max) {
-                moby_transform_joint_to_world(obj,0,&target);
-                if (g_hero_state.direction==1) vec_scale_to_length(&velocity,(char *)obj+0xD0,-speed);
+            vars->charge+=g_charge_rate_up;
+            if (vars->charge>g_charge_max) {
+                moby_transform_joint_to_world(moby,0,&target);
+                if (g_hero_state.direction==1) vec_scale_to_length(&velocity,(char *)moby+0xD0,-speed);
                 else vec_scale_to_length(&velocity,&g_hero_state.camera,speed);
-                count=coll_process_hit(&target,0,obj,0,1.0f);
+                count=coll_process_hit(&target,0,moby,0,1.0f);
                 for(i=0;i<count;i++) {
                     char *candidate=g_area_hit_targets[i];
                     char *details=moby_get_private_value_0(candidate);
@@ -204,20 +205,20 @@ void func_PAL_L00_003EC43C(ChargeWeaponMoby *obj) {
                     FastVecSub(&velocity,&delta,&target);
                     vec_scale_to_length(&velocity,&velocity,speed);
                 }
-                g_charge_weapon_moby=func_PAL_L00_003CF868(obj,st->handle,&target,&velocity);
-                if (g_charge_weapon_moby) *(ChargeWeaponMoby **)(g_charge_weapon_moby+0xB8)=obj;
+                g_charge_weapon_moby=SpawnParticlePoolMoby_pal(moby,vars->handle,&target,&velocity);
+                if (g_charge_weapon_moby) *(ChargeWeaponMoby **)(g_charge_weapon_moby+0xB8)=moby;
                 g_charge_cooldown_timer=42; g_charge_weapon_state=2;
             }
             break;
         case 2:
-            st->charge-=g_charge_rate_down;
-            if (st->charge<=g_charge_min) { st->charge=g_charge_min; g_charge_weapon_state=0; }
+            vars->charge-=g_charge_rate_down;
+            if (vars->charge<=g_charge_min) { vars->charge=g_charge_min; g_charge_weapon_state=0; }
             break;
         }
-        if (B(obj,0x31)) ref_L00_003E8180_00(func_PAL_L00_003ECD58,obj);
-        st->angle=fast_subtract_rotations(st->angle,st->charge*0.37699118f);
-        st->sine=math_fast_sin_or_cos_b(st->angle*0.5f);
-        st->cosine=math_fast_sin_or_cos_a(st->angle*0.5f);
+        if (B(moby,0x31)) ref_L00_003E8180_00(plasma_coil_draw_beams_pal,moby);
+        vars->angle=fast_subtract_rotations(vars->angle,vars->charge*0.37699118f);
+        vars->sine=math_fast_sin_or_cos_b(vars->angle*0.5f);
+        vars->cosine=math_fast_sin_or_cos_a(vars->angle*0.5f);
         break;
     }
 }

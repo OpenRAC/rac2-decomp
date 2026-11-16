@@ -73,35 +73,35 @@ static __inline__ int hud_coord(float value, float scale, float half, int active
     return result;
 }
 
-int func_US2_00290920(void)
+int gauge_popup_draw_us2(void)
 {
-    float saved;
+    float saved_opacity;
     float pulse;
     float scale;
     float zero;
     float y;
     char *text;
-    int first;
-    int second;
+    int shadow_color;
+    int text_color;
     int one;
     float half;
 
     if (g_resident_data_base[0] != 0 && ((g_subtitle_state.active == 0 && g_subtitle_state.unk24 == -1) || g_gauge_popup_mode == 2)) {
         one = 1;
         half = 0.5f;
-        saved = g_view_params.opacity;
+        saved_opacity = g_view_params.opacity;
         g_view_params.opacity = 0.62f;
         UpdateViewContext();
         pulse = IntToFloat(g_gauge_popup_blend) * 0.1f;
-        first = FastTweenColor(0x442D00, 0x60442D00, pulse);
-        second = FastTweenColor(0xF0C070, 0x55F0C070, pulse);
+        shadow_color = FastTweenColor(0x442D00, 0x60442D00, pulse);
+        text_color = FastTweenColor(0xF0C070, 0x55F0C070, pulse);
         text = table_find_by_id(g_resident_data_base[0] + 0x8710, 0xA6);
         y = (float)label_y(text, 206.0f, g_hud_scale[0], half, one);
         scale = 1.0f;
         zero = 0.0f;
-        gfx_draw_scaled_object_two_axes(text, first, 484.0f, y, scale, scale, zero);
+        gfx_draw_scaled_object_two_axes(text, shadow_color, 484.0f, y, scale, scale, zero);
         text = table_find_by_id(g_resident_data_base[0] + 0x8710, 0xA7);
-        gfx_draw_scaled_object_two_axes(text, second, 484.0f, (float)label_y(text, 206.0f, g_hud_scale[0], half, one), 1.0f, 1.0f, 0.0f);
+        gfx_draw_scaled_object_two_axes(text, text_color, 484.0f, (float)label_y(text, 206.0f, g_hud_scale[0], half, one), 1.0f, 1.0f, 0.0f);
         switch (g_gauge_popup_mode) {
         case 0:
             if (zero <= g_gauge_popup_amount && g_gauge_popup_amount <= scale) {
@@ -114,14 +114,14 @@ int func_US2_00290920(void)
                 float upper;
                 float edge;
                 float edge2;
-                float s;
+                float hud_unit;
 
                 color1 = FastTweenColor(g_gauge_popup_color_a & 0xFFFFFF, g_gauge_popup_color_a, pulse);
                 color2 = FastTweenColor(g_gauge_popup_color_b & 0xFFFFFF, g_gauge_popup_color_b, pulse);
-                s = g_hud_scale[0];
-                top = hud_coord((float)(285 - (int)((scale - g_gauge_popup_amount) * 157.0f)), s, half, one);
-                s = (float)hud_coord(128.0f, g_hud_scale[0], half, one);
-                step = s * 0.25f;
+                hud_unit = g_hud_scale[0];
+                top = hud_coord((float)(285 - (int)((scale - g_gauge_popup_amount) * 157.0f)), hud_unit, half, one);
+                hud_unit = (float)hud_coord(128.0f, g_hud_scale[0], half, one);
+                step = hud_unit * 0.25f;
                 lower = (float)hud_coord(285.0f, g_hud_scale[0], half, one);
                 edge = lower - step;
                 upper = edge + scale;
@@ -135,8 +135,8 @@ int func_US2_00290920(void)
                     if (lower <= scale)
                         break;
                 }
-                s = 128.0f;
-                upper = (float)hud_coord(s, g_hud_scale[0], 0.5f, 1);
+                hud_unit = 128.0f;
+                upper = (float)hud_coord(hud_unit, g_hud_scale[0], 0.5f, 1);
                 edge2 = upper + step;
                 lower = edge2 - 1.0f;
                 for (i = 0; i < 5; i++) {
@@ -159,14 +159,14 @@ int func_US2_00290920(void)
             float lower;
             float upper;
             float limit;
-            float s;
+            float hud_unit;
             float edge;
 
             color = FastTweenColor(g_gauge_popup_color_a & 0xFFFFFF, g_gauge_popup_color_a, pulse);
-            s = g_hud_scale[0];
-            top = hud_coord((float)(285 - (int)((1.0f - g_gauge_popup_amount) * 157.0f)), s, 0.5f, 1);
-            s = (float)hud_coord(128.0f, g_hud_scale[0], 0.5f, 1);
-            step = s * 0.25f;
+            hud_unit = g_hud_scale[0];
+            top = hud_coord((float)(285 - (int)((1.0f - g_gauge_popup_amount) * 157.0f)), hud_unit, 0.5f, 1);
+            hud_unit = (float)hud_coord(128.0f, g_hud_scale[0], 0.5f, 1);
+            step = hud_unit * 0.25f;
             lower = (float)hud_coord(285.0f, g_hud_scale[0], 0.5f, 1);
             edge = lower - step;
             upper = edge + 1.0f;
@@ -182,7 +182,7 @@ int func_US2_00290920(void)
             }
         }
         }
-        g_view_params.opacity = saved;
+        g_view_params.opacity = saved_opacity;
         UpdateViewContext();
     }
     return g_gauge_popup_state;

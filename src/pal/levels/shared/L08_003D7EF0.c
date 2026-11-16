@@ -14,12 +14,13 @@ extern u8 g_request_l08_queue[];
 
 /* One resident word, two states, and a 16-byte table entry: hands the entry to
    func_L00_00326048 with an alpha of 0x3D7A35E0. */
-void func_PAL_L08_003D7EF0(u8 *a0)
+/* Updates a Glider Pad: draws its glow effect once it has its data (PAL: different glow angle). */
+void glider_pad_update_pal(u8 *moby)
 {
-    s32 v = *(s32 *)(a0 + 0x68);
+    s32 effect_data = *(s32 *)(moby + 0x68);
 
-    if (v == 0)
+    if (effect_data == 0)
         return;
-    math_store_angle_update_result(a0, v, 0x80AAAAD2, 0x80396464, 0.07330384f);
+    math_store_angle_update_result(moby, effect_data, 0x80AAAAD2, 0x80396464, 0.07330384f);
 }
 

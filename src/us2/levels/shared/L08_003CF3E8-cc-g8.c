@@ -118,7 +118,7 @@ extern void hero_reset_speeds_and_vectors(void);
 extern void hero_record_play_counters(void);
 extern void set_hero_animation(int, int, float);
 extern void script_queue_keyed_request(int, int);
-extern int func_US2_L08_002D31F8(int, int);
+extern int hero_l08_enter_state_us2(int, int);
 extern void cam_update_aim_values(void *, void *);
 extern void hero_move_with_mount_to_transform(void *, void *);
 extern void hero_save_transform_snap_object(void *, void *);
@@ -152,6 +152,7 @@ extern PlayerCDF98 g_hero_state;
 #define OB(o) (*(u8 *)(obj + (o)))
 #define OH(o) (((u16 *)obj)[(o) / 2])
 
+/* State machine of the hero NPCs (Tabora, Dobbo, Grelbin): walks, flies and talks, dispatched on the moby state (v2.00 copy). */
 void UpdateHeroNpc_us2(u8 *obj)
 {
     Vec saved;
@@ -159,8 +160,8 @@ void UpdateHeroNpc_us2(u8 *obj)
         Vec inverse[4];
         struct { Vec velocity, point, joint; } v;
     } scratch;
-    u8 *d, *p;
-    int i, n, id;
+    u8 *d, *particle;
+    int i, joint_index, id;
     float t;
 
     d = *(u8 **)(obj + 0x68);
@@ -229,7 +230,7 @@ void UpdateHeroNpc_us2(u8 *obj)
             if (ok && g_hero_state.target == g_moby_array[DI(0x6C)].bytes && g_hero_state.unk340 != 0
                 && g_hero_state.unk34E == 0) {
                 u8 *q;
-                func_US2_L08_002D31F8(0x31, 0);
+                hero_l08_enter_state_us2(0x31, 0);
                 set_hero_animation(0x87, 0, 3.0f);
                 ((s32 *)g_hero_state.unk2290)[0x9C / 4] = -1;
                 q = g_moby_array[DI(0x6C)].bytes;
@@ -277,7 +278,7 @@ void UpdateHeroNpc_us2(u8 *obj)
                         snd_play_from_class_bank(0, 0, obj, 0x988);
                     }
                     DI(0x50) = g_vehicle_timer_start;
-                    func_US2_L08_002D31F8(0x31, 0);
+                    hero_l08_enter_state_us2(0x31, 0);
                     set_hero_animation(0x81, 0, 15.0f);
                     ((s32 *)g_hero_state.unk2290)[0x9C / 4] = -1;
                     if (g_vehicle_active_flag != 0)
@@ -579,7 +580,7 @@ void UpdateHeroNpc_us2(u8 *obj)
             g_vehicle_collision_x = g_vehicle_saved_x;
             g_vehicle_collision_y = g_vehicle_saved_y;
             DI(0x50) = 0;
-            func_US2_L08_002D31F8(0, 1);
+            hero_l08_enter_state_us2(0, 1);
             hero_reset_speeds_and_vectors();
             if (OB(0x43) != 0)
                 anim_start_blended(obj, 0, 0, 0xA);
@@ -613,18 +614,18 @@ void UpdateHeroNpc_us2(u8 *obj)
                 }
             }
             FastVecScale(&scratch.v.velocity, d + 0x20, 0.25f);
-            for (n = 0; n < 7; n++) {
-                moby_transform_joint_to_world(obj, n, &scratch.v.joint);
+            for (joint_index = 0; joint_index < 7; joint_index++) {
+                moby_transform_joint_to_world(obj, joint_index, &scratch.v.joint);
                 for (f = 0.0f; f < 1.0f; f += 0.2f) {
                     FastVecScale(&scratch.v.point, d + 0x20, -f);
                     FastVecAdd(&scratch.v.point, &scratch.v.point, &scratch.v.joint);
                     t = 0.0f;
                     if (OB(0x20) >= 7)
                         t = 0.07f;
-                    p = SpawnSpinningSparkParticle(&scratch.v.point, 2, &scratch.v.velocity, t, 0.5f, 0x0E7F7F7F, 0, 1.01f,
+                    particle = SpawnSpinningSparkParticle(&scratch.v.point, 2, &scratch.v.velocity, t, 0.5f, 0x0E7F7F7F, 0, 1.01f,
                                       math_random_float_range(24000.0f, 35000.0f));
-                    if (p != 0)
-                        p[8] = func_001163B0();
+                    if (particle != 0)
+                        particle[8] = func_001163B0();
                 }
             }
             slot = (s32 *)(d + 0x70);

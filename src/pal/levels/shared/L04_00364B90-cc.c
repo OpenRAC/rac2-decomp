@@ -30,7 +30,7 @@ typedef union {
 } HopVector;
 typedef struct {
     unsigned char pad0[0x20];
-    HopVector field20;
+    HopVector unk_20;
     unsigned char pad30[0x68];
     float yaw;
     unsigned char pad9C[0x54];
@@ -49,58 +49,58 @@ typedef struct {
     float ground_speed;
     int state_timer;
     unsigned char pad1BC[0x164];
-    float field320;
+    float unk_320;
     unsigned char pad324[0x24];
-    short field348;
-    short field34A;
+    short unk_348;
+    short unk_34A;
     unsigned char pad34C[0x108];
-    float field454;
+    float unk_454;
     unsigned char pad458[0x18];
-    HopVector field470;
-    HopVector field480;
+    HopVector unk_470;
+    HopVector unk_480;
     unsigned char pad490[0x4];
-    float field494;
+    float unk_494;
     unsigned char pad498[0x6];
-    unsigned char field49E;
+    unsigned char unk_49E;
     unsigned char pad49F[0xF];
-    short field4AE;
+    short unk_4AE;
     unsigned char pad4B0[0xC];
     float ledge_jump_speed;
     float high_jump_drift_yaw;
     float takeoff_yaw;
     unsigned char pad4C8[0xC];
-    int field4D4;
+    int unk_4D4;
     float air_target_speed;
     float high_jump_drift_speed;
     unsigned char pad4E0[0x10];
-    HopVector field4F0;
+    HopVector unk_4F0;
     unsigned char pad500[0x20];
     float jump_gravity;
-    short field524;
+    short unk_524;
     unsigned char pad526[0x2];
-    short field528;
+    short unk_528;
     unsigned char pad52A[0x3];
-    unsigned char field52D;
+    unsigned char unk_52D;
     unsigned char pad52E[0x532];
     HopVector move_impulse;
     unsigned char padA70[0x14];
-    float fieldA84;
+    float unk_A84;
     unsigned char padA88[0x1B0];
     float anim_frame;
     unsigned char padC3C[0x804];
-    HopVector field1440;
+    HopVector unk_1440;
     unsigned char pad1450[0x4];
-    short field1454;
+    short unk_1454;
     unsigned char pad1456[0x2];
-    float field1458;
+    float unk_1458;
     unsigned char pad145C[0x36];
-    unsigned char field1492;
+    unsigned char unk_1492;
     unsigned char pad1493[0xE01];
     int state;
     unsigned char pad2298[0x4];
     int control_mode;
     unsigned char pad22A0[0x23];
-    unsigned char field22C3;
+    unsigned char unk_22C3;
     unsigned char pad22C4[0x1F4];
     float stick_magnitude;
 } HopPlayer;
@@ -115,13 +115,13 @@ typedef struct {
 
 typedef struct {
     u8 pad00[0x7A8];
-    f32 field7A8;
-    f32 field7AC;
-    f32 field7B0;
-    f32 field7B4;
+    f32 unk_7A8;
+    f32 unk_7AC;
+    f32 unk_7B0;
+    f32 unk_7B4;
     u8 pad7B8[0x2290 - 0x7B8];
-    u32 field2290;
-    u32 field2294;
+    u32 unk_2290;
+    u32 unk_2294;
 } D00189E20;
 extern D00189E20 g_hero_state;
 /* Check the hero's surface contact and optionally apply its movement impulse. */
@@ -144,29 +144,29 @@ typedef int L04Quad __attribute__((mode(TI)));
 /* the record the level's spawner builds: flag bytes, a halfword, a float,
    two sixteen-byte blocks and the fields that follow them */
 typedef struct {
-    u8  field00;
-    u8  field01;
-    u8  field02;
-    u8  field03;
+    u8  unk_00;
+    u8  unk_01;
+    u8  unk_02;
+    u8  unk_03;
     u8  pad04[4];
-    u8  field08;
-    u8  field09;
-    u16 field0A;
-    f32 field0C;
-    L04Quad field10;
-    L04Quad field20;
-    f32 field30;
-    f32 field34;
-    u16 field38;
+    u8  unk_08;
+    u8  unk_09;
+    u16 unk_0A;
+    f32 unk_0C;
+    L04Quad unk_10;
+    L04Quad unk_20;
+    f32 unk_30;
+    f32 unk_34;
+    u16 unk_38;
 } L04Record;
 
 /* the second half of the record, at +0x20 */
 typedef struct {
     u8  pad00[0xC];
-    u32 field0C;
-    f32 field10;
-    f32 field14;
-    u16 field18;
+    u32 unk_0C;
+    f32 unk_10;
+    f32 unk_14;
+    u16 unk_18;
 } L04RecordTail;
 
 /* the record the level's other spawner builds: the same flag bytes, a word
@@ -236,15 +236,15 @@ typedef struct {
 } L04Follow;
 
 typedef struct {
-    u8  field00;
-    u8  field01;
-    u8  field02;
-    u8  field03;
+    u8  unk_00;
+    u8  unk_01;
+    u8  unk_02;
+    u8  unk_03;
     s32 color;
     u8  seed;
-    u8  field09;
-    u16 field0A;
-    f32 field0C;
+    u8  unk_09;
+    u16 unk_0A;
+    f32 unk_0C;
     s32 position[4];
     L04Follow follow;
 } L04Effect1A;
@@ -259,29 +259,30 @@ extern f32 math_random_float_range(f32, f32);
 extern s32 math_random_int_below(s32);
 /* func_L04_0035F3E0 is defined in L04_0035F3E0-qcopy.c. */
 
-void *func_PAL_L04_00364B90(void *a0, void *a1, u32 a2, f32 f3) {
-    L04Record *p = (L04Record *)(u32)part_alloc(0x5E);
-    L04RecordTail *q;
-    L04Quad t;
+/* Spawns a sparkle particle (record kind 0x5E) with a random start phase (PAL: frame count scaled to 50 Hz). */
+void *part_spawn_sparkle_pal(void *position, void *target, u32 duration, f32 size) {
+    L04Record *particle = (L04Record *)(u32)part_alloc(0x5E);
+    L04RecordTail *tail;
+    L04Quad quad;
 
-    if ((u32)p != 0) {
-        p->field10 = *(L04Quad *)a0;
-        q = (L04RecordTail *)((u8 *)p + 0x20);
-        p->field09 = (u8)(FloatToInt(2.0f) + 0x40);
-        p->field03 = 0x48;
-        p->field01 = 0;
-        p->field02 = *(u8 *)ref_L04_00362768_00;
-        p->field0C = f3 * 105000.0f;
-        p->field08 = (u8)math_random_int_below(0xFF);
-        p->field0A = (u16)(((int)(a2) * 5 + 2) / 6);
-        t = *(L04Quad *)a1;
-        p->field20 = t;
-        q->field0C = 0;
-        q->field10 = 0.5f;
-        q->field14 = f3;
-        q->field18 = (u16)(math_random_int_below(2) - 1);
+    if ((u32)particle != 0) {
+        particle->unk_10 = *(L04Quad *)position;
+        tail = (L04RecordTail *)((u8 *)particle + 0x20);
+        particle->unk_09 = (u8)(FloatToInt(2.0f) + 0x40);
+        particle->unk_03 = 0x48;
+        particle->unk_01 = 0;
+        particle->unk_02 = *(u8 *)ref_L04_00362768_00;
+        particle->unk_0C = size * 105000.0f;
+        particle->unk_08 = (u8)math_random_int_below(0xFF);
+        particle->unk_0A = (u16)(((int)(duration) * 5 + 2) / 6);
+        quad = *(L04Quad *)target;
+        particle->unk_20 = quad;
+        tail->unk_0C = 0;
+        tail->unk_10 = 0.5f;
+        tail->unk_14 = size;
+        tail->unk_18 = (u16)(math_random_int_below(2) - 1);
     }
-    return (u32)p;
+    return (u32)particle;
 }
 
 extern void part_kill(void *);

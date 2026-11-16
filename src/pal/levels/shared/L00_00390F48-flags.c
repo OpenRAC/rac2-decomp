@@ -11,7 +11,8 @@ extern int coll_process_hit(float, void *, int, void *, int);
 extern void moby_queue_knockback_for_nodes(void *,void *,void *,int,int,int,int,int,float,float,float);
 extern void moby_mark_spawned(void *);
 
-void func_PAL_L00_003920F8(unsigned char *object)
+/* Each frame, tests a growing area in front of the weapon for a hit and applies damage, then removes the object after 12 frames (PAL). */
+void weapon_update_hit_sweep_pal(unsigned char *object)
 {
     Quad local;
     unsigned char *globals=(unsigned char *)g_item_slot_to_record;

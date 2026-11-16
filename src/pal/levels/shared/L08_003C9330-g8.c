@@ -14,8 +14,8 @@ typedef struct {
     u8 pad70[0x78 - 0x70];
     float shake;
     u8 pad7C[0x88 - 0x7C];
-    s16 hitTimer;
-    u8 hitCount;
+    s16 hit_timer;
+    u8 hit_count;
     u8 pad8B;
     s16 extra;
     s16 message;
@@ -44,7 +44,7 @@ extern float g_gauge_base_offset __attribute__((sda)), g_gauge_screen_y __attrib
 extern unsigned char g_color_row_ptr[4] __attribute__((sda));
 extern unsigned g_hud_gauge_values[];
 extern char g_str_gauge_limit_format[];
-typedef struct { char pad[0x183C]; float health, maxHealth; } HudHero;
+typedef struct { char pad[0x183C]; float health, max_health; } HudHero;
 extern HudHero g_hero_state;
 extern int sprintf(char *, const char *, ...);
 extern double __extendsfdf2(float);
@@ -74,7 +74,7 @@ static __inline__ unsigned long PackGaugeFlag(unsigned long flags, unsigned char
 }
 
 /* Draws the status gauge and updates its swizzled palette. */
-void func_PAL_L08_003C9330(char *object)
+void hud_draw_health_gauge_pal(char *object)
 {
     char text[16];
     Hud *state = *(Hud **)(object + 0x68);
@@ -125,24 +125,24 @@ void func_PAL_L08_003C9330(char *object)
                 DrawCenteredScaledText(0x100, 0x20, 0x80202080, (u8 *)GetLocalizedString(0xe7d), 0x11, pulse);
             }
         }
-        if (state->hitCount != 0) {
+        if (state->hit_count != 0) {
             int *colors = g_gauge_color_table;
             int offset = 0x40;
             int i;
             float size, x, y;
             int color;
-            float t, base, a, b, angleA, angleB;
-            t = IntToFloat(state->hitTimer);
+            float t, base, a, b, angle_a, angle_b;
+            t = IntToFloat(state->hit_timer);
             t /= IntToFloat((((int)(g_hover_frame_limit) * 5 + 2) / 6));
             size = math_square(t) * 32.0f;
             base = g_gauge_base_offset * math_ease_out_quad(t);
             fade = FloatToInt(t * 128.0f) << 24;
             y = 16.0f - size * 0.5f;
             x = base - size * 0.5f;
-            angleA = math_wrap_angle_to_pi(IntToFloat(g_frame_l08_counter) * 0.025f);
-            angleB = math_wrap_angle_to_pi(IntToFloat(g_frame_l08_counter) * 0.033333335f);
-            a = math_fast_sin_or_cos_b(angleA) * 2.0f * state->shake;
-            b = math_fast_sin_or_cos_a(angleB) * 2.0f * state->shake;
+            angle_a = math_wrap_angle_to_pi(IntToFloat(g_frame_l08_counter) * 0.025f);
+            angle_b = math_wrap_angle_to_pi(IntToFloat(g_frame_l08_counter) * 0.033333335f);
+            a = math_fast_sin_or_cos_b(angle_a) * 2.0f * state->shake;
+            b = math_fast_sin_or_cos_a(angle_b) * 2.0f * state->shake;
             tex = GetEffectTextureDescriptor(g_gauge_tex_base_d + state->texture);
             color = fade | 0x808080;
             AppendSubpixelTexturedScreenQuad(x + a, g_gauge_screen_y + b + (1.0f - state->shake) * 4.0f + y, size, size, 0, 0, 0x20, 0x20, color, tex);
@@ -157,7 +157,7 @@ void func_PAL_L08_003C9330(char *object)
                 AppendSubpixelTexturedScreenQuad(x, g_gauge_screen_y + z, size, 32.0f, 0, 0, 0x20, 0x20, *colors | fade, tex);
                 colors++;
             } while (i >= 0);
-            if (state->hitCount < 3) {
+            if (state->hit_count < 3) {
                 tex = GetEffectTextureDescriptor(g_gauge_tex_base_e + state->texture);
                 AppendSubpixelTexturedScreenQuad(x, g_gauge_screen_y + (float)state->extra + 32.0f + y, size, size, 0, 0, 0x20, 0x20, fade | 0x808080, tex);
             }
@@ -188,7 +188,7 @@ void func_PAL_L08_003C9330(char *object)
             delta /= d;
     }
     state->shown += delta;
-    level = FloatToInt(state->shown * 251.0f / g_hero_state.maxHealth) + 2;
+    level = FloatToInt(state->shown * 251.0f / g_hero_state.max_health) + 2;
     if (level > 0xFD)
         level = 0xFD;
     if (level < 2)
@@ -208,7 +208,7 @@ void func_PAL_L08_003C9330(char *object)
     tex = GetEffectTextureDescriptor(state->texture + g_gauge_tex_base_i);
     DrawTexturedQuad(0x170, g_screen_height - 0x90, 0x80, 0x80, 0, 0, 0x80, 0x80, 0x70808080, tex);
     state->segments = level;
-    if (g_hero_state.health < g_hero_state.maxHealth * 0.1f) {
+    if (g_hero_state.health < g_hero_state.max_health * 0.1f) {
         if ((g_frame_l08_counter / 90) & 1)
             text_draw_centered_medium(0x100, 0x172, 0x80000080, GetLocalizedString(0x1149), 100);
     }

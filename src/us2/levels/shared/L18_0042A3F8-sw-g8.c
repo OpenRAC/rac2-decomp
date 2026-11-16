@@ -42,10 +42,10 @@ extern void vec_scale_to_length(void *, void *, float);
 extern float math_fast_sin_or_cos_b(float);
 extern float mat_fast_helper_a(float, float);
 extern float IntToFloat(s32);
-extern s32 func_US2_00289840(s32, s32);
+extern s32 subtitle_request_voice_line_us2(s32, s32);
 extern void level_store_value_pair_us2(s32, void *);
 extern void moby_mark_spawned(void *);
-extern void func_US2_002A7AA8(void *, s32, s32);
+extern void SetDeathBits_us2(void *, s32, s32);
 extern void anim_start_blended(void *, s32, s32, s32);
 extern void moby_set_state(void *, s32, s32);
 extern s32 math_random_int_range(s32, s32);
@@ -91,7 +91,8 @@ extern s32 enemy_get_kind_index(void *);
 extern int shooter_update_ranged_attack(void *);
 extern void receiver_bot_move_toward_target(void *);
 
-void receiver_bot_update_us2(u8 *a0) {
+/* Runs every frame for the Receiver Bot style enemy: watches the player, picks its next move, handles being grabbed and carried, then hands over to the shared tick (USA v2.00 copy). */
+void receiver_bot_update_us2(u8 *moby) {
     float ref[4] __attribute__((aligned(16)));
     float a[4] __attribute__((aligned(16)));
     float ang[4] __attribute__((aligned(16)));
@@ -100,20 +101,20 @@ void receiver_bot_update_us2(u8 *a0) {
     u8 *v;
     s32 sel;
 
-    if (moby_is_in_selected_zone(a0 + 0x10) == 0)
+    if (moby_is_in_selected_zone(moby + 0x10) == 0)
         return;
-    v = ((View *)a0)->p[0x68 / 4];
-    receiver_bot_update_targeting_us2(a0);
-    switch (((View *)a0)->b[0x95]) {
+    v = ((View *)moby)->p[0x68 / 4];
+    receiver_bot_update_targeting_us2(moby);
+    switch (((View *)moby)->b[0x95]) {
     case 1:
-        if (((View *)a0)->b[0x42] == 0xD)
-            ((View *)a0)->i[0x48 / 4] = 0;
+        if (((View *)moby)->b[0x42] == 0xD)
+            ((View *)moby)->i[0x48 / 4] = 0;
         break;
     case 2:
         if (!(((View *)v)->b[0x399] & 1) && (((View *)v)->i[0x234 / 4] == 1 || ((View *)v)->h[0x390 / 2] != 0)
             && (shooter_is_enemy_alive(*(void **)(v + 0x230)) == 0
-                || moby_is_target_in_sight(a0, *(void **)(v + 0x230)) != 0)) {
-            shooter_flag_group(a0, ((View *)a0)->b[0x21]);
+                || moby_is_target_in_sight(moby, *(void **)(v + 0x230)) != 0)) {
+            shooter_flag_group(moby, ((View *)moby)->b[0x21]);
             ((View *)v)->i[0x37C / 4] = ((View *)v)->i[0x364 / 4];
             ((View *)v)->i[0x13C / 4] = ((View *)v)->i[0x384 / 4];
             ((View *)v)->h[0x392 / 2] = ((View *)v)->b[0x398];
@@ -121,35 +122,35 @@ void receiver_bot_update_us2(u8 *a0) {
                 && (((View *)v)->i[0x3A4 / 4] == -1 || coll_point_inside_region(v + 0x220, ((View *)v)->i[0x3A4 / 4]) == 0)) {
                 if (**(s32 **)(v + 0x3A8) == 0 && **(s32 **)(v + 0x3AC) < g_receiver_delay_limit) {
                     **(s32 **)(v + 0x3A8) = math_random_int_range(g_receiver_delay_min, g_receiver_delay_max);
-                    moby_acquire_shared_resource(a0);
-                    moby_set_state(a0, 1, 4);
+                    moby_acquire_shared_resource(moby);
+                    moby_set_state(moby, 1, 4);
                 }
             } else {
-                moby_set_anim(a0, ((View *)v)->i[0x370 / 4], -1);
-                moby_set_state(a0, 1, 3);
+                moby_set_anim(moby, ((View *)v)->i[0x370 / 4], -1);
+                moby_set_state(moby, 1, 3);
             }
         }
         break;
     case 3:
         if (((View *)v)->h[0x392 / 2] == 0) {
-            moby_start_or_forward_anim(a0, 3, 0, 5.0f);
+            moby_start_or_forward_anim(moby, 3, 0, 5.0f);
             if (((View *)v)->i[0x370 / 4] != -1) {
-                moby_set_state(a0, 3, 5);
+                moby_set_state(moby, 3, 5);
             } else {
-                moby_set_anim(a0, ((View *)v)->i[0x374 / 4], -1);
+                moby_set_anim(moby, ((View *)v)->i[0x374 / 4], -1);
                 ((View *)v)->h[0x390 / 2] = math_random_int_range(g_enemy_timer_min, g_enemy_timer_max);
-                moby_set_state(a0, 3, 6);
+                moby_set_state(moby, 3, 6);
             }
         }
         break;
     case 4:
         if (((View *)v)->h[0x392 / 2] == 0) {
-            ((View *)a0)->b[0x31] = 1;
-            ((View *)a0)->uh[0x34 / 2] &= ~1;
-            path_find_best_point_by_id(ref, a0 + 0x10, g_hero_position, ((View *)v)->i[0x368 / 4], 0.0f);
-            moby_start_or_forward_anim(a0, 6, 0, 5.0f);
-            moby_aim_move_record_at_target(a0, ref, g_receiver_aim_move_speed * 0.0166666675f, g_receiver_aim_turn_rate * 0.000277777785f);
-            moby_set_state(a0, 5, 10);
+            ((View *)moby)->b[0x31] = 1;
+            ((View *)moby)->uh[0x34 / 2] &= ~1;
+            path_find_best_point_by_id(ref, moby + 0x10, g_hero_position, ((View *)v)->i[0x368 / 4], 0.0f);
+            moby_start_or_forward_anim(moby, 6, 0, 5.0f);
+            moby_aim_move_record_at_target(moby, ref, g_receiver_aim_move_speed * 0.0166666675f, g_receiver_aim_turn_rate * 0.000277777785f);
+            moby_set_state(moby, 5, 10);
         }
         break;
     case 5:
@@ -161,31 +162,31 @@ void receiver_bot_update_us2(u8 *a0) {
             || (((View *)v)->b[0x3B2] != 0 && ((View *)v)->b[0x3B3] == 0)
             || (((View *)v)->b[0x3B3] != 0 && (((View *)v)->p[0x230 / 4])[0xBC] == 0)) {
             ((View *)v)->h[0x390 / 2] = 0;
-            moby_start_or_forward_anim(a0, (func_001163B0() & 1) | 4, 0, 10.0f);
-            moby_set_state(a0, 2, 2);
+            moby_start_or_forward_anim(moby, (func_001163B0() & 1) | 4, 0, 10.0f);
+            moby_set_state(moby, 2, 2);
         } else if (((View *)v)->b[0x3B0] == 0 && ((View *)v)->i[0x368 / 4] != -1 && ((View *)v)->i[0x3A4 / 4] != -1
                    && coll_point_inside_region(v + 0x220, ((View *)v)->i[0x3A4 / 4]) == 0
                    && **(s32 **)(v + 0x3A8) == 0 && **(s32 **)(v + 0x3AC) < g_receiver_delay_limit) {
             **(s32 **)(v + 0x3A8) = math_random_int_range(g_receiver_delay_min, g_receiver_delay_max);
-            moby_acquire_shared_resource(a0);
-            moby_set_state(a0, 0, 4);
+            moby_acquire_shared_resource(moby);
+            moby_set_state(moby, 0, 4);
         }
         break;
     case 9: {
-        s32 r = moby_dispatch_action_by_kind(a0, v + 0x50);
+        s32 r = moby_dispatch_action_by_kind(moby, v + 0x50);
 
         if (r & 1) {
-            func_US2_002A7AA8(a0, 0, 3);
-            moby_set_state(a0, 12, -1);
+            SetDeathBits_us2(moby, 0, 3);
+            moby_set_state(moby, 12, -1);
         } else if (r & 2) {
             ((View *)v)->h[0x390 / 2] = math_random_int_range(g_enemy_timer_min, g_enemy_timer_max);
-            shooter_flag_group(a0, ((View *)a0)->b[0x21]);
-            if (((View *)a0)->b[0xBC] == 1) {
-                moby_start_or_forward_anim(a0, 13, 0, 10.0f);
-                moby_set_state(a0, 7, 8);
+            shooter_flag_group(moby, ((View *)moby)->b[0x21]);
+            if (((View *)moby)->b[0xBC] == 1) {
+                moby_start_or_forward_anim(moby, 13, 0, 10.0f);
+                moby_set_state(moby, 7, 8);
             } else {
-                moby_start_or_forward_anim(a0, (func_001163B0() & 1) | 4, 0, 10.0f);
-                moby_set_state(a0, 4, 6);
+                moby_start_or_forward_anim(moby, (func_001163B0() & 1) | 4, 0, 10.0f);
+                moby_set_state(moby, 4, 6);
             }
         }
         break;
@@ -199,68 +200,68 @@ void receiver_bot_update_us2(u8 *a0) {
         if (idx != -1 && (m = (u8 *)((idx << 8) + g_moby_l18_table), *(s16 *)(m + 0xAA) == 0x114D)
             && m[0x20] != 0xFE && m[0x20] != 0xFD) {
             if (m[0xBC] == 0) {
-                ((View *)a0)->b[0x23] = 0x80;
-                ((View *)a0)->f[0x2C / 4] = *(float *)(((View *)a0)->p[0x24 / 4] + 0x24);
-                ((View *)a0)->b[0x31] = 1;
-                ((View *)a0)->uh[0x34 / 2] &= ~1;
-                moby_set_state(a0, 0, 12);
+                ((View *)moby)->b[0x23] = 0x80;
+                ((View *)moby)->f[0x2C / 4] = *(float *)(((View *)moby)->p[0x24 / 4] + 0x24);
+                ((View *)moby)->b[0x31] = 1;
+                ((View *)moby)->uh[0x34 / 2] &= ~1;
+                moby_set_state(moby, 0, 12);
             }
         } else {
-            ((View *)a0)->b[0x31] = 1;
-            ((View *)a0)->uh[0x34 / 2] &= ~1;
-            moby_fuse_linked_objects(a0, a0 + 0x10, a0 + 0xF0, 0, 0);
-            moby_set_state(a0, 0, 14);
+            ((View *)moby)->b[0x31] = 1;
+            ((View *)moby)->uh[0x34 / 2] &= ~1;
+            moby_fuse_linked_objects(moby, moby + 0x10, moby + 0xF0, 0, 0);
+            moby_set_state(moby, 0, 14);
         }
         break;
     }
     case 12: {
         u8 *m;
 
-        *(Vec4 *)(a0 + 0x10) = *(Vec4 *)((u8 *)((((View *)v)->i[0x3B4 / 4] << 8) + g_moby_l18_table) + 0x10);
+        *(Vec4 *)(moby + 0x10) = *(Vec4 *)((u8 *)((((View *)v)->i[0x3B4 / 4] << 8) + g_moby_l18_table) + 0x10);
         m = (u8 *)((((View *)v)->i[0x3B4 / 4] << 8) + g_moby_l18_table);
         if (m[0xBC] == 2) {
-            if (((View *)a0)->b[0x43] != 2)
-                anim_start_blended(a0, 2, 0, 10);
-            moby_set_state(a0, 4, 13);
+            if (((View *)moby)->b[0x43] != 2)
+                anim_start_blended(moby, 2, 0, 10);
+            moby_set_state(moby, 4, 13);
         }
         break;
     }
     case 13:
         if (((u8 *)((((View *)v)->i[0x3B4 / 4] << 8) + g_moby_l18_table))[0xBC] == 3) {
-            u8 *t = ((View *)a0)->p[0x24 / 4];
+            u8 *t = ((View *)moby)->p[0x24 / 4];
 
-            ((View *)a0)->b[0x30] = ((View *)v)->b[0x3E0];
-            ((View *)a0)->i[0x98 / 4] = *(s32 *)(t + 0x10);
-            ((View *)a0)->uh[0x34 / 2] |= 0x1000;
-            ((View *)a0)->f[0x2C / 4] = *(float *)(t + 0x24);
+            ((View *)moby)->b[0x30] = ((View *)v)->b[0x3E0];
+            ((View *)moby)->i[0x98 / 4] = *(s32 *)(t + 0x10);
+            ((View *)moby)->uh[0x34 / 2] |= 0x1000;
+            ((View *)moby)->f[0x2C / 4] = *(float *)(t + 0x24);
             ((View *)v)->h[0x392 / 2] = 0;
-            if (((View *)a0)->h[0xAA / 2] == 0xED4)
+            if (((View *)moby)->h[0xAA / 2] == 0xED4)
                 ((View *)v)->f[0x100 / 4] = 1.0f;
-            if (((View *)a0)->h[0xAA / 2] == 0xEE1)
+            if (((View *)moby)->h[0xAA / 2] == 0xEE1)
                 ((View *)v)->f[0x100 / 4] = 1.10000002f;
-            moby_set_state(a0, 2, 2);
+            moby_set_state(moby, 2, 2);
         }
         break;
     case 14: {
-        u8 *t = ((View *)a0)->p[0x24 / 4];
+        u8 *t = ((View *)moby)->p[0x24 / 4];
 
-        ((View *)a0)->b[0x23] = 0x80;
-        if (*(float *)(t + 0x24) <= ((View *)a0)->f[0x2C / 4]) {
-            ((View *)a0)->b[0x30] = ((View *)v)->b[0x3E0];
-            ((View *)a0)->i[0x98 / 4] = *(s32 *)(t + 0x10);
-            ((View *)a0)->uh[0x34 / 2] |= 0x1000;
-            ((View *)a0)->f[0x2C / 4] = *(float *)(t + 0x24);
-            if (((View *)a0)->h[0xAA / 2] == 0xED4)
+        ((View *)moby)->b[0x23] = 0x80;
+        if (*(float *)(t + 0x24) <= ((View *)moby)->f[0x2C / 4]) {
+            ((View *)moby)->b[0x30] = ((View *)v)->b[0x3E0];
+            ((View *)moby)->i[0x98 / 4] = *(s32 *)(t + 0x10);
+            ((View *)moby)->uh[0x34 / 2] |= 0x1000;
+            ((View *)moby)->f[0x2C / 4] = *(float *)(t + 0x24);
+            if (((View *)moby)->h[0xAA / 2] == 0xED4)
                 ((View *)v)->f[0x100 / 4] = 1.0f;
-            if (((View *)a0)->h[0xAA / 2] == 0xEE1)
+            if (((View *)moby)->h[0xAA / 2] == 0xEE1)
                 ((View *)v)->f[0x100 / 4] = 1.10000002f;
             if (((View *)v)->b[0x3E8] != 0) {
-                if (((View *)a0)->b[0x43] != 13)
-                    anim_start_blended(a0, 13, 0, 10);
-                moby_set_state(a0, 0, 1);
+                if (((View *)moby)->b[0x43] != 13)
+                    anim_start_blended(moby, 13, 0, 10);
+                moby_set_state(moby, 0, 1);
             } else {
                 ((View *)v)->h[0x392 / 2] = 0;
-                moby_set_state(a0, 2, 2);
+                moby_set_state(moby, 2, 2);
             }
         }
         break;
@@ -271,19 +272,19 @@ void receiver_bot_update_us2(u8 *a0) {
         float t;
 
         TryClaimNotice(6, 0, 20);
-        if (flag_set_second_pending(a0) != 0)
-            snd_play_from_class_bank(6, 0, a0, 0xEE1);
+        if (flag_set_second_pending(moby) != 0)
+            snd_play_from_class_bank(6, 0, moby, 0xEE1);
         if (((View *)v)->i[0x3F0 / 4] != -1) {
             u8 *e = g_sound_state + ((View *)v)->i[0x3F0 / 4] * 0x70;
-            if (*(u8 **)(e + 0x88) == a0 && e[0x74] != 0)
+            if (*(u8 **)(e + 0x88) == moby && e[0x74] != 0)
                 goto have;
         }
-        ((View *)v)->i[0x3F0 / 4] = snd_play_from_class_bank(9, 4, a0, 0xEE1);
+        ((View *)v)->i[0x3F0 / 4] = snd_play_from_class_bank(9, 4, moby, 0xEE1);
     have:
-        gfx_update_color_fade(a0, v + 0x50);
-        math_approach_target_with_direction_mode(a0 + 0xF8,
-                      mat_fast_helper_a(((Hero *)g_hero_state)->f[0x80 / 4] - ((View *)a0)->f[0x10 / 4],
-                                    ((Hero *)g_hero_state)->f[0x84 / 4] - ((View *)a0)->f[0x14 / 4]),
+        gfx_update_color_fade(moby, v + 0x50);
+        math_approach_target_with_direction_mode(moby + 0xF8,
+                      mat_fast_helper_a(((Hero *)g_hero_state)->f[0x80 / 4] - ((View *)moby)->f[0x10 / 4],
+                                    ((Hero *)g_hero_state)->f[0x84 / 4] - ((View *)moby)->f[0x14 / 4]),
                       v + 0x1B4, 0, ((View *)v)->f[0x114 / 4], ((View *)v)->f[0x118 / 4], ((View *)v)->f[0x11C / 4]);
         g_door_trigger_flags[1] = 1;
         qcopy(ref, g_camera_l18_position);
@@ -292,33 +293,33 @@ void receiver_bot_update_us2(u8 *a0) {
         if (FastDecTimer(v + 0x396) != 0) {
             level_store_value_pair_us2(0, hud_draw_timer_bar);
             ((View *)v)->uh[0x3BC / 2] = ((View *)v)->uh[0x3BE / 2];
-            f = ((View *)a0)->f[0xF8 / 4];
+            f = ((View *)moby)->f[0xF8 / 4];
             if (((Hero *)g_hero_state)->b[0x22B4] == 4) {
                 if (g_current_map_index == 0x14)
                     g_hero_frame_flag[0] = 1;
                 hero_detach_from_object_us2(1);
             }
-            moby_reset_color_grey(a0);
-            ((View *)a0)->b[0xBC] = 1;
+            moby_reset_color_grey(moby);
+            ((View *)moby)->b[0xBC] = 1;
             ((View *)v)->i[0x13C / 4] = -1;
             ((View *)v)->h[0x392 / 2] = 30;
             mem_clear(g_receiver_flag_buffer, 0, 0x50);
-            hero_attach_to_object(4, 0x8D, a0);
+            hero_attach_to_object(4, 0x8D, moby);
             ((Hero *)g_hero_state)->f[0x98 / 4] = f;
-            ((View *)a0)->f[0xF8 / 4] = f;
+            ((View *)moby)->f[0xF8 / 4] = f;
             g_door_trigger_flags[1] = 0;
             if (g_current_map_index == 0x13) {
                 if (((View *)g_subtitle_history)->uh[0x504 / 2] == 0)
-                    func_US2_00289840(0xA14, 0x6B);
+                    subtitle_request_voice_line_us2(0xA14, 0x6B);
                 else
                     ((View *)g_subtitle_history)->uh[0x504 / 2] = 0xFFFF;
             }
             g_hero_frozen_flag = 0;
-            moby_set_state(a0, 7, 8);
+            moby_set_state(moby, 7, 8);
             h = ((View *)v)->i[0x3F0 / 4];
             if (h != -1) {
                 u8 *e = g_sound_state + h * 0x70;
-                if (*(u8 **)(e + 0x88) == a0 && e[0x74] != 0)
+                if (*(u8 **)(e + 0x88) == moby && e[0x74] != 0)
                     snd_stop_voice(h);
             }
             ((View *)v)->i[0x3F0 / 4] = -1;
@@ -328,109 +329,109 @@ void receiver_bot_update_us2(u8 *a0) {
             t = 1.0f;
         else if (t < 0.0f)
             t = 0.0f;
-        FastVecSub(c, g_hero_position, a0 + 0x10);
+        FastVecSub(c, g_hero_position, moby + 0x10);
         *(Vec4 *)b = *(Vec4 *)c;
         b[2] = 0.0f;
         vec_scale_to_length(b, b, g_receiver_targeting_distance);
-        add_vectors(c, b, a0 + 0x10);
+        add_vectors(c, b, moby + 0x10);
         b[2] += g_receiver_offset_height;
         FastVecSub(c, ref, b);
         *(Vec4 *)a = *(Vec4 *)c;
         vec_scale_to_length(a, a, ((View *)v)->f[0x3B8 / 4] * IntToFloat(((View *)v)->h[0x396 / 2]));
         add_vectors(c, a, b);
-        ang[2] = mat_fast_helper_a(((View *)a0)->f[0x10 / 4] - a[0], ((View *)a0)->f[0x14 / 4] - a[1]);
-        ang[1] = -mat_fast_helper_a(vec_distance_xy(a, a0 + 0x10), ((View *)a0)->f[0x18 / 4] - a[2]);
+        ang[2] = mat_fast_helper_a(((View *)moby)->f[0x10 / 4] - a[0], ((View *)moby)->f[0x14 / 4] - a[1]);
+        ang[1] = -mat_fast_helper_a(vec_distance_xy(a, moby + 0x10), ((View *)moby)->f[0x18 / 4] - a[2]);
         ang[0] = g_receiver_sway_angle * (math_fast_sin_or_cos_b(math_wrap_angle_to_pi(t * 6.28318548f)) * 0.0174532942f);
         object_copy_vector_to_selected(a);
         cam_set_state_rotation(ang);
-        if (((View *)a0)->b[0x95] == 8)
+        if (((View *)moby)->b[0x95] == 8)
             cam_set_mode_state(1);
         break;
     }
     case 8:
         TryClaimNotice(6, 0, 20);
-        if ((((Hero *)g_hero_state)->b[0x22B4] != 4 || ((Hero *)g_hero_state)->p[0x2290 / 4] != a0) && ((View *)v)->h[0x392 / 2] == 0) {
+        if ((((Hero *)g_hero_state)->b[0x22B4] != 4 || ((Hero *)g_hero_state)->p[0x2290 / 4] != moby) && ((View *)v)->h[0x392 / 2] == 0) {
             if (((Hero *)g_hero_state)->b[0x22B4] != 4)
                 level_store_value_pair_us2(0, 0);
             g_hero_frozen_flag = 0;
             ((View *)v)->i[0x13C / 4] = ((View *)v)->i[0x384 / 4];
             ((View *)v)->i[0x37C / 4] = ((View *)v)->i[0x360 / 4];
             ((View *)v)->i[0x38C / 4] = -1;
-            ((View *)a0)->b[0xBC] = 0;
-            moby_set_controller_speed_limits(a0, ((View *)v)->f[0x3C4 / 4] * 0.000277777785f, ((View *)v)->f[0x3C0 / 4] * 0.0166666675f,
+            ((View *)moby)->b[0xBC] = 0;
+            moby_set_controller_speed_limits(moby, ((View *)v)->f[0x3C4 / 4] * 0.000277777785f, ((View *)v)->f[0x3C0 / 4] * 0.0166666675f,
                           ((View *)v)->f[0x3D4 / 4] * 4.84813745e-06f, ((View *)v)->f[0x3D0 / 4] * 0.000290888245f);
-            ((View *)a0)->uh[0x34 / 2] &= 0xFFBE;
-            sel = enemy_get_kind_index(a0);
-            SpawnExplosionEffects(a0, g_explosion_effect_desc, 0, 2.0f, (float)((View *)v)->b[0x35], 5, 2, 9, 6.0f, 4.0f, 9.0f, 1.10000002f,
+            ((View *)moby)->uh[0x34 / 2] &= 0xFFBE;
+            sel = enemy_get_kind_index(moby);
+            SpawnExplosionEffects(moby, g_explosion_effect_desc, 0, 2.0f, (float)((View *)v)->b[0x35], 5, 2, 9, 6.0f, 4.0f, 9.0f, 1.10000002f,
                           sel, 0.0f, 1, 1, -2, 0, 0x850001);
-            moby_set_state(a0, 11, -1);
+            moby_set_state(moby, 11, -1);
         }
         break;
     }
 
-    switch (((View *)a0)->b[0x20]) {
+    switch (((View *)moby)->b[0x20]) {
     case 1:
-        moby_step_at_own_position_factor(a0, mat_fast_helper_a(((View *)v)->f[0x220 / 4] - ((View *)a0)->f[0x10 / 4],
-                                        ((View *)v)->f[0x224 / 4] - ((View *)a0)->f[0x14 / 4]));
+        moby_step_at_own_position_factor(moby, mat_fast_helper_a(((View *)v)->f[0x220 / 4] - ((View *)moby)->f[0x10 / 4],
+                                        ((View *)v)->f[0x224 / 4] - ((View *)moby)->f[0x14 / 4]));
         break;
     case 2:
-        moby_step_at_own_position(a0);
+        moby_step_at_own_position(moby);
         if (((View *)v)->h[0x392 / 2] == 0) {
             ((View *)v)->h[0x392 / 2] = g_receiver_timer_reset;
-            moby_start_or_forward_anim(a0, 2, 0, 10.0f);
-            moby_set_state(a0, 4, -1);
+            moby_start_or_forward_anim(moby, 2, 0, 10.0f);
+            moby_set_state(moby, 4, -1);
         }
         break;
     case 3:
-        math_approach_target_with_direction_mode(a0 + 0xF8,
-                      mat_fast_helper_a(((Hero *)g_hero_state)->f[0x80 / 4] - ((View *)a0)->f[0x10 / 4],
-                                    ((Hero *)g_hero_state)->f[0x84 / 4] - ((View *)a0)->f[0x14 / 4]),
+        math_approach_target_with_direction_mode(moby + 0xF8,
+                      mat_fast_helper_a(((Hero *)g_hero_state)->f[0x80 / 4] - ((View *)moby)->f[0x10 / 4],
+                                    ((Hero *)g_hero_state)->f[0x84 / 4] - ((View *)moby)->f[0x14 / 4]),
                       v + 0x1B4, 0, ((View *)v)->f[0x114 / 4], ((View *)v)->f[0x118 / 4], ((View *)v)->f[0x11C / 4]);
-        if (((View *)a0)->b[0x60] & 2) {
-            moby_start_or_forward_anim(a0, 2, 0, 10.0f);
-            moby_set_state(a0, 4, -1);
+        if (((View *)moby)->b[0x60] & 2) {
+            moby_start_or_forward_anim(moby, 2, 0, 10.0f);
+            moby_set_state(moby, 4, -1);
         }
         break;
     case 4:
-        receiver_bot_move_toward_target(a0);
+        receiver_bot_move_toward_target(moby);
         break;
     case 5:
-        if (hero_adjust_jump_speed_to_target(a0, 7.0f, 32.0f, 37.0f) != 0) {
-            if (moby_run_slot_handler(a0 + 0x10, ((View *)v)->i[0x380 / 4], 0) != 0) {
+        if (hero_adjust_jump_speed_to_target(moby, 7.0f, 32.0f, 37.0f) != 0) {
+            if (moby_run_slot_handler(moby + 0x10, ((View *)v)->i[0x380 / 4], 0) != 0) {
                 ((View *)v)->h[0x392 / 2] = 0;
-                moby_set_state(a0, 0, 4);
+                moby_set_state(moby, 0, 4);
             } else {
                 s32 n;
 
-                moby_start_or_forward_anim(a0, 2, 0, 10.0f);
+                moby_start_or_forward_anim(moby, 2, 0, 10.0f);
                 n = ((View *)v)->i[0x370 / 4];
                 if (n != -1) {
-                    moby_set_anim(a0, n, -1);
-                    moby_set_state(a0, 4, 5);
+                    moby_set_anim(moby, n, -1);
+                    moby_set_state(moby, 4, 5);
                 } else {
                     if (((View *)v)->i[0x374 / 4] != -1)
-                        moby_set_anim(a0, ((View *)v)->i[0x374 / 4], -1);
+                        moby_set_anim(moby, ((View *)v)->i[0x374 / 4], -1);
                     else
                         ((View *)v)->i[0x38C / 4] = -1;
-                    moby_set_state(a0, 4, 6);
+                    moby_set_state(moby, 4, 6);
                 }
             }
         }
         break;
     case 6:
-        shooter_update_ranged_attack(a0);
+        shooter_update_ranged_attack(moby);
         break;
     case 12:
-        sel = enemy_get_kind_index(a0);
-        SpawnExplosionEffects(a0, g_explosion_effect_desc, 0, 0.0f, 0.0f, 10, 3, 16, 4.0f, 2.0f, 9.0f, 1.0f,
+        sel = enemy_get_kind_index(moby);
+        SpawnExplosionEffects(moby, g_explosion_effect_desc, 0, 0.0f, 0.0f, 10, 3, 16, 4.0f, 2.0f, 9.0f, 1.0f,
                       sel, 15.0f, 1, 1, -1, 0, 0x810001);
     case 11: {
         u16 b2;
         u8 *p;
         u8 c;
 
-        moby_release_shared_resource(a0);
-        b2 = ((View *)a0)->uh[0xB2 / 2];
+        moby_release_shared_resource(moby);
+        b2 = ((View *)moby)->uh[0xB2 / 2];
         if (b2 & 1) {
             u8 *q = g_moby_nibble_table + (((s16)b2 >> 1) + (g_current_map_index << 10));
             if (((*q >> 4) & 7) != 7)
@@ -440,19 +441,19 @@ void receiver_bot_update_us2(u8 *a0) {
             if ((*q & 7) != 7)
                 *q += 1;
         }
-        g_trigger_flag_tables[1][((View *)a0)->h[0xB2 / 2]] = ((View *)a0)->b[0xB0] + 2;
-        if (((View *)a0)->b[0xB0] == 0xFF || (!(g_map_flags_table[((View *)a0)->b[0xB0]] & 0x80) && (g_moby_group_flags[((View *)a0)->b[0xB0] + (g_current_map_index << 4)] & 0x80)))
-            g_trigger_l18_flags[1][((View *)a0)->h[0xB2 / 2]] = ((View *)a0)->b[0xB0] + 2;
+        g_trigger_flag_tables[1][((View *)moby)->h[0xB2 / 2]] = ((View *)moby)->b[0xB0] + 2;
+        if (((View *)moby)->b[0xB0] == 0xFF || (!(g_map_flags_table[((View *)moby)->b[0xB0]] & 0x80) && (g_moby_group_flags[((View *)moby)->b[0xB0] + (g_current_map_index << 4)] & 0x80)))
+            g_trigger_l18_flags[1][((View *)moby)->h[0xB2 / 2]] = ((View *)moby)->b[0xB0] + 2;
         c = ((View *)v)->b[0x3B1];
         if (c != 0 && c != 0xFE
-            && (((View *)a0)->b[0xB0] == 0xFF || !(g_moby_group_flags[((View *)a0)->b[0xB0] + (g_current_map_index << 4)] & 0x80))) {
-            moby_wake_linked_enemy(a0);
+            && (((View *)moby)->b[0xB0] == 0xFF || !(g_moby_group_flags[((View *)moby)->b[0xB0] + (g_current_map_index << 4)] & 0x80))) {
+            moby_wake_linked_enemy(moby);
         } else {
-            moby_mark_spawned(a0);
+            moby_mark_spawned(moby);
             return;
         }
         break;
     }
     }
-    enemy_tick_timers(a0);
+    enemy_tick_timers(moby);
 }

@@ -31,12 +31,12 @@ extern int math_random_int_below(int);
 extern void moby_transform_joint_point(void *, int, void *);
 extern float FastVecLength(void *);
 extern void vec_scale_to_length(void *, void *, float);
-extern Particle *func_PAL_002BE9A8(void *, float, float, float, int, void *, float, unsigned int, int);
+extern Particle *part_spawn_spinning_spark_pal(void *, float, float, float, int, void *, float, unsigned int, int);
 extern void FastVecAdd(void *, void *, void *);
 extern int math_random_int_below(int);
 
 /* Emits two particle groups scaled by the object's transformed basis length. */
-void func_PAL_L03_00328558(Moby *object)
+void emit_scaled_object_particles_pal(Moby *object)
 {
     float matrix[16], point[4], velocity[4];
     float weight, radius, energy;
@@ -72,7 +72,7 @@ void func_PAL_L03_00328558(Moby *object)
             spin = math_random_int_below(16);
             if (math_random_int_below(2))
                 spin = -spin;
-            particle = func_PAL_002BE9A8(point, radius, 1.0f, 0.75f, spin, g_effect_descriptor_default, energy, 0x503030FF, 0);
+            particle = part_spawn_spinning_spark_pal(point, radius, 1.0f, 0.75f, spin, g_effect_descriptor_default, energy, 0x503030FF, 0);
             if (particle != 0) {
                 ParticlePayload *payload = &particle->payload;
 
@@ -106,7 +106,7 @@ void func_PAL_L03_00328558(Moby *object)
             do {
                 Particle *particle;
 
-                particle = func_PAL_002BE9A8(point, radius, 1.0f, 1.0f, 16, g_effect_descriptor_default, energy, 0x7FFFFFFF, 0);
+                particle = part_spawn_spinning_spark_pal(point, radius, 1.0f, 1.0f, 16, g_effect_descriptor_default, energy, 0x7FFFFFFF, 0);
                 if (particle != 0) {
                     ParticlePayload *payload = &particle->payload;
 

@@ -12,7 +12,8 @@ extern int part_alloc_effect_slot(void *,int,float,float,float);
 extern int g_tumbling_debris_spin_min __attribute__((sda)),g_tumbling_debris_spin_max __attribute__((sda));
 extern int g_tumbling_debris_duration __attribute__((sda));
 extern float g_tumbling_debris_scale_default __attribute__((sda)),g_tumbling_debris_scale_alt __attribute__((sda));
-char *func_PAL_L00_0040E0B0(Quad *position,Quad *velocity,int lifetime,int mode)
+/* Creates a tumbling debris piece (moby class 3790) with the given position, velocity and lifetime, and a random spin. */
+char *tumbling_debris_create_pal(Quad *position,Quad *velocity,int lifetime,int mode)
 {
     char *object;
     char *state;

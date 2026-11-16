@@ -259,7 +259,9 @@ extern void moby_update_class_specials(char *);
 
 #define OBJ ((JobaObj *)obj)
 
-void func_US2_L11_0043F9DC(u8 *obj) {
+/* Runs the arena challenge from start to finish: waiting for the player, spawning each wave of fighters, the boss fights, and the win or fail screens. (USA v2.00 message ids) */
+/* Runs the arena challenge from start to finish: waiting for the player, spawning each wave of fighters, the boss fights, and the win or fail screens. (USA v2.00 message ids) */
+void arena_controller_update_us2(u8 *obj) {
     JobaState *st;
     JobaRecord *rec1;
     JobaRecord *rec3;

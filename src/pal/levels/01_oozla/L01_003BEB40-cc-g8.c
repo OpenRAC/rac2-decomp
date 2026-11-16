@@ -4,7 +4,8 @@
 
 extern float g_water_l01_height __attribute__((sda));
 
-float func_PAL_L01_003BEB40(void) {
+/* Returns the height of the water surface in this level (PAL version). */
+float level_get_water_height_pal(void) {
     return g_water_l01_height;
 }
 

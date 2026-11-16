@@ -16,32 +16,32 @@ extern float g_burst_piece_param_b __attribute__((sda));
 extern float g_burst_piece_param_c __attribute__((sda));
 
 /* a moby's three states: idle, waiting for its model, and burst */
-void burst_update_pal(char *obj)
+void burst_update_pal(char *moby)
 {
-    char *vars = *(char **)(obj + 0x68);
+    char *vars = *(char **)(moby + 0x68);
     float vec[4] __attribute__((aligned(16)));
 
-    switch (*(unsigned char *)(obj + 0x20)) {
+    switch (*(unsigned char *)(moby + 0x20)) {
     case 0:
-        moby_set_state(obj, 1, -1);
+        moby_set_state(moby, 1, -1);
         break;
     case 1:
-        if (part_find_owned_effect_slot(obj, 0x4010000, 0) != 0) {
+        if (part_find_owned_effect_slot(moby, 0x4010000, 0) != 0) {
             if (*(int *)vars == 0)
-                moby_set_state(obj, 2, -1);
+                moby_set_state(moby, 2, -1);
         }
-        *(unsigned char *)(obj + 0xA8) = 0xFF;
+        *(unsigned char *)(moby + 0xA8) = 0xFF;
         break;
     case 2:
         *(TI128 *)vec = 0;
         vec[2] = 7.0f;
-        FastVecAdd(vec, obj + 0x10, vec);
+        FastVecAdd(vec, moby + 0x10, vec);
         SpawnExplosion_pal(vec, 1, 0x19, 0x14, 0x14, 0x14, 0x2D, 1, 0.75f, 20.0f, 1, 1, 0, 0);
-        part_explode_object_into_pieces_pal(obj, &g_burst_piece_param_c, &g_burst_piece_param_b, &g_burst_piece_param_a,
+        part_explode_object_into_pieces_pal(moby, &g_burst_piece_param_c, &g_burst_piece_param_b, &g_burst_piece_param_a,
                           0xFFFF, 0, -1, 7, 0xFFFF, 0xFF, 0);
-        part_spawn_scaled_bolts_pal(obj, 5, 4.0f);
-        moby_l00_spawn_child(obj, 0x12A0, 0);
-        moby_mark_spawned(obj);
+        part_spawn_scaled_bolts_pal(moby, 5, 4.0f);
+        moby_l00_spawn_child(moby, 0x12A0, 0);
+        moby_mark_spawned(moby);
         break;
     }
 }

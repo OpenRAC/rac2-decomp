@@ -39,7 +39,7 @@ extern int cam_push_point_out_of_walls(void *, void *, int, float, float);
 /* Steps a probe from the owner block's position along its movement direction, testing each
    step for collisions; on a hit it records the result, may pull the follow distance in, and
    re-aims the movement vector at the hit point. */
-int func_PAL_L00_004295B8(char *obj)
+int cam_follow_sweep_probe_pal(char *obj)
 {
     float original[4], point[4], direction[4], saved[4], previous[4], difference[4];
     char *base=P(obj,112);

@@ -34,7 +34,8 @@ extern int PadPressedWithin(int, int, int *);
 extern int hero_slot_item_id(int);
 extern unsigned char g_item_owned_flags[] MACRO_ADDR;
 
-int func_PAL_L00_002CAEB0(void)
+/* Picks which jump or roll move the hero starts from the buttons and speed, or fails if none fits. */
+int hero_choose_jump_or_roll_move_pal(void)
 {
     int offset;
     if (g_hero_state.mode == 14) return 0;

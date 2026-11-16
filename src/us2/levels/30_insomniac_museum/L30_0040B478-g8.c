@@ -37,7 +37,7 @@ extern GaugeState g_hero_state;
 extern int g_screen_height;
 extern unsigned g_palette_copy[];
 extern void gfx_append_vectors_to_packet(int, int, unsigned long, int, unsigned long);
-extern unsigned long func_US2_0027CED8(int);
+extern unsigned long tex_get_effect_descriptor_us2(int);
 extern int FloatToInt(float);
 extern float FastVecLength(void *), math_fabs(float), FastAddRotations(float, float);
 extern void DrawTexturedQuad(int, int, int, int, int, int, int, int, unsigned long, unsigned long);
@@ -72,13 +72,13 @@ void DrawMuseumStatusGauge_us2(char *obj) {
     mode = PackGaugeFlag(mode, g_gauge_mode_flag_c, 6);
     gfx_append_vectors_to_packet(2, 0x47, flags | ((unsigned long)g_gauge_flags_high_bits << 17),
             0x42, mode | ((unsigned long)g_gauge_mode_high_byte << 32));
-    tex = func_US2_0027CED8(g_effect_texture_base_a + *(int *)(s + 0x64));
+    tex = tex_get_effect_descriptor_us2(g_effect_texture_base_a + *(int *)(s + 0x64));
     DrawTexturedQuad(FloatToInt(g_gauge_l30_screen_x), g_screen_height - 80,
            64, 64, 0, 0, 64, 64, g_effect_texture_size_arg, tex);
-    tex = func_US2_0027CED8(g_effect_texture_base_b + *(int *)(s + 0x64));
+    tex = tex_get_effect_descriptor_us2(g_effect_texture_base_b + *(int *)(s + 0x64));
     DrawTexturedQuad(FloatToInt(g_gauge_l30_screen_x) + 64, g_screen_height - 80,
            64, 64, 0, 0, 64, 64, g_effect_texture_size_arg, tex);
-    tex = func_US2_0027CED8(g_effect_texture_base_c + *(int *)(s + 0x64));
+    tex = tex_get_effect_descriptor_us2(g_effect_texture_base_c + *(int *)(s + 0x64));
     angle = g_gauge_angle_scale * (FastVecLength(s) * scale);
     angle /= g_vehicle_turn_speed * 0.016666668f;
     angle = FastAddRotations(angle, g_gauge_angle_rate * scale);
@@ -112,9 +112,9 @@ void DrawMuseumStatusGauge_us2(char *obj) {
             (*(unsigned **)&g_gauge_palette_ptr)[j] = 0x80000000;
         }
     }
-    tex = func_US2_0027CED8(*(int *)(s + 0x64) + g_effect_texture_offset);
+    tex = tex_get_effect_descriptor_us2(*(int *)(s + 0x64) + g_effect_texture_offset);
     DrawTexturedQuad(368, g_screen_height - 144, 128, 128, 0, 0, 128, 128, 0x70808080, tex);
-    tex = func_US2_0027CED8(*(int *)(s + 0x64) + g_effect_texture_offset_alt);
+    tex = tex_get_effect_descriptor_us2(*(int *)(s + 0x64) + g_effect_texture_offset_alt);
     DrawTexturedQuad(368, g_screen_height - 144, 128, 128, 0, 0, 128, 128, 0x70808080, tex);
     *(int *)(s + 0x98) = n;
     if (g_hero_state.current < g_hero_state.maximum * 0.1f && ((g_low_health_blink_timer / 90) & 1)) {

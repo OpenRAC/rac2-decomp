@@ -16,7 +16,8 @@ extern void vec_random_direction(void *, float, float);
 extern void FastVecScale(void *, void *, float);
 extern void func_002A0F48(void *);
 
-char *func_PAL_L02_0032D5F8(char *source, int kind, TI128 *position, void *rotation,
+/* Spawns one flying fragment copied from a source object. It sets size, lifetime, speed, spin and bounds, picking random values when the caller passes zeros (PAL: 50 Hz scaling). */
+char *part_spawn_flying_fragment_pal(char *source, int kind, TI128 *position, void *rotation,
                       int lifetime, int flags, TI128 *velocity, TI128 *spin,
                       TI128 *bounds, float speed) {
     Vec4 temporary;

@@ -36,6 +36,7 @@ extern void table_clear_entry_flag(int);
 extern void part_spawn_big_explosion(void *, void *, void *);
 extern void FastVecAdd(char *, char *, char *);
 
+/* Moves a flying shot each frame, bounces or splashes it on hits, and blows it up when it is done. (USA v2.00) */
 void bouncing_l04_shot_update_us2(unsigned char *obj) {
     struct {
         ProjectileVec old, velocity, normal;

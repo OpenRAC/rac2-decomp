@@ -10,7 +10,7 @@ extern void *part_spawn_trail(void *, void *, void *, int, int, int, int, int, i
 
 /* Six sparks from the table, each placed by the object's matrices and given a
    small random drift; `height` lifts the drift's z. */
-void func_PAL_002E9DC8(char *object, float height)
+void part_spawn_object_sparks_pal(char *object, float height)
 {
     float from[3] __attribute__((aligned(16)));
     float to[3] __attribute__((aligned(16)));

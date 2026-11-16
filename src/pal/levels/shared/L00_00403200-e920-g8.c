@@ -40,7 +40,7 @@ void weapon_compute_spread_shot_velocity_pal(u8 *obj, u8 *out, int mode, u8 *fla
     float spread;
     float axis[4] __attribute__((aligned(16)));
     float rotation[4] __attribute__((aligned(16)));
-    Hero_L00_003FE920 *h = &g_hero_state;
+    Hero_L00_003FE920 *hero = &g_hero_state;
 
     {
         int index = g_hoverbomb_weapon_index[0];
@@ -49,13 +49,13 @@ void weapon_compute_spread_shot_velocity_pal(u8 *obj, u8 *out, int mode, u8 *fla
         factor = entry->scale * 0.020000001f;
     }
 
-    if (h->state == 1) {
+    if (hero->state == 1) {
         vec_scale_to_length(out, obj + 0xD0, -factor);
         qcopy(axis, obj + 0xC0);
     } else {
-        vec_scale_to_length(out, h->vec760, factor);
-        qcopy(axis, h->vec750);
-        if (h->optional != 0) {
+        vec_scale_to_length(out, hero->vec760, factor);
+        qcopy(axis, hero->vec750);
+        if (hero->optional != 0) {
             math_compute_aim_direction(out, flag, factor, 32.0f, 0.6981318f);
             qcopy(axis, g_scratch_vec_secondary);
         }

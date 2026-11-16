@@ -22,20 +22,21 @@ extern float math_random_signed_float_range(float, float);
 extern void moby_set_controller_speed_limits(void *, float, float, float, float);
 extern int math_random_int_below(int);
 extern void moby_set_state(void *, int, int);
-extern void func_PAL_002A7E68(void *, int, int, int);
+extern void anim_start_blended_pal(void *, int, int, int);
 extern float fast_vec_dist(void *, void *);
 extern void moby_update_ground_check(void *);
-extern int func_PAL_002B1A50(void *, void *, int);
+extern int moby_apply_damage_to_object_pal(void *, void *, int);
 extern int moby_count_group_not_in_state(int, int);
 extern int weapon_select_aim_target(void *, int, void *, float, float, int);
-extern void func_PAL_00319748(void *);
+extern void flyer_alert_group_on_death_pal(void *);
 extern void flyer_alert_group(void *);
 
-int func_PAL_003192E0(char *self)
+/* Sets up a flying enemy on its first frame, then checks its health: on death it alerts its group, hands its role to a group mate and returns 1 (PAL: 50 Hz timings). */
+int flyer_init_check_death_pal(char *self)
 {
     char *data = *(char **)(self + 0x68);
-    int result, dead;
-    short *p;
+    int result, is_dead;
+    short *list;
     u8 *other;
     if (*(u8 *)(self + 0x20) == 0) {
         self[0x7E] |= 1;
@@ -84,32 +85,32 @@ int func_PAL_003192E0(char *self)
         *(float *)(data + 0x30) -= 0.5f;
         *(short *)(data + 0x272) = math_random_int_below(10);
         moby_set_state(self, 2, 0);
-        if (*(u8 *)(self + 0x43)) func_PAL_002A7E68(self, 0, 0, 0);
+        if (*(u8 *)(self + 0x43)) anim_start_blended_pal(self, 0, 0, 0);
     }
     if (*(u8 *)(self + 0x31) && fast_vec_dist(self + 0x10, g_active_camera.pos) < 48.0f) {
         moby_update_ground_check(self); self[0x6F] = 45;
     }
-    dead = (unsigned char)data[0x2E] == 2;
-    result = func_PAL_002B1A50(self, data + 0x60, 0);
-    if (result || dead) {
+    is_dead = (unsigned char)data[0x2E] == 2;
+    result = moby_apply_damage_to_object_pal(self, data + 0x60, 0);
+    if (result || is_dead) {
         flyer_alert_group(self);
-        if (result == 4 || result == 5 || dead) {
+        if (result == 4 || result == 5 || is_dead) {
             if ((unsigned char)self[0x21] <= g_moby_group_count && moby_count_group_not_in_state((unsigned char)self[0x21], -1) >= 2) {
-                p = g_moby_group_lists[(unsigned char)self[0x21]];
+                list = g_moby_group_lists[(unsigned char)self[0x21]];
                 do {
-                    other = g_moby_pool_start + ((*p & 0x7FFF) << 8);
+                    other = g_moby_pool_start + ((*list & 0x7FFF) << 8);
                     if (*(short *)(other + 0xAA) == 0x99C) {
-                        char *otherData = *(char **)(other + 0x68);
-                        if (!*(int *)(otherData + 0x2AC)) {
-                            *(int *)(otherData + 0x2AC) = 1;
+                        char *other_data = *(char **)(other + 0x68);
+                        if (!*(int *)(other_data + 0x2AC)) {
+                            *(int *)(other_data + 0x2AC) = 1;
                             break;
                         }
                     }
-                } while (*p++ >= 0);
+                } while (*list++ >= 0);
             }
         }
     }
-    if (dead) { func_PAL_00319748(self); return 1; }
+    if (is_dead) { flyer_alert_group_on_death_pal(self); return 1; }
     *(int *)(data + 0x258) = weapon_select_aim_target(self, *(int *)(data + 0x250), 0, *(float *)(data + 0x268), 10.0f, 0);
     *(int *)(data + 0x25C) = weapon_select_aim_target(self, *(int *)(data + 0x254), 0, *(float *)(data + 0x26C), 10.0f, 0);
     return 0;

@@ -44,7 +44,9 @@ typedef struct {
     short duration;
 } MotionPrefix;
 
-void func_PAL_L00_0042E68C(u8 *object)
+/* Sets up a path camera: clears its motion state, totals the path lengths, picks the weighted nodes,
+   copies the start transform and fires the start event (PAL: 50 Hz duration). */
+void cam_path_motion_init_pal(u8 *object)
 {
     PathConfig *data = *(PathConfig **)(g_camera_def_table + *(short *)(object + 0x84) * 32 + 0x1c);
     MotionPrefix *motion;
@@ -98,9 +100,9 @@ void func_PAL_L00_0042E68C(u8 *object)
         int i;
         u8 *path = g_launch_path_table[data->secondPathIndex];
         for (i = 0; i < *(int *)path; i++) {
-            int byteOffset = i * 16;
-            distance = fast_vec_dist((char *)(path + (byteOffset + 0x10)), (char *)(path + 0x10 + ((i + 1) % *(int *)path) * 16));
-            *(float *)(path + byteOffset + 0x1C) = distance;
+            int byte_offset = i * 16;
+            distance = fast_vec_dist((char *)(path + (byte_offset + 0x10)), (char *)(path + 0x10 + ((i + 1) % *(int *)path) * 16));
+            *(float *)(path + byte_offset + 0x1C) = distance;
             if (i < *(int *)path - 1)
                 motion->secondDistance += distance;
         }

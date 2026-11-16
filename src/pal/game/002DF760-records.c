@@ -53,6 +53,7 @@ extern int menu_seek_chain_entry(int, int);
 extern int help_copy_record_at_depth(RecordDE990 *, int, int);
 extern void save_build_packet(char *);
 
+/* Resets the game for a fresh run but keeps the collected items, weapon records and unlocks. Then it can start saving into a slot. */
 void level_restart_keep_progress_pal(int selected)
 {
     struct {
@@ -61,15 +62,15 @@ void level_restart_keep_progress_pal(int selected)
         int slots[56];
         RecordDE990 records[56];
     } saved;
-    int saved32[32];
-    unsigned char saved56[56];
-    int saved12[12];
-    StateDE990 savedState;
-    unsigned char savedBlock[112];
+    int saved_enabled[32];
+    unsigned char saved_movie_seen[56];
+    int saved_unlocked[12];
+    StateDE990 saved_state;
+    unsigned char saved_progress[112];
     RecordDE990 first, second;
-    int resident, hadCard, i, j, k;
+    int saved_equipment_bits, had_card, i, j, k;
     unsigned char control;
-    StateDE990 *gameState;
+    StateDE990 *game_state;
     unsigned char *card, *block, *slots;
     int *words;
     unsigned char *state, *hud;
@@ -77,18 +78,18 @@ void level_restart_keep_progress_pal(int selected)
     g_player_bolts.f12++;
     g_player_bolts.f3a = 1;
     g_player_bolts.f3b = 0;
-    resident = g_equipment_bits;
-    hadCard = *(unsigned short *)(card + 0x84);
-    gameState = &g_player_bolts;
-    savedState = *gameState;
+    saved_equipment_bits = g_equipment_bits;
+    had_card = *(unsigned short *)(card + 0x84);
+    game_state = &g_player_bolts;
+    saved_state = *game_state;
     for (j = 0; j < 56; j++) {
         saved.flags[j] = g_item_owned_flags[j];
         saved.words[j] = g_help_entry_state[j];
         *(saved.records + j) = g_weapon_table[j];
         saved.slots[j] = g_item_slot_to_record[j];
     }
-    for (i = 0; i < 32; i++) saved32[i] = g_item_enabled_flags[i];
-    for (i = 0; i < 12; i++) saved12[i] = g_unlocked_item_flags[i];
+    for (i = 0; i < 32; i++) saved_enabled[i] = g_item_enabled_flags[i];
+    for (i = 0; i < 12; i++) saved_unlocked[i] = g_unlocked_item_flags[i];
     saved.flags[51] = 0;
     saved.flags[36] = 0;
     saved.flags[20] = 0;
@@ -104,18 +105,18 @@ void level_restart_keep_progress_pal(int selected)
     saved.flags[4] = 0;
     saved.flags[19] = 0;
     saved.flags[8] = 0;
-    mem_copy_aligned(savedBlock, g_level_progress_flags, 112);
+    mem_copy_aligned(saved_progress, g_level_progress_flags, 112);
     block = g_game_flag_table;
     control = block[0x90];
-    for (i = 0; i < 56; i++) saved56[i] = g_movie_seen_flags[i];
+    for (i = 0; i < 56; i++) saved_movie_seen[i] = g_movie_seen_flags[i];
     save_load_game_data_reset_menu();
-    mem_copy_aligned(g_level_progress_flags, savedBlock, 112);
+    mem_copy_aligned(g_level_progress_flags, saved_progress, 112);
     block = g_game_flag_table;
     block[0x90] = control;
     mem_clear(g_movie_channel_flags, 0, 56);
-    for (i = 0; i < 56; i++) g_movie_seen_flags[i] = saved56[i];
+    for (i = 0; i < 56; i++) g_movie_seen_flags[i] = saved_movie_seen[i];
     { int m; for (m = 7; m >= 0; m--) g_weapon_menu_slots[m] = 0; }
-    g_player_bolts = savedState;
+    g_player_bolts = saved_state;
     g_weapon_menu_slots[0] = 30;
     g_weapon_menu_slots[1] = 42;
     g_player_bolts.f22 = 0;
@@ -124,7 +125,7 @@ void level_restart_keep_progress_pal(int selected)
     g_player_bolts.f1c = 0;
     g_subtitles_option[0] = 0;
     g_subtitles_option[1] = 0;
-    if (hadCard) {
+    if (had_card) {
         card = g_subtitle_history;
         if (*(unsigned short *)(card + 0x84) == 0)
             *(unsigned short *)(card + 0x84) = 1;
@@ -136,8 +137,8 @@ void level_restart_keep_progress_pal(int selected)
         g_item_slot_to_record[k] = saved.slots[k];
         g_item_ammo_counts[k] = g_weapon_table[g_item_slot_to_record[k]].f.cost;
     }
-    for (i = 0; i < 32; i++) g_item_enabled_flags[i] = saved32[i];
-    for (i = 0; i < 12; i++) g_unlocked_item_flags[i] = saved12[i];
+    for (i = 0; i < 32; i++) g_item_enabled_flags[i] = saved_enabled[i];
+    for (i = 0; i < 12; i++) g_unlocked_item_flags[i] = saved_unlocked[i];
     g_subtitles_option[1] = 0;
     g_subtitles_option[0] = 0;
     menu_seek_chain_entry(10, 3);
@@ -155,7 +156,7 @@ void level_restart_keep_progress_pal(int selected)
     }
     hud = g_hero_state;
     *(short *)(hud + 0x24fc) = 1;
-    D_001A7AF0_gp = resident;
+    D_001A7AF0_gp = saved_equipment_bits;
     if (selected >= 0) {
         state = g_memcard_state;
         *(short *)(state + 0x18) = selected;

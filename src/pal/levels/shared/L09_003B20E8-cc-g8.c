@@ -12,7 +12,7 @@ typedef struct {
     char *owner;
     int pad44;
     int ticks;
-    float inverseTicks, d, f, range;
+    float inverse_ticks, d, f, range;
     int pad5c;
     float c;
     int a, b;
@@ -32,10 +32,11 @@ extern void func_002A0F48(char *);
 
 /* Integer arguments stay pos, owner, dir, a, b ($a0-$t0) and float arguments f, range, c, d
    ($f12-$f15); only the interleaving of the two banks is chosen. */
-char *func_PAL_L09_003B20E8(void *pos, char *owner, float f, float range, float c, void *dir, int a,
+/* Spawns a projectile at a position flying along a direction, works out how many frames it lives (PAL: 50 Hz ticks) and returns it. */
+char *projectile_l09_spawn_pal(void *pos, char *owner, float f, float range, float c, void *dir, int a,
                         int b, float d)
 {
-    char *obj = CreateMoby(0x5DE);
+    char *obj = CreateMoby(0x5DE /* moby class 1502 */);
 
     if (obj) {
         float length, ticks, factor;
@@ -60,7 +61,7 @@ char *func_PAL_L09_003B20E8(void *pos, char *owner, float f, float range, float 
         st->f = f;
         st->a = a;
         st->b = b;
-        st->inverseTicks = 1.0f / length;
+        st->inverse_ticks = 1.0f / length;
         st->c = c;
         *(float *)(obj + 0x2C) = *(float *)(*(char **)(obj + 0x24) + 0x24) * factor;
         *(unsigned char *)(obj + 0x20) = 0;

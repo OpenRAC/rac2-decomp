@@ -46,7 +46,7 @@ extern void FastVecScale(void *, void *, float);
 extern int func_001163B0(void);
 extern float math_random_float_range(float, float);
 extern void vec_scale_to_length(void *, void *, float);
-extern void func_PAL_002BEF58(void *, void *, int, float);
+extern void part_spawn_white_flash_pal(void *, void *, int, float);
 extern int math_fast_float_d(void *);
 extern int CollLine(void *, void *, int, void *, void *);
 extern int coll_test_point(void *, int, void *, float);
@@ -58,10 +58,10 @@ extern void EmitRingAndDirectionalParticles_pal(char *, int, void *, void *, flo
 extern void FastVecCross(void *, void *, void *);
 extern float math_random_angle(void);
 extern void math_apply_axis_rotation_to_quat(void *, void *, void *, float);
-extern unsigned char *func_PAL_L00_00343208(void *, void *, void *, float, int, int);
+extern unsigned char *part_spawn_accelerated_puff_pal(void *, void *, void *, float, int, int);
 extern void gfx_draw_directional_sprite(char *, int, float, int, int, int, char *, float);
 extern int math_random_int_below(int);
-extern u8 *func_PAL_002BE9A8(void *p, float f0, float f1, float f2, int z, void *local,
+extern u8 *part_spawn_spinning_spark_pal(void *p, float f0, float f1, float f2, int z, void *local,
                          float f3, int v, int t);
 extern int FloatToInt(float);
 extern void effect_clear_finished_entry(char *);
@@ -70,19 +70,20 @@ extern void ref_L00_003DB118_00(void *, void *);
 extern void part_l00_update_burst_effect();
 extern void moby_mark_spawned(void *);
 
+/* Flies a glowing projectile with a trail, hurts what it touches, then bursts into sparks (PAL: 50 Hz timings). */
 void UpdateCollidingTrailProjectile_pal(char *self)
 {
     Vec ray;
     Vec scale3;
     Vec push;
     char *timer;
-    char *pv;
+    char *vars;
     int i;
     u8 *p;
 
-    pv = *(char **)(self + 0x68);
+    vars = *(char **)(self + 0x68);
     if (*(unsigned char *)(self + 0x20) != 0) {
-        char *trail = pv + 0x10;
+        char *trail = vars + 0x10;
         vec_transform_or_copy(self + 0x10, self + 0x10);
         for (i = 3; i >= 0; i--) {
             vec_transform_or_copy(trail, trail);
@@ -92,7 +93,7 @@ void UpdateCollidingTrailProjectile_pal(char *self)
     switch (*(unsigned char *)(self + 0x20)) {
     case 0:
         for (i = 0; i < 4; i++) {
-            qcopy(pv + 0x10 + i * 0x10, self + 0x10);
+            qcopy(vars + 0x10 + i * 0x10, self + 0x10);
         }
         *(unsigned char *)(self + 0x20) = 1;
     case 1:
@@ -102,28 +103,28 @@ void UpdateCollidingTrailProjectile_pal(char *self)
         HitInfo hit;
         float spark[4] __attribute__((aligned(16)));
         ray.q = *(Quad *)(self + 0x10);
-        timer = pv + 0x60;
-        part_steer_effect_direction(*(int *)(pv + 0x78), pv, 0);
-        FastVecAdd(self + 0x10, self + 0x10, pv);
-        vec_add_object_direction_scaled(self + 0x10, pv, g_direction_step_scale * 0.00040000002f);
+        timer = vars + 0x60;
+        part_steer_effect_direction(*(int *)(vars + 0x78), vars, 0);
+        FastVecAdd(self + 0x10, self + 0x10, vars);
+        vec_add_object_direction_scaled(self + 0x10, vars, g_direction_step_scale * 0.00040000002f);
         for (i = 3; i > 0; i--) {
-            lerp_vector(pv + 0x10 + i * 0x10, pv + 0x10 + i * 0x10, pv + i * 0x10, 0.2f);
+            lerp_vector(vars + 0x10 + i * 0x10, vars + 0x10 + i * 0x10, vars + i * 0x10, 0.2f);
         }
-        *(Quad *)(pv + 0x10) = *(Quad *)(self + 0x10);
-        *(float *)(pv + 0x64) = FastAddRotations(*(float *)(pv + 0x64), *(float *)(pv + 0x68));
+        *(Quad *)(vars + 0x10) = *(Quad *)(self + 0x10);
+        *(float *)(vars + 0x64) = FastAddRotations(*(float *)(vars + 0x64), *(float *)(vars + 0x68));
         vec_clear_128(&scale3);
-        scale3.f[1] = *(float *)(pv + 0x64) * 0.5f;
-        scale3.f[0] = *(float *)(pv + 0x64) * 0.25f;
-        scale3.f[2] = *(float *)(pv + 0x64) * 0.375f;
+        scale3.f[1] = *(float *)(vars + 0x64) * 0.5f;
+        scale3.f[0] = *(float *)(vars + 0x64) * 0.25f;
+        scale3.f[2] = *(float *)(vars + 0x64) * 0.375f;
         euler_rotation_basis(self + 0xC0, &scale3);
-        *(float *)(self + 0xC0) = *(float *)(self + 0xC0) * 0.4f * (math_fast_sin_or_cos_b(*(float *)(pv + 0x64)) + 2.0f);
-        *(float *)(self + 0xD4) = *(float *)(self + 0xD4) * 0.5f * (math_fast_sin_or_cos_a(*(float *)(pv + 0x64)) + 2.0f);
-        *(float *)(self + 0xE8) = *(float *)(self + 0xE8) * 0.75f * (math_fast_sin_or_cos_b(*(float *)(pv + 0x64)) + 2.0f);
+        *(float *)(self + 0xC0) = *(float *)(self + 0xC0) * 0.4f * (math_fast_sin_or_cos_b(*(float *)(vars + 0x64)) + 2.0f);
+        *(float *)(self + 0xD4) = *(float *)(self + 0xD4) * 0.5f * (math_fast_sin_or_cos_a(*(float *)(vars + 0x64)) + 2.0f);
+        *(float *)(self + 0xE8) = *(float *)(self + 0xE8) * 0.75f * (math_fast_sin_or_cos_b(*(float *)(vars + 0x64)) + 2.0f);
         {
             int c = math_random_int_range(0x7F, 0xFF);
             *(int *)(self + 0x78) = ((c << 16) + (c << 8) + c) | 0x7F000000;
         }
-        FastVecScale(&push, pv, -0.125f);
+        FastVecScale(&push, vars, -0.125f);
         if (func_001163B0() % 10 == 0) {
             vec_clear_128(a40);
             a30[0] = *(float *)(self + 0x10) + math_random_float_range(-0.15f, 0.15f);
@@ -133,7 +134,7 @@ void UpdateCollidingTrailProjectile_pal(char *self)
             a40[1] = math_random_float_range(-0.025f, 0.025f);
             a40[2] = math_random_float_range(0.0f, 0.025f);
             vec_scale_to_length(a40, a40, 0.05f);
-            func_PAL_002BEF58(a30, a40, 0, -1.0f);
+            part_spawn_white_flash_pal(a30, a40, 0, -1.0f);
         }
         if (math_fast_float_d(timer) != 0) goto kill;
         {
@@ -171,45 +172,45 @@ void UpdateCollidingTrailProjectile_pal(char *self)
                     *(Quad *)(self + 0x10) = col->position.q;
                     *(unsigned char *)(self + 0x20) = 2;
                     *(unsigned short *)(self + 0x34) |= 0x41;
-                    *(Quad *)(pv + 0x50) = col->normal.q;
-                    *(int *)(pv + 0x7C) = 1;
+                    *(Quad *)(vars + 0x50) = col->normal.q;
+                    *(int *)(vars + 0x7C) = 1;
                     for (i = 0; i < 3; i++) {
                         vec_scale_to_length(spark, &g_hero_l00_velocity, math_random_float_range(0.20000002f, 0.40000004f));
                         spark[0] += math_random_float_range(-0.15f, 0.15f);
                         spark[1] += math_random_float_range(-0.15f, 0.15f);
                         spark[2] += math_random_float_range(-0.15f, 0.15f);
                         vec_scale_to_length(spark, spark, math_random_float_range(0.040000003f, 0.120000005f));
-                        func_PAL_002BEF58(self + 0x10, spark, 0, -1.0f);
+                        part_spawn_white_flash_pal(self + 0x10, spark, 0, -1.0f);
                     }
                 } else {
                     *(Quad *)(self + 0x10) = g_hero_l00_position.position.q;
                     *(unsigned char *)(self + 0x20) = 2;
                     *(unsigned short *)(self + 0x34) |= 0x41;
-                    *(Quad *)(pv + 0x50) = g_hero_l00_position.normal.q;
+                    *(Quad *)(vars + 0x50) = g_hero_l00_position.normal.q;
                     for (i = 0; i < 6; i++) {
                         vec_scale_to_length(a30, &g_hero_l00_velocity, math_random_float_range(0.20000002f, 0.40000004f));
                         a30[0] += math_random_float_range(-0.15f, 0.15f);
                         a30[1] += math_random_float_range(-0.15f, 0.15f);
                         a30[2] += math_random_float_range(-0.15f, 0.15f);
                         vec_scale_to_length(a30, a30, math_random_float_range(0.040000003f, 0.120000005f));
-                        func_PAL_002BEF58(self + 0x10, a30, 0, -1.0f);
+                        part_spawn_white_flash_pal(self + 0x10, a30, 0, -1.0f);
                     }
                 }
             } else {
                 *(Quad *)(self + 0x10) = col->position.q;
                 *(unsigned char *)(self + 0x20) = 2;
                 *(unsigned short *)(self + 0x34) |= 0x41;
-                *(Quad *)(pv + 0x50) = col->normal.q;
+                *(Quad *)(vars + 0x50) = col->normal.q;
                 for (i = 0; i < 6; i++) {
                     vec_scale_to_length(a30, &g_hero_l00_velocity, math_random_float_range(0.20000002f, 0.40000004f));
                     a30[0] += math_random_float_range(-0.15f, 0.15f);
                     a30[1] += math_random_float_range(-0.15f, 0.15f);
                     a30[2] += math_random_float_range(-0.15f, 0.15f);
                     vec_scale_to_length(a30, a30, math_random_float_range(0.040000003f, 0.120000005f));
-                    func_PAL_002BEF58(self + 0x10, a30, 0, -1.0f);
+                    part_spawn_white_flash_pal(self + 0x10, a30, 0, -1.0f);
                 }
             }
-            *(int *)(pv + 0x60) = 12;
+            *(int *)(vars + 0x60) = 12;
             EmitRingAndDirectionalParticles_pal(self, 12, self + 0x10, &g_hero_l00_velocity, 0.10000001f);
         }
         }
@@ -222,26 +223,26 @@ void UpdateCollidingTrailProjectile_pal(char *self)
             HitInfo hit;
             pick[0] = 0x44;
             pick[1] = 0x48;
-            vec_scale_to_length(a40, pv, 2.0f);
+            vec_scale_to_length(a40, vars, 2.0f);
             FastVecAdd(a40, a40, self + 0x10);
             FastVecCross(&hit, self + 0x10, a40);
             vec_scale_to_length(&hit, &hit, 1.0f);
-            math_apply_axis_rotation_to_quat(&hit, &hit, pv, math_random_angle());
-            func_PAL_L00_00343208(self + 0x10, pv, &hit, math_random_float_range(0.010000001f, 0.060000002f), pick[func_001163B0() % 2], math_random_int_range(0x19, 0x2A));
-            gfx_draw_directional_sprite(self + 0x10, 0x103080, math_random_float_range(0.75f, 1.2f), math_random_int_range(0x3F, 0x5F), 0xB, 2, pv, math_random_angle());
-            gfx_draw_directional_sprite(self + 0x10, 0x103080, math_random_float_range(0.75f, 1.2f) * 0.75f, math_random_int_range(0x4F, 0x6F), 0xB, 2, pv, math_random_angle());
-            gfx_draw_directional_sprite(self + 0x10, 0x103080, math_random_float_range(0.75f, 1.2f) * 0.5f, math_random_int_range(0x5F, 0x7F), 0xB, 2, pv, math_random_angle());
-            if (math_fast_float_d(pv + 0x60) != 0) goto kill;
-            if (*(int *)(pv + 0x7C) == 0) {
+            math_apply_axis_rotation_to_quat(&hit, &hit, vars, math_random_angle());
+            part_spawn_accelerated_puff_pal(self + 0x10, vars, &hit, math_random_float_range(0.010000001f, 0.060000002f), pick[func_001163B0() % 2], math_random_int_range(0x19, 0x2A));
+            gfx_draw_directional_sprite(self + 0x10, 0x103080, math_random_float_range(0.75f, 1.2f), math_random_int_range(0x3F, 0x5F), 0xB, 2, vars, math_random_angle());
+            gfx_draw_directional_sprite(self + 0x10, 0x103080, math_random_float_range(0.75f, 1.2f) * 0.75f, math_random_int_range(0x4F, 0x6F), 0xB, 2, vars, math_random_angle());
+            gfx_draw_directional_sprite(self + 0x10, 0x103080, math_random_float_range(0.75f, 1.2f) * 0.5f, math_random_int_range(0x5F, 0x7F), 0xB, 2, vars, math_random_angle());
+            if (math_fast_float_d(vars + 0x60) != 0) goto kill;
+            if (*(int *)(vars + 0x7C) == 0) {
                 for (i = 3; i > 0; i--) {
-                    lerp_vector(pv + 0x10 + i * 0x10, pv + 0x10 + i * 0x10, pv + i * 0x10, 0.2f);
+                    lerp_vector(vars + 0x10 + i * 0x10, vars + 0x10 + i * 0x10, vars + i * 0x10, 0.2f);
                 }
             } else {
                 for (i = 3; i > 0; i--) {
-                    lerp_vector(pv + 0x10 + i * 0x10, pv + 0x10 + i * 0x10, pv + i * 0x10, 0.5f);
+                    lerp_vector(vars + 0x10 + i * 0x10, vars + 0x10 + i * 0x10, vars + i * 0x10, 0.5f);
                 }
             }
-            *(Quad *)(pv + 0x10) = *(Quad *)(self + 0x10);
+            *(Quad *)(vars + 0x10) = *(Quad *)(self + 0x10);
             *(float *)(self + 0x2C) = *(float *)(self + 0x2C) + 0.0005f;
         }
         break;
@@ -249,7 +250,7 @@ void UpdateCollidingTrailProjectile_pal(char *self)
     if (*(unsigned char *)(self + 0x20) == 1) {
         for (i = 0; i < 4; i++) {
             int n = math_random_int_below(5);
-            p = func_PAL_002BE9A8(self + 0x10, 0.2f, 1.0f, 0.9f, math_random_int_below(2) ? -n : n, &g_default_vector, 210000.0f, 0x7F204080, 1);
+            p = part_spawn_spinning_spark_pal(self + 0x10, 0.2f, 1.0f, 0.9f, math_random_int_below(2) ? -n : n, &g_default_vector, 210000.0f, 0x7F204080, 1);
             if (p) {
                 u8 *t = p + 0x20;
                 *(unsigned short *)(p + 0xA) = 4;
@@ -261,7 +262,7 @@ void UpdateCollidingTrailProjectile_pal(char *self)
         }
         for (i = 0; i < 3; i++) {
             int n = math_random_int_below(3);
-            p = func_PAL_002BE9A8(self + 0x10, 0.05f, 1.0f, 0.9f, math_random_int_below(2) ? -n : n, &g_default_vector, 157500.0f, 0x7F4080FF, 1);
+            p = part_spawn_spinning_spark_pal(self + 0x10, 0.05f, 1.0f, 0.9f, math_random_int_below(2) ? -n : n, &g_default_vector, 157500.0f, 0x7F4080FF, 1);
             if (p) {
                 u8 *t = p + 0x20;
                 *(unsigned short *)(p + 0xA) = 2;
@@ -273,7 +274,7 @@ void UpdateCollidingTrailProjectile_pal(char *self)
         }
         for (i = 0; i < 2; i++) {
             int n = math_random_int_below(3);
-            p = func_PAL_002BE9A8(self + 0x10, 0.05f, 1.0f, 0.9f, math_random_int_below(2) ? -n : n, &g_default_vector, 105000.0f, 0x7FFFFFFF, 1);
+            p = part_spawn_spinning_spark_pal(self + 0x10, 0.05f, 1.0f, 0.9f, math_random_int_below(2) ? -n : n, &g_default_vector, 105000.0f, 0x7FFFFFFF, 1);
             if (p) {
                 u8 *t = p + 0x20;
                 *(unsigned short *)(p + 0xA) = 2;
@@ -285,9 +286,9 @@ void UpdateCollidingTrailProjectile_pal(char *self)
         }
     }
     effect_clear_finished_entry(self);
-    if (save_is_record_value(*(int *)(pv + 0x74), *(int *)(pv + 0x70)) == 0) {
+    if (save_is_record_value(*(int *)(vars + 0x74), *(int *)(vars + 0x70)) == 0) {
 kill:
-        table_clear_entry_flag(*(int *)(pv + 0x78));
+        table_clear_entry_flag(*(int *)(vars + 0x78));
         moby_mark_spawned(self);
     } else {
         ref_L00_003DB118_00(part_l00_update_burst_effect, self);

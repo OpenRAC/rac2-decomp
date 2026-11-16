@@ -5,7 +5,7 @@
 #include "common.h"
 extern void moby_set_state(u8 *, int, int);
 extern int math_random_int_below(int);
-extern void func_PAL_002A7E68(char *, int, int, int);
+extern void anim_start_blended_pal(char *, int, int, int);
 extern float mat_fast_helper_a(float, float);
 extern s32 flag_set_first_pending(u8 *);
 typedef int ActorVectorQuad __attribute__((mode(TI)));
@@ -65,8 +65,8 @@ void combat_actor_update_pal(char *object) {
         if (*(u8 *)(object + 0x95) == 4) {
             moby_set_state((u8 *)object, 4, 2);
             if (math_random_int_below(2)) {
-                if (*(u8 *)(object + 0x43) != 2) func_PAL_002A7E68(object, 2, 0, 8);
-            } else if (*(u8 *)(object + 0x43) != 3) func_PAL_002A7E68(object, 3, 0, 8);
+                if (*(u8 *)(object + 0x43) != 2) anim_start_blended_pal(object, 2, 0, 8);
+            } else if (*(u8 *)(object + 0x43) != 3) anim_start_blended_pal(object, 3, 0, 8);
         }
     }
     if (*(char **)(state + 0x4B0) != 0) {
@@ -83,7 +83,7 @@ void combat_actor_update_pal(char *object) {
     switch (*(u8 *)(object + 0x95)) {
     case 2:
         if (flag_set_second_pending((u8 *)object)) {
-            if (*(u8 *)(object + 0x43) != 11) func_PAL_002A7E68(object, 11, 0, 8);
+            if (*(u8 *)(object + 0x43) != 11) anim_start_blended_pal(object, 11, 0, 8);
             *(u8 *)(object + 0xBC) = 0;
             moby_set_controller_speed_limits((u8 *)object, 0.0032000002f, 0.080000006f,
                          0.0016755164f, 0.12566373f);
@@ -92,19 +92,19 @@ void combat_actor_update_pal(char *object) {
         }
         if (*(u8 *)(object + 0xBC) == 1 && *(u16 *)(object + 0x96) > 250) {
             switch (math_random_int_below(5)) {
-            case 0: if (*(u8 *)(object + 0x43) != 2) func_PAL_002A7E68(object, 2, 0, 8); break;
-            case 1: if (*(u8 *)(object + 0x43) != 3) func_PAL_002A7E68(object, 3, 0, 8); break;
-            case 2: if (*(u8 *)(object + 0x43) != 4) func_PAL_002A7E68(object, 4, 0, 8); break;
-            case 3: if (*(u8 *)(object + 0x43) != 6) func_PAL_002A7E68(object, 6, 0, 8); break;
-            case 4: if (*(u8 *)(object + 0x43) != 7) func_PAL_002A7E68(object, 7, 0, 8); break;
+            case 0: if (*(u8 *)(object + 0x43) != 2) anim_start_blended_pal(object, 2, 0, 8); break;
+            case 1: if (*(u8 *)(object + 0x43) != 3) anim_start_blended_pal(object, 3, 0, 8); break;
+            case 2: if (*(u8 *)(object + 0x43) != 4) anim_start_blended_pal(object, 4, 0, 8); break;
+            case 3: if (*(u8 *)(object + 0x43) != 6) anim_start_blended_pal(object, 6, 0, 8); break;
+            case 4: if (*(u8 *)(object + 0x43) != 7) anim_start_blended_pal(object, 7, 0, 8); break;
             }
             *(u16 *)(object + 0x96) = math_random_int_below(83);
         }
         if (*(s16 *)(state + 0x4EA) != 0) {
             moby_set_state((u8 *)object, 5, 4);
             if (math_random_int_below(2)) {
-                if (*(u8 *)(object + 0x43) != 1) func_PAL_002A7E68(object, 1, 0, 8);
-            } else if (*(u8 *)(object + 0x43) != 5) func_PAL_002A7E68(object, 5, 0, 8);
+                if (*(u8 *)(object + 0x43) != 1) anim_start_blended_pal(object, 1, 0, 8);
+            } else if (*(u8 *)(object + 0x43) != 5) anim_start_blended_pal(object, 5, 0, 8);
         }
         angle = mat_fast_helper_a(target[0] - *(float *)(object + 0x10),
                              target[1] - *(float *)(object + 0x14));
@@ -128,12 +128,12 @@ void combat_actor_update_pal(char *object) {
     case 3:
         if (flag_set_first_pending((u8 *)object)) {
             *(u8 *)(object + 0xBC) = 0;
-            if (*(u8 *)(object + 0x43) != 2) func_PAL_002A7E68(object, 2, 0, 0);
+            if (*(u8 *)(object + 0x43) != 2) anim_start_blended_pal(object, 2, 0, 0);
             *(int *)(state + 0x14C) = -1;
         }
         if (*(u8 *)(object + 0xBC) == 0 &&
             *(u16 *)(object + 0x96) > *(s16 *)(state + 0x4F0)) {
-            if (*(u8 *)(object + 0x43) != 11) func_PAL_002A7E68(object, 11, 0, 8);
+            if (*(u8 *)(object + 0x43) != 11) anim_start_blended_pal(object, 11, 0, 8);
             *(u8 *)(object + 0xBC) = 1;
         } else if (*(u8 *)(object + 0xBC) == 1) {
             if (coll_point_inside_record_volume(object + 0x10, arena_get_state_word(*(char **)(object + 0xB8)))) {
@@ -148,7 +148,7 @@ void combat_actor_update_pal(char *object) {
         break;
     case 6:
         if (flag_set_first_pending((u8 *)object)) {
-            if (*(u8 *)(object + 0x43) != 10) func_PAL_002A7E68(object, 10, 0, 8);
+            if (*(u8 *)(object + 0x43) != 10) anim_start_blended_pal(object, 10, 0, 8);
             moby_set_controller_speed_limits((u8 *)object, 0.0064000003f, 0.16000001f,
                          0.010053098f, 1.0053098f);
         }
@@ -158,13 +158,13 @@ void combat_actor_update_pal(char *object) {
         break;
     case 7:
         if (flag_set_first_pending((u8 *)object) && *(u8 *)(object + 0x43) != 11)
-            func_PAL_002A7E68(object, 11, 0, 12);
+            anim_start_blended_pal(object, 11, 0, 12);
         if (*(u8 *)(object + 0x42) == 8 && distance > 15.0f) {
-            if (*(u8 *)(object + 0x43) != 11) func_PAL_002A7E68(object, 11, 0, 3);
+            if (*(u8 *)(object + 0x43) != 11) anim_start_blended_pal(object, 11, 0, 3);
             moby_set_controller_speed_limits((u8 *)object, 0.0064000003f, 0.16000001f,
                          0.0016755164f, 0.12566373f);
         } else if (*(u8 *)(object + 0x42) == 11 && distance < 7.0f) {
-            if (*(u8 *)(object + 0x43) != 8) func_PAL_002A7E68(object, 8, 0, 3);
+            if (*(u8 *)(object + 0x43) != 8) anim_start_blended_pal(object, 8, 0, 3);
             moby_set_controller_speed_limits((u8 *)object, 0.0064000003f, 0.040000003f,
                          0.0016755164f, 0.12566373f);
         }
@@ -173,7 +173,7 @@ void combat_actor_update_pal(char *object) {
                           mat_fast_helper_a(target[0] - *(float *)(object + 0x10),
                                         target[1] - *(float *)(object + 0x14))) < 0.38397247f) {
             moby_set_state((u8 *)object, 8, -1);
-            if (*(u8 *)(object + 0x43) != 12) func_PAL_002A7E68(object, 12, 4, 2);
+            if (*(u8 *)(object + 0x43) != 12) anim_start_blended_pal(object, 12, 4, 2);
             *(int *)(state + 0x4D0) = 0;
         } else if (distance > 2.8f) {
             if (!moby_turn_toward_nearby_enemy_pal(object))
@@ -190,7 +190,7 @@ void combat_actor_update_pal(char *object) {
             *(float *)(state + 0x4CC) = 8.0f;
             if (g_active_attacker_robot == object) {
                 moby_set_state((u8 *)object, 9, -1);
-                if (*(u8 *)(object + 0x43) != 13) func_PAL_002A7E68(object, 13, 0, 6);
+                if (*(u8 *)(object + 0x43) != 13) anim_start_blended_pal(object, 13, 0, 6);
             } else moby_set_state((u8 *)object, 7, -1);
         }
         animation_frame = moby_get_anim_value(object);

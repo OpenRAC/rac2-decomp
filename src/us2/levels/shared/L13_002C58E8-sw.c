@@ -175,7 +175,8 @@ extern char g_impact_effect_data[] MACRO_ADDR;
 extern void moby_raise_state_to_eight();
 extern void moby_raise_state_to_eight_copy();
 
-void func_US2_L13_002C58E8(void) {
+/* Boldan hero state machine, run every frame: reads the pad and moves the hero through its actions (v2.00 copy). */
+void hero_l13_update_state_machine_us2(void) {
     f32 speed62;
     s32 lim67;
     s32 *cnt32;

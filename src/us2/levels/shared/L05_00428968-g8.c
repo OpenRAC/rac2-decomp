@@ -13,7 +13,7 @@ extern void glow_l05_ring_draw_4(void *);
 
 /* Turns the object towards the global target and clamps its aim cone; a target within
    half a unit takes the fast path, the rest the slow one (an angle step and an update). */
-void func_US2_L05_00428968(char *object)
+void glow_pickup_collect_slot4_us2(char *object)
 {
     char *state = *(char **)(object + 0x68);
     float distance;

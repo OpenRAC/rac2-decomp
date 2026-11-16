@@ -85,7 +85,7 @@ extern void UpdateViewContext(void);
 extern void text_draw_window_small(Rect *, u64, char *, s32);
 extern void text_draw_window_medium(Rect *, u64, char *, s32);
 extern void text_draw_window_large(Rect *, u64, char *, s32);
-extern int func_PAL_L02_00402928(void);
+extern int pal_language_at_least_two(void);
 extern void FontSetWindow(Rect *, s32, s32, s32, s32, s32, s32, s32, s32);
 extern f32 IntToFloat(s32);
 extern char *GetLocalizedString(s32);
@@ -169,7 +169,9 @@ static __inline__ int hud_coord(float value, float scale, float half, int active
     return result;
 }
 
-void func_PAL_L11_00449CBC(u8 *moby)
+/* Draws the Joba arena challenge HUD for the running challenge: timers or kill counters, the
+   wave label and the boss health bar (PAL: 50 Hz frame counter; PAL copy of joba_hud_draw_challenge). */
+void joba_hud_draw_challenge_pal(u8 *moby)
 {
     char buf[0x40];
     Rect r50;
@@ -210,9 +212,9 @@ void func_PAL_L11_00449CBC(u8 *moby)
     FontSetWindow(&r50, x, y, g_challenge_hud_f_window_left[0], g_challenge_hud_f_window_right[0], g_challenge_hud_f_window_flags, h, 0, three);
     {
     s32 x, y;
-    x = label_y(&r70, (f32)g_challenge_hud_e_x[func_PAL_L02_00402928()][0], g_hud_label_y_param, half, 1);
-    y = label_y(data, (f32)g_challenge_hud_e_y[func_PAL_L02_00402928()][0], g_hud_label_y_param, half, 1);
-    FontSetWindow(&r70, x, y, g_challenge_hud_e_window_left[func_PAL_L02_00402928()][0], g_challenge_hud_e_window_right[func_PAL_L02_00402928()][0], g_challenge_hud_e_window_flags, hud_coord((f32)g_challenge_hud_e_height, g_hud_label_y_param, half, 1), 0, three);
+    x = label_y(&r70, (f32)g_challenge_hud_e_x[pal_language_at_least_two()][0], g_hud_label_y_param, half, 1);
+    y = label_y(data, (f32)g_challenge_hud_e_y[pal_language_at_least_two()][0], g_hud_label_y_param, half, 1);
+    FontSetWindow(&r70, x, y, g_challenge_hud_e_window_left[pal_language_at_least_two()][0], g_challenge_hud_e_window_right[pal_language_at_least_two()][0], g_challenge_hud_e_window_flags, hud_coord((f32)g_challenge_hud_e_height, g_hud_label_y_param, half, 1), 0, three);
     }
     x = hud_coord((f32)g_challenge_hud_b_x, g_hud_label_y_param, half, 1);
     do { t = (f32)g_challenge_hud_b_y[0] * g_hud_label_y_param + half; y = t; } while (0);
@@ -221,10 +223,10 @@ void func_PAL_L11_00449CBC(u8 *moby)
     three2 = 3;
     {
     s32 x, y;
-    x = label_y(moby, (f32)g_challenge_hud_a_x[func_PAL_L02_00402928()][0], g_hud_label_y_param, half, 1);
+    x = label_y(moby, (f32)g_challenge_hud_a_x[pal_language_at_least_two()][0], g_hud_label_y_param, half, 1);
     do { k3 = 1; } while (0);
-    y = label_y(&rB0, (f32)g_challenge_hud_a_y[func_PAL_L02_00402928()][0], g_hud_label_y_param, half, k3);
-    FontSetWindow(&rB0, x, y, g_challenge_hud_a_window_left[func_PAL_L02_00402928()][0], g_challenge_hud_a_window_right[func_PAL_L02_00402928()][0], g_challenge_hud_a_window_flags, hud_coord((f32)g_challenge_hud_a_height, g_hud_label_y_param, half, k3), 0, three);
+    y = label_y(&rB0, (f32)g_challenge_hud_a_y[pal_language_at_least_two()][0], g_hud_label_y_param, half, k3);
+    FontSetWindow(&rB0, x, y, g_challenge_hud_a_window_left[pal_language_at_least_two()][0], g_challenge_hud_a_window_right[pal_language_at_least_two()][0], g_challenge_hud_a_window_flags, hud_coord((f32)g_challenge_hud_a_height, g_hud_label_y_param, half, k3), 0, three);
     }
     x = hud_coord((f32)g_challenge_hud_d_x, g_hud_label_y_param, half, 1);
     y = hud_coord((f32)g_challenge_hud_d_y[0], g_hud_label_y_param, half, 1);
@@ -249,7 +251,7 @@ void func_PAL_L11_00449CBC(u8 *moby)
         sprintf_n(buf, g_str_number_format, g_arena_wave_kill_targets_a[*(s16 *)(data + 0x1F2)] + sum - *(s32 *)(data + 0x140));
         DRAWBUF(text_draw_window_large, &r50);
         str = (char *)GetLocalizedString(0xE86);
-        if (func_PAL_L02_00402928()) {
+        if (pal_language_at_least_two()) {
             text_draw_window_medium(&r70, g_challenge_hud_text_color, str, func_001157AC(str));
         } else {
             text_draw_window_small(&r70, g_challenge_hud_text_color, str, func_001157AC(str));
@@ -277,7 +279,7 @@ void func_PAL_L11_00449CBC(u8 *moby)
         sprintf_n(buf, g_str_number_format, g_arena_wave_kill_targets_b[*(s16 *)(data + 0x1F2)] + sum - *(s32 *)(data + 0x140));
         DRAWBUF(text_draw_window_large, &r50);
         str = (char *)GetLocalizedString(0xE86);
-        if (func_PAL_L02_00402928()) {
+        if (pal_language_at_least_two()) {
             text_draw_window_medium(&r70, g_challenge_hud_text_color, str, func_001157AC(str));
         } else {
             text_draw_window_small(&r70, g_challenge_hud_text_color, str, func_001157AC(str));
@@ -305,7 +307,7 @@ void func_PAL_L11_00449CBC(u8 *moby)
                 DRAWBUF(text_draw_window_small, &r50);
             }
             str = (char *)GetLocalizedString(0xE86);
-        if (func_PAL_L02_00402928()) {
+        if (pal_language_at_least_two()) {
             text_draw_window_medium(&r70, g_challenge_hud_text_color, str, func_001157AC(str));
         } else {
             text_draw_window_small(&r70, g_challenge_hud_text_color, str, func_001157AC(str));
@@ -325,7 +327,7 @@ void func_PAL_L11_00449CBC(u8 *moby)
                 }
                 LBL4(0xE3, g_challenge_icon_color, g_challenge_icon_x, g_challenge_icon_y, g_challenge_label_scale, 1.0f, 1.0f, 1);
                 break;
-            case 0xB3A:
+            case MOBY_CLASS_ARACHNOID:
                 pv = *(u8 **)(obj + 0x68);
                 hud_draw_boss_health_bar(*(f32 *)(pv + 0x20) / IntToFloat(*(s16 *)(pv + 0x24)));
                 LBL4(0xE3, g_challenge_icon_color, g_challenge_icon_x, g_challenge_icon_y, g_challenge_label_scale, 1.0f, 2.0f, one);

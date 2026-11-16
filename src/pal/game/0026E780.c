@@ -11,7 +11,7 @@ extern unsigned char g_qcopy_source_block[];
    reads from elsewhere in PAL.
    -G0 as func_002FC468: D_001B22A8 is loaded absolutely, and the store in the return's delay
    slot takes the assembler's $gp form. */
-void func_PAL_0026E780(void)
+void gfx_append_splash_packet_pal(void)
 {
     unsigned char *p;
 
@@ -56,12 +56,12 @@ extern void gfx_remove_dma_handlers(void);
    image draw (func_00284E18, func_00284EA8, func_00284F40) and func_PAL_0026E780() before the
    second func_0011AEA0(0). Draws the loaded splash image over 65 frames, fading its alpha from
    128 to 0. */
-void func_PAL_0026E838(int arg)
+void ShowSplashImage_pal(int image_src)
 {
     int *data;
     int count;
 
-    fast_decompress_pal(arg, ((SplashState *)g_loader_memory)->data);
+    fast_decompress_pal(image_src, ((SplashState *)g_loader_memory)->data);
     FlushCache(0);
     for (count = 0x80; count >= 0; count -= 2) {
         gfx_reset_packet_buffer();
@@ -74,7 +74,7 @@ void func_PAL_0026E838(int arg)
         gfx_set_clear_color_packet(0, 0, 0, count);
         PutDrawBufferSmall();
         gfx_queue_second_strip_packet();
-        func_PAL_0026E780();
+        gfx_append_splash_packet_pal();
         FlushCache(0);
         SubmitBufferedDmaChain();
         gfx_wait_for_dma_status_bits(1);
@@ -86,11 +86,11 @@ void func_PAL_0026E838(int arg)
 /* func_PAL_0026E928, the PAL copy of func_0026EAC8: the same C with one more call,
    func_PAL_0026E780(), before the second func_0011AEA0(0). */
 
-void func_PAL_0026E928(int arg)
+void gfx_draw_splash_screen_frame_pal(int image_src)
 {
     char *state = g_loader_memory;
     int *data;
-    fast_decompress_pal(arg, *(void **)(state + 20));
+    fast_decompress_pal(image_src, *(void **)(state + 20));
     FlushCache(0);
     gfx_reset_packet_buffer();
     gfx_install_dma_handlers();
@@ -102,7 +102,7 @@ void func_PAL_0026E928(int arg)
     gfx_write_clear_color_packets();
     PutDrawBufferSmall();
     gfx_queue_second_strip_packet();
-    func_PAL_0026E780();
+    gfx_append_splash_packet_pal();
     FlushCache(0);
     SubmitBufferedDmaChain();
     gfx_wait_for_dma_status_bits(1);

@@ -17,8 +17,8 @@ extern int ref_L22_003FD958_04 __attribute__((sda));
 extern int ref_L22_003FD958_05 __attribute__((sda));
 extern float ref_L22_003FD958_06 __attribute__((sda));
 extern int ref_L22_003FD958_07 __attribute__((sda));
-/* Emit two particles for each randomly perturbed point. */
-void func_PAL_L22_00402258(float *position, float *direction, int count) {
+/* Emits two ground-effect particles for each randomly perturbed point of a spark burst (PAL: 50 Hz timings). */
+void part_emit_spark_burst_alt_pal(float *position, float *direction, int count) {
     float velocity[4] __attribute__((aligned(16)));
     float point[4] __attribute__((aligned(16)));
     float scaled[4] __attribute__((aligned(16)));

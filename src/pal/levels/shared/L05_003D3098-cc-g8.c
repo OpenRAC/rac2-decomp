@@ -25,10 +25,10 @@ extern char *func_L05_003CEFA0(char *, void *, int);
 extern void vec_build_spherical_offset(void *, float, float, float);
 extern int math_random_int_range(int, int);
 extern int func_001163B0(void);
-extern char *func_PAL_002BE9A8(void *, int, float, float, float, float, void *, int, int);
+extern char *part_spawn_spinning_spark_pal(void *, int, float, float, float, float, void *, int, int);
 /* Spawns three particle bursts at obj when func_002A9640 returns a record, unless the record is
    type 1 and obj is class 0x956. Returns 1 if it spawned them. */
-int func_PAL_L05_003D3098(char *obj)
+int shot_spawn_impact_bursts_pal(char *obj)
 {
     float pos[4], base[4], offset[4], center[4], vel[4];
     unsigned char *r;
@@ -139,7 +139,7 @@ int func_PAL_L05_003D3098(char *obj)
                     vec_build_spherical_offset(vel, angle, a, b);
                     FastVecAdd(vel, vel, base);
                     spin = math_random_int_range(-3, 3);
-                    p = func_PAL_002BE9A8(pos, spin, 0.0f, 1.0f, 1.0f, spread * 210000.0f, vel, color, 0);
+                    p = part_spawn_spinning_spark_pal(pos, spin, 0.0f, 1.0f, 1.0f, spread * 210000.0f, vel, color, 0);
                     if (p) {
                         *(short *)(p + 0xa) = 100;
                         s = p + 0x20;

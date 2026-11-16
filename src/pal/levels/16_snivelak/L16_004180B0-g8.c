@@ -25,24 +25,24 @@ extern char *part_spawn_scaling(void *, void *, u32, s32, s32, s32, s32, s32);
    func_L02_00401D38, from the object's two attachment points (func_0029FCC0) instead of a fixed
    pair of vectors. This unit is built with -fno-sched-interblock: retail keeps i++ and the first
    call's arguments in their own blocks. */
-void func_PAL_L16_004180B0(char *a0) {
-    float v0[4];
-    float v1[4];
-    float v2[4];
+void snivelak_emit_fire_burst_pal(char *moby) {
+    float position[4];
+    float velocity[4];
+    float down_velocity[4];
     s32 i;
-    float f;
+    float speed;
 
     for (i = 0; i < 2; i++) {
-        *(TI128 *)v2 = 0;
-        f = math_random_float_range(g_snivelak_fire_speed_min, g_snivelak_fire_speed_max);
-        v2[2] = -(f * 0.020000001f);
-        *(TI128 *)v1 = *(TI128 *)v2;
-        moby_transform_joint_to_world(a0, i, v0);
+        *(TI128 *)down_velocity = 0;
+        speed = math_random_float_range(g_snivelak_fire_speed_min, g_snivelak_fire_speed_max);
+        down_velocity[2] = -(speed * 0.020000001f);
+        *(TI128 *)velocity = *(TI128 *)down_velocity;
+        moby_transform_joint_to_world(moby, i, position);
         if (g_frame_l16_counter & 1) {
-            part_spawn_scaling(v0, v1, g_snivelak_fire_big_param_a, g_snivelak_fire_big_param_b, (math_random_int_range(0x12, 0x16) * 5 + 2) / 6, g_snivelak_fire_big_end_param, -10, 1);
+            part_spawn_scaling(position, velocity, g_snivelak_fire_big_param_a, g_snivelak_fire_big_param_b, (math_random_int_range(0x12, 0x16) * 5 + 2) / 6, g_snivelak_fire_big_end_param, -10, 1);
         } else {
-            part_spawn_scaling(v0, v1, g_snivelak_fire_mid_param_a, g_snivelak_fire_mid_param_b, (math_random_int_range(0x14, 0x18) * 5 + 2) / 6, g_snivelak_fire_mid_end_param, -10, 1);
+            part_spawn_scaling(position, velocity, g_snivelak_fire_mid_param_a, g_snivelak_fire_mid_param_b, (math_random_int_range(0x14, 0x18) * 5 + 2) / 6, g_snivelak_fire_mid_end_param, -10, 1);
         }
-        part_spawn_scaling(v0, v1, g_snivelak_fire_small_param_a, g_snivelak_fire_small_param_b, (math_random_int_range(0xA, 0xF) * 5 + 2) / 6, g_snivelak_fire_small_end_param, -10, 1);
+        part_spawn_scaling(position, velocity, g_snivelak_fire_small_param_a, g_snivelak_fire_small_param_b, (math_random_int_range(0xA, 0xF) * 5 + 2) / 6, g_snivelak_fire_small_end_param, -10, 1);
     }
 }

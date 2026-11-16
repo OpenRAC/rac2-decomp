@@ -27,13 +27,13 @@ extern int snd_play_from_class_bank(int,int,void *,int);
 extern void snd_stop_voice(int);
 
 /* Moves along the selected path, turns smoothly, and manages its movement sound. */
-int ride_platform_move_along_path_pal(char *object,int pathIndex,int *sound)
+int ride_platform_move_along_path_pal(char *object,int path_index,int *sound)
 {
     Vec target,delta;
     char *state=*(char **)(object+0x68);
-    char **path=&g_path_l17_table[pathIndex];
+    char **path=&g_path_l17_table[path_index];
     int complete=0;
-    float speedSquared,deceleration,distance,pitch;
+    float speed_squared,deceleration,distance,pitch;
     qcopy(&target,*path+16+*(int *)(state+0x94)*16);
     FastVecSub(&delta,&target,object+16);
     if(FastVecLength(&delta)<(g_platform_move_speed*0.020000001f)*2.0f) {
@@ -42,9 +42,9 @@ int ride_platform_move_along_path_pal(char *object,int pathIndex,int *sound)
     }
     distance=fast_vec_dist(object+16,*path+*(int *)*path*16);
     deceleration=g_platform_deceleration*0.00040000002f;
-    speedSquared=*(float *)(state+0x90)* *(float *)(state+0x90);
-    if(distance<=speedSquared/(deceleration*2.0f))
-        ApproachValue(state+0x90,0.0f,speedSquared/(distance*2.0f));
+    speed_squared=*(float *)(state+0x90)* *(float *)(state+0x90);
+    if(distance<=speed_squared/(deceleration*2.0f))
+        ApproachValue(state+0x90,0.0f,speed_squared/(distance*2.0f));
     else ApproachValue(state+0x90,g_platform_move_speed*0.020000001f,deceleration);
     vec_scale_to_length(&delta,&delta,*(float *)(state+0x90));
     FastVecAdd(object+16,&delta,object+16);
@@ -68,13 +68,13 @@ int ride_platform_move_along_path_pal(char *object,int pathIndex,int *sound)
 }
 
 /* Moves along the selected path, turns smoothly, and manages its movement sound. */
-int platform_move_along_path_with_sound_pal(char *object,int pathIndex,int *sound)
+int platform_move_along_path_with_sound_pal(char *object,int path_index,int *sound)
 {
     Vec target,delta;
     char *state=*(char **)(object+0x68);
-    char **path=&g_path_l17_table[pathIndex];
+    char **path=&g_path_l17_table[path_index];
     int complete=0;
-    float speedSquared,deceleration,distance,pitch;
+    float speed_squared,deceleration,distance,pitch;
     qcopy(&target,*path+16+*(int *)(state+0x94)*16);
     FastVecSub(&delta,&target,object+16);
     if(FastVecLength(&delta)<(g_platform_move_speed*0.020000001f)*2.0f) {
@@ -83,9 +83,9 @@ int platform_move_along_path_with_sound_pal(char *object,int pathIndex,int *soun
     }
     distance=fast_vec_dist(object+16,*path+16);
     deceleration=g_platform_deceleration*0.00040000002f;
-    speedSquared=*(float *)(state+0x90)* *(float *)(state+0x90);
-    if(distance<=speedSquared/(deceleration*2.0f))
-        ApproachValue(state+0x90,0.0f,speedSquared/(distance*2.0f));
+    speed_squared=*(float *)(state+0x90)* *(float *)(state+0x90);
+    if(distance<=speed_squared/(deceleration*2.0f))
+        ApproachValue(state+0x90,0.0f,speed_squared/(distance*2.0f));
     else ApproachValue(state+0x90,g_platform_move_speed*0.020000001f,deceleration);
     vec_scale_to_length(&delta,&delta,*(float *)(state+0x90));
     FastVecAdd(object+16,&delta,object+16);
@@ -120,19 +120,19 @@ extern void moby_scale_owner_words_by_angles(char *, char *, char *, float, floa
    pair takes 0.000290888245f (arcseconds to radians) times the shared 0x1B0330 word, with the
    record's own 0x12C float as the third argument in the type-3 arm and -1.0f otherwise; the
    0x120/0x124 pair then takes the other two scaled words. */
-void platform_update_bob_sway_pal(char *arg0)
+void platform_update_bob_sway_pal(char *self)
 {
-    char *state = *(char **)(arg0 + 0x68);
+    char *state = *(char **)(self + 0x68);
 
-    if (*(u8 *)(arg0 + 0x20) == 3) {
-        math_update_wrapped_angle_offset(arg0, state + 0x11C, state + 0x118, g_platform_bob_amplitude,
+    if (*(u8 *)(self + 0x20) == 3) {
+        math_update_wrapped_angle_offset(self, state + 0x11C, state + 0x118, g_platform_bob_amplitude,
                       g_platform_bob_period * 0.0003490659f,
                       *(f32 *)(state + 0x12C));
     } else {
-        math_update_wrapped_angle_offset(arg0, state + 0x11C, state + 0x118, g_platform_bob_amplitude,
+        math_update_wrapped_angle_offset(self, state + 0x11C, state + 0x118, g_platform_bob_amplitude,
                       g_platform_bob_period * 0.0003490659f, -1.0f);
     }
-    moby_scale_owner_words_by_angles(arg0, state + 0x120, state + 0x124, g_platform_sway_amplitude,
+    moby_scale_owner_words_by_angles(self, state + 0x120, state + 0x124, g_platform_sway_amplitude,
                   g_platform_sway_period * 0.0003490659f,
                   g_platform_tilt_period * 0.0003490659f);
 }

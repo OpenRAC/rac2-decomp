@@ -9,7 +9,7 @@ extern void DoGifPaging(void);
 extern char *GetLocalizedString(s32);
 extern int g_centered_text_x __attribute__((sda));
 extern int g_centered_text_y[] __attribute__((sda));
-extern void func_US2_0029CFE0(void);
+extern void resident_panel_call_b_us2(void);
 extern char *g_resident_data_base[] __attribute__((sda));
 
 extern int text_draw_centered_small(int v, int p7, unsigned long long k, char *r, int m1);
@@ -36,10 +36,11 @@ extern void gfx_wait_for_dma_status_bits(u64);
 
 extern void PatchMobyGifs(void);
 
-int func_US2_002CE3A0(void)
+/* Draws a line of menu text near the bottom of the screen, then updates and draws the menu's attached panel if there is one (USA v2.00). */
+int menu_draw_footer_and_panel_us2(void)
 {
     SetupGifPaging(0);
-    func_US2_0029CFE0();
+    resident_panel_call_b_us2();
     text_draw_centered_small(g_centered_text_x, g_centered_text_y[0], 0x80F0F0F0ULL, (char *)GetLocalizedString(0x2BE5), -1);
     DoGifPaging();
     if (g_resident_data_base[0] != 0) {

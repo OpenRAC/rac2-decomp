@@ -37,7 +37,7 @@ extern void gfx_add_draw_callback_first(void *, void *);
 extern void energy_gate_draw_effect(u8 *);
 
 /* Track the four linked actors and fade the controller's visible effect. */
-void func_PAL_L02_004163B8(u8 *object)
+void energy_gate_update_pal(u8 *object)
 {
     ControllerScratch scratch[2];
     u8 *state = *(u8 **)(object + 0x68);

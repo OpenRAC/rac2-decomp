@@ -26,14 +26,14 @@ extern f32 mat_fast_helper_a(f32,f32);
 extern f32 fast_vec_dist(void *,void *);
 extern f32 IntToFloat(s32);
 extern void vec_clear_128(void *);
-extern s32 func_PAL_L01_002BEC60(s32,s32);
+extern s32 SetHeroMoveState_pal(s32,s32);
 extern void hero_reset_position_and_direction_pal(void *,void *,s32,s32);
 /* Starts a camera path: resets its motion and mark records, measures both
  * paths' segment lengths, primes both springs and copies the template transform. */
-void func_PAL_L01_00432064(void *arg) {
+void ActivateSplinePathCamera_pal(void *arg) {
     PathVec orientation;
-    PathObject *obj=arg;
-    PathSettings *settings=g_camera_path_configs[obj->config].settings;
+    PathObject *moby=arg;
+    PathSettings *settings=g_camera_path_configs[moby->config].settings;
     PathMarks *marks;
     PathSpring *spring;
     PathMotion *motion;
@@ -41,7 +41,7 @@ void func_PAL_L01_00432064(void *arg) {
     f32 distance, factor;
     PathVec *scale,*pos,*angles;
     settings->state=3;
-    motion=&obj->state->motion;
+    motion=&moby->state->motion;
     motion->a=0;
     motion->b=0;
     motion->distance=0;
@@ -49,13 +49,13 @@ void func_PAL_L01_00432064(void *arg) {
     motion->c=0;
     motion->d=0;
     motion->duration=((s32)settings->duration * 5 + 2) / 6;
-    marks=&obj->state->marks;
+    marks=&moby->state->marks;
     for(i=0;i<8;i++) {
         marks->lengths[i]=0;
         marks->indices[i]=-1;
     }
     factor=g_render_scales.value;
-    scale=&obj->transform[3]; pos=&obj->transform[1]; angles=&obj->transform[2];
+    scale=&moby->transform[3]; pos=&moby->transform[1]; angles=&moby->transform[2];
     marks->factor=mat_fast_helper_a(1.0f,factor)*2.0f;
     if(settings->positionPath>=0) {
         s32 i, marked=0; PathRecord *path;
@@ -82,22 +82,22 @@ void func_PAL_L01_00432064(void *arg) {
             if(i<path->count-1) motion->angleDistance+=distance;
         }
     }
-    spring=&obj->state->position;
+    spring=&moby->state->position;
     spring->stiffness=0.03f; spring->damping=0.2f;
     vec_clear_128(&spring->value);
-    spring=&obj->state->rotation;
+    spring=&moby->state->rotation;
     spring->stiffness=0.03f; spring->damping=0.2f;
     vec_clear_128(&spring->value);
     { u8 *template=g_drive_settings.transform;
     qcopy(scale,template+0x30);
-    qcopy(obj,template);
+    qcopy(moby,template);
     qcopy(pos,template+0x10);
     qcopy(angles,template+0x20); }
-    { s32 cameraIndex=settings->camera;
-    if(cameraIndex<0) func_PAL_L01_002BEC60(111,1);
+    { s32 camera_index=settings->camera;
+    if(camera_index<0) SetHeroMoveState_pal(111,1);
     else {
         u8 (*cameras)[128]=(void *)g_swamp_patrol_positions;
         orientation.q=0; orientation.f[3]=1;
-        hero_reset_position_and_direction_pal(cameras[cameraIndex]+0x30,&orientation,111,0);
+        hero_reset_position_and_direction_pal(cameras[camera_index]+0x30,&orientation,111,0);
     } }
 }

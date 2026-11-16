@@ -64,7 +64,7 @@ extern char g_str_hud_score_format[], g_str_hud_time_format[], g_str_hud_value_f
 extern Block g_hud_color_block_first, g_hud_color_block_second, g_hud_color_block_third;
 extern HudWeapon g_reward_slot_table[];
 
-extern void func_PAL_L10_0042A5C8(s32, s32, s32, s32);
+extern void draw_fading_hud_icon_pairs_pal(s32, s32, s32, s32);
 extern void *level_find_object_by_class_id(s32);
 extern s32 group_count_alive(void *);
 extern s32 list_count_ready_objects(void *);
@@ -74,7 +74,7 @@ extern void text_draw_medium(s32, s32, u64, char *, s32);
 extern s32 hrugis_take_boss_flag_a(void), hrugis_take_boss_flag_b(void);
 extern int level_l00_call_module_handler_with_arg_9_pal(char *, s32);
 extern s32 math_fast_float_d(s32 *);
-extern void func_PAL_002EE490(s32, s32 *, s32 *, s32 *);
+extern void math_split_time_into_parts_pal(s32, s32 *, s32 *, s32 *);
 extern void *table_find_by_id(void *, s32);
 extern f32 IntToFloat(s32);
 /* (sprite, x, y, color, scale, angle): the EE passes the integer and float arguments in their own
@@ -86,9 +86,9 @@ extern void gfx_draw_screen_rectangle(s32, s32, s32, s32, s32, u32 *);
 extern int GetIconFrame(s32, s32);
 extern void hud_draw_sprite_gradient(void *, s32, s32, s32, s32, Block *);
 extern void text_draw_small(s32, s32, u64, char *, s32);
-extern void func_PAL_L05_00328198(s32);
+extern void level_set_counter_plus_one_pal(s32);
 extern s32 level_lookup_step_table(void);
-extern void func_PAL_0029C7F0(void), hud_draw_object_markers(void);
+extern void menu_draw_top_panel_pal(void), hud_draw_object_markers(void);
 
 /* The shape of scaled_screen_coord in src/game/002D3390.c, with this level's display scale. */
 static __inline__ s32 screen_coord(s32 mode, f32 value, f32 offset)
@@ -121,7 +121,7 @@ static __inline__ int label_y(void *handle, float value, float scale, float half
     return result;
 }
 
-s32 func_PAL_L10_00426618(void) {
+s32 DrawHrugisMissionHud_pal(void) {
     char text[128];
     char *label;
     u32 colors[2], colors2[2];
@@ -134,7 +134,7 @@ s32 func_PAL_L10_00426618(void) {
 
     switch (g_selected_mission_kind) {
     case 0:
-        func_PAL_L10_0042A5C8(0, 1, 0, 1);
+        draw_fading_hud_icon_pairs_pal(0, 1, 0, 1);
         object = level_find_object_by_class_id(0xf85);
         if (object)
             score = group_count_alive(object);
@@ -163,7 +163,7 @@ s32 func_PAL_L10_00426618(void) {
         f32 half = 0.5f;
         char *fmt;
 
-        func_PAL_L10_0042A5C8(0, 1, 1, 1);
+        draw_fading_hud_icon_pairs_pal(0, 1, 1, 1);
         label = GetLocalizedString(0x10f3);
         fmt = g_str_hud_score_format;
         sprintf(text, fmt, label, list_count_ready_objects(level_find_object_by_class_id(0xf93)));
@@ -179,7 +179,7 @@ s32 func_PAL_L10_00426618(void) {
         char *fmt;
         s32 textX2;
 
-        func_PAL_L10_0042A5C8(0, 1, 0, 1);
+        draw_fading_hud_icon_pairs_pal(0, 1, 0, 1);
         label = GetLocalizedString(0x10f5);
         fmt = g_str_hud_score_format;
         sprintf(text, fmt, label, list_count_ready_objects(level_find_object_by_class_id(0xf8e)));
@@ -191,12 +191,12 @@ s32 func_PAL_L10_00426618(void) {
         f32 half = 0.5f;
         s32 textX2;
 
-        func_PAL_L10_0042A5C8(1, 1, 0, 1);
+        draw_fading_hud_icon_pairs_pal(1, 1, 0, 1);
         label = GetLocalizedString(0x10ef);
         sprintf(text, g_str_hud_score_format, label, g_gate_frame_counter);
         textX = g_hud_panel_third_x - 65;
         text_draw_medium(textX, label_y((void *)textX, g_hud_panel_third_y - 8, g_screen_l10_scale, half, 1), 0x80808080, text, 128);
-        func_PAL_002EE490(g_mission_time_value, &a, &b, &c);
+        math_split_time_into_parts_pal(g_mission_time_value, &a, &b, &c);
         label = GetLocalizedString(0xea8);
         sprintf(text, g_str_hud_time_format, label, a, b, c);
         textX2 = g_hud_panel_first_x - 80;
@@ -300,7 +300,7 @@ s32 func_PAL_L10_00426618(void) {
         text_draw_small(67, 5, 0x80808080, text, 128);
 
         /* Weapon switch. */
-        func_PAL_L05_00328198(2);
+        level_set_counter_plus_one_pal(2);
         newidx = level_lookup_step_table();
         if (newidx >= 0) {
             g_reward_slot_table[table_find_last_used_entry(g_mission_record_index)].active = 0;
@@ -310,7 +310,7 @@ s32 func_PAL_L10_00426618(void) {
         gfx_draw_scaled_object(g_hud_label_sprite_third, x, y, 0x80f0f0f0, 1.0f, 0.0f);
     }
 
-    func_PAL_0029C7F0();
+    menu_draw_top_panel_pal();
     sprite0 = table_find_by_id(g_hud_sprite_table_base + 0x8710, 186);
     /* data, done with, holds the second sprite. */
     data = table_find_by_id(g_hud_sprite_table_base + 0x8710, 187);

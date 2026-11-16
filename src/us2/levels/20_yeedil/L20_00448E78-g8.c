@@ -22,86 +22,87 @@ extern void FastVecSub(void *, void *, void *);
 extern void FastVecScale(void *, void *, float);
 extern void FastVecAdd(void *, void *, void *);
 
-void eased_platform_update_us2(char *arg0) {
-    char *state = *(char **)(arg0 + 0x68);
+/* Moves a platform (moby class 4687) smoothly from its start to the end of a path once it is triggered, then removes it (USA v2.00). */
+void eased_platform_update_us2(char *moby) {
+    char *vars = *(char **)(moby + 0x68);
     TI128 v0, v1, v2;
 
-    qcopy(&v0, arg0 + 0x10);
-    qcopy(&v1, arg0 + 0xF0);
-    switch (*(u8 *)(arg0 + 0x20)) {
+    qcopy(&v0, moby + 0x10);
+    qcopy(&v1, moby + 0xF0);
+    switch (*(u8 *)(moby + 0x20)) {
     case 0:
-        if (*(int *)(state + 0x80) == -1) {
-            *(u16 *)(arg0 + 0x34) |= 2;
-            moby_set_state(arg0, 4, -1);
+        if (*(int *)(vars + 0x80) == -1) {
+            *(u16 *)(moby + 0x34) |= 2;
+            moby_set_state(moby, 4, -1);
             return;
         }
-        *(float *)(state + 0x88) = 0.0f;
-        *(int *)(state + 0x5C) |= 1;
-        qcopy(state + 0x60, arg0 + 0x10);
-        qcopy(state + 0x70, arg0 + 0xF0);
-        *(u16 *)(arg0 + 0x34) |= 0x100;
-        if (g_collected_l20_flags_2.collected[*(int *)(state + 0x8C)] != 0
-            || (*(u8 *)(arg0 + 0xB0) != 0xFF && *(u8 *)(state + 0x92) != 0
-                && (g_moby_group_flags[g_current_map_index][*(u8 *)(arg0 + 0xB0)] & 0x80))
-            || (*(int *)(state + 0x98) != -1
-                && coll_point_inside_region(g_hero_position, *(int *)(state + 0x98)) != 0)) {
+        *(float *)(vars + 0x88) = 0.0f;
+        *(int *)(vars + 0x5C) |= 1;
+        qcopy(vars + 0x60, moby + 0x10);
+        qcopy(vars + 0x70, moby + 0xF0);
+        *(u16 *)(moby + 0x34) |= 0x100;
+        if (g_collected_l20_flags_2.collected[*(int *)(vars + 0x8C)] != 0
+            || (*(u8 *)(moby + 0xB0) != 0xFF && *(u8 *)(vars + 0x92) != 0
+                && (g_moby_group_flags[g_current_map_index][*(u8 *)(moby + 0xB0)] & 0x80))
+            || (*(int *)(vars + 0x98) != -1
+                && coll_point_inside_region(g_hero_position, *(int *)(vars + 0x98)) != 0)) {
             /* Already triggered: snap to the end of the path. */
-            qcopy_nc(arg0 + 0x10, &g_linked_moby_table[*(int *)(state + 0x80)].pos);
-            qcopy_nc(arg0 + 0xF0, &g_linked_moby_table[*(int *)(state + 0x80)].rot);
-            moby_mark_spawned(arg0);
+            qcopy_nc(moby + 0x10, &g_linked_moby_table[*(int *)(vars + 0x80)].pos);
+            qcopy_nc(moby + 0xF0, &g_linked_moby_table[*(int *)(vars + 0x80)].rot);
+            moby_mark_spawned(moby);
             return;
         }
-        moby_set_state(arg0, 1, -1);
+        moby_set_state(moby, 1, -1);
         break;
     case 1:
-        if (*(u8 *)(arg0 + 0xBC) != 0 || flag_is_third_pending_set(arg0) != 0
-            || *(int *)(state + 0x8C) == -1
-            || g_group_l20_member_table[(*(int *)(state + 0x8C) << 8) + 0x20] == 0xFE
-            || g_group_l20_member_table[(*(int *)(state + 0x8C) << 8) + 0x20] == 0xFD
-            || (*(u8 *)(arg0 + 0xB0) != 0xFF && *(u8 *)(state + 0x92) != 0
-                && (g_moby_group_flags[g_current_map_index][*(u8 *)(arg0 + 0xB0)] & 0x80))
-            || (*(int *)(state + 0x98) != -1
-                && coll_point_inside_region(g_hero_position, *(int *)(state + 0x98)) != 0)) {
-            if (*(int *)(state + 0x94) != -1) {
-                g_group_l20_member_table[(*(int *)(state + 0x94) << 8) + 0xBC] = 1;
+        if (*(u8 *)(moby + 0xBC) != 0 || flag_is_third_pending_set(moby) != 0
+            || *(int *)(vars + 0x8C) == -1
+            || g_group_l20_member_table[(*(int *)(vars + 0x8C) << 8) + 0x20] == 0xFE
+            || g_group_l20_member_table[(*(int *)(vars + 0x8C) << 8) + 0x20] == 0xFD
+            || (*(u8 *)(moby + 0xB0) != 0xFF && *(u8 *)(vars + 0x92) != 0
+                && (g_moby_group_flags[g_current_map_index][*(u8 *)(moby + 0xB0)] & 0x80))
+            || (*(int *)(vars + 0x98) != -1
+                && coll_point_inside_region(g_hero_position, *(int *)(vars + 0x98)) != 0)) {
+            if (*(int *)(vars + 0x94) != -1) {
+                g_group_l20_member_table[(*(int *)(vars + 0x94) << 8) + 0xBC] = 1;
             }
-            if (*(u8 *)(state + 0x93) != 0) {
-                moby_mark_table_entry_flagged(*(u8 *)(arg0 + 0xB0));
+            if (*(u8 *)(vars + 0x93) != 0) {
+                moby_mark_table_entry_flagged(*(u8 *)(moby + 0xB0));
             }
-            moby_set_state(arg0, 2, -1);
+            moby_set_state(moby, 2, -1);
         }
         break;
     case 2: {
         float t, ease;
 
-        *(float *)(state + 0x88) += 1.0f / *(float *)(state + 0x84);
-        if (*(float *)(state + 0x88) > 1.0f) {
-            *(float *)(state + 0x88) = 1.0f;
+        *(float *)(vars + 0x88) += 1.0f / *(float *)(vars + 0x84);
+        if (*(float *)(vars + 0x88) > 1.0f) {
+            *(float *)(vars + 0x88) = 1.0f;
         }
-        t = *(float *)(state + 0x88);
+        t = *(float *)(vars + 0x88);
         ease = (1.0f - math_fast_sin_or_cos_a(t * 3.1415927f)) * 0.5f;
-        vec_scale_to_length(arg0 + 0xE0, arg0 + 0xE0, 1.0f - ease);
-        FastVecSub(&v2, &g_linked_moby_table[*(int *)(state + 0x80)].pos, state + 0x60);
+        vec_scale_to_length(moby + 0xE0, moby + 0xE0, 1.0f - ease);
+        FastVecSub(&v2, &g_linked_moby_table[*(int *)(vars + 0x80)].pos, vars + 0x60);
         FastVecScale(&v2, &v2, ease);
-        FastVecAdd(arg0 + 0x10, state + 0x60, &v2);
-        if (*(float *)(state + 0x88) >= 1.0f) {
-            moby_set_state(arg0, 3, -1);
+        FastVecAdd(moby + 0x10, vars + 0x60, &v2);
+        if (*(float *)(vars + 0x88) >= 1.0f) {
+            moby_set_state(moby, 3, -1);
         }
         break;
     }
     case 3:
-        if (*(int *)(state + 0x94) == -1
-            || g_group_l20_member_table[(*(int *)(state + 0x94) << 8) + 0xBC] == 0) {
-            if (*(u8 *)(state + 0x90) != 0) {
+        if (*(int *)(vars + 0x94) == -1
+            || g_group_l20_member_table[(*(int *)(vars + 0x94) << 8) + 0xBC] == 0) {
+            if (*(u8 *)(vars + 0x90) != 0) {
                 hero_exit_vehicle_mode_us2(0);
             }
-            moby_mark_spawned(arg0);
+            moby_mark_spawned(moby);
             return;
         }
         break;
     }
-    if (*(u8 *)(arg0 + 0x20) < 3) {
-        FastVecSub(&v2, arg0 + 0x10, &v0);
-        mat_combine_and_store(state + 0x20, &v2, &v1, arg0 + 0xF0);
+    if (*(u8 *)(moby + 0x20) < 3) {
+        FastVecSub(&v2, moby + 0x10, &v0);
+        mat_combine_and_store(vars + 0x20, &v2, &v1, moby + 0xF0);
     }
 }

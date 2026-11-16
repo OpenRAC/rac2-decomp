@@ -32,7 +32,8 @@ extern int math_random_int_range(int, int);
 extern int math_fast_float_d(void *);
 extern void cam_compute_view_direction(void *, void *, int);
 
-void func_PAL_L00_003EAE90(char *owner)
+/* Updates every effect record owned by an object: fades, moves and spins them, then frees them when they are done (PAL: 50 Hz timings). */
+void part_update_owned_effect_pal(char *owner)
 {
     Vector displacement, axis, velocity;
     Effect *record;

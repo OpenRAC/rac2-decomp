@@ -169,14 +169,15 @@ static __inline__ int hud_bar_bottom(void)
     return h - y + hud_size(mode, g_hud_size_value, scale, 0.5f);
 }
 
-int func_PAL_L08_00422A2C(void)
+/* Draws the level's heads-up display: the health bar with its labels, the warning and counter text, and the pickup icon (PAL version). */
+int draw_level_status_hud_pal(void)
 {
     unsigned int colors[4];
     struct Palette { unsigned int a,b; } palette;
     char text[64];
     int hero = (int)g_hero_state;
-    unsigned char *obj = *(unsigned char **)(hero + 0x1830);
-    unsigned char *s = *(unsigned char **)(obj + 0x68);
+    unsigned char *hero_moby = *(unsigned char **)(hero + 0x1830);
+    unsigned char *state = *(unsigned char **)(hero_moby + 0x68);
     int mask = -1;
 
     if (*(float *)(hero + 0x183C) < *(float *)(hero + 0x1840) * 0.25f)
@@ -197,7 +198,7 @@ int func_PAL_L08_00422A2C(void)
         gfx_append_vectors_to_packet(2, 0x47, test | ((unsigned long)g_hud_gauge_test_high << 17),
             0x42, alpha | ((unsigned long)g_hud_gauge_alpha_high << 32));
     }
-    FastDecTimer(s + 0x8E);
+    FastDecTimer(state + 0x8E);
     if (g_hud_l19_text_table) {
         float delta, ratio;
         unsigned char *str;
@@ -221,7 +222,7 @@ int func_PAL_L08_00422A2C(void)
         x = (float)(g_screen_width / 2);
         y = label_y(str, g_hud_label_y_base, g_hud_scale_factor_global, half, 1);
         sprite((char *)str, mask & 0x55F0C070, x, g_screen_height / 2 + y, fade, fade, z);
-        delta = *(float *)(hero + 0x183C) - ((HudState *)s)->level;
+        delta = *(float *)(hero + 0x183C) - ((HudState *)state)->level;
         delta *= 0.2f;
         {
             float magnitude = math_fabs(delta);
@@ -229,8 +230,8 @@ int func_PAL_L08_00422A2C(void)
         }
         c0 = g_hud_color_start;
         c1 = g_hud_color_end;
-        ((HudState *)s)->level += delta;
-        ratio = ((HudState *)s)->level / *(float *)(hero + 0x1840);
+        ((HudState *)state)->level += delta;
+        ratio = ((HudState *)state)->level / *(float *)(hero + 0x1840);
         palette.a = c0;
         palette.b = c1;
         *(struct Palette *)colors = palette;
@@ -244,11 +245,11 @@ int func_PAL_L08_00422A2C(void)
     }
     if (g_current_map_index == 8 || g_current_map_index == 19) {
         unsigned char *str;
-        if (*(short *)(s + 0x8E)) {
+        if (*(short *)(state + 0x8E)) {
             float ratio, scale, alpha;
             int color;
-            if (*(short *)(s + 0x8E) == 1) snd_play_from_class_bank(3,0,obj,0x85C);
-            ratio = IntToFloat(180-*(short *)(s + 0x8E)) / IntToFloat(180);
+            if (*(short *)(state + 0x8E) == 1) snd_play_from_class_bank(3,0,hero_moby,0x85C);
+            ratio = IntToFloat(180-*(short *)(state + 0x8E)) / IntToFloat(180);
             scale = g_hud_scale_start + (g_hud_scale_end-g_hud_scale_ease_sub)*math_ease_out_quad(ratio);
             alpha = IntegerPower(3,1.0f-ratio)*127.0f;
             color = FloatToInt(alpha*0.5f) << 24;
@@ -261,17 +262,17 @@ int func_PAL_L08_00422A2C(void)
             color = FloatToInt(alpha) << 24;
             DrawCenteredScaledText(g_screen_width-g_hud_label_x_inset,g_screen_height-hud_coord(g_hud_scale_mode, (float)g_hud_label_y_inset, 0.5f, 1, -6.0f),
                 (color|0x808080)&mask,str,0x11,scale);
-        } else if (*(int *)(s + 0x6C)) {
-            if (*(float *)(s + 0x68) > g_hud_l19_bar_threshold) {
+        } else if (*(int *)(state + 0x6C)) {
+            if (*(float *)(state + 0x68) > g_hud_l19_bar_threshold) {
                 int x, y, pad;
                 char *line;
                 str = GetLocalizedString(0x10f8);
-                thread_call_var_args_worker(text,str,FloatToInt(*(float *)(s + 0x68)));
+                thread_call_var_args_worker(text,str,FloatToInt(*(float *)(state + 0x68)));
                 line = text;
                 pad = g_pal_region_mode == 3 ? 24 : 0;
                 x = g_screen_width-g_hud_text_x_inset-pad;
                 y = g_screen_height-hud_coord(g_hud_scale_mode, (float)g_hud_label_y_inset, 0.5f, 1, -6.0f);
-                hero = 0x80FFDE8D; /* From here on `hero` is the counter's colour. */
+                hero = 0x80FFDE8D; /* From here on `hero` is the counter'state colour. */
                 hero = mask & hero;
                 text_draw_medium(x,y,(unsigned int)hero,line,func_001157AC(line));
             } else if (g_pad_pressed_flags & 0x80) {
@@ -288,10 +289,10 @@ int func_PAL_L08_00422A2C(void)
                     (unsigned int)(mask&0x80F0F0F0),str,0x11,scale);
             }
         }
-        if (s[0x8A]) {
+        if (state[0x8A]) {
             float ratio, width, height, dx, dy, top;
             int color, tex, x, y, a, b, alpha;
-            ratio = IntToFloat(*(short *)(s + 0x88))/IntToFloat((((int)(g_hud_bar_slide_frames) * 5 + 2) / 6));
+            ratio = IntToFloat(*(short *)(state + 0x88))/IntToFloat((((int)(g_hud_bar_slide_frames) * 5 + 2) / 6));
             width = math_square(ratio)*32.0f;
             height = math_square(ratio)*24.0f;
             dx = g_hud_bar_slide_dx*math_ease_out_quad(ratio);
@@ -313,7 +314,7 @@ int func_PAL_L08_00422A2C(void)
                     (float)(g_screen_width/2+32)-dx,(float)(g_screen_height/2+g_hud_l19_bar_y_offset),1.0f,1.0f,0.0f);
                 hero_end_saved_float_hold();
             }
-            if (s[0x8A] < 3) {
+            if (state[0x8A] < 3) {
                 int c=color|0xF0F0B0;
                 colors[0]=c;
                 colors[1]=c;
@@ -321,17 +322,17 @@ int func_PAL_L08_00422A2C(void)
                 colors[3]=c;
                 tex=GetIconFrame(0xEAA2,3);
                 x=FloatToInt((float)g_screen_width-g_hud_l19_bar_right_margin-dy);
-                y=FloatToInt(g_hud_bar_top_base+(float)g_hud_l19_bar_y_offset+(float)*(short *)(s + 0x8C)+top);
+                y=FloatToInt(g_hud_bar_top_base+(float)g_hud_l19_bar_y_offset+(float)*(short *)(state + 0x8C)+top);
                 y=scaled_coord(y,g_hud_scale_factor_global,0.5f,1);
                 a=FloatToInt(height);
                 b=FloatToInt(height);
                 hud_draw_sprite_gradient(tex,x,y,a,b,colors);
             }
         }
-        radar_draw(obj);
+        radar_draw(hero_moby);
     }
     gfx_append_vectors_to_packet(2,0x47,0x5340B,0x42,0x8000000044ULL);
-    *(float *)(s + 0x68)=1000000.0f;
-    *(int *)(s + 0x6C)=0;
+    *(float *)(state + 0x68)=1000000.0f;
+    *(int *)(state + 0x6C)=0;
     return 1;
 }

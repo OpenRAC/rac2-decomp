@@ -47,7 +47,7 @@ extern float moby_get_anim_value(char *);
 
 /* Advances the hero animation, applies queued frames and sound triggers, and
    records the animation frame delta. */
-void func_PAL_L00_002D29E8(void)
+void AdvanceHeroAnimation_pal(void)
 {
     u8 *base;
     AnimObject *obj;

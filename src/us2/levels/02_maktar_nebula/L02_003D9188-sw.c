@@ -29,9 +29,9 @@ typedef struct {
     short x280;
     u8 pad282[6];
     short timer;
-    short savedMode;
-    short savedAnim;
-    u8 savedPhase;
+    short saved_mode;
+    short saved_anim;
+    u8 saved_phase;
     u8 pad28F;
     short forced;
     short x292;
@@ -43,7 +43,7 @@ struct Actor {
     u8 pad21[0x13];
     unsigned short flags;
     u8 pad36[0xC];
-    u8 previousAnim;
+    u8 previous_anim;
     u8 anim;
     u8 pad44[4];
     float x48;
@@ -52,13 +52,13 @@ struct Actor {
     u8 pad61[7];
     SentryState *state;
     u8 pad6C[0x2A];
-    unsigned short stateTime;
+    unsigned short state_time;
     u8 pad98[4];
     int x9C;
     u8 padA0[0x18];
     Actor *parent;
     u8 phase;
-    u8 padBD[0x33];
+    u8 pad_bd[0x33];
     float rot[4];
     u8 pad100[0];
 };
@@ -132,7 +132,7 @@ void brawler_legs_update_us2(Actor *self)
     float direction[4] __attribute__((aligned(16)));
     float curve[4] __attribute__((aligned(16)));
     float distance, yaw, frame, facing, value;
-    short damageKind;
+    short damage_kind;
     int sound;
 
     walker_boss_update_damage(self);
@@ -144,11 +144,11 @@ void brawler_legs_update_us2(Actor *self)
     distance = vec_distance_xy(self->position, target);
     yaw = mat_fast_helper_a(target[0] - self->position[0], target[1] - self->position[1]);
     frame = moby_get_anim_value(self);
-    damageKind = 0;
+    damage_kind = 0;
     if (RESIDENT->damage) {
-        damageKind = *(short *)((char *)RESIDENT->damage + 0xAA);
+        damage_kind = *(short *)((char *)RESIDENT->damage + 0xAA);
     }
-    if (RESIDENT->motion == 7 || RESIDENT->damage == self || damageKind == 0xD08) {
+    if (RESIDENT->motion == 7 || RESIDENT->damage == self || damage_kind == 0xD08) {
         state->forced = 1;
     }
     switch (self->mode) {
@@ -159,7 +159,7 @@ void brawler_legs_update_us2(Actor *self)
         state->forced = 0;
         if (flag_set_first_pending(self)) {
             self->phase = 0;
-            self->stateTime = 0;
+            self->state_time = 0;
             anim_start_blended(self, 0, 0, 3);
             if (PROXY->anim) {
                 anim_start_blended(PROXY, 0, 0, 10);
@@ -167,7 +167,7 @@ void brawler_legs_update_us2(Actor *self)
             }
             break;
         }
-        if (self->phase == 0 && self->stateTime > 60) {
+        if (self->phase == 0 && self->state_time > 60) {
             self->phase = 1;
             if (self->anim != 3) {
                 anim_start_blended(self, 3, 0, 10);
@@ -241,7 +241,7 @@ void brawler_legs_update_us2(Actor *self)
             chainblade_advance_health_phase(state->child);
             arena_set_current_boss(self->parent, state->child);
             vec_clear_128(&state->xF0);
-            self->stateTime = 0;
+            self->state_time = 0;
             break;
         }
         if (self->phase == 0) {
@@ -261,7 +261,7 @@ void brawler_legs_update_us2(Actor *self)
         }
         if (self->phase == 1 && (self->x60 & 2)) {
             self->phase = 2;
-            self->stateTime = 0;
+            self->state_time = 0;
             if (self->anim != 4) {
                 anim_start_blended(self, 4, 0, 10);
             }
@@ -271,7 +271,7 @@ void brawler_legs_update_us2(Actor *self)
             }
         } else if (self->phase == 2) {
             value = fast_vec_dist(self->position, g_brawler_target_position);
-            if (!(value < 1.0f) && self->stateTime < 301) {
+            if (!(value < 1.0f) && self->state_time < 301) {
                 break;
             }
             self->phase = 3;
@@ -354,12 +354,12 @@ void brawler_legs_update_us2(Actor *self)
         break;
     case 6:
         if (flag_set_first_pending(self)) {
-            if (self->previousAnim == 7) {
+            if (self->previous_anim == 7) {
                 self->phase = 1;
                 if (PROXY->anim != 10) {
                     anim_start_blended(PROXY, 10, 0, 10);
                 }
-            } else if (self->previousAnim == 6) {
+            } else if (self->previous_anim == 6) {
                 self->phase = 0;
                 self->flags &= 0xEFFF;
             } else {
@@ -424,8 +424,8 @@ void brawler_legs_update_us2(Actor *self)
                 anim_start_blended(PROXY, 7, 0, 15);
             }
             state->x24C += 0.1939255f;
-            self->stateTime = 0;
-        } else if (self->stateTime >= 181) {
+            self->state_time = 0;
+        } else if (self->state_time >= 181) {
             moby_set_state(self, 6, -1);
         }
         break;
@@ -439,7 +439,7 @@ void brawler_legs_update_us2(Actor *self)
             }
             state->x24C += 0.1939255f;
         } else if (frame > 45.0f) {
-            moby_set_state(self, state->savedMode, -1);
+            moby_set_state(self, state->saved_mode, -1);
         }
         break;
     case 9:
@@ -452,10 +452,10 @@ void brawler_legs_update_us2(Actor *self)
         if (!(PROXY->x60 & 2)) {
             break;
         }
-        self->mode = state->savedMode;
-        self->phase = state->savedPhase;
-        if (PROXY->anim != state->savedAnim) {
-            anim_start_blended(PROXY, state->savedAnim, 0, 15);
+        self->mode = state->saved_mode;
+        self->phase = state->saved_phase;
+        if (PROXY->anim != state->saved_anim) {
+            anim_start_blended(PROXY, state->saved_anim, 0, 15);
         }
         break;
     case 10:
@@ -468,7 +468,7 @@ void brawler_legs_update_us2(Actor *self)
                 }
             }
             state->sound = -1;
-            if (self->previousAnim == 7) {
+            if (self->previous_anim == 7) {
                 self->phase = 1;
                 if (PROXY->anim != 13) {
                     anim_start_blended(PROXY, 13, 0, 15);
@@ -477,7 +477,7 @@ void brawler_legs_update_us2(Actor *self)
             }
             else {
                 self->phase = 0;
-                if (self->previousAnim != 6 && self->anim != 9) {
+                if (self->previous_anim != 6 && self->anim != 9) {
                     anim_start_blended(self, 9, 0, 15);
                 }
             }
@@ -509,7 +509,7 @@ void brawler_legs_update_us2(Actor *self)
             }
             self->x48 = 0.0f;
             PROXY->x48 = 0.0f;
-            self->stateTime = 0;
+            self->state_time = 0;
             FastVecSub(direction, g_camera_l02_position, PROXY->position);
             vec_scale_to_length(direction, direction, math_random_float_range(0.083333336f, 0.116666675f));
             direction[2] += 0.06666667f;
@@ -526,12 +526,12 @@ void brawler_legs_update_us2(Actor *self)
             state->scale[0] = state->scale[1] = state->scale[2] = 2.0f;
             self->flags &= 0xEFFF;
         }
-        value = IntToFloat(self->stateTime) * -0.0111110555f + 2.0f;
+        value = IntToFloat(self->state_time) * -0.0111110555f + 2.0f;
         if (value < 0.0f) {
             value = 0.0f;
         }
         state->scale[0] = state->scale[1] = state->scale[2] = value;
-        if (self->stateTime > 180) {
+        if (self->state_time > 180) {
             self->x48 = 1.0f;
             PROXY->x48 = 1.0f;
             SpawnExplosion(self->position, 1, 25, 2.0f, 20, 30, 40, 45, 1, 20.0f, 0, 1, 0, 0);

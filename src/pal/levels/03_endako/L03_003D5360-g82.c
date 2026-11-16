@@ -32,54 +32,54 @@ extern float FastAddRotations(float, float);
 extern void moby_mark_spawned(void *);
 
 /* Advances the trail, resolves a collision, then settles and fades the object. */
-void func_PAL_L03_003D56E8(char *obj)
+void trail_l03_l03_projectile_update_pal(char *obj)
 {
-    float nextPosition[4], traceEnd[4], matrix[12], particlePosition[4], trailPosition[4], trailStep[4];
+    float next_position[4], trace_end[4], matrix[12], particle_position[4], trail_position[4], trail_step[4];
     int i, color;
 
     char *state = *(char **)(obj + 0x68);
     switch (*(u8 *)(obj + 0x20)) {
     case 0: {
-        float f;
-        FastVecAdd(nextPosition, obj + 0x10, state);
-        vec_scale_to_length(traceEnd, obj + 0xc0, g_trail_projectile_trace_length);
-        FastVecAdd(traceEnd, traceEnd, nextPosition);
+        float size;
+        FastVecAdd(next_position, obj + 0x10, state);
+        vec_scale_to_length(trace_end, obj + 0xc0, g_trail_projectile_trace_length);
+        FastVecAdd(trace_end, trace_end, next_position);
         make_hit_descriptor(matrix, obj, 1, g_effect_descriptor_default, (float)*(int *)(state + 0x38));
-        *(TI128 *)(trailPosition) = *(TI128 *)(obj + 0x10);
-        FastVecScale(trailStep, state, -0.2f);
+        *(TI128 *)(trail_position) = *(TI128 *)(obj + 0x10);
+        FastVecScale(trail_step, state, -0.2f);
         i = 4;
         do {
             i--;
-            f = math_random_float_range(0.1f, 0.3f);
+            size = math_random_float_range(0.1f, 0.3f);
             color = math_random_int_below(255);
-            vec_random_direction(particlePosition, 0.0f, 0.1f);
-            FastVecAdd(particlePosition, particlePosition, trailPosition);
-            part_spawn_gravity_fade(particlePosition, g_effect_descriptor_default, 12, 0x808080, color, 32, 0, f*210000.0f, f*42000.0f, 0.0f, 0);
-            FastVecAdd(trailPosition, trailPosition, trailStep);
+            vec_random_direction(particle_position, 0.0f, 0.1f);
+            FastVecAdd(particle_position, particle_position, trail_position);
+            part_spawn_gravity_fade(particle_position, g_effect_descriptor_default, 12, 0x808080, color, 32, 0, size*210000.0f, size*42000.0f, 0.0f, 0);
+            FastVecAdd(trail_position, trail_position, trail_step);
         } while (i >= 0);
-        if (CollLine(nextPosition, traceEnd, 0, obj, matrix) && g_hero_ground_collision.count > 0) {
+        if (CollLine(next_position, trace_end, 0, obj, matrix) && g_hero_ground_collision.count > 0) {
             *(TI128 *)(state + 0x20) = *(TI128 *)(g_hero_ground_collision.pos);
             *(TI128 *)(state + 0x10) = *(TI128 *)(g_hero_ground_collision.normal);
             *(float *)(state + 0x34) = g_trail_projectile_trace_length;
             part_l00_spawn_spark_burst_3_pal(g_hero_ground_collision.pos, 10, 1);
             moby_set_state(obj, 1, -1);
         }
-        *(TI128 *)(obj + 0x10) = *(TI128 *)(nextPosition);
+        *(TI128 *)(obj + 0x10) = *(TI128 *)(next_position);
         if (math_fast_float_d(state + 0x30)) moby_mark_spawned(obj);
         break;
     }
     case 1: {
         void *rotation = obj + 0xf4;
-        float f;
-        f = mat_fast_helper_a(vec_length_xy(state + 0x10), *(float *)(state + 0x18));
-        StepAngleTowardTarget(rotation, 0, f, 0.12566373f);
+        float step;
+        step = mat_fast_helper_a(vec_length_xy(state + 0x10), *(float *)(state + 0x18));
+        StepAngleTowardTarget(rotation, 0, step, 0.12566373f);
         *(TI128 *)(obj + 0x10) = *(TI128 *)(state + 0x20);
-        vec_scale_to_length(nextPosition, obj + 0xc0, -*(float *)(state + 0x34));
-        FastVecAdd(obj + 0x10, obj + 0x10, nextPosition);
+        vec_scale_to_length(next_position, obj + 0xc0, -*(float *)(state + 0x34));
+        FastVecAdd(obj + 0x10, obj + 0x10, next_position);
         ApproachValue(state + 0x34, 0.0f, 0.0060000005f);
         { float amount = *(float *)(state + 0x34);
-          f = amount*1.2566373f;
-          *(float *)(obj + 0xf0) = FastAddRotations(*(float *)(obj + 0xf0), f); }
+          step = amount*1.2566373f;
+          *(float *)(obj + 0xf0) = FastAddRotations(*(float *)(obj + 0xf0), step); }
         if (*(float *)(state + 0x34) <= 0.0f) {
             moby_set_state(obj, 2, -1);
             *(int *)(state + 0x30) = 50;

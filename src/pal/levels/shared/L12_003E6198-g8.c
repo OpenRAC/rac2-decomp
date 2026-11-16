@@ -11,53 +11,54 @@ extern void FastVecAdd(void *, void *, void *);
 extern float fast_vec_dist(void *, void *);
 extern float coll_probe_ground_height_below(void *, int, float);
 
-int AdvanceAlongPath_pal(u8 *a0, u8 *a1) {
-    u8 *st = *(u8 **)(a0 + 0x68);
-    u8 *e = *(u8 **)(g_path_zone_table + (*(s32 *)(st + 0x158) << 2));
+/* Moves the enemy along a path toward the next point and says when it has reached the end (PAL: 50 Hz step). */
+int AdvanceAlongPath_pal(u8 *moby, u8 *path) {
+    u8 *vars = *(u8 **)(moby + 0x68);
+    u8 *zone = *(u8 **)(g_path_zone_table + (*(s32 *)(vars + 0x158) << 2));
     float entry[4];
     float dir[4];
     float rot[4];
     float len;
     u8 *src;
 
-    if (*(s32 *)(st + 0x168) > 0) {
-        src = (u8 *)(*(s32 *)(st + 0x168) << 4);
-        src += (s32)a1;
+    if (*(s32 *)(vars + 0x168) > 0) {
+        src = (u8 *)(*(s32 *)(vars + 0x168) << 4);
+        src += (s32)path;
         src += 0x10;
     }
     else
-        src = e + 0x10;
+        src = zone + 0x10;
     qcopy(entry, src);
-    if (*(s32 *)(st + 0x168) > 0) {
-        FastVecSub(rot, a1 + ((*(s32 *)(st + 0x168) << 4) + 0x10),
-                      a1 + (*(s32 *)(st + 0x168) << 4));
+    if (*(s32 *)(vars + 0x168) > 0) {
+        FastVecSub(rot, path + ((*(s32 *)(vars + 0x168) << 4) + 0x10),
+                      path + (*(s32 *)(vars + 0x168) << 4));
         *(qword *)dir = *(qword *)rot;
         len = FastVecLength(dir);
         if (g_enemy_path_speed * 0.020000001f < len)
             vec_scale_to_length(dir, dir, g_enemy_path_speed * 0.020000001f);
-        FastVecAdd(a0 + 0x10, a0 + 0x10, dir);
+        FastVecAdd(moby + 0x10, moby + 0x10, dir);
     } else {
-        FastVecSub(rot, e + 0x10, a1 + (*(s32 *)a1 << 4));
+        FastVecSub(rot, zone + 0x10, path + (*(s32 *)path << 4));
         *(qword *)dir = *(qword *)rot;
         len = FastVecLength(dir);
         if (g_enemy_path_speed * 0.020000001f < len)
             vec_scale_to_length(dir, dir, g_enemy_path_speed * 0.020000001f);
-        FastVecAdd(a0 + 0x10, a0 + 0x10, dir);
+        FastVecAdd(moby + 0x10, moby + 0x10, dir);
     }
-    if (fast_vec_dist(a0 + 0x10, entry) <= 0.5f) {
-        s32 c = *(s32 *)(st + 0x168);
+    if (fast_vec_dist(moby + 0x10, entry) <= 0.5f) {
+        s32 index = *(s32 *)(vars + 0x168);
 
-        if (c == -1)
+        if (index == -1)
             return 1;
-        if (*(s32 *)a1 - 1 == c) {
-            float f;
+        if (*(s32 *)path - 1 == index) {
+            float ground;
 
-            *(s32 *)(st + 0x168) = -1;
-            f = coll_probe_ground_height_below(e + 0x10, 0, 0.5f);
-            if (*(float *)(e + 0x18) - f < 10.0f)
-                *(float *)(e + 0x18) = f + 0.5f;
+            *(s32 *)(vars + 0x168) = -1;
+            ground = coll_probe_ground_height_below(zone + 0x10, 0, 0.5f);
+            if (*(float *)(zone + 0x18) - ground < 10.0f)
+                *(float *)(zone + 0x18) = ground + 0.5f;
         } else {
-            *(s32 *)(st + 0x168) = c + 1;
+            *(s32 *)(vars + 0x168) = index + 1;
         }
     }
     return 0;

@@ -17,6 +17,7 @@ static inline void WrapLow(int *index, int last)
         *index = last;
 }
 
+/* Moves the list selection up or down on pad input, skipping empty entries, and returns 1 when the selected entry is confirmed. (PAL) */
 void *UpdateMenuListSelection_pal(SelectionMenu *object, int flags)
 {
     int direction = 0;

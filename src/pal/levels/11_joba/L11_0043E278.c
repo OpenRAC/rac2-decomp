@@ -14,23 +14,23 @@ struct RotorState {
       int f60;
       char pad64[0x9C];
       float points[13][4];
-      float oldPoints[13][4];
+      float old_points[13][4];
       char pad2A0[0x10];
       int choices[4][4];
       char pad2F0[0x30];
-      int pathIndex;
+      int path_index;
       struct RotorPath *path;
       char pad328[8];
       int records[10];
       int linked;
       char pad35C[0xC];
-      int projectileClass;
+      int projectile_class;
       char pad36C[4];
-      s16 pathPoint;
+      s16 path_point;
       char pad372[2];
-      s16 projectileIndex;
-      s16 projectileDelay;
-      s16 ropeCount;
+      s16 projectile_index;
+      s16 projectile_delay;
+      s16 rope_count;
       u16 toggle;
       char pad37C[4];
       u8 disabled[10];
@@ -76,39 +76,39 @@ void chain_creature_fire_projectile_pal(struct RotorObject *obj)
     float offset[4];
     float velocity[4];
     float jitter[4];
-    float toTarget[4];
+    float to_target[4];
     struct RotorState *state = obj->state;
     char *projectile;
 
-    if (state->projectileIndex == -1)
+    if (state->projectile_index == -1)
         return;
 
-    while (state->disabled[state->projectileIndex])
-        ++state->projectileIndex;
-    if (state->projectileIndex >= 10) {
-        state->projectileIndex = -1;
+    while (state->disabled[state->projectile_index])
+        ++state->projectile_index;
+    if (state->projectile_index >= 10) {
+        state->projectile_index = -1;
         return;
     }
-    if (!FastDecTimer(&state->projectileDelay))
+    if (!FastDecTimer(&state->projectile_delay))
         return;
 
-    moby_transform_joint_to_world(LISTED_RECORD(obj, state->projectileIndex), 0, pos);
-    moby_transform_joint_point(LISTED_RECORD(obj, state->projectileIndex), 0, matrix);
+    moby_transform_joint_to_world(LISTED_RECORD(obj, state->projectile_index), 0, pos);
+    moby_transform_joint_point(LISTED_RECORD(obj, state->projectile_index), 0, matrix);
     vec_scale_to_length(offset, matrix[2], -0.3f);
     FastVecAdd(pos, pos, offset);
 
     vec_random_direction(jitter, 0.020000001f, 0.060000002f);
     jitter[2] = -0.10000001f;
     qcopy_nc(velocity, jitter);
-    FastVecSub(toTarget, state->aim, pos);
-    vec_scale_to_length(toTarget, toTarget, 0.40000004f);
-    FastVecAdd(velocity, velocity, toTarget);
+    FastVecSub(to_target, state->aim, pos);
+    vec_scale_to_length(to_target, to_target, 0.40000004f);
+    FastVecAdd(velocity, velocity, to_target);
 
-    projectile = moby_find_active_in_group(state->projectileClass);
+    projectile = moby_find_active_in_group(state->projectile_class);
     if (projectile)
-        joba_shot_init(projectile, LISTED_RECORD(obj, state->projectileIndex), obj->fB8,
+        joba_shot_init(projectile, LISTED_RECORD(obj, state->projectile_index), obj->fB8,
                           state->f60, pos, velocity, 120, 0.004f, state->f35);
-    ++state->projectileIndex;
-    state->projectileDelay = 12;
+    ++state->projectile_index;
+    state->projectile_delay = 12;
 }
 

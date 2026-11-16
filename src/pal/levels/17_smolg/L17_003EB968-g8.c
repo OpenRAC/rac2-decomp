@@ -14,26 +14,26 @@ extern s32 g_hit_burst_piece_table_a __attribute__((sda));
 
 /* Sets the object's stage up: the first stage asks the level's own spawner for a child and
    gives up its handle, the second one only releases the handle. */
-void hit_l17_burst_update_pal(s32 a0)
+void hit_l17_burst_update_pal(s32 obj)
 {
-    u8 v = *(u8 *)(a0 + 0x20);
+    u8 stage = *(u8 *)(obj + 0x20);
 
-    switch (v) {
+    switch (stage) {
     case 0:
-        moby_set_state(a0, 1, -1);
+        moby_set_state(obj, 1, -1);
         break;
     case 1:
-        if (part_find_owned_effect_slot(a0, 0x4010001, 0) != 0) {
-            moby_set_state(a0, 2, -1);
-            *(u8 *)(a0 + 0xA8) = 0xFF;
+        if (part_find_owned_effect_slot(obj, 0x4010001, 0) != 0) {
+            moby_set_state(obj, 2, -1);
+            *(u8 *)(obj + 0xA8) = 0xFF;
         }
         break;
     case 2:
-        part_explode_object_into_pieces(a0, &g_hit_burst_piece_table_c, &g_hit_burst_piece_table_b, &g_hit_burst_piece_table_a,
+        part_explode_object_into_pieces(obj, &g_hit_burst_piece_table_c, &g_hit_burst_piece_table_b, &g_hit_burst_piece_table_a,
                           0xFFFF, 0, g_hit_burst_piece_param, 0, 0xFFFF, 0xFF, 0);
-        SpawnExplosion(a0 + 0x10, 0, 12, 10, 10, 10, 0, 0,
-                      *(f32 *)(a0 + 0x2C) * 10.0f, 20.0f, 1, 0, 0, 0);
-        moby_mark_spawned(a0);
+        SpawnExplosion(obj + 0x10, 0, 12, 10, 10, 10, 0, 0,
+                      *(f32 *)(obj + 0x2C) * 10.0f, 20.0f, 1, 0, 0, 0);
+        moby_mark_spawned(obj);
         break;
     }
 }
@@ -65,7 +65,7 @@ extern int PlayMobySound(int, int, void *);
 /* Steers toward the linked object and maintains its movement sound. */
 void follower_l17_update_pal(char *obj)
 {
-    float v[4] __attribute__((aligned(16)));
+    float stage[4] __attribute__((aligned(16)));
     float target[4] __attribute__((aligned(16)));
     float dir[4] __attribute__((aligned(16)));
     float delta[4] __attribute__((aligned(16)));
@@ -77,10 +77,10 @@ void follower_l17_update_pal(char *obj)
     }
     I(state, 0x8C) |= 4;
     H(state, 0x3E) |= 8;
-    v[0] = math_fast_sin_or_cos_a(F(obj, 0xF8)) * (0.080000006f);
-    v[1] = math_fast_sin_or_cos_b(F(obj, 0xF8)) * (0.080000006f);
-    v[2] = 0;
-    mat_combine_and_store(state + 0x50, v, obj + 0xF0, obj + 0xF0);
+    stage[0] = math_fast_sin_or_cos_a(F(obj, 0xF8)) * (0.080000006f);
+    stage[1] = math_fast_sin_or_cos_b(F(obj, 0xF8)) * (0.080000006f);
+    stage[2] = 0;
+    mat_combine_and_store(state + 0x50, stage, obj + 0xF0, obj + 0xF0);
 
     if (I(state, 0x90) == -1 ||
         !moby_get_private_value_2(g_moby_l17_pool + (I(state, 0x90) << 8))) {
@@ -96,10 +96,10 @@ void follower_l17_update_pal(char *obj)
         dir[2] = 0;
         F(state, 0x9C) = FastVecDot(target, dir);
     }
-    v[0] = math_fast_sin_or_cos_a(F(obj, 0xF8)) * F(state, 0x9C);
-    v[1] = math_fast_sin_or_cos_b(F(obj, 0xF8)) * F(state, 0x9C);
-    v[2] = 0;
-    mat_combine_and_store(state + 0x50, v, obj + 0xF0, obj + 0xF0);
+    stage[0] = math_fast_sin_or_cos_a(F(obj, 0xF8)) * F(state, 0x9C);
+    stage[1] = math_fast_sin_or_cos_b(F(obj, 0xF8)) * F(state, 0x9C);
+    stage[2] = 0;
+    mat_combine_and_store(state + 0x50, stage, obj + 0xF0, obj + 0xF0);
     F(obj, 0x48) = F(state, 0x9C) * 12.499999f;
 
     if (math_fabs(F(obj, 0x48)) < 0.1f) {

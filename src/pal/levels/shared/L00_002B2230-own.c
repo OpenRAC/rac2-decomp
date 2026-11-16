@@ -70,7 +70,8 @@ typedef struct {
 } Hero2318;
 extern Hero2318 g_hero_state;
 
-void func_PAL_L00_002B2230(void) {
+/* Lets the hero lock onto a close enemy and fire the current weapon at it, with a burst of sparks. Counts down the weapon ammo and reloads when empty. */
+void hero_update_lock_on_weapon_fire_pal(void) {
     float v[4] __attribute__((aligned(16)));
     float a[4] __attribute__((aligned(16)));
     float b[4] __attribute__((aligned(16)));

@@ -3,7 +3,7 @@
 #include "common.h"
 extern int math_random_int_below(int);
 extern void moby_set_state(void *, int, int);
-extern void func_PAL_002A7E68(void *, int, int, int);
+extern void anim_start_blended_pal(void *, int, int, int);
 extern int armed_enemy_has_partner_in_group(char *);
 extern u8 *g_moby_l02_pool[] __attribute__((sda));
 extern int math_random_int_below(int);
@@ -32,15 +32,15 @@ int armed_enemy_try_close_attack_pal(char *object) {
             if (math_random_int_below(5) == 0) {
                 moby_set_state(object, 0xC, 5);
                 if (*(u8 *)(object + 0x43) != 7)
-                    func_PAL_002A7E68(object, 7, 0, 0x8);
+                    anim_start_blended_pal(object, 7, 0, 0x8);
             } else if (*(int *)(state + 0x2E4) != 0) {
                 moby_set_state(object, 0x12, 6);
                 if (*(u8 *)(object + 0x43) != 0xD)
-                    func_PAL_002A7E68(object, 0xD, 8, 0xC);
+                    anim_start_blended_pal(object, 0xD, 8, 0xC);
             } else {
                 moby_set_state(object, 0xF, 6);
                 if (*(u8 *)(object + 0x43) != 0xA)
-                    func_PAL_002A7E68(object, 0xA, 8, 0xC);
+                    anim_start_blended_pal(object, 0xA, 8, 0xC);
             }
             return 1;
         }

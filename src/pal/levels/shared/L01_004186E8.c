@@ -28,32 +28,33 @@ extern char g_hero_state[];
 extern ParticleEffectSlot ref_L00_00410D20_01[];
 extern char *ref_L00_00410D20_02[];
 
-void func_PAL_L01_004186E8(char *m) {
-    float a[4], b[4];
+/* Updates up to 30 glow effects attached to other mobys: pulses their colour, throws sparks near them and frees them when the target is gone (PAL). */
+void part_update_attached_glow_effects_pal(char *moby) {
+    float spark_a[4], spark_b[4];
     int i;
 
-    qcopy_nc(m + 0x10, g_hero_state);
+    qcopy_nc(moby + 0x10, g_hero_state);
     for (i = 0; i < 30; i++) {
-        char *s;
+        char *slot;
         char *other;
         int dead;
 
         if (!ref_L00_00410D20_01[i].target)
             continue;
-        s = (char *)&ref_L00_00410D20_01[i];
-        *(float *)(s + 0xC) = FastAddRotations(*(float *)(s + 0xC), 0.25132746f);
+        slot = (char *)&ref_L00_00410D20_01[i];
+        *(float *)(slot + 0xC) = FastAddRotations(*(float *)(slot + 0xC), 0.25132746f);
         dead = 0;
-        if (*(signed char *)(*(char **)(s + 0x18) + 0x20) < 0)
+        if (*(signed char *)(*(char **)(slot + 0x18) + 0x20) < 0)
             dead = 1;
-        if (!*(int *)(*(char **)(s + 0x18) + 0x98))
+        if (!*(int *)(*(char **)(slot + 0x18) + 0x98))
             dead = 1;
-        if (math_fast_float_d(s))
+        if (math_fast_float_d(slot))
             dead = 1;
-        if (vec_fast_helper_b(s + 0x1C)) {
+        if (vec_fast_helper_b(slot + 0x1C)) {
             int count, j;
-            char *target = *(char **)(s + 0x18);
+            char *target = *(char **)(slot + 0x18);
 
-            *(float *)(s + 0x1C) = *(float *)(s + 0x14);
+            *(float *)(slot + 0x1C) = *(float *)(slot + 0x14);
             count = coll_process_hit(target + 0x10, 0, target, 0, 8.0f);
             for (j = 0; j < count; j++) {
                 other = ref_L00_00410D20_02[j];
@@ -69,45 +70,45 @@ void func_PAL_L01_004186E8(char *m) {
 
             {
                 float scale = math_random_float_range(0.3f, 0.65f) * 0.0009764999849721789f;
-                float x = *(float *)(*(char **)(s + 0x18) + 0xC) * scale;
+                float x = *(float *)(*(char **)(slot + 0x18) + 0xC) * scale;
                 float y = math_random_angle();
                 float z = math_random_angle();
 
-                vec_build_spherical_offset(a, x, y, z);
+                vec_build_spherical_offset(spark_a, x, y, z);
             }
             {
                 float scale = math_random_float_range(0.3f, 0.65f) * 0.0009764999849721789f;
-                float x = *(float *)(*(char **)(s + 0x18) + 0xC) * scale;
+                float x = *(float *)(*(char **)(slot + 0x18) + 0xC) * scale;
                 float y = math_random_angle();
                 float z = math_random_angle();
 
-                vec_build_spherical_offset(b, x, y, z);
+                vec_build_spherical_offset(spark_b, x, y, z);
             }
             j = math_random_int_range(5, 15);
             count = math_random_int_range(15, 30);
-            tumbling_piece_spawn(m, *(char **)(s + 0x18), *(char **)(s + 0x18), a, b, 0, j, count, s, 0.0f);
+            tumbling_piece_spawn(moby, *(char **)(slot + 0x18), *(char **)(slot + 0x18), spark_a, spark_b, 0, j, count, slot, 0.0f);
         }
         if (dead) {
-            target_apply_slot_color(s);
-            *(char **)(s + 0x18) = 0;
+            target_apply_slot_color(slot);
+            *(char **)(slot + 0x18) = 0;
             continue;
         }
         goto timer;
     collide:
-        vec_clear_128(a);
-        tumbling_piece_spawn(m, *(char **)(s + 0x18), other, a, a, 1, 10, 30, s, *(float *)(s + 0x10));
-        tumbling_piece_spawn(m, *(char **)(s + 0x18), other, a, a, 0, 10, 30, s, 0.0f);
+        vec_clear_128(spark_a);
+        tumbling_piece_spawn(moby, *(char **)(slot + 0x18), other, spark_a, spark_a, 1, 10, 30, slot, *(float *)(slot + 0x10));
+        tumbling_piece_spawn(moby, *(char **)(slot + 0x18), other, spark_a, spark_a, 0, 10, 30, slot, 0.0f);
         goto random_particles;
     timer:
-        if (*(int *)(s + 0x24) == 0) {
-            int c = FastTweenColor(*(int *)(s + 4), *(int *)(s + 8),
-                                  (math_fast_sin_or_cos_a(*(float *)(s + 0xC)) + 1.0f) * 0.5f);
+        if (*(int *)(slot + 0x24) == 0) {
+            int color = FastTweenColor(*(int *)(slot + 4), *(int *)(slot + 8),
+                                  (math_fast_sin_or_cos_a(*(float *)(slot + 0xC)) + 1.0f) * 0.5f);
 
-            set_moby_color(*(char **)(s + 0x18), c & 255, (c >> 8) & 255, (c >> 16) & 255);
+            set_moby_color(*(char **)(slot + 0x18), color & 255, (color >> 8) & 255, (color >> 16) & 255);
         } else
-            --*(int *)(s + 0x24);
+            --*(int *)(slot + 0x24);
     }
-    tumbling_pieces_update_pal(m);
-    ref_L00_00410D20_00(tracked_target_offsets_update_pal, m);
+    tumbling_pieces_update_pal(moby);
+    ref_L00_00410D20_00(tracked_target_offsets_update_pal, moby);
 }
 

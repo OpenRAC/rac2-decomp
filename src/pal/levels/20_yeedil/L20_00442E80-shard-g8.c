@@ -6,7 +6,7 @@ typedef struct { char pad[0x80]; Vec position; char pad90[0x40]; Vec top; } Play
 typedef struct {
     Vec velocity;
     Vec trail[3];
-    float radius, angle, targetRadius, targetZ, radiusSpeed, spin, zSpeed, baseZ, pad60;
+    float radius, angle, target_radius, target_z, radius_speed, spin, z_speed, base_z, pad60;
     int timer;
     int reverse;
     int *clock;
@@ -32,17 +32,18 @@ extern int math_fast_float_d(void *), subtract_integer_with_clamp(int);
 extern void moby_set_state(void *, int, int);
 extern int CollLine(void *, void *, int, void *, int);
 extern int coll_sweep_from_object(void *, void *, float, float, int, float, int, int, int);
-extern char *func_PAL_0032F3B8(void *, void *, void *, float);
+extern char *part_spawn_blast_effect_moby_pal(void *, void *, void *, float);
 extern char *SpawnExplosion_pal(void *, int, int, int, int, int, int, int, float, float, int, int, int, int);
 extern int PlayMobySound(int, int, void *);
 extern void gfx_add_draw_callback_third(void (*)(void *), void *);
-extern void func_PAL_L20_00444E38(char *), part_add_moby_glow_trail(void *);
+extern void part_spawn_shard_pal(char *), part_add_moby_glow_trail(void *);
 
+/* Updates moby class 4509: a glowing shard that circles in place, then flies at the player, and breaks with sparks when it hits something. */
 void orbiting_shard_update_pal(unsigned char *obj)
 {
     Vec old, delta, target;
     float speed;
-    ShardState *s = *(ShardState **)(obj + 0x68);
+    ShardState *shard = *(ShardState **)(obj + 0x68);
 
     if (g_hero_vehicle_mode == 2) {
         moby_mark_spawned(obj);
@@ -51,30 +52,30 @@ void orbiting_shard_update_pal(unsigned char *obj)
     qcopy(old, obj + 0x10);
     switch (obj[0x20]) {
     case 0:
-        math_step_value_toward_target(&s->radius, &s->radiusSpeed, s->targetRadius, g_shard_radius_speed * 0.00040000002f, g_shard_radius_speed * 0.00040000002f, g_shard_radius_param * 0.020000001f);
-        ((float *)(obj + 0x10))[0] = math_fast_sin_or_cos_a(s->angle) * s->radius;
-        ((float *)(obj + 0x10))[1] = math_fast_sin_or_cos_b(s->angle) * s->radius;
+        math_step_value_toward_target(&shard->radius, &shard->radius_speed, shard->target_radius, g_shard_radius_speed * 0.00040000002f, g_shard_radius_speed * 0.00040000002f, g_shard_radius_param * 0.020000001f);
+        ((float *)(obj + 0x10))[0] = math_fast_sin_or_cos_a(shard->angle) * shard->radius;
+        ((float *)(obj + 0x10))[1] = math_fast_sin_or_cos_b(shard->angle) * shard->radius;
         ((float *)(obj + 0x10))[2] = 0.0f;
         FastVecAdd(obj + 0x10, obj + 0x10, *(char **)(obj + 0xB8) + 0x10);
         ((float *)(obj + 0x10))[2] = old[2];
-        if (math_fabs(s->radius - s->targetRadius) < 0.5f) {
+        if (math_fabs(shard->radius - shard->target_radius) < 0.5f) {
             speed = g_shard_spin_target * 0.0003490659f;
-            if (s->reverse == 0)
+            if (shard->reverse == 0)
                 speed = -speed;
-            ApproachValue(&s->spin, speed, g_shard_spin_rate * 6.981318e-06f);
-            s->angle = FastAddRotations(s->angle, s->spin);
-            math_step_value_toward_target((float *)(obj + 0x18), &s->zSpeed, s->targetZ, g_shard_z_speed * 0.00040000002f, g_shard_z_speed * 0.00040000002f, g_shard_z_rate * 0.020000001f);
-            if (math_fabs(((float *)(obj + 0x10))[2] - s->targetZ) < 0.1f)
-                s->targetZ = s->baseZ + math_random_float_range(3.0f, 8.0f);
+            ApproachValue(&shard->spin, speed, g_shard_spin_rate * 6.981318e-06f);
+            shard->angle = FastAddRotations(shard->angle, shard->spin);
+            math_step_value_toward_target((float *)(obj + 0x18), &shard->z_speed, shard->target_z, g_shard_z_speed * 0.00040000002f, g_shard_z_speed * 0.00040000002f, g_shard_z_rate * 0.020000001f);
+            if (math_fabs(((float *)(obj + 0x10))[2] - shard->target_z) < 0.1f)
+                shard->target_z = shard->base_z + math_random_float_range(3.0f, 8.0f);
         }
-        if (math_fast_float_d(&s->timer)
+        if (math_fast_float_d(&shard->timer)
             && FastDiffRots(((Moby *)obj)->rot[2], mat_fast_helper_a(g_hero_state.position[0] - ((float *)(obj + 0x10))[0], g_hero_state.position[1] - ((float *)(obj + 0x10))[1])) < 0.62831855f) {
-            FastVecSub(s->velocity, obj + 0x10, old);
-            s->velocity[2] = 0.0f;
+            FastVecSub(shard->velocity, obj + 0x10, old);
+            shard->velocity[2] = 0.0f;
             moby_set_state(obj, 1, -1);
-        } else if (subtract_integer_with_clamp(*s->clock - g_frame_l20_counter) >= 6) {
-            FastVecSub(s->velocity, obj + 0x10, old);
-            s->velocity[2] = 0.0f;
+        } else if (subtract_integer_with_clamp(*shard->clock - g_frame_l20_counter) >= 6) {
+            FastVecSub(shard->velocity, obj + 0x10, old);
+            shard->velocity[2] = 0.0f;
             moby_set_state(obj, 2, -1);
         }
         break;
@@ -82,27 +83,27 @@ void orbiting_shard_update_pal(unsigned char *obj)
         {
             float rate;
 
-            { float b = g_shard_z_rate * 0.020000001f; math_step_value_toward_target((float *)(obj + 0x18), &s->zSpeed, s->baseZ + 1.0f, g_shard_z_speed * 0.00040000002f, g_shard_z_speed * 0.00040000002f, b); }
+            { float b = g_shard_z_rate * 0.020000001f; math_step_value_toward_target((float *)(obj + 0x18), &shard->z_speed, shard->base_z + 1.0f, g_shard_z_speed * 0.00040000002f, g_shard_z_speed * 0.00040000002f, b); }
             rate = g_shard_length_rate * 0.020000001f;
             FastVecSub(target, g_hero_state.top, obj + 0x10);
             target[2] = 0.0f;
             vec_scale_to_length(target, target, rate);
-            FastVecSub(delta, target, s->velocity);
+            FastVecSub(delta, target, shard->velocity);
             vec_scale_to_length(delta, delta, g_shard_delta_length * 0.00040000002f);
-            FastVecAdd(s->velocity, s->velocity, delta);
-            vec_scale_to_length(s->velocity, s->velocity, rate);
-            FastVecAdd(obj + 0x10, obj + 0x10, s->velocity);
+            FastVecAdd(shard->velocity, shard->velocity, delta);
+            vec_scale_to_length(shard->velocity, shard->velocity, rate);
+            FastVecAdd(obj + 0x10, obj + 0x10, shard->velocity);
             if (FastDiffRots(((Moby *)obj)->rot[2], mat_fast_helper_a(g_hero_state.position[0] - ((float *)(obj + 0x10))[0], g_hero_state.position[1] - ((float *)(obj + 0x10))[1])) > 1.5707964f)
                 moby_set_state(obj, 2, -1);
         }
         break;
     case 2:
         {
-            float length = FastVecLength(s->velocity);
+            float length = FastVecLength(shard->velocity);
 
             ApproachValue(&length, g_shard_length_rate * 0.020000001f, 0.004f);
-            vec_scale_to_length(s->velocity, s->velocity, length);
-            FastVecAdd(obj + 0x10, obj + 0x10, s->velocity);
+            vec_scale_to_length(shard->velocity, shard->velocity, length);
+            FastVecAdd(obj + 0x10, obj + 0x10, shard->velocity);
             if (obj[0x31] == 0) {
                 moby_mark_spawned(obj);
                 return;
@@ -118,15 +119,15 @@ void orbiting_shard_update_pal(unsigned char *obj)
         int i;
 
         for (i = 2; i > 0; i--)
-            qcopy(s->trail[i], s->trail[i - 1]);
-        qcopy(s->trail[0], obj + 0x10);
+            qcopy(shard->trail[i], shard->trail[i - 1]);
+        qcopy(shard->trail[0], obj + 0x10);
     }
     if (CollLine(old, obj + 0x10, 0, *(void **)(obj + 0xB8), 0)) {
         if (g_hit_l20_result[0]) {
             FastVecSub(target, g_camera_l20_position, obj + 0x10);
             vec_scale_to_length(target, target, 1.0f);
-            coll_sweep_from_object(*(void **)(obj + 0xB8), obj + 0x10, 2.0f, s->scale, 0x10001, 1.0f, 0, 1, 0);
-            func_PAL_0032F3B8(obj, obj + 0x10, target, 0.0f);
+            coll_sweep_from_object(*(void **)(obj + 0xB8), obj + 0x10, 2.0f, shard->scale, 0x10001, 1.0f, 0, 1, 0);
+            part_spawn_blast_effect_moby_pal(obj, obj + 0x10, target, 0.0f);
         } else {
             SpawnExplosion_pal(obj + 0x10, 0, 10, 20, 20, 20, 45, 0, 0.75f, 20.0f, 1, 0, 0, 0);
         }
@@ -135,6 +136,6 @@ void orbiting_shard_update_pal(unsigned char *obj)
         return;
     }
     if (obj[0x31])
-        func_PAL_L20_00444E38(obj);
+        part_spawn_shard_pal(obj);
     gfx_add_draw_callback_third(part_add_moby_glow_trail, obj);
 }

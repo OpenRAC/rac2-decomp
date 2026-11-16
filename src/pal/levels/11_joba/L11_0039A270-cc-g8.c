@@ -54,7 +54,7 @@ typedef struct {
    vectors by a growing factor and raises the target's alpha; then, for D_L11_001AEC6C
    frames, scales back toward 1 before restoring the mode bits and freeing itself. Every
    frame it queues func_L11_003982F0 and func_L11_00397820 with itself. */
-void func_PAL_L11_0039A270(u8 *obj) {
+void part_update_grow_fade_glow_pal(u8 *obj) {
     Grow_003974A8 *ctx = *(Grow_003974A8 **)(obj + 0x68);
     f32 t;
 

@@ -10,6 +10,7 @@ extern void prompt_bar_set_text_offsets(void *, float, float, float, float, floa
 extern int single_toggle_a_update(void *, int);
 extern int g_single_toggle_a_prompt_ids[2] __attribute__((sda));
 
+/* Sets up the single toggle option menu: prompt bar and texts. */
 void single_toggle_a_init_us2(char *object, void *argument)
 {
     int *allocation;

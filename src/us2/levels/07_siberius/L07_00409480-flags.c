@@ -22,9 +22,10 @@ extern s32 g_siberius_trigger_flags[] __attribute__((sda));
 extern f32 g_spark_burst_saved_value __attribute__((sda));
 extern f32 g_spark_burst_scale __attribute__((sda));
 
+/* Updates a Siberius trigger object: waits for a touch, plays an effect and sound once, then removes itself after a timer (USA v2.00). */
 void siberius_trigger_update_us2(u8 *obj)
 {
-    f32 a[4], b[4];
+    f32 obj_pos[4], source_pos[4];
     u8 *state = *(u8 **)(obj + 0x68);
     u8 *hit;
     s32 blocked;
@@ -36,15 +37,15 @@ void siberius_trigger_update_us2(u8 *obj)
         if (!*(s32 *)state) {
             hit = part_find_owned_effect_slot(obj, 0x4010000, 0);
             if (hit) {
-                qcopy(a, obj + 0x10);
-                a[2] += 0.5f;
+                qcopy(obj_pos, obj + 0x10);
+                obj_pos[2] += 0.5f;
                 blocked = 1;
                 if (*(u8 **)(hit + 0x20)) {
-                    qcopy(b, *(u8 **)(hit + 0x20) + 0x10);
-                    b[2] += 0.5f;
-                    if (fast_vec_dist(b, a) < 64.0f) {
+                    qcopy(source_pos, *(u8 **)(hit + 0x20) + 0x10);
+                    source_pos[2] += 0.5f;
+                    if (fast_vec_dist(source_pos, obj_pos) < 64.0f) {
                         blocked = 0;
-                        if (!CollLine(b, a, 2, obj, 0)) blocked = 1;
+                        if (!CollLine(source_pos, obj_pos, 2, obj, 0)) blocked = 1;
                     }
                 }
                 if (blocked) moby_set_state(obj, 2, -1);

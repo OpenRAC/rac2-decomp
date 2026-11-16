@@ -40,40 +40,41 @@ extern void hero_reset_position_and_direction(void *obj, void *pos, s32 a2, s32 
 extern void gfx_setup_scale_record(s32 id, s32 a1);
 
 /* Switches the object to its second phase. */
-void boss_enter_second_phase_pal(SibObj *a0)
+/* Switches the object to its second phase. */
+void boss_enter_second_phase_pal(SibObj *moby)
 {
-    f32 arg[4];
-    f32 v[4];
-    SibGroups *state;
-    u16 *p;
-    u16 *q;
-    u8 *e;
+    f32 hero_rotation[4];
+    f32 rotation[4];
+    SibGroups *groups;
+    u16 *joint_ptr;
+    u16 *matrix_ptr;
+    u8 *record;
 
-    *(TI128 *)v = 0;
-    v[2] = g_hero_reset_offset_z;
-    *(TI128 *)arg = *(TI128 *)v;
-    state = (SibGroups *)a0->state;
-    hero_reset_position_and_direction(&g_hero_l07_reset_position, arg, 0, 1);
-    a0->flags34 |= 2;
-    a0->f98 = 0;
-    for (p = g_group_l07_id_lists[state->groupD0];
-         p != 0 && ((s16)p[-1] >= 0 || p == g_group_l07_id_lists[state->groupD0]) &&
-         (e = g_joint_record_table + ((*p & 0x7FFF) << 5)) != 0;
-         p++) {
-        e[0x1E] &= 0xFB;
+    *(TI128 *)rotation = 0;
+    rotation[2] = g_hero_reset_offset_z;
+    *(TI128 *)hero_rotation = *(TI128 *)rotation;
+    groups = (SibGroups *)moby->state;
+    hero_reset_position_and_direction(&g_hero_l07_reset_position, hero_rotation, 0, 1);
+    moby->flags34 |= 2;
+    moby->f98 = 0;
+    for (joint_ptr = g_group_l07_id_lists[groups->groupD0];
+         joint_ptr != 0 && ((s16)joint_ptr[-1] >= 0 || joint_ptr == g_group_l07_id_lists[groups->groupD0]) &&
+         (record = g_joint_record_table + ((*joint_ptr & 0x7FFF) << 5)) != 0;
+         joint_ptr++) {
+        record[0x1E] &= 0xFB;
     }
-    for (p = g_group_l07_id_lists[state->groupCC];
-         p != 0 && ((s16)p[-1] >= 0 || p == g_group_l07_id_lists[state->groupCC]) &&
-         (e = g_joint_record_table + ((*p & 0x7FFF) << 5)) != 0;
-         p++) {
-        e[0x1E] |= 4;
+    for (joint_ptr = g_group_l07_id_lists[groups->groupCC];
+         joint_ptr != 0 && ((s16)joint_ptr[-1] >= 0 || joint_ptr == g_group_l07_id_lists[groups->groupCC]) &&
+         (record = g_joint_record_table + ((*joint_ptr & 0x7FFF) << 5)) != 0;
+         joint_ptr++) {
+        record[0x1E] |= 4;
     }
-    for (q = g_group_l07_id_lists[state->groupCC];
-         q != 0 && ((s16)q[-1] >= 0 || q == g_group_l07_id_lists[state->groupCC]) &&
-         (e = g_matrix_l07_record_table + ((*q & 0x7FFF) << 6)) != 0;
-         q++) {
-        *(f32 *)(e + 0x38) -= 100.0f;
-        gfx_setup_scale_record(*q & 0x7FFF, 1);
+    for (matrix_ptr = g_group_l07_id_lists[groups->groupCC];
+         matrix_ptr != 0 && ((s16)matrix_ptr[-1] >= 0 || matrix_ptr == g_group_l07_id_lists[groups->groupCC]) &&
+         (record = g_matrix_l07_record_table + ((*matrix_ptr & 0x7FFF) << 6)) != 0;
+         matrix_ptr++) {
+        *(f32 *)(record + 0x38) -= 100.0f;
+        gfx_setup_scale_record(*matrix_ptr & 0x7FFF, 1);
     }
     g_ship_phase_state = 2;
 }

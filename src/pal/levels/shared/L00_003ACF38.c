@@ -19,7 +19,7 @@ extern char *ref_L00_003AB388_1;
 extern char *ref_L00_003AB388_2[];
 extern void *g_active_tether_object MACRO_ADDR;
 extern void QueueMobyImpact(void *,void *);
-extern int func_PAL_00335DD0(void *,int,void *);
+extern int weapon_start_health_drain_pal(void *,int,void *);
 extern int coll_process_hit(void *,int,void *,void *,float);
 extern int PlayMobySound(int,int,void *);
 extern char *SpawnExplosion_pal(void *, float, float, int, int, int, int, int, int, int, int, int, int, void *);
@@ -59,9 +59,9 @@ void seeker_apply_projectile_hit_pal(char *moby, void *direction, void *position
         QueueMobyImpact(target, &hit);
         if (((WeaponDamageClass *)(
         g_item_slot_to_record[0x18] * 0xE0 + (unsigned int)ref_L00_003AB388_0))[0].mode)
-            func_PAL_00335DD0(target, 0x43, *(char **)(moby + 0xB8));
+            weapon_start_health_drain_pal(target, 0x43, *(char **)(moby + 0xB8));
         else
-            func_PAL_00335DD0(target, 0x18, *(char **)(moby + 0xB8));
+            weapon_start_health_drain_pal(target, 0x18, *(char **)(moby + 0xB8));
     }
     hit.damage = ((WeaponDamageClass *)(
         g_item_slot_to_record[0x18] * 0xE0 + (unsigned int)ref_L00_003AB388_0))[0].area;
@@ -69,10 +69,10 @@ void seeker_apply_projectile_hit_pal(char *moby, void *direction, void *position
     if (((WeaponDamageClass *)(
         g_item_slot_to_record[0x18] * 0xE0 + (unsigned int)ref_L00_003AB388_0))[0].mode) {
         for (i = 0; i < count; i++)
-            func_PAL_00335DD0(ref_L00_003AB388_2[i], 0x43, *(char **)(moby + 0xB8));
+            weapon_start_health_drain_pal(ref_L00_003AB388_2[i], 0x43, *(char **)(moby + 0xB8));
     } else {
         for (i = 0; i < count; i++)
-            func_PAL_00335DD0(ref_L00_003AB388_2[i], 0x18, *(char **)(moby + 0xB8));
+            weapon_start_health_drain_pal(ref_L00_003AB388_2[i], 0x18, *(char **)(moby + 0xB8));
     }
     cam_compute_view_direction(moby + 0x10, forward, 1);
     FastVecScale(forward, forward, -1.0f);

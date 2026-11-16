@@ -3,9 +3,10 @@
 
 extern int math_random_int_below(int);
 extern int FloatToInt(float);
-extern char *func_PAL_002BE9A8(void *, int, void *, float, float, unsigned int, float, float, int);
+extern char *part_spawn_spinning_spark_pal(void *, int, void *, float, float, unsigned int, float, float, int);
 extern char g_default_vector[] __attribute__((section(".sdata")));
 
+/* Spawns two coloured sparks and two white ones at an impact point. */
 void seeker_spawn_impact_sparks_pal(void *unused, void *position)
 {
     int i, sign;
@@ -13,7 +14,7 @@ void seeker_spawn_impact_sparks_pal(void *unused, void *position)
     for (i=1; i>=0; i--) {
         int n=math_random_int_below(16);
         sign=math_random_int_below(2);
-        p=func_PAL_002BE9A8(position, sign ? -n : n, g_default_vector, 0.04f, 1.0f, 0x7f204080, 0.9f, 50000.0f, 1);
+        p=part_spawn_spinning_spark_pal(position, sign ? -n : n, g_default_vector, 0.04f, 1.0f, 0x7f204080, 0.9f, 50000.0f, 1);
         q=p+32;
         if(p) {
             *(short *)(p+10)=8;
@@ -26,7 +27,7 @@ void seeker_spawn_impact_sparks_pal(void *unused, void *position)
     { int n=16;
     int j;
     for(j=0;j<2;j++) {
-        p=func_PAL_002BE9A8(position,n,g_default_vector,0.02f,1.0f,0x7fffffff,0.97f,15000.0f,1);
+        p=part_spawn_spinning_spark_pal(position,n,g_default_vector,0.02f,1.0f,0x7fffffff,0.97f,15000.0f,1);
         n=-n;
         q=p+32;
         if(p) {
@@ -62,31 +63,32 @@ extern Res_189E20 g_hero_state;
 extern char g_cam_follow_matrix[];
 extern void vec_scale_to_length(void *, void *, float);
 extern void vec_compute_object_to_target(void *, void *, void *, int, float);
-extern char *func_PAL_L00_003ADC68(void *, void *, void *, void *);
+extern char *effect_spawn_owned_moby_pal(void *, void *, void *, void *);
 
-char *hero_fire_effect_from_facing_pal(char *a0, char *a1) {
-    float buf[4];
+/* Spawns the hero's seeker effect, aimed along the camera, the hero's facing or the lock-on target (PAL: 50 Hz speed). */
+char *hero_fire_effect_from_facing_pal(char *position, char *moby) {
+    float velocity[4];
     float angle;
-    AngleRecord_262570 *e;
-    Res_189E20 *g;
-    void *p;
+    AngleRecord_262570 *entry;
+    Res_189E20 *hero;
+    void *target;
 
-    e = &g_weapon_l00_table[g_seeker_weapon_index[0]];
-    angle = e->angle * 0.020000001f;
+    entry = &g_weapon_l00_table[g_seeker_weapon_index[0]];
+    angle = entry->angle * 0.020000001f;
     if (g_hero_state.i2294 == 0x1D) {
-        vec_scale_to_length(buf, g_cam_follow_matrix, angle);
+        vec_scale_to_length(velocity, g_cam_follow_matrix, angle);
     } else if (g_hero_state.h24EC == 1) {
-        vec_scale_to_length(buf, a1 + 0xD0, -angle);
+        vec_scale_to_length(velocity, moby + 0xD0, -angle);
     } else {
-        vec_scale_to_length(buf, (char *)&g_hero_state + 0x760, angle);
+        vec_scale_to_length(velocity, (char *)&g_hero_state + 0x760, angle);
     }
-    g = &g_hero_state;
-    p = 0;
-    if (g->pBF8 != 0) {
-        vec_compute_object_to_target(g->pBF8, a0, buf, 0, angle);
-        p = g->pBF8;
+    hero = &g_hero_state;
+    target = 0;
+    if (hero->pBF8 != 0) {
+        vec_compute_object_to_target(hero->pBF8, position, velocity, 0, angle);
+        target = hero->pBF8;
     }
-    return func_PAL_L00_003ADC68(a0, buf, a1, p);
+    return effect_spawn_owned_moby_pal(position, velocity, moby, target);
 }
 
 

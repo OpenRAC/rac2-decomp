@@ -29,48 +29,49 @@ extern int snd_play_from_class_bank(int, int, void *, int);
 extern u8 *CreateMoby(int);
 extern void mem_copy_aligned(void *, void *, int);
 
-void func_PAL_L12_0042EE58(u8 *a0)
+/* Counts down a short timer, then blows up with an explosion and sound and drops a smaller piece of debris (PAL: 50 Hz timings). */
+void timed_explosion_debris_update_pal(u8 *moby)
 {
-    s32 *s = *(s32 **)(a0 + 0x68);
+    s32 *vars = *(s32 **)(moby + 0x68);
     s32 life;
-    u8 *obj;
-    u16 flags;
-    f32 v[4];
+    u8 *piece;
+    u16 hit_flags;
+    f32 blast_pos[4];
 
-    int state = a0[0x20];
+    int state = moby[0x20];
 
     switch (state) {
     case 0:
-        *(s16 *)((u8 *)s + 0x34) = ((s32)(math_random_int_range(20, 50)) * 5 + 2) / 6;
-        moby_set_state(a0, 1, -1);
+        *(s16 *)((u8 *)vars + 0x34) = ((s32)(math_random_int_range(20, 50)) * 5 + 2) / 6;
+        moby_set_state(moby, 1, -1);
         break;
     case 1:
-        life = *(s16 *)((u8 *)s + 0x34);
-        if (life < 0 || cam_moby_update_pal(a0)) {
-            matrix_mul_vec3(v, (u8 *)s + 0x20, a0 + 0xC0);
-            obj = 0;
-            FastVecAdd(v, a0 + 0x10, v);
-            SpawnExplosion_pal(v, 0, 0x19, 0x14, 0x14, 0x14, 0x2D, 1, 1.0f, 20.0f, state, state, 0, 0);
-            snd_play_from_class_bank(2, 0, a0, 0x12B1);
-            flags = *(u16 *)(a0 + 0x7C);
-            if (flags & 1)
-                obj = CreateMoby(0x12E0);
-            else if (flags & 2)
-                obj = CreateMoby(0x12E1);
-            else if (flags & 4)
-                obj = CreateMoby(0x12E2);
-            if (obj != 0) {
-                qcopy(obj + 0x10, v);
-                *(f32 *)(obj + 0x2C) = *(f32 *)(*(u8 **)(obj + 0x24) + 0x24) *
-                                       (*(f32 *)(a0 + 0x2C) / *(f32 *)(*(u8 **)(a0 + 0x24) + 0x24));
-                mem_copy_aligned(obj + 0xC0, a0 + 0xC0, 0x18);
-                part_explode_object_into_pieces_pal(obj, g_explosion_piece_offsets, g_explosion_piece_table_b, g_explosion_piece_table_c, 0xFF, -1,
+        life = *(s16 *)((u8 *)vars + 0x34);
+        if (life < 0 || cam_moby_update_pal(moby)) {
+            matrix_mul_vec3(blast_pos, (u8 *)vars + 0x20, moby + 0xC0);
+            piece = 0;
+            FastVecAdd(blast_pos, moby + 0x10, blast_pos);
+            SpawnExplosion_pal(blast_pos, 0, 0x19, 0x14, 0x14, 0x14, 0x2D, 1, 1.0f, 20.0f, state, state, 0, 0);
+            snd_play_from_class_bank(2, 0, moby, 0x12B1);
+            hit_flags = *(u16 *)(moby + 0x7C);
+            if (hit_flags & 1)
+                piece = CreateMoby(0x12E0);
+            else if (hit_flags & 2)
+                piece = CreateMoby(0x12E1);
+            else if (hit_flags & 4)
+                piece = CreateMoby(0x12E2);
+            if (piece != 0) {
+                qcopy(piece + 0x10, blast_pos);
+                *(f32 *)(piece + 0x2C) = *(f32 *)(*(u8 **)(piece + 0x24) + 0x24) *
+                                       (*(f32 *)(moby + 0x2C) / *(f32 *)(*(u8 **)(moby + 0x24) + 0x24));
+                mem_copy_aligned(piece + 0xC0, moby + 0xC0, 0x18);
+                part_explode_object_into_pieces_pal(piece, g_explosion_piece_offsets, g_explosion_piece_table_b, g_explosion_piece_table_c, 0xFF, -1,
                                   g_explosion_piece_effect, 0xF, 0xFF, 0xFF, 0);
-                moby_mark_spawned(obj);
+                moby_mark_spawned(piece);
             }
-            moby_mark_spawned(a0);
+            moby_mark_spawned(moby);
         } else {
-            *(s16 *)((u8 *)s + 0x34) = life - 1;
+            *(s16 *)((u8 *)vars + 0x34) = life - 1;
         }
         break;
     }

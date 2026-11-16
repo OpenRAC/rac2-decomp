@@ -14,10 +14,11 @@ extern float math_fast_sin_or_cos_b(float);
 extern void FastVecScale(void *, void *, float);
 extern float FastVecDot(void *, void *);
 extern void FastVecAdd(void *, void *, void *);
-extern char *func_PAL_L04_00365B68(void *, void *, void *, int, int, float, float, float);
-extern void func_PAL_L04_0041A660(void *, void *, void *, void *);
+extern char *part_l04_spawn_spinning_pal(void *, void *, void *, int, int, float, float, float);
+extern void racer_start_trail_pal(void *, void *, void *, void *);
 
-void func_PAL_L04_0041AB08(char *owner, void *pos, void *dir, float length)
+/* Spawns a line of trail particles from a position along a direction, with a few special coloured ones (PAL). */
+void emit_trail_effects_pal(char *owner, void *pos, void *dir, float length)
 {
     struct {
         struct { float v[4]; } __attribute__((aligned(16))) origin;
@@ -39,7 +40,7 @@ void func_PAL_L04_0041AB08(char *owner, void *pos, void *dir, float length)
     FastVecScale(frame.bias, owner + 0xC0, 0.05f);
     FastVecScale(frame.step, dir, 1.0f / length);
     FastVecDot(frame.step, owner + 0xC0);
-    if (*(short *)(owner + 0xAA) == 0xB2D)
+    if (*(short *)(owner + 0xAA) == MOBY_CLASS_ENEMY_HOVERBIKE)
         count = (int)(length + length) + 1;
     else
         count = (int)(length * 5.0f) + 2;
@@ -66,10 +67,10 @@ void func_PAL_L04_0041AB08(char *owner, void *pos, void *dir, float length)
         frame.offset[2] -= 0.2f;
         if (i == 1 && type >= 0) {
             FastVecAdd(frame.point, frame.point, dir);
-            func_PAL_L04_00365B68(frame.offset, frame.point, dir, frame.types.values[type], type,
+            part_l04_spawn_spinning_pal(frame.offset, frame.point, dir, frame.types.values[type], type,
                 magnitude * 0.01f + 0.05f, frame.offset[2] - 0.25f, 0.004f);
         } else {
-            func_PAL_L04_0041A660(owner, frame.point, dir, owner + 0x10);
+            racer_start_trail_pal(owner, frame.point, dir, owner + 0x10);
         }
         if (++g_trail_size_index >= 10)
             g_trail_size_index = 0;

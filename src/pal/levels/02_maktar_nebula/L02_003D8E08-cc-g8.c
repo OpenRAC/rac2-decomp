@@ -13,12 +13,13 @@ extern char g_chainblade_spawn_record_a[] SDATA(D_L02_001B0230);
 extern char g_chainblade_spawn_record_b[] SDATA(D_L02_001B0260);
 extern int g_chainblade_landing_point __attribute__((sda));
 
-int func_PAL_L02_003D8E08(char *arg0) {
-    char *state = *(char **)(arg0 + 0x68);
+/* Decides if the boss should land: only near the arena centre, after a long enough wait, with rising odds. */
+int chainblade_should_land_pal(char *self) {
+    char *state = *(char **)(self + 0x68);
     short timer;
     int delta;
 
-    if (vec_distance_xy(arg0 + 0x10, &g_chainblade_landing_point) > 18.0f) {
+    if (vec_distance_xy(self + 0x10, &g_chainblade_landing_point) > 18.0f) {
         return 0;
     }
     timer = *(short *)(state + 0x32E);

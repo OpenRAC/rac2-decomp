@@ -15,30 +15,30 @@ extern float ref_L03_003C4240_05 __attribute__((sda));
 
 /* Turns the object with its state: it stops when the state has no time left, otherwise it
    spreads the turn over the frame and lets the state and the object react to it. */
-void moby_turn_toward_move_direction_pal(unsigned char *a0) {
-    unsigned char *s1 = *(unsigned char **)(a0 + 0x68);
-    unsigned char *v;
-    float f;
-    float g;
+void moby_turn_toward_move_direction_pal(unsigned char *object) {
+    unsigned char *state = *(unsigned char **)(object + 0x68);
+    unsigned char *target;
+    float value;
+    float length;
 
-    f = FastVecLength((float *)(s1 + 0x1B0));
-    if (f <= 0.0f)
+    value = FastVecLength((float *)(state + 0x1B0));
+    if (value <= 0.0f)
         return;
-    g = FastVecLength((float *)(s1 + 0x1B0));
-    if (g > 0.020000001f) {
-        f = mat_fast_helper_a(*(float *)(s1 + 0x1B0), *(float *)(s1 + 0x1B4));
-        f = FastAddRotations(f, 3.14159274f);
-        ref_L03_003C4240_00(a0, f);
+    length = FastVecLength((float *)(state + 0x1B0));
+    if (length > 0.020000001f) {
+        value = mat_fast_helper_a(*(float *)(state + 0x1B0), *(float *)(state + 0x1B4));
+        value = FastAddRotations(value, 3.14159274f);
+        ref_L03_003C4240_00(object, value);
     }
-    ref_L03_003C4240_01(a0, a0 + 0x10, 0x10, *(float *)(a0 + 0xF8),
+    ref_L03_003C4240_01(object, object + 0x10, 0x10, *(float *)(object + 0xF8),
                         ref_L03_003C4240_05 * 0.020000001f,
                         ref_L03_003C4240_04 * 0.00040000002f);
-    ref_L03_003C4240_02(*(void **)(s1 + 0x220), a0 + 0x10, s1 + 0x368);
-    v = *(unsigned char **)(s1 + 0x194);
-    if (v != 0) {
-        if (*(short *)(v + 0xAA) == 0x940 || *(short *)(v + 0xAA) == 0x93C ||
-            *(short *)(v + 0xAA) == 0x964)
-            ref_L03_003C4240_03(*(unsigned char **)(s1 + 0x194), a0 + 0x10);
+    ref_L03_003C4240_02(*(void **)(state + 0x220), object + 0x10, state + 0x368);
+    target = *(unsigned char **)(state + 0x194);
+    if (target != 0) {
+        if (*(short *)(target + 0xAA) == 0x940 /* moby class 2368 */ || *(short *)(target + 0xAA) == 0x93C /* moby class 2364 */ ||
+            *(short *)(target + 0xAA) == 0x964 /* moby class 2404 */)
+            ref_L03_003C4240_03(*(unsigned char **)(state + 0x194), object + 0x10);
     }
 }
 
@@ -52,6 +52,7 @@ extern void vec_clamp_length(float *, float);
 extern float g_moby_l03_push_scale __attribute__((sda));
 extern float g_moby_push_clamp __attribute__((sda));
 
+/* Pushes the object toward a target point by adding a scaled offset to its drift velocity. (PAL: 50 Hz scaling) */
 void moby_push_toward_target_pal(u8 *object, void *target)
 {
     float delta[4];
@@ -118,26 +119,26 @@ typedef struct {
     unsigned char kind;
 } L03Obj;
 
-/* Per object kind (a0->kind: 1 and 7, 8, 2..6, else) it picks a pair of ids and a scale, turns
+/* Per object kind (object->kind: 1 and 7, 8, 2..6, else) it picks a pair of ids and a scale, turns
    the object's phase (the float at 0x35C of its state) by that scale, stores the result of
-   func_00283D38 on the pair in a0->tint, and, when the state's stamp is not the frame counter,
+   func_00283D38 on the pair in object->tint, and, when the state's stamp is not the frame counter,
    stamps the counter into the state of every entity of its group and registers
    func_L03_003C4800 for the object with func_L00_002E6CF0. The kind selects its arm through the
    level's jump table; `cases` only keeps the labels alive, and the labels are named after the
    kind that reaches them. */
-void moby_pulse_tint_pal(L03Obj *a0) {
+void moby_pulse_tint_pal(L03Obj *object) {
     static void *cases[9] = {&&c0, &&c1, &&c2, &&c3, &&c4, &&c5, &&c6, &&c1, &&c8};
-    L03State *s1 = a0->state;
+    L03State *state = object->state;
     int pair[2];
     float scale;
-    float t;
-    float r;
-    unsigned short *q;
-    L03Obj *e;
+    float angle;
+    float wave;
+    unsigned short *id_list;
+    L03Obj *other;
     unsigned int kind;
 
-    if (a0->live != 0) {
-        kind = a0->kind;
+    if (object->live != 0) {
+        kind = object->kind;
         if (kind < 9)
             goto *ref_L03_003C4578_00[kind];
         goto c0;
@@ -181,21 +182,21 @@ c0:
         pair[1] = ref_L03_003C4578_17[0];
         scale = ref_L03_003C4578_18 * 0.0003490659f;
 join:
-        t = FastAddRotations(s1->phase, scale);
-        s1->phase = t;
-        r = math_fast_sin_or_cos_b(t);
-        a0->tint = FastTweenColor(pair[0], pair[1], r * 0.5f + 0.5f);
-        if (s1->stamp != ref_L03_003C4578_19) {
-            for (q = ref_L03_003C4578_20[a0->group];
-                 a0->group != 0xFF && a0->group <= ref_L03_003C4578_21 && q != 0 &&
-                 ((q != 0 && (short)q[-1] >= 0) || q == ref_L03_003C4578_20[a0->group]);
-                 q++) {
-                e = (L03Obj *)(ref_L03_003C4578_22[0] + ((*q & 0x7FFF) << 8));
-                if (e == 0)
+        angle = FastAddRotations(state->phase, scale);
+        state->phase = angle;
+        wave = math_fast_sin_or_cos_b(angle);
+        object->tint = FastTweenColor(pair[0], pair[1], wave * 0.5f + 0.5f);
+        if (state->stamp != ref_L03_003C4578_19) {
+            for (id_list = ref_L03_003C4578_20[object->group];
+                 object->group != 0xFF && object->group <= ref_L03_003C4578_21 && id_list != 0 &&
+                 ((id_list != 0 && (short)id_list[-1] >= 0) || id_list == ref_L03_003C4578_20[object->group]);
+                 id_list++) {
+                other = (L03Obj *)(ref_L03_003C4578_22[0] + ((*id_list & 0x7FFF) << 8));
+                if (other == 0)
                     break;
-                e->state->stamp = ref_L03_003C4578_19;
+                other->state->stamp = ref_L03_003C4578_19;
             }
-            gfx_add_draw_callback_first(part_spawn_at_attachment_points, a0);
+            gfx_add_draw_callback_first(part_spawn_at_attachment_points, object);
         }
     }
 }

@@ -28,22 +28,23 @@ extern void CalculateAimedLaunchVelocity(void *, void *, float, float, float, fl
 extern void moby_transform_joint_to_world(char *, int, void *);
 extern int coll_trace_projectile_to_impact_pal(void *, void *, void *, void *, char *, int, int, float);
 extern int math_fast_float_d(void *), weapon_spend_ammo(int, int);
-extern void func_PAL_L00_002AF458(void), cancel_hero_item_animation_pal(void), ref_L00_003EAA58_00(void *, char *);
+extern void start_equipped_item_animation_pal(void), cancel_hero_item_animation_pal(void), ref_L00_003EAA58_00(void *, char *);
 extern int PlayMobySound(int, int, char *);
-extern char *func_PAL_L00_0038ACC8(void *, void *);
+extern char *miniturret_spawn_shot_pal(void *, void *);
+/* Updates the Miniturret Glove: it aims, then shoots a miniturret after a short wind-up (PAL: 50 Hz counts). */
 void miniturret_l00_glove_update_pal(char *self)
 {
-    char a[16], b[16];
-    char *bp;
-    char *st = *(char **)(self + 0x68);
+    char muzzle[16], aim_buf[16];
+    char *aim;
+    char *vars = *(char **)(self + 0x68);
     int ready;
     float scale;
     char *shot;
-    moby_transform_joint_to_world(self, 0, a);
-    bp = b;
+    moby_transform_joint_to_world(self, 0, muzzle);
+    aim = aim_buf;
     scale = g_hero_state.field_2294 == 29 ? 11.0f : 4.5f;
-    CalculateAimedLaunchVelocity(bp, a, 1.5f, scale, 0.3f, 0.0044f, 0, 0);
-    *(int *)(st + 0x24) = coll_trace_projectile_to_impact_pal(a, bp, st, st + 0x10, self, 0, 0, 0.0044f);
+    CalculateAimedLaunchVelocity(aim, muzzle, 1.5f, scale, 0.3f, 0.0044f, 0, 0);
+    *(int *)(vars + 0x24) = coll_trace_projectile_to_impact_pal(muzzle, aim, vars, vars + 0x10, self, 0, 0, 0.0044f);
     ready = 1;
     if (g_hero_state.field_2294 == 29) {
         if (!math_fast_float_d(&g_hero_state.field_2534)) ready = 0;
@@ -51,30 +52,30 @@ void miniturret_l00_glove_update_pal(char *self)
     switch (*(unsigned char *)(self + 0x20)) {
     case 0:
         self[0x20] = 1;
-        *(int *)(st + 0x24) = 0;
+        *(int *)(vars + 0x24) = 0;
         /* Fall through. */
     case 1:
         if ((*(int *)(g_pad_state + 0x1A4) & g_hero_state.field_1230) &&
             !g_hero_state.field_22BC && ready) {
             if (weapon_spend_ammo(-1, 1)) {
-                func_PAL_L00_002AF458();
+                start_equipped_item_animation_pal();
                 self[0x20] = 2;
-                *(int *)(st + 0x20) = 17;
+                *(int *)(vars + 0x20) = 17;
             } else PlayMobySound(2, 0, self);
         }
         break;
     case 2:
-        if (math_fast_float_d(st + 0x20)) {
+        if (math_fast_float_d(vars + 0x20)) {
             PlayMobySound(0, 0, self);
-            shot = func_PAL_L00_0038ACC8(a, bp);
+            shot = miniturret_spawn_shot_pal(muzzle, aim);
             *(char **)(shot + 0xB8) = self;
             cancel_hero_item_animation_pal();
             self[0x20] = 3;
-            *(int *)(st + 0x20) = 8;
+            *(int *)(vars + 0x20) = 8;
         }
         break;
     case 3:
-        if (math_fast_float_d(st + 0x20)) self[0x20] = 1;
+        if (math_fast_float_d(vars + 0x20)) self[0x20] = 1;
         break;
     }
     ref_L00_003EAA58_00(miniturret_glove_draw_pal, self);

@@ -10,27 +10,28 @@ extern int weapon_select_aim_target(char *, int, void *, int, float, float);
 extern float ApproachValue(float *, float, float);
 extern void turret_death_burst_pal(char *);
 
-void turret_update_health_aim_pal(char *arg0) {
+/* Handles the turret's health and aim target: sets it up on the first frame, takes damage from hits, and blows up when its health reaches zero. */
+void turret_update_health_aim_pal(char *moby) {
     char *state;
     char *p;
     u32 *q;
     short t;
     float f;
 
-    state = *(char **)(arg0 + 0x68);
-    if (*(u8 *)(arg0 + 0x20) == 0) {
-        moby_set_state(arg0, 1, -1);
-        *(u16 *)(arg0 + 0x34) = (*(u16 *)(arg0 + 0x34) | 0x41) & 0xEFFF;
-        *(int *)(arg0 + 0x98) = 0;
-        qcopy((state + 0x180), (arg0 + 0x10));
-        *(float *)(arg0 + 0x2C) =
-            *(float *)(*(u32 *)(arg0 + 0x24) + 0x24) * g_turret_health_aim_scale;
+    state = *(char **)(moby + 0x68);
+    if (*(u8 *)(moby + 0x20) == 0) {
+        moby_set_state(moby, 1, -1);
+        *(u16 *)(moby + 0x34) = (*(u16 *)(moby + 0x34) | 0x41) & 0xEFFF;
+        *(int *)(moby + 0x98) = 0;
+        qcopy((state + 0x180), (moby + 0x10));
+        *(float *)(moby + 0x2C) =
+            *(float *)(*(u32 *)(moby + 0x24) + 0x24) * g_turret_health_aim_scale;
         *(int *)(state + 0x1B8) = -1;
     }
-    if (*(u8 *)(arg0 + 0x20) == 1) {
+    if (*(u8 *)(moby + 0x20) == 1) {
         return;
     }
-    p = part_find_owned_effect_slot(arg0, 0x10000, 0);
+    p = part_find_owned_effect_slot(moby, 0x10000, 0);
     if (p != 0) {
         q = *(u32 **)(p + 0x20);
         if (q != 0) {
@@ -40,17 +41,17 @@ void turret_update_health_aim_pal(char *arg0) {
             }
         }
     }
-    f = moby_update_aim_target_strength_pal(arg0, p);
+    f = moby_update_aim_target_strength_pal(moby, p);
     ApproachValue((float *)(state + 0x20), 0.0f, f);
-    *(u8 *)(arg0 + 0xA8) = 0xFF;
+    *(u8 *)(moby + 0xA8) = 0xFF;
     if (*(float *)(state + 0x20) == 0.0f) {
-        turret_death_burst_pal(arg0);
-        *(u8 *)(arg0 + 0xA8) = 0xFF;
-        moby_set_state(arg0, 1, -1);
-        *(int *)(arg0 + 0x98) = 0;
-        *(u16 *)(arg0 + 0x34) = (*(u16 *)(arg0 + 0x34) | 0x41) & 0xEFFF;
+        turret_death_burst_pal(moby);
+        *(u8 *)(moby + 0xA8) = 0xFF;
+        moby_set_state(moby, 1, -1);
+        *(int *)(moby + 0x98) = 0;
+        *(u16 *)(moby + 0x34) = (*(u16 *)(moby + 0x34) | 0x41) & 0xEFFF;
     }
-    if (*(u8 *)(arg0 + 0x20) == 5) {
+    if (*(u8 *)(moby + 0x20) == 5) {
         return;
     }
     {
@@ -62,7 +63,7 @@ void turret_update_health_aim_pal(char *arg0) {
         return;
     }
     }
-    weapon_select_aim_target(arg0, *(int *)(state + 0x160), 0, 0, 1024.0f, 37.0f);
+    weapon_select_aim_target(moby, *(int *)(state + 0x160), 0, 0, 1024.0f, 37.0f);
     if (*(u32 *)(state + 0x150) != 0) {
         return;
     }
@@ -81,26 +82,27 @@ extern float math_fast_sin_or_cos_b(float);
 extern void part_queue_ground_shadow(char *, float);
 extern void turret_turn_toward_target_pal(char *);
 
-void turret_update_bob_aim_pal(char *arg0) {
-    char *state = *(char **)(arg0 + 0x68);
-    u16 n = *(u16 *)(arg0 + 0x96);
+/* Ends each turret frame: counts the frame, bobs the turret up and down, and turns its aim. */
+void turret_update_bob_aim_pal(char *moby) {
+    char *state = *(char **)(moby + 0x68);
+    u16 n = *(u16 *)(moby + 0x96);
     float r;
 
-    *(u16 *)(arg0 + 0x96) = n + 1;
-    if (*(u8 *)(arg0 + 0x31)) {
-        qcopy((arg0 + 0x10), (state + 0x180));
+    *(u16 *)(moby + 0x96) = n + 1;
+    if (*(u8 *)(moby + 0x31)) {
+        qcopy((moby + 0x10), (state + 0x180));
         r = g_turret_bob_phase;
         r = FastAddRotations(*(float *)(state + 0x1A0), r * 0.0003490659f);
         *(float *)(state + 0x1A0) = r;
         r = math_fast_sin_or_cos_b(r);
         {
             float amount = g_turret_bob_amount;
-            *(float *)(arg0 + 0x18) = *(float *)(arg0 + 0x18) + g_turret_bob_amplitude * r;
-            part_queue_ground_shadow(arg0, amount);
+            *(float *)(moby + 0x18) = *(float *)(moby + 0x18) + g_turret_bob_amplitude * r;
+            part_queue_ground_shadow(moby, amount);
         }
     }
-    if (((*(u16 *)(arg0 + 0x34)) ^ 1) & 1) {
-        turret_turn_toward_target_pal(arg0);
+    if (((*(u16 *)(moby + 0x34)) ^ 1) & 1) {
+        turret_turn_toward_target_pal(moby);
     }
 }
 
@@ -114,10 +116,11 @@ extern int hero_set_control_motion_and_step(char *, void *);
 extern void FastVecSub(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
 
-float turret_move_toward_target_pal(char *arg0) {
-    char *state = *(char **)(arg0 + 0x68);
+/* Moves the turret toward its target spot, works out how far it must turn, and returns the distance still to go. */
+float turret_move_toward_target_pal(char *moby) {
+    char *state = *(char **)(moby + 0x68);
     char *v = state + 0x180;
-    char *src = arg0 + 0x10;
+    char *src = moby + 0x10;
     float b0[4] __attribute__((aligned(16)));
     float b1[4] __attribute__((aligned(16)));
     float speed;
@@ -134,9 +137,9 @@ float turret_move_toward_target_pal(char *arg0) {
                   g_turret_move_max_speed * 0.020000001f);
     vec_scale_to_length(state + 0xF0, b0, speed);
     qcopy(src, v);
-    hero_set_control_motion_and_step(arg0, state + 0xF0);
+    hero_set_control_motion_and_step(moby, state + 0xF0);
     qcopy(v, src);
-    vec_transform_by_object_or_given(arg0, b1, state + 0xF0, 0);
+    vec_transform_by_object_or_given(moby, b1, state + 0xF0, 0);
     gain = g_turret_turn_gain;
     a = b1[1] * -gain;
     *(float *)(state + 0x1A8) = a;

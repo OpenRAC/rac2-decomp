@@ -40,39 +40,39 @@ typedef struct {
    at TARGET: velocity toward the target at the configured speed, with the vertical component of
    a ballistic arc under the configured gravity (both per 60 Hz frame). With an owner, the
    velocity and the offset from the owner are kept in the owner's frame. Returns the object. */
-char *func_PAL_L07_003F8B18(char *a0, char *a1, char *a2, char *a3, float a4)
+char *SpawnBallisticMoby_pal(char *parent, char *owner, char *spawn_pos, char *target_pos, float extra_value)
 {
-    F43E0Moby *obj = (F43E0Moby *)CreateMoby(0xE1D);
+    F43E0Moby *moby = (F43E0Moby *)CreateMoby(0xE1D);
 
-    if (obj != 0) {
-        F43E0Vars *st;
+    if (moby != 0) {
+        F43E0Vars *vars;
         float speed, gravity;
-        float buf[16];
+        float basis[16];
 
-        moby_init_child_from_parent(obj, a0);
-        qcopy(obj->pos, a2);
-        obj->rot[2] = math_random_angle();
-        obj->rot[0] = math_random_angle();
-        euler_rotation_basis(obj->mtx, obj->rot);
-        obj->flags |= 0x100;
-        st = (F43E0Vars *)obj->pVars;
-        obj->scale = *(float *)(obj->pClass + 0x24) * g_debris_l07_scale_factor;
+        moby_init_child_from_parent(moby, parent);
+        qcopy(moby->pos, spawn_pos);
+        moby->rot[2] = math_random_angle();
+        moby->rot[0] = math_random_angle();
+        euler_rotation_basis(moby->mtx, moby->rot);
+        moby->flags |= 0x100;
+        vars = (F43E0Vars *)moby->pVars;
+        moby->scale = *(float *)(moby->pClass + 0x24) * g_debris_l07_scale_factor;
         speed = g_debris_speed * (0.020000001f);
         gravity = g_debris_l07_gravity * (0.00040000002f);
-        st->owner = a1;
-        FastVecSub(st->vel, a3, obj->pos);
-        vec_fast_normalize_helper(st->vel, st->vel, speed);
-        st->vel[2] = weapon_compute_shot_launch_speed(obj->pos, (float *)a3, 0, speed, -gravity);
-        st->vel[3] = gravity;
-        st->x34 = a4;
-        if (a1 != 0) {
-            matrix_from_basis_rows(buf, a1 + 0xC0);
-            matrix_mul_vec3(st->vel, st->vel, buf);
-            FastVecSub(st->offset, obj->pos, a1 + 0x10);
-            matrix_mul_vec3(st->offset, st->offset, buf);
+        vars->owner = owner;
+        FastVecSub(vars->vel, target_pos, moby->pos);
+        vec_fast_normalize_helper(vars->vel, vars->vel, speed);
+        vars->vel[2] = weapon_compute_shot_launch_speed(moby->pos, (float *)target_pos, 0, speed, -gravity);
+        vars->vel[3] = gravity;
+        vars->x34 = extra_value;
+        if (owner != 0) {
+            matrix_from_basis_rows(basis, owner + 0xC0);
+            matrix_mul_vec3(vars->vel, vars->vel, basis);
+            FastVecSub(vars->offset, moby->pos, owner + 0x10);
+            matrix_mul_vec3(vars->offset, vars->offset, basis);
         }
     }
-    return (char *)obj;
+    return (char *)moby;
 }
 
 extern f32 func_2E5318(f32 a, f32 b);
@@ -119,41 +119,41 @@ extern u8 *g_hit_object_list[];
 
 /* Advances the object's own state: three step kinds by the 0x20 flag, then the shared
    spin and the two sampled vectors. */
-void func_PAL_L07_003F90C8(u8 *a0)
+void beam_update_pal(u8 *moby)
 {
-    u8 *s1 = a0;
-    u8 *s2 = *(u8 **)(a0 + 0x68);
-    u8 v1 = *(u8 *)(a0 + 0x20);
-    f32 v[4];
-    f32 w[4];
+    u8 *beam = moby;
+    u8 *vars = *(u8 **)(moby + 0x68);
+    u8 state = *(u8 *)(moby + 0x20);
+    f32 start[4];
+    f32 end[4];
 
-    switch (v1) {
+    switch (state) {
     case 0:
         {
-            u32 n = *(u16 *)(s1 + 0x96) + 1;
+            u32 n = *(u16 *)(beam + 0x96) + 1;
 
-            *(u16 *)(s1 + 0x96) = n;
+            *(u16 *)(beam + 0x96) = n;
             if ((u16)n == 1) {
                 break;
             }
-            ApproachValue((f32 *)(s2 + 0x24), 1.0f, g_beam_fade_in_rate * (0.020000001f));
-            if (1.0f <= *(f32 *)(s2 + 0x24)) {
-                moby_set_state(s1, 1, -1);
+            ApproachValue((f32 *)(vars + 0x24), 1.0f, g_beam_fade_in_rate * (0.020000001f));
+            if (1.0f <= *(f32 *)(vars + 0x24)) {
+                moby_set_state(beam, 1, -1);
             }
         }
         break;
     case 1:
-        ApproachValue((f32 *)(s2 + 0x24), 0.0f, g_beam_fade_out_rate * (0.020000001f));
-        if (*(f32 *)(s2 + 0x24) <= 0.0f) {
-            moby_mark_spawned(s1);
+        ApproachValue((f32 *)(vars + 0x24), 0.0f, g_beam_fade_out_rate * (0.020000001f));
+        if (*(f32 *)(vars + 0x24) <= 0.0f) {
+            moby_mark_spawned(beam);
             return;
         }
         break;
     }
-    *(f32 *)(s2 + 0x28) = FastAddRotations(*(f32 *)(s2 + 0x28), g_beam_spin_rate * 0.0003490659f);
-    gfx_add_draw_callback_first(DrawSegmentedBeam, s1);
-    if (0.333f < *(f32 *)(s2 + 0x24)) {
-        beam_get_end_points(s1, v, w);
-        coll_cast_object_line(*(u32 *)(s1 + 0xB8), v, w, 1, *(f32 *)(s2 + 0x2C), 1.0f, 0, 1, 0);
+    *(f32 *)(vars + 0x28) = FastAddRotations(*(f32 *)(vars + 0x28), g_beam_spin_rate * 0.0003490659f);
+    gfx_add_draw_callback_first(DrawSegmentedBeam, beam);
+    if (0.333f < *(f32 *)(vars + 0x24)) {
+        beam_get_end_points(beam, start, end);
+        coll_cast_object_line(*(u32 *)(beam + 0xB8), start, end, 1, *(f32 *)(vars + 0x2C), 1.0f, 0, 1, 0);
     }
 }

@@ -16,6 +16,7 @@ extern void text_draw_small(int, int, unsigned long, char *, int);
 extern int sprintf(char *, char *, ...);
 extern int func_001157AC(char *);
 
+/* Draws an options menu screen with its title, a heading line and a line showing whether the setting is on or off, plus the button hints. (PAL) */
 int menu_toggle_option_draw_pal(void)
 {
     char text[64];

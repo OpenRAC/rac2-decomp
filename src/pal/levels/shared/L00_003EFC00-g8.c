@@ -18,7 +18,7 @@ extern unsigned char *g_effect_param_pointer_b NOT_SDA;
 extern char g_default_vector[] __attribute__((sda));
 extern void moby_transform_joint_to_world(char *, int, void *);
 extern char *moby_get_or_find_target(void *, void *, int, float, float, float, float, float);
-extern void func_PAL_002A7E68(char *, int, int, int);
+extern void anim_start_blended_pal(char *, int, int, int);
 extern void FastVecSub(void *, void *, void *);
 extern float FastVecDot(void *, void *);
 extern char *moby_get_private_value_0(char *);
@@ -26,7 +26,7 @@ extern int math_random_int_below(int);
 extern char *part_spawn_gravity_fade(void *, void *, int, int, int, int, int, float, float, float, int);
 extern void vec_scale_to_length(void *, void *, float);
 extern void FastVecAdd(void *, void *, void *);
-extern char *func_PAL_L00_003F10D8(void *, char *, char *);
+extern char *homing_l00_shot_spawn_pal(void *, char *, char *);
 extern int PlayMobySound(int, int, char *);
 extern float math_random_float_range(float, float);
 typedef struct {
@@ -40,7 +40,8 @@ typedef struct {
     float cooldown;
 } State3EB8E8;
 
-void func_PAL_L00_003EFC00(char *self, State3EB8E8 *st)
+/* Lets a Synthenoid pick a target in front of it and, when ready, fire a homing shot at it (PAL: 50 Hz cooldown). */
+void synthenoid_fire_homing_shot_pal(char *self, State3EB8E8 *state)
 {
     float pos[4], v[4], target[4], dir[4];
     char *obj, *part, *bone;
@@ -48,26 +49,26 @@ void func_PAL_L00_003EFC00(char *self, State3EB8E8 *st)
     float dot;
     char *entry;
 
-    if (!vec_fast_helper_b(&st->cooldown) || g_frame_l00_counter % 4 != st->slot)
+    if (!vec_fast_helper_b(&state->cooldown) || g_frame_l00_counter % 4 != state->slot)
         return;
     moby_transform_joint_to_world(self, 1, pos);
-    st->phase ^= 1;
+    state->phase ^= 1;
     obj = moby_get_or_find_target(pos, g_cam_follow_matrix, 0, g_homing_yaw_degrees * 0.01745329424738884f,
                             g_homing_pitch_degrees * 0.01745329424738884f, g_homing_param,
                             g_homing_yaw_degrees * 0.01745329424738884f, g_homing_pitch_degrees * 0.01745329424738884f);
     if (obj) {
         if ((*(short *)(obj + 0xAA) == 0xEE1 || *(short *)(obj + 0xAA) == 0xEC0 || *(short *)(obj + 0xAA) == 0xED4) &&
             *(unsigned char *)(*(char **)(obj + 0x68) + 0x3B1) == 255) {
-            st->target = 0;
+            state->target = 0;
             return;
         }
         if (*(short *)(obj + 0xAA) == 0xEF4) {
-            st->target = 0;
+            state->target = 0;
             return;
         }
-        st->target = obj;
+        state->target = obj;
         if (*(unsigned char *)(self + 0x43) != 2)
-            func_PAL_002A7E68(self, 2, 0, 4);
+            anim_start_blended_pal(self, 2, 0, 4);
         FastVecSub(v, self + 0x10, g_hero_position);
         dot = FastVecDot(v, self + 0xE0);
         if (g_game_l00_mode[0] != 2 && *(unsigned char *)(self + 0x42) == *(unsigned char *)(self + 0x43) &&
@@ -89,17 +90,17 @@ void func_PAL_L00_003EFC00(char *self, State3EB8E8 *st)
             FastVecSub(dir, target, pos);
             vec_scale_to_length(dir, dir, g_homing_speed);
             FastVecAdd(pos, pos, dir);
-            func_PAL_L00_003F10D8(pos, self, obj);
+            homing_l00_shot_spawn_pal(pos, self, obj);
             PlayMobySound(0, 0, self);
             {
                 int selected = g_item_slot_to_record.selected;
                 entry = g_weapon_l00_table[selected];
             }
             dot = math_random_float_range(0.0f, 0.17f);
-            st->cooldown = 1.0f / *(float *)(entry + 0x54) + dot;
-            st->shots++;
+            state->cooldown = 1.0f / *(float *)(entry + 0x54) + dot;
+            state->shots++;
         }
     } else {
-        st->target = 0;
+        state->target = 0;
     }
 }

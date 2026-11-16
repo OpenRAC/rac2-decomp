@@ -5,12 +5,12 @@
 
 extern void muckdweller_update_targeting(void *);
 extern void muckdweller_init_pal(void *);
-extern void func_PAL_L01_003E05D0(void *);
+extern void part_spawn_moving_bubbles_pal(void *);
 extern void muckdweller_tick_timers_pal(void *);
 extern void muckdweller_find_farthest_anchor(void *, void *);
 extern void moby_move_keeping_transform_alt_pal(void *, void *);
 extern s32 moby_move_keeping_transform_pal(void *, void *);
-extern void func_PAL_L01_003E0710(void *, s32);
+extern void muckdweller_fire_spit_shot_pal(void *, s32);
 extern void part_spawn_puffs_around_point(void *, s32);
 extern void part_queue_moby_for_glow(void *, s32, s32);
 extern s32 FastDecTimer(void *);
@@ -19,7 +19,7 @@ extern s32 math_random_int_range(s32, s32);
 extern s32 math_random_int_below(s32);
 extern s32 moby_dispatch_action_by_kind(void *, void *);
 extern s32 level_has_pending_inner_flag(void *);
-extern void func_PAL_002A7E68(void *, s32, s32, s32);
+extern void anim_start_blended_pal(void *, s32, s32, s32);
 extern void moby_set_state(void *, s32, s32);
 extern void SetDeathBits_pal(void *, s32, s32);
 extern f32 math_fabs(f32);
@@ -55,34 +55,34 @@ typedef unsigned int UpdateQuad __attribute__((mode(TI)));
 
 /* Runs the moby's state machine on obj[0x95]; from state 3 on, except 5, it then eases the
    rotation at 0xF4 and 0xF0 towards a direction, each angle clamped to 40 degrees. */
-void func_PAL_L01_003DF4D8(u8 *obj)
+void muckdweller_update_pal(u8 *moby)
 {
     f32 delta[4] __attribute__((aligned(16)));
     f32 pos[4] __attribute__((aligned(16)));
     f32 matrix[16] __attribute__((aligned(16)));
     f32 inverse[16] __attribute__((aligned(16)));
-    f32 oldInverse[16] __attribute__((aligned(16)));
+    f32 old_inverse[16] __attribute__((aligned(16)));
     f32 height;
-    u8 *state = *(u8 **)(obj + 0x68);
+    u8 *state = *(u8 **)(moby + 0x68);
     f32 rate, speed, angle, pitch;
     s32 result;
 
-    if (obj[0x95])
-        muckdweller_update_targeting(obj);
-    switch (obj[0x95]) {
+    if (moby[0x95])
+        muckdweller_update_targeting(moby);
+    switch (moby[0x95]) {
     case 0:
-        muckdweller_init_pal(obj);
+        muckdweller_init_pal(moby);
         break;
     case 1:
         if (state[0x3D0]) {
-            U(obj, 0x34) |= 1;
-            I(obj, 0x98) = 0;
-            obj[0x31] = 0;
+            U(moby, 0x34) |= 1;
+            I(moby, 0x98) = 0;
+            moby[0x31] = 0;
         }
         if (I(state, 0x2F4) == 1 && FastDecTimer(state + 0x3D4)) {
             if (state[0x3D0]) {
-                muckdweller_find_farthest_anchor(obj, pos);
-                FastVecSub(delta, pos, obj + 0x10);
+                muckdweller_find_farthest_anchor(moby, pos);
+                FastVecSub(delta, pos, moby + 0x10);
                 rate = 0.033333335071802139282f;
                 if (FastVecLength(delta) * rate < 0.16000001f)
                     speed = FastVecLength(delta) * rate;
@@ -90,90 +90,90 @@ void func_PAL_L01_003DF4D8(u8 *obj)
                     speed = 0.16000001f;
                 vec_scale_to_length(delta, delta, speed);
                 height = 0;
-                delta[2] = weapon_compute_shot_launch_speed(obj + 0x10, pos, &height, speed, -0.0072000003f);
+                delta[2] = weapon_compute_shot_launch_speed(moby + 0x10, pos, &height, speed, -0.0072000003f);
                 qcopy(state + 0x190, delta);
                 qcopy(state + 0x390, pos);
-                if (obj[0x43] != 12)
-                    func_PAL_002A7E68(obj, 12, 0, 2);
+                if (moby[0x43] != 12)
+                    anim_start_blended_pal(moby, 12, 0, 2);
                 if (height > 0)
-                    F(obj, 0x48) = 51.0f / height;
-                I(obj, 0x98) = I(*(u8 **)(obj + 0x24), 0x10);
-                obj[0x31] = 1;
-                U(obj, 0x34) &= 0xfffe;
-                moby_set_state(obj, 0, 2);
+                    F(moby, 0x48) = 51.0f / height;
+                I(moby, 0x98) = I(*(u8 **)(moby + 0x24), 0x10);
+                moby[0x31] = 1;
+                U(moby, 0x34) &= 0xfffe;
+                moby_set_state(moby, 0, 2);
             } else {
                 if (I(state, 0x41C) != -1)
                     I(state, 0x3F8) = I(state, 0x41C);
-                if (obj[0x43] != 7)
-                    func_PAL_002A7E68(obj, 7, 0, math_random_int_range(7, 12));
-                moby_set_state(obj, 3, 3);
+                if (moby[0x43] != 7)
+                    anim_start_blended_pal(moby, 7, 0, math_random_int_range(7, 12));
+                moby_set_state(moby, 3, 3);
             }
         }
         break;
     case 2: {
         f32 distance;
 
-        FastVecAdd(obj + 0x10, obj + 0x10, state + 0x190);
-        MobySpringTurn(obj, mat_fast_helper_a(F(state, 0x2E0) - F(obj, 0x10), F(state, 0x2E4) - F(obj, 0x14)),
+        FastVecAdd(moby + 0x10, moby + 0x10, state + 0x190);
+        MobySpringTurn(moby, mat_fast_helper_a(F(state, 0x2E0) - F(moby, 0x10), F(state, 0x2E4) - F(moby, 0x14)),
                       F(state, 0x1D4), F(state, 0x1E4), F(state, 0x1DC) * 2, state + 0x274);
         F(state, 0x198) -= 0.0072000003f;
-        if (F(state, 0x198) <= 0 && math_fabs(F(obj, 0x18) - F(state, 0x398)) < -F(state, 0x198)) {
-            F(obj, 0x48) = 1;
-            F(obj, 0x18) = F(state, 0x398);
+        if (F(state, 0x198) <= 0 && math_fabs(F(moby, 0x18) - F(state, 0x398)) < -F(state, 0x198)) {
+            F(moby, 0x48) = 1;
+            F(moby, 0x18) = F(state, 0x398);
             F(state, 0x198) = 0;
-            distance = vec_distance_xy(obj + 0x10, state + 0x390);
+            distance = vec_distance_xy(moby + 0x10, state + 0x390);
             if (distance < FastVecLength(state + 0x190)) {
-                qcopy(obj + 0x10, state + 0x390);
+                qcopy(moby + 0x10, state + 0x390);
                 qzero(state + 0x190);
             }
-            if (obj[0x60] & 2) {
-                qcopy(state + 0x2B0, obj + 0x10);
-                if (obj[0x43] != 6)
-                    func_PAL_002A7E68(obj, 6, 0, 10);
-                F(obj, 0x48) = 1;
+            if (moby[0x60] & 2) {
+                qcopy(state + 0x2B0, moby + 0x10);
+                if (moby[0x43] != 6)
+                    anim_start_blended_pal(moby, 6, 0, 10);
+                F(moby, 0x48) = 1;
                 F(state, 0x3DC) = math_random_signed_float_range(20, 45) * 0.01745329424738884f;
                 if (I(state, 0x41C) != -1)
                     I(state, 0x3F8) = I(state, 0x41C);
                 if (state[0x3D3])
-                    moby_set_state(obj, 2, 3);
+                    moby_set_state(moby, 2, 3);
                 else {
                     if (I(state, 0x3C0) != -1)
                         I(state, 0x1FC) = I(state, 0x3C0);
-                    moby_set_state(obj, 3, 3);
+                    moby_set_state(moby, 3, 3);
                 }
             }
         }
         break;
     }
     case 3:
-        switch (obj[0x20]) {
+        switch (moby[0x20]) {
         case 1:
-            if ((obj[0x60] & 2) && !H(state, 0x3D8)) {
+            if ((moby[0x60] & 2) && !H(state, 0x3D8)) {
                 int wait = math_random_int_range(180, 440);
 
                 wait = ((s32)(wait) * 5 + 2) / 6;
                 H(state, 0x3D8) = wait;
-                if (obj[0x43] != 6)
-                    func_PAL_002A7E68(obj, 6, 7, math_random_int_range(7, 12));
-                moby_set_state(obj, 2, -1);
+                if (moby[0x43] != 6)
+                    anim_start_blended_pal(moby, 6, 7, math_random_int_range(7, 12));
+                moby_set_state(moby, 2, -1);
             }
             break;
         case 2:
-            moby_move_keeping_transform_alt_pal(obj, state + 0x2B0);
-            if (!obj[0x40]) {
+            moby_move_keeping_transform_alt_pal(moby, state + 0x2B0);
+            if (!moby[0x40]) {
                 if ((I(state, 0x2F4) == 1 || H(state, 0x3D6)) &&
-                    (I(state, 0x408) != -1 || (**(s32 **)(state + 0x400) == H(obj, 0xB2) && !I(state, 0x404)))) {
+                    (I(state, 0x408) != -1 || (**(s32 **)(state + 0x400) == H(moby, 0xB2) && !I(state, 0x404)))) {
                     if (I(state, 0x3C0) != -1)
                         I(state, 0x1FC) = I(state, 0x3C0);
                     H(state, 0x3D6) = 300;
                     if (I(state, 0x408) != -1) {
-                        if (obj[0x43] != 7)
-                            func_PAL_002A7E68(obj, 7, 0, math_random_int_range(7, 12));
-                        moby_set_state(obj, 3, -1);
+                        if (moby[0x43] != 7)
+                            anim_start_blended_pal(moby, 7, 0, math_random_int_range(7, 12));
+                        moby_set_state(moby, 3, -1);
                     } else {
-                        if (obj[0x43] != (func_001163B0() & 1) + 2)
-                            func_PAL_002A7E68(obj, (func_001163B0() & 1) + 2, 0, math_random_int_range(7, 12));
-                        moby_set_state(obj, 5, -1);
+                        if (moby[0x43] != (func_001163B0() & 1) + 2)
+                            anim_start_blended_pal(moby, (func_001163B0() & 1) + 2, 0, math_random_int_range(7, 12));
+                        moby_set_state(moby, 5, -1);
                     }
                 } else {
                     Timer16 timer = *(Timer16 *)(state + 0x3D8);
@@ -182,13 +182,13 @@ void func_PAL_L01_003DF4D8(u8 *obj)
                         break;
                     if (!H(state, 0x3D6) && I(state, 0x408) == -1) {
                         H(state, 0x3D8) = 100;
-                        if (obj[0x43] != (func_001163B0() & 1))
-                            func_PAL_002A7E68(obj, func_001163B0() & 1, 0, 12);
-                        moby_set_state(obj, 1, 3);
+                        if (moby[0x43] != (func_001163B0() & 1))
+                            anim_start_blended_pal(moby, func_001163B0() & 1, 0, 12);
+                        moby_set_state(moby, 1, 3);
                     } else if (!timer.value && I(state, 0x408) == -1) {
-                        if (obj[0x43] != (func_001163B0() & 1) + 4)
-                            func_PAL_002A7E68(obj, (func_001163B0() & 1) | 4, 0, 12);
-                        moby_set_state(obj, 1, 3);
+                        if (moby[0x43] != (func_001163B0() & 1) + 4)
+                            anim_start_blended_pal(moby, (func_001163B0() & 1) | 4, 0, 12);
+                        moby_set_state(moby, 1, 3);
                     }
                 }
             }
@@ -196,53 +196,53 @@ void func_PAL_L01_003DF4D8(u8 *obj)
         case 3: {
             f32 distance;
 
-            moby_move_keeping_transform_pal(obj, state + 0x390);
-            distance = vec_distance_xy(obj + 0x10, state + 0x390);
-            if (obj[0x60] & 2) {
+            moby_move_keeping_transform_pal(moby, state + 0x390);
+            distance = vec_distance_xy(moby + 0x10, state + 0x390);
+            if (moby[0x60] & 2) {
                 if ((H(*(u8 **)(state + 0x2F0), 0xAA) != 0xB1A && distance <= 3) ||
                     (H(*(u8 **)(state + 0x2F0), 0xAA) == 0xB1A && distance < 1)) {
                     I(state, 0x404) = 150;
                     F(state, 0x3F4) = 0.3f;
                     I(state, 0x3F0) = 0;
-                    if (obj[0x43] != 8)
-                        func_PAL_002A7E68(obj, 8, 0, math_random_int_range(4, 7));
-                    moby_set_state(obj, 0, 4);
+                    if (moby[0x43] != 8)
+                        anim_start_blended_pal(moby, 8, 0, math_random_int_range(4, 7));
+                    moby_set_state(moby, 0, 4);
                 }
                 if (I(state, 0x2F4) != 1 && !H(state, 0x3D6) && I(state, 0x408) == -1 && !math_random_int_below(39)) {
                     if (!math_random_int_below(3)) {
                         I(state, 0x404) = 150;
                         F(state, 0x3F4) = 0.3f;
                         I(state, 0x3F0) = 0;
-                        if (obj[0x43] != 8)
-                            func_PAL_002A7E68(obj, 8, 0, math_random_int_range(4, 7));
-                        moby_set_state(obj, 0, 4);
+                        if (moby[0x43] != 8)
+                            anim_start_blended_pal(moby, 8, 0, math_random_int_range(4, 7));
+                        moby_set_state(moby, 0, 4);
                     } else {
-                        if (obj[0x43] != 6)
-                            func_PAL_002A7E68(obj, 6, 0, math_random_int_range(12, 18));
-                        moby_set_state(obj, 4, 3);
+                        if (moby[0x43] != 6)
+                            anim_start_blended_pal(moby, 6, 0, math_random_int_range(12, 18));
+                        moby_set_state(moby, 4, 3);
                     }
                 }
             }
             break;
         }
         case 4:
-            moby_move_keeping_transform_alt_pal(obj, state + 0x2B0);
-            if (obj[0x60] & 2) {
-                if (!I(state, 0x404) || vec_distance_xy(obj + 0x10, g_hero_state + 0x80) > 7) {
+            moby_move_keeping_transform_alt_pal(moby, state + 0x2B0);
+            if (moby[0x60] & 2) {
+                if (!I(state, 0x404) || vec_distance_xy(moby + 0x10, g_hero_state + 0x80) > 7) {
                     H(state, 0x3D8) = 50;
-                    if (obj[0x43] != (func_001163B0() & 1) + 4)
-                        func_PAL_002A7E68(obj, (func_001163B0() & 1) | 4, 0, 12);
-                    moby_set_state(obj, 1, 3);
+                    if (moby[0x43] != (func_001163B0() & 1) + 4)
+                        anim_start_blended_pal(moby, (func_001163B0() & 1) | 4, 0, 12);
+                    moby_set_state(moby, 1, 3);
                 }
             }
             break;
         case 5:
-            MobySpringTurn(obj, mat_fast_helper_a(F(state, 0x2E0) - F(obj, 0x10), F(state, 0x2E4) - F(obj, 0x14)),
+            MobySpringTurn(moby, mat_fast_helper_a(F(state, 0x2E0) - F(moby, 0x10), F(state, 0x2E4) - F(moby, 0x14)),
                           F(state, 0x1D4) * 2, F(state, 0x1E4), F(state, 0x1DC) * 2, state + 0x274);
-            if (obj[0x60] & 2) {
-                if (obj[0x43] != 7)
-                    func_PAL_002A7E68(obj, 7, 0, math_random_int_range(7, 12));
-                moby_set_state(obj, 3, -1);
+            if (moby[0x60] & 2) {
+                if (moby[0x43] != 7)
+                    anim_start_blended_pal(moby, 7, 0, math_random_int_range(7, 12));
+                moby_set_state(moby, 3, -1);
             }
             break;
         }
@@ -251,65 +251,65 @@ void func_PAL_L01_003DF4D8(u8 *obj)
         f32 distance;
         u8 *target;
 
-        distance = moby_get_anim_value(obj);
+        distance = moby_get_anim_value(moby);
         target = *(u8 **)(state + 0x2F0);
-        math_approach_target_with_direction_mode(obj + 0xF8, mat_fast_helper_a(F(target, 0x10) - F(obj, 0x10), F(target, 0x14) - F(obj, 0x14)),
+        math_approach_target_with_direction_mode(moby + 0xF8, mat_fast_helper_a(F(target, 0x10) - F(moby, 0x10), F(target, 0x14) - F(moby, 0x14)),
                       F(state, 0x1D4), F(state, 0x1D8), F(state, 0x1DC), state + 0x274, 0);
-        if (obj[0x42] == 8 && distance >= 18 && distance <= 23) {
-            F(obj, 0x48) = 0.4f;
-            coll_test_hit_at_bone(obj, 0, 0x4000001, 0, 1, 0, 0.2f, (f32)state[0x34], 1);
-            func_PAL_L01_003E0710(obj, 0);
+        if (moby[0x42] == 8 && distance >= 18 && distance <= 23) {
+            F(moby, 0x48) = 0.4f;
+            coll_test_hit_at_bone(moby, 0, 0x4000001, 0, 1, 0, 0.2f, (f32)state[0x34], 1);
+            muckdweller_fire_spit_shot_pal(moby, 0);
         } else {
-            F(obj, 0x48) = 1;
-            func_PAL_L01_003E0710(obj, 1);
+            F(moby, 0x48) = 1;
+            muckdweller_fire_spit_shot_pal(moby, 1);
         }
-        if (obj[0x42] == 8 && distance >= 25) {
-            F(state, 0x380) = math_fast_sin_or_cos_a(F(obj, 0xF8)) * 3.25f;
-            F(state, 0x384) = math_fast_sin_or_cos_b(F(obj, 0xF8)) * 3.25f;
+        if (moby[0x42] == 8 && distance >= 25) {
+            F(state, 0x380) = math_fast_sin_or_cos_a(F(moby, 0xF8)) * 3.25f;
+            F(state, 0x384) = math_fast_sin_or_cos_b(F(moby, 0xF8)) * 3.25f;
             I(state, 0x388) = 0;
-            FastVecAdd(state + 0x380, state + 0x380, obj + 0x10);
+            FastVecAdd(state + 0x380, state + 0x380, moby + 0x10);
             F(state, 0x388) = coll_probe_ground_height_below(state + 0x380, 0, 0.5f) + 0.025f;
-            part_spawn_puffs_around_point(obj, 1);
+            part_spawn_puffs_around_point(moby, 1);
         }
-        if (obj[0x60] & 2) {
-            if (obj[0x43] != 6)
-                func_PAL_002A7E68(obj, 6, 0, math_random_int_range(12, 18));
-            moby_set_state(obj, 4, 3);
+        if (moby[0x60] & 2) {
+            if (moby[0x43] != 6)
+                anim_start_blended_pal(moby, 6, 0, math_random_int_range(12, 18));
+            moby_set_state(moby, 4, 3);
         }
         break;
     }
     case 5:
-        result = moby_dispatch_action_by_kind(obj, state + 0x110);
+        result = moby_dispatch_action_by_kind(moby, state + 0x110);
         if (result & 1)
-            moby_set_state(obj, 0, 6);
+            moby_set_state(moby, 0, 6);
         else if (result & 2) {
             I(state, 0x410) = -1;
-            func_PAL_L01_003E05D0(obj);
+            part_spawn_moving_bubbles_pal(moby);
             if (I(state, 0x3C0) != -1)
                 I(state, 0x1FC) = I(state, 0x3C0);
             if (I(state, 0x41C) != -1)
                 I(state, 0x3F8) = I(state, 0x41C);
             H(state, 0x3D6) = 500;
             H(state, 0x3D8) = 25;
-            if (obj[0x43] != (func_001163B0() & 1) + 4)
-                func_PAL_002A7E68(obj, (func_001163B0() & 1) | 4, 0, 12);
-            moby_set_state(obj, 1, 3);
+            if (moby[0x43] != (func_001163B0() & 1) + 4)
+                anim_start_blended_pal(moby, (func_001163B0() & 1) | 4, 0, 12);
+            moby_set_state(moby, 1, 3);
         }
         break;
     case 6:
-        SetDeathBits_pal(obj, 0, 3);
-        func_PAL_L01_003E05D0(obj);
-        part_spawn_puffs_around_point(obj, 1);
-        part_queue_moby_for_glow(obj, 0, 0);
+        SetDeathBits_pal(moby, 0, 3);
+        part_spawn_moving_bubbles_pal(moby);
+        part_spawn_puffs_around_point(moby, 1);
+        part_queue_moby_for_glow(moby, 0, 0);
         break;
     }
-    if (obj[0x95] != 5 && obj[0x95] >= 3) {
+    if (moby[0x95] != 5 && moby[0x95] >= 3) {
         *(UpdateQuad *)pos = 0;
-        pos[2] = F(obj, 0xF8);
+        pos[2] = F(moby, 0xF8);
         *(UpdateQuad *)delta = *(UpdateQuad *)pos;
         euler_to_matrix(matrix, delta);
         matrix_from_basis_rows(inverse, matrix);
-        matrix_from_basis_rows(oldInverse, obj + 0xC0);
+        matrix_from_basis_rows(old_inverse, moby + 0xC0);
         {
             f32 *v;
             u8 *target = *(u8 **)(state + 0x248);
@@ -332,10 +332,10 @@ void func_PAL_L01_003DF4D8(u8 *obj)
             pitch = 0.69813179969787597656f;
         else if (pitch < -0.69813179969787597656f)
             pitch = -0.69813179969787597656f;
-        math_approach_target_with_direction_mode(obj + 0xF4, angle, 0.0025132746f, 0.0025132746f,
+        math_approach_target_with_direction_mode(moby + 0xF4, angle, 0.0025132746f, 0.0025132746f,
                       0.12566373f, state + 0x3EC, 0);
-        math_approach_target_with_direction_mode(obj + 0xF0, pitch, 0.0025132746f, 0.0025132746f,
+        math_approach_target_with_direction_mode(moby + 0xF0, pitch, 0.0025132746f, 0.0025132746f,
                       0.12566373f, state + 0x3E8, 0);
     }
-    muckdweller_tick_timers_pal(obj);
+    muckdweller_tick_timers_pal(moby);
 }

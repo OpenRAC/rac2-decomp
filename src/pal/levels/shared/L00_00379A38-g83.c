@@ -30,13 +30,14 @@ extern float g_menu_slide_scale;
 extern char *GetLocalizedString(int);
 extern int sprintf(char *, char *, ...);
 extern int text_draw_centered_medium(int, int, unsigned long long, unsigned char *, int);
-extern void func_PAL_002FAB40(char *, int);
+extern void text_format_number_with_separators_pal(char *, int);
 extern int GetIconFrame(int, int);
 extern int text_measure_width_second_set(unsigned char *, int);
 extern void hud_draw_sprite_gradient(int, int, int, int, int, unsigned int *);
 extern int save_count_items_above_baseline(void);
 
-void func_PAL_L00_0037A140(void) {
+/* Draws the upgrade and price text lines with the bolt icons for the selected upgrade. */
+void shop_draw_upgrade_price_lines_pal(void) {
     char first[256];
     char second[256];
     unsigned int colors[4];
@@ -53,7 +54,7 @@ void func_PAL_L00_0037A140(void) {
         text_draw_centered_medium(g_shop_price_second_x, (int)((float)g_shop_price_second_y * g_menu_slide_scale + 0.5f),
                       0x80F0F0F0ULL, (unsigned char *)first, -1);
     }
-    func_PAL_002FAB40(first, g_purchase_menu_model.prices.rows[*(int *)(model + 0x80)].group);
+    text_format_number_with_separators_pal(first, g_purchase_menu_model.prices.rows[*(int *)(model + 0x80)].group);
     sprintf(second, g_str_shop_price_line_format, (unsigned char *)GetLocalizedString(0x114E), first,
         (unsigned char *)GetLocalizedString(0x1B30));
     text_draw_centered_medium(g_shop_price_line_x, (int)((float)g_shop_price_line_y * g_menu_slide_scale + 0.5f),

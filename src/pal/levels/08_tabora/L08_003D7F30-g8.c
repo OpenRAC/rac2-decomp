@@ -36,7 +36,8 @@ extern int FastTweenColor(int, int, float);
    0.02 and the ring colour's frame phase takes the 50 Hz scale, so its 255 becomes 212 and
    1/255 becomes 1/212. The ring constants stay in the loop here: the scale makes it too long
    for loop.c to hoist them. Only the spacing, a local whose life spans the frame load, leaves. */
-void func_PAL_L08_003D7F30(char *obj)
+/* Spawns sparks and draws four glowing rings around the object that pulse with the frame counter (PAL: 50 Hz timings). */
+void spawn_particles_and_draw_glow_rings_pal(char *obj)
 {
     TI128 joint, velocity, step, ring, ring_step;
     int count;

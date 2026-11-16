@@ -34,7 +34,7 @@ typedef struct {
 } KilonoidHeroView;
 extern KilonoidHeroView g_hero_state __attribute__((nosda));
 extern unsigned char g_sound_state[] __attribute__((nosda));
-extern void func_PAL_002A7E68(char *, int, int, int);
+extern void anim_start_blended_pal(char *, int, int, int);
 extern int ref_L00_003D4A20_01(int, int, char *);
 extern float ref_L00_003D4A20_02(void);
 extern float ref_L00_003D4A20_03(void *, void *);
@@ -44,8 +44,8 @@ extern void ref_L00_003D4A20_06(int);
 extern int ref_L00_003D4A20_07(int, int);
 extern float ref_L00_003D4A20_08(float, float);
 extern void ref_L00_003D4A20_09(char *, char *);
-extern void func_PAL_L00_003D85E0(char *, char *);
-extern void func_PAL_L00_003D8170(char *, char *);
+extern void synthenoid_l00_update_movement_pal(char *, char *);
+extern void kilonoid_fire_shot_pal(char *, char *);
 extern int ref_L00_003D4A20_12(void *);
 extern void ref_L00_003D4A20_13(char *);
 extern void ref_L00_003D4A20_14(void *, float);
@@ -56,7 +56,7 @@ extern void ref_L00_003D4A20_17(void *, void *, void *, float);
 extern void ref_L00_003D4A20_18(void *, void *, void *, float);
 extern void ref_L00_003D4A20_19(void *, void *);
 extern void ref_L00_003D4A20_20(char *, float);
-extern void func_PAL_L00_003D89F0(char *, char *);
+extern void part_emit_drifting_from_moby_pal(char *, char *);
 extern void ref_L00_003D4A20_22(void *, void *, float);
 extern float ref_L00_003D4A20_23(float);
 extern void ref_L00_003D4A20_24(void *, void *, float);
@@ -83,11 +83,11 @@ typedef struct {
     float w2;
 } KilonoidObjectView;
 
-void func_PAL_L00_003D8AB8(unsigned char *object)
+void kilonoid_update_pal(unsigned char *object)
 {
     float temp[4];
     KilonoidQuad zero;
-    char *state, *heroMoby;
+    char *state, *hero_moby;
     int displaced, r, g, b, color, flip, n;
     float f;
     if (!object)
@@ -109,7 +109,7 @@ void func_PAL_L00_003D8AB8(unsigned char *object)
         state[0x26] = 0;
         *(int *)(state+0x20) = 0;
         *(short *)(state+0x46) = 0;
-        if (object[0x43]) func_PAL_002A7E68(object, 0, 0, 8);
+        if (object[0x43]) anim_start_blended_pal(object, 0, 0, 8);
         object[0x30] = 255;
         ((short *)object)[0x32/2] = 255;
         state[0x25] = 0;
@@ -133,7 +133,7 @@ void func_PAL_L00_003D8AB8(unsigned char *object)
         object[0x20] = 1;
         break;
     case 1:
-        if ((object[0x60]&2) && object[0x43] != 1) func_PAL_002A7E68(object, 1, 0, 10);
+        if ((object[0x60]&2) && object[0x43] != 1) anim_start_blended_pal(object, 1, 0, 10);
         {
             unsigned char *current = g_sound_state + (signed char)state[0x27] * 0x70;
             if (*(unsigned char **)(current+0x88) != object || !current[0x74]) {
@@ -159,12 +159,12 @@ void func_PAL_L00_003D8AB8(unsigned char *object)
         }
         *(KilonoidQuad *)(state+0x60) = *(KilonoidQuad *)g_hero_state.position;
         if (*(int *)(state+0x20)>17 && (object[0x60]&2)) {
-            if (object[0x43] != 1) func_PAL_002A7E68(object, 1, 0, ((s32)(ref_L00_003D4A20_07(7, 12)) * 5 + 2) / 6);
+            if (object[0x43] != 1) anim_start_blended_pal(object, 1, 0, ((s32)(ref_L00_003D4A20_07(7, 12)) * 5 + 2) / 6);
             *(float *)(object+0x48) = ref_L00_003D4A20_08(0.95f, 1.05f);
         }
         if ((unsigned char)state[0x25]<*(int *)(state+0x40) && g_hero_state.mode != 22 && g_hero_state.mode != 20 && !g_hero_state.flag) {
             ref_L00_003D4A20_09(object, state);
-            func_PAL_L00_003D85E0(object, state);
+            synthenoid_l00_update_movement_pal(object, state);
         } else {
             qzero_nc(state+0x10);
             *(int *)(state+0x20) = g_kilonoid_fade_frames;
@@ -173,7 +173,7 @@ void func_PAL_L00_003D8AB8(unsigned char *object)
             ref_L00_003D4A20_01(2, 0, object);
             object[0x20] = 2;
         }
-        func_PAL_L00_003D8170(object, state);
+        kilonoid_fire_shot_pal(object, state);
         break;
     case 2:
         ReleaseSound((signed char)state[0x27], object);
@@ -222,16 +222,16 @@ destroy:
         }
         ref_L00_003D4A20_19(position, position);
         ref_L00_003D4A20_20(object, 0.3f);
-        func_PAL_L00_003D89F0(object, state);
+        part_emit_drifting_from_moby_pal(object, state);
     }
 basis:
-    heroMoby = g_hero_state.moby;
-    qcopy(object+0xc0, heroMoby+0xc0);
-    qcopy(object+0xd0, heroMoby+0xd0);
-    qcopy(object+0xe0, heroMoby+0xe0);
+    hero_moby = g_hero_state.moby;
+    qcopy(object+0xc0, hero_moby+0xc0);
+    qcopy(object+0xd0, hero_moby+0xd0);
+    qcopy(object+0xe0, hero_moby+0xe0);
     if (g_hero_state.mode == 15) {
-        qcopy(object+0xc0, heroMoby+0xd0);
-        ref_L00_003D4A20_22(object+0xd0, heroMoby+0xc0, -1.0f);
+        qcopy(object+0xc0, hero_moby+0xd0);
+        ref_L00_003D4A20_22(object+0xd0, hero_moby+0xc0, -1.0f);
     }
     f = *(float *)(object+0xf8);
     if (ref_L00_003D4A20_23(f)>0.00001f) {

@@ -3,7 +3,7 @@
 #include "common.h"
 extern void math_update_wrapped_angle_offset(u8 *, u8 *, u8 *, float, float, float);
 extern void moby_mark_spawned(void *);
-extern void func_PAL_L12_004075B8(void *);
+extern void gfx_draw_sparkle_trail_to_hero_pal(void *);
 extern float vec_distance_xy(void *, void *);
 extern void value_set_entry_by_index_pal(int, int);
 extern void help_unlock_entry(int);
@@ -42,18 +42,18 @@ typedef struct {
 /* Sets the object's rotation and bob from the level's tuning floats. An object whose packed
    counter is already set is removed; otherwise, once within 1.5 units of the target position,
    it plays its sound, bumps the counter and is removed. */
-void func_PAL_L12_00407880(u8 *object) {
-    u8 *state = *(u8 **)(object + 0x68);
+void collectible_update_todano_pal(u8 *moby) {
+    u8 *vars = *(u8 **)(moby + 0x68);
     u16 index;
     s32 bits;
     TodanoObjectFlags *record;
 
-    if (object[0x20]) return;
-    ((TodanoRotation *)object)->rx = g_collectible_tilt_x * 0.0174532942f;
-    ((TodanoRotation *)object)->ry = g_collectible_tilt_y * 0.0174532942f;
-    ((TodanoRotation *)object)->rz = g_todano_spin_degrees * 0.0174532942f;
-    math_update_wrapped_angle_offset(object, g_collectible_angle_state_a, g_collectible_angle_state_b, g_collectible_angle_offset, g_collectible_spin_speed * 0.0003490659f, 0.0f);
-    index = *(u16 *)(object + 0xB2);
+    if (moby[0x20]) return;
+    ((TodanoRotation *)moby)->rx = g_collectible_tilt_x * 0.0174532942f;
+    ((TodanoRotation *)moby)->ry = g_collectible_tilt_y * 0.0174532942f;
+    ((TodanoRotation *)moby)->rz = g_todano_spin_degrees * 0.0174532942f;
+    math_update_wrapped_angle_offset(moby, g_collectible_angle_state_a, g_collectible_angle_state_b, g_collectible_angle_offset, g_collectible_spin_speed * 0.0003490659f, 0.0f);
+    index = *(u16 *)(moby + 0xB2);
     record = &g_object_flags;
     if (record->flags[(s16)index]) goto kill;
     bits = (u8)g_moby_nibble_table[((s16)index >> 1) + (g_current_map_index << 10)];
@@ -65,17 +65,17 @@ void func_PAL_L12_00407880(u8 *object) {
     goto update;
 
 kill:
-    moby_mark_spawned(object);
+    moby_mark_spawned(moby);
     return;
 
 update:
-    func_PAL_L12_004075B8(object);
-    if (vec_distance_xy(object + 0x10, g_hero_position) < 1.5f) {
+    gfx_draw_sparkle_trail_to_hero_pal(moby);
+    if (vec_distance_xy(moby + 0x10, g_hero_position) < 1.5f) {
         value_set_entry_by_index_pal(0x1246, 0x1A1);
         help_unlock_entry(0x10);
-        moby_set_flag_bit(g_moby_list_start + (*(s32 *)state << 8), 1);
+        moby_set_flag_bit(g_moby_list_start + (*(s32 *)vars << 8), 1);
         moby_handle_request_slot_state(0x10);
-        INCREMENT_OBJECT_COUNTER(object);
-        moby_mark_spawned(object);
+        INCREMENT_OBJECT_COUNTER(moby);
+        moby_mark_spawned(moby);
     }
 }

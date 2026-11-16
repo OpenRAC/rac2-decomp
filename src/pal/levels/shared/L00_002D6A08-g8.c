@@ -5,21 +5,22 @@ extern char g_hero_state[];
 extern float g_look_rate_scale_a __attribute__((sda));
 extern float g_look_sensitivity_a __attribute__((sda));
 
-int hero_get_camera_params_pal(float *a0, float *a1, float *a2)
+/* Gives the camera values for hero states 98 to 100 and 17. Returns 1 if it filled them in, otherwise 0. */
+int hero_get_camera_params_pal(float *height_out, float *pitch_out, float *yaw_out)
 {
     char *p = g_hero_state;
     int v = *(int *)(p + 8852);
 
     if (v >= 98 && v <= 100) {
-        if (a0) *a0 = *(float *)(p + 6316);
-        if (a1) *a1 = g_look_rate_scale_a * 6.981318e-06f;
-        if (a2) *a2 = g_look_sensitivity_a * 0.0003490659f;
+        if (height_out) *height_out = *(float *)(p + 6316);
+        if (pitch_out) *pitch_out = g_look_rate_scale_a * 6.981318e-06f;
+        if (yaw_out) *yaw_out = g_look_sensitivity_a * 0.0003490659f;
         return 1;
     }
     if (v == 17) {
-        if (a0) *a0 = *(float *)(p + 152);
-        if (a1) *a1 = g_look_rate_scale_a * 2.0943955e-05f;
-        if (a2) *a2 = g_look_sensitivity_a * 0.0010471977f;
+        if (height_out) *height_out = *(float *)(p + 152);
+        if (pitch_out) *pitch_out = g_look_rate_scale_a * 2.0943955e-05f;
+        if (yaw_out) *yaw_out = g_look_sensitivity_a * 0.0010471977f;
         return 1;
     }
     return 0;
@@ -32,6 +33,7 @@ extern void FastVecCross(void *, void *, void *);
 extern char g_camera_l00_position[];
 extern char g_camera_state_block[];
 
+/* Eases the camera height behind the hero and copies the hero camera data into the level camera block. */
 void hero_update_camera_block_pal(void) {
     char *player = g_hero_state;
     char *camera;

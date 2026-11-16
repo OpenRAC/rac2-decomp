@@ -79,7 +79,7 @@ extern char g_tether_zero_vec[];
    It is a -g unit: the line label on the case 1 division is what makes the assembler pad it with
    the retail's nop. The sweep's thresholds are locals set at the head of their case, which is what
    puts them in saved registers before the calls. */
-void func_PAL_L04_0045A808(u8 *self)
+void light_controller_update_pal(u8 *self)
 {
     State_L04_00454BF8 *st = *(State_L04_00454BF8 **)(self + 0x68);
     f32 to_cam[4];

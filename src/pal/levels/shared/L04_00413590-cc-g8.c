@@ -29,14 +29,14 @@ typedef struct { int v[5]; } AttackChoices;
 extern AttackChoices g_attack_choices;
 extern struct { unsigned char pad[0x80]; float position[4]; unsigned char pad90[0x2290-0x90]; unsigned char *hero; } g_hero_state;
 typedef struct {
- unsigned char pad0[0x260]; int triggerList;
+ unsigned char pad0[0x260]; int trigger_list;
  unsigned char pad264[0x10]; short elevated;
  unsigned char pad276[6]; float height;
  unsigned char pad280[4]; float tilt;
  unsigned char pad288[8]; float offset[4];
  unsigned char pad2a0[0x6c]; float length;
  unsigned char pad310[0x50]; int state, duration, timer;
- unsigned char pad36c[0x16c]; int alternate, alternateTimer;
+ unsigned char pad36c[0x16c]; int alternate, alternate_timer;
  unsigned char pad4e0[0x284]; int cooldown, ready;
 } AttackState;
 typedef struct { int unused, flags; unsigned char pad8[0x38]; } AttackSettings;
@@ -57,85 +57,87 @@ extern void FastVecSub(void *,void *,void *);
 extern float func_L00_002EE290(void *);
 extern int math_random_int_range(int,int);
 extern int snd_play_from_class_bank(int,int,void *,int);
-extern void func_PAL_L04_00410678(void *,void *,int,int);
+extern void part_l04_spawn_burst_pal(void *,void *,int,int);
 extern int math_fast_float_d(void *);
 extern void moby_transform_joint_to_world(void *,int,void *);
 extern void vec_build_spherical_offset(void *,float,float,float);
 extern void add_vectors(void *,void *,void *);
-extern unsigned char *func_PAL_L04_003FD4F8(void *,void *,void *,int);
+extern unsigned char *SpawnHomingShot_pal(void *,void *,void *,int);
 extern int PlayMobySound(int,int,void *);
 extern unsigned char *bike_find_aim_target(void *,void *,void *,void *,void *,void *,float,float);
 extern int queue_copy_record_by_index(int);
-extern void * func_PAL_L04_003FE7B0(void *,void *,void *,float,float,float,float,float);
-extern void * func_PAL_L04_003FFF88(void *,void *);
-void func_PAL_L04_00413590(unsigned char *m)
+extern void * homing_rocket_spawn_pal(void *,void *,void *,float,float,float,float,float);
+extern void * shield_dome_spawn_pal(void *,void *);
+/* Handles the racer item use each frame: collects item boxes, then fires the current weapon (shot,
+   homing rocket or shield dome) when the fire button is pressed (PAL: 50 Hz timings). */
+void racer_update_item_use_pal(unsigned char *moby)
 {
  AttackChoices choices;
  float origin[4],dir[4],delta[4],probe[4],temp[4];
- unsigned char *target; float pitch,yaw,aimPitch,aimYaw,extra; AttackState *p=*(AttackState **)(m+0x68); unsigned char *d; int count,i,state,choice;
+ unsigned char *target; float pitch,yaw,aim_pitch,aim_yaw,extra; AttackState *vars=*(AttackState **)(moby+0x68); unsigned char *item_box_vars; int count,i,state,choice;
  choices=g_attack_choices;
- FastVecScale(probe,p->offset,3);
+ FastVecScale(probe,vars->offset,3);
  FastVecAdd(probe,probe,((unsigned char *)&g_hero_state + 0xe0));
  count=coll_process_hit(probe,0.7f,0,g_hero_state.hero,0);
  if(count) {
-  FastVecScale(delta,p->offset,7);
+  FastVecScale(delta,vars->offset,7);
   for(i=0;i<count;i++) if(moby_is_in_special_class_range(g_special_moby_list[i]) || H(g_special_moby_list[i],0xaa)==0x85)
    part_queue_impact_effect(g_special_moby_list[i],g_hero_state.hero,0x10000,g_hero_state.position,delta,1);
  }
- racer_update_boost_pal(m);
- if((g_race_challenge_table[g_current_race_index].flags&1) && p->triggerList!=-1) {
-  GetFirstMobyInGroup(&target,p->triggerList,0,0);
+ racer_update_boost_pal(moby);
+ if((g_race_challenge_table[g_current_race_index].flags&1) && vars->trigger_list!=-1) {
+  GetFirstMobyInGroup(&target,vars->trigger_list,0,0);
   while(target) {
-   if(H(target,0xaa)==0xab8) {
-    d=P(target,0x68);FastVecSub(delta,target+16,m+16);
-    if(!I(d,0) && func_L00_002EE290(delta)<1) {
-     choice=p->state;state=choice;
-     if(I(d,4)==-1) do {choice=math_random_int_range(1,4);} while(state==choice && I(d,4)==-1);
-     if(choice==4) {p->alternate=1;p->alternateTimer=choices.v[4];}
-     else {int duration; p->state=choice;duration=choices.v[choice];p->timer=0;p->duration=duration;}
-     if(m[0x20]!=3)snd_play_from_class_bank(0,0,m,0xab8);
-     func_PAL_L04_00410678(target+16,p->offset,8,0);I(d,0)=250;
+   if(H(target,0xaa)==MOBY_CLASS_HOVERBIKE_RACE_ITEM_BOX) {
+    item_box_vars=P(target,0x68);FastVecSub(delta,target+16,moby+16);
+    if(!I(item_box_vars,0) && func_L00_002EE290(delta)<1) {
+     choice=vars->state;state=choice;
+     if(I(item_box_vars,4)==-1) do {choice=math_random_int_range(1,4);} while(state==choice && I(item_box_vars,4)==-1);
+     if(choice==4) {vars->alternate=1;vars->alternate_timer=choices.v[4];}
+     else {int duration; vars->state=choice;duration=choices.v[choice];vars->timer=0;vars->duration=duration;}
+     if(moby[0x20]!=3)snd_play_from_class_bank(0,0,moby,0xab8);
+     part_l04_spawn_burst_pal(target+16,vars->offset,8,0);I(item_box_vars,0)=250;
     }
    }
    GetNextMobyInGroup(&target,target,0,0);
   }
  }
- if(p->alternate) {
-  p->ready=0;
-  if(math_fast_float_d(&p->alternateTimer)) {p->alternate=0;p->ready=1;}
+ if(vars->alternate) {
+  vars->ready=0;
+  if(math_fast_float_d(&vars->alternate_timer)) {vars->alternate=0;vars->ready=1;}
  }
- if(p->ready && math_fast_float_d(&p->cooldown)) {p->ready=0;p->cooldown=33;}
- if(m[0x20]==3)return;
- switch(p->state) {
+ if(vars->ready && math_fast_float_d(&vars->cooldown)) {vars->ready=0;vars->cooldown=33;}
+ if(moby[0x20]==3)return;
+ switch(vars->state) {
  case 0: break;
  case 1:
-  if(math_fast_float_d(&p->timer) && (g_pad_pressed_flags&5)) {
-   p->timer=2;moby_transform_joint_to_world(m,((p->duration^1)&1),origin);
-   if(p->elevated)vec_build_spherical_offset(dir,p->length+0.6f,F(m,0xf8),-p->tilt);
-   else vec_build_spherical_offset(dir,p->length+0.6f,F(m,0xf8),-F(m,0xf4));
-   add_vectors(temp,origin,dir);func_PAL_L04_003FD4F8(m,origin,dir,100);PlayMobySound(7,0,m);
-   if(math_fast_float_d(&p->duration))p->state=0;
+  if(math_fast_float_d(&vars->timer) && (g_pad_pressed_flags&5)) {
+   vars->timer=2;moby_transform_joint_to_world(moby,((vars->duration^1)&1),origin);
+   if(vars->elevated)vec_build_spherical_offset(dir,vars->length+0.6f,F(moby,0xf8),-vars->tilt);
+   else vec_build_spherical_offset(dir,vars->length+0.6f,F(moby,0xf8),-F(moby,0xf4));
+   add_vectors(temp,origin,dir);SpawnHomingShot_pal(moby,origin,dir,100);PlayMobySound(7,0,moby);
+   if(math_fast_float_d(&vars->duration))vars->state=0;
   }return;
  case 2: {
   unsigned char *target; float tilt;
-  if(math_fast_float_d(&p->timer) && (g_pad_held_flags&5)) {
-   yaw=0;extra=0;p->timer=25;moby_transform_joint_to_world(m,((p->duration^1)&1),origin);tilt=F(m,0xf8);
-   if(p->elevated)vec_build_spherical_offset(dir,p->length+0.6f+p->height,tilt,yaw);
-   else {vec_build_spherical_offset(dir,p->length+0.6f+p->height,tilt,-F(m,0xf4));yaw=F(m,0xf4);}
+  if(math_fast_float_d(&vars->timer) && (g_pad_held_flags&5)) {
+   yaw=0;extra=0;vars->timer=25;moby_transform_joint_to_world(moby,((vars->duration^1)&1),origin);tilt=F(moby,0xf8);
+   if(vars->elevated)vec_build_spherical_offset(dir,vars->length+0.6f+vars->height,tilt,yaw);
+   else {vec_build_spherical_offset(dir,vars->length+0.6f+vars->height,tilt,-F(moby,0xf4));yaw=F(moby,0xf4);}
    pitch=tilt;yaw-=0.3490659f;
-   target=bike_find_aim_target(m,origin,dir,&aimPitch,&aimYaw,&extra,0.78539824f,30);
+   target=bike_find_aim_target(moby,origin,dir,&aim_pitch,&aim_yaw,&extra,0.78539824f,30);
    if(target) {
     FastVecSub(delta,origin,target+16);
-    if(func_L00_002EE290(delta)<25) {pitch=aimPitch;yaw=aimYaw;}
-   } else {aimPitch=pitch;aimYaw=yaw;extra=0.2f;}
+    if(func_L00_002EE290(delta)<25) {pitch=aim_pitch;yaw=aim_yaw;}
+   } else {aim_pitch=pitch;aim_yaw=yaw;extra=0.2f;}
    queue_copy_record_by_index(47);add_vectors(temp,origin,dir);
-   func_PAL_L04_003FE7B0(m,origin,target,aimPitch,aimYaw,extra,pitch,yaw);PlayMobySound(8,0,m);
-   if(math_fast_float_d(&p->duration))p->state=0;
+   homing_rocket_spawn_pal(moby,origin,target,aim_pitch,aim_yaw,extra,pitch,yaw);PlayMobySound(8,0,moby);
+   if(math_fast_float_d(&vars->duration))vars->state=0;
   }return; }
  case 3:
-  if(math_fast_float_d(&p->timer) && (g_pad_held_flags&5)) {
-   p->timer=25;FastVecAdd(temp,m+16,p->offset);*(AttackQuad *)origin=*(AttackQuad *)temp;func_PAL_L04_003FFF88(m,origin);
-   if(math_fast_float_d(&p->duration))p->state=0;
+  if(math_fast_float_d(&vars->timer) && (g_pad_held_flags&5)) {
+   vars->timer=25;FastVecAdd(temp,moby+16,vars->offset);*(AttackQuad *)origin=*(AttackQuad *)temp;shield_dome_spawn_pal(moby,origin);
+   if(math_fast_float_d(&vars->duration))vars->state=0;
   }
   break;
  }

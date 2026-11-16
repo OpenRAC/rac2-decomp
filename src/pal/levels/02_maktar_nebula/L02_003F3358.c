@@ -25,57 +25,57 @@ extern float FastAddRotations(float, float);
    heading towards it, weighted by the progress (+0x34, minus 6, over 8, at least 0). The heading
    is then copied into the hero's state at +0x1D4, +0x1DC gets 1.0 and, from a progress of 0.9, the
    two shared calls run. Nothing happens while the hero's halfword at +0x86 is not 0. */
-void path_update_hero_heading_pal(char *arg0) {
+void path_update_hero_heading_pal(char *moby) {
     char *hero = *(char **)(&g_camera_l02_position + 0x50);
     char *state;
-    char *hs;
-    char *cam;
-    float *dir;
+    char *hero_state;
+    char *cam_state;
+    float *hero_dir;
     char *path;
     float scale;
-    float a1;
-    float a2;
-    float t;
+    float path_angle;
+    float hero_angle;
+    float ease_weight;
     int last;
-    int i;
-    int j;
+    int from_index;
+    int to_index;
 
     if (*(short *)(hero + 0x86) != 0)
         return;
-    state = *(char **)(arg0 + 0x68);
-    hs = *(char **)(hero + 0x70);
-    cam = hs + 0x1C0;
-    dir = (float *)(hs + 0x160);
+    state = *(char **)(moby + 0x68);
+    hero_state = *(char **)(hero + 0x70);
+    cam_state = hero_state + 0x1C0;
+    hero_dir = (float *)(hero_state + 0x160);
     path = g_route_polygons[*(int *)state];
     scale = (*(float *)(state + 0x34) - 6.0f) * 0.125f;
     if (scale < 0.0f)
         scale = 0.0f;
     last = *(int *)path - 1;
-    i = *(int *)(state + 0x30);
-    if (i == last)
-        i--;
-    j = i + *(int *)(state + 0x3C);
-    if (j > last)
-        j = last;
+    from_index = *(int *)(state + 0x30);
+    if (from_index == last)
+        from_index--;
+    to_index = from_index + *(int *)(state + 0x3C);
+    if (to_index > last)
+        to_index = last;
     {
-        char *p0 = path + i * 16;
-        char *p1 = path + j * 16;
+        char *from_point = path + from_index * 16;
+        char *to_point = path + to_index * 16;
 
-        a1 = mat_fast_helper_a(*(float *)(p1 + 0x10) - *(float *)(p0 + 0x10),
-                           *(float *)(p1 + 0x14) - *(float *)(p0 + 0x14));
+        path_angle = mat_fast_helper_a(*(float *)(to_point + 0x10) - *(float *)(from_point + 0x10),
+                           *(float *)(to_point + 0x14) - *(float *)(from_point + 0x14));
     }
-    a2 = mat_fast_helper_a(dir[0], dir[1]);
-    a2 = FastAddRotations(a2, 3.1415927f);
-    a1 = fast_subtract_rotations(a1, a2);
-    if (math_fabs(a1) < 0.0017453294713050127f) {
+    hero_angle = mat_fast_helper_a(hero_dir[0], hero_dir[1]);
+    hero_angle = FastAddRotations(hero_angle, 3.1415927f);
+    path_angle = fast_subtract_rotations(path_angle, hero_angle);
+    if (math_fabs(path_angle) < 0.0017453294713050127f) {
         *(float *)(state + 0x38) = 0.0f;
     } else {
-        t = scale * g_path_heading_easing_scale;
-        math_approach_target_with_braking(state + 0x38, a1, (t + 0.5f) * 0.00040000002f,
-                      (t + 0.5f) * 0.00040000002f, t * 0.020000001f);
+        ease_weight = scale * g_path_heading_easing_scale;
+        math_approach_target_with_braking(state + 0x38, path_angle, (ease_weight + 0.5f) * 0.00040000002f,
+                      (ease_weight + 0.5f) * 0.00040000002f, ease_weight * 0.020000001f);
     }
-    *(float *)(cam + 0x1C) = 1.0f;
-    *(float *)(cam + 0x14) = *(float *)(state + 0x38);
+    *(float *)(cam_state + 0x1C) = 1.0f;
+    *(float *)(cam_state + 0x14) = *(float *)(state + 0x38);
     if (scale >= 0.9f) {
         set_follow_camera_orbit_clamp_mode(0);
         cam_set_lock_flag();

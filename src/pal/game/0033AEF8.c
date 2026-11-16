@@ -7,17 +7,17 @@ extern char *hud_construct_widget_base(void *p);
 /* func_00338F58 is matched in 00338F58.c. */
 
 /* Initialises eight sub-objects at byte offsets 8, 84, 160, 236 (step 76) and 312, 384, 456, 528 (step 72) of the argument with two different helpers and returns the argument. */
-void *func_PAL_0033AEF8(char *a0)
+void *mission_screen_init_parts_pal(char *screen)
 {
-    object_construct_derived_a(a0 + 8);
-    object_construct_derived_a(a0 + 84);
-    object_construct_derived_a(a0 + 160);
-    object_construct_derived_a(a0 + 236);
-    hud_construct_widget_base(a0 + 312);
-    hud_construct_widget_base(a0 + 400);
-    hud_construct_widget_base(a0 + 488);
-    hud_construct_widget_base(a0 + 576);
-    return a0;
+    object_construct_derived_a(screen + 8);
+    object_construct_derived_a(screen + 84);
+    object_construct_derived_a(screen + 160);
+    object_construct_derived_a(screen + 236);
+    hud_construct_widget_base(screen + 312);
+    hud_construct_widget_base(screen + 400);
+    hud_construct_widget_base(screen + 488);
+    hud_construct_widget_base(screen + 576);
+    return screen;
 }
 
 
@@ -46,7 +46,7 @@ extern Statistics_0033B218 g_progress_statistics;
 
 /* func_PAL_0033B218, the PAL copy of func_00339320: the same C, where the widgets from +0x180 sit 0x10 and 0x20 further on,
    the object at +0x258 is at +0x298, and the highest level time is scaled to 50 Hz before it is compared and kept. */
-int func_PAL_0033B218(char *a0)
+int mission_screen_place_parts_pal(char *screen)
 {
     Float2_0033B218 z0 = {0.0f, 0.0f};
     Float2_0033B218 z1 = {0.0f, 0.0f};
@@ -56,14 +56,14 @@ int func_PAL_0033B218(char *a0)
     Float2_0033B218 g1 = ref_L00_0042EC50_01;
     Float2_0033B218 g2 = ref_L00_0042EC50_02;
 
-    object_set_first_float4(a0 + 8, z0.x + (*(float **)(a0 + 4))[0], z0.y + (*(float **)(a0 + 4))[1], 0.0f, 0.0f);
-    object_set_first_float4(a0 + 0x54, z3.x + (*(float **)(a0 + 4))[0], z3.y + (*(float **)(a0 + 4))[1], 0.0f, 0.0f);
-    object_set_first_float4(a0 + 0xA0, z1.x + (*(float **)(a0 + 4))[0], z1.y + (*(float **)(a0 + 4))[1], 0.0f, 0.0f);
-    object_set_first_float4(a0 + 0xEC, z2.x + (*(float **)(a0 + 4))[0], z2.y + (*(float **)(a0 + 4))[1], 0.0f, 0.0f);
-    object_set_first_float4(a0 + 0x138, g0.x + (*(float **)(a0 + 4))[0], g0.y + (*(float **)(a0 + 4))[1], 0.0f, 0.0f);
-    object_set_first_float4(a0 + 0x190, g1.x + (*(float **)(a0 + 4))[0], g1.y + (*(float **)(a0 + 4))[1], 0.0f, 0.0f);
-    object_set_first_float4(a0 + 0x1E8, g2.x + (*(float **)(a0 + 4))[0], g2.y + (*(float **)(a0 + 4))[1], 0.0f, 0.0f);
-    text_format_location_name(a0 + 0x298, g_selected_map_index);
+    object_set_first_float4(screen + 8, z0.x + (*(float **)(screen + 4))[0], z0.y + (*(float **)(screen + 4))[1], 0.0f, 0.0f);
+    object_set_first_float4(screen + 0x54, z3.x + (*(float **)(screen + 4))[0], z3.y + (*(float **)(screen + 4))[1], 0.0f, 0.0f);
+    object_set_first_float4(screen + 0xA0, z1.x + (*(float **)(screen + 4))[0], z1.y + (*(float **)(screen + 4))[1], 0.0f, 0.0f);
+    object_set_first_float4(screen + 0xEC, z2.x + (*(float **)(screen + 4))[0], z2.y + (*(float **)(screen + 4))[1], 0.0f, 0.0f);
+    object_set_first_float4(screen + 0x138, g0.x + (*(float **)(screen + 4))[0], g0.y + (*(float **)(screen + 4))[1], 0.0f, 0.0f);
+    object_set_first_float4(screen + 0x190, g1.x + (*(float **)(screen + 4))[0], g1.y + (*(float **)(screen + 4))[1], 0.0f, 0.0f);
+    object_set_first_float4(screen + 0x1E8, g2.x + (*(float **)(screen + 4))[0], g2.y + (*(float **)(screen + 4))[1], 0.0f, 0.0f);
+    text_format_location_name(screen + 0x298, g_selected_map_index);
     if (g_game_time >= 11) {
         if (g_progress_statistics.count < 0xffff) g_progress_statistics.count++;
     }
@@ -73,20 +73,20 @@ int func_PAL_0033B218(char *a0)
 }
 
 extern void gfx_draw_screen_element_stored(char *a);
-extern void func_PAL_00338770(char *a);
+extern void text_label_draw_pal(char *a);
 
 /* early-returns when a 32-bit field is zero, otherwise calls one helper four times and another three times with fixed byte offsets off the argument pointer. */
-void func_PAL_0033B4B8(char *a0)
+void mission_screen_draw_parts_pal(char *screen)
 {
-    if (*(int *)(a0 + 728) == 0)
+    if (*(int *)(screen + 728) == 0)
         return;
-    gfx_draw_screen_element_stored(a0 + 8);
-    gfx_draw_screen_element_stored(a0 + 84);
-    gfx_draw_screen_element_stored(a0 + 160);
-    gfx_draw_screen_element_stored(a0 + 236);
-    func_PAL_00338770(a0 + 312);
-    func_PAL_00338770(a0 + 400);
-    func_PAL_00338770(a0 + 488);
+    gfx_draw_screen_element_stored(screen + 8);
+    gfx_draw_screen_element_stored(screen + 84);
+    gfx_draw_screen_element_stored(screen + 160);
+    gfx_draw_screen_element_stored(screen + 236);
+    text_label_draw_pal(screen + 312);
+    text_label_draw_pal(screen + 400);
+    text_label_draw_pal(screen + 488);
 }
 
 
@@ -227,28 +227,29 @@ extern void F8ad956d6_FUN_00295F60(int first, int second);
 extern int F8ad956d6_FUN_002DAF68(char *target);
 extern void F8ad956d6_FUN_00336A78(char *target);
 
+/* Draws the list screen: panels, prompt-style effects and the nine text widgets, when active (PAL version). */
 void list_screen_draw_pal(char *object)
 {
-    char *s0 = object;
+    char *screen = object;
 
-    if (*(int *)(s0 + 1168) == 0)
+    if (*(int *)(screen + 1168) == 0)
         return;
-    F8ad956d6_FUN_00336320(s0 + 8);
-    F8ad956d6_FUN_00336320(s0 + 84);
+    F8ad956d6_FUN_00336320(screen + 8);
+    F8ad956d6_FUN_00336320(screen + 84);
     F8ad956d6_FUN_002FC560(66, 68);
     F8ad956d6_FUN_002FC560(71, 11);
     F8ad956d6_FUN_00295F60(0, 1);
     F8ad956d6_FUN_002DAF68(0);
-    F8ad956d6_FUN_00336320(s0 + 160);
-    F8ad956d6_FUN_00336320(s0 + 236);
-    F8ad956d6_FUN_00336A78(s0 + 312);
-    F8ad956d6_FUN_00336A78(s0 + 400);
-    F8ad956d6_FUN_00336A78(s0 + 488);
-    F8ad956d6_FUN_00336A78(s0 + 576);
-    F8ad956d6_FUN_00336A78(s0 + 664);
-    F8ad956d6_FUN_00336A78(s0 + 752);
-    F8ad956d6_FUN_00336A78(s0 + 840);
-    F8ad956d6_FUN_00336A78(s0 + 928);
-    F8ad956d6_FUN_00336A78(s0 + 1016);
+    F8ad956d6_FUN_00336320(screen + 160);
+    F8ad956d6_FUN_00336320(screen + 236);
+    F8ad956d6_FUN_00336A78(screen + 312);
+    F8ad956d6_FUN_00336A78(screen + 400);
+    F8ad956d6_FUN_00336A78(screen + 488);
+    F8ad956d6_FUN_00336A78(screen + 576);
+    F8ad956d6_FUN_00336A78(screen + 664);
+    F8ad956d6_FUN_00336A78(screen + 752);
+    F8ad956d6_FUN_00336A78(screen + 840);
+    F8ad956d6_FUN_00336A78(screen + 928);
+    F8ad956d6_FUN_00336A78(screen + 1016);
 }
 

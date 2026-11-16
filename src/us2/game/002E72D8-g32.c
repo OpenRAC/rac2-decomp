@@ -71,7 +71,7 @@ extern void matrix_mul_vec3(void *, void *, void *), mat_get_euler_angles(void *
 extern void mat_combine_and_store(void *, void *, void *, void *), moby_update_sway(void *, void *, void *);
 
 /* Spawns the equipment pieces if needed, then makes each piece follow the base object. */
-void func_US2_002E72D8(Object *object)
+void UpdateEquipmentPieces_us2(Object *object)
 {
     float p[4], old[4], matrix[16], previous[4], delta[4], offset[4];
     char *target;

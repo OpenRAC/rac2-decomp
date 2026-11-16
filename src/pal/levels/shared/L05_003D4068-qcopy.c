@@ -14,7 +14,7 @@ extern float math_random_float_range(float, float);
 extern void *part_spawn_object_relative_particle(char *, void *, void *, void *, s32);
 
 /* Spawns three trail marks at the object's tail unless the game is in state 2. */
-void func_PAL_L05_003D4280(char *obj)
+void moby_spawn_trail_marks_pal(char *obj)
 {
     V4_F3D0538 dir, drift, tail, mark1, mark2, mark3;
     float k;

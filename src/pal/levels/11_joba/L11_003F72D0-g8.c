@@ -35,42 +35,44 @@ extern f32 *arena_get_center_point(s32 a0);
 extern f32 g_joba_orbit_radius __attribute__((sda));
 extern f32 g_orbit_enemy_start_z __attribute__((sda));
 
-void joba_rail_reset_pal(u8 *arg0) {
-    L11Moby *m = (L11Moby *)arg0;
-    u8 *s1 = *(u8 **)(arg0 + 0x68);
-    f32 *p;
-    f32 f20;
-    f32 y;
-    u32 w;
+/* Resets a Joba enemy to full health and its starting state, then puts it on the orbit circle
+   in the arena (PAL: v1.01 joba_rail_reset). */
+void joba_rail_reset_pal(u8 *moby) {
+    L11Moby *m = (L11Moby *)moby;
+    u8 *vars = *(u8 **)(moby + 0x68);
+    f32 *center;
+    f32 trig_value;
+    f32 orbit_y;
+    u32 model_value;
 
-    *(f32 *)(s1 + 0x20) = (f32)*(s16 *)(s1 + 0x24);
-    w = *(u32 *)(m->model + 0x10);
+    *(f32 *)(vars + 0x20) = (f32)*(s16 *)(vars + 0x24);
+    model_value = *(u32 *)(m->model + 0x10);
     m->flags &= 0xFFFE;
     m->b31 = 1;
-    m->w98 = w;
-    *(u8 *)(s1 + 0x2E) = 1;
+    m->w98 = model_value;
+    *(u8 *)(vars + 0x2E) = 1;
     m->b7F = 0;
     m->flags = (m->flags & 0xFFB9) | 0x1000;
-    *(s32 *)(s1 + 0x60) = 0;
-    part_spawn_damage_debris_pal((char *)m, (char *)(s1 + 0x50), (char *)(s1 + 0x20));
-    if (*(s16 *)(s1 + 0x70) != 0) {
-        *(s16 *)(s1 + 0x70) = 0;
-        set_moby_color(m, *(u32 *)(s1 + 0x280), *(u32 *)(s1 + 0x284),
-                      *(u32 *)(s1 + 0x288));
-        *(s16 *)(s1 + 0x72) = 1;
+    *(s32 *)(vars + 0x60) = 0;
+    part_spawn_damage_debris_pal((char *)m, (char *)(vars + 0x50), (char *)(vars + 0x20));
+    if (*(s16 *)(vars + 0x70) != 0) {
+        *(s16 *)(vars + 0x70) = 0;
+        set_moby_color(m, *(u32 *)(vars + 0x280), *(u32 *)(vars + 0x284),
+                      *(u32 *)(vars + 0x288));
+        *(s16 *)(vars + 0x72) = 1;
     }
-    moby_set_state(arg0, 2, 2);
-    *(s32 *)(s1 + 0x250) = 0;
-    f20 = math_fast_sin_or_cos_a(*(f32 *)(s1 + 0x250));
-    p = arena_get_center_point(m->slot);
-    m->x = g_joba_orbit_radius * f20 + p[0];
-    f20 = math_fast_sin_or_cos_b(*(f32 *)(s1 + 0x250));
-    p = arena_get_center_point(m->slot);
-    y = g_joba_orbit_radius * f20 + p[1];
+    moby_set_state(moby, 2, 2);
+    *(s32 *)(vars + 0x250) = 0;
+    trig_value = math_fast_sin_or_cos_a(*(f32 *)(vars + 0x250));
+    center = arena_get_center_point(m->slot);
+    m->x = g_joba_orbit_radius * trig_value + center[0];
+    trig_value = math_fast_sin_or_cos_b(*(f32 *)(vars + 0x250));
+    center = arena_get_center_point(m->slot);
+    orbit_y = g_joba_orbit_radius * trig_value + center[1];
     m->z = g_orbit_enemy_start_z;
     m->rotX = -1.5707965f;
     m->rotW = 0;
-    m->y = y;
-    m->rotZ = FastAddRotations(3.1415927f, *(f32 *)(s1 + 0x250));
+    m->y = orbit_y;
+    m->rotZ = FastAddRotations(3.1415927f, *(f32 *)(vars + 0x250));
     euler_rotation_basis(m->mtx, &m->rotW);
 }

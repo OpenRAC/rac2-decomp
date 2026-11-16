@@ -24,15 +24,16 @@ typedef struct {
 } D00189E20_View;
 extern D00189E20_View g_hero_state;
 
-void museum_draw_selected_exhibit_entry_pal(char *a0) {
-    char *st = *(char **)(a0 + 0x68);
+/* Draws the currently picked entry on the screen with a fixed color (PAL version). */
+void museum_draw_selected_exhibit_entry_pal(char *obj) {
+    char *st = *(char **)(obj + 0x68);
     Vec6 buf;
-    int v;
+    int model;
 
     g_hero_state.mode = 5;
     g_hero_state.flag = 1;
     buf = *(Vec6 *)g_museum_entry_vec;
-    v = func_2FB3C8(*(int *)(g_museum_exhibit_models + *(int *)(st + 0x144) * 4));
-    func_3132D8(&buf, 0x80F0F0F0, v, 1, 0, -1, 0, 0, 0, 0);
+    model = func_2FB3C8(*(int *)(g_museum_exhibit_models + *(int *)(st + 0x144) * 4));
+    func_3132D8(&buf, 0x80F0F0F0, model, 1, 0, -1, 0, 0, 0, 0);
 }
 

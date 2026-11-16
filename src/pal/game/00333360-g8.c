@@ -20,11 +20,11 @@ extern void mat_get_euler_angles(void *,void *);
 extern int moby_transform_point_and_rotation_by_parent(void *,int,void *,void *,void *,void *);
 extern void euler_rotation_basis(void *,void *);
 extern void *part_find_owned_effect_slot(void *,int,int);
-extern void func_PAL_00333CD8(void *);
+extern void explosion_effect_update_pal(void *);
 extern float mat_fast_helper_a(float,float);
 extern void part_queue_ground_shadow(void *,float);
 extern void moby_set_state(void *,int,int);
-extern void func_PAL_002A7E68(void *,int,int,int);
+extern void anim_start_blended_pal(void *,int,int,int);
 extern float math_random_float_range(float,float);
 extern float vec_distance_xy(void *,void *);
 extern int math_fast_float_d(void *);
@@ -45,7 +45,9 @@ extern float coll_probe_ground_height_below(void *,int,float);
 #define AI_I(p,n) (*(int *)((char *)(p)+(n)))
 #define AI_B(p,n) (*(unsigned char *)((char *)(p)+(n)))
 
-void func_PAL_00333360(char *object)
+/* Wandering creature AI: picks a state (idle, walk, run, flee), steers along the ground and
+ * explodes when it falls or is hit (PAL: 50 Hz timings). */
+void wandering_creature_update_pal(char *object)
 {
     float dest[4] __attribute__((aligned(16)));
     float temp[4] __attribute__((aligned(16)));
@@ -64,7 +66,7 @@ void func_PAL_00333360(char *object)
         euler_rotation_basis(object+0xc0,temp);
         qcopy(object+0xf0,temp);
     }
-    if (part_find_owned_effect_slot(object,0x4010000,0)) func_PAL_00333CD8(object);
+    if (part_find_owned_effect_slot(object,0x4010000,0)) explosion_effect_update_pal(object);
     mat_fast_helper_a(AI_F(object,0x10)-g_hero_state.pos[0],AI_F(object,0x14)-g_hero_state.pos[1]);
     part_queue_ground_shadow(object,0.5f);
     switch (AI_B(object,0x20)) {
@@ -74,13 +76,13 @@ void func_PAL_00333360(char *object)
     case 1:
         if (AI_B(object,0x60)&2) {
             r=math_random_float_range(0,100);
-            if (r>=0 && r<20) func_PAL_002A7E68(object,0,0,8);
-            if (r>=20 && r<50) func_PAL_002A7E68(object,4,0,8);
-            if (r>=50 && r<100) func_PAL_002A7E68(object,1,0,8);
+            if (r>=0 && r<20) anim_start_blended_pal(object,0,0,8);
+            if (r>=20 && r<50) anim_start_blended_pal(object,4,0,8);
+            if (r>=50 && r<100) anim_start_blended_pal(object,1,0,8);
         }
         if (vec_distance_xy(object+0x10,g_hero_state.pos)<2 && !g_hero_effect_inhibit && !g_ground_check_inhibit) {
             moby_set_state(object,2,-1);
-            func_PAL_002A7E68(object,2,0,8);
+            anim_start_blended_pal(object,2,0,8);
             AI_F(object,0x48)=0.75f;
         }
         if (math_fast_float_d(state+0x70)) {
@@ -89,34 +91,34 @@ void func_PAL_00333360(char *object)
                 if (math_random_int_below(2)) {
                     moby_set_state(object,5,-1);
                     AI_I(state,0x70)=(math_random_int_range(400,600)*5+2)/6;
-                    func_PAL_002A7E68(object,2,0,8);
+                    anim_start_blended_pal(object,2,0,8);
                     AI_F(object,0x48)=0.75f;
                 } else {
                     moby_set_state(object,6,-1);
                     AI_I(state,0x70)=(math_random_int_range(180,360)*5+2)/6;
-                    func_PAL_002A7E68(object,3,0,8);
+                    anim_start_blended_pal(object,3,0,8);
                 }
             }
         }
         break;
     case 6:
-        if (AI_B(object,0x60)&2) func_PAL_002A7E68(object,3,0,8);
+        if (AI_B(object,0x60)&2) anim_start_blended_pal(object,3,0,8);
         if (math_fast_float_d(state+0x70)) {
             moby_set_state(object,1,-1);
             AI_I(state,0x70)=(math_random_int_range(120,600)*5+2)/6;
-            func_PAL_002A7E68(object,math_random_int_below(2),0,8);
+            anim_start_blended_pal(object,math_random_int_below(2),0,8);
         }
         break;
     case 5:
         if (AI_B(object,0x60)&2) {
-            func_PAL_002A7E68(object,2,0,8);
+            anim_start_blended_pal(object,2,0,8);
             AI_F(object,0x48)=0.75f;
         }
         position=object+0x10;
         if (vec_distance_xy(position,g_hero_state.pos)<2) {
             moby_set_state(object,2,-1);
             AI_F(object,0x48)=0.1f;
-            func_PAL_002A7E68(object,2,0,8);
+            anim_start_blended_pal(object,2,0,8);
         }
         if (math_fast_float_d(state+0x70)) {
             moby_set_state(object,1,-1);
@@ -165,7 +167,7 @@ void func_PAL_00333360(char *object)
             if (g_collision_hit.surface!=g_hero_state.surface) qcopy(object+0x10,g_collision_hit.point);
         }
         hit=GetCollHitMaterial();
-        if (hit>0 && hit!=10 && !g_hero_effect_inhibit) {func_PAL_00333CD8(object);return;}
+        if (hit>0 && hit!=10 && !g_hero_effect_inhibit) {explosion_effect_update_pal(object);return;}
         moby_set_state(object,0,-1);
         break;
     case 3:

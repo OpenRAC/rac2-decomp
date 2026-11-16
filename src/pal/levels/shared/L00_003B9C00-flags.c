@@ -21,6 +21,8 @@ extern unsigned char *moby_get_or_find_target(void *,void *,int,float,float,floa
 extern float fast_vec_dist(void *,void *),math_fabs(float);
 extern void hud_add_moby_marker(void *,unsigned int,void *,int,int,int,float,float,float);
 
+/* Looks for an enemy in front of the player and locks on to it, drawing a marker on the target.
+ * (PAL) */
 void weapon_update_target_lock_pal(unsigned char *object)
 {
     Vector point,projection,facing;

@@ -10,8 +10,9 @@ extern f32 math_random_float_range(f32 low, f32 high);
 extern char *SpawnExplosion(void *a0, int a1, int a2, int a3, int a4, int a5, int a6, int a7,
                           int a8, int a9, int a10, int a11, f32 f12, f32 f13);
 
-void part_start_random_scale_effect_pal(u8 *a0) {
-    f32 f = math_random_float_range(0.8f, 1.2f);
-    SpawnExplosion(a0, 0, 5, 4, 4, 4, 4, 0, 0, 0, 0, 0, f, 20.0f);
+/* Spawns an explosion at the moby with a random scale between 0.8 and 1.2 (PAL: unchanged from v1.01 apart from the callee). */
+void part_start_random_scale_effect_pal(u8 *moby) {
+    f32 scale = math_random_float_range(0.8f, 1.2f);
+    SpawnExplosion(moby, 0, 5, 4, 4, 4, 4, 0, 0, 0, 0, 0, scale, 20.0f);
 }
 

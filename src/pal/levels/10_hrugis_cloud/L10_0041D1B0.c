@@ -32,19 +32,19 @@ extern s32 g_unused_sda_word_b __attribute__((sda));
 
 /* Sets the cloud puff up: the builder's record gets state 2, the effect is
    started, the object's own state and flags are written and its timer is set. */
-void cloud_puff_init_pal(u8 *arg0) {
-    u8 *s1 = *(u8 **)(arg0 + 0x68);
-    u8 *s0 = (u8 *)func_0037BA88(arg0);
+void cloud_puff_init_pal(u8 *moby) {
+    u8 *vars = *(u8 **)(moby + 0x68);
+    u8 *motion = (u8 *)func_0037BA88(moby);
 
-    *(s32 *)(s0 + 0x148) = 2;
-    func_0037CCB0(arg0, 1);
-    *(s32 *)(s1 + 0x268) = -1;
-    *(f32 *)(s1 + 0x180) = 2.0f;
-    arg0[0x20] = 1;
-    arg0[0x30] = 0xFF;
-    *(u16 *)(arg0 + 0x32) = 0x1FF;
-    *(u16 *)(arg0 + 0x34) |= 0x100;
-    *(f32 *)(arg0 + 0x2C) = 0.16f;
+    *(s32 *)(motion + 0x148) = 2;
+    func_0037CCB0(moby, 1);
+    *(s32 *)(vars + 0x268) = -1;
+    *(f32 *)(vars + 0x180) = 2.0f;
+    moby[0x20] = 1;
+    moby[0x30] = 0xFF;
+    *(u16 *)(moby + 0x32) = 0x1FF;
+    *(u16 *)(moby + 0x34) |= 0x100;
+    *(f32 *)(moby + 0x2C) = 0.16f;
 }
 
 

@@ -6,12 +6,13 @@
  * call, with 8.0f for 10.0f and 0.080000006f for 0.06666667f (the 50 Hz scale). */
 extern char g_hero_state[];
 extern void set_hero_animation_pal(int, int, float);
-extern s32 func_PAL_L01_002BEC60(int, int);
+extern s32 SetHeroMoveState_pal(int, int);
 extern void moby_transform_joint_to_world(void *, int, void *);
 extern void FastVecSub(void *, void *, void *), vec_clamp_length(void *, float);
 extern void FastVecAdd(void *, void *, void *), vec_clear_128(void *);
 
-void func_PAL_L01_003C4768(char *object)
+/* Holds the player in the monster's grip, pulling him to the monster's hand and stopping him moving (PAL: 50 Hz timings). */
+void swamp_monster_hold_hero_pal(char *moby)
 {
     char *hero = g_hero_state;
     struct L01_003C08A0_S {
@@ -24,13 +25,13 @@ void func_PAL_L01_003C4768(char *object)
 
     if (*(int *)(hero + 0x2294) != 0x6F) {
         saved_flag = *(unsigned char *)(hero + 0x22B5) != 0;
-        *(int *)(object + 0x98) = 0;
-        func_PAL_L01_002BEC60(0x6F, 1);
+        *(int *)(moby + 0x98) = 0;
+        SetHeroMoveState_pal(0x6F, 1);
         set_hero_animation_pal(10, 0, 8.0f);
         *(unsigned char *)(hero + 0x22B5) = saved_flag;
     }
     *(unsigned short *)(hero + 0x1F0) = 2;
-    moby_transform_joint_to_world(object, 10, &joint_position);
+    moby_transform_joint_to_world(moby, 10, &joint_position);
     joint_position.z = joint_position.z - 1.0f;
     FastVecSub(offset, &joint_position, hero + 0x80);
     vec_clamp_length(offset, 0.080000006f);

@@ -15,6 +15,7 @@ extern void *cam_moby_create_pal(void *,int,int,int,void *,void *,void *,int,flo
 extern void STUB_printf(void *);
 extern char g_str_explode_debug[];
 
+/* Breaks an object into flying pieces, one per animation entry, with random speed and lifetime (PAL). */
 void part_explode_object_into_pieces_pal(unsigned char *object,float *range,float *scale,float *lifetime,int kinds,int sound,int skip,int flags,int mask,unsigned char alpha,void *callback)
 {
     float velocity[4], life, size;

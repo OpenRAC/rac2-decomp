@@ -30,10 +30,10 @@ extern int path_build_route_nodes(void *, int, void *, int);
 extern void STUB_printf(const char *, ...);
 extern float math_random_signed_float_range(float, float);
 extern void moby_set_state(void *, int, int);
-extern void func_PAL_002A7E68(void *, int, int, int);
+extern void anim_start_blended_pal(void *, int, int, int);
 extern float fast_vec_dist(void *, void *);
 extern void moby_update_ground_check(void *);
-extern int func_PAL_002B1A50(void *, void *, int);
+extern int moby_apply_damage_to_object_pal(void *, void *, int);
 extern void actor_alert_group(u8 *);
 extern s32 weapon_select_aim_target(void *, s32, float, float, s32, s32);
 extern void SetDeathBits_pal(void *, int, int);
@@ -43,23 +43,23 @@ extern void moby_mark_spawned(void *);
 /* A Notak enemy's update, the same shape as func_L06_00443A38: spawn-time setup, then the
    distance, target and ground checks. The fields are indexed through typed pointers (in-struct
    MEMs), and the setup's store order is the one that gives retail's schedule and registers.
-   qzero_nc's bare volatile asm flushes cse, so the later `m[0x43] != 3` test builds a fresh 3
+   qzero_nc's bare volatile asm flushes cse, so the later `moby[0x43] != 3` test builds a fresh 3
    rather than keeping the setup's 3 in a saved register across the calls, as retail does. */
 #define B(o) (v[o])
 #define H(o) (((short *)v)[(o) / 2])
 #define I(o) (((int *)v)[(o) / 4])
 #define F(o) (((float *)v)[(o) / 4])
 
-void func_PAL_L06_00423250(u8 *m)
+void actor_init_and_check_hits_pal(u8 *moby)
 {
-    u8 *v = *(u8 **)(m + 0x68);
+    u8 *v = *(u8 **)(moby + 0x68);
     int hit;
 
-    if (m[0x20] == 0) {
-        I(0x480) = path_build_route_nodes(m, I(0x230), v + 0x260, 16);
+    if (moby[0x20] == 0) {
+        I(0x480) = path_build_route_nodes(moby, I(0x230), v + 0x260, 16);
         STUB_printf(g_str_actor_hit_debug, I(0x480));
-        qcopy(v + 0x460, m + 0x10);
-        F(0x46C) = *(float *)(m + 0xF8);
+        qcopy(v + 0x460, moby + 0x10);
+        F(0x46C) = *(float *)(moby + 0xF8);
         B(0x70) = 15;
         I(0xA8) = 3;
         B(0x71) = 12;
@@ -92,23 +92,23 @@ void func_PAL_L06_00423250(u8 *m)
         I(0x498) = -1;
         I(0x5A0) = H(0x490);
         qzero_nc(v + 0x5B0);
-        moby_set_state(m, 1, 0);
-        if (m[0x43] != 1)
-            func_PAL_002A7E68(m, 1, 0, 0);
+        moby_set_state(moby, 1, 0);
+        if (moby[0x43] != 1)
+            anim_start_blended_pal(moby, 1, 0, 0);
         B(0x48) = FloatToInt(20.0f);
         B(0x4A) = FloatToInt(8.0f);
         if (H(0x492) != 0) {
-            if (m[0x43] != 3)
-                func_PAL_002A7E68(m, 3, 0, 0);
+            if (moby[0x43] != 3)
+                anim_start_blended_pal(moby, 3, 0, 0);
             B(0x48) = FloatToInt(20.0f);
             B(0x4A) = FloatToInt(24.0f);
         }
     }
-    if (m[0x31] != 0 && fast_vec_dist(m + 0x10, g_hero_l06_position) < 24.0f) {
-        moby_update_ground_check(m);
-        m[0x6F] = 0x16;
+    if (moby[0x31] != 0 && fast_vec_dist(moby + 0x10, g_hero_l06_position) < 24.0f) {
+        moby_update_ground_check(moby);
+        moby[0x6F] = 0x16;
     }
-    hit = func_PAL_002B1A50(m, v + 0x60, 0);
+    hit = moby_apply_damage_to_object_pal(moby, v + 0x60, 0);
     if (hit != 0) {
         if (B(0x37) == 10)
             B(0xD7) = 1;
@@ -116,15 +116,15 @@ void func_PAL_L06_00423250(u8 *m)
             I(0xF0) = 0;
             F(0xF4) = 1.0053098f;
         }
-        actor_alert_group(m);
-        m[0xA8] = 0xFF;
+        actor_alert_group(moby);
+        moby[0xA8] = 0xFF;
     }
-    I(0x228) = weapon_select_aim_target(m, I(0x220), F(0x240), 10.0f, 0, 0);
-    I(0x22C) = weapon_select_aim_target(m, I(0x224), F(0x244), 10.0f, 0, 0);
-    if (*(float *)(m + 0x18) < 48.0f) {
-        SetDeathBits_pal(m, 0, 3);
-        part_spawn_explosion_with_sparks_pal(m, m + 0x10, -1, 1.0f, 13.0f);
-        moby_mark_spawned(m);
+    I(0x228) = weapon_select_aim_target(moby, I(0x220), F(0x240), 10.0f, 0, 0);
+    I(0x22C) = weapon_select_aim_target(moby, I(0x224), F(0x244), 10.0f, 0, 0);
+    if (*(float *)(moby + 0x18) < 48.0f) {
+        SetDeathBits_pal(moby, 0, 3);
+        part_spawn_explosion_with_sparks_pal(moby, moby + 0x10, -1, 1.0f, 13.0f);
+        moby_mark_spawned(moby);
     }
 }
 

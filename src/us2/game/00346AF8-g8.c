@@ -11,8 +11,9 @@ extern int g_selection_menu_index[];
 extern int g_selected_item_material __attribute__((sda));
 extern int snd_play_from_global_bank(int, int, int);
 
-void selection_menu_handle_two_entry_input_us2(char *o, int buttons) {
-#define I(off) (*(int *)(o+(off)))
+/* Handles the pad in the two-entry selection menu: moves the cursor and picks an owned item (USA v2.00 copy). */
+void selection_menu_handle_two_entry_input_us2(char *owner, int buttons) {
+#define I(off) (*(int *)(owner+(off)))
     int index;
     if (buttons & 0x1000) {
         snd_play_from_global_bank(3,0,0); I(0x4FC)++; I(0x500)=1; I(0x508)=0;

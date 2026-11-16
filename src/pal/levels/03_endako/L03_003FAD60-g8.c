@@ -15,15 +15,17 @@ typedef struct { u8 pad[0x80]; f32 x, y; } Hero;
 extern Hero g_hero_state;
 extern u8 *g_endako_boss_state_ptr __attribute__((nosda));
 
+/* Eases the camera view angle toward the angle between the boss and the hero, then sets the
+   camera override's tilt from it. */
 void endako_boss_ease_view_angle_pal(u8 *entity) {
     u8 *state;
     u8 *obj;
-    u8 *s0;
-    f32 f0;
-    f32 f12;
-    f32 f13;
-    f32 f14;
-    f32 f15;
+    u8 *parts;
+    f32 angle;
+    f32 arg_a;
+    f32 arg_b;
+    f32 arg_c;
+    f32 arg_d;
     f32 first;
     f32 local;
 
@@ -37,29 +39,29 @@ void endako_boss_ease_view_angle_pal(u8 *entity) {
     *(f32 *)obj = x;
     *(f32 *)(*(u8 **)(state + 0x2C8) + 4) = y; }
 
-    f12 = *(f32 *)(entity + 0x10) - g_hero_state.x;
-    f13 = *(f32 *)(entity + 0x14) - g_hero_state.y;
-    s0 = *(u8 **)(g_endako_boss_state_ptr + 0x70);
-    first = mat_fast_helper_a(f12, f13);
+    arg_a = *(f32 *)(entity + 0x10) - g_hero_state.x;
+    arg_b = *(f32 *)(entity + 0x14) - g_hero_state.y;
+    parts = *(u8 **)(g_endako_boss_state_ptr + 0x70);
+    first = mat_fast_helper_a(arg_a, arg_b);
     /* The base moves on between the two reads: combine cannot then fold the
      * second read's address, so retail's addiu and based load remain. */
-    { f32 *rot = (f32 *)(s0 + 0x160);
-    f12 = rot[0];
-    s0 += 0x1C0;
-    f13 = rot[1]; }
-    f0 = mat_fast_helper_a(f12, f13);
+    { f32 *rot = (f32 *)(parts + 0x160);
+    arg_a = rot[0];
+    parts += 0x1C0;
+    arg_b = rot[1]; }
+    angle = mat_fast_helper_a(arg_a, arg_b);
 
-    f13 = 3.14159274f;
-    f0 = FastAddRotations(f0, f13);
-    f0 = fast_subtract_rotations(first, f0);
+    arg_b = 3.14159274f;
+    angle = FastAddRotations(angle, arg_b);
+    angle = fast_subtract_rotations(first, angle);
 
-    f13 = 0.005026549f;
-    f14 = f13;
-    f15 = 0.25132746f;
-    local = f0;
-    f12 = 0.0f;
-    math_approach_target_with_direction_mode(&local, state + 0xCC, f12, f13, f14, f15, 0);
+    arg_b = 0.005026549f;
+    arg_c = arg_b;
+    arg_d = 0.25132746f;
+    local = angle;
+    arg_a = 0.0f;
+    math_approach_target_with_direction_mode(&local, state + 0xCC, arg_a, arg_b, arg_c, arg_d, 0);
 
-    *(f32 *)(s0 + 0x1C) = 1.0f;
-    *(f32 *)(s0 + 0x14) = -*(f32 *)(state + 0xCC);
+    *(f32 *)(parts + 0x1C) = 1.0f;
+    *(f32 *)(parts + 0x14) = -*(f32 *)(state + 0xCC);
 }

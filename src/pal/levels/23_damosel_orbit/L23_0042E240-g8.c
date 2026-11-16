@@ -36,9 +36,9 @@ void fast_shot_update_pal(u8 *moby) {
     u8 *vars = *(u8 **)(moby + 0x68);
     float move[4];
     Hit_00428CF8 hit1;
-    float vec[4];
+    float shot_vec[4];
     Hit_00428CF8 hit2;
-    s32 v;
+    s32 frame_counter;
 
     if (moby[0xBC] == 0) {
         *(s32 *)(vars + 0x24) = *(s32 *)(vars + 0x24) + 1;
@@ -53,21 +53,21 @@ void fast_shot_update_pal(u8 *moby) {
             make_hit_descriptor(&hit1, moby, 0x80003, vars, *(float *)(vars + 0x14));
             hit1.f1A = *(u16 *)(moby + 0xAA);
             if (CollLine(moby + 0x10, move, 0, moby, 0) != 0 || coll_test_point(moby + 0x10, 0, moby, 0.3f) != 0) {
-                u8 *base = g_last_ray_hit;
+                u8 *ray_hit = g_last_ray_hit;
 
-                if (*(u8 **)(base + 0x18) != 0) {
-                    s16 cls = *(s16 *)(*(u8 **)(base + 0x18) + 0xAA);
+                if (*(u8 **)(ray_hit + 0x18) != 0) {
+                    s16 hit_class = *(s16 *)(*(u8 **)(ray_hit + 0x18) + 0xAA);
 
-                    if (cls != 0x7E5 && cls != 0xF7F && cls != 0xF7E) {
-                        *(TI128 *)vec = *(TI128 *)vars;
-                        FastVecScale(vec, vec, 1.5f);
-                        vec[2] = 1.0f;
-                        vec[3] = 5627.9248046875f;
-                        make_hit_descriptor(&hit2, moby, 0x90003, vec, *(float *)(vars + 0x14));
+                    if (hit_class != 0x7E5 && hit_class != 0xF7F && hit_class != 0xF7E) {
+                        *(TI128 *)shot_vec = *(TI128 *)vars;
+                        FastVecScale(shot_vec, shot_vec, 1.5f);
+                        shot_vec[2] = 1.0f;
+                        shot_vec[3] = 5627.9248046875f;
+                        make_hit_descriptor(&hit2, moby, 0x90003, shot_vec, *(float *)(vars + 0x14));
                         hit2.f19 = 1;
                         hit2.f1A = *(u16 *)(moby + 0xAA);
                         hit2.f18 = 0;
-                        if (*(s32 *)(base + 0x18) == g_hero_moby) {
+                        if (*(s32 *)(ray_hit + 0x18) == g_hero_moby) {
                             snd_start_in_slot(0x20, 0, 0);
                         }
                         coll_process_hit(0.6f, moby + 0x10, 0, moby, &hit2);
@@ -77,11 +77,11 @@ void fast_shot_update_pal(u8 *moby) {
                         return;
                     }
                 } else {
-                    *(TI128 *)vec = *(TI128 *)vars;
-                    FastVecScale(vec, vec, 3.0f);
-                    vec[2] = 1.0f;
-                    vec[3] = 5627.9248046875f;
-                    make_hit_descriptor(&hit2, moby, 0x90003, vec, *(float *)(vars + 0x14));
+                    *(TI128 *)shot_vec = *(TI128 *)vars;
+                    FastVecScale(shot_vec, shot_vec, 3.0f);
+                    shot_vec[2] = 1.0f;
+                    shot_vec[3] = 5627.9248046875f;
+                    make_hit_descriptor(&hit2, moby, 0x90003, shot_vec, *(float *)(vars + 0x14));
                     hit2.f19 = 1;
                     hit2.f1A = *(u16 *)(moby + 0xAA);
                     hit2.f18 = 0;
@@ -94,7 +94,7 @@ void fast_shot_update_pal(u8 *moby) {
             if (moby[0xBC] == 0) {
                 *(TI128 *)(moby + 0x10) = *(TI128 *)move;
             }
-            FastVecScale(vec, vars, -0.5f);
+            FastVecScale(shot_vec, vars, -0.5f);
             vec_clear_128(&hit2);
             break;
         case 1:
@@ -106,11 +106,11 @@ void fast_shot_update_pal(u8 *moby) {
     math_apply_axis_rotation_to_quat(moby + 0xE0, moby + 0xE0, moby + 0xD0, g_fast_shot_spin_degrees * 0.017453294f);
     math_apply_axis_rotation_to_quat(moby + 0xC0, moby + 0xC0, moby + 0xD0, g_fast_shot_spin_degrees * 0.017453294f);
     gfx_add_draw_callback_third((void *)part_draw_sign_band_sparkles, moby);
-    v = *(s32 *)(vars + 0x2C) + 2;
-    *(s32 *)(vars + 0x2C) = v;
-    if (v > 0x40) {
+    frame_counter = *(s32 *)(vars + 0x2C) + 2;
+    *(s32 *)(vars + 0x2C) = frame_counter;
+    if (frame_counter > 0x40) {
         *(s32 *)(vars + 0x2C) = 0x40;
-    } else if (v < 0) {
+    } else if (frame_counter < 0) {
         *(s32 *)(vars + 0x2C) = 0;
     }
 }

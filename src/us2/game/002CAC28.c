@@ -14,7 +14,7 @@ extern char g_pause_link_third[];
 extern char g_pause_link_second[];
 extern int g_current_map_index __attribute__((sda));
 extern int g_pause_state_word;
-extern int func_US2_002B5B30(void);
+extern int mode_get_global_value_a_us2(void);
 extern int menu_get_mode(void);
 extern void snd_send_cmd22(int);
 extern void music_Pause(int);
@@ -51,9 +51,10 @@ typedef struct {
     int f1F4;
 } State_2C9CF8;
 
-void func_US2_002CAC28(int mode)
+/* Sets up the pause menu state when the menu opens, including its screen links and starting values (USA v2.00). */
+void menu_init_pause_state_us2(int mode)
 {
-    if (func_US2_002B5B30() != 4 || menu_get_mode() != 8)
+    if (mode_get_global_value_a_us2() != 4 || menu_get_mode() != 8)
         ((State_2C9CF8 *)g_pause_menu_state)->f1F4 = 0;
     if (!((State_2C9CF8 *)g_pause_menu_state)->f1F4) {
         snd_send_cmd22(0x5D);

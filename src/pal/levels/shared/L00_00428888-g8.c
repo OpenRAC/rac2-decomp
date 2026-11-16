@@ -69,7 +69,9 @@ typedef struct {
     char pad74[9]; unsigned char handoff; short transition;
 } CameraOwner;
 
-void func_PAL_L00_00428888(CameraOwner *owner)
+/* Sets up the follow camera: clears its state blocks to the default view, aim and turn settings,
+   then starts it from the hero or the previous camera (PAL: 50 Hz timings). */
+void follow_camera_setup_pal(CameraOwner *owner)
 {
     CameraQuad projected, difference;
     CameraSettings *camera = &owner->state->camera;
@@ -80,12 +82,12 @@ void func_PAL_L00_00428888(CameraOwner *owner)
     PlaneState *plane;
     TrackerState *tracker;
     float distance;
-    unsigned char *initialPosition = g_hero_state + 0x80;
+    unsigned char *initial_position = g_hero_state + 0x80;
     unsigned char *hero;
     g_camera_setup_state_a = 0;
     g_camera_setup_state_b = 0;
-    qcopy(camera, initialPosition);
-    hero = initialPosition - 0x80;
+    qcopy(camera, initial_position);
+    hero = initial_position - 0x80;
     camera->fB0 = 1.5f;
     camera->iC0 = CI(hero, 0x2290);
     camera->bC4 = 0;

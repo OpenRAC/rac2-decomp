@@ -8,56 +8,57 @@ extern float g_rivet_bot_rate_a __attribute__((sda));
 extern float g_rivet_bot_rate_b __attribute__((sda));
 extern u8 g_camera_pose_buffer[];
 extern void moby_mark_spawned(void *);
-extern void func_PAL_002A7E68(void *, int, int, int);
+extern void anim_start_blended_pal(void *, int, int, int);
 extern void moby_update_ground_check(void *);
 extern float fast_vec_dist(void *, void *);
-extern int func_PAL_002B1A50(void *, void *, int);
+extern int moby_apply_damage_to_object_pal(void *, void *, int);
 extern int weapon_select_aim_target(void *, int, int, int, float, float);
-extern void func_PAL_L03_00423688(u8 *);
+extern void rivet_bot_mark_stream_pal(u8 *);
 
 typedef struct { u8 pad[0x120]; f32 rate[3]; } RateView;
 
-void func_PAL_L03_00422F18(u8 *self) {
-    u8 *st = *(u8 **)(self + 0x68);
+/* Rivet bot init and hit check: sets it up on its first frame, then marks the stream when it is hit (PAL). */
+void rivet_bot_init_check_hit_pal(u8 *moby) {
+    u8 *state = *(u8 **)(moby + 0x68);
 
-    if (self[0x20] == 0) {
-        st[0x48] = FloatToInt(20.0f);
-        st[0x4A] = FloatToInt(14.399999618530273f);
-        st[0x60] = 7;
-        *(f32 *)(st + 0x8C) = 0.4000000059604645f;
-        *(s32 *)(st + 0x98) = 3;
-        *(f32 *)(st + 0x80) = 0.5f;
-        *(f32 *)(st + 0x84) = 0.5f;
-        *(f32 *)(st + 0x90) = *(f32 *)(self + 0x18) - 2.0f;
-        *(s32 *)(st + 0x138) |= 0x15;
-        *(f32 *)(st + 0x134) = 0.05000000074505806f;
-        *(f32 *)(st + 0x104) = 0.25f;
-        *(f32 *)(st + 0x100) = 0.5f;
-        *(f32 *)(st + 0x108) = 0.75f;
-        *(f32 *)(st + 0x10C) = 0.75f;
-        *(f32 *)(st + 0x110) = 0.7853982448577881f;
-        *(f32 *)(st + 0x130) = 0.523598849773407f;
-        st[0x28] = 3;
-        *(s32 *)(st + 0x1D8) = -1;
-        *(s32 *)(st + 0x350) = -1;
-        if (*(s32 *)(st + 0x210) == -1) {
-            moby_mark_spawned(self);
+    if (moby[0x20] == 0) {
+        state[0x48] = FloatToInt(20.0f);
+        state[0x4A] = FloatToInt(14.399999618530273f);
+        state[0x60] = 7;
+        *(f32 *)(state + 0x8C) = 0.4000000059604645f;
+        *(s32 *)(state + 0x98) = 3;
+        *(f32 *)(state + 0x80) = 0.5f;
+        *(f32 *)(state + 0x84) = 0.5f;
+        *(f32 *)(state + 0x90) = *(f32 *)(moby + 0x18) - 2.0f;
+        *(s32 *)(state + 0x138) |= 0x15;
+        *(f32 *)(state + 0x134) = 0.05000000074505806f;
+        *(f32 *)(state + 0x104) = 0.25f;
+        *(f32 *)(state + 0x100) = 0.5f;
+        *(f32 *)(state + 0x108) = 0.75f;
+        *(f32 *)(state + 0x10C) = 0.75f;
+        *(f32 *)(state + 0x110) = 0.7853982448577881f;
+        *(f32 *)(state + 0x130) = 0.523598849773407f;
+        state[0x28] = 3;
+        *(s32 *)(state + 0x1D8) = -1;
+        *(s32 *)(state + 0x350) = -1;
+        if (*(s32 *)(state + 0x210) == -1) {
+            moby_mark_spawned(moby);
             return;
         }
-        moby_set_state(self, 1, 0);
-        if (self[0x43] != 0)
-            func_PAL_002A7E68(self, 0, 0, 0);
+        moby_set_state(moby, 1, 0);
+        if (moby[0x43] != 0)
+            anim_start_blended_pal(moby, 0, 0, 0);
     }
-    if (self[0x31] != 0) {
-        if (fast_vec_dist(self + 0x10, g_camera_pose_buffer) < 48.0f) {
-            moby_update_ground_check(self);
-            self[0x6F] = 0x2D;
+    if (moby[0x31] != 0) {
+        if (fast_vec_dist(moby + 0x10, g_camera_pose_buffer) < 48.0f) {
+            moby_update_ground_check(moby);
+            moby[0x6F] = 0x2D;
         }
     }
-    ((RateView *)st)->rate[2] = g_rivet_bot_rate_c * 0.020000001f;
-    ((RateView *)st)->rate[0] = g_rivet_bot_rate_a * 0.00040000002f;
-    ((RateView *)st)->rate[1] = g_rivet_bot_rate_b * 0.00040000002f;
-    if (func_PAL_002B1A50(self, st + 0x50, 0))
-        func_PAL_L03_00423688(self);
-    weapon_select_aim_target(self, *(s32 *)(st + 0x214), 0, 0, 16.0f, 0.0f);
+    ((RateView *)state)->rate[2] = g_rivet_bot_rate_c * 0.020000001f;
+    ((RateView *)state)->rate[0] = g_rivet_bot_rate_a * 0.00040000002f;
+    ((RateView *)state)->rate[1] = g_rivet_bot_rate_b * 0.00040000002f;
+    if (moby_apply_damage_to_object_pal(moby, state + 0x50, 0))
+        rivet_bot_mark_stream_pal(moby);
+    weapon_select_aim_target(moby, *(s32 *)(state + 0x214), 0, 0, 16.0f, 0.0f);
 }

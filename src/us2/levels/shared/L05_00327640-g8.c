@@ -5,7 +5,7 @@
 extern short g_menu_command_flag[];
 extern int ref_US2_L05_00327640_00 __attribute__((sda));
 
-void func_US2_L05_00327640(int value)
+void level_store_value_plus_one_us2(int value)
 {
     if (g_menu_command_flag[0] <= 0) {
         ref_US2_L05_00327640_00 = value + 1;

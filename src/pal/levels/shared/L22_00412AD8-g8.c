@@ -12,29 +12,29 @@ extern void gfx_add_draw_callback_third(void (*callback)(char *), char *object);
  * state-1 body (a 16-byte copy of the record's vector, the pair update and the shared sub-object
  * test that promotes the record to state 2); state 2 destroys the record and returns; every other
  * state, and the end of the state-1 body, re-arms the record through the level callback. */
-void timed_record_update_pal(char *a0)
+void timed_record_update_pal(char *moby)
 {
-    char *handle = *(char **)(a0 + 0x68);
+    char *handle = *(char **)(moby + 0x68);
     char local[16];
 
-    switch (*(unsigned char *)(a0 + 0x20)) {
+    switch (*(unsigned char *)(moby + 0x20)) {
     case 0:
-        *(unsigned char *)(a0 + 0x20) = 1;
+        *(unsigned char *)(moby + 0x20) = 1;
     case 1: {
-        char *p = a0 + 0x10;
+        char *p = moby + 0x10;
 
         qcopy(local, p);
         FastVecAdd(p, handle, p);
-        projectile_check_hit_explode_pal(a0, local);
+        projectile_check_hit_explode_pal(moby, local);
         if (math_fast_float_d(handle + 0x10) != 0)
-            *(unsigned char *)(a0 + 0x20) = 2;
+            *(unsigned char *)(moby + 0x20) = 2;
         break;
     }
     case 2:
-        moby_mark_spawned(a0);
+        moby_mark_spawned(moby);
         return;
     default:
         break;
     }
-    gfx_add_draw_callback_third(part_update_scrolling_effect, a0);
+    gfx_add_draw_callback_third(part_update_scrolling_effect, moby);
 }

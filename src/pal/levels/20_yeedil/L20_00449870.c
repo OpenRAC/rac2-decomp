@@ -22,41 +22,41 @@ extern char g_hero_position[];
    launches a projectile along the rotated, flattened offset.  Retail's
    constants are 0x3F490FDC and 0x3F060A93, one ulp above the nearest floats
    to pi/4 and pi/6, so they are written 0.78539825f and 0.52359885f. */
-char *func_PAL_L20_00449870(char *arg0)
+char *yeedil_boss_fire_lobbed_projectile_pal(char *moby)
 {
-    char *state = *(char **)(arg0 + 0x68);
-    float ang[4];
-    float v[4];
-    float w[4];
-    float t;
-    float f;
+    char *state = *(char **)(moby + 0x68);
+    float pos[4];
+    float vel[4];
+    float target_dir[4];
+    float aim_angle;
+    float angle;
 
-    t = 0.78539825f;
-    yeedil_boss_compute_shot_launch_pal(arg0, (char *)ang, (char *)v, &t);
-    ang[2] = ang[2] + 1.0f;
-    if (t < 0.0f) {
-        if (t > -0.52359885f)
-            t = -0.52359885f;
-        else if (t < -0.78539825f)
-            t = -0.78539825f;
+    aim_angle = 0.78539825f;
+    yeedil_boss_compute_shot_launch_pal(moby, (char *)pos, (char *)vel, &aim_angle);
+    pos[2] = pos[2] + 1.0f;
+    if (aim_angle < 0.0f) {
+        if (aim_angle > -0.52359885f)
+            aim_angle = -0.52359885f;
+        else if (aim_angle < -0.78539825f)
+            aim_angle = -0.78539825f;
     } else {
-        if (t > 0.78539825f)
-            t = 0.78539825f;
-        else if (t < 0.52359885f)
-            t = 0.52359885f;
+        if (aim_angle > 0.78539825f)
+            aim_angle = 0.78539825f;
+        else if (aim_angle < 0.52359885f)
+            aim_angle = 0.52359885f;
     }
-    f = FastAddRotations(t, *(float *)(arg0 + 0xF8));
-    v[0] = math_fast_sin_or_cos_a(f) * 0.20000002f;
-    v[1] = math_fast_sin_or_cos_b(f) * 0.20000002f;
-    v[2] = -0.04f;
+    angle = FastAddRotations(aim_angle, *(float *)(moby + 0xF8));
+    vel[0] = math_fast_sin_or_cos_a(angle) * 0.20000002f;
+    vel[1] = math_fast_sin_or_cos_b(angle) * 0.20000002f;
+    vel[2] = -0.04f;
     if (math_random_int_below(2) != 0) {
-        FastVecScale(w, v, 75.0f);
+        FastVecScale(target_dir, vel, 75.0f);
     } else {
-        FastVecScale(w, v, math_random_float_range(0.4f, 0.6f) * 150.0f);
+        FastVecScale(target_dir, vel, math_random_float_range(0.4f, 0.6f) * 150.0f);
     }
-    FastVecAdd(w, w, ang);
-    FastVecSub(w, g_hero_position, w);
-    w[2] = 0.0f;
-    vec_scale_to_length(w, w, 0.20000002f);
-    return part_create_interpolated_emitter((int)arg0, 0, ang, v, w, 0x96, 0x1F4, *(unsigned char *)(state + 0x36));
+    FastVecAdd(target_dir, target_dir, pos);
+    FastVecSub(target_dir, g_hero_position, target_dir);
+    target_dir[2] = 0.0f;
+    vec_scale_to_length(target_dir, target_dir, 0.20000002f);
+    return part_create_interpolated_emitter((int)moby, 0, pos, vel, target_dir, 0x96, 0x1F4, *(unsigned char *)(state + 0x36));
 }

@@ -11,36 +11,37 @@ extern int g_item_grid_third_mode_desc_e __attribute__((sda));
 extern int g_item_grid_third_mode_desc_f __attribute__((sda));
 extern int g_item_grid_third_mode_desc_g __attribute__((sda));
 
-void func_PAL_00347078(char *o)
+/* Draws the item grid in its third mode, highlighted while the menu mode is 2. */
+void item_grid_draw_third_mode_pal(char *menu)
 {
-    int f[23];
+    int params[23];
 
-    f[16] = 0;
-    f[14] = 0;
-    f[11] = 0;
-    f[13] = 0;
-    f[20] = 0;
+    params[16] = 0;
+    params[14] = 0;
+    params[11] = 0;
+    params[13] = 0;
+    params[20] = 0;
 
-    f[21] = 1;
-    f[19] = *(int *)(o + 0x4B4);
-    f[21] = *(int *)(o + 0x4B8) == 2;
-    f[3] = *(int *)(o + 0x4AC);
-    f[4] = *(int *)(o + 0x4B0);
-    f[9] = (int)&g_item_grid_third_mode_desc_g;
-    f[1] = g_item_grid_third_mode_desc_a;
-    f[2] = g_item_grid_third_mode_desc_b;
-    f[0] = (int)g_help_pending_entries;
-    f[17] = (int)(o + 0x220);
-    f[10] = (int)(o + 0x130);
-    f[12] = (int)(o + 0x17C);
-    f[15] = (int)(o + 0x278);
-    f[18] = *(int *)(o + 0x4A0);
-    f[8] = (int)&g_item_grid_third_mode_desc_f;
-    f[7] = (int)&g_item_grid_third_mode_desc_e;
-    f[6] = (int)&g_item_grid_third_mode_desc_d;
-    f[5] = (int)&g_item_grid_third_mode_desc_c;
-    f[22] = 1;
-    DrawItemGrid(f);
+    params[21] = 1;
+    params[19] = *(int *)(menu + 0x4B4);
+    params[21] = *(int *)(menu + 0x4B8) == 2;
+    params[3] = *(int *)(menu + 0x4AC);
+    params[4] = *(int *)(menu + 0x4B0);
+    params[9] = (int)&g_item_grid_third_mode_desc_g;
+    params[1] = g_item_grid_third_mode_desc_a;
+    params[2] = g_item_grid_third_mode_desc_b;
+    params[0] = (int)g_help_pending_entries;
+    params[17] = (int)(menu + 0x220);
+    params[10] = (int)(menu + 0x130);
+    params[12] = (int)(menu + 0x17C);
+    params[15] = (int)(menu + 0x278);
+    params[18] = *(int *)(menu + 0x4A0);
+    params[8] = (int)&g_item_grid_third_mode_desc_f;
+    params[7] = (int)&g_item_grid_third_mode_desc_e;
+    params[6] = (int)&g_item_grid_third_mode_desc_d;
+    params[5] = (int)&g_item_grid_third_mode_desc_c;
+    params[22] = 1;
+    DrawItemGrid(params);
 }
 
 extern char g_grid_menu_selection_rows[];
@@ -52,36 +53,37 @@ extern int g_item_grid_first_mode_desc_e __attribute__((sda));
 extern int g_item_grid_first_mode_desc_f __attribute__((sda));
 extern int g_item_grid_first_mode_desc_g __attribute__((sda));
 
-void func_PAL_00347348(char *o)
+/* Draws the item grid in its first mode, highlighted while the menu mode is 0. */
+void item_grid_draw_first_mode_pal(char *menu)
 {
-    int f[23];
+    int params[23];
 
-    f[16] = 0;
-    f[14] = 0;
-    f[11] = 0;
-    f[13] = 0;
-    f[20] = 0;
+    params[16] = 0;
+    params[14] = 0;
+    params[11] = 0;
+    params[13] = 0;
+    params[20] = 0;
 
-    f[21] = 1;
-    f[19] = *(int *)(o + 0x4B4);
-    f[21] = *(int *)(o + 0x4B8) == 0;
-    f[3] = *(int *)(o + 0x4AC);
-    f[4] = *(int *)(o + 0x4B0);
-    f[9] = (int)&g_item_grid_first_mode_desc_g;
-    f[1] = g_item_grid_first_mode_desc_a;
-    f[2] = g_item_grid_first_mode_desc_b;
-    f[0] = (int)g_grid_menu_selection_rows;
-    f[17] = (int)(o + 0x220);
-    f[10] = (int)(o + 0x130);
-    f[12] = (int)(o + 0x17C);
-    f[15] = (int)(o + 0x278);
-    f[18] = *(int *)(o + 0x4A0);
-    f[8] = (int)&g_item_grid_first_mode_desc_f;
-    f[7] = (int)&g_item_grid_first_mode_desc_e;
-    f[6] = (int)&g_item_grid_first_mode_desc_d;
-    f[5] = (int)&g_item_grid_first_mode_desc_c;
-    f[22] = 1;
-    DrawItemGrid(f);
+    params[21] = 1;
+    params[19] = *(int *)(menu + 0x4B4);
+    params[21] = *(int *)(menu + 0x4B8) == 0;
+    params[3] = *(int *)(menu + 0x4AC);
+    params[4] = *(int *)(menu + 0x4B0);
+    params[9] = (int)&g_item_grid_first_mode_desc_g;
+    params[1] = g_item_grid_first_mode_desc_a;
+    params[2] = g_item_grid_first_mode_desc_b;
+    params[0] = (int)g_grid_menu_selection_rows;
+    params[17] = (int)(menu + 0x220);
+    params[10] = (int)(menu + 0x130);
+    params[12] = (int)(menu + 0x17C);
+    params[15] = (int)(menu + 0x278);
+    params[18] = *(int *)(menu + 0x4A0);
+    params[8] = (int)&g_item_grid_first_mode_desc_f;
+    params[7] = (int)&g_item_grid_first_mode_desc_e;
+    params[6] = (int)&g_item_grid_first_mode_desc_d;
+    params[5] = (int)&g_item_grid_first_mode_desc_c;
+    params[22] = 1;
+    DrawItemGrid(params);
 }
 
 extern void object_set_first_float4(char *p, float x, float y, float zero, float zero2);
@@ -107,7 +109,8 @@ extern float g_object_offset_y_c;
 extern float g_object_offset_x_d __attribute__((sda));
 extern float g_object_offset_y_d;
 
-void func_PAL_003468F8(char *self)
+/* Places four of the grid menu's widgets relative to the menu position. */
+void grid_menu_reposition_widgets_pal(char *self)
 {
     float zero = 0.0f;
 
@@ -130,36 +133,37 @@ extern int g_menu_field_seven_a __attribute__((sda));
 extern int g_menu_field_six_a __attribute__((sda));
 extern int g_menu_field_five_a __attribute__((sda));
 
-void func_PAL_00347168(char *o)
+/* Draws the item grid in its second mode, highlighted while the menu mode is 1. */
+void item_grid_draw_second_mode_pal(char *menu)
 {
-    int f[23];
+    int params[23];
 
-    f[16] = 0;
-    f[14] = 0;
-    f[11] = 0;
-    f[13] = 0;
-    f[20] = 0;
+    params[16] = 0;
+    params[14] = 0;
+    params[11] = 0;
+    params[13] = 0;
+    params[20] = 0;
 
-    f[21] = 1;
-    f[19] = *(int *)(o + 0x4B4);
-    f[21] = *(int *)(o + 0x4B8) == 1;
-    f[3] = *(int *)(o + 0x4AC);
-    f[4] = *(int *)(o + 0x4B0);
-    f[9] = (int)&g_menu_field_nine_a;
-    f[1] = g_menu_field_one_a;
-    f[2] = g_menu_field_two_a;
-    f[0] = (int)g_str_menu_item_a;
-    f[17] = (int)(o + 0x220);
-    f[10] = (int)(o + 0x130);
-    f[12] = (int)(o + 0x17C);
-    f[15] = (int)(o + 0x278);
-    f[18] = *(int *)(o + 0x4A0);
-    f[8] = (int)&g_menu_field_eight_a;
-    f[7] = (int)&g_menu_field_seven_a;
-    f[6] = (int)&g_menu_field_six_a;
-    f[5] = (int)&g_menu_field_five_a;
-    f[22] = 1;
-    DrawItemGrid(f);
+    params[21] = 1;
+    params[19] = *(int *)(menu + 0x4B4);
+    params[21] = *(int *)(menu + 0x4B8) == 1;
+    params[3] = *(int *)(menu + 0x4AC);
+    params[4] = *(int *)(menu + 0x4B0);
+    params[9] = (int)&g_menu_field_nine_a;
+    params[1] = g_menu_field_one_a;
+    params[2] = g_menu_field_two_a;
+    params[0] = (int)g_str_menu_item_a;
+    params[17] = (int)(menu + 0x220);
+    params[10] = (int)(menu + 0x130);
+    params[12] = (int)(menu + 0x17C);
+    params[15] = (int)(menu + 0x278);
+    params[18] = *(int *)(menu + 0x4A0);
+    params[8] = (int)&g_menu_field_eight_a;
+    params[7] = (int)&g_menu_field_seven_a;
+    params[6] = (int)&g_menu_field_six_a;
+    params[5] = (int)&g_menu_field_five_a;
+    params[22] = 1;
+    DrawItemGrid(params);
 }
 
 extern char g_str_menu_item_b[];
@@ -171,34 +175,35 @@ extern int g_menu_field_seven_b __attribute__((sda));
 extern int g_menu_field_six_b __attribute__((sda));
 extern int g_menu_field_five_b __attribute__((sda));
 
-void func_PAL_00347258(char *o)
+/* Draws the item grid in its fourth mode, highlighted while the menu mode is 3. */
+void item_grid_draw_fourth_mode_pal(char *menu)
 {
-    int f[23];
+    int params[23];
 
-    f[16] = 0;
-    f[14] = 0;
-    f[11] = 0;
-    f[13] = 0;
-    f[20] = 0;
+    params[16] = 0;
+    params[14] = 0;
+    params[11] = 0;
+    params[13] = 0;
+    params[20] = 0;
 
-    f[21] = 1;
-    f[19] = *(int *)(o + 0x4B4);
-    f[21] = *(int *)(o + 0x4B8) == 3;
-    f[3] = *(int *)(o + 0x4AC);
-    f[4] = *(int *)(o + 0x4B0);
-    f[9] = (int)&g_menu_field_nine_b;
-    f[1] = g_menu_field_one_b;
-    f[2] = g_menu_field_two_b;
-    f[0] = (int)g_str_menu_item_b;
-    f[17] = (int)(o + 0x220);
-    f[10] = (int)(o + 0x130);
-    f[12] = (int)(o + 0x17C);
-    f[15] = (int)(o + 0x278);
-    f[18] = *(int *)(o + 0x4A0);
-    f[8] = (int)&g_menu_field_eight_b;
-    f[7] = (int)&g_menu_field_seven_b;
-    f[6] = (int)&g_menu_field_six_b;
-    f[5] = (int)&g_menu_field_five_b;
-    f[22] = 1;
-    DrawItemGrid(f);
+    params[21] = 1;
+    params[19] = *(int *)(menu + 0x4B4);
+    params[21] = *(int *)(menu + 0x4B8) == 3;
+    params[3] = *(int *)(menu + 0x4AC);
+    params[4] = *(int *)(menu + 0x4B0);
+    params[9] = (int)&g_menu_field_nine_b;
+    params[1] = g_menu_field_one_b;
+    params[2] = g_menu_field_two_b;
+    params[0] = (int)g_str_menu_item_b;
+    params[17] = (int)(menu + 0x220);
+    params[10] = (int)(menu + 0x130);
+    params[12] = (int)(menu + 0x17C);
+    params[15] = (int)(menu + 0x278);
+    params[18] = *(int *)(menu + 0x4A0);
+    params[8] = (int)&g_menu_field_eight_b;
+    params[7] = (int)&g_menu_field_seven_b;
+    params[6] = (int)&g_menu_field_six_b;
+    params[5] = (int)&g_menu_field_five_b;
+    params[22] = 1;
+    DrawItemGrid(params);
 }

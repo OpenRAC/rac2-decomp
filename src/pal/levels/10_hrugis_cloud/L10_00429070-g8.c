@@ -65,7 +65,8 @@ static __inline__ int label_y(void *handle, float value, float scale, float half
     return result;
 }
 
-s32 func_PAL_L10_00429070(void) {
+/* Draws the Hrugis Cloud mission reward panel (PAL). */
+s32 menu_draw_reward_panel_pal(void) {
     char buf[128];
     f32 center = IntToFloat(g_screen_width) * 0.5f;
     void *sprite;

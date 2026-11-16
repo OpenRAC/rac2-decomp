@@ -89,11 +89,13 @@ static __inline__ int hud_coord(float value, float scale, float half)
     return result;
 }
 
-s32 func_PAL_L04_004158F0(void) {
+/* Draws the race screen: the lap panel, the record time, and the list of racer ranks with their times
+   (PAL: 50 Hz timings and PAL string ids). */
+s32 draw_race_standings_hud_pal(void) {
     char text[64];
     u8 *object = g_race_controller;
     u8 *state = *(u8 **)(object + 0x68);
-    s32 row = 0, bottom, ahead, playerSeen = 0;
+    s32 row = 0, bottom, ahead, player_seen = 0;
     s32 rank, time, y, lap, flag;
     u8 *racer;
     f32 alpha, fy, angle, fade;
@@ -150,11 +152,11 @@ tick:
             }
             g_race_hud_message_timer--;
         } else if (g_race_challenge_table[g_current_race_index].times[lap - 1]) {
-            s32 recordTime;
-            char *recordFormat = GetLocalizedString(0xeeb);
-            recordTime = g_race_challenge_table[g_current_race_index].times[lap - 1];
-            if (g_extras_unlocked_flag) recordTime *= 10;
-            { int n_ = sprintf(text, recordFormat, recordTime); int x_ = g_screen_width / 2; int row_ = label_y((void *)x_, 65.0f, g_race_hud_layout_scale, 0.5f, 1); int len_ = func_001157AC(text); text_draw_centered_small(x_, row_, 0x80F0F0F0ULL, text, len_); }
+            s32 record_time;
+            char *record_format = GetLocalizedString(0xeeb);
+            record_time = g_race_challenge_table[g_current_race_index].times[lap - 1];
+            if (g_extras_unlocked_flag) record_time *= 10;
+            { int n_ = sprintf(text, record_format, record_time); int x_ = g_screen_width / 2; int row_ = label_y((void *)x_, 65.0f, g_race_hud_layout_scale, 0.5f, 1); int len_ = func_001157AC(text); text_draw_centered_small(x_, row_, 0x80F0F0F0ULL, text, len_); }
         }
     }
     bottom = 315 - (s32)g_hud_bottom_scroll_pos;
@@ -186,9 +188,9 @@ tick:
             if (y <= 138) { y = 138; g_hud_top_scroll_stopped = 1; }
             rank = *(s32 *)(state + 0x320);
             time = g_race_time_ticks;
-            playerSeen = 1;
+            player_seen = 1;
             racer = *(u8 **)(state + 0x3A0);
-        } else if (*(s16 *)(racer + 0xAA) == 0xB2D) {
+        } else if (*(s16 *)(racer + 0xAA) == MOBY_CLASS_ENEMY_HOVERBIKE) {
             u8 *rs = *(u8 **)(racer + 0x68);
             rank = *(u8 *)(rs + 0xA2);
             time = *(s32 *)(rs + 0x1A0);
@@ -231,7 +233,7 @@ tick:
         text_draw_medium(210, hud_coord(fy, g_race_hud_layout_scale, half), (s64)color, text, -1); row++;
         if (row >= 10) break;
     }
-    if (*(s32 *)(state + 0x320) > 10 && !g_hud_top_scroll_stopped && !playerSeen) {
+    if (*(s32 *)(state + 0x320) > 10 && !g_hud_top_scroll_stopped && !player_seen) {
         sprintf(text, g_str_localized_label_format, GetLocalizedString(g_race_rank_string_ids[*(s32 *)(state + 0x320) - 1]), GetLocalizedString(0xea6));
         y += 15;
         { int row_ = hud_coord((f32)y, g_race_hud_layout_scale, 0.5f); text_draw_centered_medium(175, row_, 0x8000C0C0ULL, text, -1); }

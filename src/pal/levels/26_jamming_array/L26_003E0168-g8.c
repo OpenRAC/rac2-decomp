@@ -11,7 +11,7 @@ extern float gravity_get_center_distance(char *);
 extern int math_random_int_below(int);
 extern void enemy_spawn_child_parts(char *, char **, int, int);
 extern void moby_set_state(unsigned char *, unsigned char, int);
-extern void func_PAL_002A7E68(void *, int, int, int);
+extern void anim_start_blended_pal(void *, int, int, int);
 extern float fast_vec_dist(void *, void *);
 extern void moby_update_ground_check(void *);
 extern int moby_apply_damage_to_object(void *, void *, int);
@@ -21,7 +21,7 @@ extern void matrix_from_basis_rows(void *, void *);
 extern void cam_compute_view_direction(char *, char *, int);
 extern void group_destroy_attached_parts(char *, char *);
 
-int func_PAL_L26_003E0168(unsigned char *object) {
+int flying_creature_update_state_pal(unsigned char *object) {
     char *private = *(char **)(object + 0x68);
     float height;
     float turn;
@@ -53,7 +53,7 @@ int func_PAL_L26_003E0168(unsigned char *object) {
         }
         enemy_spawn_child_parts((char *)object, (char **)(private + 0x270), 0, 2);
         moby_set_state(object, 1, 0);
-        if (object[0x43]) func_PAL_002A7E68(object, 0, 0, 0);
+        if (object[0x43]) anim_start_blended_pal(object, 0, 0, 0);
     }
     if (object[0x31] && fast_vec_dist(object + 0x10, g_hero_l26_origin) < 24.0f) {
         moby_update_ground_check(object);

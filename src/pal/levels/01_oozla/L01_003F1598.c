@@ -30,7 +30,7 @@ extern void moby_transform_joint_to_world(void *, s32, void *);
 extern f32 math_fast_sin_or_cos_b(f32);
 extern s32 FloatToInt(f32);
 extern s32 snd_play_from_class_bank(s32, s32, void *, s32);
-typedef struct { u8 pad[0x80]; f32 pos[4]; u8 pad90[0x2AC]; u8 *object; s32 active; } PlayerECC;
+typedef struct { u8 pad[0x80]; f32 position[4]; u8 pad90[0x2AC]; u8 *object; s32 active; } PlayerECC;
 extern PlayerECC g_hero_state;
 extern s32 g_current_map_index[] __attribute__((sda));
 extern u8 g_moby_nibble_table[];
@@ -42,53 +42,53 @@ extern s32 cam_is_hero_in_trigger(void *);
 /* Pulses the object's grey colour until the player touches it (save nibble counter at
    D_0019B4A8) or its id is already collected; then marks it and its linked record active
    and plays sound 0x8A1 once. */
-void collectible_marker_update_pal(u8 *obj) {
-    f32 pos[4] __attribute__((aligned(16)));
-    u8 *state = *(u8 **)(obj + 0x68);
-    f32 dist;
+void collectible_marker_update_pal(u8 *moby) {
+    f32 position[4] __attribute__((aligned(16)));
+    u8 *vars = *(u8 **)(moby + 0x68);
+    f32 distance;
     s32 shade;
-    u16 id;
+    u16 moby_id;
     u32 color;
-    if (!state) return;
-    *(f32 *)(state + 4) = FastAddRotations(*(f32 *)(state + 4), 0.12566373f);
-    if (obj[0x20] == 0) {
-        moby_transform_joint_to_world(obj, 0, pos);
-        dist = vec_distance_xy(g_hero_state.pos, pos);
-        *(s32 *)(state + 8) = 0;
-        if (g_hero_state.object == obj && g_hero_state.active && dist < 0.5f) {
-            u16 objectId;
-            objectId = *(u16 *)(obj + 0xB2);
-            if (objectId & 1) {
-                if (((g_moby_nibble_table[((s16)objectId >> 1) + (g_current_map_index[0] << 10)] >> 4) & 7) != 7)
-                    g_moby_nibble_table[((s16)objectId >> 1) + (g_current_map_index[0] << 10)] += 16;
+    if (!vars) return;
+    *(f32 *)(vars + 4) = FastAddRotations(*(f32 *)(vars + 4), 0.12566373f);
+    if (moby[0x20] == 0) {
+        moby_transform_joint_to_world(moby, 0, position);
+        distance = vec_distance_xy(g_hero_state.position, position);
+        *(s32 *)(vars + 8) = 0;
+        if (g_hero_state.object == moby && g_hero_state.active && distance < 0.5f) {
+            u16 object_id;
+            object_id = *(u16 *)(moby + 0xB2);
+            if (object_id & 1) {
+                if (((g_moby_nibble_table[((s16)object_id >> 1) + (g_current_map_index[0] << 10)] >> 4) & 7) != 7)
+                    g_moby_nibble_table[((s16)object_id >> 1) + (g_current_map_index[0] << 10)] += 16;
             } else {
-                if ((g_moby_nibble_table[((s16)objectId >> 1) + (g_current_map_index[0] << 10)] & 7) != 7)
-                    g_moby_nibble_table[((s16)objectId >> 1) + (g_current_map_index[0] << 10)] += 1;
+                if ((g_moby_nibble_table[((s16)object_id >> 1) + (g_current_map_index[0] << 10)] & 7) != 7)
+                    g_moby_nibble_table[((s16)object_id >> 1) + (g_current_map_index[0] << 10)] += 1;
             }
         }
-        if (obj[0xB0] != 255) {
+        if (moby[0xB0] != 255) {
             s32 nibble;
-            id = *(u16 *)(obj + 0xB2);
-            if (g_level_save_state_backup.collected[(s16)id] != 0) goto activate;
-            nibble = g_moby_nibble_table[((s16)id >> 1) + (g_current_map_index[0] << 10)];
-            if ((id & 1) ? ((nibble >> 4) & 7) : (nibble & 7)) {
+            moby_id = *(u16 *)(moby + 0xB2);
+            if (g_level_save_state_backup.collected[(s16)moby_id] != 0) goto activate;
+            nibble = g_moby_nibble_table[((s16)moby_id >> 1) + (g_current_map_index[0] << 10)];
+            if ((moby_id & 1) ? ((nibble >> 4) & 7) : (nibble & 7)) {
 activate:
-                obj[0x20] = 1;
-                obj[0xBC] = 1;
-                if (*(s32 *)state != -1) g_moby_l01_table[*(s32 *)state].data[0xBC] = 1;
+                moby[0x20] = 1;
+                moby[0xBC] = 1;
+                if (*(s32 *)vars != -1) g_moby_l01_table[*(s32 *)vars].data[0xBC] = 1;
             }
         }
-        shade = FloatToInt((math_fast_sin_or_cos_b(*(f32 *)(state + 4)) * 4.0f - 3.0f) * 128.0f);
+        shade = FloatToInt((math_fast_sin_or_cos_b(*(f32 *)(vars + 4)) * 4.0f - 3.0f) * 128.0f);
         if (shade > 128) shade = 128;
         else if (shade < 32) shade = 32;
         color = (shade << 8) | 0x80000000;
-        *(u32 *)(obj + 0x78) = (shade << 16) | color | shade;
+        *(u32 *)(moby + 0x78) = (shade << 16) | color | shade;
     } else {
-        if (!*(s32 *)(state + 8)) {
-            snd_play_from_class_bank(0, 0, obj, 0x8A1);
-            *(s32 *)(state + 8) = 1;
+        if (!*(s32 *)(vars + 8)) {
+            snd_play_from_class_bank(0, 0, moby, 0x8A1);
+            *(s32 *)(vars + 8) = 1;
         }
-        *(u32 *)(obj + 0x78) = 0x80208010;
+        *(u32 *)(moby + 0x78) = 0x80208010;
     }
 }
 

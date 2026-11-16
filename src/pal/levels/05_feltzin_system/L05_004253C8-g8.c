@@ -39,23 +39,23 @@ extern int func_37AAC8(int a0);
 /* Same reset, plus the shutdown of the two cached records. */
 void feltzin_challenge_reset_free_records_pal(void)
 {
-    char *p;
+    char *challenge;
     int one = 1;
 
     func_37B210();
     func_379F18(1);
-    p = (char *)g_feltzin_challenge_state;
-    *(int *)(p + 0x28) = 100;
-    *(float *)(p + 0x30) = 8.0f;
-    *(int *)(p + 0x10) = 0;
-    *(int *)(p + 0xC) = 0;
+    challenge = (char *)g_feltzin_challenge_state;
+    *(int *)(challenge + 0x28) = 100;
+    *(float *)(challenge + 0x30) = 8.0f;
+    *(int *)(challenge + 0x10) = 0;
+    *(int *)(challenge + 0xC) = 0;
     g_feltzin_challenge_active = 0;
-    *(int *)(p + 0x14) = 0;
-    *(int *)(p + 0x2C) = one;
+    *(int *)(challenge + 0x14) = 0;
+    *(int *)(challenge + 0x2C) = one;
     g_feltzin_menu_started = 0;
     func_379F28(0);
     if (func_442860() != 0) {
-        *(int *)(p + 0x2C) = 0;
+        *(int *)(challenge + 0x2C) = 0;
         *(unsigned char *)(g_feltzin_controller_moby + 0x20) = one;
     }
     func_37D6E8();
@@ -80,33 +80,33 @@ void feltzin_challenge_reset_free_records_pal(void)
 }
 
 /* func_PAL_L05_00425518, the PAL copy of func_L05_0041FE98, with the shutdown test of func_PAL_L05_004253C8. */
-void func_PAL_L05_00425518(void)
+void feltzin_challenge_shutdown_pal(void)
 {
-    char *p;
+    char *challenge;
     int i;
     int one = 1;
 
     func_37B210();
     func_379F18(1);
-    p = (char *)g_feltzin_challenge_state;
+    challenge = (char *)g_feltzin_challenge_state;
     g_feltzin_menu_mode = -2;
-    *(int *)(p + 0x10) = 0;
-    *(int *)(p + 0x28) = 100;
-    *(int *)(p + 0xC) = 0;
+    *(int *)(challenge + 0x10) = 0;
+    *(int *)(challenge + 0x28) = 100;
+    *(int *)(challenge + 0xC) = 0;
     g_feltzin_needs_reset = one;
     g_feltzin_challenge_active = 0;
-    *(int *)(p + 0x14) = 0;
-    *(int *)(p + 0x2C) = one;
+    *(int *)(challenge + 0x14) = 0;
+    *(int *)(challenge + 0x2C) = one;
     i = func_37AAC8(6);
     g_feltzin_menu_started = 0;
     g_spawn_entry_table[i].words[5] = g_spawn_entry_table[i].words[4];
     func_37D6E8();
     func_379F68();
     func_445A98();
-    *(float *)(p + 0x30) = 8.0f;
+    *(float *)(challenge + 0x30) = 8.0f;
     func_379F28(0);
     if (func_442860() != 0) {
-        *(int *)(p + 0x2C) = 0;
+        *(int *)(challenge + 0x2C) = 0;
         *(unsigned char *)(g_feltzin_controller_moby + 0x20) = one;
     }
     if (g_feltzin_record_a != 0) {

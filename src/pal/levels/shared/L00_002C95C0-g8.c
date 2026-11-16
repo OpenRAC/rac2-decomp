@@ -34,7 +34,7 @@ extern void set_hero_animation_pal(int, int, float);
  * animation 20 and clamps a scale from the time. Otherwise it moves frame to the range holding the
  * time, restarts the animation at the matching frame when frame changes (the table gives an
  * offset per old and new frame), and clamps a scale chosen by frame. */
-void func_PAL_L00_002CA448(void)
+void hero_update_anim_scale_pal(void)
 {
     float limit;
     int old;

@@ -8,102 +8,105 @@ extern void prompt_bar_init_pal(void *, void *, void *);
 extern char *GetLocalizedString(int);
 extern void prompt_bar_set_texts_pal(void *, int, int, int);
 extern void prompt_bar_set_text_offsets_pal(void *, float, float, float, float, float, float);
-extern int func_PAL_L00_004388F8(void *, int);
+extern int menu_handle_page_input_c_pal(void *, int);
 extern int g_onoff_menu_prompt_ids[2] __attribute__((sda));
 
 extern int g_level_child_params_a[2] __attribute__((sda));
 
-void func_PAL_L00_004387D0(char *object, void *argument)
+/* Builds the first on/off menu page: allocates its cell, sets up the prompt bar with three texts and offsets. */
+void menu_build_page_a_pal(char *object, void *parent)
 {
-    int *allocation;
+    int *cell;
     char *child;
-    int text, second;
-    *(void **)object = argument;
-    if (argument) {
-        allocation = ui_return_second_arg(16, pool_alloc_cell(argument));
-        *(int **)(object + 0x2DC) = allocation;
-        allocation[1] = 0;
-        allocation[2] = 0;
-        allocation[3] = 0;
-        allocation[0] = 0;
+    int text_a, text_b;
+    *(void **)object = parent;
+    if (parent) {
+        cell = ui_return_second_arg(16, pool_alloc_cell(parent));
+        *(int **)(object + 0x2DC) = cell;
+        cell[1] = 0;
+        cell[2] = 0;
+        cell[3] = 0;
+        cell[0] = 0;
     }
     **(float **)(object + 0x2DC) = 255.0f;
     (*(float **)(object + 0x2DC))[1] = 195.0f;
     child = object + 8;
-    prompt_bar_init_pal(child, argument, g_level_child_params_a);
-    text = GetLocalizedString(0xB72);
-    second = GetLocalizedString(0xB5F);
-    prompt_bar_set_texts_pal(child, text, second, GetLocalizedString(0xB60));
+    prompt_bar_init_pal(child, parent, g_level_child_params_a);
+    text_a = GetLocalizedString(0xB72);
+    text_b = GetLocalizedString(0xB5F);
+    prompt_bar_set_texts_pal(child, text_a, text_b, GetLocalizedString(0xB60));
     prompt_bar_set_text_offsets_pal(child, 0.0f, -143.0f, 0.0f, 114.0f, 0.0f, 140.0f);
     prompt_bar_set_spacing_pal(child, 0.4f);
     *(int *)(object + 0x2D8) = 0;
-    func_PAL_L00_004388F8(object, 0);
+    menu_handle_page_input_c_pal(object, 0);
 }
 
 
 
-extern int func_PAL_L00_00438FB8(void *, int);
+extern int menu_update_two_part_flags_b_pal(void *, int);
 
 extern int g_level_child_params_b[2] __attribute__((sda));
 
-void func_PAL_L00_00438E90(char *object, void *argument)
+/* Builds the text_b on/off menu page, the same as the first with its own parameters. */
+void menu_build_page_b_pal(char *object, void *parent)
 {
-    int *allocation;
+    int *cell;
     char *child;
-    int text, second;
-    *(void **)object = argument;
-    if (argument) {
-        allocation = ui_return_second_arg(16, pool_alloc_cell(argument));
-        *(int **)(object + 0x2DC) = allocation;
-        allocation[1] = 0;
-        allocation[2] = 0;
-        allocation[3] = 0;
-        allocation[0] = 0;
+    int text_a, text_b;
+    *(void **)object = parent;
+    if (parent) {
+        cell = ui_return_second_arg(16, pool_alloc_cell(parent));
+        *(int **)(object + 0x2DC) = cell;
+        cell[1] = 0;
+        cell[2] = 0;
+        cell[3] = 0;
+        cell[0] = 0;
     }
     **(float **)(object + 0x2DC) = 255.0f;
     (*(float **)(object + 0x2DC))[1] = 195.0f;
     child = object + 8;
-    prompt_bar_init_pal(child, argument, g_level_child_params_b);
-    text = GetLocalizedString(0xB72);
-    second = GetLocalizedString(0xB5F);
-    prompt_bar_set_texts_pal(child, text, second, GetLocalizedString(0xB60));
+    prompt_bar_init_pal(child, parent, g_level_child_params_b);
+    text_a = GetLocalizedString(0xB72);
+    text_b = GetLocalizedString(0xB5F);
+    prompt_bar_set_texts_pal(child, text_a, text_b, GetLocalizedString(0xB60));
     prompt_bar_set_text_offsets_pal(child, 0.0f, -143.0f, 0.0f, 114.0f, 0.0f, 140.0f);
     prompt_bar_set_spacing_pal(child, 0.4f);
     *(int *)(object + 0x2D8) = 0;
-    func_PAL_L00_00438FB8(object, 0);
+    menu_update_two_part_flags_b_pal(object, 0);
 }
 
 
 
-extern int func_PAL_L00_004391F8(void *, int);
+extern int menu_update_two_part_flags_c_pal(void *, int);
 
 extern int g_level_child_params_c[2] __attribute__((sda));
 
-void func_PAL_L00_004390D0(char *object, void *argument)
+/* Builds the third on/off menu page, the same as the first with its own parameters. */
+void menu_build_page_c_pal(char *object, void *parent)
 {
-    int *allocation;
+    int *cell;
     char *child;
-    int text, second;
-    *(void **)object = argument;
-    if (argument) {
-        allocation = ui_return_second_arg(16, pool_alloc_cell(argument));
-        *(int **)(object + 0x2DC) = allocation;
-        allocation[1] = 0;
-        allocation[2] = 0;
-        allocation[3] = 0;
-        allocation[0] = 0;
+    int text_a, text_b;
+    *(void **)object = parent;
+    if (parent) {
+        cell = ui_return_second_arg(16, pool_alloc_cell(parent));
+        *(int **)(object + 0x2DC) = cell;
+        cell[1] = 0;
+        cell[2] = 0;
+        cell[3] = 0;
+        cell[0] = 0;
     }
     **(float **)(object + 0x2DC) = 255.0f;
     (*(float **)(object + 0x2DC))[1] = 195.0f;
     child = object + 8;
-    prompt_bar_init_pal(child, argument, g_level_child_params_c);
-    text = GetLocalizedString(0xB72);
-    second = GetLocalizedString(0xB5F);
-    prompt_bar_set_texts_pal(child, text, second, GetLocalizedString(0xB60));
+    prompt_bar_init_pal(child, parent, g_level_child_params_c);
+    text_a = GetLocalizedString(0xB72);
+    text_b = GetLocalizedString(0xB5F);
+    prompt_bar_set_texts_pal(child, text_a, text_b, GetLocalizedString(0xB60));
     prompt_bar_set_text_offsets_pal(child, 0.0f, -143.0f, 0.0f, 114.0f, 0.0f, 140.0f);
     prompt_bar_set_spacing_pal(child, 0.4f);
     *(int *)(object + 0x2D8) = 0;
-    func_PAL_L00_004391F8(object, 0);
+    menu_update_two_part_flags_c_pal(object, 0);
 }
 
 

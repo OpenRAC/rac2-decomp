@@ -6,6 +6,7 @@ extern int Fe524d931_FUN_002E5E58(int a, int b, int c);
 extern void UpdateViewContext(void);
 extern unsigned char g_display_mode_flag;
 
+/* Handles input for the on/off option menu and flips the option on confirm. */
 int onoff_menu_update_us2(char *object, int mask)
 {
     float *v;

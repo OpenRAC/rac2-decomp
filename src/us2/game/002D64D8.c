@@ -9,6 +9,7 @@ extern void SetupGifPaging(long arg0);
 extern void SetupGifPaging(long param_1);
 extern void func_0029CAB0(void);
 
+/* Draws a third kind of menu page between the start and end of screen drawing. */
 int menu_page_draw_third_us2(void) {
     SetupGifPaging(0);
     func_0029CAB0();

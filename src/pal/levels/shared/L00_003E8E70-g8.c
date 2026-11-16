@@ -47,6 +47,7 @@ extern void ref_L00_003E4BF0_00(void (*)(void *),void *);
 extern void mini_nuke_blast_draw(void *);
 typedef struct { char pad[0x10]; float phase; int timer; float rate; int alpha, unused, count, handle; } State4BF0;
 
+/* Updates the Mini-Nuke blast: it grows, hurts everything inside its radius, shakes the camera, then fades out and removes itself (PAL: 50 Hz timings). */
 void mini_nuke_blast_update_pal(char *object)
 {
     Vec4BF0 center, offset, query, direction;

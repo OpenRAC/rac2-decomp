@@ -34,12 +34,13 @@ extern int hero_slot_item_id(int);
 extern char *ref_L00_002AF3D8_0(int, int);
 extern void ref_L00_002AF3D8_1(int, void *, int, int, int, int);
 
-void func_PAL_L00_002AF2C8(int arg0, int arg1)
+/* Creates the objects for the two item slots if they are missing, using the current item (PAL). */
+void hero_create_item_slot_objects_pal(int inhibit, int request)
 {
     int id, i;
 
     if (D_00189E20_26.disabled || !D_00189E20_26.enabled ||
-        !D_00189E20_26.active || arg0 || !arg1)
+        !D_00189E20_26.active || inhibit || !request)
         return;
 
     id = ((EntryAF3D8 *)g_weapon_l00_table)[g_item_slot_to_record[hero_slot_item_id(0)]].id;

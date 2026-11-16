@@ -35,7 +35,7 @@ extern void FastVecAdd(void *, void *, void *);
 
 /* Fills the first free effect slot for owner: random angles, speeds and amplitudes, a timer
  * of duration frames, and the object's position as the start (offset when it has a record). */
-void func_PAL_00317928(void *owner, char *object, int duration)
+void alloc_effect_slot_pal(void *owner, char *object, int duration)
 {
     PoolEffect *pool = g_pool_effect_slots;
     int i = 0;

@@ -28,14 +28,14 @@ extern void vec_clear_128(void *), matrix_mul_vec3(void *, void *, void *), Fast
    pos[3] is -1, at a point on self's basis; counts it in self's state (+0x4C, +0x50).
    The EE ABI passes size in $f12 and pos in $a1 in either declaration order (callers
    declare (void *, void *, float)); this order copies pos last, as retail's $s3 shows. */
-void func_PAL_0032A898(char *self, float size, float *pos)
+void SpawnObjectParticle_pal(char *self, float size, float *pos)
 {
-    float v[4];
+    float offset[4];
     Particle290 *base = g_object_particles;
     char *state = *(char **)(self + 0x68);
     Particle290 *p;
     Particle290 *record;
-    int i, c;
+    int i, grey;
 
     for (i = 0; i < 300; i++) {
         p = &base[i];
@@ -43,8 +43,8 @@ void func_PAL_0032A898(char *self, float size, float *pos)
             continue;
         p->timer2 = p->timer = math_random_int_range(80, 200);
         record = p;
-        c = math_random_int_range(96, 128);
-        p->color2 = p->color = c + ((c << 7) & 0xFF00) + ((c << 14) & 0xFF0000);
+        grey = math_random_int_range(96, 128);
+        p->color2 = p->color = grey + ((grey << 7) & 0xFF00) + ((grey << 14) & 0xFF0000);
         p->kind = *(int *)(state + 0x50) % 2 + 1;
         p->life = p->duration = (((int)(math_random_int_range(50, 60)) * 5 + 2) / 6);
         p->size = size;
@@ -53,11 +53,11 @@ void func_PAL_0032A898(char *self, float size, float *pos)
         p->owner = self;
         ++*(int *)(state + 0x4C);
         if (pos[3] == -1.0f) {
-            vec_clear_128(v);
-            v[3] = 1.0f;
-            v[0] = -0.3f;
-            matrix_mul_vec3(v, v, self + 0xC0);
-            FastVecAdd(p, v, self + 0x10);
+            vec_clear_128(offset);
+            offset[3] = 1.0f;
+            offset[0] = -0.3f;
+            matrix_mul_vec3(offset, offset, self + 0xC0);
+            FastVecAdd(p, offset, self + 0x10);
         } else {
             qcopy(record->pos, pos);
         }

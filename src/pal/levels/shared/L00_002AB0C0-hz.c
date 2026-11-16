@@ -70,11 +70,12 @@ typedef struct {
 extern FloatBlock_2ab1d8 D_L00_0025BE10_1;
 
 extern int hero_test_reach_blend(float *out, float scale, float amount);
+/* Blends the camera angle pair toward the hero's reach and writes the clamped angles into the level's float block (PAL: 50 Hz timings). */
 void cam_update_blend_angles_pal(void)
 {
-    float ret;
-    float f1, f20, f21, f22;
-    int v;
+    float distance;
+    float reach_gap, pitch_angle, yaw_angle, reach_scale;
+    int item_id;
 
     D_00189E20_16.s24EC = 0;
 
@@ -98,33 +99,33 @@ void cam_update_blend_angles_pal(void)
     D_L00_0025BE10_1.f6D4 = 0.072000004f;
     D_L00_0025BE10_1.f6D8 = 0.43200004f;
 
-    ret = fast_vec_dist(&g_hero_position, D_L00_001BF220_2);
-    f1 = 1.3f - (ret - g_hero_position.f1E4);
-    f22 = f1 * 0.9615385f;
-    f20 = f22 * (-70.0f * 0.017453294f);
-    if (-30.0f * 0.017453294f < f20)
-        f20 = -30.0f * 0.017453294f;
-    if (f20 < (-70.0f * 0.017453294f))
-        f20 = -70.0f * 0.017453294f;
+    distance = fast_vec_dist(&g_hero_position, D_L00_001BF220_2);
+    reach_gap = 1.3f - (distance - g_hero_position.f1E4);
+    reach_scale = reach_gap * 0.9615385f;
+    pitch_angle = reach_scale * (-70.0f * 0.017453294f);
+    if (-30.0f * 0.017453294f < pitch_angle)
+        pitch_angle = -30.0f * 0.017453294f;
+    if (pitch_angle < (-70.0f * 0.017453294f))
+        pitch_angle = -70.0f * 0.017453294f;
 
-    f21 = 0.0f;
-    v = hero_slot_item_id(0);
-    if (v == 27 || v == 44) {
-        float f0 = 40.0f * 0.017453294f;
+    yaw_angle = 0.0f;
+    item_id = hero_slot_item_id(0);
+    if (item_id == 27 || item_id == 44) {
+        float max_yaw = 40.0f * 0.017453294f;
 
-        f21 = f22 * f0;
-        if (f0 < f21)
-            f21 = f0;
+        yaw_angle = reach_scale * max_yaw;
+        if (max_yaw < yaw_angle)
+            yaw_angle = max_yaw;
     }
 
-    D_L00_0025BE10_1.f694 = f20;
-    D_L00_0025BE10_1.f690 = f21;
+    D_L00_0025BE10_1.f694 = pitch_angle;
+    D_L00_0025BE10_1.f690 = yaw_angle;
 
     if (D_00189E20_16.b22BB == 2) {
         D_L00_0025BE10_1.f624 = D_L00_0025BE10_1.f6D4;
         D_L00_0025BE10_1.f628 = D_L00_0025BE10_1.f6D8;
-        D_L00_0025BE10_1.f5E4 = f20;
-        D_L00_0025BE10_1.f5E0 = f21;
+        D_L00_0025BE10_1.f5E4 = pitch_angle;
+        D_L00_0025BE10_1.f5E0 = yaw_angle;
     }
 
     D_00189E20_16.s24EC = 1;

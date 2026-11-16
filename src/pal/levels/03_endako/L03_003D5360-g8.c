@@ -39,20 +39,20 @@ extern f32  g_ant_bridge_angle_limit __attribute__((sda));
 
 /* case 0 spawns the object and points the actor at it; case 1 clears the
    object while the state word still reads zero, and clears the word otherwise */
-void shared_record_reset_update_pal(char *a0)
+void shared_record_reset_update_pal(char *moby)
 {
-    char *s0 = a0;
+    char *obj = moby;
 
-    switch (*(u8 *)(s0 + 0x20)) {
+    switch (*(u8 *)(obj + 0x20)) {
     case 0:
         g_camera_override_slot = cam_alloc_override_slot(4);
-        moby_set_state(s0, 1, -1);
-        *(u8 *)(s0 + 0x30) = 0xFF;
+        moby_set_state(obj, 1, -1);
+        *(u8 *)(obj + 0x30) = 0xFF;
         break;
     case 1: {
-        u32 v = g_shared_record_pending;
+        u32 pending = g_shared_record_pending;
 
-        if (v == 0) {
+        if (pending == 0) {
             g_camera_override_slot->f00 = -1.0f;
             g_camera_override_slot->f04 = -1.0f;
             g_camera_override_slot->f08 = -1.0f;

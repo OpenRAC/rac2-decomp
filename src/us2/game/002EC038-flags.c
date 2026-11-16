@@ -78,7 +78,7 @@ extern void update_moby_animation_state(void *);
 extern float IntToFloat(int);
 extern void FastVecScale(void *, void *, float);
 extern void FastVecAdd(void *, void *, void *);
-extern void func_US2_002E72D8(void *);
+extern void UpdateEquipmentPieces_us2(void *);
 extern void render_environment_mapped_object(void);
 extern void gfx_register_overlay_draw_callback(void *, void *);
 extern void func_002A0F48(void *);
@@ -157,7 +157,7 @@ int cutscene_update_scripted_actors_us2(void)
             type = actor->type;
             if (type == 0xD54) {
                 actor->flags = 8;
-                func_US2_002E72D8(actor);
+                UpdateEquipmentPieces_us2(actor);
                 if (!g_transition_effect_list || g_transition_effect_list->type == type)
                     gfx_register_overlay_draw_callback(render_environment_mapped_object, actor);
             }

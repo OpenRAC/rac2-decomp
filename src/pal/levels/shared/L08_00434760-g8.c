@@ -50,14 +50,15 @@ extern void gfx_add_draw_callback_first(void (*callback)(void *), void *object);
 typedef struct { float upper, lower, phase, rate; } DoorState;
 typedef struct {
     u8 pad0[0x31];
-    u8 drawMode;
+    u8 draw_mode;
     short radius;
     u16 flags;
     u8 pad36[0x7a];
     u8 id;
 } DoorObject;
 
-void func_PAL_L08_00434760(u8 *object)
+/* Updates a door: sets up the drawing data at the start, opens it when triggered, moves it up and down, and registers it for drawing (PAL: 50 Hz timings). */
+void door_update_pal(u8 *object)
 {
     DoorState *data = *(DoorState **)(object + 0x68);
     float rate;
@@ -119,7 +120,7 @@ void func_PAL_L08_00434760(u8 *object)
                     ((unsigned long)g_flare_tex_bits_n << 6)) |
                     (long)((unsigned long)g_flare_tex_bits_o << 32));
         third->alpha = alpha;
-        ((DoorObject *)object)->drawMode = 0;
+        ((DoorObject *)object)->draw_mode = 0;
         ((DoorObject *)object)->flags |= 1;
         if (g_moby_group_flags[object[0xb0] + g_current_map_index * 16] & 0x80) {
             data->phase = 3.1415927410125732f;

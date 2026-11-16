@@ -7,7 +7,9 @@ extern void part_kill(void *);
 extern unsigned char *g_part_tex_falling_drift_table[];
 extern float g_falling_spin_param __attribute__((sda));
 
-void func_PAL_002C9058(char *self)
+/* Falling drift particle: moves by its velocity plus a shared vector, spins, and is freed when
+   it passes its height limit. */
+void part_update_falling_drift_pal(char *self)
 {
     char *state = self + 32;
     char *pos;

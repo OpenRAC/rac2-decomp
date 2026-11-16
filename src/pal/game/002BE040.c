@@ -20,6 +20,7 @@ typedef struct {
     float f44;
 } OBJ_F3c007b59;
 
+/* Updates a pulsing glow: its alpha rises and falls, it grows and spins, and it dies when the alpha reaches zero (PAL: 50 Hz timings). */
 void part_update_pulsing_pal(OBJ_F3c007b59 *o)
 {
     float *p = (float *)((char *)o + 32);

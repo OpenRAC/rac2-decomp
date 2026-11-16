@@ -31,11 +31,12 @@ s32 route_check_object_points(u8 *, u8 *, u8 *);
 extern s32 math_random_int_below(s32);
 extern f32 g_effect_aim_offset_scale;
 
-void func_PAL_L11_003D5F64(u8 *a0) {
-    if (*(u8 *)(a0 + 0x31) == 0)
+/* While the object is active, keeps turning its two spin angles (PAL: 50 Hz steps). */
+void moby_spin_angles_update_pal(u8 *moby) {
+    if (*(u8 *)(moby + 0x31) == 0)
         return;
-    *(f32 *)(a0 + 0xF4) = FastAddRotations(*(f32 *)(a0 + 0xF4),
+    *(f32 *)(moby + 0xF4) = FastAddRotations(*(f32 *)(moby + 0xF4),
                                         0.12566373f);
-    *(f32 *)(a0 + 0xF8) = FastAddRotations(*(f32 *)(a0 + 0xF8),
+    *(f32 *)(moby + 0xF8) = FastAddRotations(*(f32 *)(moby + 0xF8),
                                         0.055850547f);
 }

@@ -53,7 +53,7 @@ extern char g_hero_position[];
 extern unsigned int g_pad_held_flags;
 extern char g_hero_moby_default[];
 extern int g_pickup_request_pending __attribute__((sda));
-extern void func_US2_002E72D8(void *);
+extern void UpdateEquipmentPieces_us2(void *);
 /* func_L00_002E6EF8 in level 0; its address differs in levels 8, 9, 19 and 30. */
 extern void ref_L00_003603C0_00(DrawCallback, void *);
 extern void gfx_add_draw_callback_first(DrawCallback, void *);
@@ -78,24 +78,25 @@ extern int level_release_matching_resource(int);
     (HERO_VEHICLE && *(short *)(HERO_VEHICLE + 0xAA) == 0xD54 && \
      (unsigned char)HERO_VEHICLE[0x20] != 254 && (unsigned char)HERO_VEHICLE[0x20] != 253)
 
-void func_US2_L00_00361628(unsigned char *object) {
+/* Updates a pickup that glows and pulses its colour, and activates when the hero is near or riding vehicle class 0xD54. */
+void pickup_update_interactive_us2(unsigned char *object) {
     Vector position;
     Vector offset;
     Vector angles;
     unsigned char *private = *(unsigned char **)(object + 0x68);
     char **slot;
-    int index;
+    int i;
     short key;
     char *spawn;
     unsigned int shade;
     int available;
-    if (!g_game_l00_mode) func_US2_002E72D8(object);
+    if (!g_game_l00_mode) UpdateEquipmentPieces_us2(object);
     if ((unsigned char)object[0x31]) {
         private[0xE] = (unsigned char)private[0xE] + 2;
         key = g_pickup_key_ids[(g_equipment_bits >> 4) & 1];
-        for (index = 0; g_launch_moby_list[index]; index++) {
-            slot = g_launch_moby_list + index;
-            if (*(short *)(g_launch_moby_list[index] + 0xAA) == key) {
+        for (i = 0; g_launch_moby_list[i]; i++) {
+            slot = g_launch_moby_list + i;
+            if (*(short *)(g_launch_moby_list[i] + 0xAA) == key) {
                 shade = (int)(math_fast_sin_or_cos_a(IntToFloat((unsigned char)private[0xE] - 128) * 0.024543693f) * 50.0f) + 140;
                 *(unsigned int *)(*slot + 0x78) = shade | (shade << 8) | (shade << 16);
                 *(unsigned short *)(*slot + 0x34) |= 0x10;

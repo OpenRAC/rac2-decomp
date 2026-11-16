@@ -19,89 +19,89 @@ extern void vec_scale_to_length(V4 *, V4 *, f32);
 extern f32 fast_vec_dist(V4 *, V4 *);
 extern s32 math_random_int_below(s32);
 extern u8 *part_spawn_trailing_spark(V4 *, V4 *, s32, s32, s32, s32, f32);
-extern u8 *func_PAL_002BE9A8(V4 *, f32, f32, f32, f32, s32, V4 *, u32, s32);
+extern u8 *part_spawn_spinning_spark_pal(V4 *, f32, f32, f32, f32, s32, V4 *, u32, s32);
 
 /* Adapted from RAC1 emit_beam_trail_particles (OpenRAC, GPL-3.0). */
-void beam_spawn_trail_particles_pal(X *x) {
-    V4 l0;
-    V4 a;
-    V4 d;
-    V4 t;
-    N *g;
-    f32 s;
-    f32 q;
-    u32 col;
+void beam_spawn_trail_particles_pal(X *beam) {
+    V4 spark_vel;
+    V4 origin;
+    V4 delta;
+    V4 step_pos;
+    N *trail;
+    f32 step_len;
+    f32 size_scale;
+    u32 tint;
     s32 i;
-    s32 n;
-    s32 m;
-    u8 *p;
+    s32 step_count;
+    s32 move_state;
+    u8 *spark;
 
-    g = x->f68;
-    l0.f[0] = math_fast_sin_or_cos_a(math_random_angle()) * 0.05f;
-    l0.f[1] = math_fast_sin_or_cos_b(math_random_angle()) * 0.05f;
-    l0.f[2] = 0.0f;
-    l0.f[2] = -math_random_float_range(0.01f, 0.03f);
-    matrix_mul_vec3(&l0, &l0, &x->vC0);
-    FastVecAdd(&l0, &l0, &g_hero_state.v150);
-    qcopy(&a, &x->v10);
+    trail = beam->f68;
+    spark_vel.f[0] = math_fast_sin_or_cos_a(math_random_angle()) * 0.05f;
+    spark_vel.f[1] = math_fast_sin_or_cos_b(math_random_angle()) * 0.05f;
+    spark_vel.f[2] = 0.0f;
+    spark_vel.f[2] = -math_random_float_range(0.01f, 0.03f);
+    matrix_mul_vec3(&spark_vel, &spark_vel, &beam->vC0);
+    FastVecAdd(&spark_vel, &spark_vel, &g_hero_state.v150);
+    qcopy(&origin, &beam->v10);
     if (g_hero_state.i2294 == 0x7B) {
         if (g_game_time % 3 == 0) {
-            part_spawn_trailing_spark(&a, &l0, 0x4F007FFF, 0x1FFFFFFF, 8, 1, 10000.0f);
+            part_spawn_trailing_spark(&origin, &spark_vel, 0x4F007FFF, 0x1FFFFFFF, 8, 1, 10000.0f);
         }
     } else {
-        part_spawn_trailing_spark(&a, &l0, 0x4F007FFF, 0x1FFFFFFF, 8, 1, 10000.0f);
+        part_spawn_trailing_spark(&origin, &spark_vel, 0x4F007FFF, 0x1FFFFFFF, 8, 1, 10000.0f);
     }
-    if (g->f0C) {
-        s = fast_vec_dist(&g->v10, &a) * 0.5f;
-        FastVecSub(&d, &g->v10, &a);
+    if (trail->f0C) {
+        step_len = fast_vec_dist(&trail->v10, &origin) * 0.5f;
+        FastVecSub(&delta, &trail->v10, &origin);
         for (i = 1; i < 2; i++) {
-            vec_scale_to_length(&t, &d, s * (f32)i);
-            FastVecAdd(&t, &a, &t);
-            part_spawn_trailing_spark(&t, &l0, 0x4F007FFF, 0x1FFFFFFF, 8, 1, 10000.0f);
+            vec_scale_to_length(&step_pos, &delta, step_len * (f32)i);
+            FastVecAdd(&step_pos, &origin, &step_pos);
+            part_spawn_trailing_spark(&step_pos, &spark_vel, 0x4F007FFF, 0x1FFFFFFF, 8, 1, 10000.0f);
         }
     }
-    g->f00 = math_random_int_below(8);
-    q = 1.075f;
-    col = 0x808080;
-    l0.f[0] = 0.0f;
-    l0.f[1] = 0.0f;
-    l0.f[2] = -0.3f;
-    l0.f[3] = 1.0f;
-    matrix_mul_vec3(&l0, &l0, &x->vC0);
-    FastVecAdd(&a, &x->v10, &l0);
-    l0.f[3] = 1.0f;
-    l0.f[2] = -0.075f;
-    l0.f[0] = 0.0f;
-    l0.f[1] = 0.0f;
-    matrix_mul_vec3(&l0, &l0, &x->vC0);
-    l0.f[2] = 0.025f;
-    FastVecAdd(&l0, &l0, &g_hero_state.v150);
+    trail->f00 = math_random_int_below(8);
+    size_scale = 1.075f;
+    tint = 0x808080;
+    spark_vel.f[0] = 0.0f;
+    spark_vel.f[1] = 0.0f;
+    spark_vel.f[2] = -0.3f;
+    spark_vel.f[3] = 1.0f;
+    matrix_mul_vec3(&spark_vel, &spark_vel, &beam->vC0);
+    FastVecAdd(&origin, &beam->v10, &spark_vel);
+    spark_vel.f[3] = 1.0f;
+    spark_vel.f[2] = -0.075f;
+    spark_vel.f[0] = 0.0f;
+    spark_vel.f[1] = 0.0f;
+    matrix_mul_vec3(&spark_vel, &spark_vel, &beam->vC0);
+    spark_vel.f[2] = 0.025f;
+    FastVecAdd(&spark_vel, &spark_vel, &g_hero_state.v150);
     if (g_hero_state.i2294 == 8) {
-        col = 0xA0A0A0;
-        q = 1.0165f;
-        l0.f[2] -= 0.10000001f;
+        tint = 0xA0A0A0;
+        size_scale = 1.0165f;
+        spark_vel.f[2] -= 0.10000001f;
     }
     if (g_hero_state.i2294 == 0x7B) {
-        col = 0xA0A0A0;
-        q = 1.037f;
-        l0.f[2] -= 0.060000002f;
+        tint = 0xA0A0A0;
+        size_scale = 1.037f;
+        spark_vel.f[2] -= 0.060000002f;
     }
-    p = func_PAL_002BE9A8(&a, 0.05f, 1.01f, q, 30000.0f, 6, &l0, col, 0);
-    if (p) p[3] = 0x44;
-    if (g->f0C) {
-        s = fast_vec_dist(&g->v10, &a) * 0.16667f;
-        FastVecSub(&d, &g->v10, &a);
-        m = g_hero_state.i2294;
-        n = 4;
-        if (m == 8) n = 2;
-        if (m == 0x7B) n = 1;
-        for (i = 1; i < n; i++) {
-            vec_scale_to_length(&t, &d, s * (f32)i);
-            FastVecAdd(&t, &a, &t);
-            p = func_PAL_002BE9A8(&t, 0.05f, 1.01f, q, 30000.0f, 6, &l0, col, 0);
-            if (p) p[3] = 0x44;
+    spark = part_spawn_spinning_spark_pal(&origin, 0.05f, 1.01f, size_scale, 30000.0f, 6, &spark_vel, tint, 0);
+    if (spark) spark[3] = 0x44;
+    if (trail->f0C) {
+        step_len = fast_vec_dist(&trail->v10, &origin) * 0.16667f;
+        FastVecSub(&delta, &trail->v10, &origin);
+        move_state = g_hero_state.i2294;
+        step_count = 4;
+        if (move_state == 8) step_count = 2;
+        if (move_state == 0x7B) step_count = 1;
+        for (i = 1; i < step_count; i++) {
+            vec_scale_to_length(&step_pos, &delta, step_len * (f32)i);
+            FastVecAdd(&step_pos, &origin, &step_pos);
+            spark = part_spawn_spinning_spark_pal(&step_pos, 0.05f, 1.01f, size_scale, 30000.0f, 6, &spark_vel, tint, 0);
+            if (spark) spark[3] = 0x44;
         }
     }
-    qcopy(&g->v10, &a);
-    g->f0C = 1;
+    qcopy(&trail->v10, &origin);
+    trail->f0C = 1;
 }

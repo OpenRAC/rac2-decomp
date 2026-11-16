@@ -25,6 +25,9 @@ extern void math_approach_target_with_braking(float *, float, float, float, floa
 extern void FastVecAdd(void *a0, void *a1, void *a2);
 extern float gravity_get_center_distance(char *p);
 
+/* Steers the moby toward the target: aims it, works out the wanted speed from the distance and
+   limits, eases the current velocity toward it and keeps the moby near the ground (PAL: 50 Hz
+   timings). */
 void moby_l02_steer_toward_target_pal(char *object, char *data, void *target, TI128 *input, void *unused0, void *unused1, char *transform) {
     MotionVector desired, change;
     float vertical;

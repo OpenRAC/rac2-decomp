@@ -24,42 +24,43 @@ typedef struct {
     int *a, *b; unsigned char *owner; void (*update)(void), (*callback)(void);
 } Context;
 
+/* Runs a group of effect objects for the owner: sets them up, updates each step and hides them when the hero is too close. */
 void effect_group_update_pal(unsigned char *obj)
 {
-    char *d;
+    char *vars;
     Context context;
     float position[4];
     int count, id, allowed;
     unsigned char *player = g_hero_state.player;
     if (player && *(short *)(player + 0xAA) == 0x45 && player[0x20] != 254 && player[0x20] != 253 && g_hero_state.mode == 49) return;
-    d = *(char **)(obj + 0x68);
-    if (!d) return;
+    vars = *(char **)(obj + 0x68);
+    if (!vars) return;
     count = 1;
-    if (*(int *)(d + 0x18) != -1) count = g_effect_group_counts[*(int *)(d + 0x18)];
-    count += *(int *)(d + 0x10);
+    if (*(int *)(vars + 0x18) != -1) count = g_effect_group_counts[*(int *)(vars + 0x18)];
+    count += *(int *)(vars + 0x10);
     context.kind = 48; context.count = count;
     context.a = &g_effect_context_a; context.b = &g_effect_context_b;
     context.items = g_effect_items; context.models = g_effect_models; context.data = g_effect_data;
     context.states = g_effect_group_counts; context.aux = g_effect_aux_buffer; context.more = g_effect_more_data;
     context.update = effect_pool_clear; context.callback = gfx_add_draw_callback_third;
     context.owner = obj;
-    if (*(unsigned char *)(d + 0x14) == 0 && *(int *)(d + 0x18) != -1) {
-        char *firstTarget = g_effect_target_records + *(int *)(d + 0x38) * 0x70;
-        if (*(unsigned char **)(firstTarget + 0x88) != obj || *(unsigned char *)(firstTarget + 0x74) == 0)
-            *(int *)(d + 0x38) = snd_start_in_slot(20, 4, (char *)obj);
+    if (*(unsigned char *)(vars + 0x14) == 0 && *(int *)(vars + 0x18) != -1) {
+        char *first_target = g_effect_target_records + *(int *)(vars + 0x38) * 0x70;
+        if (*(unsigned char **)(first_target + 0x88) != obj || *(unsigned char *)(first_target + 0x74) == 0)
+            *(int *)(vars + 0x38) = snd_start_in_slot(20, 4, (char *)obj);
     } else {
-        id = *(int *)(d + 0x38);
+        id = *(int *)(vars + 0x38);
         if (id != -1) {
-            char *secondTarget = g_effect_target_records + id * 0x70;
-            if (*(unsigned char **)(secondTarget + 0x88) == obj && *(unsigned char *)(secondTarget + 0x74)) snd_stop_voice(id);
+            char *second_target = g_effect_target_records + id * 0x70;
+            if (*(unsigned char **)(second_target + 0x88) == obj && *(unsigned char *)(second_target + 0x74)) snd_stop_voice(id);
         }
-        *(int *)(d + 0x38) = -1;
+        *(int *)(vars + 0x38) = -1;
     }
     switch (obj[0x20]) {
     case 0:
         water_init_object_pal(&context);
-        water_add_splash_entry((char *)obj, *(float *)(d + 0x34));
-        if (*(int *)(d + 0x28) != -1) {
+        water_add_splash_entry((char *)obj, *(float *)(vars + 0x34));
+        if (*(int *)(vars + 0x28) != -1) {
             int alpha = 255;
 
             obj[0x30] = alpha;
@@ -70,20 +71,20 @@ void effect_group_update_pal(unsigned char *obj)
         break;
     case 2:
         water_advance_controller_state(&context);
-        if (math_fabs(*(float *)(obj + 0x18) - *(float *)(d + 0x2C)) <= 2 && *(int *)(d + 0x18) != -1)
-            math_step_value_toward_target((char *)obj + 0x18, d + 0x30, *(float *)(d + 0x2C), 0.0024f, 0.0024f, 0.120000005f);
+        if (math_fabs(*(float *)(obj + 0x18) - *(float *)(vars + 0x2C)) <= 2 && *(int *)(vars + 0x18) != -1)
+            math_step_value_toward_target((char *)obj + 0x18, vars + 0x30, *(float *)(vars + 0x2C), 0.0024f, 0.0024f, 0.120000005f);
         break;
     }
     water_update_ripple_patches(&context);
-    if (*(int *)(d + 0x28) != -1 && !IsPointInCuboid(g_hero_l06_position, *(int *)(d + 0x28))) {
+    if (*(int *)(vars + 0x28) != -1 && !IsPointInCuboid(g_hero_l06_position, *(int *)(vars + 0x28))) {
         allowed = 1;
         if (*(int *)(g_hero_l06_position + 0x2C0)) {
             qcopy(position, g_hero_l06_position);
-            position[2] = *(float *)d;
-            if (IsPointInCuboid((char *)position, *(int *)(d + 0x28))) allowed = 0;
+            position[2] = *(float *)vars;
+            if (IsPointInCuboid((char *)position, *(int *)(vars + 0x28))) allowed = 0;
         }
         if (allowed) {
-            for (id = *(int *)(d + 0x10); id < context.count; ++id)
+            for (id = *(int *)(vars + 0x10); id < context.count; ++id)
                 *(short *)(context.items + id * 0x1190 + 0x1E) = 0;
         }
     }

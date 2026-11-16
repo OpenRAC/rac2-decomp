@@ -69,6 +69,7 @@ extern int UpdateSoundVoices(void);
 extern int sceGsSyncV(int);
 extern int snd_resume_music_stream(void);
 
+/* Starts the scene that plays between two levels, for the given mode (USA v2.00). */
 void level_transition_scene_start_us2(int mode)
 {
     TransitionMoby *p;

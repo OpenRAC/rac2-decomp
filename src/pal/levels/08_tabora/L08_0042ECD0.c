@@ -15,8 +15,8 @@ extern void gfx_append_vectors_to_packet(int, int, u64, int, u64);
 
 /* The spawner's per-frame draw callback: each live slot past state 1 scrolls its phase
    (wrapping at -8) and has its two 0x140-byte strips drawn. */
-void beam_slots_draw_pal(char *a) {
-    char *q = *(char **)(a + 0x68);
+void beam_slots_draw_pal(char *moby) {
+    char *vars = *(char **)(moby + 0x68);
     int i;
 
     VU1_addGSregister(0x47, 0x51001);
@@ -34,8 +34,8 @@ void beam_slots_draw_pal(char *a) {
         }
         p = g_slot_pane_points + k * 0x140;
         DrawGlowBillboardPair(g_beam_slot_key[i], i);
-        y = *(int *)(q + 4) + 63;
-        x = *(int *)q + 63;
+        y = *(int *)(vars + 4) + 63;
+        x = *(int *)vars + 63;
         DrawRibbonStrips(y, x, g_slot_pane_points + j * 0x140, 128, 64, i, -1);
         DrawRibbonStrips(y, x, p, 48, 16, i, math_random_int_range(1, 20));
     }

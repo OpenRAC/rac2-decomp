@@ -29,6 +29,7 @@ extern int func_001163B0(void);
 extern void math_apply_axis_rotation_to_quat(void *, void *, void *, float);
 extern unsigned char *part_spawn_ground_effect(void *, int, float, float, unsigned int, int, int, void *, int, float);
 
+/* Spawns a burst of count sparks at pos, thrown out around the camera-facing axis with random size, speed and spin (PAL). */
 void gorn_part_spawn_spark_burst_pal(char *pos, int count, int mode) {
     float velocity[4] __attribute__((aligned(16)));
     float point[4] __attribute__((aligned(16)));

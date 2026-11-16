@@ -7,7 +7,8 @@ extern float FastAddRotations(float a, float b);
 extern void math_update_wrapped_angle_offset(char *a0, void *a1, void *a2, f32 f12, f32 f13, f32 f14);
 extern void moby_scale_owner_words_by_angles(char *a0, void *a1, void *a2, f32 f12, f32 f13, f32 f14);
 
-void func_PAL_L09_003EDEE8(char *object) {
+/* Saves the moby position and eases its turn angles (PAL: 50 Hz rates). */
+void moby_ease_turn_angles_pal(char *object) {
     char *frame = *(char **)(object + 0x68);
     TI128 *src = (TI128 *)(object + 0x10);
     TI128 *dst = (TI128 *)(frame + 0x330);

@@ -73,7 +73,7 @@ typedef struct { int words[10]; } SpawnEntry;
 extern SpawnEntry g_spawn_entry_table[];
 extern int func_37AAC8(int a0);
 
-void func_US2_L05_00421A98(void)
+void feltzin_challenge_shutdown_us2(void)
 {
     char *p;
     int i;

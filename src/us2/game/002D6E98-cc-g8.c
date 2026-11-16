@@ -48,7 +48,7 @@ extern void gfx_disable_screen_flag(void);
 extern void gfx_enable_screen_flag(void);
 extern void DoGifPaging(void);
 extern void mem_clear(void *, int, int);
-extern unsigned long func_US2_0027CED8(int);
+extern unsigned long tex_get_effect_descriptor_us2(int);
 extern int measure_text_width(char *, int, unsigned char *);
 extern int menu_blend_highlight_color(int, int, int);
 extern int sprintf(char *, char *, ...);
@@ -194,12 +194,12 @@ int RenderLocalizedUiEntryList_us2(MenuDescriptor *menu) {
             }
             gfx_disable_screen_flag();
             text_draw_line(x + g_text_shadow_offset_x, y + g_text_shadow_offset_y, 0x80000000L, text_id, -1,
-                       func_US2_0027CED8(font_texture_index), glyphs);
+                       tex_get_effect_descriptor_us2(font_texture_index), glyphs);
             gfx_enable_screen_flag();
             if (menu->flags & 0x80) {
                 gfx_disable_screen_flag();
             }
-            text_draw_line(x, y, color, text_id, -1, func_US2_0027CED8(font_texture_index), glyphs);
+            text_draw_line(x, y, color, text_id, -1, tex_get_effect_descriptor_us2(font_texture_index), glyphs);
             y += row_height;
             if (menu->items[selection_index].secondary_text_id != 0) {
                 gfx_disable_screen_flag();
@@ -207,13 +207,13 @@ int RenderLocalizedUiEntryList_us2(MenuDescriptor *menu) {
                 shadow_y = y + g_text_shadow_offset_y;
                 secondary_text = GetLocalizedString(menu->items[selection_index].secondary_text_id);
                 text_draw_line(shadow_x, shadow_y, 0x80000000L, secondary_text, -1,
-                           func_US2_0027CED8(font_texture_index), glyphs);
+                           tex_get_effect_descriptor_us2(font_texture_index), glyphs);
                 if (!(menu->flags & 0x80)) {
                     gfx_enable_screen_flag();
                 }
                 text_draw_line(x, y, color,
                            GetLocalizedString(menu->items[selection_index].secondary_text_id), -1,
-                           func_US2_0027CED8(font_texture_index), glyphs);
+                           tex_get_effect_descriptor_us2(font_texture_index), glyphs);
                 y += row_height;
             }
             if (menu->flags & 0x80) {

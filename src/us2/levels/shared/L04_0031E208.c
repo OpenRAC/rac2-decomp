@@ -28,10 +28,10 @@ extern s32 g_current_map_index MACRO_ADDR;
 
 /* shared callees, named by their catalogue rows */
 extern void anim_start_startup_animations(void);
-extern void func_US2_002E72D8(void *mob);
+extern void UpdateEquipmentPieces_us2(void *mob);
 extern void math_store_angle_update_result(void *mob, void *p, s32 a2, s32 a3, f32 alpha);
 
-void func_US2_L04_0031E208(void) {
+void level_update_mob_list_by_type_us2(void) {
     s32 i;
 
     anim_start_startup_animations();
@@ -42,7 +42,7 @@ void func_US2_L04_0031E208(void) {
             mob->flags |= 0x800;
         }
         if (mob->type == 0xD54) {
-            func_US2_002E72D8(mob);
+            UpdateEquipmentPieces_us2(mob);
         }
         if (mob != 0) {
             s32 type = 0xFA0;

@@ -28,7 +28,7 @@ void rocket_draw_ribbon_strip_pal(void *self,int color,int alpha)
     char *object=self,*state=*(char **)(object+0x68);
     Quad128 **table;
     int index;
-    float fraction,uvStep,width;
+    float fraction,uv_step,width;
     table=(Quad128 **)level_get_slot_body(*(int *)(state+0x50),*(int *)(state+0x3c));
     if(!table) { table_clear_entry_flag(*(int *)(state+0x6c)); moby_mark_spawned(object); return; }
     if(*(int *)(state+0x54)<3) return;
@@ -47,7 +47,7 @@ void rocket_draw_ribbon_strip_pal(void *self,int color,int alpha)
     FastVecSub(&direction,object+0x10,table[*(int *)(state+0x30)]);
     FastVecCross(&side,&direction,object+0xe0); vec_scale_to_length(&side,&side,width);
     FastVecAdd(&packet.view.vertices[0],object+0x10,&side); FastVecSub(&packet.view.vertices[1],object+0x10,&side);
-    uvStep=0.5f/IntToFloat(*(int *)(state+0x54)-2);
+    uv_step=0.5f/IntToFloat(*(int *)(state+0x54)-2);
     for(index=0;index<*(int *)(state+0x54);index++) {
         if(index>0) FastVecSub(&direction,&table[*(int *)(state+0x30)][index-1],table[*(int *)(state+0x30)]+index);
         FastVecCross(&side,&direction,object+0xe0); vec_scale_to_length(&side,&side,width);
@@ -56,6 +56,6 @@ void rocket_draw_ribbon_strip_pal(void *self,int color,int alpha)
         draw_world_quad(&packet,0,0);
         packet.view.vertices[0]=packet.view.vertices[2]; packet.view.vertices[1]=packet.view.vertices[3];
         packet.view.uv[0][0]=packet.view.uv[2][0]; packet.view.uv[1][0]=packet.view.uv[3][0];
-        packet.view.uv[2][0]+=uvStep; packet.view.uv[3][0]+=uvStep;
+        packet.view.uv[2][0]+=uv_step; packet.view.uv[3][0]+=uv_step;
     }
 }

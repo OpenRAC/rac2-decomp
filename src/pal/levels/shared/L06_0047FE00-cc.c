@@ -1,6 +1,6 @@
 /* func_PAL_L06_0047FE00, the PAL copy of func_L06_0047A408: the same C. */
 /* Follow camera swing volume update, shared by levels 06, 12 and 13.
- * A unit of its own because it needs -g and hazard labels, and flags are per file. */
+ * A unit of its own because it needs -cam_base and hazard labels, and flags are per file. */
 #include "common.h"
 typedef struct {
     f32 swing; u8 pad04[4]; s32 volume_25faf0; s32 clip_volume; s32 volume_25fa38; s32 path; u8 pad18[8];
@@ -60,8 +60,9 @@ extern void cam_set_speeds_if_nonzero(f32, f32);
 extern void cam_set_turn_speeds_if_nonzero(f32, f32);
 
 extern int cam_is_hero_in_volume(void *);
-void volume_camera_swing_pal(char *arg) {
-    struct UpdateCam *cam = (struct UpdateCam *)arg;
+/* Swings the follow camera while the hero is inside a camera volume, easing its distance, height and sideways settings. */
+void volume_camera_swing_pal(char *volume) {
+    struct UpdateCam *cam = (struct UpdateCam *)volume;
     CameraVec dir;
     SwingCameraParams *params;
     struct UpdateCam *rec;
@@ -78,7 +79,7 @@ void volume_camera_swing_pal(char *arg) {
     s32 at_end;
     f32 total;
     f32 swing;
-    f32 t;
+    f32 blend;
 
     params = ((CamDesc *)ref_L06_0047A408_00)[cam->descriptor_index].params;
     if (params->type == 8 && FOLLOW_CAM_STATE(((struct UpdateCam *)ref_L06_0047A408_01))->tail.mode == 0) {
@@ -111,9 +112,9 @@ stop:
         return;
     }
     if (params->timer == 0) {
-        u8 *g = (u8 *)&ref_L06_0047A408_02;
-        params->start_lateral_stiffness = FOLLOW_CAM_STATE(*(struct UpdateCam **)(g + 0x190))->follow.lateral_stiffness;
-        params->start_lateral_damping = FOLLOW_CAM_STATE(*(struct UpdateCam **)(g + 0x190))->follow.lateral_damping;
+        u8 *cam_base = (u8 *)&ref_L06_0047A408_02;
+        params->start_lateral_stiffness = FOLLOW_CAM_STATE(*(struct UpdateCam **)(cam_base + 0x190))->follow.lateral_stiffness;
+        params->start_lateral_damping = FOLLOW_CAM_STATE(*(struct UpdateCam **)(cam_base + 0x190))->follow.lateral_damping;
     }
     if (*(s32 *)&params->type == 5) {
         *(s32 *)&params->swing = 0;
@@ -240,10 +241,10 @@ stop:
         if (params->timer >= 100) {
             cam_set_speeds_if_nonzero(params->lateral_stiffness, params->lateral_damping);
         } else {
-            t = params->timer / IntToFloat(100);
+            blend = params->timer / IntToFloat(100);
             cam_set_speeds_if_nonzero(
-                params->start_lateral_stiffness + (params->lateral_stiffness - params->start_lateral_stiffness) * t,
-                params->start_lateral_damping + (params->lateral_damping - params->start_lateral_damping) * t);
+                params->start_lateral_stiffness + (params->lateral_stiffness - params->start_lateral_stiffness) * blend,
+                params->start_lateral_damping + (params->lateral_damping - params->start_lateral_damping) * blend);
         }
     }
     if (params->type == 1 || params->type == 7 || params->type == 10) {

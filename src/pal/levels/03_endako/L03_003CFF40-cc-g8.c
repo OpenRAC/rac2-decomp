@@ -52,95 +52,95 @@ extern f32  g_ant_bridge_angle_limit __attribute__((sda));
 /* The actor's per-frame update: state 0 spawns it and aims, state 2 looks the
    target up, states 3 and 4 turn it by a rate that decays; every other state
    does nothing.  The actor's angle is at 0xF4, its rate at 0x74 of the state. */
-void func_PAL_L03_003CFF40(char *a0)
+void ant_bridge_update_pal(char *moby)
 {
-    char *s2 = a0;
-    char *s1 = *(char **)(s2 + 0x68);
+    char *obj = moby;
+    char *vars = *(char **)(obj + 0x68);
     char buf[0x40];
-    char *s0;
+    char *offset_ptr;
 
-    switch (*(u8 *)(s2 + 0x20)) {
+    switch (*(u8 *)(obj + 0x20)) {
     case 0:
-        if (*(s32 *)(s1 + 0x70) != -1) {
-            moby_set_state(s2, 2, -1);
-            s0 = s1 + 0x60;
-            FastVecSub(s0, g_moby_record_base + *(s32 *)(s1 + 0x70) * 0x100 + 0x10, s2 + 0x10);
-            *(s32 *)(s1 + 0x7C) = -1;
-            *(s32 *)(s1 + 0x78) = 0;
-            matrix_from_basis_rows(buf, s2 + 0xC0);
-            matrix_mul_vec3(s0, s0, buf);
+        if (*(s32 *)(vars + 0x70) != -1) {
+            moby_set_state(obj, 2, -1);
+            offset_ptr = vars + 0x60;
+            FastVecSub(offset_ptr, g_moby_record_base + *(s32 *)(vars + 0x70) * 0x100 + 0x10, obj + 0x10);
+            *(s32 *)(vars + 0x7C) = -1;
+            *(s32 *)(vars + 0x78) = 0;
+            matrix_from_basis_rows(buf, obj + 0xC0);
+            matrix_mul_vec3(offset_ptr, offset_ptr, buf);
         } else {
-            moby_set_state(s2, 1, -1);
+            moby_set_state(obj, 1, -1);
         }
         break;
     case 2: {
-        char *p;
+        char *slot;
 
-        if (flag_is_third_pending_set(g_moby_record_base + *(s32 *)(s1 + 0x70) * 0x100) == 0) {
+        if (flag_is_third_pending_set(g_moby_record_base + *(s32 *)(vars + 0x70) * 0x100) == 0) {
             break;
         }
-        p = g_sound_state + *(s32 *)(s1 + 0x7C) * 0x70;
-        if (*(char **)(p + 0x88) != s2 || *(u8 *)(p + 0x74) == 0) {
-            *(s32 *)(s1 + 0x7C) = PlayMobySound(0, 4, s2);
+        slot = g_sound_state + *(s32 *)(vars + 0x7C) * 0x70;
+        if (*(char **)(slot + 0x88) != obj || *(u8 *)(slot + 0x74) == 0) {
+            *(s32 *)(vars + 0x7C) = PlayMobySound(0, 4, obj);
         }
-        moby_set_state_in_list(*(u8 *)(s2 + 0x21), 4);
-        moby_set_state(s2, 3, -1);
+        moby_set_state_in_list(*(u8 *)(obj + 0x21), 4);
+        moby_set_state(obj, 3, -1);
         break;
     }
     case 3: {
-        char *p;
-        char *q;
-        f32 t;
-        f32 v;
+        char *slot;
+        char *target_pos;
+        f32 angle;
+        f32 rate;
 
-        *(f32 *)(s1 + 0x74) = *(f32 *)(s1 + 0x74)
-            + (*(f32 *)(s2 + 0xF4) / (f32)(((int)(g_ant_bridge_divisor) * 5 + 2) / 6) + 0.00013962637f);
-        t = *(f32 *)(s2 + 0xF4) + *(f32 *)(s1 + 0x74);
-        *(f32 *)(s2 + 0xF4) = t;
-        if (1.69646013f < t) {
-            if (*(s32 *)(s1 + 0x78) < 5) {
-                if (*(s32 *)(s1 + 0x7C) != -1) {
-                    p = g_sound_state + *(s32 *)(s1 + 0x7C) * 0x70;
-                    if (*(char **)(p + 0x88) == s2 && *(u8 *)(p + 0x74) != 0) {
-                        snd_stop_voice(*(s32 *)(s1 + 0x7C));
+        *(f32 *)(vars + 0x74) = *(f32 *)(vars + 0x74)
+            + (*(f32 *)(obj + 0xF4) / (f32)(((int)(g_ant_bridge_divisor) * 5 + 2) / 6) + 0.00013962637f);
+        angle = *(f32 *)(obj + 0xF4) + *(f32 *)(vars + 0x74);
+        *(f32 *)(obj + 0xF4) = angle;
+        if (1.69646013f < angle) {
+            if (*(s32 *)(vars + 0x78) < 5) {
+                if (*(s32 *)(vars + 0x7C) != -1) {
+                    slot = g_sound_state + *(s32 *)(vars + 0x7C) * 0x70;
+                    if (*(char **)(slot + 0x88) == obj && *(u8 *)(slot + 0x74) != 0) {
+                        snd_stop_voice(*(s32 *)(vars + 0x7C));
                     }
                 }
-                *(s32 *)(s1 + 0x7C) = -1;
-                PlayMobySound(1, 0, s2);
-                (*(s32 *)(s1 + 0x78))++;
+                *(s32 *)(vars + 0x7C) = -1;
+                PlayMobySound(1, 0, obj);
+                (*(s32 *)(vars + 0x78))++;
             }
-            *(f32 *)(s2 + 0xF4) = 1.69646013f;
-            v = *(f32 *)(s1 + 0x74);
-            if (0.0006981318f < v) {
-                *(f32 *)(s1 + 0x74) = v * -0.5f;
+            *(f32 *)(obj + 0xF4) = 1.69646013f;
+            rate = *(f32 *)(vars + 0x74);
+            if (0.0006981318f < rate) {
+                *(f32 *)(vars + 0x74) = rate * -0.5f;
             } else {
-                *(s32 *)(s1 + 0x74) = 0;    /* the retail stores the word, not the float */
-                moby_set_state(s2, 5, -1);
+                *(s32 *)(vars + 0x74) = 0;    /* the retail stores the word, not the float */
+                moby_set_state(obj, 5, -1);
             }
         }
-        q = g_moby_record_base + *(s32 *)(s1 + 0x70) * 0x100 + 0x10;
-        matrix_mul_vec3(q, s1 + 0x60, s2 + 0xC0);
-        FastVecAdd(q, q, s2 + 0x10);
+        target_pos = g_moby_record_base + *(s32 *)(vars + 0x70) * 0x100 + 0x10;
+        matrix_mul_vec3(target_pos, vars + 0x60, obj + 0xC0);
+        FastVecAdd(target_pos, target_pos, obj + 0x10);
         break;
     }
     case 4: {
-        f32 f3;
-        f32 t;
-        f32 v;
+        f32 angle_limit;
+        f32 angle;
+        f32 rate;
 
-        f3 = g_ant_bridge_angle_limit * 3.14159274f;
-        *(f32 *)(s1 + 0x74) = *(f32 *)(s1 + 0x74)
-            + (*(f32 *)(s2 + 0xF4) / (f32)(((int)(g_ant_bridge_divisor) * 5 + 2) / 6) + 0.00013962637f);
-        t = *(f32 *)(s2 + 0xF4) + *(f32 *)(s1 + 0x74);
-        *(f32 *)(s2 + 0xF4) = t;
-        if (f3 < t) {
-            *(f32 *)(s2 + 0xF4) = f3;
-            v = *(f32 *)(s1 + 0x74);
-            if (0.0006981318f < v) {
-                *(f32 *)(s1 + 0x74) = v * -0.5f;
+        angle_limit = g_ant_bridge_angle_limit * 3.14159274f;
+        *(f32 *)(vars + 0x74) = *(f32 *)(vars + 0x74)
+            + (*(f32 *)(obj + 0xF4) / (f32)(((int)(g_ant_bridge_divisor) * 5 + 2) / 6) + 0.00013962637f);
+        angle = *(f32 *)(obj + 0xF4) + *(f32 *)(vars + 0x74);
+        *(f32 *)(obj + 0xF4) = angle;
+        if (angle_limit < angle) {
+            *(f32 *)(obj + 0xF4) = angle_limit;
+            rate = *(f32 *)(vars + 0x74);
+            if (0.0006981318f < rate) {
+                *(f32 *)(vars + 0x74) = rate * -0.5f;
             } else {
-                *(s32 *)(s1 + 0x74) = 0;    /* the retail stores the word, not the float */
-                moby_set_state(s2, 5, -1);
+                *(s32 *)(vars + 0x74) = 0;    /* the retail stores the word, not the float */
+                moby_set_state(obj, 5, -1);
             }
         }
         break;
@@ -156,6 +156,6 @@ typedef struct {
 } L03_22C8Entry;
 
 extern L03_22C8Entry *g_path_l03_entry_table[];
-extern void moby_set_state(char *a0, s32 a1, s32 a2);
+extern void moby_set_state(char *moby, s32 a1, s32 a2);
 extern void FastVecSub(void *, void *, void *);
 extern void FastVecAdd(void *, void *, void *);

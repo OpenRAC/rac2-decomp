@@ -41,23 +41,24 @@ extern void gfx_wait_for_dma_status_bits(int);
 extern int sceGsSyncV(int);
 extern void cutscene_end_scripted_pal(void);
 
+/* Plays a bonus reel scene: starts it, runs the frame loop while the scene is active, then ends it. Returns whether the player skipped it. */
 int PlayBonusReelWithGameLoop_pal(int unused)
 {
-    SceneEntry *prev;
+    SceneEntry *previous_entry;
     SceneEntry *entry;
     int i;
-    int value;
+    int skipped;
 
     cutscene_start_scripted_pal();
-    prev = g_moby_pool_start;
+    previous_entry = g_moby_pool_start;
     i = 0;
     if (i < g_scene_playback_state.count) {
         do {
             do {
                 entry = g_scene_playback_state.entries[i];
-                if (entry != 0 && prev != entry) {
-                    entry->previous = prev;
-                    prev = entry;
+                if (entry != 0 && previous_entry != entry) {
+                    entry->previous = previous_entry;
+                    previous_entry = entry;
                 }
             } while (0);
             i++;
@@ -76,7 +77,7 @@ int PlayBonusReelWithGameLoop_pal(int unused)
         gfx_write_clear_color_packets();
         g_gfx_pass_mode = -1;
         pad_poll_ports_pal();
-        value = cutscene_update_scripted_actors_pal();
+        skipped = cutscene_update_scripted_actors_pal();
         gfx_append_draw_list_buffer_tag(0);
         g_render_layer_flags = 0x131;
         RenderFrame_pal();
@@ -90,6 +91,6 @@ int PlayBonusReelWithGameLoop_pal(int unused)
     } while (g_current_game_mode == 2);
     D_001A8BB0_GP = 0;
     cutscene_end_scripted_pal();
-    return value;
+    return skipped;
 }
 

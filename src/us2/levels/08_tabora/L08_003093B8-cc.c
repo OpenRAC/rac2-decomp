@@ -35,7 +35,7 @@ typedef struct TaboraObject {
     char pad36[0x32];
     char *vars;
     char pad6C[0x3E];
-    short classId;
+    short class_id;
 } TaboraObject;
 typedef struct TaboraScene {
     char pad00[0x30];
@@ -80,7 +80,7 @@ extern float g_tabora_rotation_angles[4] MACRO_ADDR;
 extern float g_cutscene_rotation_speed_x __attribute__((sda));
 extern float g_cutscene_rotation_speed_y, g_cutscene_rotation_speed_z, g_cutscene_rotation_speed_w;
 extern void anim_start_startup_animations(void);
-extern void func_US2_002E72D8(void *);
+extern void UpdateEquipmentPieces_us2(void *);
 extern void math_store_angle_update_result(void *, void *, int, int, float);
 extern void moby_copy_group_word_to_members(void);
 extern void FastVecAdd(void *, void *, void *);
@@ -107,7 +107,8 @@ extern char *part_spawn_fading_drift(void *, void *, int, int, int, int, int, in
 extern void *part_spawn_hero_relative(void *, void *, int, int, int, int, float);
 extern unsigned char *part_spawn_fading(void *, int, int, int, int, int, int, float);
 
-void func_US2_L08_003093B8(void) {
+/* Runs the scripted effects of the Tabora cutscene: sparks, screen shake, and glowing rings that change with each phase of the scene (USA v2.00). */
+void tabora_cutscene_update_effects_us2(void) {
     float v[4] __attribute__((aligned(16)));
     float w[4] __attribute__((aligned(16)));
     /* Adjacent in the frame: func_002833F0 fills all three as rows of one matrix. */
@@ -123,11 +124,11 @@ void func_US2_L08_003093B8(void) {
         TaboraObject *p;
         for (; j < g_tabora_scene.count; ++j) {
             p = g_tabora_scene.objects[j];
-            if (p && p->classId==0xE29) p->flags |= 0x800;
-            if (p->classId==0xD54) func_US2_002E72D8(p);
+            if (p && p->class_id==0xE29) p->flags |= 0x800;
+            if (p->class_id==0xD54) UpdateEquipmentPieces_us2(p);
             if (p) {
                 int kind = 0xFA0;
-                if (p->classId==kind && g_current_map_index != 0x33 && p->vars)
+                if (p->class_id==kind && g_current_map_index != 0x33 && p->vars)
                     math_store_angle_update_result(p,p->vars+12,0x80AAAAD2,0x80396464,0.061086535f);
             }
         }
@@ -161,7 +162,7 @@ void func_US2_L08_003093B8(void) {
             int i;
             int colour, life, alpha, spin, packed;
             TaboraParticle *r;
-            float scale, size, angle, frameStep;
+            float scale, size, angle, frame_step;
             p=0;
             moby_copy_group_word_to_members();
             n=0;
@@ -172,7 +173,7 @@ void func_US2_L08_003093B8(void) {
                 *(u128 *)v = 0;
                 v[2]=0.01f;
                 v[3]=1.0f;
-                frameStep=0.008333334f;
+                frame_step=0.008333334f;
                 for (i=0;i<n;++i) {
                     life=math_random_int_range(90,117);
                     qzero(w);
@@ -189,17 +190,17 @@ void func_US2_L08_003093B8(void) {
                     size=math_random_float_range(0.1f,0.3f);
                     v[0]=math_random_signed_float_range(0.0f,0.011666667f);
                     v[1]=math_random_signed_float_range(0.0f,0.011666667f);
-                    v[2]=math_random_float_range(frameStep*0.1f,0.008333334f);
+                    v[2]=math_random_float_range(frame_step*0.1f,0.008333334f);
                     FastVecScale(v,v,scale);
                     r=SpawnSpinningSparkParticle(w,0.1f,1.0f,angle,spin,v,colour,size*210000.0f,0);
                     if (r) {
-                        TaboraParticleData *particleData=&r->data;
+                        TaboraParticleData *particle_data=&r->data;
                         if (math_random_int_below(2)) r->kind=0x44;
                         r->lifetime=life;
                         {
-                            particleData->kind=2;
-                            particleData->alpha=alpha;
-                            particleData->lifetime=life;
+                            particle_data->kind=2;
+                            particle_data->alpha=alpha;
+                            particle_data->lifetime=life;
                         }
                     }
                 }
@@ -264,17 +265,17 @@ void func_US2_L08_003093B8(void) {
     {
         float amount=6.0f;
         float rate=0.0f;
-        float frameStep, timeScale, t, scale;
+        float frame_step, time_scale, t, scale;
         float size;
         int alpha;
         int j;
-        int duration, lifeStep;
+        int duration, life_step;
         *(u128 *)w=*(u128 *)v;
         w[2]+=1.0f;
         if (math_random_int_below(4)==0) {
             FastVecSub(forward,g_hero_position_vec,w);
-            timeScale=0.016666668f;
-            frameStep=0.008333334f;
+            time_scale=0.016666668f;
+            frame_step=0.008333334f;
             vec_scale_to_length(forward,forward,5.0f);
             FastVecAdd(w,forward,w);
             vec_random_direction(matrix,rate,rate);
@@ -282,17 +283,17 @@ void func_US2_L08_003093B8(void) {
             size*=0.06666667f;
             alpha=math_random_int_below(255)&255;
             duration=60;
-            lifeStep=0;
+            life_step=0;
             part_spawn_hero_relative(w,matrix,0x50804080,duration,alpha,0,size);
             for (j=0;j<1;++j) {
-                t=rate*timeScale;
+                t=rate*time_scale;
                 vec_random_direction(offset,t,t);
                 FastVecAdd(matrix,matrix,offset);
-                t=0.0f; /* Second set in the loop: keeps rate*timeScale from being hoisted and folded. */
-                scale=amount*frameStep*(g_tabora_scene.frame-480);
+                t=0.0f; /* Second set in the loop: keeps rate*time_scale from being hoisted and folded. */
+                scale=amount*frame_step*(g_tabora_scene.frame-480);
                 alpha=math_random_int_below(255)&255;
                 part_spawn_hero_relative(w,matrix,0x40804080,duration,alpha,0,scale);
-                duration+=lifeStep;
+                duration+=life_step;
             }
         }
     }

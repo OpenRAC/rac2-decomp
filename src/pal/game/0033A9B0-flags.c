@@ -1,4 +1,6 @@
 #include "include_asm.h"
+#include "names.h"
 
-void func_PAL_0033AE40(void) {
+/* Empty stub (does nothing). */
+void ui_nop_d_pal(void) {
 }

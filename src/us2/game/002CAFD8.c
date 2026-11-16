@@ -18,7 +18,8 @@ typedef struct {
 } ScreenState;
 extern ScreenState g_view_params;
 
-void func_US2_002CAFD8(void) {
+/* Resets the view's field of view and fog, updates the view context, then resets the active camera. */
+void view_reset_fov_and_fog(void) {
     ScreenState *view = &g_view_params;
 
     view->f218 = 0.0f;

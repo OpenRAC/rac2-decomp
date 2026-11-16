@@ -12,12 +12,12 @@ extern u8 *g_route_path_table[];
 extern u16 *g_moby_l04_group_lists[];
 extern u8 *g_moby_l04_pool __attribute__((sda));
 extern int g_tribesman_group_limit __attribute__((sda));
-extern int func_PAL_L04_00455E08(u8 *);
+extern int tribesman_update_common_pal(u8 *);
 extern int flag_set_second_pending(u8 *);
 extern void moby_set_controller_speed_limits(u8 *, float, float, float, float);
 extern float math_fabs(float);
 extern int math_fast_float_d(void *);
-extern void func_PAL_002A7E68(u8 *, int, int, int);
+extern void anim_start_blended_pal(u8 *, int, int, int);
 extern int math_random_int_range(int, int), math_random_int_below(int);
 extern void moby_set_state(u8 *, u8, int);
 extern float vec_distance_xy(void *, void *), mat_fast_helper_a(float, float);
@@ -44,11 +44,11 @@ extern u8 *moby_find_linked_object(u8 *);
 struct family_27f9_object;
 extern float moby_turn_toward_position(struct family_27f9_object *, float *, float *, float, float, float);
 extern int moby_l01_turn_toward_target_pal(char *, char *);
-extern int func_PAL_L04_00456890(u8 *, void *, float, float, float, float);
+extern int enemy_walk_toward_target_pal(u8 *, void *, float, float, float, float);
 extern int moby_turn_toward_target_and_step_pal(char *, float *, float);
 extern void moby_transform_joint_to_world(char *, int, char *);
 extern int coll_sweep_from_object(void *, void *, int, float, float, float, int, int, int);
-extern void func_PAL_L04_00456B58(char *);
+extern void enemy_tick_timers_blend_pal(char *);
 #define I(o) (*(s32 *)(state + (o)))
 #define U(o) (*(u32 *)(state + (o)))
 #define F(o) (*(float *)(state + (o)))
@@ -58,18 +58,18 @@ extern void func_PAL_L04_00456B58(char *);
 #define OF(o) (*(float *)(object + (o)))
 
 /* Updates the beast's rider mode, route following and close-range action states. */
-void func_PAL_L04_00453500(u8 *object)
+void tribesman_l04_update_pal(u8 *object)
 {
     BeastVector offset, target, lateral;
     u8 *state;
     u8 *other, *route, *entity, *linked;
     u16 *ids;
-    float oldHeight = OF(0x18);
-    float distance, angle, turn, nearest, firstDistance, lastDistance;
-    int i, selected, random, animation;
+    float old_height = OF(0x18);
+    float distance, angle, turn, nearest, first_distance, last_distance;
+    int i, selected, random_choice, animation;
     u32 dispatch;
     state = *(u8 **)(object + 0x68);
-    if (func_PAL_L04_00455E08(object)) { moby_mark_spawned(object); return; }
+    if (tribesman_update_common_pal(object)) { moby_mark_spawned(object); return; }
     switch (object[0x95]) {
     case 0:
         if (flag_set_second_pending(object))
@@ -79,18 +79,18 @@ void func_PAL_L04_00453500(u8 *object)
             if (math_fast_float_d(state + 0x2B0)) {
                 g_tribesman_flag[0] = 1;
                 if (I(0x29C) != -1) {
-                    if (object[0x43] != 12) func_PAL_002A7E68(object, 12, 0, 8);
+                    if (object[0x43] != 12) anim_start_blended_pal(object, 12, 0, 8);
                     moby_set_state(object, 22, 2);
                 } else if (I(0x2A4) == 1) {
-                    if (object[0x43] != 31) func_PAL_002A7E68(object, 31, 0, ((s32)(math_random_int_range(10, 20)) * 5 + 2) / 6);
+                    if (object[0x43] != 31) anim_start_blended_pal(object, 31, 0, ((s32)(math_random_int_range(10, 20)) * 5 + 2) / 6);
                     moby_set_state(object, 17, 2);
                 } else {
                     I(0x2A0) = 1;
                     if (math_random_int_below(3) == 1) {
-                        if (object[0x43] != 11) func_PAL_002A7E68(object, 11, 0, 8);
+                        if (object[0x43] != 11) anim_start_blended_pal(object, 11, 0, 8);
                         moby_set_state(object, 17, 3);
                     } else {
-                        if (object[0x43] != 12) func_PAL_002A7E68(object, 12, 0, 8);
+                        if (object[0x43] != 12) anim_start_blended_pal(object, 12, 0, 8);
                         moby_set_state(object, 19, 3);
                     }
                 }
@@ -99,26 +99,26 @@ void func_PAL_L04_00453500(u8 *object)
         }
         if (S(0x276) != 0) {
             if (I(0x570) != -1 && I(0x574) == 1) {
-                if (object[0x43] != 24) func_PAL_002A7E68(object, 24, 0, ((s32)(math_random_int_range(5, 15)) * 5 + 2) / 6);
+                if (object[0x43] != 24) anim_start_blended_pal(object, 24, 0, ((s32)(math_random_int_range(5, 15)) * 5 + 2) / 6);
                 moby_set_state(object, 6, -1);
             } else if (I(0x570) != -1 && I(0x574) > 1) {
-                if (object[0x43] != 12) func_PAL_002A7E68(object, 12, 0, ((s32)(math_random_int_range(5, 15)) * 5 + 2) / 6);
+                if (object[0x43] != 12) anim_start_blended_pal(object, 12, 0, ((s32)(math_random_int_range(5, 15)) * 5 + 2) / 6);
                 moby_set_state(object, 7, -1);
                 moby_set_controller_speed_limits(object, 0.0056000003f, 0.14000002f, 0.004886923f, 0.31415933f);
             } else {
                 object[0x95] = 1;
-                if (object[0x43] != 24) func_PAL_002A7E68(object, 24, 0, 17);
+                if (object[0x43] != 24) anim_start_blended_pal(object, 24, 0, 17);
             }
             if ((u32)(US(0x274) - 1) < 2 && math_fabs(*(float *)(P(0x240) + 0x18) - OF(0x18)) < 2.0f) {
                 if (I(0x29C) != -1) {
-                    if (object[0x43] != 12) func_PAL_002A7E68(object, 12, 0, 8);
+                    if (object[0x43] != 12) anim_start_blended_pal(object, 12, 0, 8);
                     moby_set_state(object, 22, 2);
                 } else if (I(0x2A4) == 1) {
-                    if (object[0x43] != 31) func_PAL_002A7E68(object, 31, 0, ((s32)(math_random_int_range(10, 20)) * 5 + 2) / 6);
+                    if (object[0x43] != 31) anim_start_blended_pal(object, 31, 0, ((s32)(math_random_int_range(10, 20)) * 5 + 2) / 6);
                     moby_set_state(object, 17, 2);
                 } else {
                     I(0x2A0) = 1;
-                    if (object[0x43] != 11) func_PAL_002A7E68(object, 11, 0, 8);
+                    if (object[0x43] != 11) anim_start_blended_pal(object, 11, 0, 8);
                     moby_set_state(object, 17, 3);
                 }
             }
@@ -133,7 +133,7 @@ void func_PAL_L04_00453500(u8 *object)
         if (I(0x258) != 1 && I(0x25C) != 1) break;
         I(0x178) &= ~0x10;
         if (I(0x29C) != -1) {
-            if (object[0x43] != 12) func_PAL_002A7E68(object, 12, 0, 8);
+            if (object[0x43] != 12) anim_start_blended_pal(object, 12, 0, 8);
             moby_set_state(object, 22, 2);
             selected = 0; nearest = 100.0f;
             for (i = 0; i < *(int *)g_route_path_table[I(0x29C)]; i++) {
@@ -142,11 +142,11 @@ void func_PAL_L04_00453500(u8 *object)
             }
             path_set_follower_nodes(object, g_route_path_table[I(0x29C)], -1, selected);
         } else if (I(0x2A4) == 1) {
-            if (object[0x43] != 12) func_PAL_002A7E68(object, 12, 0, 8);
+            if (object[0x43] != 12) anim_start_blended_pal(object, 12, 0, 8);
             moby_set_state(object, 21, 2);
         } else {
             I(0x2A0) = 1;
-            if (object[0x43] != 11) func_PAL_002A7E68(object, 11, 0, 8);
+            if (object[0x43] != 11) anim_start_blended_pal(object, 11, 0, 8);
             moby_set_state(object, 17, 3);
         }
         break;
@@ -154,14 +154,14 @@ void func_PAL_L04_00453500(u8 *object)
         if (flag_set_second_pending(object))
             moby_set_controller_speed_limits(object, 0.0056000003f, 0.14000002f, 0.0016755164f, 0.12566373f);
         if (I(0x258) == 1 || I(0x25C) == 1 || I(0x560) != 0) break;
-        random = math_random_int_below(4);
-        if (random == 0) {
-            if (object[0x43] != 25) func_PAL_002A7E68(object, 25, 0, ((s32)(math_random_int_range(10, 20)) * 5 + 2) / 6);
-        } else if (random == 1) {
-            if (object[0x43] != 17) func_PAL_002A7E68(object, 17, 0, ((s32)(math_random_int_range(20, 30)) * 5 + 2) / 6);
-        } else if (random == 2) {
-            if (object[0x43] != 30) func_PAL_002A7E68(object, 30, 0, ((s32)(math_random_int_range(20, 30)) * 5 + 2) / 6);
-        } else if (object[0x43] != 24) func_PAL_002A7E68(object, 24, 0, ((s32)(math_random_int_range(20, 30)) * 5 + 2) / 6);
+        random_choice = math_random_int_below(4);
+        if (random_choice == 0) {
+            if (object[0x43] != 25) anim_start_blended_pal(object, 25, 0, ((s32)(math_random_int_range(10, 20)) * 5 + 2) / 6);
+        } else if (random_choice == 1) {
+            if (object[0x43] != 17) anim_start_blended_pal(object, 17, 0, ((s32)(math_random_int_range(20, 30)) * 5 + 2) / 6);
+        } else if (random_choice == 2) {
+            if (object[0x43] != 30) anim_start_blended_pal(object, 30, 0, ((s32)(math_random_int_range(20, 30)) * 5 + 2) / 6);
+        } else if (object[0x43] != 24) anim_start_blended_pal(object, 24, 0, ((s32)(math_random_int_range(20, 30)) * 5 + 2) / 6);
         moby_set_state(object, 12, 1);
         break;
     case 4:
@@ -175,18 +175,18 @@ void func_PAL_L04_00453500(u8 *object)
         if (dispatch & 2) {
             S(0x26) = 0;
             if ((I(0x258) == 1 || I(0x25C) == 1) && math_fabs(*(float *)(P(0x240) + 0x18) - OF(0x18)) < 2.0f) {
-                if (object[0x43] != 12) func_PAL_002A7E68(object, 12, 0, 8);
+                if (object[0x43] != 12) anim_start_blended_pal(object, 12, 0, 8);
                 moby_set_state(object, 21, 2);
                 if (state[0x37] != 10) break;
-                if (object[0x43] != 14) func_PAL_002A7E68(object, 14, 9, 3);
+                if (object[0x43] != 14) anim_start_blended_pal(object, 14, 9, 3);
                 moby_set_controller_speed_limits(object, 0.0056000003f, 0.14000002f, 0.0016755164f, 0.12566373f);
                 moby_set_state(object, 23, 2);
             } else if (I(0x570) != -1) {
-                if (object[0x43] != 12) func_PAL_002A7E68(object, 12, 0, ((s32)(math_random_int_range(5, 15)) * 5 + 2) / 6);
+                if (object[0x43] != 12) anim_start_blended_pal(object, 12, 0, ((s32)(math_random_int_range(5, 15)) * 5 + 2) / 6);
                 moby_set_state(object, 7, 0);
                 moby_set_controller_speed_limits(object, 0.0056000003f, 0.14000002f, 0.004886923f, 0.31415933f);
             } else {
-                if (object[0x43] != 10) func_PAL_002A7E68(object, 10, 0, 8);
+                if (object[0x43] != 10) anim_start_blended_pal(object, 10, 0, 8);
                 moby_set_state(object, 12, 1);
                 S(0x270) = ((s32)(math_random_int_range(580, 600)) * 5 + 2) / 6;
             }
@@ -196,18 +196,18 @@ void func_PAL_L04_00453500(u8 *object)
         if (flag_set_second_pending(object))
             moby_set_controller_speed_limits(object, 0.0056000003f, 0.14000002f, 0.0016755164f, 0.12566373f);
         if (I(0x2A4) == 1) {
-            if (object[0x43] != 12) func_PAL_002A7E68(object, 12, 0, 8);
+            if (object[0x43] != 12) anim_start_blended_pal(object, 12, 0, 8);
             moby_set_state(object, 21, 2);
         }
         if (I(0x258) == 1 || I(0x25C) == 1) break;
-        random = math_random_int_below(4);
-        if (random == 0) {
-            if (object[0x43] != 11) func_PAL_002A7E68(object, 11, 0, 8);
-        } else if (random == 1) {
-            if (object[0x43] != 17) func_PAL_002A7E68(object, 17, 0, 17);
-        } else if (random == 2) {
-            if (object[0x43] != 30) func_PAL_002A7E68(object, 30, 0, 17);
-        } else if (object[0x43] != 24) func_PAL_002A7E68(object, 24, 0, 17);
+        random_choice = math_random_int_below(4);
+        if (random_choice == 0) {
+            if (object[0x43] != 11) anim_start_blended_pal(object, 11, 0, 8);
+        } else if (random_choice == 1) {
+            if (object[0x43] != 17) anim_start_blended_pal(object, 17, 0, 17);
+        } else if (random_choice == 2) {
+            if (object[0x43] != 30) anim_start_blended_pal(object, 30, 0, 17);
+        } else if (object[0x43] != 24) anim_start_blended_pal(object, 24, 0, 17);
         moby_set_state(object, 12, 1);
         break;
     case 5:
@@ -233,7 +233,7 @@ void func_PAL_L04_00453500(u8 *object)
             if (P(0x288)) { moby_mark_spawned(P(0x288)); P(0x288) = 0; }
             moby_mark_spawned(P(0x290));
             *(u8 **)(*(u8 **)(P(0x284) + 0x68) + 0x2AC) = 0;
-            if (object[0x43] != 9) func_PAL_002A7E68(object, 9, 0, 0);
+            if (object[0x43] != 9) anim_start_blended_pal(object, 9, 0, 0);
             moby_set_state(object, 3, 6);
         }
         break;
@@ -261,7 +261,7 @@ void func_PAL_L04_00453500(u8 *object)
                 *(u32 *)(object + 0x98) = *(u32 *)(*(u8 **)(object + 0x24) + 0x10);
                 moby_set_state(object, 12, 1);
                 if (S(0x270) < 250) S(0x270) = ((s32)(math_random_int_range(480, 600)) * 5 + 2) / 6;
-                if (object[0x43] != 11) func_PAL_002A7E68(object, 11, 0, 8);
+                if (object[0x43] != 11) anim_start_blended_pal(object, 11, 0, 8);
             } else {
                 SetDeathBits_pal(object, 0, 3); part_queue_moby_for_glow(object, 0, 0); return;
             }
@@ -291,7 +291,7 @@ void func_PAL_L04_00453500(u8 *object)
                 *(u32 *)(object + 0x98) = *(u32 *)(*(u8 **)(object + 0x24) + 0x10);
                 moby_set_state(object, 12, 1);
                 if (S(0x270) < 250) S(0x270) = ((s32)(math_random_int_range(480, 600)) * 5 + 2) / 6;
-                if (object[0x43] != 11) func_PAL_002A7E68(object, 11, 0, 8);
+                if (object[0x43] != 11) anim_start_blended_pal(object, 11, 0, 8);
             } else {
                 SetDeathBits_pal(object, 0, 3); part_queue_moby_for_glow(object, 0, 0); return;
             }
@@ -319,18 +319,18 @@ void func_PAL_L04_00453500(u8 *object)
             math_fast_float_d(state + 0x294);
             animation = object[0x43];
             if ((animation != 13 && animation != 10) || (animation == 10 && I(0x294) != 0)) {
-                if (object[0x43] != 13) func_PAL_002A7E68(object, 13, 0, 12);
+                if (object[0x43] != 13) anim_start_blended_pal(object, 13, 0, 12);
             }
             if (I(0x294) > 17)
                 ApproachValue((float *)(state + 0x124), 0.060000002f, 0.0012f);
             else
                 ApproachValue((float *)(state + 0x124), 0.0f, 0.0012f);
             if (object[0x43] == 13) {
-                if (I(0x294) == 0) func_PAL_002A7E68(object, 10, 0, 10);
+                if (I(0x294) == 0) anim_start_blended_pal(object, 10, 0, 10);
                 enemy_update_wander_heading_pal(object, state + 0x110, state + 0x140);
             } else if (object[0x43] == 10 && (object[0x60] & 2)) {
                 I(0x294) = math_random_int_range(100, 583);
-                if (object[0x43] != 13) func_PAL_002A7E68(object, 13, 0, 10);
+                if (object[0x43] != 13) anim_start_blended_pal(object, 13, 0, 10);
             }
         }
         break;
@@ -345,18 +345,18 @@ void func_PAL_L04_00453500(u8 *object)
             F(0x328) = turn;
         }
         if (I(0x564) == 1 && object[0x42] == 28 && math_random_int_below(200) == 1) {
-            if (object[0x43] != 27) func_PAL_002A7E68(object, 27, 0, 25);
-            if (math_random_int_below(3) == 1 && object[0x43] != 26) func_PAL_002A7E68(object, 26, 0, 25);
+            if (object[0x43] != 27) anim_start_blended_pal(object, 27, 0, 25);
+            if (math_random_int_below(3) == 1 && object[0x43] != 26) anim_start_blended_pal(object, 26, 0, 25);
         }
         if ((u32)(object[0x42] - 26) < 2 && (object[0x60] & 2)) {
-            if (object[0x43] != 29) func_PAL_002A7E68(object, 29, 0, 25);
+            if (object[0x43] != 29) anim_start_blended_pal(object, 29, 0, 25);
             if (*(s16 *)(P(0x56C) + 0xAA) == 0xFF8) {
                 *(int *)(*(u8 **)(P(0x56C) + 0x68) + 0x564) = 1; I(0x564) = 2;
             }
         }
         if (object[0x42] == 29 && (object[0x60] & 2)) {
-            if (object[0x43] != 30) func_PAL_002A7E68(object, 30, 0, 25);
-            if (I(0x564) == 1 && object[0x43] != 28) func_PAL_002A7E68(object, 28, 0, 25);
+            if (object[0x43] != 30) anim_start_blended_pal(object, 30, 0, 25);
+            if (I(0x564) == 1 && object[0x43] != 28) anim_start_blended_pal(object, 28, 0, 25);
             if (I(0x564) == 3) {
                 ids = g_moby_l04_group_lists[object[0x21]];
                 for (;;) {
@@ -370,21 +370,21 @@ void func_PAL_L04_00453500(u8 *object)
                 }
             }
         }
-        if (I(0x564) == 1 && object[0x42] == 30 && object[0x43] != 29) func_PAL_002A7E68(object, 29, 0, 17);
-        if (I(0x564) == 3 && P(0x56C)[0x42] == 29 && object[0x43] != 29) func_PAL_002A7E68(object, 29, 0, 29);
+        if (I(0x564) == 1 && object[0x42] == 30 && object[0x43] != 29) anim_start_blended_pal(object, 29, 0, 17);
+        if (I(0x564) == 3 && P(0x56C)[0x42] == 29 && object[0x43] != 29) anim_start_blended_pal(object, 29, 0, 29);
         break;
     case 6:
         I(0x2A0) = 1;
         if (object[0x60] & 2) {
             moby_set_state(object, 7, -1);
-            if (object[0x43] != 13) func_PAL_002A7E68(object, 13, 0, 25);
+            if (object[0x43] != 13) anim_start_blended_pal(object, 13, 0, 25);
             I(0x2A0) = 0;
         }
         break;
     case 7:
         if (path_follow_nodes_pal((char *)object, (char *)g_route_path_table[I(0x570)])) {
             moby_set_state(object, 9, -1);
-            if (object[0x43] != 24) func_PAL_002A7E68(object, 24, 0, 17);
+            if (object[0x43] != 24) anim_start_blended_pal(object, 24, 0, 17);
         }
         break;
     case 9:
@@ -393,10 +393,10 @@ void func_PAL_L04_00453500(u8 *object)
             if (moby_count_group_not_in_state(object[0x21], -1) > 1) {
                 P(0x56C) = (u8 *)moby_find_linked_object(object);
                 moby_set_state(object, 11, -1);
-                if (object[0x43] != 28) func_PAL_002A7E68(object, 28, 0, 25);
+                if (object[0x43] != 28) anim_start_blended_pal(object, 28, 0, 25);
                 I(0x564) = 1;
                 if (P(0x56C)[0x42] == 28) {
-                    if (object[0x43] != 30) func_PAL_002A7E68(object, 30, 0, 25);
+                    if (object[0x43] != 30) anim_start_blended_pal(object, 30, 0, 25);
                     I(0x564) = 2;
                 }
             }
@@ -414,7 +414,7 @@ void func_PAL_L04_00453500(u8 *object)
         if (F(0x298) > 0.2f) {
             moby_turn_toward_position((struct family_27f9_object *)object, (float *)P(0x240), (float *)(state + 0x28C), 0.001f, 0.01f, 0.1f);
             if (object[0x60] & 2) {
-                if (object[0x43] != 22) func_PAL_002A7E68(object, 22, 0, 17);
+                if (object[0x43] != 22) anim_start_blended_pal(object, 22, 0, 17);
                 moby_set_state(object, 13, -1); U(0x178) |= 0x10;
                 if (I(0x578) != -1) *(Quad *)(state + 0x110) = *(Quad *)(g_route_path_table[I(0x578)] + 0x10);
             }
@@ -426,7 +426,7 @@ void func_PAL_L04_00453500(u8 *object)
         moby_l01_turn_toward_target_pal((char *)object, (char *)(state + 0x110));
         if (vec_distance_xy(object + 0x10, state + 0x110) < 2.0f) {
             I(0x178) &= ~0x10; moby_set_state(object, 14, -1);
-            if (object[0x43] != 24) func_PAL_002A7E68(object, 24, 0, 17);
+            if (object[0x43] != 24) anim_start_blended_pal(object, 24, 0, 17);
             if (I(0x578) != -1) moby_set_state(object, 16, -1);
         }
         break;
@@ -434,18 +434,18 @@ void func_PAL_L04_00453500(u8 *object)
         moby_set_controller_speed_limits(object, 0.0024f, 0.060000002f, 0.005445428f, 0.35604724f);
         if (path_follow_nodes_pal((char *)object, (char *)g_route_path_table[I(0x578)])) {
             moby_set_state(object, 16, -1);
-            if (object[0x43] != 24) func_PAL_002A7E68(object, 24, 0, 17);
+            if (object[0x43] != 24) anim_start_blended_pal(object, 24, 0, 17);
         }
         break;
     case 16:
         if (object[0x60] & 2) {
             route = g_route_path_table[I(0x578)];
-            firstDistance = vec_distance_xy(object + 0x10, route + 0x10);
-            lastDistance = vec_distance_xy(object + 0x10, route + *(int *)route * 16);
-            if (lastDistance < firstDistance) path_set_follower_nodes(object, g_route_path_table[I(0x578)], 0, *(int *)route - 1);
+            first_distance = vec_distance_xy(object + 0x10, route + 0x10);
+            last_distance = vec_distance_xy(object + 0x10, route + *(int *)route * 16);
+            if (last_distance < first_distance) path_set_follower_nodes(object, g_route_path_table[I(0x578)], 0, *(int *)route - 1);
             else path_set_follower_nodes(object, g_route_path_table[I(0x578)], *(int *)route - 1, 0);
             moby_set_state(object, 15, -1);
-            if (object[0x43] != 13) func_PAL_002A7E68(object, 13, 0, 17);
+            if (object[0x43] != 13) anim_start_blended_pal(object, 13, 0, 17);
         }
         break;
     case 21:
@@ -453,13 +453,13 @@ void func_PAL_L04_00453500(u8 *object)
             I(0x2A0) = 1;
             moby_set_controller_speed_limits(object, 0.00080000004f, 0.020000001f, 0.0016755164f, 0.12566373f);
             moby_set_state(object, 20, -1);
-            if (object[0x43] != 22) func_PAL_002A7E68(object, 22, 0, 8);
+            if (object[0x43] != 22) anim_start_blended_pal(object, 22, 0, 8);
             break;
         }
         if (vec_distance_xy(object + 0x10, P(0x240) + 0x10) < 2.5f) {
             angle = mat_fast_helper_a(F(0x230) - OF(0x10), F(0x234) - OF(0x14));
             if (FastDiffRots(OF(0xF8), angle) < 0.3490659f) {
-                if (object[0x43] != 14) func_PAL_002A7E68(object, 14, 0, 8);
+                if (object[0x43] != 14) anim_start_blended_pal(object, 14, 0, 8);
                 moby_set_controller_speed_limits(object, 0.0056000003f, 0.14000002f, 0.0016755164f, 0.12566373f);
                 moby_set_state(object, 23, 2);
                 break;
@@ -471,17 +471,17 @@ void func_PAL_L04_00453500(u8 *object)
             break;
         }
         if (I(0x548) != 0) {
-            if (func_PAL_L04_00456890(object, state + 0x230, OF(0xF8), 7.0f, 0.25f, F(0x2A8)) &&
+            if (enemy_walk_toward_target_pal(object, state + 0x230, OF(0xF8), 7.0f, 0.25f, F(0x2A8)) &&
                 object[0x21] <= g_tribesman_group_limit && moby_count_group_not_in_state(object[0x21], -1) > 1) {
                 u16 *list = g_moby_l04_group_lists[object[0x21]];
                 do {
                     other = *(u8 **)(g_moby_l04_pool + ((*list & 0x7FFF) << 8) + 0x68);
                     if (*(int *)(other + 0x2A4) == 0) {
-                        firstDistance = vec_distance_xy(object + 0x10, P(0x240) + 0x10);
-                        lastDistance = vec_distance_xy(object + 0x10, P(0x240) + 0x10);
-                        if (firstDistance < lastDistance && *(float *)(other + 0x20) > 0.0f) {
+                        first_distance = vec_distance_xy(object + 0x10, P(0x240) + 0x10);
+                        last_distance = vec_distance_xy(object + 0x10, P(0x240) + 0x10);
+                        if (first_distance < last_distance && *(float *)(other + 0x20) > 0.0f) {
                             *(int *)(other + 0x2A4) = 1; I(0x2A4) = 0;
-                            if (object[0x43] != 11) func_PAL_002A7E68(object, 11, 0, 8);
+                            if (object[0x43] != 11) anim_start_blended_pal(object, 11, 0, 8);
                             moby_set_state(object, 17, 3);
                         }
                         break;
@@ -498,15 +498,15 @@ void func_PAL_L04_00453500(u8 *object)
             distance = vec_distance_xy(object + 0x10, P(0x240) + 0x10);
             if (distance < 12.0f) {
                 I(0x2A0) = 1;
-                if (object[0x43] != 20) func_PAL_002A7E68(object, 20, 0, 8);
+                if (object[0x43] != 20) anim_start_blended_pal(object, 20, 0, 8);
                 moby_set_state(object, 18, -1);
             } else {
                 I(0x2A0) = 1;
-                if (object[0x43] != 12) func_PAL_002A7E68(object, 12, 0, 8);
+                if (object[0x43] != 12) anim_start_blended_pal(object, 12, 0, 8);
                 moby_set_state(object, 19, 3);
             }
             if (I(0x2A4) != 0) {
-                if (object[0x43] != 12) func_PAL_002A7E68(object, 12, 0, 8);
+                if (object[0x43] != 12) anim_start_blended_pal(object, 12, 0, 8);
                 moby_set_state(object, 21, 2);
             }
         }
@@ -514,30 +514,30 @@ void func_PAL_L04_00453500(u8 *object)
     case 18:
         moby_turn_toward_position((struct family_27f9_object *)object, (float *)P(0x240), (float *)(state + 0x28C), 0.001f, 0.01f, 0.1f);
         if (vec_distance_xy(object + 0x10, P(0x240) + 0x10) > 12.0f && math_random_int_below(10) == 1) {
-            if (object[0x43] != 12) func_PAL_002A7E68(object, 12, 0, 8);
+            if (object[0x43] != 12) anim_start_blended_pal(object, 12, 0, 8);
             moby_set_state(object, 19, -1);
         }
         if (vec_distance_xy(object + 0x10, P(0x240) + 0x10) < 2.5f) {
-            if (object[0x43] != 14) func_PAL_002A7E68(object, 14, 0, 8);
+            if (object[0x43] != 14) anim_start_blended_pal(object, 14, 0, 8);
             moby_set_state(object, 23, -1);
         }
         if (math_random_int_below(3) == 1 && (object[0x60] & 2)) {
-            if (object[0x43] != 25) func_PAL_002A7E68(object, 25, 0, 8);
-            if (math_random_int_below(3) == 1 && object[0x43] != 24) func_PAL_002A7E68(object, 24, 0, 8);
+            if (object[0x43] != 25) anim_start_blended_pal(object, 25, 0, 8);
+            if (math_random_int_below(3) == 1 && object[0x43] != 24) anim_start_blended_pal(object, 24, 0, 8);
             moby_set_state(object, 17, 3);
         }
         break;
     case 19:
         if (I(0x548) != 0) {
-            if (func_PAL_L04_00456890(object, state + 0x230, OF(0xF8), 7.0f, 0.25f, F(0x2A8))) {
-                if (object[0x43] != 20) func_PAL_002A7E68(object, 20, 0, 8);
+            if (enemy_walk_toward_target_pal(object, state + 0x230, OF(0xF8), 7.0f, 0.25f, F(0x2A8))) {
+                if (object[0x43] != 20) anim_start_blended_pal(object, 20, 0, 8);
                 moby_set_state(object, 18, -1);
             }
         } else {
             moby_turn_toward_target_and_step_pal((char *)object, (float *)(state + 0x230), F(0x2A8));
         }
         if (vec_distance_xy(object + 0x10, P(0x240) + 0x10) < 8.0f) {
-            if (object[0x43] != 20) func_PAL_002A7E68(object, 20, 0, 8);
+            if (object[0x43] != 20) anim_start_blended_pal(object, 20, 0, 8);
             moby_set_state(object, 18, -1);
         }
         break;
@@ -546,7 +546,7 @@ void func_PAL_L04_00453500(u8 *object)
         if (distance < 2.5f) {
             angle = mat_fast_helper_a(F(0x230) - OF(0x10), F(0x234) - OF(0x14));
             if (FastDiffRots(OF(0xF8), angle) < 0.3490659f) {
-                if (object[0x43] != 14) func_PAL_002A7E68(object, 14, 0, 5);
+                if (object[0x43] != 14) anim_start_blended_pal(object, 14, 0, 5);
                 moby_set_controller_speed_limits(object, 0.0056000003f, 0.14000002f, 0.0016755164f, 0.12566373f);
                 moby_set_state(object, 23, 2);
                 break;
@@ -568,21 +568,21 @@ void func_PAL_L04_00453500(u8 *object)
     case 22:
         F(0x174) = 1.5f;
         if (vec_distance_xy(object + 0x10, P(0x240) + 0x10) < 2.5f) {
-            if (object[0x43] != 14) func_PAL_002A7E68(object, 14, 0, 2);
+            if (object[0x43] != 14) anim_start_blended_pal(object, 14, 0, 2);
             moby_set_state(object, 23, -1); I(0x29C) = -1; F(0x164) = 0.0012f;
         } else {
             F(0x164) = 0.006f;
             if (path_follow_nodes_pal((char *)object, (char *)g_route_path_table[I(0x29C)])) {
                 if (I(0x2A4) == 1) {
-                    if (object[0x43] != 12) func_PAL_002A7E68(object, 12, 0, 8);
+                    if (object[0x43] != 12) anim_start_blended_pal(object, 12, 0, 8);
                     moby_set_state(object, 21, 2);
                 } else {
                     I(0x2A0) = 1;
                     if (math_random_int_below(3) == 1) {
-                        if (object[0x43] != 11) func_PAL_002A7E68(object, 11, 0, 8);
+                        if (object[0x43] != 11) anim_start_blended_pal(object, 11, 0, 8);
                         moby_set_state(object, 17, 3);
                     } else {
-                        if (object[0x43] != 12) func_PAL_002A7E68(object, 12, 0, 8);
+                        if (object[0x43] != 12) anim_start_blended_pal(object, 12, 0, 8);
                         moby_set_state(object, 19, 3);
                     }
                 }
@@ -609,15 +609,15 @@ void func_PAL_L04_00453500(u8 *object)
         } else OF(0x48) = 1.0f;
         if (object[0x60] & 2) {
             if (F(0x20) > 1.0f) {
-                if (object[0x43] != 31) func_PAL_002A7E68(object, 31, 0, 8);
+                if (object[0x43] != 31) anim_start_blended_pal(object, 31, 0, 8);
                 moby_set_state(object, 24, -1);
             } else {
-                if (object[0x43] != 31) func_PAL_002A7E68(object, 31, 0, 8);
+                if (object[0x43] != 31) anim_start_blended_pal(object, 31, 0, 8);
                 moby_set_state(object, 24, -1);
             }
             if (object[0x95] != 2) {
                 moby_set_state(object, 18, -1);
-                if (object[0x43] != 20) func_PAL_002A7E68(object, 20, 0, 8);
+                if (object[0x43] != 20) anim_start_blended_pal(object, 20, 0, 8);
             }
         }
         break;
@@ -625,16 +625,16 @@ void func_PAL_L04_00453500(u8 *object)
         if (object[0x60] & 2) {
             if (vec_distance_xy(object + 0x10, P(0x240) + 0x10) < 2.5f) {
             return_to_follow:
-                if (object[0x43] != 12) func_PAL_002A7E68(object, 12, 0, 8);
+                if (object[0x43] != 12) anim_start_blended_pal(object, 12, 0, 8);
                 moby_set_state(object, 21, -1);
             } else {
-                if (object[0x43] != 12) func_PAL_002A7E68(object, 12, 0, 8);
+                if (object[0x43] != 12) anim_start_blended_pal(object, 12, 0, 8);
                 moby_set_state(object, 21, -1);
             }
         }
         break;
     }
-    func_PAL_L04_00456B58((char *)object);
-    if (math_fabs(OF(0x18) - oldHeight) < 0.005f) OF(0x18) = oldHeight;
+    enemy_tick_timers_blend_pal((char *)object);
+    if (math_fabs(OF(0x18) - old_height) < 0.005f) OF(0x18) = old_height;
     return;
 }

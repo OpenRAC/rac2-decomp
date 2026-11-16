@@ -10,6 +10,7 @@ extern int func_0029C560(int);
 extern char *tab_menu_get_selected_entry(void *);
 extern void menu_start_action(int);
 
+/* Menu input handler: on confirm, sends the selected entry as a menu action, with the refuse sound when it has no value. */
 int menu_handle_input_send_selection_or_refuse_us2(void)
 {
     struct { short reserved; unsigned short key; int value; } message;
@@ -76,7 +77,8 @@ extern char g_extras_unlock_entry_a[], g_extras_unlock_entry_b[], g_extras_unloc
 extern void tab_menu_set_tables_us2(char *, char *, char *, char *);
 extern void tab_menu_switch_tab_us2(char *, int);
 
-int func_US2_002D02A0(void)
+/* Works out which extras are unlocked (all items owned, all movies seen), fills the third tab table to match and shows its tab. */
+int menu_update_extras_unlocks_us2(void)
 {
     int i, j;
 

@@ -42,7 +42,7 @@ extern void multiply_matrix3x3(void *, void *, void *);
    third row (+0xE0) follows the mean normal of the kept points and eases
    the position (+0x10) toward their centre along D_L00_001B2C00. Without any
    hit it sets state 4 and a velocity along the first row. */
-void func_PAL_L00_00405F98(char *object)
+void align_vehicle_to_ground_probes_pal(char *object)
 {
     float (*probes)[4] = g_spider_ground_probe_offsets;
     float edges[8][4];

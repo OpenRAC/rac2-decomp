@@ -72,6 +72,7 @@ after_first:
 
 extern int grid_menu_get_selected_text_id(void *);
 
+/* Hands the object the text pointer of the selected grid menu entry. */
 int menu_set_object_panel_pointer_us2(char *object) {
     if (g_resident_data_base[0] != 0)
         *(void **)(object + 0x34) = grid_menu_get_selected_text_id(g_resident_data_base[0] + 0x3A000);

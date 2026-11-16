@@ -29,50 +29,51 @@ extern int snd_is_voice_playing_for_owner(void *, int);
 extern int snd_play_from_class_bank(int, int, void *, int);
 extern void snd_stop_voice(int);
 
+/* Moves a moby along a numbered path one point at a time, turning and tilting it, and plays a hum while it moves. Returns 1 when it reaches the end. */
 int moby_move_along_path_pal(char *moby, int path, int *sound)
 {
     L06Vector target, delta;
     float height;
     char **route = &g_path_list[path];
-    char *st = *(char **)(moby + 0x68);
+    char *vars = *(char **)(moby + 0x68);
     int done = 0;
     float limit, angle;
     int handle;
     u8 *slot;
     float *yaw;
-    int point = *(int *)(st + 0x64);
+    int point = *(int *)(vars + 0x64);
     char *node = *route;
     height = 0;
     qcopy(&target, node + point * 16 + 0x10);
-    *(float *)(st + 0x108) = target.f[2];
-    *(float *)(st + 0xEC) = 0;
-    *(float *)(st + 0xE8) = 0;
+    *(float *)(vars + 0x108) = target.f[2];
+    *(float *)(vars + 0xEC) = 0;
+    *(float *)(vars + 0xE8) = 0;
     FastVecSub(&delta, &target, moby + 0x10);
     if (FastVecLength(&delta) < g_path_wait_seconds * (0.020000001f) * 2.0f) {
-        ++*(int *)(st + 0x64);
-        done = *(int *)(st + 0x64) == *(int *)*route;
+        ++*(int *)(vars + 0x64);
+        done = *(int *)(vars + 0x64) == *(int *)*route;
     }
     limit = fast_vec_dist(moby + 0x10, *route + *(int *)*route * 16);
-    math_step_value_toward_target(&height, st + 0x60, limit,
+    math_step_value_toward_target(&height, vars + 0x60, limit,
         g_path_speed_scale * 0.00040000002f,
         g_path_speed_scale * 0.00040000002f,
         g_path_wait_seconds * (0.020000001f));
-    vec_scale_to_length(&delta, &delta, *(float *)(st + 0x60));
+    vec_scale_to_length(&delta, &delta, *(float *)(vars + 0x60));
     FastVecAdd(moby + 0x10, &delta, moby + 0x10);
     angle = -mat_fast_helper_a(vec_length_xy(&delta), delta.f[2]);
     if (angle > 0.2617994248867035f) angle = 0.2617994248867035f;
     else if (angle < -0.2617994248867035f) angle = -0.2617994248867035f;
     yaw = (float *)(moby + 0xF8);
-    math_approach_target_with_direction_mode(moby + 0xF4, st + 0x6C, 0, angle,
+    math_approach_target_with_direction_mode(moby + 0xF4, vars + 0x6C, 0, angle,
         g_path_turn_rate * 6.981318e-06f,
         g_path_turn_rate * 6.981318e-06f, 0.25132746f);
     angle = mat_fast_helper_a(target.f[0] - *(float *)(moby + 0x10), target.f[1] - *(float *)(moby + 0x14));
-    math_approach_target_with_direction_mode(yaw, st + 0x68, 0, angle,
+    math_approach_target_with_direction_mode(yaw, vars + 0x68, 0, angle,
         g_path_pitch_rate * 6.981318e-06f,
         g_path_pitch_rate * 6.981318e-06f,
         g_path_yaw_rate * 0.0003490659f);
-    math_approach_target_with_direction_mode(moby + 0xF0, st + 0x70, 0,
-        *(float *)(st + 0x68) * *(float *)(st + 0x60) * g_path_speed_factor,
+    math_approach_target_with_direction_mode(moby + 0xF0, vars + 0x70, 0,
+        *(float *)(vars + 0x68) * *(float *)(vars + 0x60) * g_path_speed_factor,
         g_path_roll_rate * 6.981318e-06f,
         g_path_roll_rate * 6.981318e-06f, 0.25132746f);
     if (!done) {

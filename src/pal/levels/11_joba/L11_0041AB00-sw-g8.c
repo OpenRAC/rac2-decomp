@@ -14,90 +14,92 @@ extern void mat_combine_and_store(void *, void *, void *, void *);
 extern s32 PlayMobySound(s32, s32, u8 *);
 extern void snd_stop_voice(s32);
 
-void func_PAL_L11_0041B2E8(u8 *arg0) {
-    f32 tmp[4] __attribute__((aligned(16)));
-    u8 *base = g_moby_l11_table;
-    u8 *entity = arg0;
-    u8 *state = *(u8 **)(entity + 0x68);
-    u8 *target = base + *(s32 *)(state + 0x68) * 256;
-    switch (*(u8 *)(entity + 0x20)) {
+/* Waits for its trigger object to become active, then bobs the object out and back in a smooth
+   wave with a sound, and repeats (PAL: 50 Hz step sizes). */
+void pulsing_platform_linked_update_pal(u8 *moby) {
+    f32 offset[4] __attribute__((aligned(16)));
+    u8 *moby_table = g_moby_l11_table;
+    u8 *platform = moby;
+    u8 *state = *(u8 **)(platform + 0x68);
+    u8 *target = moby_table + *(s32 *)(state + 0x68) * 256;
+    switch (*(u8 *)(platform + 0x20)) {
     case 0:
         *(u32 *)(state + 0x5C) |= 4;
-        *(u8 *)(entity + 0x20) = 1;
+        *(u8 *)(platform + 0x20) = 1;
         *(f32 *)(state + 0x6C) = 3.1415927410125732f;
         *(s32 *)(state + 0x70) = 0;
         g_pulsing_platform_linked_counter = 0;
-        qcopy(state + 0x80, entity + 0x10);
+        qcopy(state + 0x80, platform + 0x10);
         /* fall through */
     case 1: {
-        u8 *entry;
+        u8 *sound_slot;
         if (*(s32 *)(state + 0x60) && *(u8 *)(target + 0x20) == 2) {
-            entry = (u8 *)(*(s32 *)(state + 0x74) * 0x70 + (s32)g_sound_state);
-            if (*(u8 **)(entry + 0x88) == entity) {
-                if (!*(u8 *)(entry + 0x74))
-                    *(s32 *)(state + 0x74) = PlayMobySound(0, 4, entity);
+            sound_slot = (u8 *)(*(s32 *)(state + 0x74) * 0x70 + (s32)g_sound_state);
+            if (*(u8 **)(sound_slot + 0x88) == platform) {
+                if (!*(u8 *)(sound_slot + 0x74))
+                    *(s32 *)(state + 0x74) = PlayMobySound(0, 4, platform);
             } else {
-                *(s32 *)(state + 0x74) = PlayMobySound(0, 4, entity);
+                *(s32 *)(state + 0x74) = PlayMobySound(0, 4, platform);
             }
-            *(u8 *)(entity + 0x20) = 2;
+            *(u8 *)(platform + 0x20) = 2;
             *(f32 *)(state + 0x6C) = 3.1415927410125732f;
             *(s32 *)(state + 0x70) = 0;
         }
         break;
     }
     case 2: {
-        u8 *entry;
+        u8 *sound_slot;
         *(f32 *)(state + 0x70) += 0.062831864f;
         *(f32 *)(state + 0x6C) = FastAddRotations(*(f32 *)(state + 0x6C), 0.062831864f);
         if (*(f32 *)(state + 0x70) >= 3.1415927410125732f) {
             if (*(s32 *)(state + 0x74) != -1) {
-                entry = (u8 *)(*(s32 *)(state + 0x74) * 0x70 + (s32)g_sound_state);
-                if (*(u8 **)(entry + 0x88) == entity && *(u8 *)(entry + 0x74))
+                sound_slot = (u8 *)(*(s32 *)(state + 0x74) * 0x70 + (s32)g_sound_state);
+                if (*(u8 **)(sound_slot + 0x88) == platform && *(u8 *)(sound_slot + 0x74))
                     snd_stop_voice(*(s32 *)(state + 0x74));
             }
             *(s32 *)(state + 0x74) = -1;
-            *(u8 *)(entity + 0x20) = 3;
+            *(u8 *)(platform + 0x20) = 3;
         } else {
-            vec_scale_to_length(tmp, entity + 0xD0, -(math_fast_sin_or_cos_a(*(f32 *)(state + 0x6C)) + 1.0f) * 4.0f);
-            FastVecAdd(entity + 0x10, tmp, state + 0x80);
+            vec_scale_to_length(offset, platform + 0xD0, -(math_fast_sin_or_cos_a(*(f32 *)(state + 0x6C)) + 1.0f) * 4.0f);
+            FastVecAdd(platform + 0x10, offset, state + 0x80);
         }
         break;
     }
     case 3: {
-        u8 *entry;
+        u8 *sound_slot;
         if (*(u8 *)(target + 0x20) != 2) {
-            entry = (u8 *)(*(s32 *)(state + 0x74) * 0x70 + (s32)g_sound_state);
-            if (*(u8 **)(entry + 0x88) == entity) {
-                if (!*(u8 *)(entry + 0x74))
-                    *(s32 *)(state + 0x74) = PlayMobySound(0, 4, entity);
+            sound_slot = (u8 *)(*(s32 *)(state + 0x74) * 0x70 + (s32)g_sound_state);
+            if (*(u8 **)(sound_slot + 0x88) == platform) {
+                if (!*(u8 *)(sound_slot + 0x74))
+                    *(s32 *)(state + 0x74) = PlayMobySound(0, 4, platform);
             } else {
-                *(s32 *)(state + 0x74) = PlayMobySound(0, 4, entity);
+                *(s32 *)(state + 0x74) = PlayMobySound(0, 4, platform);
             }
-            *(u8 *)(entity + 0x20) = 4;
+            *(u8 *)(platform + 0x20) = 4;
         }
         break;
     }
     case 4: {
-        u8 *entry;
+        u8 *sound_slot;
         *(f32 *)(state + 0x70) += 0.062831864f;
         *(f32 *)(state + 0x6C) = FastAddRotations(*(f32 *)(state + 0x6C), 0.062831864f);
         if (*(f32 *)(state + 0x70) >= 6.2831854820251465f) {
             if (*(s32 *)(state + 0x74) != -1) {
-                entry = (u8 *)(*(s32 *)(state + 0x74) * 0x70 + (s32)g_sound_state);
-                if (*(u8 **)(entry + 0x88) == entity && *(u8 *)(entry + 0x74))
+                sound_slot = (u8 *)(*(s32 *)(state + 0x74) * 0x70 + (s32)g_sound_state);
+                if (*(u8 **)(sound_slot + 0x88) == platform && *(u8 *)(sound_slot + 0x74))
                     snd_stop_voice(*(s32 *)(state + 0x74));
             }
             *(s32 *)(state + 0x74) = -1;
-            *(u8 *)(entity + 0x20) = 1;
+            *(u8 *)(platform + 0x20) = 1;
             *(f32 *)(state + 0x6C) = 3.1415927410125732f;
             *(s32 *)(state + 0x70) = 0;
-            qcopy(entity + 0x10, state + 0x80);
+            qcopy(platform + 0x10, state + 0x80);
         } else {
-            vec_scale_to_length(tmp, entity + 0xD0, -(math_fast_sin_or_cos_a(*(f32 *)(state + 0x6C)) + 1.0f) * 4.0f);
-            FastVecAdd(entity + 0x10, tmp, state + 0x80);
+            vec_scale_to_length(offset, platform + 0xD0, -(math_fast_sin_or_cos_a(*(f32 *)(state + 0x6C)) + 1.0f) * 4.0f);
+            FastVecAdd(platform + 0x10, offset, state + 0x80);
         }
         break;
     }
     }
-    mat_combine_and_store(state + 0x20, &g_identity_l11_matrix, entity + 0xF0, entity + 0xF0);
+    mat_combine_and_store(state + 0x20, &g_identity_l11_matrix, platform + 0xF0, platform + 0xF0);
 }

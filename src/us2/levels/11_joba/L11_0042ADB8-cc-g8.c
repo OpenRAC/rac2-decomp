@@ -47,10 +47,10 @@ extern void gfx_start_color_fade(void *, void *);
 extern void MarkGroupClassCF5CF6Members(void *);
 extern s32 moby_count_group_not_in_state(s32, s32);
 extern s32 hero_check_distance_zones(void *, void *, s32, s32, f32, f32, s32);
-extern void func_US2_002A7AA8(void *, s32, s32);
+extern void SetDeathBits_us2(void *, s32, s32);
 
 /* Initializes linked objects, updates damage, and releases children on removal. */
-s32 func_US2_L11_0042ADB8(u8 *object) {
+s32 jobian_lieutenant_update_us2(u8 *object) {
     f32 vectors[16];
     s32 damage;
     u8 *data = *(u8 **)(object + 0x68);
@@ -278,7 +278,7 @@ s32 func_US2_L11_0042ADB8(u8 *object) {
     }
     if (*(f32 *)(object + 0x18) < 61.0f && g_arena_progress_level >= 6) {
         moby_mark_spawned(*(void **)(data + 0x278));
-        func_US2_002A7AA8(object, 0, 3);
+        SetDeathBits_us2(object, 0, 3);
         if (g_tribe_group_limit >= object[0x21] && moby_count_group_not_in_state(object[0x21], -1) >= 2) {
             u16 *deathIds = g_group_id_lists[object[0x21]];
             do {

@@ -6,7 +6,8 @@ extern float FastAddRotations(float, float);
 extern int FastDecTimer(short *);
 extern void moby_mark_spawned(void *);
 
-void func_PAL_L00_00390440(char *object)
+/* Shrinks, spins and fades the object over its life, then removes it (PAL: 50 Hz spin step). */
+void debris_update_shrinking_spinning_pal(char *object)
 {
     char *data = *(char **)(object + 0x68);
     float step = 0.062831864f;

@@ -41,7 +41,7 @@ extern MotionSettings_L13 g_warp_ring_motion_settings __attribute__((sda));
 extern int g_arena_state_flag;
 extern int g_current_level_set __attribute__((sda));
 extern int g_level_toggle_flag __attribute__((sda));
-extern void func_PAL_L13_00420888(Ring_L13 *);
+extern void warp_ring_show_message_pal(Ring_L13 *);
 extern int PlayMobySound(int, int, Ring_L13 *);
 extern void hero_start_target_state(float *, int, float);
 extern int coll_sweep_from_object(void *, void *, int, int, int, int, float, float, float);
@@ -53,7 +53,9 @@ extern void gfx_add_draw_callback_first(void (*)(void *), void *);
 extern float ApproachValue(float *, float, float);
 extern float math_step_value_toward_target(float *, float *, float, float, float, float);
 
-void func_PAL_L13_00420460(Ring_L13 *object)
+/* Updates a warp ring: while the hero stands on it and presses the button, takes the hero
+ * to the linked ring (PAL: 50 Hz rates). */
+void warp_ring_update_pal(Ring_L13 *object)
 {
     float position[4] __attribute__((aligned(16)));
     RingState_L13 *state = object->state;
@@ -79,7 +81,7 @@ void func_PAL_L13_00420460(Ring_L13 *object)
             return;
         if (g_hero_state.target != object || g_hero_state.busy != 0)
             return;
-        func_PAL_L13_00420888(object);
+        warp_ring_show_message_pal(object);
         if (!(g_pad_held_flags[0] & 0x10))
             return;
         if (g_warp_ring_state == 11) {

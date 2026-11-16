@@ -35,7 +35,7 @@ extern void gfx_draw_billboard_quad(void *, int, unsigned int, int, float, float
  * visible object. Each bound of the first vertex loop is built in two steps beside its test:
  * loop.c moves such a pair out of the loop after the copy of offsetAddress, while a single load
  * would stay ahead of that copy. */
-void func_PAL_L02_003EC4E8(char *actor) {
+void DrawRotatingObjectGroupEffects_pal(char *moby) {
     float matrices[32][16] __attribute__((aligned(16)));
     float rotation[16] __attribute__((aligned(16)));
     unsigned int visible[32];
@@ -48,10 +48,10 @@ void func_PAL_L02_003EC4E8(char *actor) {
     unsigned short *entry;
     unsigned short id;
     float frame;
-    int count = 0, i = 0, layer, pass, nextLayer, nextPass;
-    int uvIndex;
+    int count = 0, i = 0, layer, pass, next_layer, next_pass;
+    int uv_index;
     int draw;
-    float *offsetAddress;
+    float *offset_address;
     unsigned int color;
     *(Quad *)probe = 0;
     probe[0] = 30.0f;
@@ -61,7 +61,7 @@ void func_PAL_L02_003EC4E8(char *actor) {
     point[0] = (frame * 0.0016666667f + frame * 0.0016666667f) * 3.1415927f - 3.1415927f;
     *(Quad *)angles = *(Quad *)point;
     euler_to_matrix(rotation, angles);
-    entry = g_entity_group_lists[*(unsigned char *)(actor + 0x21)];
+    entry = g_entity_group_lists[*(unsigned char *)(moby + 0x21)];
     while (count < 32) {
         char *object;
         id = *entry;
@@ -88,11 +88,11 @@ void func_PAL_L02_003EC4E8(char *actor) {
         matrix_mul_vec3(packet[i].vertex[3], packet[i].vertex[3], tilt);
     }
     multiply_matrix3x3(doubled, tilt, tilt);
-    for (pass = 0; pass < 16; pass = nextPass) {
+    for (pass = 0; pass < 16; pass = next_pass) {
         int pair = (pass & 1) ? 2 : 0;
-        nextPass = pass + 1;
-        for (layer = 0; layer < 1; layer = nextLayer) {
-            nextLayer = layer + 1;
+        next_pass = pass + 1;
+        for (layer = 0; layer < 1; layer = next_layer) {
+            next_layer = layer + 1;
             matrix_mul_vec3(packet[layer].vertex[pair], packet[layer].vertex[pair], doubled);
             matrix_mul_vec3(packet[layer].vertex[pair + 1], packet[layer].vertex[pair + 1], doubled);
             for (draw = 0; draw < count; draw++) {
@@ -101,42 +101,42 @@ void func_PAL_L02_003EC4E8(char *actor) {
         }
     }
     packet[0].state[1] = GetEffectTextureDescriptor(g_quad_l02_packet_texture_id);
-    for (uvIndex = 0; uvIndex < 4; uvIndex++) {
-        packet[0].uv[uvIndex][0] = D_L02_001B0B48_gp[uvIndex][0];
-        packet[0].uv[uvIndex][1] = g_quad_packet_uv_table[uvIndex][1];
-        packet[0].color[uvIndex] = g_quad_packet_color_pair[uvIndex & 1];
+    for (uv_index = 0; uv_index < 4; uv_index++) {
+        packet[0].uv[uv_index][0] = D_L02_001B0B48_gp[uv_index][0];
+        packet[0].uv[uv_index][1] = g_quad_packet_uv_table[uv_index][1];
+        packet[0].color[uv_index] = g_quad_packet_color_pair[uv_index & 1];
     }
     set_identity_matrix(identity);
     {
-    int objectIndex;
-    for (objectIndex = 0; objectIndex < count; objectIndex++) {
+    int object_index;
+    for (object_index = 0; object_index < count; object_index++) {
         int vertex;
         float *geometry;
-        if (!visible[objectIndex]) continue;
-        FastVecSub(point, g_camera_l02_position, matrices[objectIndex] + 12);
-        FastVecCross(normal, matrices[objectIndex], point);
+        if (!visible[object_index]) continue;
+        FastVecSub(point, g_camera_l02_position, matrices[object_index] + 12);
+        FastVecCross(normal, matrices[object_index], point);
         normal[3] = 1.0f;
-        qcopy(identity + 12, matrices[objectIndex] + 12);
+        qcopy(identity + 12, matrices[object_index] + 12);
         geometry = (float *)D_L02_001B0AB0_gp;
         {
-            float *g = geometry;
-            float (*v)[4] = packet[0].vertex;
-            float (*lowerEnd)[4], (*allEnd)[4];
+            float *geometry_ptr = geometry;
+            float (*vertex_ptr)[4] = packet[0].vertex;
+            float (*lower_end)[4], (*all_end)[4];
             do {
-                float extent = g[2];
-                offsetAddress = offset;
-                lowerEnd = g_quad_packet_extents;
-                lowerEnd += 2;
-                if ((int)g < (int)lowerEnd) extent += g_quad_packet_extent_step;
+                float extent = geometry_ptr[2];
+                offset_address = offset;
+                lower_end = g_quad_packet_extents;
+                lower_end += 2;
+                if ((int)geometry_ptr < (int)lower_end) extent += g_quad_packet_extent_step;
                 else extent -= g_quad_packet_extent_step;
-                vec_scale_to_length(*v, normal, extent);
-                vec_scale_to_length(offset, matrices[objectIndex], g[0]);
-                g += 4;
-                FastVecAdd(*v, *v, offset);
-                v++;
-                allEnd = g_quad_packet_extents;
-                allEnd += 4;
-            } while ((int)g < (int)allEnd);
+                vec_scale_to_length(*vertex_ptr, normal, extent);
+                vec_scale_to_length(offset, matrices[object_index], geometry_ptr[0]);
+                geometry_ptr += 4;
+                FastVecAdd(*vertex_ptr, *vertex_ptr, offset);
+                vertex_ptr++;
+                all_end = g_quad_packet_extents;
+                all_end += 4;
+            } while ((int)geometry_ptr < (int)all_end);
         }
         draw_world_quad(packet, identity, 0);
         for (vertex = 0; vertex < 4; vertex++) {
@@ -150,7 +150,7 @@ void func_PAL_L02_003EC4E8(char *actor) {
         *(Quad *)offset = 0;
         offset[0] = 2.666f;
         offset[3] = 1.0f;
-        transform_vector(offset, offsetAddress, matrices[objectIndex]);
+        transform_vector(offset, offset_address, matrices[object_index]);
         frame = math_random_float_range(0.0f, 1.0f);
         color = FastTweenColor(D_L02_001B0A98_gp, g_quad_packet_colors[1], frame);
         frame = math_random_angle();

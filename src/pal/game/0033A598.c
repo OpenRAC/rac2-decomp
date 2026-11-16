@@ -1,6 +1,8 @@
 #include "include_asm.h"
+#include "names.h"
 
-float func_PAL_0033A598(void *object, int mode)
+/* Returns the text scale for a text panel mode: 0.7, 0.8 or 1.0 (PAL only). */
+float text_panel_mode_scale_pal(void *object, int mode)
 {
     switch (mode) {
     case 0:

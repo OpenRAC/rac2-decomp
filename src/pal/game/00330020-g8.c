@@ -21,7 +21,8 @@ extern int g_cam_zoom_effect_target __attribute__((sda));
 extern float ref_L00_0032E4F0_04;
 extern void UpdateViewContext(void);
 
-void func_PAL_00330020(float size)
+/* Starts the camera zoom effect, scaled by size (PAL: 50 Hz duration). */
+void cam_set_zoom_effect_pal(float size)
 {
     Ref_L00_0032E4F0_Block *block;
     float zoom;

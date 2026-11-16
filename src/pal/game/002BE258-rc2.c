@@ -43,6 +43,7 @@ extern f32 mat_get_product_element(f32 *, s8 *, f32 *, s32);
 extern s32 FastDecTimer(s8 *);
 extern void part_kill(Obj *);
 
+/* Updates a particle that bounces around a joint and fades in and out, dying when it passes behind the joint's plane (PAL: 50 Hz timings). */
 void part_update_bouncing_fade_pal(Obj *o)
 {
     Sub *s = &o->sub;

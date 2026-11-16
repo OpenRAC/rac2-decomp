@@ -37,7 +37,7 @@ extern unsigned char *g_part_tex_burst_ember_table;
 
 /* Spawns a debris particle at position: modes 0 and 1 sit still for life frames,
    mode 2 flies off at a random speed and direction for life1 frames. */
-Particle_002C2A88 *func_PAL_002C3798(TI128 *position, unsigned char mode, unsigned char life,
+Particle_002C2A88 *part_spawn_debris_pal(TI128 *position, unsigned char mode, unsigned char life,
                                  unsigned char arg3, unsigned char arg4, unsigned char life1, int arg6,
                                  float arg7, float speed)
 {

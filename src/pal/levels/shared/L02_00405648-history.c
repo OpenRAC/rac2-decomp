@@ -25,10 +25,12 @@ extern void QueueMobyImpact(void *, void *);
 extern char *moby_get_private_value_0(void *);
 extern void moby_forward_position_call(void *, void *, int);
 extern void moby_update_effect_by_class_pal(char *);
-extern void func_PAL_L02_00405D00(void *);
+extern void spawn_actor_puff_pal(void *);
 extern void part_spawn_trail_at_owner(void *);
 extern char *g_hit_l02_result;
 
+/* Updates a projectile: flies it forward, plays its sound, hits what it touches, spawns trail puffs and
+   removes itself at the map edge (PAL: 50 Hz timings). */
 void projectile_l02_update_pal(unsigned char *obj)
 {
     float old[4] __attribute__((aligned(16)));
@@ -39,7 +41,7 @@ void projectile_l02_update_pal(unsigned char *obj)
     float step[4] __attribute__((aligned(16)));
     char packet[48] __attribute__((aligned(16)));
     float impact[4] __attribute__((aligned(16)));
-    unsigned char *d = *(unsigned char **)(obj + 0x68);
+    unsigned char *vars = *(unsigned char **)(obj + 0x68);
     char *hit, *info;
     int i;
 
@@ -51,44 +53,44 @@ void projectile_l02_update_pal(unsigned char *obj)
         int random;
         moby_set_state(obj, 1, -1);
         random = func_001163B0();
-        *(int *)(d + 0x60) = 0;
-        *(int *)(d + 0x7c) = -1;
-        d[0x74] = random & 1;
-        *(float *)(obj + 0xf8) = mat_fast_helper_a(*(float *)d, *(float *)(d + 4));
-        *(float *)(obj + 0xf4) = -mat_fast_helper_a(vec_length_xy(d), *(float *)(d + 8));
+        *(int *)(vars + 0x60) = 0;
+        *(int *)(vars + 0x7c) = -1;
+        vars[0x74] = random & 1;
+        *(float *)(obj + 0xf8) = mat_fast_helper_a(*(float *)vars, *(float *)(vars + 4));
+        *(float *)(obj + 0xf4) = -mat_fast_helper_a(vec_length_xy(vars), *(float *)(vars + 8));
         euler_rotation_basis(obj + 0xc0, obj + 0xf0);
         matrix_mul_vec3(&point, &point, obj + 0xc0);
         FastVecAdd(&point, &point, obj + 0x10);
         vec_scale_to_length((char *)&step, (char *)&point, 0.01f);
-        qcopy(d + 0x20, &point);
+        qcopy(vars + 0x20, &point);
         for (i = 0; i < 3; i++) {
-            FastVecAdd(d + 0x30 + i * 16, d + 0x20 + i * 16, &step);
+            FastVecAdd(vars + 0x30 + i * 16, vars + 0x20 + i * 16, &step);
         }
-        d[0x79] = 2;
+        vars[0x79] = 2;
     }
     /* Fall through to the first movement update. */
     case 1: {
         unsigned char *p;
-        int id;
-        *(float *)(obj + 0xf8) = mat_fast_helper_a(*(float *)d, *(float *)(d + 4));
-        *(float *)(obj + 0xf4) = -mat_fast_helper_a(vec_length_xy(d), *(float *)(d + 8));
-        *(float *)(d + 0x60) -= 0.1f;
-        if (*(float *)(d + 0x60) <= -8.0f) {
-            *(float *)(d + 0x60) += 8.0f;
+        int voice_id;
+        *(float *)(obj + 0xf8) = mat_fast_helper_a(*(float *)vars, *(float *)(vars + 4));
+        *(float *)(obj + 0xf4) = -mat_fast_helper_a(vec_length_xy(vars), *(float *)(vars + 8));
+        *(float *)(vars + 0x60) -= 0.1f;
+        if (*(float *)(vars + 0x60) <= -8.0f) {
+            *(float *)(vars + 0x60) += 8.0f;
         }
         matrix_mul_vec3(&point, &point, obj + 0xc0);
         FastVecAdd(&point, &point, obj + 0x10);
         qcopy(&old, obj + 0x10);
-        FastVecAdd(obj + 0x10, obj + 0x10, d);
-        id = *(int *)(d + 0x7c);
-        p = g_sound_state + id * 0x70;
+        FastVecAdd(obj + 0x10, obj + 0x10, vars);
+        voice_id = *(int *)(vars + 0x7c);
+        p = g_sound_state + voice_id * 0x70;
         if (*(char **)(p + 0x88) != obj || !p[0x74]) {
-            *(int *)(d + 0x7c) = PlayMobySound(0, 4, obj);
+            *(int *)(vars + 0x7c) = PlayMobySound(0, 4, obj);
         }
         if (CollLine(&old, obj + 0x10, 0, *(int *)(obj + 0xb8), 0)) {
             hit = g_hit_l02_result;
             if (hit) {
-                make_hit_descriptor(packet, obj, 0x10001, d, *(float *)(d + 0x6c));
+                make_hit_descriptor(packet, obj, 0x10001, vars, *(float *)(vars + 0x6c));
                 packet[0x18] = 5;
                 packet[0x19] = 3;
                 *(unsigned short *)(packet + 0x1a) = *(unsigned short *)(obj + 0xaa);
@@ -107,7 +109,7 @@ void projectile_l02_update_pal(unsigned char *obj)
             obj[0x20] = 2;
             *(unsigned short *)(obj + 0x34) |= 0x41;
         }
-        if (math_fast_float_d(d + 0x70) ||
+        if (math_fast_float_d(vars + 0x70) ||
             *(float *)(obj + 0x10) < 2.0f || *(float *)(obj + 0x10) > 1021.0f ||
             *(float *)(obj + 0x14) < 2.0f || *(float *)(obj + 0x14) > 1021.0f ||
             *(float *)(obj + 0x18) < 2.0f || *(float *)(obj + 0x18) > 1021.0f) {
@@ -116,43 +118,43 @@ void projectile_l02_update_pal(unsigned char *obj)
             qcopy(obj + 0x10, &old);
             break;
         }
-        if (!d[0x7a]) {
-            FastVecSub((float *)&step, (float *)(d + 0x10), (float *)d);
-            if (*(float *)(d + 0x64) < FastVecLength(&step)) {
-                vec_scale_to_length((char *)&step, (char *)&step, *(float *)(d + 0x64));
+        if (!vars[0x7a]) {
+            FastVecSub((float *)&step, (float *)(vars + 0x10), (float *)vars);
+            if (*(float *)(vars + 0x64) < FastVecLength(&step)) {
+                vec_scale_to_length((char *)&step, (char *)&step, *(float *)(vars + 0x64));
             } else {
-                d[0x7a] = 1;
+                vars[0x7a] = 1;
             }
-            FastVecAdd(d, d, &step);
+            FastVecAdd(vars, vars, &step);
         }
-        if (!(unsigned char)d[0x77]) {
-            func_PAL_L02_00405D00(obj);
-            d[0x77] = d[0x78];
+        if (!(unsigned char)vars[0x77]) {
+            spawn_actor_puff_pal(obj);
+            vars[0x77] = vars[0x78];
         } else {
-            d[0x77]--;
+            vars[0x77]--;
         }
-        if (!(unsigned char)d[0x79]) {
+        if (!(unsigned char)vars[0x79]) {
             for (i = 3; i > 0; i--) {
-                qcopy(d + 0x20 + i * 16, d + 0x10 + i * 16);
+                qcopy(vars + 0x20 + i * 16, vars + 0x10 + i * 16);
             }
-            qcopy(d + 0x20, &point);
-            d[0x79] = 2;
+            qcopy(vars + 0x20, &point);
+            vars[0x79] = 2;
         } else {
-            d[0x79]--;
+            vars[0x79]--;
         }
         break;
     }
     case 2: {
         unsigned char *p;
-        int id;
-        id = *(int *)(d + 0x7c);
-        if (id != -1) {
-            p = g_sound_state + id * 0x70;
+        int voice_id;
+        voice_id = *(int *)(vars + 0x7c);
+        if (voice_id != -1) {
+            p = g_sound_state + voice_id * 0x70;
             if (*(char **)(p + 0x88) == obj && p[0x74]) {
-                snd_stop_voice(id);
+                snd_stop_voice(voice_id);
             }
         }
-        *(int *)(d + 0x7c) = -1;
+        *(int *)(vars + 0x7c) = -1;
         moby_mark_spawned(obj);
         return;
     }

@@ -15,21 +15,21 @@ extern void protopet_end_action(u8 *, int);
    %hi copy in its delay slot come out (see func_L02_003EB138).  The entity bank is an `sda`
    array of unknown size, which gives retail's absolute lui/lw load in this -G8 unit. */
 void yeedil_destroy_group_protopets_pal(u8 *self) {
-    u16 *p;
-    u8 *e;
+    u16 *entry;
+    u8 *member;
 
     if (self[0x21] == 0xFF)
         return;
-    for (p = g_group_l20_id_lists[self[0x21]];
-         self[0x21] != 0xFF && self[0x21] <= g_group_count && p != 0 &&
-         ((p != 0 && (s16)p[-1] >= 0) || p == g_group_l20_id_lists[self[0x21]]);
-         p++) {
-        e = g_group_l20_member_table[0] + ((*p & 0x7FFF) << 8);
-        if (e == 0)
+    for (entry = g_group_l20_id_lists[self[0x21]];
+         self[0x21] != 0xFF && self[0x21] <= g_group_count && entry != 0 &&
+         ((entry != 0 && (s16)entry[-1] >= 0) || entry == g_group_l20_id_lists[self[0x21]]);
+         entry++) {
+        member = g_group_l20_member_table[0] + ((*entry & 0x7FFF) << 8);
+        if (member == 0)
             break;
-        if (*(s16 *)(e + 0xAA) == 0xB69 && e[0x20] != 0xFE && e[0x20] != 0xFD) {
-            SetDeathBits_pal(e, 0, 1);
-            protopet_end_action(e, 0);
+        if (*(s16 *)(member + 0xAA) == MOBY_CLASS_PROTOPET && member[0x20] != 0xFE && member[0x20] != 0xFD) {
+            SetDeathBits_pal(member, 0, 1);
+            protopet_end_action(member, 0);
         }
     }
 }

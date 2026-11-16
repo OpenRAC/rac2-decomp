@@ -22,8 +22,9 @@ extern void vec_scale_to_length(void *,void *,float);
 extern int CollLine(char *,void *,int,char *,void *);
 extern void ApplyAreaHitOrEmitParticles_pal(char *,char *);
 extern int level_has_pending_inner_flag(char *);
-extern int func_PAL_00335DD0(char *,int,int);
+extern int weapon_start_health_drain_pal(char *,int,int);
 
+/* Checks whether the bolt hit anything during its last step. If so it applies the hit effect and damage. Returns 1 when the bolt should stop. */
 int vaporizer_bolt_test_hit_pal(char *object,char *source)
 {
     unsigned int settingsIndex = g_beam_weapon_index;
@@ -51,7 +52,7 @@ int vaporizer_bolt_test_hit_pal(char *object,char *source)
         if (result->object == 0) return 1;
         if (level_has_pending_inner_flag(result->object) != 0) return 1;
         if (result->object != 0)
-            func_PAL_00335DD0(result->object,0x42,*(int *)(object + 0xb8));
+            weapon_start_health_drain_pal(result->object,0x42,*(int *)(object + 0xb8));
     }
     return 0;
 }

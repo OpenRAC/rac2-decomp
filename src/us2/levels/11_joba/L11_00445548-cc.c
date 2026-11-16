@@ -99,16 +99,17 @@ extern JobaFlagBlockView g_hero_l11_state_block;
 /* The level's own jump table: the address of each case body. */
 extern void *jtbl_002BB0E0[13];
 
-s32 func_US2_L11_00445548(s32 a) {
+/* Returns the text number of a challenge's title. (USA v2.00 text ids) */
+s32 arena_get_challenge_title_text_id_us2(s32 index) {
     static void * tab[] = {
         &&c0, &&c1, &&c2, &&c3, &&c4, &&c5, &&c6, &&c7,
         &&c8, &&c9, &&c10, &&c11, &&c12
     };
 
-    if ((u32)a >= 13) {
+    if ((u32)index >= 13) {
         goto def;
     }
-    goto *jtbl_002BB0E0[a];
+    goto *jtbl_002BB0E0[index];
 c0:
     return 0x2dfc;
 c1:

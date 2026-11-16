@@ -34,14 +34,15 @@ extern s32 FloatToInt(f32);
 extern void vec_build_spherical_offset(void *, f32, f32, f32);
 extern u8 *part_spawn_trail(void *, void *, void *, s32, s32, s32, s32, s32, s32);
 extern s32 func_001163B0(void);
-void func_PAL_L01_003DED38(u8 *obj) {
+/* Spawns the debris particle burst for the object, thrown in the direction of its velocity (PAL: 50 Hz rates). */
+void part_spawn_debris_burst_pal(u8 *moby) {
     f32 vel[4] __attribute__((aligned(16)));
     f32 accel[4] __attribute__((aligned(16)));
     f32 pos[4] __attribute__((aligned(16)));
-    u8 *state = *(u8 **)(obj+0x68);
+    u8 *state = *(u8 **)(moby+0x68);
     f32 yaw, pitch, speed, angle;
-    s32 i, a, b, c;
-    u8 *part;
+    s32 i, life_a, life_b, life_c;
+    u8 *particle;
     u8 *position;
     f32 *dest;
     vel[3]=g_debris_vel_w;
@@ -50,7 +51,7 @@ void func_PAL_L01_003DED38(u8 *obj) {
     pitch=-mat_fast_helper_a(vec_length_xy(state),*(f32 *)(state+8));
     for(i=0;i<g_debris_count_a;i++) {
         dest=pos;
-        position=obj+0x10;
+        position=moby+0x10;
         {
             qcopy(dest,position);
         }
@@ -64,16 +65,16 @@ void func_PAL_L01_003DED38(u8 *obj) {
         speed*=0.020000001f;
         angle=FastAddRotations(yaw,angle);
         vec_build_spherical_offset(accel,speed,angle,pitch);
-        a=FloatToInt((math_random_float_range(g_debris_color_a_base,g_debris_color_a_base*2)*5.0f+2.0f)*0.16666667f);
-        b=FloatToInt((math_random_float_range(g_debris_color_b_base,g_debris_color_b_base*1.2f)*5.0f+2.0f)*0.16666667f);
-        c=FloatToInt((math_random_float_range(g_debris_color_c_base,g_debris_color_c_base*1.2f)*5.0f+2.0f)*0.16666667f);
-        part=part_spawn_trail(pos,vel,accel,g_debris_sprite_a,g_debris_sprite_b,a,b,c,-1);
-        if(part && (func_001163B0()&1)) part[3]=0x48;
+        life_a=FloatToInt((math_random_float_range(g_debris_color_a_base,g_debris_color_a_base*2)*5.0f+2.0f)*0.16666667f);
+        life_b=FloatToInt((math_random_float_range(g_debris_color_b_base,g_debris_color_b_base*1.2f)*5.0f+2.0f)*0.16666667f);
+        life_c=FloatToInt((math_random_float_range(g_debris_color_c_base,g_debris_color_c_base*1.2f)*5.0f+2.0f)*0.16666667f);
+        particle=part_spawn_trail(pos,vel,accel,g_debris_sprite_a,g_debris_sprite_b,life_a,life_b,life_c,-1);
+        if(particle && (func_001163B0()&1)) particle[3]=0x48;
     }
     vel[3]=g_debris_second_vel_w;
     accel[3]=g_debris_second_accel_w;
     for(i=0;i<g_debris_count_b;i++) {
-        qcopy(pos,obj+0x10);
+        qcopy(pos,moby+0x10);
         pos[0]+=math_random_float_range(-0.2f,0.2f);
         pos[1]+=math_random_float_range(-0.2f,0.2f);
         pos[2]+=math_random_float_range(-0.2f,0.2f);
@@ -87,10 +88,10 @@ void func_PAL_L01_003DED38(u8 *obj) {
         speed*=0.020000001f;
         angle=FastAddRotations(yaw,angle);
         vec_build_spherical_offset(accel,speed,angle,pitch);
-        a=FloatToInt((math_random_float_range(g_debris_second_color_a_base,g_debris_second_color_a_base*2)*5.0f+2.0f)*0.16666667f);
-        b=FloatToInt((math_random_float_range(g_debris_second_color_b_base,g_debris_second_color_b_base*1.2f)*5.0f+2.0f)*0.16666667f);
-        c=FloatToInt((math_random_float_range(g_debris_second_color_c_base,g_debris_second_color_c_base*1.2f)*5.0f+2.0f)*0.16666667f);
-        part=part_spawn_trail(pos,vel,accel,g_debris_second_sprite_a,g_debris_second_sprite_b,a,b,c,-1);
-        if(part && (func_001163B0()&1)) part[3]=0x48;
+        life_a=FloatToInt((math_random_float_range(g_debris_second_color_a_base,g_debris_second_color_a_base*2)*5.0f+2.0f)*0.16666667f);
+        life_b=FloatToInt((math_random_float_range(g_debris_second_color_b_base,g_debris_second_color_b_base*1.2f)*5.0f+2.0f)*0.16666667f);
+        life_c=FloatToInt((math_random_float_range(g_debris_second_color_c_base,g_debris_second_color_c_base*1.2f)*5.0f+2.0f)*0.16666667f);
+        particle=part_spawn_trail(pos,vel,accel,g_debris_second_sprite_a,g_debris_second_sprite_b,life_a,life_b,life_c,-1);
+        if(particle && (func_001163B0()&1)) particle[3]=0x48;
     }
 }

@@ -26,65 +26,66 @@ extern int path_push_point_away(int,void *,void *,float);
 extern void moby_transform_joint_to_world(void *,int,void *);
 extern int CollLine(void *,void *,int,void *,int);
 extern void moby_update_ground_check(void *);
-void held_platform_move_by_input_pal(char *obj)
+/* Moves the held platform from the stick input, with braking, and keeps its sound and ground check up to date. (PAL: 50 Hz timings) */
+void held_platform_move_by_input_pal(char *moby)
 {
     float a[4],b[4],c[4];
     union { float m[12]; struct { float pad[4], d[4]; } v; } scratch;
-    char *state=*(char **)(obj+0x68);
-    char *other;
+    char *vars=*(char **)(moby+0x68);
+    char *held;
     int id;
-    if(*(u8 *)(obj+0x20)==2) {
+    if(*(u8 *)(moby+0x20)==2) {
         *(TI128 *)c=0;
         c[2]=FastAddRotations(g_hero_l03_aux_state,g_held_platform_turn_degrees*0.017453294f);
         *(TI128 *)(b)=*(TI128 *)(c);
         euler_rotation_basis(scratch.m,b);
         qcopy(a,g_player_state.vec);
         if(FastVecLength(a)>0.0f && g_player_state.mode==0x31) {
-            L03ControlEntry *entry=(L03ControlEntry *)(g_sound_state+*(int *)(state+0x108)*0x70);
-            if(entry->owner!=obj || !entry->active)
-                *(int *)(state+0x108)=PlayMobySound(0,4,obj);
+            L03ControlEntry *entry=(L03ControlEntry *)(g_sound_state+*(int *)(vars+0x108)*0x70);
+            if(entry->owner!=moby || !entry->active)
+                *(int *)(vars+0x108)=PlayMobySound(0,4,moby);
         } else {
-            id=*(int *)(state+0x108);
+            id=*(int *)(vars+0x108);
             if(id!=-1) {
                 L03ControlEntry *entry=(L03ControlEntry *)(g_sound_state+id*0x70);
-                if(entry->owner==obj && entry->active) snd_stop_voice(id);
+                if(entry->owner==moby && entry->active) snd_stop_voice(id);
             }
-            *(int *)(state+0x108)=-1;
+            *(int *)(vars+0x108)=-1;
         }
         a[0]=-a[0];
         matrix_mul_vec3(a,a,scratch.m);
-        other=*(char **)(state+0xf0);
-        if(other) {
-            if(*(short *)(other+0xaa)==0xb85) FastVecScale(a,a,g_held_platform_special_move_scale*(0.020000001f));
+        held=*(char **)(vars+0xf0);
+        if(held) {
+            if(*(short *)(held+0xaa)==0xb85) FastVecScale(a,a,g_held_platform_special_move_scale*(0.020000001f));
             else FastVecScale(a,a,g_held_platform_other_move_scale*(0.020000001f));
         } else FastVecScale(a,a,g_held_platform_move_scale*(0.020000001f));
     } else {
-        id=*(int *)(state+0x108);
+        id=*(int *)(vars+0x108);
         if(id!=-1) {
             L03ControlEntry *entry=(L03ControlEntry *)(g_sound_state+id*0x70);
-            if(entry->owner==obj && entry->active) snd_stop_voice(id);
+            if(entry->owner==moby && entry->active) snd_stop_voice(id);
         }
-        *(int *)(state+0x108)=-1;
+        *(int *)(vars+0x108)=-1;
         vec_clear_128(a);
     }
-    FastVecSub(b,a,state+0xe0);
+    FastVecSub(b,a,vars+0xe0);
     b[2]=0;
-    other=*(char **)(state+0xf0);
-    if(other) {
-        if(*(short *)(other+0xaa)==0xb85) vec_clamp_length(b,g_held_platform_special_clamp_scale*0.00040000002f);
+    held=*(char **)(vars+0xf0);
+    if(held) {
+        if(*(short *)(held+0xaa)==0xb85) vec_clamp_length(b,g_held_platform_special_clamp_scale*0.00040000002f);
         else vec_clamp_length(b,g_held_platform_other_clamp_scale*0.00040000002f);
     } else {
         vec_clamp_length(b,g_held_platform_clamp_scale*0.00040000002f);
     }
-    FastVecAdd(state+0xe0,state+0xe0,b);
-    FastVecAdd(obj+0x10,obj+0x10,state+0xe0);
-    path_push_point_away(*(int *)state,obj+0x10,obj+0x10,1.25f);
-    moby_transform_joint_to_world(obj,2,c);
+    FastVecAdd(vars+0xe0,vars+0xe0,b);
+    FastVecAdd(moby+0x10,moby+0x10,vars+0xe0);
+    path_push_point_away(*(int *)vars,moby+0x10,moby+0x10,1.25f);
+    moby_transform_joint_to_world(moby,2,c);
     qcopy(scratch.m,c);
     scratch.m[2]+=20.0f;
     qcopy(scratch.v.d,c);
     scratch.v.d[2]+=0.5f;
-    if(CollLine(scratch.v.d,scratch.m,2,obj,0)) *(float *)(state+0xf4)=g_collision_hit_height;
-    moby_update_ground_check(obj);
-    *(u8 *)(obj+0xbd)=g_held_platform_state_byte;
+    if(CollLine(scratch.v.d,scratch.m,2,moby,0)) *(float *)(vars+0xf4)=g_collision_hit_height;
+    moby_update_ground_check(moby);
+    *(u8 *)(moby+0xbd)=g_held_platform_state_byte;
 }

@@ -27,11 +27,12 @@ typedef struct {
  int unknown, life, unknown2, flags, first, last, unknown3, type;
 } Effect76;
 
-void func_PAL_002E84A8(void *object, int index, int alternate)
+/* Draws one engine flame of the ship and adds a smoky puff behind it. */
+void ship_spawn_engine_flame_pal(void *object, int index, int alternate)
 {
  float pos[4], step[4], matrix[12], first[4], second[4], combined[4];
  Effect76 effect;
- char *o = object;
+ char *ship = object;
  unsigned long long next;
  float strength, count, radius, small, start, end, inner, outer, width;
  float *entry;
@@ -45,18 +46,18 @@ void func_PAL_002E84A8(void *object, int index, int alternate)
  effect.unknown = 0x001A0000;
  effect.unknown2 = 0x001C0000;
 #endif
- next = *(unsigned long long *)(*(char **)(o + 0x5c) + 0x10);
- vec_fast_helper_e(first, *(unsigned long long *)(*(char **)(o + 0x58) + 0x10));
+ next = *(unsigned long long *)(*(char **)(ship + 0x5c) + 0x10);
+ vec_fast_helper_e(first, *(unsigned long long *)(*(char **)(ship + 0x58) + 0x10));
  vec_fast_helper_e(second, next);
- scale_vector(first, first, (1.0f - *(float *)(o + 0x44)) * (1.0f / 32768.0f));
- scale_vector(second, second, *(float *)(o + 0x44) * (1.0f / 32768.0f));
+ scale_vector(first, first, (1.0f - *(float *)(ship + 0x44)) * (1.0f / 32768.0f));
+ scale_vector(second, second, *(float *)(ship + 0x44) * (1.0f / 32768.0f));
  vec_copy_helper_b(combined, first, second);
  quaternion_to_rotation_basis(combined, matrix);
- multiply_matrix3x3(matrix, o + 0xc0, matrix);
+ multiply_matrix3x3(matrix, ship + 0xc0, matrix);
  entry = &g_engine_flame_offsets + index * 4;
  matrix_mul_vec3(pos, entry, matrix);
- FastVecAdd(pos, pos, o + 0x10);
- strength = (float)*(unsigned char *)(o + 0x95) * (entry[3] * (1.0f / 128.0f));
+ FastVecAdd(pos, pos, ship + 0x10);
+ strength = (float)*(unsigned char *)(ship + 0x95) * (entry[3] * (1.0f / 128.0f));
  count = strength * 5.0f;
  radius = strength * 0.06f + 0.06f;
  small = strength * 0.04f + 0.04f;

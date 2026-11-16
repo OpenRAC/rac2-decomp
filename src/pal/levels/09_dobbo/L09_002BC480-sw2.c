@@ -6,24 +6,24 @@ typedef TI128 V4_F6a70b950;
 typedef struct Rac2Native_5b4b17178a13f443_SmallSlotReset128Owner Rac2Native_5b4b17178a13f443_SmallSlotReset128Owner;
 typedef struct {
     char pad0[35];         
-    unsigned char f35;     
+    unsigned char unk_35;     
     char pad36[8];         
-    float f44;             
-    unsigned char f48;     
-    unsigned char f49;     
-    unsigned short f50;    
-    unsigned short f52;    
+    float unk_44;             
+    unsigned char unk_48;     
+    unsigned char unk_49;     
+    unsigned short unk_50;    
+    unsigned short unk_52;    
     char pad54[2];         
-    long long f56;         
+    long long unk_56;         
     char pad64[34];        
-    unsigned char f98;     
+    unsigned char unk_98;     
     char pad99[21];        
-    int f120;              
-    unsigned short f124;   
+    int unk_120;              
+    unsigned short unk_124;   
     char pad126[26];       
-    int f152;              
+    int unk_152;              
     char pad156[14];       
-    short f170;            
+    short unk_170;            
 } Src_F66766f2b;
 typedef struct {
     char pad0[256];        
@@ -73,17 +73,17 @@ extern f32 mat_fast_helper_a(f32, f32);
 extern f32 FastAddRotations(f32, f32);
 extern f32 FastDiffRots(f32, f32);
 extern s32 FloatToInt(f32);
-extern void func_PAL_002A7E68(void *, int, int, int);
+extern void anim_start_blended_pal(void *, int, int, int);
 extern void RippleDisturb(void *, s32, u32, f32, f32, f32, f32);
 extern void AdjustPlayerHealth_pal(int);
 extern void hero_play_footstep_sound_dust_pal(int, int, int, int);
 extern void hero_clear_tracked_slots(void);
 extern void part_emit_hero_dust_and_debris_pal(int, int, int);
-extern void func_PAL_L00_002AF2C8(int, int);
+extern void hero_create_item_slot_objects_pal(int, int);
 extern void hero_resolve_stick_direction(int, f32);
 extern void hero_l00_select_aim_target(f32, f32, f32);
-extern void func_PAL_L00_002BA480(void);
-extern int func_PAL_L00_002CB2C8(void);
+extern void hero_setup_attached_object_transform_pal(void);
+extern int hero_try_start_grab_pal(void);
 extern void set_hero_animation_pal(int, int, f32);
 extern void UpdateHeroAimTarget(f32, f32, f32);
 extern s32 hero_get_weapon_anim_id(int);
@@ -108,7 +108,7 @@ extern f32 g_hero_l09_state_float_param_b __attribute__((sda));
 extern s32 g_hero_l09_animation_ids[2] __attribute__((sda));
 extern f32 g_hero_state_float_sequences[][25];
 extern u8 g_hero_state_data_block[];
-typedef struct { u8 pad0[0x148]; f32 f148; u8 pad14C[0x400 - 0x14C]; s32 i400; } L19State_1B9900;
+typedef struct { u8 pad0[0x148]; f32 unk_148; u8 pad14C[0x400 - 0x14C]; s32 i400; } L19State_1B9900;
 extern L19State_1B9900 g_hero_l09_aux_state;
 typedef union { u8 b[0x2600]; s16 h[0x1300]; u16 uh[0x1300]; s32 i[0x980]; u32 u[0x980]; f32 f[0x980]; u8 *ptr[0x980]; TI128 q[0x260]; } Hero;
 #define HP ((Hero *)D_00189E20)
@@ -123,7 +123,7 @@ typedef union { u8 b[0x2600]; s16 h[0x1300]; u16 uh[0x1300]; s32 i[0x980]; u32 u
 #define COPY_VECTOR(dst,src) (*(TI128 *)VEC(dst) = *(TI128 *)VEC(src))
 
 /* Changes the player's action, initializes its movement parameters and selects animation. */
-s32 func_PAL_L09_002C3708(s32 action, s32 animate) {
+s32 hero_l09_set_state_pal(s32 action, s32 animate) {
     u8 *objectSnapshot;
     u8 *hit_10, *hit_29, *hit_44, *hit_45, *hit_52;
     s32 oldStep;
@@ -171,7 +171,7 @@ s32 func_PAL_L09_002C3708(s32 action, s32 animate) {
         level_release_slot_list((Rac2Native_5b4b17178a13f443_SmallSlotReset128Owner *)VEC(0x18E0));
     }
     if (SHORT(0x1FA) == 0) slot_clear_active_bytes();
-    func_PAL_L00_002AF2C8(WORD(0x22A0), WORD(0x2294));
+    hero_create_item_slot_objects_pal(WORD(0x22A0), WORD(0x2294));
     WORD(0x1188) = 0;
     switch (action) {
     case 0:
@@ -183,7 +183,7 @@ s32 func_PAL_L09_002C3708(s32 action, s32 animate) {
         hero_clear_slot_records();
         if (BYTE(0x22B4)) { hero_start_move_state_walk_or_run(0); return 1; }
         COPY_VECTOR(0x160, 0x120);
-        if (BYTE(0x149A) && SHORT(0x34C) == 0) { func_PAL_L09_002C3708(0x76, 1); return 0; }
+        if (BYTE(0x149A) && SHORT(0x34C) == 0) { hero_l09_set_state_pal(0x76, 1); return 0; }
         WORD(0x1188) = 0x68;
         if (!animate) goto finish;
         if (hero_get_weapon_anim_id(0) == 0x51) set_hero_animation_pal(hero_get_weapon_anim_id(0), 0, 15.0f); else set_hero_animation_pal(hero_get_weapon_anim_id(0), 0, -1.0f);
@@ -196,7 +196,7 @@ s32 func_PAL_L09_002C3708(s32 action, s32 animate) {
         goto finish;
     case 0x3D:
         set_hero_animation_pal(hero_get_weapon_anim_id(0), 0, 7.0f);
-        if (PTR(0x1854)) func_PAL_002A7E68(PTR(0x1854), 0, 0, 7);
+        if (PTR(0x1854)) anim_start_blended_pal(PTR(0x1854), 0, 0, 7);
         goto finish;
     case 0x39:
         WORD(0x229C) = 20; BITS(0x24A0) = 0; COPY_VECTOR(0x160, 0x120);
@@ -318,7 +318,7 @@ s32 func_PAL_L09_002C3708(s32 action, s32 animate) {
             (WORD(0x22A4) == 4 || WORD(0x22A0) == 3 || WORD(0x22AC) == 3)) REAL(0x1B4) = 0;
         WORD(0x1188) = 0x68;
         if (BYTE(0x149A)) {
-            if (SHORT(0x34C) == 0 || REAL(0x31C) < 0.3f) { func_PAL_L09_002C3708(0x76, 1); return 0; }
+            if (SHORT(0x34C) == 0 || REAL(0x31C) < 0.3f) { hero_l09_set_state_pal(0x76, 1); return 0; }
         }
         if (BYTE(0x22B9) || WORD(0x2294) == 0x70) {
             WORD(0x2294) = 0x70; set_hero_animation_pal(0x59, 0, 7.0f); goto finish;
@@ -351,11 +351,11 @@ s32 func_PAL_L09_002C3708(s32 action, s32 animate) {
     case 3:
         WORD(0x229C) = 1; BITS(0x24A0) = 0;
         COPY_VECTOR(0x160, 0x120);
-        if (BYTE(0x149A) && SHORT(0x34C) == 0) { func_PAL_L09_002C3708(0x76, 1); return 0; }
-        if (func_PAL_L00_002CB2C8()) return 0;
+        if (BYTE(0x149A) && SHORT(0x34C) == 0) { hero_l09_set_state_pal(0x76, 1); return 0; }
+        if (hero_try_start_grab_pal()) return 0;
         if (hero_get_weapon_anim_id(0) == 0x51) {
             if (!animate) goto finish;
-            if (func_PAL_L09_002C3708(0, 0)) set_hero_animation_pal(hero_get_weapon_anim_id(0), 0, 15.0f);
+            if (hero_l09_set_state_pal(0, 0)) set_hero_animation_pal(hero_get_weapon_anim_id(0), 0, 15.0f);
             return 0;
         }
         if (!animate) goto finish;
@@ -380,7 +380,7 @@ s32 func_PAL_L09_002C3708(s32 action, s32 animate) {
         WORD(0x229C) = 12; BITS(0x24A0) = 0;
         REAL(0x1B4) = vec_length_xy(VEC(0x120));
         if (REAL(0x1B4) > 0.14000002f) REAL(0x1B4) = 0.14000002f;
-        if (BYTE(0x149A) && SHORT(0x34C) == 0) { func_PAL_L09_002C3708(0x76, 1); return 0; }
+        if (BYTE(0x149A) && SHORT(0x34C) == 0) { hero_l09_set_state_pal(0x76, 1); return 0; }
         WORD(0x1188) = 0x68;
         COPY_VECTOR(0x160, 0x120);
         vec_clamp_length((float *)VEC(0x160), 0.14000002f);
@@ -522,13 +522,13 @@ s32 func_PAL_L09_002C3708(s32 action, s32 animate) {
     case 0x6E: case 0x81: case 0x89: case 0x92:
         if (WORD(0x2294) != 0x81 && PTR(0x33C) &&
             (*(s16 *)(PTR(0x33C) + 0xAA) == 0x9B9 || *(s16 *)(PTR(0x33C) + 0xAA) == 0xF05)) {
-            func_PAL_L09_002C3708(0x81, 1); return 0;
+            hero_l09_set_state_pal(0x81, 1); return 0;
         }
         if (WORD(0x2294) != 0x6E && SHORT(0x348) == 1 && action != 0xE &&
-            action != 0x38 && !g_hero_l09_lock_flag_b) { func_PAL_L09_002C3708(0x6E, 1); return 0; }
+            action != 0x38 && !g_hero_l09_lock_flag_b) { hero_l09_set_state_pal(0x6E, 1); return 0; }
         if (WORD(0x22A0) == 0x11 && !BYTE(0x24DA)) BYTE(0x24DB)++;
         else BYTE(0x24DB) = 0;
-        if (SHORT(0x1F2)) { func_PAL_L09_002C3708(0x82, 1); return 0; }
+        if (SHORT(0x1F2)) { hero_l09_set_state_pal(0x82, 1); return 0; }
         if (SHORT(0x212)) {
             WORD(0x2294) = WORD(0x22A0); WORD(0x2298) = oldStep; WORD(0x1B8) = WORD(0x22A8);
             return 0;
@@ -603,9 +603,9 @@ s32 func_PAL_L09_002C3708(s32 action, s32 animate) {
             if (WORD(0x22A0) == 0x38 || WORD(0x22AC) == 0x38 || WORD(0x24CC) == 0) {
                 WORD(0x18C0)++;
                 if (WORD(0x18C0) > 2 || WORD(0x24CC) == 0) {
-                    if (g_current_map_index == 2 && g_hero_l09_special_state_flag) func_PAL_L09_002C3708(0x7D, 1);
-                    else if (*(s32 *)(*(u8 **)(PTR(0x2290) + 0x24) + 0x1F0) != 0) func_PAL_L09_002C3708(0x79, 1);
-                    else func_PAL_L09_002C3708(0x39, 1);
+                    if (g_current_map_index == 2 && g_hero_l09_special_state_flag) hero_l09_set_state_pal(0x7D, 1);
+                    else if (*(s32 *)(*(u8 **)(PTR(0x2290) + 0x24) + 0x1F0) != 0) hero_l09_set_state_pal(0x79, 1);
+                    else hero_l09_set_state_pal(0x39, 1);
                     return 0;
                 }
             } else WORD(0x18C0) = 0;
@@ -762,7 +762,7 @@ s32 func_PAL_L09_002C3708(s32 action, s32 animate) {
             if (g_statistics_table[56].count < 0xFFFF) g_statistics_table[56].count++;
             if (g_statistics_table[56].maximum < ((s32)g_frame_counter * 5 + 2) / 6) g_statistics_table[56].maximum = ((s32)g_frame_counter * 5 + 2) / 6;
             g_statistics_table[56].levels = (g_statistics_table[56].levels | (1u << g_current_map_index)) | 0x80000000u;
-            func_PAL_L00_002BA480(); WORD(0x2294) = WORD(0x22A0); WORD(0x229C) = WORD(0x22A4);
+            hero_setup_attached_object_transform_pal(); WORD(0x2294) = WORD(0x22A0); WORD(0x229C) = WORD(0x22A4);
             goto finish;
         }
         if (action != 0x83) BITS(0x24A0) = 0;
@@ -778,7 +778,7 @@ s32 func_PAL_L09_002C3708(s32 action, s32 animate) {
                 selected_14 = WORD(0x22A0) == 11 && WORD(0x22A8) < 35 ? 14 : 9;
                 set_hero_animation_pal(0x2B, 4, (f32)selected_14);
                 animation_14 = hero_get_slot_object(0);
-                if (moby_is_class_71((u8 *)animation_14)) func_PAL_002A7E68((u8 *)animation_14, 10, 4, selected_14 + 2);
+                if (moby_is_class_71((u8 *)animation_14)) anim_start_blended_pal((u8 *)animation_14, 10, 4, selected_14 + 2);
             }
             goto finish;
         case 0x15:
@@ -811,7 +811,7 @@ s32 func_PAL_L09_002C3708(s32 action, s32 animate) {
                 queue_copy_record_by_index(19);
                 if (animate) {
                     set_hero_animation_pal(0x60, 4, -1.0f);
-                    func_PAL_002A7E68(PTR(0x1220), 3, 4, -1);
+                    anim_start_blended_pal(PTR(0x1220), 3, 4, -1);
                 }
                 hero_l00_select_aim_target(11.0f, 0.8726646900177002f, -1.0f);
             }
@@ -841,7 +841,7 @@ s32 func_PAL_L09_002C3708(s32 action, s32 animate) {
             current /= 2;
             set_hero_animation_pal(mode + 0x17, current, (f32)selected_13);
             animation_13 = hero_get_slot_object(0);
-            if (moby_is_class_71((u8 *)animation_13)) func_PAL_002A7E68((u8 *)animation_13, mode + 3, current, selected_13);
+            if (moby_is_class_71((u8 *)animation_13)) anim_start_blended_pal((u8 *)animation_13, mode + 3, current, selected_13);
         }
         goto finish;
         case 0x22:
@@ -914,7 +914,7 @@ s32 func_PAL_L09_002C3708(s32 action, s32 animate) {
             REAL(0x120) = math_fast_sin_or_cos_a(angle_53) * REAL(0x644) * 0.7f;
             REAL(0x124) = math_fast_sin_or_cos_b(angle_53) * REAL(0x644) * 0.7f; REAL(0x128) = 0.09f;
             if (WORD(0x640) > 12 && WORD(0x24CC) < 2) WORD(0x24CC) = 2;
-            PTR(0x2290)[0xA8] = 255; func_PAL_L09_002C3708(0x16, 1); HALF(0x1F4) = 125; HALF(0x1D0) = 58;
+            PTR(0x2290)[0xA8] = 255; hero_l09_set_state_pal(0x16, 1); HALF(0x1F4) = 125; HALF(0x1D0) = 58;
             return 0;
         }
         HALF(0x1DC) = 64; REAL(0x69C) = 0.050000004f;
@@ -966,7 +966,7 @@ finish:
         WORD(0x1298) == 20 && WORD(0x2304)) BITS(0x2320) = 1;
     if (WORD(0x229C) == 20) { cancel_hero_item_animation_pal(); BYTE(0x22BC) = 1; }
     if ((!hero_is_in_special_kind_or_mode() || WORD(0x229C) == 18) &&
-        (REAL(0x330) < g_hero_l09_aux_state.f148 || WORD(0x229C) == 0)) g_hero_l09_aux_state.i400 = 0;
+        (REAL(0x330) < g_hero_l09_aux_state.unk_148 || WORD(0x229C) == 0)) g_hero_l09_aux_state.i400 = 0;
     if (WORD(0x229C) != WORD(0x22A4)) hero_clear_tracked_slots();
     WORD(0x1B8) = 0;
     BITS(0x1C0) = 0;

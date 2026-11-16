@@ -27,7 +27,7 @@ extern unsigned char *g_part_tex_white_flash;
 
 /* Spawns a white flash particle at position moving with velocity; growing, or
    shrinking when flag is set; a negative size picks a random one. */
-void func_PAL_002BEF58(TI128 *position, TI128 *velocity, int flag, float size)
+void part_spawn_white_flash_pal(TI128 *position, TI128 *velocity, int flag, float size)
 {
     Particle_002BE278 *p = part_alloc(0x19);
     typeof(p->motion) *m = &p->motion;

@@ -11,10 +11,11 @@ typedef struct {
 extern CallbackState g_pause_menu_state;
 extern int g_menu_input_flags;
 extern int g_menu_input_flags;
-extern int func_PAL_L00_0030F768(int);
+extern int module_l00_call_handler_with_arg_20_pal(int);
 extern void ref_PAL_L00_0034EC80_00(int);
 
-int func_PAL_L00_0034EC80(void) {
+/* Handles menu input: reports the pause-menu value when the pending bit is set, otherwise reports 1 for a confirm or cancel button, or passes the flags on to a level module handler. */
+int level_l00_menu_input_update_pal(void) {
     int result = 0;
     int flags = g_menu_input_flags;
     if (flags & 0x10) {
@@ -42,7 +43,8 @@ extern void SetupGifPaging(long);
 extern void level_l00_call_module_handler_pal(void);
 extern void DoGifPaging(void);
 
-int func_PAL_L00_0034ED08(void)
+/* Brackets a level module handler call with GIF paging setup and flush, then returns zero. */
+int level_l00_paging_call_handler_pal(void)
 {
   SetupGifPaging(0);
   level_l00_call_module_handler_pal();

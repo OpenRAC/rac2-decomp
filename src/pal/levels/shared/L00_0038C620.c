@@ -3,9 +3,9 @@
 #include "common.h"
 
 /* Raise the byte field to eight when it is below. */
-void func_PAL_L00_0038C620(unsigned char *a0) {
-    if (a0[0x20] < 8) {
-        a0[0x20] = 8;
+void moby_l00_raise_state_to_8(unsigned char *object) {
+    if (object[0x20] < 8) {
+        object[0x20] = 8;
     }
 }
 
@@ -30,7 +30,8 @@ extern void *F6eb4f363_FUN_002BF728(char *object, char *local, float amount, flo
 
 /* func_00304AD0 uses the profile in 00304AD0-g8-qcopy.c. */
 
-void func_PAL_L00_0038CF30(char *object)
+/* Sometimes spawns a bubble effect on the ground under the object. */
+void part_l00_spawn_object_effect_burst_2_pal(char *object)
 {
     char local[16];
     float base;

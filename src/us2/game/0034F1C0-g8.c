@@ -13,6 +13,8 @@ extern void DrawBoltCounterPanel(void *);
 extern void text_panel_draw_scaled(void *);
 extern void func_0029CB80(void);
 
+/* Draws the item and bolt HUD with the HUD scale set to 0.62: lays out the radial menu, draws the bolt counter
+   and text panel, then restores the scale. (USA v2.00) */
 void hud_item_bolt_draw_us2(char *object)
 {
     float saved;

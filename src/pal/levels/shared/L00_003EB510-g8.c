@@ -42,6 +42,7 @@ typedef struct {
     BounceVector point, normal, offset;
 } BounceWorkspace;
 
+/* Updates the Mini Nuke projectile: it flies and bounces, then explodes and removes itself when it lands or leaves the map (PAL: 50 Hz timings). */
 void mini_nuke_projectile_update_pal(unsigned char *object) {
     char *state = *(char **)(object + 0x68);
     BounceWorkspace work;

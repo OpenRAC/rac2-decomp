@@ -30,13 +30,14 @@ extern void mat_combine_and_store(void *, const void *, const void *, const void
    state + 0x74 and state + 0x70 by the timer phase, brought down to at most 1. Both states
    then pass the position change, the old rotation and the rotation at object + 0xF0 to
    func_002AD6F0. */
-void func_PAL_L20_003A1B00(unsigned char *object) {
-    Vector oldPosition, oldRotation, delta;
+/* Moves a platform up and down in a repeating wave and passes its movement on to what rides on it (PAL: 50 Hz timer). */
+void bobbing_l20_platform_update_pal(unsigned char *object) {
+    Vector old_position, old_rotation, delta;
     unsigned char *state = *(unsigned char **)(object + 0x68);
     float phase, low, high, z;
 
-    oldPosition.q = *(TI128 *)(object + 0x10);
-    oldRotation.q = *(TI128 *)(object + 0xF0);
+    old_position.q = *(TI128 *)(object + 0x10);
+    old_rotation.q = *(TI128 *)(object + 0xF0);
     switch (object[0x20]) {
     case 0:
         if (flag_set_first_pending(object)) {
@@ -57,6 +58,6 @@ void func_PAL_L20_003A1B00(unsigned char *object) {
         *(float *)(object + 0x14) = z + (low + (high - low) * phase);
         break;
     }
-    FastVecSub(&delta, object + 0x10, &oldPosition);
-    mat_combine_and_store(state + 0x20, &delta, &oldRotation, object + 0xF0);
+    FastVecSub(&delta, object + 0x10, &old_position);
+    mat_combine_and_store(state + 0x20, &delta, &old_rotation, object + 0xF0);
 }

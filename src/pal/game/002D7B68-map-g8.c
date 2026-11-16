@@ -83,7 +83,7 @@ extern int req_push_queue(void *, int), req_launch_queued(void *);
 extern int map_find_table_index(int), map_find_cache_slot_by_id(int), map_choose_slot_to_reuse(void);
 extern void map_move_cache_slot(int, int);
 extern int fast_decompress_pal(int, void *);
-extern int func_PAL_002DF328(int), release_menu_stream_buffer(int);
+extern int menu_stream_chunk_claim_free_pal(int), release_menu_stream_buffer(int);
 extern void compose_bitmap_from_mask(void *, void *, void *, void *);
 extern void map_decode_occlusion(int, void *, void *), map_build_mask_bitmap(int, void *, void *);
 extern long register_8bit_texture(int, int, void *, void *, int, int);
@@ -92,17 +92,18 @@ extern int map_select_first_usable_slot(void), PickNextMap(void);
 extern s32 gfx_upload_records_to_buffer_slot(int, void *, int, int, int);
 extern int load_start_disc_read(int, int, int);
 
-int func_PAL_002D7B68(int arg)
+/* Runs the map screen: handles buttons, loads the map picture for the chosen page and streams the next one from disc (PAL version). */
+int DrawMapScreen_pal(int unused)
 {
-    int prev, idx, id, slot, n, buf, pick, next, k;
-    MapHeader *hdr;
-    char *pix, *pal, *base, *a, *tex, *b, *c;
-    int mapped;
-    char *tbase;
+    int previous_level, table_index, cache_id, slot, reuse_slot, mask_buffer, free_slot, next_map, map_key;
+    MapHeader *header;
+    char *pixels, *palette_data, *data_base, *mask_data, *texture_data, *layer1_data, *layer2_data;
+    int movie_index;
+    char *texture_base;
 
     map_update_overlay_pan_zoom();
     if (g_pause_menu_state.current != (MapPage *)g_level_page_root) {
-        prev = g_map_overlay_state.level;
+        previous_level = g_map_overlay_state.level;
         if ((g_pad_state[0x1C4 / 4] & 0xD00) && !g_pause_menu_state.locked) {
 close_map:
             return 1;
@@ -123,11 +124,11 @@ back_done:
             g_pause_menu_state.next = (int)g_pause_page_c;
         if ((g_pad_state[0x1C4 / 4] & 0x20) && g_map_overlay_state.level >= 0 && !g_pause_menu_state.pending) {
             if (g_map_overlay_state.level == 0)
-                mapped = 21;
+                movie_index = 21;
             else if (g_map_overlay_state.level == 24)
-                mapped = 0;
+                movie_index = 0;
             else
-                mapped = g_map_overlay_state.level;
+                movie_index = g_map_overlay_state.level;
             if (g_map_overlay_state.level < 0) goto close_map;
             {
                 unsigned int word = (unsigned)g_map_overlay_state.level >> 2;
@@ -144,64 +145,64 @@ back_done:
                 g_pause_menu_state.saved_mode = saved_mode;
             }
             D_001A7478_sda = 2;
-            req_push_queue(g_loader_movie, mapped);
+            req_push_queue(g_loader_movie, movie_index);
             req_launch_queued(g_loader_movie);
             goto close_map;
         }
-        idx = map_find_table_index(g_map_overlay_state.level);
-        if (idx >= 0) {
-            if ((g_pad_state[0x1C4 / 4] & 8) && idx < 27) {
-                if (g_map_select_list[idx + 1] || !g_current_map_index) map_set_current_and_refresh(g_map_select_list[idx + 1]);
+        table_index = map_find_table_index(g_map_overlay_state.level);
+        if (table_index >= 0) {
+            if ((g_pad_state[0x1C4 / 4] & 8) && table_index < 27) {
+                if (g_map_select_list[table_index + 1] || !g_current_map_index) map_set_current_and_refresh(g_map_select_list[table_index + 1]);
             }
-            if ((g_pad_state[0x1C4 / 4] & 4) && idx) {
-                if (g_map_select_list[idx - 1] || !g_current_map_index) map_set_current_and_refresh(g_map_select_list[idx - 1]);
+            if ((g_pad_state[0x1C4 / 4] & 4) && table_index) {
+                if (g_map_select_list[table_index - 1] || !g_current_map_index) map_set_current_and_refresh(g_map_select_list[table_index - 1]);
             }
         }
-        if (g_map_overlay_state.level != prev) {
+        if (g_map_overlay_state.level != previous_level) {
             snd_play_from_global_bank(3, 0, 0);
             menu_update_entry_states();
         }
     }
     if (g_pause_menu_state.current == (MapPage *)g_level_page_root)
         g_map_overlay_state.stream = 1;
-    id = g_map_overlay_state.level;
-    if (g_map_overlay_flag) id += 256;
-    slot = map_find_cache_slot_by_id(id);
+    cache_id = g_map_overlay_state.level;
+    if (g_map_overlay_flag) cache_id += 256;
+    slot = map_find_cache_slot_by_id(cache_id);
     if (g_map_overlay_state.level != g_map_overlay_state.loaded && slot != -1) {
-        n = map_choose_slot_to_reuse();
-        if (g_map_overlay_state.slots[0] && n > 0) {
-            map_move_cache_slot(n, 0);
-            if (!slot) slot = n;
+        reuse_slot = map_choose_slot_to_reuse();
+        if (g_map_overlay_state.slots[0] && reuse_slot > 0) {
+            map_move_cache_slot(reuse_slot, 0);
+            if (!slot) slot = reuse_slot;
         }
         fast_decompress_pal(g_map_overlay_state.slots[slot], g_map_overlay_state.header);
-        hdr = g_map_overlay_state.header;
-        pix = (char *)hdr + hdr->pixels;
-        pal = (char *)hdr + hdr->palette;
-        buf = func_PAL_002DF328(0);
-        if (buf) {
-            base = (char *)g_map_overlay_state.header;
-            a = base + hdr->mask + 8;
+        header = g_map_overlay_state.header;
+        pixels = (char *)header + header->pixels;
+        palette_data = (char *)header + header->palette;
+        mask_buffer = menu_stream_chunk_claim_free_pal(0);
+        if (mask_buffer) {
+            data_base = (char *)g_map_overlay_state.header;
+            mask_data = data_base + header->mask + 8;
             if (g_map_overlay_state.level == g_current_map_index)
-                compose_bitmap_from_mask(pal, pix, pal, g_map_overlay_state.mask);
+                compose_bitmap_from_mask(palette_data, pixels, palette_data, g_map_overlay_state.mask);
             else {
                 if (g_map_unlocked_flags[g_map_overlay_state.level])
-                    map_decode_occlusion(buf, g_map_occlusion_data + (g_map_overlay_state.level << 11), base + hdr->chunks);
+                    map_decode_occlusion(mask_buffer, g_map_occlusion_data + (g_map_overlay_state.level << 11), data_base + header->chunks);
                 else
-                    map_build_mask_bitmap(buf, a, a);
-                compose_bitmap_from_mask(pal, pix, pal, (void *)buf);
+                    map_build_mask_bitmap(mask_buffer, mask_data, mask_data);
+                compose_bitmap_from_mask(palette_data, pixels, palette_data, (void *)mask_buffer);
             }
         }
-        tbase = (char *)g_map_overlay_state.header;
-        tex = tbase + hdr->texture;
-        b = tbase + hdr->layer1 + 0x420;
-        c = tbase + hdr->layer2 + 0x420;
-        g_map_overlay_state.texture[0] = register_8bit_texture(7, 7, tex + 32, tex + 0x420, g_map_overlay_state.clut_vram, g_map_overlay_state.texture_vram[0]);
-        g_map_overlay_state.texture[1] = register_8bit_texture(7, 7, tex + 32, b, g_map_overlay_state.clut_vram, g_map_overlay_state.texture_vram[1]);
-        g_map_overlay_state.texture[2] = register_8bit_texture(7, 7, tex + 32, c, g_map_overlay_state.clut_vram, g_map_overlay_state.texture_vram[2]);
-        if (buf) register_8bit_texture(9, 9, pal, pal, 0x3FF000, g_map_overlay_state.image_vram);
+        texture_base = (char *)g_map_overlay_state.header;
+        texture_data = texture_base + header->texture;
+        layer1_data = texture_base + header->layer1 + 0x420;
+        layer2_data = texture_base + header->layer2 + 0x420;
+        g_map_overlay_state.texture[0] = register_8bit_texture(7, 7, texture_data + 32, texture_data + 0x420, g_map_overlay_state.clut_vram, g_map_overlay_state.texture_vram[0]);
+        g_map_overlay_state.texture[1] = register_8bit_texture(7, 7, texture_data + 32, layer1_data, g_map_overlay_state.clut_vram, g_map_overlay_state.texture_vram[1]);
+        g_map_overlay_state.texture[2] = register_8bit_texture(7, 7, texture_data + 32, layer2_data, g_map_overlay_state.clut_vram, g_map_overlay_state.texture_vram[2]);
+        if (mask_buffer) register_8bit_texture(9, 9, palette_data, palette_data, 0x3FF000, g_map_overlay_state.image_vram);
         func_0029D0E0();
-        if (buf) release_menu_stream_buffer(buf);
-        g_map_overlay_state.slots[0] = (int)pix;
+        if (mask_buffer) release_menu_stream_buffer(mask_buffer);
+        g_map_overlay_state.slots[0] = (int)pixels;
         g_map_overlay_state.loaded = g_map_overlay_state.level;
         func_0029DEA8(g_map_overlay_state.level, 0);
     }
@@ -210,47 +211,47 @@ back_done:
         g_map_overlay_state.ids[g_map_overlay_state.selected] ^= 0x1000;
         g_map_overlay_state.selected = -1;
     }
-    pick = -1;
+    free_slot = -1;
     if (g_map_overlay_state.stream && !g_music_state.mode) {
-        pick = map_select_first_usable_slot();
-        if (pick != -1) {
-            next = PickNextMap();
-            if (next != -1) {
-                k = (g_current_map_index + g_map_overlay_state.source_level == 0) ? 0 : 256;
-                if (k == next) {
-                    gfx_upload_records_to_buffer_slot(g_map_overlay_state.slots[pick], g_map_overlay_state.source, 0, g_map_overlay_state.source_size, 0);
-                    g_map_overlay_state.sizes[pick] = g_map_overlay_state.source_size;
+        free_slot = map_select_first_usable_slot();
+        if (free_slot != -1) {
+            next_map = PickNextMap();
+            if (next_map != -1) {
+                map_key = (g_current_map_index + g_map_overlay_state.source_level == 0) ? 0 : 256;
+                if (map_key == next_map) {
+                    gfx_upload_records_to_buffer_slot(g_map_overlay_state.slots[free_slot], g_map_overlay_state.source, 0, g_map_overlay_state.source_size, 0);
+                    g_map_overlay_state.sizes[free_slot] = g_map_overlay_state.source_size;
                 } else {
-                    if (next & 256) {
+                    if (next_map & 256) {
                         int *size;
                         int sector, origin, read_buffer, sectors;
                         origin = g_copy_setup_data.base;
-                        sector = g_copy_setup_data.alt_maps[next ^ 256].offset;
-                        size = &g_copy_setup_data.alt_maps[next ^ 256].size;
-                        read_buffer = g_map_overlay_state.slots[pick];
+                        sector = g_copy_setup_data.alt_maps[next_map ^ 256].offset;
+                        size = &g_copy_setup_data.alt_maps[next_map ^ 256].size;
+                        read_buffer = g_map_overlay_state.slots[free_slot];
                         sectors = *size;
                         load_start_disc_read(read_buffer, sector + origin, sectors);
-                        g_map_overlay_state.sizes[pick] = (*size << 11) >> 4;
+                        g_map_overlay_state.sizes[free_slot] = (*size << 11) >> 4;
                     } else {
                         int *size;
                         int sector, origin, read_buffer, sectors;
                         origin = g_copy_setup_data.base;
-                        sector = g_copy_setup_data.maps[next].offset;
-                        size = &g_copy_setup_data.maps[next].size;
-                        read_buffer = g_map_overlay_state.slots[pick];
+                        sector = g_copy_setup_data.maps[next_map].offset;
+                        size = &g_copy_setup_data.maps[next_map].size;
+                        read_buffer = g_map_overlay_state.slots[free_slot];
                         sectors = *size;
                         load_start_disc_read(read_buffer, sector + origin, sectors);
-                        g_map_overlay_state.sizes[pick] = (*size << 11) >> 4;
+                        g_map_overlay_state.sizes[free_slot] = (*size << 11) >> 4;
                     }
                     g_pause_menu_state.pending = 1;
                 }
-                g_map_overlay_state.ids[pick] = next | 0x1000;
-                g_map_overlay_state.selected = pick;
+                g_map_overlay_state.ids[free_slot] = next_map | 0x1000;
+                g_map_overlay_state.selected = free_slot;
             }
         }
     }
-    slot = map_find_cache_slot_by_id(id);
-    if (g_map_overlay_state.level != g_map_overlay_state.loaded && !g_music_state.mode && slot == -1 && pick == slot)
+    slot = map_find_cache_slot_by_id(cache_id);
+    if (g_map_overlay_state.level != g_map_overlay_state.loaded && !g_music_state.mode && slot == -1 && free_slot == slot)
         map_choose_slot_to_reuse();
     return 0;
 }

@@ -69,7 +69,7 @@ extern int ref_L00_003A98E8_1 MACRO_ADDR;
  * spot, with a burst of particles, and returns 0. Otherwise it starts the projectile's effect and
  * returns the moby. `mode' follows the FP arguments: the integer and FP banks are assigned apart,
  * so it stays in $a3, and its argument move comes late enough to give it the shorter life. */
-char *func_PAL_L00_003AD088(void *position, void *velocity, char *owner, float speed, float life,
+char *SpawnProjectile_pal(void *position, void *velocity, char *owner, float speed, float life,
                         float scale, int mode)
 {
     ProjectilePoint from;

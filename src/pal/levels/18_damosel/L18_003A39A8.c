@@ -2,7 +2,7 @@
 
 #include "common.h"
 extern s32 FastDecTimer(s16 *timer);
-extern s32 func_PAL_00289730(s32 key, s32 selection);
+extern s32 subtitle_request_voice_line_pal(s32 key, s32 selection);
 extern s32 IsPointInCuboid(void *point, s32 index);
 extern s32 snd_play_from_global_bank(s32 index, s32 value, void *object);
 extern void value_set_entry_by_index_pal(s32 first, s32 second);
@@ -16,26 +16,27 @@ extern s32 func_001163B0(void);
 extern s32 FloatToInt(float);
 extern u8 *g_orbiting_effect_type_table;
 
-void two_step_hero_trigger_update_pal(u8 *entity) {
+/* Watches the hero in two steps, first for one action and then for another, and then triggers an event with a sound. (PAL: 50 Hz timings) */
+void two_step_hero_trigger_update_pal(u8 *moby) {
     u8 *state;
     u32 substate;
     u8 mode;
 
-    state = *(u8 **)(entity + 0x68);
-    if (entity[0x20] == 0) {
-        entity[0x30] = 0xFF;
+    state = *(u8 **)(moby + 0x68);
+    if (moby[0x20] == 0) {
+        moby[0x30] = 0xFF;
         *(u16 *)(state + 0xE) = 0x21;
         *(u16 *)(state + 0xC) = 0;
-        entity[0x20] = 1;
+        moby[0x20] = 1;
     }
     if (g_two_step_trigger_flag != 0)
         goto after;
     if (g_map_overlay_flag[0] != 0) {
         if (FastDecTimer((s16 *)(state + 0xE)) != 0)
-            func_PAL_00289730(0xA27, 0x7E);
+            subtitle_request_voice_line_pal(0xA27, 0x7E);
     }
 after:
-    mode = entity[0x20];
+    mode = moby[0x20];
     if (mode != 1)
         goto end;
     substate = *(u32 *)(state + 0x8);

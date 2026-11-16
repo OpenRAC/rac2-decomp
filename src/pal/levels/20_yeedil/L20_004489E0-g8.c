@@ -17,21 +17,22 @@ extern int math_random_int_below(int);
 extern char *moby_activate_linked_child_pal(char *,void *);
 extern char *yeedil_boss_place_group_member_pal(char *,void *);
 
-char *yeedil_boss_spawn_minion_at_point_pal(char *arg0) {
+/* Picks a spawn point on the arena edge that is in front of the camera and not too close to the hero or the enemy, then launches a helper there. (PAL) */
+char *yeedil_boss_spawn_minion_at_point_pal(char *moby) {
     V pos;
-    char *state=*(char **)(arg0+0x68);
+    char *state=*(char **)(moby+0x68);
     char *points=g_path_point_tables[*(int *)(state+0x234)];
     int i,best=-1;
     float angle,limit=3.1415927f;
     for(i=0;i<6;i++) {
-        char *p=points+0x10+i*0x10;
+        char *point=points+0x10+i*0x10;
         if (*(int *)(state+0x182C)==0 && i!=0 && i!=3) continue;
         if (*(int *)(state+0x182C)==1 && (i==0 || i==3)) continue;
-        if (vec_distance_xy(p,g_hero_position)>3.0f && vec_distance_xy(p,arg0+0x10)>6.0f) {
-            angle=mat_fast_helper_a(*(float *)p-g_hero_l20_extra_state.x,*(float *)(p+4)-g_hero_l20_extra_state.y);
+        if (vec_distance_xy(point,g_hero_position)>3.0f && vec_distance_xy(point,moby+0x10)>6.0f) {
+            angle=mat_fast_helper_a(*(float *)point-g_hero_l20_extra_state.x,*(float *)(point+4)-g_hero_l20_extra_state.y);
             angle=FastDiffRots(g_hero_l20_extra_state.yaw,angle);
             if (angle<limit) {
-                qcopy(&pos,p);
+                qcopy(&pos,point);
                 pos.f[2]=coll_probe_ground_height_below(&pos,0,0.5f)+0.6f;
                 if (!coll_test_point(&pos,0.5f,0,0)) {limit=angle;best=i;}
             }
@@ -40,6 +41,6 @@ char *yeedil_boss_spawn_minion_at_point_pal(char *arg0) {
     if(best==-1) return 0;
     qcopy(&pos,points+best*0x10+0x10);
     pos.f[2]=coll_probe_ground_height_below(&pos,0,0.5f);
-    if(g_yeedil_force_minion_spawn || (*(int *)(state+0x182C)!=0 && math_random_int_below(2))) return moby_activate_linked_child_pal(arg0,&pos);
-    return yeedil_boss_place_group_member_pal(arg0,&pos);
+    if(g_yeedil_force_minion_spawn || (*(int *)(state+0x182C)!=0 && math_random_int_below(2))) return moby_activate_linked_child_pal(moby,&pos);
+    return yeedil_boss_place_group_member_pal(moby,&pos);
 }

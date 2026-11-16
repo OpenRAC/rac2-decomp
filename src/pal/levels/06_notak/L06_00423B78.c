@@ -14,6 +14,7 @@ extern char *part_spawn_ground_effect(void *, int, float, float, unsigned int, i
 extern int FloatToInt(float);
 extern float math_random_float_range(float, float);
 
+/* Throws a burst of colored particles away from the hero's side of the given position (PAL: 50 Hz timings). */
 void part_spawn_colored_burst_pal(float *pos, int count) {
     float velocity[4], origin[4], direction[4], axis[4], offset[4];
     float size, angle;
@@ -49,53 +50,54 @@ void part_spawn_colored_burst_pal(float *pos, int count) {
 
 extern void moby_set_state(char *, int, int);
 extern int math_fast_float_d(char *);
-extern void func_PAL_002A7E68(char *, int, int, int);
+extern void anim_start_blended_pal(char *, int, int, int);
 
-void actor_choose_idle_anim_pal(char *a0)
+/* Picks the actor's next walking or idle animation after it reaches a goal or finishes a turn (PAL: 50 Hz timings). */
+void actor_choose_idle_anim_pal(char *moby)
 {
-    char *o = *(char **)(a0 + 0x68);
+    char *state = *(char **)(moby + 0x68);
 
-    if (*(int *)(o + 0x5A0) == 1) {
-        if (*(int *)(o + 0x23C) == -1) {
-            if (math_fast_float_d(o + 0x25C)) {
-                moby_set_state(a0, 7, 2);
-                if (*(unsigned char *)(a0 + 0x43) != 0x13) {
-                    func_PAL_002A7E68(a0, 0x13, 0, 17);
+    if (*(int *)(state + 0x5A0) == 1) {
+        if (*(int *)(state + 0x23C) == -1) {
+            if (math_fast_float_d(state + 0x25C)) {
+                moby_set_state(moby, 7, 2);
+                if (*(unsigned char *)(moby + 0x43) != 0x13) {
+                    anim_start_blended_pal(moby, 0x13, 0, 17);
                 }
-                o[0x48] = FloatToInt(20.0f);
-                o[0x4A] = FloatToInt(24.0f);
+                state[0x48] = FloatToInt(20.0f);
+                state[0x4A] = FloatToInt(24.0f);
             }
         } else {
-            moby_set_state(a0, 8, 2);
-            if (*(unsigned char *)(a0 + 0x43) != 0x12) {
-                func_PAL_002A7E68(a0, 0x12, 0, 17);
+            moby_set_state(moby, 8, 2);
+            if (*(unsigned char *)(moby + 0x43) != 0x12) {
+                anim_start_blended_pal(moby, 0x12, 0, 17);
             }
-            o[0x48] = FloatToInt(20.0f);
-            o[0x4A] = FloatToInt(24.0f);
+            state[0x48] = FloatToInt(20.0f);
+            state[0x4A] = FloatToInt(24.0f);
         }
-    } else if (*(short *)(o + 0x492) != 0 && math_fast_float_d(o + 0x25C)) {
-        *(short *)(o + 0x492) = 0;
-        moby_set_state(a0, 7, 2);
+    } else if (*(short *)(state + 0x492) != 0 && math_fast_float_d(state + 0x25C)) {
+        *(short *)(state + 0x492) = 0;
+        moby_set_state(moby, 7, 2);
         if (!math_random_int_below(2)) {
-            if (*(unsigned char *)(a0 + 0x43) != 0x11) {
-                func_PAL_002A7E68(a0, 0x11, 0, 17);
+            if (*(unsigned char *)(moby + 0x43) != 0x11) {
+                anim_start_blended_pal(moby, 0x11, 0, 17);
             }
-            o[0x48] = FloatToInt(20.0f);
-            o[0x4A] = FloatToInt(24.0f);
+            state[0x48] = FloatToInt(20.0f);
+            state[0x4A] = FloatToInt(24.0f);
         } else {
-            if (*(unsigned char *)(a0 + 0x43) != 0x13) {
-                func_PAL_002A7E68(a0, 0x13, 0, 17);
+            if (*(unsigned char *)(moby + 0x43) != 0x13) {
+                anim_start_blended_pal(moby, 0x13, 0, 17);
             }
-            o[0x48] = FloatToInt(20.0f);
-            o[0x4A] = FloatToInt(24.0f);
+            state[0x48] = FloatToInt(20.0f);
+            state[0x4A] = FloatToInt(24.0f);
         }
-    } else if (*(short *)(o + 0x492) == 0 && math_fast_float_d(o + 0x25C)) {
-        moby_set_state(a0, 9, 2);
-        if (*(unsigned char *)(a0 + 0x43) != 0x12) {
-            func_PAL_002A7E68(a0, 0x12, 0, 17);
+    } else if (*(short *)(state + 0x492) == 0 && math_fast_float_d(state + 0x25C)) {
+        moby_set_state(moby, 9, 2);
+        if (*(unsigned char *)(moby + 0x43) != 0x12) {
+            anim_start_blended_pal(moby, 0x12, 0, 17);
         }
-        o[0x48] = FloatToInt(20.0f);
-        o[0x4A] = FloatToInt(24.0f);
+        state[0x48] = FloatToInt(20.0f);
+        state[0x4A] = FloatToInt(24.0f);
     }
 }
 

@@ -17,7 +17,7 @@ extern void FastVecAdd(char *, char *, char *);
 /* func_002C38E0 is in the -G8 sibling. */
 
 /* Advances a spark, stops it on collision, and decays its RGBA channels. */
-void func_PAL_002C4810(char *p) {
+void part_update_colliding_spark_pal(char *p) {
  float v[4];char *q;
  if(!p)return;
  q=p+32;*(float *)(p+12)+=-120.00001f;

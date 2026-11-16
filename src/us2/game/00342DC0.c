@@ -3,6 +3,7 @@
 
 extern void menu_set_entry_table(unsigned char *owner, float *records);
 
+/* Sets the record table of a list menu and of its list. */
 void list_menu_set_records_us2(unsigned char *owner, float *records)
 {
     menu_set_entry_table(owner + 0x10, records);

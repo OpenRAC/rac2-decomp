@@ -12,7 +12,7 @@ static __inline__ float ParticleLifetimeFraction(float remaining, float lifetime
  return remaining / lifetime;
 }
 
-void func_PAL_002BEB88(char *p)
+void part_update_fading_puff_pal(char *p)
 {
  char *q=p+32, *pos=p+16;
  float f,denom;

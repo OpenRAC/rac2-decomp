@@ -19,35 +19,37 @@ extern void snd_stop_voice(int);
 extern int math_fast_float_d(void *);
 extern void FadeToBlack(int);
 extern void level_store_value_pair_us2(int, void *);
-extern s32 func_US2_L15_00431C88(void);
+extern s32 gorn_reward_panel_draw_us2(void);
 extern void snd_clamp_copy_volumes(void);
 extern int MemcardSave(int,int);
 extern void hero_set_state_value_c(int);
 extern void ResetGornStageCounters(void *);
 extern int request_begin_slot(int,int,int,int,int);
 
-void gorn_finish_challenge_stage_us2(char *self, int stage)
+/* Finishes a Gorn challenge stage (USA v2.00): stops the stage sound, shows the reward panel and
+   adds the bolts, then waits for the pad to retry or leave. */
+void gorn_finish_challenge_stage_us2(char *moby, int stage)
 {
-    char *state = *(char **)(self + 0x68);
-    char *obj = g_moby_base + (*(int *)(state + 0x20) << 8);
-    GornData *data = *(GornData **)(obj + 0x68);
-    int id = data->id;
-    if (id != -1) {
-        char *entry = g_sound_state + id * 0x70;
-        if (*(char **)(entry + 0x88) == obj && *(unsigned char *)(entry + 0x74))
-            snd_stop_voice(id);
+    char *vars = *(char **)(moby + 0x68);
+    char *stage_moby = g_moby_base + (*(int *)(vars + 0x20) << 8);
+    GornData *data = *(GornData **)(stage_moby + 0x68);
+    int voice_id = data->id;
+    if (voice_id != -1) {
+        char *entry = g_sound_state + voice_id * 0x70;
+        if (*(char **)(entry + 0x88) == stage_moby && *(unsigned char *)(entry + 0x74))
+            snd_stop_voice(voice_id);
     }
     data->id = -1;
     if (g_challenge_mode == 2) {
         return;
     }
-    if (!math_fast_float_d(state + 0x6C)) {
+    if (!math_fast_float_d(vars + 0x6C)) {
         return;
     }
     if (g_challenge_menu_data && !g_gorn_stage_finished_flag) {
         int count, value;
         FadeToBlack(30);
-        level_store_value_pair_us2(0, func_US2_L15_00431C88);
+        level_store_value_pair_us2(0, gorn_reward_panel_draw_us2);
         count = g_challenge_completed_a[stage];
         value = g_gorn_reward_table[stage][count < 3 ? count : 2];
         g_gorn_stage_finished_flag = 1;
@@ -61,13 +63,13 @@ void gorn_finish_challenge_stage_us2(char *self, int stage)
         MemcardSave(0, -1);
     }
     hero_set_state_value_c(1);
-    if (!math_fast_float_d(state + 0x50)) {
+    if (!math_fast_float_d(vars + 0x50)) {
         if (g_pad_held_flags & 0x40) {
             g_gorn_stage_finished_flag = 0;
-            *(int *)(state + 0x50) = 5400;
+            *(int *)(vars + 0x50) = 5400;
             FadeToBlack(30);
             hero_set_state_value_c(0);
-            *(int *)(state + 0x6C) = 120;
+            *(int *)(vars + 0x6C) = 120;
             if (g_challenge_completed_a[0]) {
                 if (D_L15_001B1520_4[1] && D_L15_001B1520_4[2]) {
                     g_gorn_selected_challenge = 3;
@@ -80,11 +82,11 @@ void gorn_finish_challenge_stage_us2(char *self, int stage)
                 }
             }
             g_gorn_cutscene_started_flag = 0;
-            ResetGornStageCounters(self);
+            ResetGornStageCounters(moby);
         } else if (g_pad_held_flags & 0x10) {
             request_begin_slot(3, 1, 4, 0, 0);
         }
     } else {
-        *(int *)(state + 0x50) = 5400;
+        *(int *)(vars + 0x50) = 5400;
     }
 }

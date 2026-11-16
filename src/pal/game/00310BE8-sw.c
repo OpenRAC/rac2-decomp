@@ -24,7 +24,7 @@ extern float FastVecLength(void *);
 extern float fast_vec_dist(void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
 extern void moby_transform_joint_to_world(void *, int, void *);
-extern void func_PAL_002A7E68(void *, int, int, int);
+extern void anim_start_blended_pal(void *, int, int, int);
 extern int PlayMobySound(int, int, char *);
 extern s32 swingshot_hook_spawn_pal(s32 arg0, f32 fparg0);
 extern void gfx_draw_wavy_link_strip(char *);

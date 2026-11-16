@@ -167,7 +167,8 @@ static __inline__ int hud_bar_bottom(void)
     return h - y + hud_size(mode, g_hud_bar_size_param, scale, 0.5f);
 }
 
-int func_US2_L08_0041EDCC(void)
+/* Draws the level status HUD: the status bar and its labels, warning and counter texts and the pickup icon (USA v2.00). */
+int hud_draw_level_status_us2(void)
 {
     unsigned int colors[4];
     struct Palette { unsigned int a,b; } palette;

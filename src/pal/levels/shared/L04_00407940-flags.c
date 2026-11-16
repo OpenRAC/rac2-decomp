@@ -13,7 +13,7 @@ typedef unsigned int PathQuad __attribute__((mode(TI)));
 extern int g_is_pal_video MACRO_ADDR;
 extern int g_current_lap __attribute__((sda));
 
-extern void func_PAL_L04_00407168(void *);
+extern void UpdateRacerRouteChoice_pal(void *);
 extern float IntToFloat(int);
 extern int GetCollHitMaterial(void);
 extern float math_fabs(float);
@@ -40,12 +40,12 @@ extern void add_vectors(void *, void *, void *);
 
 /* Paces a route follower: derives its speed from the time left and from a peer at +0x164,
    steers its lateral offset (+0x16C) and advances its point on the route at +0x110. */
-void func_PAL_L04_00407940(unsigned char *moby, unsigned char *vars)
+void UpdateRouteFollowerPace_pal(unsigned char *moby, unsigned char *vars)
 {
-    float toNext[4], toPeer[4], cross[4], tmp[4];
-    unsigned char *peerVars;
+    float to_next[4], to_peer[4], cross[4], tmp[4];
+    unsigned char *peer_vars;
     float speed, distance;
-    int i, neighbor, next, oldIndex;
+    int i, neighbor, next, old_index;
 
     if (INT_AT(vars, 0x180))
         INT_AT(vars, 0x180)--;
@@ -67,7 +67,7 @@ void func_PAL_L04_00407940(unsigned char *moby, unsigned char *vars)
     if (INT_AT(vars, 0x1C0) > 0)
         return;
 
-    func_PAL_L04_00407168(moby);
+    UpdateRacerRouteChoice_pal(moby);
 
     if (speed < 0.0f
         || (speed >= 22.15f && INT_AT(vars, 0x160) >= 2
@@ -83,27 +83,27 @@ void func_PAL_L04_00407940(unsigned char *moby, unsigned char *vars)
         float delta;
         unsigned char *peer = PTR_AT(vars, 0x164);
 
-        peerVars = PTR_AT(peer, 0x68);
-        delta = FLOAT_AT(peerVars, 0x310) - FLOAT_AT(vars, 0x11C);
+        peer_vars = PTR_AT(peer, 0x68);
+        delta = FLOAT_AT(peer_vars, 0x310) - FLOAT_AT(vars, 0x11C);
         /* Re-reading the peer's state here lets jump threading skip the identical test below. */
-        if (FLOAT_AT(vars, 0x11C) + 12.0f < FLOAT_AT(peerVars, 0x310)
-            && FLOAT_AT(vars, 0x11C) > FLOAT_AT(peerVars, 0x310) - 150.0f
+        if (FLOAT_AT(vars, 0x11C) + 12.0f < FLOAT_AT(peer_vars, 0x310)
+            && FLOAT_AT(vars, 0x11C) > FLOAT_AT(peer_vars, 0x310) - 150.0f
             && g_current_lap >= INT_AT(vars, 0x160)
-            && PTR_AT(peerVars, 0x730) != moby
+            && PTR_AT(peer_vars, 0x730) != moby
             && PTR_AT(vars, 0x164)[0xBC] == 5)
             FLOAT_AT(vars, 0x134) += (delta - 12.0f) * 0.002f;
-        if (PTR_AT(vars, 0x164)[0xBC] == 5 && !INT_AT(peerVars, 0x724) && delta > 1.0f && delta < 10.0f) {
-            PTR_AT(peerVars, 0x734) = moby;
-            INT_AT(peerVars, 0x720) = 1;
+        if (PTR_AT(vars, 0x164)[0xBC] == 5 && !INT_AT(peer_vars, 0x724) && delta > 1.0f && delta < 10.0f) {
+            PTR_AT(peer_vars, 0x734) = moby;
+            INT_AT(peer_vars, 0x720) = 1;
         }
         if (INT_AT(vars, 0x168) && vars[0xA2] != 1 && math_fabs(delta) < 10.0f
             && INT_AT(vars, 0x160) >= g_current_lap) {
             int closest;
 
             FLOAT_AT(vars, 0x134) += (delta * 0.020000001f) + (delta * 0.020000001f);
-            if (FLOAT_AT(vars, 0x11C) > FLOAT_AT(peerVars, 0x310) && !INT_AT(vars, 0x180)
+            if (FLOAT_AT(vars, 0x11C) > FLOAT_AT(peer_vars, 0x310) && !INT_AT(vars, 0x180)
                 && !SHORT_AT(vars, 0x17E) && PTR_AT(vars, 0x8C)) {
-                float lead = FLOAT_AT(vars, 0x11C) - FLOAT_AT(peerVars, 0x310);
+                float lead = FLOAT_AT(vars, 0x11C) - FLOAT_AT(peer_vars, 0x310);
 
                 if (lead < 10.0f && lead > 2.0f && !math_random_int_below(1)) {
                     unsigned char *target = PTR_AT(vars, 0x164);
@@ -116,7 +116,7 @@ void func_PAL_L04_00407940(unsigned char *moby, unsigned char *vars)
                     else
                         anim_start_blended(PTR_AT(vars, 0x8C), 7, 0, 10);
                     INT_AT(vars, 0x180) = (math_random_int_range(120, 180) * 5 + 2) / 6;
-                } else if (FLOAT_AT(vars, 0x11C) - FLOAT_AT(peerVars, 0x310) > -5.0f && !math_random_int_below(3)) {
+                } else if (FLOAT_AT(vars, 0x11C) - FLOAT_AT(peer_vars, 0x310) > -5.0f && !math_random_int_below(3)) {
                     unsigned char *target = PTR_AT(vars, 0x164);
                     float angle = fast_subtract_rotations(FLOAT_AT(moby, 0xF8),
                                                 mat_fast_helper_a(FLOAT_AT(target, 0x10) - FLOAT_AT(moby, 0x10),
@@ -130,29 +130,29 @@ void func_PAL_L04_00407940(unsigned char *moby, unsigned char *vars)
                 } else
                     INT_AT(vars, 0x180) = 50;
             }
-            *(PathQuad *)toNext = *(PathQuad *)(PTR_AT(vars, 0x164) + 0x10);
-            closest = vec_find_nearest_point_index(toNext, PTR_AT(vars, 0x110));
+            *(PathQuad *)to_next = *(PathQuad *)(PTR_AT(vars, 0x164) + 0x10);
+            closest = vec_find_nearest_point_index(to_next, PTR_AT(vars, 0x110));
             if (closest == 0 || closest == INT_AT(PTR_AT(vars, 0x110), 0) - 1)
                 FLOAT_AT(vars, 0x16C) = 0;
             else {
-                float nextDist, prevDist;
+                float next_dist, prev_dist;
                 int prev;
 
                 next = closest + 1;
                 prev = closest - 1;
-                nextDist = fast_vec_dist(PTR_AT(vars, 0x110) + 16 + next * 16, PTR_AT(vars, 0x164) + 16);
-                prevDist = fast_vec_dist(PTR_AT(vars, 0x110) + 16 + prev * 16, PTR_AT(vars, 0x164) + 16);
+                next_dist = fast_vec_dist(PTR_AT(vars, 0x110) + 16 + next * 16, PTR_AT(vars, 0x164) + 16);
+                prev_dist = fast_vec_dist(PTR_AT(vars, 0x110) + 16 + prev * 16, PTR_AT(vars, 0x164) + 16);
                 neighbor = prev;
-                if (nextDist < prevDist)
+                if (next_dist < prev_dist)
                     neighbor = next;
                 FLOAT_AT(vars, 0x16C) = math_distance_to_line(PTR_AT(vars, 0x110) + 16 + closest * 16,
                                                           PTR_AT(vars, 0x110) + 16 + neighbor * 16,
                                                           PTR_AT(vars, 0x164) + 16);
                 FastVecSub(tmp, PTR_AT(vars, 0x110) + 16 + next * 16, PTR_AT(vars, 0x110) + 16 + closest * 16);
-                *(PathQuad *)toNext = *(PathQuad *)tmp;
+                *(PathQuad *)to_next = *(PathQuad *)tmp;
                 FastVecSub(tmp, PTR_AT(vars, 0x164) + 16, PTR_AT(vars, 0x110) + 16 + closest * 16);
-                *(PathQuad *)toPeer = *(PathQuad *)tmp;
-                FastVecCross(cross, toNext, toPeer);
+                *(PathQuad *)to_peer = *(PathQuad *)tmp;
+                FastVecCross(cross, to_next, to_peer);
                 if (cross[2] > 0.0f)
                     FLOAT_AT(vars, 0x16C) = -FLOAT_AT(vars, 0x16C);
                 if (FLOAT_AT(vars, 0x16C) > 1.5f)
@@ -169,7 +169,7 @@ void func_PAL_L04_00407940(unsigned char *moby, unsigned char *vars)
             FLOAT_AT(vars, 0x134) = 0.1772f;
     }
 
-    oldIndex = INT_AT(vars, 0x114);
+    old_index = INT_AT(vars, 0x114);
     distance = vec_distance_xy(vars + 0xF0, moby + 0x10);
     if ((INT_AT(vars, 0x244) && distance < 15.0f) || (!INT_AT(vars, 0x244) && distance < 5.0f)) {
         FLOAT_AT(vars, 0xA8) += (INT_AT(vars, 0x244) ? 15.0f : 5.0f) - distance;
@@ -198,7 +198,7 @@ void func_PAL_L04_00407940(unsigned char *moby, unsigned char *vars)
                           vars + 0x114, vars + 0x118, vars + 0xF0);
         }
     }
-    for (i = oldIndex; i <= INT_AT(vars, 0x114); i++) {
+    for (i = old_index; i <= INT_AT(vars, 0x114); i++) {
         unsigned char *point = PTR_AT(vars, 0x110) + i * 16;
         float f = FLOAT_AT(point, 0x1C);
 
@@ -226,8 +226,8 @@ void func_PAL_L04_00407940(unsigned char *moby, unsigned char *vars)
         }
     }
     distance = FLOAT_AT(vars, 0x170) + FLOAT_AT(vars, 0x16C);
-    toNext[0] = math_fast_sin_or_cos_a(FastAddRotations(FLOAT_AT(moby, 0xF8), 1.5707964897155762f)) * distance;
-    toNext[1] = math_fast_sin_or_cos_b(FastAddRotations(FLOAT_AT(moby, 0xF8), 1.5707964897155762f)) * distance;
-    toNext[2] = 0.0f;
-    add_vectors(toPeer, vars + 0xF0, toNext);
+    to_next[0] = math_fast_sin_or_cos_a(FastAddRotations(FLOAT_AT(moby, 0xF8), 1.5707964897155762f)) * distance;
+    to_next[1] = math_fast_sin_or_cos_b(FastAddRotations(FLOAT_AT(moby, 0xF8), 1.5707964897155762f)) * distance;
+    to_next[2] = 0.0f;
+    add_vectors(to_peer, vars + 0xF0, to_next);
 }

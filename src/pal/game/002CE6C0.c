@@ -29,6 +29,7 @@ void DoGifPaging(void);
 
 /* External functions declared with exact aliases from task.externals */
 
+/* Draws a menu screen through one helper call between SetupGifPaging and DoGifPaging (PAL). */
 long long menu_draw_screen_via_helper_pal(void)
 {
     SetupGifPaging(0LL);

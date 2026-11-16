@@ -9,7 +9,7 @@ typedef int TI128 __attribute__((mode(TI)));
 typedef union { u8 b[0x2600]; s8 c[0x2600]; s16 h[0x1300]; u16 uh[0x1300]; s32 i[0x980]; u32 u[0x980]; f32 f[0x980]; void *ptr[0x980]; s64 d[0x4C0]; TI128 q[0x260]; } Hero;
 
 /* A 0x80-byte record of the level table at D_L13_001B2A0C; its point is at +0x30. */
-typedef struct { u8 pad0[0x30]; TI128 v; u8 pad40[0x40]; } L13Cam;
+typedef struct { u8 pad0[0x30]; TI128 point; u8 pad40[0x40]; } L13Cam;
 
 extern char g_hero_state[];
 extern float g_hero_position[];
@@ -33,12 +33,12 @@ extern int math_fast_float_d(void *);
 extern float mat_fast_helper_a(float, float);
 extern float FastDiffRots(float, float);
 extern void SetDeathBits_pal(void *, int, int);
-extern void func_PAL_002A7E68(void *, int, int, int);
+extern void anim_start_blended_pal(void *, int, int, int);
 extern void moby_set_state(void *, int, int);
 extern int math_random_int_below(int);
 extern int math_random_int_range(int, int);
 extern int CollLine(void *, void *, int, void *, int);
-extern int func_PAL_002AF6C0(void *, float);
+extern int math_is_value_within_step_pal(void *, float);
 extern int moby_dispatch_action_by_kind(void *, void *);
 extern int flag_set_first_pending(void *);
 extern void moby_set_controller_speed_limits(void *, float, float, float, float);
@@ -49,7 +49,7 @@ extern int moby_start_effect_from_entry(void *, float);
 extern void part_queue_moby_for_glow(void *, int, void *);
 extern int moby_fuse_linked_objects(void *, void *, void *, void *, int);
 extern int rps_judge_round(void *);
-extern int func_PAL_L13_00410C98(void *);
+extern int guard_alt_init_check_pal(void *);
 extern void guard_alt_update_hit_timer(void *);
 extern u8 *blast_projectile_spawn_pal(void *, void *, void *, int, float);
 extern int moby_step_at_own_position_pal(void *);
@@ -61,182 +61,182 @@ extern void moby_turn_toward_hero_pal(void *);
 
 /* The per-frame update of the second level-13 guard kind, built like func_L13_00406F18:
    the action states (+0x95), the animation states (+0x20), then the shared timer update. */
-void func_PAL_L13_0040F08C(u8 *a0)
+void guard_alt_update_pal(u8 *moby)
 {
-    float m[4] __attribute__((aligned(16)));
-    float v[4] __attribute__((aligned(16)));
-    u8 *st;
+    float mat[4] __attribute__((aligned(16)));
+    float vec[4] __attribute__((aligned(16)));
+    u8 *vars;
 
-    st = *(u8 **)(a0 + 0x68);
-    if (func_PAL_L13_00410C98(a0) != 0) {
-        part_queue_moby_for_glow(a0, 0, 0);
+    vars = *(u8 **)(moby + 0x68);
+    if (guard_alt_init_check_pal(moby) != 0) {
+        part_queue_moby_for_glow(moby, 0, 0);
     }
-    switch (a0[0x95]) {
+    switch (moby[0x95]) {
     case 0: {
-        s32 r;
-        r = *(s32 *)(st + 0x250);
-        if (r == 1 && math_fast_float_d(st + 0x248) != 0) {
-            if (*(s32 *)(st + 0x2A8) == 0 || ((Hero *)g_hero_state)->h[0x348 / 2] == r) {
-                *(s32 *)(st + 0x288) = r;
-                moby_set_state(a0, 0x17, 2);
-                if (a0[0x43] != 6) {
-                    func_PAL_002A7E68(a0, 6, 0, 0x8);
+        s32 flag;
+        flag = *(s32 *)(vars + 0x250);
+        if (flag == 1 && math_fast_float_d(vars + 0x248) != 0) {
+            if (*(s32 *)(vars + 0x2A8) == 0 || ((Hero *)g_hero_state)->h[0x348 / 2] == flag) {
+                *(s32 *)(vars + 0x288) = flag;
+                moby_set_state(moby, 0x17, 2);
+                if (moby[0x43] != 6) {
+                    anim_start_blended_pal(moby, 6, 0, 0x8);
                 }
-                if (math_random_int_below(2) == r) {
-                    if (a0[0x43] != 7) {
-                        func_PAL_002A7E68(a0, 7, 0, 0x8);
+                if (math_random_int_below(2) == flag) {
+                    if (moby[0x43] != 7) {
+                        anim_start_blended_pal(moby, 7, 0, 0x8);
                     }
                 }
-                if (*(s32 *)(st + 0x268) != -1) {
-                    moby_set_state(a0, 0x12, 2);
-                    if (a0[0x43] != 3) {
-                        func_PAL_002A7E68(a0, 3, 0, 0xC);
+                if (*(s32 *)(vars + 0x268) != -1) {
+                    moby_set_state(moby, 0x12, 2);
+                    if (moby[0x43] != 3) {
+                        anim_start_blended_pal(moby, 3, 0, 0xC);
                     }
                 }
-                if (*(s32 *)(st + 0x294) != -1) {
-                    moby_set_state(a0, 0xF, 2);
-                    if (a0[0x43] != 3) {
-                        func_PAL_002A7E68(a0, 3, 0, 0xC);
+                if (*(s32 *)(vars + 0x294) != -1) {
+                    moby_set_state(moby, 0xF, 2);
+                    if (moby[0x43] != 3) {
+                        anim_start_blended_pal(moby, 3, 0, 0xC);
                     }
                 }
-                if (*(s32 *)(st + 0x2A8) != 0) {
-                    u8 *e = g_object_table_base + (*(s32 *)(st + 0x2AC) << 8);
-                    e[0x20] = 3;
-                    *(u8 **)(*(u8 **)(e + 0x68) + 0xC) = a0;
+                if (*(s32 *)(vars + 0x2A8) != 0) {
+                    u8 *linked = g_object_table_base + (*(s32 *)(vars + 0x2AC) << 8);
+                    linked[0x20] = 3;
+                    *(u8 **)(*(u8 **)(linked + 0x68) + 0xC) = moby;
                 }
             }
-        } else if (*(s64 *)(st + 0x280) == 1 && math_fast_float_d(st + 0x248) != 0) {
-            if (*(s32 *)(st + 0x278) != -1) {
-                moby_set_state(a0, 0xE, -1);
-                if (a0[0x43] != 3) {
-                    func_PAL_002A7E68(a0, 3, 0, 0x8);
+        } else if (*(s64 *)(vars + 0x280) == 1 && math_fast_float_d(vars + 0x248) != 0) {
+            if (*(s32 *)(vars + 0x278) != -1) {
+                moby_set_state(moby, 0xE, -1);
+                if (moby[0x43] != 3) {
+                    anim_start_blended_pal(moby, 3, 0, 0x8);
                 }
-                *(s32 *)(st + 0x284) = 1;
+                *(s32 *)(vars + 0x284) = 1;
             }
-        } else if (*(s32 *)(st + 0x24C) != 0) {
-            if (*(s32 *)(st + 0x250) == 1 || *(s32 *)(st + 0x254) == 1) {
-                *(s32 *)(st + 0x288) = 1;
-                if (a0[0x43] != 0xF) {
-                    func_PAL_002A7E68(a0, 0xF, 0, 0x15);
+        } else if (*(s32 *)(vars + 0x24C) != 0) {
+            if (*(s32 *)(vars + 0x250) == 1 || *(s32 *)(vars + 0x254) == 1) {
+                *(s32 *)(vars + 0x288) = 1;
+                if (moby[0x43] != 0xF) {
+                    anim_start_blended_pal(moby, 0xF, 0, 0x15);
                 }
-                moby_set_state(a0, 0x13, 2);
-                if (*(s32 *)(st + 0x268) != -1) {
-                    moby_set_state(a0, 0x12, 2);
-                    if (a0[0x43] != 3) {
-                        func_PAL_002A7E68(a0, 3, 0, 0xC);
+                moby_set_state(moby, 0x13, 2);
+                if (*(s32 *)(vars + 0x268) != -1) {
+                    moby_set_state(moby, 0x12, 2);
+                    if (moby[0x43] != 3) {
+                        anim_start_blended_pal(moby, 3, 0, 0xC);
                     }
                 }
-                if (*(s32 *)(st + 0x294) != -1) {
-                    moby_set_state(a0, 0xF, 2);
-                    if (a0[0x43] != 3) {
-                        func_PAL_002A7E68(a0, 3, 0, 0xC);
+                if (*(s32 *)(vars + 0x294) != -1) {
+                    moby_set_state(moby, 0xF, 2);
+                    if (moby[0x43] != 3) {
+                        anim_start_blended_pal(moby, 3, 0, 0xC);
                     }
                 }
-                if (*(s32 *)(st + 0x2A8) != 0) {
-                    u8 *e = g_object_table_base + (*(s32 *)(st + 0x2AC) << 8);
-                    e[0x20] = 3;
-                    *(u8 **)(*(u8 **)(e + 0x68) + 0xC) = a0;
+                if (*(s32 *)(vars + 0x2A8) != 0) {
+                    u8 *linked = g_object_table_base + (*(s32 *)(vars + 0x2AC) << 8);
+                    linked[0x20] = 3;
+                    *(u8 **)(*(u8 **)(linked + 0x68) + 0xC) = moby;
                 }
             }
-            *(s32 *)(st + 0x24C) = 0;
-            if (*(s32 *)(st + 0x240) < 0xFA) {
-                *(s32 *)(st + 0x240) = (math_random_int_range(0x1E0, 0x258) * 5 + 2) / 6;
+            *(s32 *)(vars + 0x24C) = 0;
+            if (*(s32 *)(vars + 0x240) < 0xFA) {
+                *(s32 *)(vars + 0x240) = (math_random_int_range(0x1E0, 0x258) * 5 + 2) / 6;
             }
         }
         break;
     }
     case 8: {
-        s32 r;
+        s32 flag;
         s32 i;
-        u8 *e;
-        if (*(s32 *)(st + 0x298) != 0 && (i = *(s32 *)(st + 0x29C)) != -1) {
-            e = g_object_table_base + (i << 8);
-            if (e == 0 || e[0x20] == 0xFE || e[0x20] == 0xFD) {
-                *(u16 *)(a0 + 0x34) = (*(u16 *)(a0 + 0x34) & 0xFFBE) | 0x1000;
-                *(s32 *)(a0 + 0x98) = *(s32 *)(*(u8 **)(a0 + 0x24) + 0x10);
-                *(u16 *)(*(u8 **)(st + 0x25C) + 0x34) &= 0xFFBE;
-                *(u16 *)(*(u8 **)(st + 0x25C) + 0x34) |= 0x1000;
-                *(s32 *)(*(u8 **)(st + 0x25C) + 0x98) = *(s32 *)(*(u8 **)(*(u8 **)(st + 0x25C) + 0x24) + 0x10);
-                moby_fuse_linked_objects(a0, a0 + 0x10, a0 + 0xF0, 0, 0);
-                *(s32 *)(st + 0x298) = 0;
-                if (*(s32 *)(st + 0x2A0) != -1) {
-                    moby_set_state(a0, 0x1B, 7);
-                    if (a0[0x43] != 3) {
-                        func_PAL_002A7E68(a0, 3, 0, 0xC);
+        u8 *linked;
+        if (*(s32 *)(vars + 0x298) != 0 && (i = *(s32 *)(vars + 0x29C)) != -1) {
+            linked = g_object_table_base + (i << 8);
+            if (linked == 0 || linked[0x20] == 0xFE || linked[0x20] == 0xFD) {
+                *(u16 *)(moby + 0x34) = (*(u16 *)(moby + 0x34) & 0xFFBE) | 0x1000;
+                *(s32 *)(moby + 0x98) = *(s32 *)(*(u8 **)(moby + 0x24) + 0x10);
+                *(u16 *)(*(u8 **)(vars + 0x25C) + 0x34) &= 0xFFBE;
+                *(u16 *)(*(u8 **)(vars + 0x25C) + 0x34) |= 0x1000;
+                *(s32 *)(*(u8 **)(vars + 0x25C) + 0x98) = *(s32 *)(*(u8 **)(*(u8 **)(vars + 0x25C) + 0x24) + 0x10);
+                moby_fuse_linked_objects(moby, moby + 0x10, moby + 0xF0, 0, 0);
+                *(s32 *)(vars + 0x298) = 0;
+                if (*(s32 *)(vars + 0x2A0) != -1) {
+                    moby_set_state(moby, 0x1B, 7);
+                    if (moby[0x43] != 3) {
+                        anim_start_blended_pal(moby, 3, 0, 0xC);
                     }
                 } else {
-                    if (a0[0x43] != 5) {
-                        func_PAL_002A7E68(a0, 5, 0, 0x8);
+                    if (moby[0x43] != 5) {
+                        anim_start_blended_pal(moby, 5, 0, 0x8);
                     }
-                    if (*(s32 *)(st + 0x290) == 1) {
-                        if (a0[0x43] != 0xC) {
-                            func_PAL_002A7E68(a0, 0xC, 0, 0x8);
+                    if (*(s32 *)(vars + 0x290) == 1) {
+                        if (moby[0x43] != 0xC) {
+                            anim_start_blended_pal(moby, 0xC, 0, 0x8);
                         }
                     }
-                    moby_set_state(a0, 0x15, 2);
+                    moby_set_state(moby, 0x15, 2);
                 }
             }
         } else {
-            r = *(s32 *)(st + 0x250);
-            if (r == 1 && math_fast_float_d(st + 0x248) != 0) {
-                *(s32 *)(st + 0x288) = r;
-                if (a0[0x43] != 5) {
-                    func_PAL_002A7E68(a0, 5, 0, 0x8);
+            flag = *(s32 *)(vars + 0x250);
+            if (flag == 1 && math_fast_float_d(vars + 0x248) != 0) {
+                *(s32 *)(vars + 0x288) = flag;
+                if (moby[0x43] != 5) {
+                    anim_start_blended_pal(moby, 5, 0, 0x8);
                 }
-                if (*(s32 *)(st + 0x290) == r) {
-                    if (a0[0x43] != 0xC) {
-                        func_PAL_002A7E68(a0, 0xC, 0, 0x8);
+                if (*(s32 *)(vars + 0x290) == flag) {
+                    if (moby[0x43] != 0xC) {
+                        anim_start_blended_pal(moby, 0xC, 0, 0x8);
                     }
                 }
-                moby_set_state(a0, 0x15, 2);
-                *(u16 *)(a0 + 0x34) = (*(u16 *)(a0 + 0x34) & 0xFFBE) | 0x1000;
-                *(s32 *)(a0 + 0x98) = *(s32 *)(*(u8 **)(a0 + 0x24) + 0x10);
-                *(u16 *)(*(u8 **)(st + 0x25C) + 0x34) &= 0xFFBE;
-                *(u16 *)(*(u8 **)(st + 0x25C) + 0x34) |= 0x1000;
-                *(s32 *)(*(u8 **)(st + 0x25C) + 0x98) = *(s32 *)(*(u8 **)(*(u8 **)(st + 0x25C) + 0x24) + 0x10);
-                moby_fuse_linked_objects(a0, a0 + 0x10, a0 + 0xF0, 0, 0);
+                moby_set_state(moby, 0x15, 2);
+                *(u16 *)(moby + 0x34) = (*(u16 *)(moby + 0x34) & 0xFFBE) | 0x1000;
+                *(s32 *)(moby + 0x98) = *(s32 *)(*(u8 **)(moby + 0x24) + 0x10);
+                *(u16 *)(*(u8 **)(vars + 0x25C) + 0x34) &= 0xFFBE;
+                *(u16 *)(*(u8 **)(vars + 0x25C) + 0x34) |= 0x1000;
+                *(s32 *)(*(u8 **)(vars + 0x25C) + 0x98) = *(s32 *)(*(u8 **)(*(u8 **)(vars + 0x25C) + 0x24) + 0x10);
+                moby_fuse_linked_objects(moby, moby + 0x10, moby + 0xF0, 0, 0);
             } else {
-                r = a0[0xBC];
-                if (r == 1) {
-                    *(s32 *)(st + 0x288) = r;
-                    if (a0[0x43] != 5) {
-                        func_PAL_002A7E68(a0, 5, 0, 0x8);
+                flag = moby[0xBC];
+                if (flag == 1) {
+                    *(s32 *)(vars + 0x288) = flag;
+                    if (moby[0x43] != 5) {
+                        anim_start_blended_pal(moby, 5, 0, 0x8);
                     }
-                    if (*(s32 *)(st + 0x290) == r) {
-                        if (a0[0x43] != 0xC) {
-                            func_PAL_002A7E68(a0, 0xC, 0, 0x8);
+                    if (*(s32 *)(vars + 0x290) == flag) {
+                        if (moby[0x43] != 0xC) {
+                            anim_start_blended_pal(moby, 0xC, 0, 0x8);
                         }
                     }
-                    moby_set_state(a0, 0x15, 2);
-                    *(u16 *)(a0 + 0x34) = (*(u16 *)(a0 + 0x34) & 0xFFBE) | 0x1000;
-                    *(s32 *)(a0 + 0x98) = *(s32 *)(*(u8 **)(a0 + 0x24) + 0x10);
-                    *(u16 *)(*(u8 **)(st + 0x25C) + 0x34) &= 0xFFBE;
-                    *(u16 *)(*(u8 **)(st + 0x25C) + 0x34) |= 0x1000;
-                    *(s32 *)(*(u8 **)(st + 0x25C) + 0x98) = *(s32 *)(*(u8 **)(*(u8 **)(st + 0x25C) + 0x24) + 0x10);
-                    moby_fuse_linked_objects(a0, a0 + 0x10, a0 + 0xF0, 0, 0);
+                    moby_set_state(moby, 0x15, 2);
+                    *(u16 *)(moby + 0x34) = (*(u16 *)(moby + 0x34) & 0xFFBE) | 0x1000;
+                    *(s32 *)(moby + 0x98) = *(s32 *)(*(u8 **)(moby + 0x24) + 0x10);
+                    *(u16 *)(*(u8 **)(vars + 0x25C) + 0x34) &= 0xFFBE;
+                    *(u16 *)(*(u8 **)(vars + 0x25C) + 0x34) |= 0x1000;
+                    *(s32 *)(*(u8 **)(vars + 0x25C) + 0x98) = *(s32 *)(*(u8 **)(*(u8 **)(vars + 0x25C) + 0x24) + 0x10);
+                    moby_fuse_linked_objects(moby, moby + 0x10, moby + 0xF0, 0, 0);
                 }
             }
         }
         break;
     }
     case 6: {
-        u8 *e;
-        e = g_object_table_base + (*(s32 *)(st + 0x29C) << 8);
-        if (e == 0 || e[0x20] == 0xFE || e[0x20] == 0xFD || *(s32 *)(st + 0x2B8) == 1) {
-            *(s32 *)(st + 0x298) = 0;
-            if (*(s32 *)(st + 0x2A0) != -1) {
-                moby_set_state(a0, 0x1B, 7);
-                if (a0[0x43] != 3) {
-                    func_PAL_002A7E68(a0, 3, 0, 0xC);
+        u8 *linked;
+        linked = g_object_table_base + (*(s32 *)(vars + 0x29C) << 8);
+        if (linked == 0 || linked[0x20] == 0xFE || linked[0x20] == 0xFD || *(s32 *)(vars + 0x2B8) == 1) {
+            *(s32 *)(vars + 0x298) = 0;
+            if (*(s32 *)(vars + 0x2A0) != -1) {
+                moby_set_state(moby, 0x1B, 7);
+                if (moby[0x43] != 3) {
+                    anim_start_blended_pal(moby, 3, 0, 0xC);
                 }
             } else {
-                moby_set_state(a0, 0x15, 2);
-                if (a0[0x43] != 5) {
-                    func_PAL_002A7E68(a0, 5, 0, 0x8);
+                moby_set_state(moby, 0x15, 2);
+                if (moby[0x43] != 5) {
+                    anim_start_blended_pal(moby, 5, 0, 0x8);
                 }
-                if (*(s32 *)(st + 0x290) == 1) {
-                    if (a0[0x43] != 0xC) {
-                        func_PAL_002A7E68(a0, 0xC, 0, 0x8);
+                if (*(s32 *)(vars + 0x290) == 1) {
+                    if (moby[0x43] != 0xC) {
+                        anim_start_blended_pal(moby, 0xC, 0, 0x8);
                     }
                 }
             }
@@ -244,119 +244,119 @@ void func_PAL_L13_0040F08C(u8 *a0)
         break;
     }
     case 4:
-        moby_step_at_own_position_pal(a0);
-        if (*(s32 *)(st + 0x250) == 1) {
-            moby_set_state(a0, 0x13, 5);
-            if (a0[0x43] != 0xF) {
-                func_PAL_002A7E68(a0, 0xF, 0, 0x21);
+        moby_step_at_own_position_pal(moby);
+        if (*(s32 *)(vars + 0x250) == 1) {
+            moby_set_state(moby, 0x13, 5);
+            if (moby[0x43] != 0xF) {
+                anim_start_blended_pal(moby, 0xF, 0, 0x21);
             }
         }
         break;
     case 5:
-        moby_step_at_own_position_pal(a0);
-        if (*(s32 *)(st + 0x250) != 1 && *(s32 *)(st + 0x254) != 1 && a0[0x20] != 0x12) {
-            moby_set_state(a0, 1, 4);
-            if (a0[0x43] != 0xD) {
-                func_PAL_002A7E68(a0, 0xD, 0, 0x19);
+        moby_step_at_own_position_pal(moby);
+        if (*(s32 *)(vars + 0x250) != 1 && *(s32 *)(vars + 0x254) != 1 && moby[0x20] != 0x12) {
+            moby_set_state(moby, 1, 4);
+            if (moby[0x43] != 0xD) {
+                anim_start_blended_pal(moby, 0xD, 0, 0x19);
             }
         }
         break;
     case 1:
-        if (*(s32 *)(st + 0x250) == 1 || *(s32 *)(st + 0x254) == 1) {
-            *(s32 *)(st + 0x288) = 1;
-            if (a0[0x43] != 0xF) {
-                func_PAL_002A7E68(a0, 0xF, 0, 0x15);
+        if (*(s32 *)(vars + 0x250) == 1 || *(s32 *)(vars + 0x254) == 1) {
+            *(s32 *)(vars + 0x288) = 1;
+            if (moby[0x43] != 0xF) {
+                anim_start_blended_pal(moby, 0xF, 0, 0x15);
             }
-            moby_set_state(a0, 0x13, 2);
-            if (*(s32 *)(st + 0x268) != -1) {
-                moby_set_state(a0, 0x12, 2);
-                if (a0[0x43] != 3) {
-                    func_PAL_002A7E68(a0, 3, 0, 0xC);
+            moby_set_state(moby, 0x13, 2);
+            if (*(s32 *)(vars + 0x268) != -1) {
+                moby_set_state(moby, 0x12, 2);
+                if (moby[0x43] != 3) {
+                    anim_start_blended_pal(moby, 3, 0, 0xC);
                 }
             }
-            if (*(s32 *)(st + 0x294) != -1) {
-                moby_set_state(a0, 0xF, 2);
-                if (a0[0x43] != 3) {
-                    func_PAL_002A7E68(a0, 3, 0, 0xC);
+            if (*(s32 *)(vars + 0x294) != -1) {
+                moby_set_state(moby, 0xF, 2);
+                if (moby[0x43] != 3) {
+                    anim_start_blended_pal(moby, 3, 0, 0xC);
                 }
             }
-            if (*(s32 *)(st + 0x2A8) != 0) {
-                u8 *e = g_object_table_base + (*(s32 *)(st + 0x2AC) << 8);
-                e[0x20] = 3;
-                *(u8 **)(*(u8 **)(e + 0x68) + 0xC) = a0;
+            if (*(s32 *)(vars + 0x2A8) != 0) {
+                u8 *linked = g_object_table_base + (*(s32 *)(vars + 0x2AC) << 8);
+                linked[0x20] = 3;
+                *(u8 **)(*(u8 **)(linked + 0x68) + 0xC) = moby;
             }
-        } else if (*(s32 *)(st + 0x240) == 0) {
-            moby_set_state(a0, 1, 0);
+        } else if (*(s32 *)(vars + 0x240) == 0) {
+            moby_set_state(moby, 1, 0);
         }
         break;
     case 2: {
-        s32 r;
-        if (flag_set_second_pending(a0) != 0) {
-            moby_set_controller_speed_limits(a0, 0.0048f, 0.120000005f, 0.010053098f, 1.0053098f);
+        s32 flag;
+        if (flag_set_second_pending(moby) != 0) {
+            moby_set_controller_speed_limits(moby, 0.0048f, 0.120000005f, 0.010053098f, 1.0053098f);
         }
-        if (*(s32 *)(st + 0x250) != 1 && *(s32 *)(st + 0x254) != 1 && a0[0x20] != 0x12) {
-            moby_set_state(a0, 0xD, 1);
-            if (a0[0x43] != 0xD) {
-                func_PAL_002A7E68(a0, 0xD, 0, 0x19);
+        if (*(s32 *)(vars + 0x250) != 1 && *(s32 *)(vars + 0x254) != 1 && moby[0x20] != 0x12) {
+            moby_set_state(moby, 0xD, 1);
+            if (moby[0x43] != 0xD) {
+                anim_start_blended_pal(moby, 0xD, 0, 0x19);
             }
-            *(s32 *)(st + 0x240) = (math_random_int_range(0x244, 0x258) * 5 + 2) / 6;
-            r = math_random_int_below(4);
-            *(s32 *)(st + 0x26C) = 0;
-            *(s32 *)(st + 0x274) = *(s32 *)(st + 0x270) + r;
+            *(s32 *)(vars + 0x240) = (math_random_int_range(0x244, 0x258) * 5 + 2) / 6;
+            flag = math_random_int_below(4);
+            *(s32 *)(vars + 0x26C) = 0;
+            *(s32 *)(vars + 0x274) = *(s32 *)(vars + 0x270) + flag;
         }
         break;
     }
     case 3: {
-        s32 r;
-        r = moby_dispatch_action_by_kind(a0, st + 0x140);
-        if (r & 1) {
-            u8 *p = *(u8 **)(st + 0x25C);
-            if (p != 0 && *(s16 *)(p + 0xAA) == 0xEA9) {
-                moby_mark_spawned(p);
+        s32 flag;
+        flag = moby_dispatch_action_by_kind(moby, vars + 0x140);
+        if (flag & 1) {
+            u8 *child = *(u8 **)(vars + 0x25C);
+            if (child != 0 && *(s16 *)(child + 0xAA) == 0xEA9) {
+                moby_mark_spawned(child);
             }
-            SetDeathBits_pal(a0, 0, 3);
-            part_queue_moby_for_glow(a0, 0, 0);
+            SetDeathBits_pal(moby, 0, 3);
+            part_queue_moby_for_glow(moby, 0, 0);
             return;
         }
-        if (r & 2) {
-            if (*(s32 *)(st + 0x250) == 1 || *(s32 *)(st + 0x254) == 1) {
-                if (a0[0x43] != 5) {
-                    func_PAL_002A7E68(a0, 5, 0, 0x8);
+        if (flag & 2) {
+            if (*(s32 *)(vars + 0x250) == 1 || *(s32 *)(vars + 0x254) == 1) {
+                if (moby[0x43] != 5) {
+                    anim_start_blended_pal(moby, 5, 0, 0x8);
                 }
-                if (*(s32 *)(st + 0x290) == 1) {
-                    if (a0[0x43] != 0xC) {
-                        func_PAL_002A7E68(a0, 0xC, 0, 0x8);
+                if (*(s32 *)(vars + 0x290) == 1) {
+                    if (moby[0x43] != 0xC) {
+                        anim_start_blended_pal(moby, 0xC, 0, 0x8);
                     }
                 }
-                moby_set_state(a0, 0x15, 2);
+                moby_set_state(moby, 0x15, 2);
             } else {
                 if (math_random_int_below(2) == 1) {
-                    if (a0[0x43] != 1) {
-                        func_PAL_002A7E68(a0, 1, 0, 0x11);
+                    if (moby[0x43] != 1) {
+                        anim_start_blended_pal(moby, 1, 0, 0x11);
                     }
                 } else {
-                    if (a0[0x43] != 0) {
-                        func_PAL_002A7E68(a0, 0, 0, 0x11);
+                    if (moby[0x43] != 0) {
+                        anim_start_blended_pal(moby, 0, 0, 0x11);
                     }
                 }
                 if (math_random_int_below(5) == 1) {
-                    if (a0[0x43] != 0xE) {
-                        func_PAL_002A7E68(a0, 0xE, 0, 0x19);
+                    if (moby[0x43] != 0xE) {
+                        anim_start_blended_pal(moby, 0xE, 0, 0x19);
                     }
                 }
-                moby_set_state(a0, 0xD, 1);
-                *(s32 *)(st + 0x240) = (math_random_int_range(0x244, 0x258) * 5 + 2) / 6;
+                moby_set_state(moby, 0xD, 1);
+                *(s32 *)(vars + 0x240) = (math_random_int_range(0x244, 0x258) * 5 + 2) / 6;
             }
-            if (*(s32 *)(st + 0x278) != -1 && *(s32 *)(st + 0x288) == 0) {
-                moby_set_state(a0, 0x10, -1);
-                if (a0[0x43] != 3) {
-                    func_PAL_002A7E68(a0, 3, 0, 0x8);
+            if (*(s32 *)(vars + 0x278) != -1 && *(s32 *)(vars + 0x288) == 0) {
+                moby_set_state(moby, 0x10, -1);
+                if (moby[0x43] != 3) {
+                    anim_start_blended_pal(moby, 3, 0, 0x8);
                 }
             }
-            if (*(s32 *)(st + 0x294) != -1) {
-                moby_set_state(a0, 0xF, 2);
-                if (a0[0x43] != 3) {
-                    func_PAL_002A7E68(a0, 3, 0, 0xC);
+            if (*(s32 *)(vars + 0x294) != -1) {
+                moby_set_state(moby, 0xF, 2);
+                if (moby[0x43] != 3) {
+                    anim_start_blended_pal(moby, 3, 0, 0xC);
                 }
             }
         }
@@ -364,108 +364,108 @@ void func_PAL_L13_0040F08C(u8 *a0)
     }
     }
 
-    switch (a0[0x20]) {
+    switch (moby[0x20]) {
     case 9:
-        if (*(u16 *)(a0 + 0x96) >= 0x38) {
-            moby_set_state(a0, 0xA, -1);
-            if (a0[0x43] != math_random_int_below(3) + 0x13) {
-                func_PAL_002A7E68(a0, math_random_int_below(3) + 0x13, 0, 2);
+        if (*(u16 *)(moby + 0x96) >= 0x38) {
+            moby_set_state(moby, 0xA, -1);
+            if (moby[0x43] != math_random_int_below(3) + 0x13) {
+                anim_start_blended_pal(moby, math_random_int_below(3) + 0x13, 0, 2);
             }
-            if (a0[0x43] == 0x13) {
-                *(s32 *)(st + 0x2C4) = 0;
+            if (moby[0x43] == 0x13) {
+                *(s32 *)(vars + 0x2C4) = 0;
                 STUB_printf(g_str_guard_alt_msg_a);
-            } else if (a0[0x43] == 0x15) {
-                *(s32 *)(st + 0x2C4) = 1;
+            } else if (moby[0x43] == 0x15) {
+                *(s32 *)(vars + 0x2C4) = 1;
                 STUB_printf(g_str_guard_alt_msg_b);
             } else {
-                *(s32 *)(st + 0x2C4) = 2;
+                *(s32 *)(vars + 0x2C4) = 2;
                 STUB_printf(g_str_guard_alt_msg_c);
             }
         }
         break;
     case 12:
-        if (*(u16 *)(a0 + 0x96) >= 0x47) {
-            moby_set_state(a0, 0xA, -1);
-            if (a0[0x43] != math_random_int_below(3) + 0x13) {
-                func_PAL_002A7E68(a0, math_random_int_below(3) + 0x13, 0, 2);
+        if (*(u16 *)(moby + 0x96) >= 0x47) {
+            moby_set_state(moby, 0xA, -1);
+            if (moby[0x43] != math_random_int_below(3) + 0x13) {
+                anim_start_blended_pal(moby, math_random_int_below(3) + 0x13, 0, 2);
             }
-            if (a0[0x43] == 0x13) {
-                *(s32 *)(st + 0x2C4) = 0;
+            if (moby[0x43] == 0x13) {
+                *(s32 *)(vars + 0x2C4) = 0;
                 STUB_printf(g_str_guard_alt_msg_a);
-            } else if (a0[0x43] == 0x15) {
-                *(s32 *)(st + 0x2C4) = 1;
+            } else if (moby[0x43] == 0x15) {
+                *(s32 *)(vars + 0x2C4) = 1;
                 STUB_printf(g_str_guard_alt_msg_b);
             } else {
-                *(s32 *)(st + 0x2C4) = 2;
+                *(s32 *)(vars + 0x2C4) = 2;
                 STUB_printf(g_str_guard_alt_msg_c);
             }
         }
         break;
     case 10: {
-        s32 r;
-        if (*(u16 *)(a0 + 0x96) >= 0x3D) {
-            r = rps_judge_round(a0);
-            if (r == 2) {
-                moby_set_state(a0, 9, -1);
-                if (a0[0x43] != 0x12) {
-                    func_PAL_002A7E68(a0, 0x12, 0, 2);
+        s32 flag;
+        if (*(u16 *)(moby + 0x96) >= 0x3D) {
+            flag = rps_judge_round(moby);
+            if (flag == 2) {
+                moby_set_state(moby, 9, -1);
+                if (moby[0x43] != 0x12) {
+                    anim_start_blended_pal(moby, 0x12, 0, 2);
                 }
-            } else if (r == 0) {
-                moby_set_state(a0, 0xB, -1);
-                if (a0[0x43] != 7) {
-                    func_PAL_002A7E68(a0, 7, 0, 0x8);
+            } else if (flag == 0) {
+                moby_set_state(moby, 0xB, -1);
+                if (moby[0x43] != 7) {
+                    anim_start_blended_pal(moby, 7, 0, 0x8);
                 }
             } else {
-                moby_set_state(a0, 0xB, -1);
-                if (a0[0x43] != 0x16) {
-                    func_PAL_002A7E68(a0, 0x16, 0, 0x8);
+                moby_set_state(moby, 0xB, -1);
+                if (moby[0x43] != 0x16) {
+                    anim_start_blended_pal(moby, 0x16, 0, 0x8);
                 }
             }
         }
         break;
     }
     case 11:
-        if (*(u16 *)(a0 + 0x96) >= 0x49) {
-            moby_set_state(a0, 0xC, -1);
-            if (a0[0x43] != 0x12) {
-                func_PAL_002A7E68(a0, 0x12, 0, 0xF);
+        if (*(u16 *)(moby + 0x96) >= 0x49) {
+            moby_set_state(moby, 0xC, -1);
+            if (moby[0x43] != 0x12) {
+                anim_start_blended_pal(moby, 0x12, 0, 0xF);
             }
         }
         break;
     case 7:
-        if (*(s32 *)(st + 0x2A4) != 0) {
-            if (AdvancePathWaypoint_pal(a0, g_guard_path_table[*(s32 *)(st + 0x2B0)]) != 0) {
-                moby_set_state(a0, 8, -1);
+        if (*(s32 *)(vars + 0x2A4) != 0) {
+            if (AdvancePathWaypoint_pal(moby, g_guard_path_table[*(s32 *)(vars + 0x2B0)]) != 0) {
+                moby_set_state(moby, 8, -1);
                 if (math_random_int_below(2) == 1) {
-                    if (a0[0x43] != 1) {
-                        func_PAL_002A7E68(a0, 1, 0, 0x11);
+                    if (moby[0x43] != 1) {
+                        anim_start_blended_pal(moby, 1, 0, 0x11);
                     }
                 } else {
-                    if (a0[0x43] != 0) {
-                        func_PAL_002A7E68(a0, 0, 0, 0x11);
+                    if (moby[0x43] != 0) {
+                        anim_start_blended_pal(moby, 0, 0, 0x11);
                     }
                 }
                 if (math_random_int_below(5) == 1) {
-                    if (a0[0x43] != 0xE) {
-                        func_PAL_002A7E68(a0, 0xE, 0, 0x19);
+                    if (moby[0x43] != 0xE) {
+                        anim_start_blended_pal(moby, 0xE, 0, 0x19);
                     }
                 }
             }
         } else {
-            if (path_follow_nodes_pal(a0, g_guard_path_table[*(s32 *)(st + 0x2B0)]) != 0) {
-                moby_set_state(a0, 8, -1);
+            if (path_follow_nodes_pal(moby, g_guard_path_table[*(s32 *)(vars + 0x2B0)]) != 0) {
+                moby_set_state(moby, 8, -1);
                 if (math_random_int_below(2) == 1) {
-                    if (a0[0x43] != 1) {
-                        func_PAL_002A7E68(a0, 1, 0, 0x11);
+                    if (moby[0x43] != 1) {
+                        anim_start_blended_pal(moby, 1, 0, 0x11);
                     }
                 } else {
-                    if (a0[0x43] != 0) {
-                        func_PAL_002A7E68(a0, 0, 0, 0x11);
+                    if (moby[0x43] != 0) {
+                        anim_start_blended_pal(moby, 0, 0, 0x11);
                     }
                 }
                 if (math_random_int_below(5) == 1) {
-                    if (a0[0x43] != 0xE) {
-                        func_PAL_002A7E68(a0, 0xE, 0, 0x19);
+                    if (moby[0x43] != 0xE) {
+                        anim_start_blended_pal(moby, 0xE, 0, 0x19);
                     }
                 }
             }
@@ -473,383 +473,383 @@ void func_PAL_L13_0040F08C(u8 *a0)
         break;
     case 8: {
         s32 *path;
-        float d;
-        if (a0[0x60] & 2) {
-            path = g_guard_path_table[*(s32 *)(st + 0x2B0)];
-            d = vec_distance_xy(a0 + 0x10, path + 4);
-            if (vec_distance_xy(a0 + 0x10, path + *path * 4) < d) {
-                path_set_follower_nodes(a0, g_guard_path_table[*(s32 *)(st + 0x2B0)], 0, *path - 1);
+        float dist;
+        if (moby[0x60] & 2) {
+            path = g_guard_path_table[*(s32 *)(vars + 0x2B0)];
+            dist = vec_distance_xy(moby + 0x10, path + 4);
+            if (vec_distance_xy(moby + 0x10, path + *path * 4) < dist) {
+                path_set_follower_nodes(moby, g_guard_path_table[*(s32 *)(vars + 0x2B0)], 0, *path - 1);
             } else {
-                path_set_follower_nodes(a0, g_guard_path_table[*(s32 *)(st + 0x2B0)], *path - 1, 0);
+                path_set_follower_nodes(moby, g_guard_path_table[*(s32 *)(vars + 0x2B0)], *path - 1, 0);
             }
-            moby_set_state(a0, 7, -1);
-            if (a0[0x43] != 2) {
-                func_PAL_002A7E68(a0, 2, 0, 0x11);
+            moby_set_state(moby, 7, -1);
+            if (moby[0x43] != 2) {
+                anim_start_blended_pal(moby, 2, 0, 0x11);
             }
         }
         break;
     }
     case 5:
-        if (a0[0x60] & 2) {
-            moby_set_state(a0, 6, 0);
-            if (a0[0x43] != 0xD) {
-                func_PAL_002A7E68(a0, 0xD, 0, 0x21);
+        if (moby[0x60] & 2) {
+            moby_set_state(moby, 6, 0);
+            if (moby[0x43] != 0xD) {
+                anim_start_blended_pal(moby, 0xD, 0, 0x21);
             }
         }
         break;
     case 4:
-        if (a0[0x60] & 2) {
-            moby_set_state(a0, 1, 0);
-            if (a0[0x43] != 0xD) {
-                func_PAL_002A7E68(a0, 0xD, 0, 0x11);
+        if (moby[0x60] & 2) {
+            moby_set_state(moby, 1, 0);
+            if (moby[0x43] != 0xD) {
+                anim_start_blended_pal(moby, 0xD, 0, 0x11);
             }
         }
         break;
     case 6: {
-        u8 *e = g_object_table_base + (*(s32 *)(st + 0x264) << 8);
-        moby_start_effect_from_entry(a0, mat_fast_helper_a(*(float *)(e + 0x10) - *(float *)(a0 + 0x10),
-                                             *(float *)(e + 0x14) - *(float *)(a0 + 0x14)));
+        u8 *linked = g_object_table_base + (*(s32 *)(vars + 0x264) << 8);
+        moby_start_effect_from_entry(moby, mat_fast_helper_a(*(float *)(linked + 0x10) - *(float *)(moby + 0x10),
+                                             *(float *)(linked + 0x14) - *(float *)(moby + 0x14)));
         break;
     }
     case 13:
-        if (a0[0x60] & 2) {
-            if (a0[0x43] != 0xD) {
-                func_PAL_002A7E68(a0, 0xD, 0, 0x8);
+        if (moby[0x60] & 2) {
+            if (moby[0x43] != 0xD) {
+                anim_start_blended_pal(moby, 0xD, 0, 0x8);
             }
-            moby_set_state(a0, 1, -1);
+            moby_set_state(moby, 1, -1);
         }
         break;
     case 27: {
-        s32 r;
-        if (*(s32 *)(st + 0x2A4) != 0) {
-            r = AdvancePathWaypoint_pal(a0, g_guard_path_table[*(s32 *)(st + 0x2A0)]);
+        s32 flag;
+        if (*(s32 *)(vars + 0x2A4) != 0) {
+            flag = AdvancePathWaypoint_pal(moby, g_guard_path_table[*(s32 *)(vars + 0x2A0)]);
         } else {
-            r = path_follow_nodes_pal(a0, g_guard_path_table[*(s32 *)(st + 0x2A0)]);
+            flag = path_follow_nodes_pal(moby, g_guard_path_table[*(s32 *)(vars + 0x2A0)]);
         }
-        if (r != 0 || vec_distance_xy(a0 + 0x10, *(u8 **)(st + 0x200) + 0x10) < 8.0f) {
-            if (a0[0x43] != 5) {
-                func_PAL_002A7E68(a0, 5, 0, 0x8);
+        if (flag != 0 || vec_distance_xy(moby + 0x10, *(u8 **)(vars + 0x200) + 0x10) < 8.0f) {
+            if (moby[0x43] != 5) {
+                anim_start_blended_pal(moby, 5, 0, 0x8);
             }
-            if (*(s32 *)(st + 0x290) == 1) {
-                if (a0[0x43] != 0xC) {
-                    func_PAL_002A7E68(a0, 0xC, 0, 0x8);
+            if (*(s32 *)(vars + 0x290) == 1) {
+                if (moby[0x43] != 0xC) {
+                    anim_start_blended_pal(moby, 0xC, 0, 0x8);
                 }
             }
-            moby_set_state(a0, 0x15, -1);
+            moby_set_state(moby, 0x15, -1);
         }
         break;
     }
     case 14:
-        moby_set_state(a0, 0x10, -1);
-        if (a0[0x43] != 3) {
-            func_PAL_002A7E68(a0, 3, 0, 0x8);
+        moby_set_state(moby, 0x10, -1);
+        if (moby[0x43] != 3) {
+            anim_start_blended_pal(moby, 3, 0, 0x8);
         }
         break;
     case 16:
-        if (path_follow_nodes_pal(a0, g_guard_path_table[*(s32 *)(st + 0x278)]) != 0) {
-            *(s32 *)(st + 0x288) = 1;
-            moby_set_state(a0, 0x11, -1);
-            if (a0[0x43] != 0xD) {
-                func_PAL_002A7E68(a0, 0xD, 0, 0x8);
+        if (path_follow_nodes_pal(moby, g_guard_path_table[*(s32 *)(vars + 0x278)]) != 0) {
+            *(s32 *)(vars + 0x288) = 1;
+            moby_set_state(moby, 0x11, -1);
+            if (moby[0x43] != 0xD) {
+                anim_start_blended_pal(moby, 0xD, 0, 0x8);
             }
         }
         break;
     case 17:
         STUB_printf(g_str_guard_alt_msg_d);
-        moby_set_state(a0, 1, -1);
+        moby_set_state(moby, 1, -1);
         break;
     case 18: {
         s32 i;
         s32 j;
-        if (flag_set_first_pending(a0) != 0 && *(s32 *)(st + 0x2A8) != 0) {
-            i = *(s32 *)(st + 0x350);
+        if (flag_set_first_pending(moby) != 0 && *(s32 *)(vars + 0x2A8) != 0) {
+            i = *(s32 *)(vars + 0x350);
             if (i != -1) {
-                j = *(s32 *)(st + 0x354);
+                j = *(s32 *)(vars + 0x354);
                 if (j != -1) {
                     u8 *base = g_object_table_base;
                     (base + (i << 8))[0x20] = 4;
                     (base + (j << 8))[0x20] = 4;
-                    *(s32 *)(st + 0x350) = -1;
-                    *(s32 *)(st + 0x354) = -1;
+                    *(s32 *)(vars + 0x350) = -1;
+                    *(s32 *)(vars + 0x354) = -1;
                 }
             }
         }
-        *(TI128 *)m = ((L13Cam *)g_moby_slot_table)[*(s32 *)(st + 0x268)].v;
-        if (*(s32 *)(st + 0x2A4) != 0) {
-            creature_move_along_ground_pal(a0, m);
+        *(TI128 *)mat = ((L13Cam *)g_moby_slot_table)[*(s32 *)(vars + 0x268)].point;
+        if (*(s32 *)(vars + 0x2A4) != 0) {
+            creature_move_along_ground_pal(moby, mat);
         } else {
-            moby_l01_turn_toward_target_pal(a0, m);
+            moby_l01_turn_toward_target_pal(moby, mat);
         }
-        if (vec_distance_xy(a0 + 0x10, m) < 0.5f) {
-            moby_set_state(a0, 0x15, -1);
-            if (a0[0x43] != 5) {
-                func_PAL_002A7E68(a0, 5, 0, 0xC);
+        if (vec_distance_xy(moby + 0x10, mat) < 0.5f) {
+            moby_set_state(moby, 0x15, -1);
+            if (moby[0x43] != 5) {
+                anim_start_blended_pal(moby, 5, 0, 0xC);
             }
-            if (*(s32 *)(st + 0x290) == 1) {
-                if (a0[0x43] != 0xC) {
-                    func_PAL_002A7E68(a0, 0xC, 0, 0x8);
+            if (*(s32 *)(vars + 0x290) == 1) {
+                if (moby[0x43] != 0xC) {
+                    anim_start_blended_pal(moby, 0xC, 0, 0x8);
                 }
             }
-            if (*(s32 *)(st + 0x2A8) != 0) {
-                moby_set_state(a0, 0x18, -1);
-                if (a0[0x43] != 0x10) {
-                    func_PAL_002A7E68(a0, 0x10, 0, 0x11);
+            if (*(s32 *)(vars + 0x2A8) != 0) {
+                moby_set_state(moby, 0x18, -1);
+                if (moby[0x43] != 0x10) {
+                    anim_start_blended_pal(moby, 0x10, 0, 0x11);
                 }
             }
         }
         break;
     }
     case 29:
-        *(TI128 *)m = *(TI128 *)(st + 0x360);
-        if (*(s32 *)(st + 0x2A4) != 0) {
-            creature_move_along_ground_pal(a0, m);
+        *(TI128 *)mat = *(TI128 *)(vars + 0x360);
+        if (*(s32 *)(vars + 0x2A4) != 0) {
+            creature_move_along_ground_pal(moby, mat);
         } else {
-            moby_l01_turn_toward_target_pal(a0, m);
+            moby_l01_turn_toward_target_pal(moby, mat);
         }
-        if (vec_distance_xy(a0 + 0x10, m) < 0.5f) {
-            moby_set_state(a0, 0x15, -1);
-            if (a0[0x43] != 5) {
-                func_PAL_002A7E68(a0, 5, 0, 0xC);
+        if (vec_distance_xy(moby + 0x10, mat) < 0.5f) {
+            moby_set_state(moby, 0x15, -1);
+            if (moby[0x43] != 5) {
+                anim_start_blended_pal(moby, 5, 0, 0xC);
             }
-            if (*(s32 *)(st + 0x290) == 1) {
-                if (a0[0x43] != 0xC) {
-                    func_PAL_002A7E68(a0, 0xC, 0, 0x8);
+            if (*(s32 *)(vars + 0x290) == 1) {
+                if (moby[0x43] != 0xC) {
+                    anim_start_blended_pal(moby, 0xC, 0, 0x8);
                 }
             }
-            if (*(s32 *)(st + 0x2A8) != 0) {
-                moby_set_state(a0, 0x18, -1);
-                if (a0[0x43] != 0x10) {
-                    func_PAL_002A7E68(a0, 0x10, 0, 0x11);
+            if (*(s32 *)(vars + 0x2A8) != 0) {
+                moby_set_state(moby, 0x18, -1);
+                if (moby[0x43] != 0x10) {
+                    anim_start_blended_pal(moby, 0x10, 0, 0x11);
                 }
             }
         }
         break;
     case 15:
-        if (*(s32 *)(st + 0x2A4) != 0) {
-            if (AdvancePathWaypoint_pal(a0, g_guard_path_table[*(s32 *)(st + 0x294)]) != 0) {
-                moby_set_state(a0, 0x15, -1);
-                if (a0[0x43] != 5) {
-                    func_PAL_002A7E68(a0, 5, 0, 0x8);
+        if (*(s32 *)(vars + 0x2A4) != 0) {
+            if (AdvancePathWaypoint_pal(moby, g_guard_path_table[*(s32 *)(vars + 0x294)]) != 0) {
+                moby_set_state(moby, 0x15, -1);
+                if (moby[0x43] != 5) {
+                    anim_start_blended_pal(moby, 5, 0, 0x8);
                 }
-                if (*(s32 *)(st + 0x290) == 1) {
-                    if (a0[0x43] != 0xC) {
-                        func_PAL_002A7E68(a0, 0xC, 0, 0x8);
+                if (*(s32 *)(vars + 0x290) == 1) {
+                    if (moby[0x43] != 0xC) {
+                        anim_start_blended_pal(moby, 0xC, 0, 0x8);
                     }
                 }
-                *(s32 *)(st + 0x294) = -1;
+                *(s32 *)(vars + 0x294) = -1;
             }
-        } else if (path_follow_nodes_pal(a0, g_guard_path_table[*(s32 *)(st + 0x294)]) != 0
-                   || vec_distance_xy(a0 + 0x10, *(u8 **)(st + 0x200) + 0x10) < 8.0f) {
-            moby_set_state(a0, 0x15, -1);
-            if (a0[0x43] != 5) {
-                func_PAL_002A7E68(a0, 5, 0, 0x8);
+        } else if (path_follow_nodes_pal(moby, g_guard_path_table[*(s32 *)(vars + 0x294)]) != 0
+                   || vec_distance_xy(moby + 0x10, *(u8 **)(vars + 0x200) + 0x10) < 8.0f) {
+            moby_set_state(moby, 0x15, -1);
+            if (moby[0x43] != 5) {
+                anim_start_blended_pal(moby, 5, 0, 0x8);
             }
-            if (*(s32 *)(st + 0x290) == 1) {
-                if (a0[0x43] != 0xC) {
-                    func_PAL_002A7E68(a0, 0xC, 0, 0x8);
+            if (*(s32 *)(vars + 0x290) == 1) {
+                if (moby[0x43] != 0xC) {
+                    anim_start_blended_pal(moby, 0xC, 0, 0x8);
                 }
             }
-            *(s32 *)(st + 0x294) = -1;
+            *(s32 *)(vars + 0x294) = -1;
         }
         break;
     case 19:
-        if (a0[0x60] & 2) {
-            if (a0[0x43] != 5) {
-                func_PAL_002A7E68(a0, 5, 0, 0x8);
+        if (moby[0x60] & 2) {
+            if (moby[0x43] != 5) {
+                anim_start_blended_pal(moby, 5, 0, 0x8);
             }
-            if (*(s32 *)(st + 0x290) == 1) {
-                if (a0[0x43] != 0xC) {
-                    func_PAL_002A7E68(a0, 0xC, 0, 0x8);
+            if (*(s32 *)(vars + 0x290) == 1) {
+                if (moby[0x43] != 0xC) {
+                    anim_start_blended_pal(moby, 0xC, 0, 0x8);
                 }
             }
-            moby_set_state(a0, 0x15, -1);
+            moby_set_state(moby, 0x15, -1);
         }
         break;
     case 25: {
         u8 *hit;
-        if (FastDiffRots(*(float *)(a0 + 0xF8),
-                          mat_fast_helper_a(*(float *)(st + 0x1F0) - *(float *)(a0 + 0x10),
-                                        *(float *)(st + 0x1F4) - *(float *)(a0 + 0x14))) < 0.78539824f) {
-            moby_transform_joint_to_world(a0, 2, m);
-            FastVecSub(v, st + 0x1F0, m);
-            vec_scale_to_length(v, v, 0.6f);
-            if (CollLine(m, st + 0x1F0, 0, a0, 0) == 0) {
-                if (a0[0x43] != 5) {
-                    func_PAL_002A7E68(a0, 5, 0, 0x8);
+        if (FastDiffRots(*(float *)(moby + 0xF8),
+                          mat_fast_helper_a(*(float *)(vars + 0x1F0) - *(float *)(moby + 0x10),
+                                        *(float *)(vars + 0x1F4) - *(float *)(moby + 0x14))) < 0.78539824f) {
+            moby_transform_joint_to_world(moby, 2, mat);
+            FastVecSub(vec, vars + 0x1F0, mat);
+            vec_scale_to_length(vec, vec, 0.6f);
+            if (CollLine(mat, vars + 0x1F0, 0, moby, 0) == 0) {
+                if (moby[0x43] != 5) {
+                    anim_start_blended_pal(moby, 5, 0, 0x8);
                 }
-                if (*(s32 *)(st + 0x290) == 1) {
-                    if (a0[0x43] != 0xC) {
-                        func_PAL_002A7E68(a0, 0xC, 0, 0x8);
+                if (*(s32 *)(vars + 0x290) == 1) {
+                    if (moby[0x43] != 0xC) {
+                        anim_start_blended_pal(moby, 0xC, 0, 0x8);
                     }
                 }
-                moby_set_state(a0, 0x15, -1);
+                moby_set_state(moby, 0x15, -1);
             } else {
                 hit = *(u8 **)(g_collision_l13_result + 0x18);
-                if (hit != 0 && (hit == g_hero_moby || hit == *(u8 **)(st + 0x200)
+                if (hit != 0 && (hit == g_hero_moby || hit == *(u8 **)(vars + 0x200)
                                  || *(s16 *)(hit + 0xAA) == 0xC87 || *(s16 *)(hit + 0xAA) == 0xC86
                                  || *(s16 *)(hit + 0xAA) == 0x1F4 || *(s16 *)(hit + 0xAA) == 0x200
                                  || *(s16 *)(hit + 0xAA) == 0x1FF)) {
-                    if (a0[0x43] != 5) {
-                        func_PAL_002A7E68(a0, 5, 0, 0x8);
+                    if (moby[0x43] != 5) {
+                        anim_start_blended_pal(moby, 5, 0, 0x8);
                     }
-                    if (*(s32 *)(st + 0x290) == 1) {
-                        if (a0[0x43] != 0xC) {
-                            func_PAL_002A7E68(a0, 0xC, 0, 0x8);
+                    if (*(s32 *)(vars + 0x290) == 1) {
+                        if (moby[0x43] != 0xC) {
+                            anim_start_blended_pal(moby, 0xC, 0, 0x8);
                         }
                     }
-                    moby_set_state(a0, 0x15, -1);
+                    moby_set_state(moby, 0x15, -1);
                 }
             }
         }
-        if (a0[0x60] & 2) {
-            if (a0[0x42] == 4) {
+        if (moby[0x60] & 2) {
+            if (moby[0x42] == 4) {
                 if (math_random_int_below(2) == 1) {
-                    if (a0[0x43] != 1) {
-                        func_PAL_002A7E68(a0, 1, 0, 0x11);
+                    if (moby[0x43] != 1) {
+                        anim_start_blended_pal(moby, 1, 0, 0x11);
                     }
                 } else {
-                    if (a0[0x43] != 0) {
-                        func_PAL_002A7E68(a0, 0, 0, 0x11);
+                    if (moby[0x43] != 0) {
+                        anim_start_blended_pal(moby, 0, 0, 0x11);
                     }
                 }
             } else {
-                if (a0[0x43] != 4) {
-                    func_PAL_002A7E68(a0, 4, 0, 0x11);
+                if (moby[0x43] != 4) {
+                    anim_start_blended_pal(moby, 4, 0, 0x11);
                 }
             }
         }
         break;
     }
     case 21:
-        moby_start_effect_from_entry(a0, mat_fast_helper_a(*(float *)(*(u8 **)(st + 0x200) + 0x10) - *(float *)(a0 + 0x10),
-                                             *(float *)(*(u8 **)(st + 0x200) + 0x14) - *(float *)(a0 + 0x14)));
-        if (*(s32 *)(st + 0x2A4) != 0) {
-            moby_turn_toward_hero_pal(a0);
+        moby_start_effect_from_entry(moby, mat_fast_helper_a(*(float *)(*(u8 **)(vars + 0x200) + 0x10) - *(float *)(moby + 0x10),
+                                             *(float *)(*(u8 **)(vars + 0x200) + 0x14) - *(float *)(moby + 0x14)));
+        if (*(s32 *)(vars + 0x2A4) != 0) {
+            moby_turn_toward_hero_pal(moby);
         }
-        if (func_PAL_002AF6C0(a0, 1.0f) != 0) {
-            if (FastDiffRots(*(float *)(a0 + 0xF8),
-                              mat_fast_helper_a(*(float *)(st + 0x1F0) - *(float *)(a0 + 0x10),
-                                            *(float *)(st + 0x1F4) - *(float *)(a0 + 0x14))) < 0.78539824f) {
-                moby_transform_joint_to_world(*(u8 **)(st + 0x25C), 0, m);
-                FastVecSub(v, st + 0x1F0, m);
-                vec_scale_to_length(v, v, 0.6f);
-                blast_projectile_spawn_pal(a0, v, m, 0, st[0x34]);
-                (*(s32 *)(st + 0x26C))++;
+        if (math_is_value_within_step_pal(moby, 1.0f) != 0) {
+            if (FastDiffRots(*(float *)(moby + 0xF8),
+                              mat_fast_helper_a(*(float *)(vars + 0x1F0) - *(float *)(moby + 0x10),
+                                            *(float *)(vars + 0x1F4) - *(float *)(moby + 0x14))) < 0.78539824f) {
+                moby_transform_joint_to_world(*(u8 **)(vars + 0x25C), 0, mat);
+                FastVecSub(vec, vars + 0x1F0, mat);
+                vec_scale_to_length(vec, vec, 0.6f);
+                blast_projectile_spawn_pal(moby, vec, mat, 0, vars[0x34]);
+                (*(s32 *)(vars + 0x26C))++;
             }
         }
-        if (a0[0x60] & 2) {
-            if (*(s32 *)(st + 0x26C) <= 0) {
-                moby_set_state(a0, 0x19, -1);
-                if (a0[0x43] != 4) {
-                    func_PAL_002A7E68(a0, 4, 0, 0x8);
+        if (moby[0x60] & 2) {
+            if (*(s32 *)(vars + 0x26C) <= 0) {
+                moby_set_state(moby, 0x19, -1);
+                if (moby[0x43] != 4) {
+                    anim_start_blended_pal(moby, 4, 0, 0x8);
                 }
             } else {
-                s32 r;
-                moby_set_state(a0, 0x17, -1);
-                if (a0[0x43] != 6) {
-                    func_PAL_002A7E68(a0, 6, 0, 0x8);
+                s32 flag;
+                moby_set_state(moby, 0x17, -1);
+                if (moby[0x43] != 6) {
+                    anim_start_blended_pal(moby, 6, 0, 0x8);
                 }
                 if (math_random_int_below(2) == 1) {
-                    if (a0[0x43] != 7) {
-                        func_PAL_002A7E68(a0, 7, 0, 0x8);
+                    if (moby[0x43] != 7) {
+                        anim_start_blended_pal(moby, 7, 0, 0x8);
                     }
                 }
-                r = math_random_int_below(4);
-                *(s32 *)(st + 0x26C) = 0;
-                *(s32 *)(st + 0x274) = *(s32 *)(st + 0x270) + r;
+                flag = math_random_int_below(4);
+                *(s32 *)(vars + 0x26C) = 0;
+                *(s32 *)(vars + 0x274) = *(s32 *)(vars + 0x270) + flag;
             }
         }
         break;
     case 24:
-        moby_start_effect_from_entry(a0, mat_fast_helper_a(*(float *)(*(u8 **)(st + 0x200) + 0x10) - *(float *)(a0 + 0x10),
-                                             *(float *)(*(u8 **)(st + 0x200) + 0x14) - *(float *)(a0 + 0x14)));
-        if (*(s32 *)(st + 0x2A4) != 0) {
-            moby_turn_toward_hero_pal(a0);
+        moby_start_effect_from_entry(moby, mat_fast_helper_a(*(float *)(*(u8 **)(vars + 0x200) + 0x10) - *(float *)(moby + 0x10),
+                                             *(float *)(*(u8 **)(vars + 0x200) + 0x14) - *(float *)(moby + 0x14)));
+        if (*(s32 *)(vars + 0x2A4) != 0) {
+            moby_turn_toward_hero_pal(moby);
         }
-        if (func_PAL_002AF6C0(a0, 1.0f) != 0) {
-            if (FastDiffRots(*(float *)(a0 + 0xF8),
-                              mat_fast_helper_a(*(float *)(st + 0x1F0) - *(float *)(a0 + 0x10),
-                                            *(float *)(st + 0x1F4) - *(float *)(a0 + 0x14))) < 0.78539824f) {
-                (*(s32 *)(st + 0x26C))++;
-                moby_transform_joint_to_world(*(u8 **)(st + 0x25C), 0, m);
-                FastVecSub(v, st + 0x1F0, m);
-                vec_scale_to_length(v, v, 0.6f);
-                blast_projectile_spawn_pal(a0, v, m, 0, st[0x34]);
+        if (math_is_value_within_step_pal(moby, 1.0f) != 0) {
+            if (FastDiffRots(*(float *)(moby + 0xF8),
+                              mat_fast_helper_a(*(float *)(vars + 0x1F0) - *(float *)(moby + 0x10),
+                                            *(float *)(vars + 0x1F4) - *(float *)(moby + 0x14))) < 0.78539824f) {
+                (*(s32 *)(vars + 0x26C))++;
+                moby_transform_joint_to_world(*(u8 **)(vars + 0x25C), 0, mat);
+                FastVecSub(vec, vars + 0x1F0, mat);
+                vec_scale_to_length(vec, vec, 0.6f);
+                blast_projectile_spawn_pal(moby, vec, mat, 0, vars[0x34]);
             }
         }
-        if ((a0[0x60] & 2) && *(s32 *)(st + 0x26C) > 0) {
-            s32 r;
-            moby_set_state(a0, 0x17, -1);
-            if (a0[0x43] != 6) {
-                func_PAL_002A7E68(a0, 6, 0, 0x8);
+        if ((moby[0x60] & 2) && *(s32 *)(vars + 0x26C) > 0) {
+            s32 flag;
+            moby_set_state(moby, 0x17, -1);
+            if (moby[0x43] != 6) {
+                anim_start_blended_pal(moby, 6, 0, 0x8);
             }
             if (math_random_int_below(2) == 1) {
-                if (a0[0x43] != 7) {
-                    func_PAL_002A7E68(a0, 7, 0, 0x8);
+                if (moby[0x43] != 7) {
+                    anim_start_blended_pal(moby, 7, 0, 0x8);
                 }
             }
-            r = math_random_int_below(4);
-            *(s32 *)(st + 0x26C) = 0;
-            *(s32 *)(st + 0x274) = *(s32 *)(st + 0x270) + r;
+            flag = math_random_int_below(4);
+            *(s32 *)(vars + 0x26C) = 0;
+            *(s32 *)(vars + 0x274) = *(s32 *)(vars + 0x270) + flag;
         }
         break;
     case 22:
-        moby_start_effect_from_entry(a0, mat_fast_helper_a(*(float *)(*(u8 **)(st + 0x200) + 0x10) - *(float *)(a0 + 0x10),
-                                             *(float *)(*(u8 **)(st + 0x200) + 0x14) - *(float *)(a0 + 0x14)));
-        if (*(s32 *)(st + 0x2A4) != 0) {
-            moby_turn_toward_hero_pal(a0);
+        moby_start_effect_from_entry(moby, mat_fast_helper_a(*(float *)(*(u8 **)(vars + 0x200) + 0x10) - *(float *)(moby + 0x10),
+                                             *(float *)(*(u8 **)(vars + 0x200) + 0x14) - *(float *)(moby + 0x14)));
+        if (*(s32 *)(vars + 0x2A4) != 0) {
+            moby_turn_toward_hero_pal(moby);
         }
-        if (func_PAL_002AF6C0(a0, 1.0f) != 0) {
-            moby_transform_joint_to_world(*(u8 **)(st + 0x25C), 0, m);
-            FastVecSub(v, st + 0x1F0, m);
-            vec_scale_to_length(v, v, 0.50000006f);
-            blast_projectile_spawn_pal(a0, v, m, 0, st[0x34]);
-            (*(s32 *)(st + 0x26C))++;
+        if (math_is_value_within_step_pal(moby, 1.0f) != 0) {
+            moby_transform_joint_to_world(*(u8 **)(vars + 0x25C), 0, mat);
+            FastVecSub(vec, vars + 0x1F0, mat);
+            vec_scale_to_length(vec, vec, 0.50000006f);
+            blast_projectile_spawn_pal(moby, vec, mat, 0, vars[0x34]);
+            (*(s32 *)(vars + 0x26C))++;
         }
         break;
     case 23:
-        moby_start_effect_from_entry(a0, mat_fast_helper_a(*(float *)(*(u8 **)(st + 0x200) + 0x10) - *(float *)(a0 + 0x10),
-                                             *(float *)(*(u8 **)(st + 0x200) + 0x14) - *(float *)(a0 + 0x14)));
+        moby_start_effect_from_entry(moby, mat_fast_helper_a(*(float *)(*(u8 **)(vars + 0x200) + 0x10) - *(float *)(moby + 0x10),
+                                             *(float *)(*(u8 **)(vars + 0x200) + 0x14) - *(float *)(moby + 0x14)));
         if (g_current_map_index[0] != 0x10) {
-            if (a0[0x60] & 2) {
-                moby_set_state(a0, 0x19, -1);
-                if (a0[0x43] != 4) {
-                    func_PAL_002A7E68(a0, 4, 0, 0x8);
+            if (moby[0x60] & 2) {
+                moby_set_state(moby, 0x19, -1);
+                if (moby[0x43] != 4) {
+                    anim_start_blended_pal(moby, 4, 0, 0x8);
                 }
-                if (*(s32 *)(st + 0x2A8) != 0) {
-                    moby_set_state(a0, 0x18, -1);
-                    if (a0[0x43] != 0x10) {
-                        func_PAL_002A7E68(a0, 0x10, 0, 0x11);
+                if (*(s32 *)(vars + 0x2A8) != 0) {
+                    moby_set_state(moby, 0x18, -1);
+                    if (moby[0x43] != 0x10) {
+                        anim_start_blended_pal(moby, 0x10, 0, 0x11);
                     }
                 }
-                if (*(s32 *)(st + 0x358) != 0 && vec_distance_xy(a0 + 0x10, st + 0x360) > 4.0f) {
-                    moby_set_state(a0, 0x1D, -1);
-                    if (a0[0x43] != 3) {
-                        func_PAL_002A7E68(a0, 3, 0, 0x8);
+                if (*(s32 *)(vars + 0x358) != 0 && vec_distance_xy(moby + 0x10, vars + 0x360) > 4.0f) {
+                    moby_set_state(moby, 0x1D, -1);
+                    if (moby[0x43] != 3) {
+                        anim_start_blended_pal(moby, 3, 0, 0x8);
                     }
                 }
             }
         } else {
-            if (*(u16 *)(a0 + 0x96) >= 0xB5) {
-                moby_set_state(a0, 0x15, -1);
-                if (a0[0x43] != 5) {
-                    func_PAL_002A7E68(a0, 5, 0, 0x8);
+            if (*(u16 *)(moby + 0x96) >= 0xB5) {
+                moby_set_state(moby, 0x15, -1);
+                if (moby[0x43] != 5) {
+                    anim_start_blended_pal(moby, 5, 0, 0x8);
                 }
-                if (*(s32 *)(st + 0x290) == 1) {
-                    if (a0[0x43] != 0xC) {
-                        func_PAL_002A7E68(a0, 0xC, 0, 0x8);
+                if (*(s32 *)(vars + 0x290) == 1) {
+                    if (moby[0x43] != 0xC) {
+                        anim_start_blended_pal(moby, 0xC, 0, 0x8);
                     }
                 }
-                if (*(s32 *)(st + 0x2A8) != 0) {
-                    moby_set_state(a0, 0x18, -1);
-                    if (a0[0x43] != 0x10) {
-                        func_PAL_002A7E68(a0, 0x10, 0, 0x11);
+                if (*(s32 *)(vars + 0x2A8) != 0) {
+                    moby_set_state(moby, 0x18, -1);
+                    if (moby[0x43] != 0x10) {
+                        anim_start_blended_pal(moby, 0x10, 0, 0x11);
                     }
                 }
             }
-            if (a0[0x60] & 2) {
-                if (a0[0x43] != 4) {
-                    func_PAL_002A7E68(a0, 4, 0, 4);
+            if (moby[0x60] & 2) {
+                if (moby[0x43] != 4) {
+                    anim_start_blended_pal(moby, 4, 0, 4);
                 }
             }
         }
@@ -858,5 +858,5 @@ void func_PAL_L13_0040F08C(u8 *a0)
     default:
         break;
     }
-    guard_alt_update_hit_timer(a0);
+    guard_alt_update_hit_timer(moby);
 }

@@ -153,9 +153,10 @@ extern void menu_update_pause_widgets_pal(void);
 extern void menu_handle_pause_fade_timer_pal(void);
 extern int UpdateSoundVoices_pal(void);
 extern void moby_update_visible_objects(void);
-extern void func_PAL_002CB410(void);
+extern void menu_close_and_save_choices_pal(void);
 
-void func_PAL_002CB710(void)
+/* Per-frame update of the pause menu: counts frames, polls the memory card, runs the handler for the current mode and updates sound (PAL). */
+void menu_update_pause_pal(void)
 {
     ((PauseState *)g_pause_menu_state)->update_count = ((PauseState *)g_pause_menu_state)->update_count > 31999 ? 32000 : ((PauseState *)g_pause_menu_state)->update_count + 1;
     ((PauseState *)g_pause_menu_state)->clear = 0;
@@ -180,7 +181,7 @@ void func_PAL_002CB710(void)
     }
     moby_update_visible_objects();
     UpdateSoundVoices_pal();
-    if (((PauseState *)g_pause_menu_state)->pending) func_PAL_002CB410();
+    if (((PauseState *)g_pause_menu_state)->pending) menu_close_and_save_choices_pal();
 }
 
 void menu_enter_pause_mode_two(void);

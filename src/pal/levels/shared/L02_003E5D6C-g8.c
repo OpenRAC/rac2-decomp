@@ -15,7 +15,7 @@ extern char *g_platform_actor_ref[];
 
 typedef struct {
     char pad0[0x24]; int message; int timer;
-    char pad1[0x3c]; int disabled; short f6c; char pad2[4]; short f72;
+    char pad1[0x3c]; int disabled; short unk_6c; char pad2[4]; short unk_72;
 } L02E1A40Hud;
 extern L02E1A40Hud g_music_state;
 extern float g_pickup_spin_speed SDATA(D_L02_001B0760);
@@ -56,7 +56,7 @@ extern s32 snd_resume_music_stream(void);
 typedef struct {
     int other, first, second; char pad0[8]; int auxiliary;
     float angle, angle2, fade; char pad1[4]; int color0, color1, alpha;
-    char pad2[4]; int f38, f3c, count, message0, message1;
+    char pad2[4]; int unk_38, unk_3c, count, message0, message1;
 } L02E1A40Data;
 struct L02E1A40Object {
     char pad0[0x10]; float position[4]; unsigned char state;
@@ -67,10 +67,12 @@ struct L02E1A40Object {
 typedef struct { char pad[0x5c0]; L02E1A40Object *target; } L02E1A40Hero;
 extern L02E1A40Hero g_hero_state;
 #define I(p,o) (*(int *)((char *)(p)+(o)))
-void func_PAL_L02_003E5D6C(L02E1A40Object *obj)
+/* Updates a progress pickup ring: waits, spins and sparkles, shows its message when the hero targets
+   it, then saves its progress nibble when it fades out (PAL: 50 Hz timings). */
+void progress_pickup_update_pal(L02E1A40Object *obj)
 {
     float pos[4], vel[4];
-    L02E1A40Data *d=obj->data;
+    L02E1A40Data *vars=obj->data;
     L02E1A40Object *other;
     unsigned short index;
     unsigned short completedIndex;
@@ -82,21 +84,21 @@ void func_PAL_L02_003E5D6C(L02E1A40Object *obj)
     unsigned char *save;
     switch(obj->state) {
     case 0:
-        d->f38=0; d->f3c=0; d->count=0;
+        vars->unk_38=0; vars->unk_3c=0; vars->count=0;
         index=obj->index;
         if(g_cell_flags.flags[(short)index] ||
            ((initialPacked=g_moby_nibble_table[((short)index>>1)+(g_current_map_index[0]<<10)]),
             (index&1) ? ((initialPacked>>4)&7) : (initialPacked&7))) {
-            moby_set_flag_bit((g_moby_l02_pool[0]+d->first),1);
-            moby_set_flag_bit((g_moby_l02_pool[0]+d->second),1);
-            if(d->auxiliary!=-1) moby_mark_spawned(entityPool_gp+d->auxiliary);
+            moby_set_flag_bit((g_moby_l02_pool[0]+vars->first),1);
+            moby_set_flag_bit((g_moby_l02_pool[0]+vars->second),1);
+            if(vars->auxiliary!=-1) moby_mark_spawned(entityPool_gp+vars->auxiliary);
             moby_set_state(obj,5,-1);
         } else moby_set_state(obj,1,-1);
         break;
     case 1:
-        d->angle=FastAddRotations(d->angle,g_pickup_spin_speed*0.0003490659f);
+        vars->angle=FastAddRotations(vars->angle,g_pickup_spin_speed*0.0003490659f);
         gfx_add_draw_callback_first(DrawPulsingRingEffect,obj);
-        if(d->fade!=0.0f) ApproachValue(&d->fade,0.0f,0.040000003f);
+        if(vars->fade!=0.0f) ApproachValue(&vars->fade,0.0f,0.040000003f);
         if(obj->active && !math_random_int_below(5)) {
             angle=math_random_angle();
             pos[0]=math_fast_sin_or_cos_a(angle)*1.15f;
@@ -120,7 +122,7 @@ void func_PAL_L02_003E5D6C(L02E1A40Object *obj)
                 hero_start_target_state(obj->position,1,obj->radius);
             }
         } else {
-            other=(g_moby_l02_pool[0]+d->other);
+            other=(g_moby_l02_pool[0]+vars->other);
             if(vec_distance_xy(obj->position,other->position)<1.5f && math_fabs(obj->position[2]-other->position[2])<0.5f)
                 moby_set_state(obj,3,-1);
         }
@@ -128,33 +130,33 @@ void func_PAL_L02_003E5D6C(L02E1A40Object *obj)
     case 2:
         if(flag_set_first_pending(obj)) {
             PlayMobySound(1,0,(char *)obj);
-            d->color0=g_pickup_color_a;
-            d->color1=D_L02_001B0780_abs[1];
-            d->fade=0;d->alpha=0;
+            vars->color0=g_pickup_color_a;
+            vars->color1=D_L02_001B0780_abs[1];
+            vars->fade=0;vars->alpha=0;
             value_set_entry_by_index(4893,180);
             if(!g_music_state.disabled && g_music_state.message==-1) {
-                message0=d->message0;
+                message0=vars->message0;
                 g_music_state.timer=0;
                 g_music_state.message=(message0&0x3fff)+2000;
             }
         }
         if(g_platform_actor_ref[0]!=(char *)obj) moby_set_state(obj,1,-1);
-        d->angle=FastAddRotations(d->angle,g_pickup_spin_speed*0.0003490659f);
-        angle=FastAddRotations(d->angle2,g_pickup_second_spin_speed*0.0003490659f);
+        vars->angle=FastAddRotations(vars->angle,g_pickup_spin_speed*0.0003490659f);
+        angle=FastAddRotations(vars->angle2,g_pickup_second_spin_speed*0.0003490659f);
         frame=g_frame_l02_counter[0];
-        d->angle2=angle;
-        if((frame&1) && d->alpha<255) d->alpha++;
+        vars->angle2=angle;
+        if((frame&1) && vars->alpha<255) vars->alpha++;
         gfx_add_draw_callback_first(DrawPulsingRingEffect,obj);
-        ApproachValue(&d->fade,1,0.040000003f);
+        ApproachValue(&vars->fade,1,0.040000003f);
         break;
     case 3:
         if(flag_set_first_pending(obj)) {
-            I(d,0x40)++;
-            d->color0=g_pickup_color_b;
-            d->color1=D_L02_001B0788_abs[1];
-            d->fade=0;d->alpha=0;
+            I(vars,0x40)++;
+            vars->color0=g_pickup_color_b;
+            vars->color1=D_L02_001B0788_abs[1];
+            vars->fade=0;vars->alpha=0;
             value_set_entry_by_index(4894,180);
-            message1=d->message1;
+            message1=vars->message1;
             g_music_state.timer=0;
             g_music_state.message=(message1&0x3fff)+2000;
         }
@@ -162,22 +164,22 @@ void func_PAL_L02_003E5D6C(L02E1A40Object *obj)
         obj->ticks = ticks + 1;
         if(ticks>150) moby_set_state(obj,4,-1);
         else if(obj->ticks>50) {
-{ L02E1A40Object *candidate; int i=d->other; candidate=g_moby_l02_pool[0]+i; if(g_hero_state.target==candidate) g_hero_state.target=0; }
-            moby_set_flag_bit((g_moby_l02_pool[0]+d->first),1);
-            moby_set_flag_bit((g_moby_l02_pool[0]+d->second),1);
+{ L02E1A40Object *candidate; int i=vars->other; candidate=g_moby_l02_pool[0]+i; if(g_hero_state.target==candidate) g_hero_state.target=0; }
+            moby_set_flag_bit((g_moby_l02_pool[0]+vars->first),1);
+            moby_set_flag_bit((g_moby_l02_pool[0]+vars->second),1);
         }
-        d->angle=FastAddRotations(d->angle,g_pickup_spin_speed*0.0003490659f);
-        angle=FastAddRotations(d->angle2,g_pickup_second_spin_speed*0.0003490659f);
+        vars->angle=FastAddRotations(vars->angle,g_pickup_spin_speed*0.0003490659f);
+        angle=FastAddRotations(vars->angle2,g_pickup_second_spin_speed*0.0003490659f);
         frame=g_frame_l02_counter[0];
-        d->angle2=angle;
-        if((frame&1) && d->alpha<255) d->alpha++;
+        vars->angle2=angle;
+        if((frame&1) && vars->alpha<255) vars->alpha++;
         gfx_add_draw_callback_first(DrawPulsingRingEffect,obj);
-        ApproachValue(&d->fade,1,0.040000003f);
+        ApproachValue(&vars->fade,1,0.040000003f);
         break;
     case 4:
         gfx_add_draw_callback_first(DrawPulsingRingEffect,obj);
-        ApproachValue(&d->fade,0,0.040000003f);
-        if(d->fade<=0) {
+        ApproachValue(&vars->fade,0,0.040000003f);
+        if(vars->fade<=0) {
             completedIndex=obj->index;
             if(completedIndex&1) {
                 save=&g_moby_nibble_table[((short)completedIndex>>1)+(currentLevel_gp<<10)];
@@ -192,5 +194,5 @@ void func_PAL_L02_003E5D6C(L02E1A40Object *obj)
         }
         break;
     }
-    if(g_music_state.f72==3 && g_music_state.f6c<6000) snd_resume_music_stream();
+    if(g_music_state.unk_72==3 && g_music_state.unk_6c<6000) snd_resume_music_stream();
 }

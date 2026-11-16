@@ -37,31 +37,32 @@ extern int snd_Pump(void);
 extern int mpeg_is_audio_buffer_full(void);
 extern int mpeg_vobuf_is_empty(char *);
 
-int read_mpeg_pal(char *vd, char *rb, int *file) {
-    int armed = 0;
+/* Plays the movie stream: reads data, feeds the decoder, and stops early if the player presses the skip buttons. Returns 1 if skipped (PAL). */
+int read_mpeg_pal(char *video_dec, char *read_buf, int *file_info) {
+    int pad_released = 0;
     int aborted = 0;
     int started = 0;
-    int left = *file;
-    int toread;
-    int n;
-    int got;
-    int avail;
+    int bytes_left = *file_info;
+    int bytes_to_read;
+    int count;
+    int bytes_read;
+    int bytes_avail;
     int used;
     u8 *put;
     s32 get;
 
     FlushCache(0);
-    toread = left;
+    bytes_to_read = bytes_left;
     FlushCache(2);
     sceGsSyncV(0);
 
-    while (left >= 5 && videoDecGetState(vd) != 3) {
+    while (bytes_left >= 5 && videoDecGetState(video_dec) != 3) {
         int hit = 0;
 
         pad_poll_ports_pal();
-        if (g_pad_state.buttons.words[0] == 0) armed = 1;
-        if (armed && (n = g_loader_state_word[0]) != 3) {
-            if (n == 2 && g_pad_state.buttons.words[0] != 0 &&
+        if (g_pad_state.buttons.words[0] == 0) pad_released = 1;
+        if (pad_released && (count = g_loader_state_word[0]) != 3) {
+            if (count == 2 && g_pad_state.buttons.words[0] != 0 &&
                 g_pad_state.buttons.words[1] == 0) {
                 hit = 1;
             } else if (((g_player_stats[2] & 0xffff0000) || g_loader_state_word[0] != 0 ||
@@ -77,21 +78,21 @@ int read_mpeg_pal(char *vd, char *rb, int *file) {
             aborted = 1;
             mpeg_dec_set_state_running(g_movie_player_state[0] + 0xD9048);
         }
-        n = readBufBeginPut((u8 *)rb, &put);
-        if (toread > 0 && n > 0xFFFF) {
-            got = mpeg_read_disc_sectors(file, put, 0x10000, 0);
-            readBufEndPut(rb, got);
-            toread -= got;
+        count = readBufBeginPut((u8 *)read_buf, &put);
+        if (bytes_to_read > 0 && count > 0xFFFF) {
+            bytes_read = mpeg_read_disc_sectors(file_info, put, 0x10000, 0);
+            readBufEndPut(read_buf, bytes_read);
+            bytes_to_read -= bytes_read;
         }
         proceedAudio();
         mpeg_start_decoder_dma();
-        avail = readBufBeginGet((u8 *)rb, &get);
-        if (avail > 0) {
-            int size = *(int *)(rb + 0x50008);
+        bytes_avail = readBufBeginGet((u8 *)read_buf, &get);
+        if (bytes_avail > 0) {
+            int size = *(int *)(read_buf + 0x50008);
 
-            used = sceMpegDemuxPssRing(vd, get, avail, rb, size);
-            readBufEndGet((u8 *)rb, used);
-            left -= used;
+            used = sceMpegDemuxPssRing(video_dec, get, bytes_avail, read_buf, size);
+            readBufEndGet((u8 *)read_buf, used);
+            bytes_left -= used;
         }
         proceedAudio();
         if (!started && voBufIsFull(g_movie_player_state[0] + 0xD9168) && mpeg_is_audio_buffer_full()) {
@@ -103,11 +104,11 @@ int read_mpeg_pal(char *vd, char *rb, int *file) {
 
     snd_send_cmd9(5, 0);
     snd_Pump();
-    while (!mpeg_dec_send_packet(vd)) {
+    while (!mpeg_dec_send_packet(video_dec)) {
         proceedAudio();
         mpeg_start_decoder_dma();
     }
-    while (!func_00351A38(vd) && videoDecGetState(vd) != 3 && !mpeg_vobuf_is_empty(g_movie_player_state[0] + 0xD9168)) {
+    while (!func_00351A38(video_dec) && videoDecGetState(video_dec) != 3 && !mpeg_vobuf_is_empty(g_movie_player_state[0] + 0xD9168)) {
         mpeg_start_decoder_dma();
     }
     mpeg_clear_flag();

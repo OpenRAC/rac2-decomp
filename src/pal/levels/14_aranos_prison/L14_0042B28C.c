@@ -76,13 +76,14 @@ extern void lift_request_start(void *);
 extern void moby_mark_spawned(void *);
 extern void lift_set_moving_state(void *);
 extern void moby_set_state(void *, int, int);
-extern s32 func_PAL_L00_002C4480(int, int);
+extern s32 hero_l00_set_action_pal(int, int);
 extern int math_fast_float_d(void *);
 extern float math_fast_sin_or_cos_b(float);
 extern void gfx_add_draw_callback_third(void (*)(void *), void *);
 extern void snd_queue_level_jingle(char *);
 
-void func_PAL_L14_0042BC18(unsigned char *moby) {
+/* Runs the prison lift scene (PAL): sets up the checkpoint by progress, moves the hero through the lift, panel and guard stages, then fades the music and plays the end scene. */
+void lift_scene_update_pal(unsigned char *moby) {
     PrisonLiftState *state = *(PrisonLiftState **)(moby + 0x68);
     unsigned char *lift = g_moby_l14_pool + state->lift * 256;
     unsigned char *panel = g_moby_l14_pool + state->panel * 256;
@@ -225,7 +226,7 @@ void func_PAL_L14_0042BC18(unsigned char *moby) {
         if (flag_set_first_pending(moby)) {
             state->fadeTimer = ((s32)(state->fadeLength) * 5 + 2) / 6 * 2;
             state->waitTimer = ((s32)(state->fadeLength) * 5 + 2) / 6;
-            func_PAL_L00_002C4480(0x6F, 1);
+            hero_l00_set_action_pal(0x6F, 1);
         }
         if (math_fast_float_d(&state->waitTimer))
             moby_set_state(moby, state->nextState, -1);

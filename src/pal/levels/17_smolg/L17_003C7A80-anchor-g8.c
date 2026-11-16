@@ -28,122 +28,122 @@ extern char *g_moby_l17_pool MACRO_ADDR;
 extern float g_anchor_move_seconds __attribute__((sda)), g_anchor_delay_seconds __attribute__((sda));
 extern MotionQuad g_hero_position[];
 extern int math_fast_float_d(void *);
-extern void func_PAL_L17_003C7908(void *, void *, void *);
+extern void platform_place_on_path_by_timer_pal(void *, void *, void *);
 extern int platform_is_point_below(void *, void *);
 extern void FastVecSub(void *, void *, void *);
 extern void mat_combine_and_store(void *, void *, void *, void *);
 
 /* Moves the object between two anchors when their source mobys are cleared, waiting at
    the far anchor, and stops while a forward or backward probe is blocked. */
-void func_PAL_L17_003C7A80(unsigned char *obj)
+void triggered_anchor_mover_update_pal(unsigned char *obj)
 {
     struct { MotionVec old, delta, probe1, probe2; } frame;
-    MotionState *s = *(MotionState **)(obj + 0x68);
+    MotionState *vars = *(MotionState **)(obj + 0x68);
     char *target;
     MotionAnchor *anchor;
 
     frame.old.q = *(MotionQuad *)(obj + 0x10);
-    math_fast_float_d(&s->cooldown);
+    math_fast_float_d(&vars->cooldown);
     switch (obj[0x20]) {
     case 0:
-        s->speed = 0;
-        s->blocked = 0;
-        s->cooldown = 0;
+        vars->speed = 0;
+        vars->blocked = 0;
+        vars->cooldown = 0;
         obj[0x20] = 1;
-        s->flags |= 9;
-        if (s->destination0 != -1)
-            *(MotionQuad *)(obj + 0x10) = g_path_l17_table[s->destination0]->position.q;
-        else if (s->destination1 != -1)
-            *(MotionQuad *)(obj + 0x10) = g_path_l17_table[s->destination1]->position.q;
+        vars->flags |= 9;
+        if (vars->destination0 != -1)
+            *(MotionQuad *)(obj + 0x10) = g_path_l17_table[vars->destination0]->position.q;
+        else if (vars->destination1 != -1)
+            *(MotionQuad *)(obj + 0x10) = g_path_l17_table[vars->destination1]->position.q;
         break;
     case 1:
-        if (s->source0 != -1 && s->destination0 != -1) {
-            target = g_moby_l17_pool + (s->source0 << 8);
+        if (vars->source0 != -1 && vars->destination0 != -1) {
+            target = g_moby_l17_pool + (vars->source0 << 8);
             if (!target || (unsigned char)target[0x20] == 254 || (unsigned char)target[0x20] == 253
-                || (unsigned char)target[0x20] == s->activeState) {
-                s->timer = 0;
-                s->direction = 0;
+                || (unsigned char)target[0x20] == vars->activeState) {
+                vars->timer = 0;
+                vars->direction = 0;
                 obj[0x20] = 2;
                 break;
             }
         }
-        if (s->destination0 == -1 && s->source1 != -1 && s->destination1 != -1) {
-            target = g_moby_l17_pool + (s->source1 << 8);
+        if (vars->destination0 == -1 && vars->source1 != -1 && vars->destination1 != -1) {
+            target = g_moby_l17_pool + (vars->source1 << 8);
             if (!target || (unsigned char)target[0x20] == 254 || (unsigned char)target[0x20] == 253
-                || (unsigned char)target[0x20] == s->activeState) {
-                s->timer = 0;
-                s->direction = 1;
+                || (unsigned char)target[0x20] == vars->activeState) {
+                vars->timer = 0;
+                vars->direction = 1;
                 obj[0x20] = 2;
             }
         }
         break;
     case 2:
-        if (!s->blocked)
-            s->timer += 1.0f;
-        if (s->timer >= (g_anchor_move_seconds * 300.0f + 2.0f) * 0.16666667f)
-            s->timer = (g_anchor_move_seconds * 300.0f + 2.0f) * 0.16666667f;
-        if (s->direction == 0)
-            anchor = g_path_l17_table[s->destination0];
+        if (!vars->blocked)
+            vars->timer += 1.0f;
+        if (vars->timer >= (g_anchor_move_seconds * 300.0f + 2.0f) * 0.16666667f)
+            vars->timer = (g_anchor_move_seconds * 300.0f + 2.0f) * 0.16666667f;
+        if (vars->direction == 0)
+            anchor = g_path_l17_table[vars->destination0];
         else
-            anchor = g_path_l17_table[s->destination1];
-        func_PAL_L17_003C7908(obj, anchor, &frame.old);
-        if (s->timer >= (g_anchor_move_seconds * 300.0f + 2.0f) * 0.16666667f) {
-            if (s->once0 && !s->direction) {
-                s->destination0 = -1;
+            anchor = g_path_l17_table[vars->destination1];
+        platform_place_on_path_by_timer_pal(obj, anchor, &frame.old);
+        if (vars->timer >= (g_anchor_move_seconds * 300.0f + 2.0f) * 0.16666667f) {
+            if (vars->once0 && !vars->direction) {
+                vars->destination0 = -1;
                 obj[0x20] = 1;
-            } else if (s->once1 && s->direction == 1) {
-                s->destination1 = -1;
+            } else if (vars->once1 && vars->direction == 1) {
+                vars->destination1 = -1;
                 obj[0x20] = 1;
             } else {
                 obj[0x20] = 4;
-                s->delay = 0;
+                vars->delay = 0;
             }
         }
         break;
     case 3:
-        if (!s->blocked)
-            s->timer -= 1.0f;
-        if (s->timer <= 0.0f)
-            s->timer = 0.0f;
-        if (s->direction == 0)
-            anchor = g_path_l17_table[s->destination0];
+        if (!vars->blocked)
+            vars->timer -= 1.0f;
+        if (vars->timer <= 0.0f)
+            vars->timer = 0.0f;
+        if (vars->direction == 0)
+            anchor = g_path_l17_table[vars->destination0];
         else
-            anchor = g_path_l17_table[s->destination1];
-        func_PAL_L17_003C7908(obj, anchor, &frame.old);
-        if (s->timer <= 0.0f)
+            anchor = g_path_l17_table[vars->destination1];
+        platform_place_on_path_by_timer_pal(obj, anchor, &frame.old);
+        if (vars->timer <= 0.0f)
             obj[0x20] = 1;
         break;
     case 4:
-        s->delay += 1.0f;
-        if (s->delay >= (g_anchor_delay_seconds * 300.0f + 2.0f) * 0.16666667f) {
-            MotionMoby *m;
+        vars->delay += 1.0f;
+        if (vars->delay >= (g_anchor_delay_seconds * 300.0f + 2.0f) * 0.16666667f) {
+            MotionMoby *source_moby;
             obj[0x20] = 3;
-            if (s->direction == 0)
-                m = (MotionMoby *)((s->source0 << 8) + (unsigned int)g_moby_l17_pool);
-            else if (s->direction == 1)
-                m = (MotionMoby *)((s->source1 << 8) + (unsigned int)g_moby_l17_pool);
+            if (vars->direction == 0)
+                source_moby = (MotionMoby *)((vars->source0 << 8) + (unsigned int)g_moby_l17_pool);
+            else if (vars->direction == 1)
+                source_moby = (MotionMoby *)((vars->source1 << 8) + (unsigned int)g_moby_l17_pool);
             else
                 break;
-            m->marked = 0;
+            source_moby->marked = 0;
         }
         break;
     }
-    if (s->cooldown) {
-        s->blocked = 1;
-    } else if (s->speed < 0.0f) {
+    if (vars->cooldown) {
+        vars->blocked = 1;
+    } else if (vars->speed < 0.0f) {
         frame.probe1.q = g_hero_position[0];
         if (platform_is_point_below(obj, &frame.probe1)) {
-            if (!s->cooldown)
-                s->cooldown = 25;
-            s->blocked = 1;
+            if (!vars->cooldown)
+                vars->cooldown = 25;
+            vars->blocked = 1;
         } else
             goto check_clear;
     } else {
 check_clear:
         frame.probe2.q = g_hero_position[0];
         if (!platform_is_point_below(obj, &frame.probe2))
-            s->blocked = 0;
+            vars->blocked = 0;
     }
     FastVecSub(&frame.delta, obj + 0x10, &frame.old);
-    mat_combine_and_store((char *)s + 0x50, &frame.delta, obj + 0xF0, obj + 0xF0);
+    mat_combine_and_store((char *)vars + 0x50, &frame.delta, obj + 0xF0, obj + 0xF0);
 }

@@ -6,6 +6,7 @@ extern void list_menu_set_enabled(char *, int);
 extern void list_menu_set_record_table(char *, char *);
 extern char g_list_menu_record_table_second[];
 
+/* Sets up the text of another menu page when the menu data is loaded. */
 int menu_page_text_init_second_us2(void)
 {
     if (g_resident_data_base[0] != 0) {

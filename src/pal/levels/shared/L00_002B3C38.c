@@ -7,6 +7,7 @@ extern float g_hero_speed_params[] MACRO_ADDR;
 extern void hero_resolve_stick_direction(int, float);
 #define H ((Hero *)D_00189E20)
 
+/* Sets the hero wanted speed from the stick, slowing it down in one special state. */
 void hero_update_target_speed_pal(void)
 {
     hero_resolve_stick_direction(0, 1.0f);

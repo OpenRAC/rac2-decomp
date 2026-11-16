@@ -93,12 +93,14 @@ extern void FastVecSub(void *,void *,void *),vec_scale_to_length(void *,void *,f
 extern void matrix_from_basis_rows(void *,void *),transform_vector(void *,void *,void *);
 extern float mat_fast_helper_a(float,float),FastAddRotations(float,float),vec_length_xy(void *);
 extern void moby_update_eased_node(void *,void *,int,float,float);
-extern s32 func_PAL_L00_002C4480(int,int);
-extern void func_PAL_L00_002AF458(void),cancel_hero_item_animation_pal(void),gfx_add_draw_callback_first(void (*)(void),void *);
+extern s32 hero_l00_set_action_pal(int,int);
+extern void start_equipped_item_animation_pal(void),cancel_hero_item_animation_pal(void),gfx_add_draw_callback_first(void (*)(void),void *);
 extern void target_tether_draw_beam_pal(void);
 extern int PlayMobySound(int,int,void *);
 
-void func_PAL_L00_003BCEB8(unsigned char *object,AimState *state)
+/* Handles the targeting and lock-on beam of the player's grabbing tool. It picks targets, tracks
+ * them, aims the tool and handles the charge sound and button. (PAL: 50 Hz timings) */
+void target_lock_on_update_pal(unsigned char *object,AimState *state)
 {
     AimVector target, origin, direction, temp;
     unsigned char matrix[64] __attribute__((aligned(16)));
@@ -155,7 +157,7 @@ void func_PAL_L00_003BCEB8(unsigned char *object,AimState *state)
             FastVecAdd(&temp,&temp,&origin);
             if (CollLine(&origin,&temp,0,g_hero_state.f2290,0)) {
                 unsigned char *hit=g_collision_result.hit;
-                if (hit && B(hit,0x20)!=254 && B(hit,0x20)!=253 && S(hit,0xaa)==0xee1) {
+                if (hit && B(hit,0x20)!=254 && B(hit,0x20)!=253 && S(hit,0xaa)==MOBY_CLASS_RECEIVER_BOT) {
                     entry=P(hit,0x68);
                     if ((B(entry,0x3b1)&0x80) && (F(entry,0x3e4)==0.0f || vec_distance_xy(&origin,object+0x10)<F(entry,0x3e4)))
                         candidate=g_collision_result.hit;
@@ -205,13 +207,13 @@ void func_PAL_L00_003BCEB8(unsigned char *object,AimState *state)
         }
     }
     if (state->mode==1 && g_hero_state.f2294!=28 && g_hero_state.f2294!=49) {
-        if (g_hero_state.f2294==1) func_PAL_L00_002C4480(29,1);
+        if (g_hero_state.f2294==1) hero_l00_set_action_pal(29,1);
         if (g_hero_state.f22b4!=4) moby_update_eased_node(object,&g_target_lock_aim_angles,g_hero_state.f22b4==4?5:0,ref_L00_003B9310_02*1.44f,ref_L00_003B9310_03*1.44f);
         if (g_hero_state.f340 && !g_hero_state.f34e && !g_target_lock_disabled && !g_hero_state.f22bc && (g_pad_state.held&g_hero_state.f1230) && (g_hero_state.f1240>=13 || g_hero_state.f22b4==4)) {
             if (!state->held) {
                 if (g_hero_state.f22b4!=4) {
                     unsigned char *sound;
-                    func_PAL_L00_002AF458(); sound=g_sound_state+state->handle*0x70;
+                    start_equipped_item_animation_pal(); sound=g_sound_state+state->handle*0x70;
                     if (P(sound,0x88)!=object || !B(sound,0x74)) state->handle=PlayMobySound(0,4,object);
                 }
                 state->held=1;

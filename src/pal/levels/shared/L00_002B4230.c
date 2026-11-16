@@ -8,6 +8,7 @@ extern void FastVecAdd(char *, char *, char *);
 extern void func_001290E0(int *, int *);
 extern unsigned char D_00189E20_1[];
 
+/* When the hero runs into a wall, takes away the part of the hero speed that goes into it and slows the hero down a little. */
 void hero_cancel_velocity_into_wall_pal(void)
 {
     char *p = (char *)D_00189E20_1;

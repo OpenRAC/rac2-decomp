@@ -1,5 +1,5 @@
 /* func_PAL_L05_00448CA8, the PAL copy of func_L05_00442A58: the same C, where the roll and combo
-   timers scale to 50 Hz (the tunables are read as ints) and rollInverse is stored before rollDelay. */
+   timers scale to 50 Hz (the tunables are read as ints) and roll_inverse is stored before roll_delay. */
 #include "include_asm.h"
 #include "common.h"
 
@@ -12,7 +12,7 @@ typedef unsigned int Quad __attribute__((mode(TI)));
 
 typedef struct {
     char pad0[0x108];
-    float stickX, stickY;
+    float stick_x, stick_y;
     char pad110[0x90];
     union {
         long buttons;
@@ -22,15 +22,15 @@ typedef struct {
 
 /* At the camera state's +0x50. */
 typedef struct {
-    float yawParams[3], pitchParams[3];
+    float yaw_params[3], pitch_params[3];
     char pad18[6];
     unsigned char mode, changed;
     char pad20[0x34];
-    float pitchVelocity, yawVelocity;
+    float pitch_velocity, yaw_velocity;
     char pad5c[8];
     float pitch, yaw;
     char pad6c[8];
-    float pitchLimit, yawLimit;
+    float pitch_limit, yaw_limit;
 } InputMode;
 
 typedef struct {
@@ -41,11 +41,11 @@ typedef struct {
 /* At the camera state's +0xD4. */
 typedef struct {
     char pad0[4];
-    s16 rollDirection, rollTimer;
-    float rollInverse;
-    s16 rollDelay, comboTimer, comboDelay;
+    s16 roll_direction, roll_timer;
+    float roll_inverse;
+    s16 roll_delay, combo_timer, combo_delay;
     char pad12[2];
-    float comboInverse;
+    float combo_inverse;
 } RollState;
 
 extern ShipPad g_pad_state;
@@ -69,12 +69,13 @@ extern float math_fabs(float);
 extern int hero_get_state_value_b(void);
 extern int path_is_touching_linked_point(char *);
 extern float FastVecDot(void *, char *);
-extern int func_PAL_L05_00449258(char *);
+extern int ship_update_turn_animation_pal(char *);
 extern float math_step_spring_damper_clamped(float *, float, float, float, float, float);
 extern int FastDecTimer(short *);
 extern float IntToFloat(int);
 
-void func_PAL_L05_00448CA8(char *obj, float *yawRate, float *pitchRate)
+/* Reads the stick and buttons into pitch and yaw rates for the ship, and handles the barrel roll and double-tap combo timers (PAL: 50 Hz). */
+void UpdateSteeringInput_pal(char *obj, float *yaw_rate, float *pitch_rate)
 {
     float axis[4] __attribute__((aligned(16)));
     InputMode *state = (InputMode *)(*(char **)(obj + 0x70) + 0x50);
@@ -82,8 +83,8 @@ void func_PAL_L05_00448CA8(char *obj, float *yawRate, float *pitchRate)
     RollState *roll;
 
     cam_load_parameter_set(obj);
-    horizontal = -g_pad_state.stickX;
-    vertical = g_pad_state.stickY;
+    horizontal = -g_pad_state.stick_x;
+    vertical = g_pad_state.stick_y;
     if (math_fabs(vertical) < g_ship_stick_deadzone) {
         if (vertical == 0.0f) {
             if (g_pad_state.input.words.held & 0x1000) {
@@ -141,43 +142,43 @@ void func_PAL_L05_00448CA8(char *obj, float *yawRate, float *pitchRate)
         if (math_fabs(FastVecDot(axis, obj)) < 0.7f)
             state->mode = 2;
     }
-    if (func_PAL_L05_00449258(obj)) {
-        *pitchRate = (*yawRate = 0.0f);
+    if (ship_update_turn_animation_pal(obj)) {
+        *pitch_rate = (*yaw_rate = 0.0f);
     }
-    *pitchRate = (-vertical * 0.017453294f) * state->pitchLimit;
-    *yawRate = (horizontal * 0.017453294f) * state->yawLimit;
-    state->pitch = math_step_spring_damper_clamped(&state->pitchVelocity, state->pitch, *pitchRate,
-                                 state->pitchParams[0], state->pitchParams[1], state->pitchParams[2]);
-    state->yaw = math_step_spring_damper_clamped(&state->yawVelocity, state->yaw, *yawRate,
-                               state->yawParams[0], state->yawParams[1], state->yawParams[2]);
+    *pitch_rate = (-vertical * 0.017453294f) * state->pitch_limit;
+    *yaw_rate = (horizontal * 0.017453294f) * state->yaw_limit;
+    state->pitch = math_step_spring_damper_clamped(&state->pitch_velocity, state->pitch, *pitch_rate,
+                                 state->pitch_params[0], state->pitch_params[1], state->pitch_params[2]);
+    state->yaw = math_step_spring_damper_clamped(&state->yaw_velocity, state->yaw, *yaw_rate,
+                               state->yaw_params[0], state->yaw_params[1], state->yaw_params[2]);
     {
         SteeringRecord *record = *(SteeringRecord **)(obj + 0x70);
         record->value = math_step_spring_damper_clamped(&record->velocity, record->value, vertical,
                                       g_ship_roll_vec_x, g_ship_roll_vec_y, g_ship_roll_vec_z);
     }
-    *pitchRate = state->pitch;
-    *yawRate = state->yaw;
+    *pitch_rate = state->pitch;
+    *yaw_rate = state->yaw;
     roll = (RollState *)(*(char **)(obj + 0x70) + 0xD4);
-    if (roll->rollTimer && FastDecTimer(&roll->rollTimer))
-        roll->rollDirection = 0;
-    if (roll->rollDelay == 0) {
+    if (roll->roll_timer && FastDecTimer(&roll->roll_timer))
+        roll->roll_direction = 0;
+    if (roll->roll_delay == 0) {
         if (g_pad_state.input.buttons & 0xC) {
-            roll->rollTimer = ((s32)(g_ship_roll_timer_value) * 5 + 2) / 6;
-            roll->rollInverse = 1.0f / IntToFloat(roll->rollTimer);
-            roll->rollDelay = roll->rollTimer + ((s32)(g_ship_roll_delay_offset) * 5 + 2) / 6;
-            if (g_pad_state.input.words.held & 4) roll->rollDirection = -1;
-            else roll->rollDirection = 1;
-            if (g_cheat_flags) roll->rollDirection = roll->rollDirection == -1 ? 1 : -1;
+            roll->roll_timer = ((s32)(g_ship_roll_timer_value) * 5 + 2) / 6;
+            roll->roll_inverse = 1.0f / IntToFloat(roll->roll_timer);
+            roll->roll_delay = roll->roll_timer + ((s32)(g_ship_roll_delay_offset) * 5 + 2) / 6;
+            if (g_pad_state.input.words.held & 4) roll->roll_direction = -1;
+            else roll->roll_direction = 1;
+            if (g_cheat_flags) roll->roll_direction = roll->roll_direction == -1 ? 1 : -1;
         }
     } else {
-        FastDecTimer(&roll->rollDelay);
+        FastDecTimer(&roll->roll_delay);
     }
-    if (FastDecTimer(&roll->comboDelay) && g_ship_combo_enabled && g_current_map_index != 20) {
+    if (FastDecTimer(&roll->combo_delay) && g_ship_combo_enabled && g_current_map_index != 20) {
         if ((g_pad_state.input.words.held & 3) == 3 || (g_pad_state.input.words.held & 0xC) == 0xC) {
-            roll->comboDelay = ((s32)(g_ship_combo_delay) * 5 + 2) / 6;
+            roll->combo_delay = ((s32)(g_ship_combo_delay) * 5 + 2) / 6;
             g_ship_state = 7;
-            roll->comboTimer = ((s32)(g_ship_roll_duration) * 5 + 2) / 6;
-            roll->comboInverse = 1.0f / IntToFloat(roll->comboTimer);
+            roll->combo_timer = ((s32)(g_ship_roll_duration) * 5 + 2) / 6;
+            roll->combo_inverse = 1.0f / IntToFloat(roll->combo_timer);
         }
     }
 }

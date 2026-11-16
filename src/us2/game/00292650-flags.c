@@ -21,7 +21,7 @@ extern Entry_001B9740 g_texture_upload_params[];
 extern int log2dim(int);
 extern int subtract_integer_with_clamp(int);
 
-void func_US2_00292650(int *p, int count) {
+void gfx_load_texture_upload_params_us2(int *p, int count) {
     for (g_gfx_entry_count = 0; g_gfx_entry_count < count; g_gfx_entry_count++) {
         int w0 = *p++;
         int w1 = *p++;

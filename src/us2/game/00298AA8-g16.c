@@ -34,7 +34,7 @@ extern int GetIconFrame(int key, int index);
 extern void DrawHudSpriteSubpixel(int icon, int x, int y, int w, int h, int alpha, unsigned int color);
 extern void gfx_draw_screen_line(int x0, int y0, int x1, int y1, u64 color, int flags);
 
-void func_US2_00298AA8(float x0, float x1, float y0, float y1, float scale)
+void map_draw_class_markers_us2(float x0, float x1, float y0, float y1, float scale)
 {
     float u;
     float v;

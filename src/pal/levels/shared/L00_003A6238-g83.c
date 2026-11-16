@@ -14,7 +14,7 @@ typedef struct { char prefix[0x54]; float fireRate; char tail[0x88]; } WeaponEnt
 extern WeaponEntry g_weapon_l00_table[];
 extern void anim_start_blended_with_flags(void *, int, int, int, int);
 extern void ReleaseDeadOrExpiredSlots(void *);
-extern s32 func_PAL_L00_002C4480(int, int);
+extern s32 hero_l00_set_action_pal(int, int);
 extern int get_ammo(int);
 extern void hud_add_moby_marker(void *, unsigned int, int, int, int, int, float, float, float);
 extern int math_fast_float_d(void *);
@@ -25,7 +25,7 @@ extern int PlayMobySound(int, int, char *);
 extern char *hero_fire_effect_from_facing_pal(void *, void *);
 
 /* Update the firing effect and its input-controlled cooldown. */
-void func_PAL_L00_003A7518(char *moby)
+void seeker_gun_update_pal(char *moby)
 {
     float position[4];
     float *cooldown = *(float **)(moby + 0x68);
@@ -39,7 +39,7 @@ void func_PAL_L00_003A7518(char *moby)
     *(float *)(moby + 0x2C) = *(float *)(*(char **)(moby + 0x24) + 0x24) * g_seeker_gun_speed_scale;
     g_weapon_effect_scale = 0.1f;
     if (H->i[0x2294 / 4] == 1)
-        func_PAL_L00_002C4480(29, 1);
+        hero_l00_set_action_pal(29, 1);
     if (H->i[0x2294 / 4] == 29) {
         unsigned int color;
         if (*cooldown > 0.0f && get_ammo(-1))

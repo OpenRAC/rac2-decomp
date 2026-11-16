@@ -10,7 +10,8 @@ extern int g_buy_back_label_y;
 extern char *GetLocalizedString(int);
 extern int text_draw_centered_medium(int, int, unsigned long long, unsigned char *, int);
 
-void func_US2_L00_00379738(void)
+/* Draws the buy and back labels for the selected item, showing buy only if the player has enough bolts. */
+void shop_draw_buy_back_labels_us2(void)
 {
     char *model = g_purchase_menu_model;
 

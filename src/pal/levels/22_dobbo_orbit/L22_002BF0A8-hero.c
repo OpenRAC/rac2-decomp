@@ -47,7 +47,7 @@ extern void hero_start_pose_offset(float, float, float);
 extern int hero_slot_item_id(int);
 extern int hero_find_ledge_grab_pal(void *, void *, void *);
 extern void ProbeHeroAirborneWallContact_pal(void);
-extern void func_PAL_L00_002B34C0(void);
+extern void hero_update_turn_from_anim_pal(void);
 extern int math_is_below_plane_within_depth(float);
 extern void hero_resolve_stick_direction(float, int);
 extern void hero_update_target_speed_pal(void);
@@ -58,20 +58,20 @@ extern void hero_compute_push_direction(float);
 extern void hero_set_push_direction(void *);
 extern void hero_build_move_impulse(float, float);
 extern float hero_get_speed_along_forward(void *);
-extern void func_PAL_L00_002B6488(void);
-extern void func_PAL_L00_002B6B38(void);
+extern void ApplyHeroGravityAndJumpMotion_pal(void);
+extern void hero_update_airborne_steering_pal(void);
 extern void hero_l00_select_aim_target(float, float, float);
 extern void hero_apply_mode_pose_offsets_pal(void);
 extern void UpdateHeroMotionResponseParameters_pal(void);
 extern void UpdateHeroLeanAndSwayParameters(void);
 extern void hero_shrink_vector_by_amount(float);
-extern void func_PAL_L00_002B9508(void);
+extern void hero_steer_reference_point_pal(void);
 extern float hero_get_direction_angle_delta(void *, int);
 extern int hero_play_sound(int index, int flags);
 extern void snd_update_slot_object(int, void *, int);
 extern void hero_try_surface_push_response(float, float, float);
-extern void func_PAL_L00_002BA480(void);
-extern int func_PAL_L00_002CB2C8(void);
+extern void hero_setup_attached_object_transform_pal(void);
+extern int hero_try_start_grab_pal(void);
 extern void set_hero_animation_pal(int, int, float);
 extern void hero_apply_mode_transform(void *, void *, float);
 extern void hero_build_relative_point(void *, int, float, float, float);
@@ -130,7 +130,7 @@ extern int math_random_int_range(int, int);
 extern float math_random_float_range(float, float);
 extern float math_random_signed_float_range(float, float);
 extern float vec_spring_to_target(void *, void *, void *, float, float, float);
-extern void func_PAL_002BEF58(void *, void *, int, float);
+extern void part_spawn_white_flash_pal(void *, void *, int, float);
 extern int PlayMobySound(int, int, void *);
 extern void pad_clamp_stick_to_unit_range(void *, void *, float);
 extern void cam_set_limits_first(float, float);
@@ -139,7 +139,7 @@ extern void cam_set_limits_fourth(float, float);
 extern void hero_get_offset_vector(void *);
 extern void hero_rotate_matrix(float, float, float);
 extern void hero_cancel_velocity_into_wall_pal(void);
-extern void func_PAL_L00_002B60C0(float);
+extern void ApproachHeroVelocity_pal(float);
 extern void part_emit_hero_radial_particles_pal(void);
 extern void hero_update_height_offset_pal(void);
 extern void hero_build_relative_offset(void *, int, float, float, float);
@@ -179,7 +179,7 @@ extern s32 find_nearest_path_point(void *path, Vec4 *position, Vec4 *state, s32 
                             s32 wrap, float max_distance, float first, float second);
 extern void hero_apply_reference_tilt_rotation(const Vec4 *input, Vec4 output_matrix[4], s32 mode,
                             float first, float second, float third);
-extern u8 *func_PAL_002C0428(const Vec4 *from, const Vec4 *to, float radius, float floor);
+extern u8 *part_spawn_bubble_pal(const Vec4 *from, const Vec4 *to, float radius, float floor);
 typedef struct Probe48 {
     Vec4 vector;             
     u32 unused10;
@@ -220,10 +220,11 @@ extern void PH_G2(void *, float, float);
 extern float PH_G3(float);
 extern float PH_G4(float);
 extern char PH_D2[] MACRO_ADDR;
-extern void func_PAL_L00_0038C620();
+extern void moby_l00_raise_state_to_8();
 extern void moby_raise_state_to_eight_copy();
 
-void func_PAL_L22_002BF0A8(void)
+/* Per-frame state switch for the hero in this level (PAL): runs the movement, animation and effects of the hero's current state. */
+void hero_l22_update_state_machine_pal(void)
 {
     u8 *entry_object = H(u8 *, 0x2290);
     int entry_substate = H(int, 0x2298);
@@ -233,7 +234,7 @@ void func_PAL_L22_002BF0A8(void)
     float shared_limit;
     int shared_mode, shared_index;
     float *shared_table;
-    u8 *hp32;
+    u8 *hero_bytes;
     u8 *shared_object;
 
     /* Only one state arm runs per invocation. Its temporary vectors and probe
@@ -258,12 +259,12 @@ void func_PAL_L22_002BF0A8(void)
             Vec4 output_matrix[4];
         } state_86;
         struct {
-            Vec4 targetPosition;
+            Vec4 target_position;
             Vec4 desired;
             Vec4 offset;
         } state_24;
         struct {
-            Vec4 targetPosition;
+            Vec4 target_position;
             Vec4 relative;
             Vec4 scaled;
             Vec4 delta;
@@ -307,8 +308,8 @@ void func_PAL_L22_002BF0A8(void)
             Vec4 first;             /* path sample, or the spawned debris origin */
             Vec4 second;            /* second path sample, or the debris velocity */
             union {
-                struct { Vec4 displacement; Vec4 previousStep; } d;
-                struct { Vec4 probeA; Vec4 probeB; } p;
+                struct { Vec4 displacement; Vec4 previous_step; } d;
+                struct { Vec4 probe_a; Vec4 probe_b; } p;
                 unsigned char query[48] __attribute__((aligned(16)));
             } u;
             Vec4 direction;
@@ -345,7 +346,7 @@ void func_PAL_L22_002BF0A8(void)
             Vec4 second;
         } state_4d;
         struct {
-            Vec4 hitPosition;       /* first vector of a 64-byte contact record */
+            Vec4 hit_position;       /* first vector of a 64-byte contact record */
             Vec4 hit_rest[3];
             Vec4 side;
             Vec4 candidate;
@@ -394,7 +395,7 @@ case 57: case 109: case 111: case 125:
             stat_bump(&g_progress_statistics, 18);
         }
     }
-    if (H(u32, 0x2294) == 3 && func_PAL_L00_002CB2C8()) goto finish;
+    if (H(u32, 0x2294) == 3 && hero_try_start_grab_pal()) goto finish;
     if (H(u32, 0x2294) == 4 &&
         (H(float, 0x24B8) > 0.2f || H(u8 *, 0x2290)[0x43] == 14 || H(u8 *, 0x2290)[0x43] == 15)) {
         if (H(u32, 0x2294) == 4) hero_steer_heading(0, 0.0028800003f, 0.10080001f, 0.13962635f);
@@ -482,7 +483,7 @@ case 57: case 109: case 111: case 125:
 
 case 0x32: case 0x33: case 0x34:
 {
-    float oldPitch,steer,minimumSteer,pitchChange,controllerScale,rate,maximumInput,steeringLimit;
+    float old_pitch,steer,minimum_steer,pitch_change,controller_scale,rate,maximum_input,steering_limit;
     if (H(u32,0x2294)==0x34) {
         if (H(s32,0x1B8)>58) g_hero_state_machine_word=65535;
         snd_update_slot_object(5,H(void*,0x2290),15);queue_copy_record_by_index(22);
@@ -514,9 +515,9 @@ case 0x32: case 0x33: case 0x34:
     }
     {
         float horizontal=FLD(g_pad_state, float, 0x128), vertical=FLD(g_pad_state, float, 0x12C);
-        maximumInput=horizontal<vertical?vertical:horizontal;
+        maximum_input=horizontal<vertical?vertical:horizontal;
     }
-    steeringLimit=0.013962637f;steeringLimit+=maximumInput*0.010471976f; /* retail max.s, not float-to-int/OR */
+    steering_limit=0.013962637f;steering_limit+=maximum_input*0.010471976f; /* retail max.s, not float-to-int/OR */
     steer=0.0f;
     
     if ((FLD(g_pad_state, u64, 0x1A0)&0xC0)==0x80 || H(s32,0x2298)==1) {
@@ -559,16 +560,16 @@ case 0x32: case 0x33: case 0x34:
     } else {H(s16,0xA4E)=0;H(s16,0xA4C)=0;}
 
     if (FLD(g_pad_state, u32, 0x1A4)&0x40) {
-        hp32=(u8 *)g_hero_state;
-        if ((s32)(g_frame_l22_counter-FLD(hp32,u32,0xA54))<58) ++FLD(hp32,s32,0xA50);
-        FLD(hp32,u32,0xA54)=g_frame_l22_counter;
+        hero_bytes=(u8 *)g_hero_state;
+        if ((s32)(g_frame_l22_counter-FLD(hero_bytes,u32,0xA54))<58) ++FLD(hero_bytes,s32,0xA50);
+        FLD(hero_bytes,u32,0xA54)=g_frame_l22_counter;
     }
     if (H(s16,0xA4E)>58) H(s32,0xA50)=0;
     if (FLD(g_pad_state, u32, 0x1A0)&0x80) H(s32,0xA50)=0;
     if (H(u32,0x2294)==0x33) steer=0.0f;
-    oldPitch=H(float,0x94);
-    math_approach_with_velocity(HP(0x94),steer,HP(0xA28),0.0216f,0.28800002f,steeringLimit, 0);
-    pitchChange=fast_subtract_rotations(H(float,0x94),oldPitch);
+    old_pitch=H(float,0x94);
+    math_approach_with_velocity(HP(0x94),steer,HP(0xA28),0.0216f,0.28800002f,steering_limit, 0);
+    pitch_change=fast_subtract_rotations(H(float,0x94),old_pitch);
     hero_resolve_stick_direction(1.0f, 0);hero_steer_heading(0,0.01008f,0.115200005f,0.10471977f);
     H(float,0xA2C)=H(float,0x1A4);math_fast_float_d(HP(0xA34));
     if (H(s32,0x2298)==1) H(float,0x1B0)=0.120000005f;
@@ -577,13 +578,13 @@ case 0x32: case 0x33: case 0x34:
         else H(float,0x1B0)=0.056000005f;
     }
     else H(float,0x1B0)=0.060000002f;
-    controllerScale=H(float,0x24B8);
-    if (((FLD(g_pad_state, u32, 0x1A0)&0xC0) || H(s32,0x2298)==1) && H(float,0x24B8)<1.0f) controllerScale=1.0f;
+    controller_scale=H(float,0x24B8);
+    if (((FLD(g_pad_state, u32, 0x1A0)&0xC0) || H(s32,0x2298)==1) && H(float,0x24B8)<1.0f) controller_scale=1.0f;
     if (H(float,0x24B8)>0.15f) {
         float minimum=H(u32,0x2294)==0x34?0.4f:0.35f;
-        if (controllerScale<minimum) controllerScale=minimum;
+        if (controller_scale<minimum) controller_scale=minimum;
     }
-    if (H(u32,0x2294)!=0x34 || !(FLD(g_pad_state, u32, 0x1A0)&10)) H(float,0x1B0)*=controllerScale;
+    if (H(u32,0x2294)!=0x34 || !(FLD(g_pad_state, u32, 0x1A0)&10)) H(float,0x1B0)*=controller_scale;
     if (math_fast_float_d(HP(0xA30))) {
 
         int low,high,choice;
@@ -594,7 +595,7 @@ case 0x32: case 0x33: case 0x34:
         qcopy(&workspace.state_32.velocity, &H(Vec4,0x110));
         vec_scale_to_length(&workspace.state_32.lateral,&workspace.state_32.lateral,0.030000001f);
         FastVecAdd(&workspace.state_32.velocity,&workspace.state_32.velocity,&workspace.state_32.lateral);workspace.state_32.velocity.z+=0.040000003f;
-        func_PAL_002C0428(&workspace.state_32.position,&workspace.state_32.velocity,25200.0f,-1.0f);
+        part_spawn_bubble_pal(&workspace.state_32.position,&workspace.state_32.velocity,25200.0f,-1.0f);
         choice=math_random_int_below(100);
         if ((float)choice<40.0f) H(s32,0xA30)=math_random_int_range(3,9);
         else H(s32,0xA30)=math_random_int_range(33,75);
@@ -617,7 +618,7 @@ case 0x32: case 0x33: case 0x34:
                 vec_add_offset(&workspace.state_32.velocity,&workspace.state_32.velocity,-0.015000001f,H(float,0x98),H(float,0x94));
                 H(s16,0xA38)=FloatToInt((0.14000002f-H(float,0x1B4))*28.571424f);
                 energy=math_random_float_range(6300.0f,9450.0f);
-                func_PAL_002C0428(&workspace.state_32.position,&workspace.state_32.velocity,energy,-1.0f);
+                part_spawn_bubble_pal(&workspace.state_32.position,&workspace.state_32.velocity,energy,-1.0f);
             }
         }
     }
@@ -641,12 +642,12 @@ case 0x32: case 0x33: case 0x34:
     }
     math_approach_with_velocity(HP(0x90),rate,HP(0xA24),0.007f,0.17f,0.024434613f, 0);
     cam_set_limits_second(0.009f,0.22f);cam_set_limits_third(0.04f,0.2f);cam_set_limits_fourth(0.02f,0.2f);
-    FLD(g_hero_tuning_block, float, 0x114)=pitchChange*47.0f;FLD(g_hero_tuning_block, float, 0x118)=rate*1.5f;FLD(g_hero_tuning_block, float, 0x110)=rate*1.4f;
+    FLD(g_hero_tuning_block, float, 0x114)=pitch_change*47.0f;FLD(g_hero_tuning_block, float, 0x118)=rate*1.5f;FLD(g_hero_tuning_block, float, 0x110)=rate*1.4f;
     if (FLD(g_hero_tuning_block, float, 0x114)>0.8726647f) FLD(g_hero_tuning_block, float, 0x114)=0.8726647f;
     else if (FLD(g_hero_tuning_block, float, 0x114)< -0.8726647f) FLD(g_hero_tuning_block, float, 0x114)=-0.8726647f;
     FLD(g_hero_tuning_block, float, 0x364)=0.03f;FLD(g_hero_tuning_block, float, 0x368)=0.22f;
-    FLD(g_hero_tuning_block, float, 0x324)=pitchChange*40.0f;FLD(g_hero_tuning_block, float, 0x328)=rate*1.1f;
-    FLD(g_hero_tuning_block, float, 0x3D8)=rate*1.1f;FLD(g_hero_tuning_block, float, 0x3D4)=pitchChange*40.0f;
+    FLD(g_hero_tuning_block, float, 0x324)=pitch_change*40.0f;FLD(g_hero_tuning_block, float, 0x328)=rate*1.1f;
+    FLD(g_hero_tuning_block, float, 0x3D8)=rate*1.1f;FLD(g_hero_tuning_block, float, 0x3D4)=pitch_change*40.0f;
     FLD(g_hero_tuning_block, float, 0x414)=0.03f;FLD(g_hero_tuning_block, float, 0x418)=0.22f;
     goto finish;
 }
@@ -699,7 +700,7 @@ case 0x7f:
         vec_scale_to_length(&workspace.state_67.offset, &workspace.state_67.offset, 0.030000001f);
         FastVecAdd(&workspace.state_67.projected_position, &workspace.state_67.projected_position, &workspace.state_67.offset);
         workspace.state_67.projected_position.z = workspace.state_67.projected_position.z + 0.040000003f;
-        func_PAL_002C0428(&workspace.state_67.joint_position, &workspace.state_67.projected_position, 25200.0f, -1.0f);
+        part_spawn_bubble_pal(&workspace.state_67.joint_position, &workspace.state_67.projected_position, 25200.0f, -1.0f);
         if (H(s32, 0x1b8) < 33) {
             H(s32, 0xa30) = math_random_int_range(2, 4);
             H(s32, 0xa30) = H(s32, 0xa30) + H(s32, 0x1b8) / 5;
@@ -841,9 +842,9 @@ case 0x23:
 case 0x24:
 {
 
-    float bearing,firstRoot,secondRoot;
-    qcopy(&workspace.state_24.targetPosition, H(u8*,0xAA4)+0x10);
-    H(float,0xAB0)=fast_vec_dist(HP(0x80),&workspace.state_24.targetPosition);
+    float bearing,first_root,second_root;
+    qcopy(&workspace.state_24.target_position, H(u8*,0xAA4)+0x10);
+    H(float,0xAB0)=fast_vec_dist(HP(0x80),&workspace.state_24.target_position);
     H(float,0xAAC)=5e1f;
     if (H(float,0xAA0)>0.0f) H(float,0xAAC)=H(float,0xAB0)/H(float,0x170);
     if (H(s32,0x2298)==0) {
@@ -855,16 +856,16 @@ case 0x24:
         H(float,0x1A0)=bearing;
         hero_steer_heading(0,0.0432f,0.21600002f,0.14660768f);
     } else if (H(s32,0x2298)==1) ApproachValue(HP(0xAA0),0.0f,0.016800001f);
-    if (math_solve_quadratic(&firstRoot,&secondRoot,-0.008400001f,H(float,0xAA0),1.9f-H(float,0xAB0))>0 && firstRoot>0.0f) {
+    if (math_solve_quadratic(&first_root,&second_root,-0.008400001f,H(float,0xAA0),1.9f-H(float,0xAB0))>0 && first_root>0.0f) {
         H(s32,0x2298)=1;
-        H(float,0xAAC)=firstRoot;
+        H(float,0xAAC)=first_root;
     }
     H(u16,0x226)=3;
     if (H(float,0xAAC)<17.0f) H(s32,0xAB4)=1;
     if (H(s32,0xAB4)) StepAngleTowardTarget(HP(0x94),0,0.0f,0.0767945f);
     else {
-        float horizontal=vec_distance_xy(HP(0x80),&workspace.state_24.targetPosition);
-        bearing=mat_fast_helper_a(horizontal,workspace.state_24.targetPosition.z-H(float,0x88));
+        float horizontal=vec_distance_xy(HP(0x80),&workspace.state_24.target_position);
+        bearing=mat_fast_helper_a(horizontal,workspace.state_24.target_position.z-H(float,0x88));
         bearing=FastAddRotations(-bearing,1.5707965f);
         StepAngleTowardTarget(HP(0x94),0,bearing,0.12915438f);
     }
@@ -1157,7 +1158,7 @@ case 21: case 131:
             H(float, 0xF4) += math_fast_sin_or_cos_b(H(float, 0x98)) * 0.026f;
             qcopy(&H(Vec4, 0x140), &H(Vec4, 0xF0));
         }
-        if (H(u32, 0x2294) == 21) func_PAL_L00_002BA480();
+        if (H(u32, 0x2294) == 21) hero_setup_attached_object_transform_pal();
     }
     if (H(u8, 0x1492)) {
         if (math_is_below_plane_within_depth(84.0f)) {
@@ -1168,7 +1169,7 @@ case 21: case 131:
             H(float, 0xF4) += math_fast_sin_or_cos_b(heading) * speed;
             qcopy(&H(Vec4, 0x140), &H(Vec4, 0xF0));
         }
-        { func_PAL_L00_002B9508(); goto finish; }
+        { hero_steer_reference_point_pal(); goto finish; }
     }
     hero_approach_speed(0.014800001f, 0.0112000005f);
     hero_compute_push_direction(99999.0f);
@@ -1185,7 +1186,7 @@ case 19:
     int steer;
     float distance, excess, scaled, radius, limit, angle, magnitude, rate, offset;
     if (H(int, 0xC2C) || H(float, 0xC38) < (float)g_hero_anim_records[H(s16, 0xBFC)].f[8]) H(u8, 0x1239) = 2;
-    if (H(u8, 0x1492)) { func_PAL_L00_002B9508(); goto finish; }
+    if (H(u8, 0x1492)) { hero_steer_reference_point_pal(); goto finish; }
     animation = (unsigned char *)&g_hero_anim_records[H(s16, 0xBFC)];
     H(float, 0x1B0) = 0.0f;
     if (H(void *, 0xBE4) && H(int, 0x1B8) < 3) {
@@ -1289,7 +1290,7 @@ case 0x1F:
             H(float,0xF4)+=math_fast_sin_or_cos_b(H(float,0x98))*0.024000002f;
             qcopy(&H(Vec4,0x140), &H(Vec4,0xF0));
         }
-        func_PAL_L00_002B9508();
+        hero_steer_reference_point_pal();
     } else {
         if (H(s32,0x1B8)>start) hero_approach_speed(0.076000005f,0.036000002f);
         if (H(s32,0xBE8)) hero_compute_push_direction(H(float,0xBEC));
@@ -1404,7 +1405,7 @@ case 0x22:
         }
         k = 1.0f;
         if (H(s16, 0x1454)) {
-            func_PAL_L00_002B34C0();
+            hero_update_turn_from_anim_pal();
         } else {
             H(float, 0x1458) = H(float, 0x98);
             qcopy(&H(Vec, 0x1440), &H(Vec, 0x0));
@@ -1515,7 +1516,7 @@ case 0x7b:
 
 
     case 0x2E:
-        func_PAL_L00_002B9508();
+        hero_steer_reference_point_pal();
         cam_set_limits_first(0.04f, 0.2f);
         cam_set_limits_second(0.04f, 0.2f);
         cam_set_limits_third(0.04f, 0.2f);
@@ -1588,7 +1589,7 @@ case 0x7b:
 case 0x27: case 0x28: case 0x29: case 0x2A: case 0x3E:
 {
 
-    int typeAllowsPose,poseAvailable,heightJump,configuration;
+    int type_allows_pose,pose_available,height_jump,configuration;
     if ((u32)(H(u32,0x2294)-0x28)>=2U && H(u32,0x2294)!=0x3E) snd_update_slot_object(0,H(void*,0x2290),0);
     else {
         int slot=H(s32,0x242C);
@@ -1609,23 +1610,23 @@ case 0x27: case 0x28: case 0x29: case 0x2A: case 0x3E:
         workspace.state_27.second.z=0.0f;
         workspace.state_27.second.z=math_random_float_range(0.060000002f,0.10000001f);
         workspace.state_27.second.w=-0.012f;
-        func_PAL_002BEF58(&workspace.state_27.first,&workspace.state_27.second,0,-1.0f);
+        part_spawn_white_flash_pal(&workspace.state_27.first,&workspace.state_27.second,0,-1.0f);
     }
     configuration=FLD(g_weapon_l22_table+g_item_slot_to_record[H(s32,0x1248)]*0xE0, s32, 0x1C);
-    typeAllowsPose=configuration!=0;
-    if (H(s32,0x1248)==13) typeAllowsPose=0;
-    poseAvailable=0;
-    if (typeAllowsPose) poseAvailable=H(u8,0x22BA)!=0;
+    type_allows_pose=configuration!=0;
+    if (H(s32,0x1248)==13) type_allows_pose=0;
+    pose_available=0;
+    if (type_allows_pose) pose_available=H(u8,0x22BA)!=0;
     find_nearest_path_point(H(void*,0x630),HP(0x80),HP(0x5D0),HP(0x634),HP(0x638),H(s32,0x654),999.0f,2.0f,2.5f);
     if (H(s32,0x660))
         find_nearest_path_point(H(void*,0x664),HP(0x80),HP(0x610),HP(0x668),HP(0x66C),H(s32,0x670),999.0f,2.0f,2.5f);
-    heightJump=0;
+    height_jump=0;
     if (H(float,0x31C)>1.0699999f && H(u32,0x2294)!=0x28 && H(u32,0x2294)!=0x3E && !H(s32,0x660))
-        heightJump=H(s32,0x1BC)>25;
-    if (heightJump) ++H(s32,0x6C8); else H(s32,0x6C8)=0;
-    if ((H(s32,0x640) && ++H(s32,0x640)) || heightJump) {
+        height_jump=H(s32,0x1BC)>25;
+    if (height_jump) ++H(s32,0x6C8); else H(s32,0x6C8)=0;
+    if ((H(s32,0x640) && ++H(s32,0x640)) || height_jump) {
         qcopy(&H(Vec4,0xF0), &H(Vec4,0x120));
-        if ((u32)(H(u32,0x2294)-0x28)<2U) { func_PAL_L00_002B6488();goto finish; }
+        if ((u32)(H(u32,0x2294)-0x28)<2U) { ApplyHeroGravityAndJumpMotion_pal();goto finish; }
         if (PH_G1(HP(0xF0)) < 0.050000004f) {
             PH_G2(HP(0x1B4), 0.080000006f, 0.016f);
             H(float,0xF0)=PH_G3(H(float,0x64C))*H(float,0x1B4);
@@ -1635,24 +1636,24 @@ case 0x27: case 0x28: case 0x29: case 0x2A: case 0x3E:
 
         goto finish;
     } else {
-        float pathStep=(float)H(s32,0x648);
-        float pathSpeed=H(float,0x644)*pathStep;
-        if (H(u32,0x2294)==0x3E) pathSpeed=H(float,0x69C)*pathStep;
-        Spline_AdvanceByDistance(H(void*,0x630),&workspace.state_27.first,HP(0x634),HP(0x638),pathSpeed,H(s32,0x654));
+        float path_step=(float)H(s32,0x648);
+        float path_speed=H(float,0x644)*path_step;
+        if (H(u32,0x2294)==0x3E) path_speed=H(float,0x69C)*path_step;
+        Spline_AdvanceByDistance(H(void*,0x630),&workspace.state_27.first,HP(0x634),HP(0x638),path_speed,H(s32,0x654));
         if (H(s32,0x660))
-            Spline_AdvanceByDistance(H(void*,0x664),&workspace.state_27.second,HP(0x668),HP(0x66C),pathSpeed,H(s32,0x670));
+            Spline_AdvanceByDistance(H(void*,0x664),&workspace.state_27.second,HP(0x668),HP(0x66C),path_speed,H(s32,0x670));
         if (H(s32,0x1BC)>75) {
-            int segment,hitA,hitB;
+            int segment,hit_a,hit_b;
             float weight,heading;
-            pathSpeed=H(float,0x170);pathSpeed*=25.333334f;
-            qcopy(&workspace.state_27.u.p.probeA, &H(Vec4,0x80));
+            path_speed=H(float,0x170);path_speed*=25.333334f;
+            qcopy(&workspace.state_27.u.p.probe_a, &H(Vec4,0x80));
             segment=H(s32,0x634);weight=H(float,0x638);
-            hitA=Spline_AdvanceByDistance(H(void*,0x630),&workspace.state_27.u.p.probeA,&segment,&weight,pathSpeed,H(s32,0x654));
-            qcopy(&workspace.state_27.u.p.probeB, &H(Vec4,0x80));
+            hit_a=Spline_AdvanceByDistance(H(void*,0x630),&workspace.state_27.u.p.probe_a,&segment,&weight,path_speed,H(s32,0x654));
+            qcopy(&workspace.state_27.u.p.probe_b, &H(Vec4,0x80));
             segment=H(s32,0x634);weight=H(float,0x638);
-            hitB=Spline_AdvanceByDistance(H(void*,0x630),&workspace.state_27.u.p.probeB,&segment,&weight,pathSpeed+0.1f,H(s32,0x654));
-            if ((!(hitA | hitB) || H(s32,0x654)) && H(u32,0x2294)==0x27) {
-                heading=mat_fast_helper_a(workspace.state_27.u.p.probeB.x-workspace.state_27.u.p.probeA.x,workspace.state_27.u.p.probeB.y-workspace.state_27.u.p.probeA.y);
+            hit_b=Spline_AdvanceByDistance(H(void*,0x630),&workspace.state_27.u.p.probe_b,&segment,&weight,path_speed+0.1f,H(s32,0x654));
+            if ((!(hit_a | hit_b) || H(s32,0x654)) && H(u32,0x2294)==0x27) {
+                heading=mat_fast_helper_a(workspace.state_27.u.p.probe_b.x-workspace.state_27.u.p.probe_a.x,workspace.state_27.u.p.probe_b.y-workspace.state_27.u.p.probe_a.y);
                 heading=fast_subtract_rotations(H(float,0x64C),heading)*0.47f;
                 if (heading>0.78539824f) heading=0.78539824f;
                 if (heading< -0.78539824f) heading=-0.78539824f;
@@ -1665,12 +1666,12 @@ case 0x27: case 0x28: case 0x29: case 0x2A: case 0x3E:
             float horizontal=vec_length_xy(HP(0x110));
             FLD(g_hero_tuning_block, float, 0x60)=mat_fast_helper_a(horizontal,H(float,0x118));
         }
-        if (typeAllowsPose) {
+        if (type_allows_pose) {
             u8 *pose_hero=g_hero_state;
-            float poseScale=0.43200004f;
+            float pose_scale=0.43200004f;
             cam_set_limits_fourth(0.024480002f,0.43200004f);
-            cam_set_limits_second(0.03888f,poseScale);
-            cam_set_limits_third(0.03888f,poseScale);
+            cam_set_limits_second(0.03888f,pose_scale);
+            cam_set_limits_third(0.03888f,pose_scale);
             if (FLD(pose_hero,void*,0x6A8)) {
                 float angle;
                 FastVecSub(&workspace.state_27.u.d.displacement,FLD(pose_hero,u8*,0x6A8)+0x10,&FLD(pose_hero,u8,0x80));
@@ -1687,32 +1688,32 @@ case 0x27: case 0x28: case 0x29: case 0x2A: case 0x3E:
                 }
             } else {
                 u8 action=FLD(pose_hero,u8*,0x2290)[0x43];
-                float angularBase,pose,bodyScale;
+                float angular_base,pose,body_scale;
                 if (action!=0x31 && FLD(pose_hero,u8*,0x2290)[0x43]==0x48) {
 
-                    bodyScale=0.5f;
+                    body_scale=0.5f;
                     pose=FastAddRotations(0.13962635f,FLD(pose_hero,float,0x6A0));
-                    angularBase=-0.06981318f;
+                    angular_base=-0.06981318f;
                     FLD(g_hero_tuning_block, float, 0x278)=pose;
-                    FLD(g_hero_tuning_block, float, 0x118)=FastAddRotations(angularBase,FLD(pose_hero,float,0x6A0)*bodyScale);
-                    FLD(g_hero_tuning_block, float, 0x1C8)=FastAddRotations(angularBase,FLD(pose_hero,float,0x6A0)*bodyScale);
+                    FLD(g_hero_tuning_block, float, 0x118)=FastAddRotations(angular_base,FLD(pose_hero,float,0x6A0)*body_scale);
+                    FLD(g_hero_tuning_block, float, 0x1C8)=FastAddRotations(angular_base,FLD(pose_hero,float,0x6A0)*body_scale);
                 } else if (action==0x31 || action==0x47) {
-                    bodyScale=0.58823526f;
+                    body_scale=0.58823526f;
                     pose=FastAddRotations(-0.8203048f,FLD(pose_hero,float,0x6A0));
-                    angularBase=0.73303837f;
+                    angular_base=0.73303837f;
                     FLD(g_hero_tuning_block, float, 0x278)=pose;
-                    FLD(g_hero_tuning_block, float, 0x118)=FastAddRotations(angularBase,FLD(pose_hero,float,0x6A0)*bodyScale);
-                    FLD(g_hero_tuning_block, float, 0x1C8)=FastAddRotations(angularBase,FLD(pose_hero,float,0x6A0)*bodyScale);
+                    FLD(g_hero_tuning_block, float, 0x118)=FastAddRotations(angular_base,FLD(pose_hero,float,0x6A0)*body_scale);
+                    FLD(g_hero_tuning_block, float, 0x1C8)=FastAddRotations(angular_base,FLD(pose_hero,float,0x6A0)*body_scale);
                 }
             }
         }
         {
-            int nextIndex=path_advance_index(H(void*,0x630),H(s32,0x634),H(s32,0x648),H(s32,0x654));
+            int next_index=path_advance_index(H(void*,0x630),H(s32,0x634),H(s32,0x648),H(s32,0x654));
             float distance;
-            FastVecSub(&workspace.state_27.u.d.displacement,(u8*)H(void*,0x630)+(nextIndex*16+16),&workspace.state_27.first);
+            FastVecSub(&workspace.state_27.u.d.displacement,(u8*)H(void*,0x630)+(next_index*16+16),&workspace.state_27.first);
             distance=FastVecLength(&workspace.state_27.u.d.displacement);
             if (distance<0.001f) {
-                if (H(s32,0x634)==nextIndex) { H(s32,0x640)=1;goto finish; }
+                if (H(s32,0x634)==next_index) { H(s32,0x640)=1;goto finish; }
             } else {
                 H(float,0x64C)=mat_fast_helper_a(workspace.state_27.u.d.displacement.x,workspace.state_27.u.d.displacement.y);
                 H(float,0x650)=mat_fast_helper_a(vec_length_xy(&workspace.state_27.u.d.displacement),workspace.state_27.u.d.displacement.z);
@@ -1735,11 +1736,11 @@ case 0x27: case 0x28: case 0x29: case 0x2A: case 0x3E:
                 fraction=(float)H(s32,0x678)*0.025f;
                 FastVecScale(&workspace.state_27.u.d.displacement,&workspace.state_27.u.d.displacement,fraction);
                 fraction=(float)(H(s32,0x678)-1)*0.025f;
-                FastVecSub(&workspace.state_27.u.d.previousStep,&workspace.state_27.first,&workspace.state_27.second);
-                FastVecScale(&workspace.state_27.u.d.previousStep,&workspace.state_27.u.d.previousStep,fraction);
-                H(float,0x88)+=workspace.state_27.u.d.displacement.z-workspace.state_27.u.d.previousStep.z;
-                FastVecAdd(&workspace.state_27.u.d.previousStep,&workspace.state_27.second,&workspace.state_27.u.d.displacement);
-                FastVecSub(&workspace.state_27.u.d.displacement,&workspace.state_27.u.d.previousStep,HP(0x80));
+                FastVecSub(&workspace.state_27.u.d.previous_step,&workspace.state_27.first,&workspace.state_27.second);
+                FastVecScale(&workspace.state_27.u.d.previous_step,&workspace.state_27.u.d.previous_step,fraction);
+                H(float,0x88)+=workspace.state_27.u.d.displacement.z-workspace.state_27.u.d.previous_step.z;
+                FastVecAdd(&workspace.state_27.u.d.previous_step,&workspace.state_27.second,&workspace.state_27.u.d.displacement);
+                FastVecSub(&workspace.state_27.u.d.displacement,&workspace.state_27.u.d.previous_step,HP(0x80));
                 H(float,0xF0)=workspace.state_27.u.d.displacement.x;H(float,0xF4)=workspace.state_27.u.d.displacement.y;
                 FastVecSub(&workspace.state_27.u.d.displacement,&workspace.state_27.first,HP(0x5D0));
                 H(float,0x88)+=workspace.state_27.u.d.displacement.z;
@@ -1749,21 +1750,21 @@ case 0x27: case 0x28: case 0x29: case 0x2A: case 0x3E:
                 H(float,0xF0)=workspace.state_27.u.d.displacement.x;
                 H(float,0x88)+=workspace.state_27.u.d.displacement.z;
                 H(float,0xF4)=workspace.state_27.u.d.displacement.y;
-                FastVecSub(&workspace.state_27.u.d.previousStep,HP(0x5D0),HP(0x80));
-                workspace.state_27.u.d.previousStep.z=0.0f;
-                if (FastVecLength(&workspace.state_27.u.d.previousStep)>0.020000001f)
-                    vec_scale_to_length(&workspace.state_27.u.d.previousStep,&workspace.state_27.u.d.previousStep,0.020000001f);
-                H(float,0x80)+=workspace.state_27.u.d.previousStep.x;
-                H(float,0x84)+=workspace.state_27.u.d.previousStep.y;
+                FastVecSub(&workspace.state_27.u.d.previous_step,HP(0x5D0),HP(0x80));
+                workspace.state_27.u.d.previous_step.z=0.0f;
+                if (FastVecLength(&workspace.state_27.u.d.previous_step)>0.020000001f)
+                    vec_scale_to_length(&workspace.state_27.u.d.previous_step,&workspace.state_27.u.d.previous_step,0.020000001f);
+                H(float,0x80)+=workspace.state_27.u.d.previous_step.x;
+                H(float,0x84)+=workspace.state_27.u.d.previous_step.y;
             }
             if (H(u32,0x2294)==0x3E) H(float,0xF8)-=0.0092f;
-            else func_PAL_L00_002B6488();
+            else ApplyHeroGravityAndJumpMotion_pal();
         } else {
-            float steering,slope,speedAdjustment,negativeDistance,distance;
+            float steering,slope,speed_adjustment,negative_distance,distance;
             int segment;float weight;
             H(s32,0x660)=0;
             steering=0.0f;
-            if (H(float,0x24B8)>0.2f && poseAvailable) {
+            if (H(float,0x24B8)>0.2f && pose_available) {
                 hero_resolve_stick_direction(1.0f, 0);
                 steering=fast_subtract_rotations(H(float,0x1A0),H(float,0x64C));
                 if (steering>0.78539824f) steering=0.78539824f;
@@ -1774,28 +1775,28 @@ case 0x27: case 0x28: case 0x29: case 0x2A: case 0x3E:
             ApproachValue(HP(0x680),0.24000001f,0.006f);
             segment=H(s32,0x634);weight=H(float,0x638);
             { float speed=0.3f;
-            qcopy(&workspace.state_27.u.p.probeA, &H(Vec4,0x80));
-            Spline_AdvanceByDistance(H(void*,0x630),&workspace.state_27.u.p.probeA,&segment,&weight,speed,H(s32,0x654)); }
-            slope=mat_fast_helper_a(vec_distance_xy(HP(0x5D0),&workspace.state_27.u.p.probeA),workspace.state_27.u.p.probeA.z-H(float,0x5D8));
+            qcopy(&workspace.state_27.u.p.probe_a, &H(Vec4,0x80));
+            Spline_AdvanceByDistance(H(void*,0x630),&workspace.state_27.u.p.probe_a,&segment,&weight,speed,H(s32,0x654)); }
+            slope=mat_fast_helper_a(vec_distance_xy(HP(0x5D0),&workspace.state_27.u.p.probe_a),workspace.state_27.u.p.probe_a.z-H(float,0x5D8));
             if (slope>0.0f) {
-                speedAdjustment=slope*-0.09549296f;
+                speed_adjustment=slope*-0.09549296f;
                 if (slope>0.26179942f) H(s32,0x67C)=0;
                 else if (slope<0.13962635f && H(s32,0x67C)==0) H(s32,0x67C)=-1;
             } else {
-                speedAdjustment=-slope*0.4583662f;
+                speed_adjustment=-slope*0.4583662f;
                 if (slope< -0.19198623f) H(s32,0x67C)=1;
                 else if (slope> -0.122173056f && H(s32,0x67C)==1) H(s32,0x67C)=-1;
             }
-            if (H(float,0x674)<speedAdjustment) ApproachValue(HP(0x674),speedAdjustment,0.0032000002f);
-            else ApproachValue(HP(0x674),speedAdjustment,0.00080000004f);
+            if (H(float,0x674)<speed_adjustment) ApproachValue(HP(0x674),speed_adjustment,0.0032000002f);
+            else ApproachValue(HP(0x674),speed_adjustment,0.00080000004f);
             if (H(float,0x674)>0.24000001f) H(float,0x674)=0.24000001f;
             if (H(float,0x674)< -0.050000004f) H(float,0x674)=-0.050000004f;
             H(float,0x644)=H(float,0x680)+H(float,0x674);
             if (H(float,0x644)<0.0f) H(float,0x644)=0.0f;
             FastVecSub(HP(0xF0),&workspace.state_27.first,HP(0x5D0));
             FastVecSub(&workspace.state_27.u.d.displacement,HP(0x5D0),HP(0x80));
-            negativeDistance=-FastVecLength(&workspace.state_27.u.d.displacement);
-            math_spring_float_to_goal(&negativeDistance,HP(0x6AC),0.0f,0.0432f,0.43200004f,0.14000002f);
+            negative_distance=-FastVecLength(&workspace.state_27.u.d.displacement);
+            math_spring_float_to_goal(&negative_distance,HP(0x6AC),0.0f,0.0432f,0.43200004f,0.14000002f);
             distance=FastVecLength(&workspace.state_27.u.d.displacement);
             if (distance<H(float,0x6AC)) H(float,0x6AC)=distance;
             if (H(float,0x6AC)<distance) vec_scale_to_length(&workspace.state_27.u.d.displacement,&workspace.state_27.u.d.displacement,H(float,0x6AC));
@@ -1836,7 +1837,7 @@ case 0x71:
             workspace.state_71.particle_velocity.y = workspace.state_71.particle_velocity.y + math_fast_sin_or_cos_b(angle) * radius;
             workspace.state_71.particle_velocity.z = math_random_float_range(0.060000002f, 0.10000001f);
             workspace.state_71.particle_velocity.w = -0.014f;
-            func_PAL_002BEF58(&workspace.state_71.particle_position, &workspace.state_71.particle_velocity, 0, -1.0f);
+            part_spawn_white_flash_pal(&workspace.state_71.particle_position, &workspace.state_71.particle_velocity, 0, -1.0f);
         }
     }
     find_nearest_path_point(H(void *, 0x6e0), &workspace.state_71.reference_position, &H(Vec4, 0x6d0),
@@ -1919,7 +1920,7 @@ case 0x46: case 0x47:
 case 0x76:
     H(float, 0x1a0) = H(float, 0x32c);
     H(float, 0x1b0) = 0.11000001f;
-    func_PAL_L00_002B60C0(0.010000001f);
+    ApproachHeroVelocity_pal(0.010000001f);
     hero_apply_mode_transform(&H(Vec4, 0xf0), &H(Vec4, 0x130), 0.0072000003f);
     goto finish;
 
@@ -1937,7 +1938,7 @@ case 6: case 44:
         if (H(float, 0x31C) > 1.0f) H(int, 0x2298) = 1;
     }
     hero_update_target_speed_pal();
-    if (!H(s16, 0x1E0)) func_PAL_L00_002B6B38();
+    if (!H(s16, 0x1E0)) hero_update_airborne_steering_pal();
     hero_apply_mode_pose_offsets_pal();
     hero_build_move_impulse(0.7f, 0.0f);
     hero_apply_mode_transform(HP(0xF0), HP(0xF0), H(float, 0xA80));
@@ -2010,7 +2011,7 @@ case 0x82:
     hero_steer_heading(0, 0.03888f, 0.43200004f, H(float, 0x24b8) * 0.10471977f);
     step = 0.002f;
     if (H(float, 0x24b8) < 0.200000003f) step = 0.00080000004f;
-    func_PAL_L00_002B60C0(step);
+    ApproachHeroVelocity_pal(step);
     goto finish;
 }
 
@@ -2087,7 +2088,7 @@ case 91: case 102: case 110: case 129: case 137: case 146:
         H(u32, 0x2294) != 11 && H(u32, 0x2294) != 16 && H(u32, 0x2294) != 12 &&
         H(u32, 0x2294) != 17 && H(u32, 0x2294) != 27 && H(u32, 0x2294) != 137 && H(u32, 0x2294) != 72)) {
         if (H(s16, 0x528)) {
-            func_PAL_L00_002B9508();
+            hero_steer_reference_point_pal();
             if (H(u32, 0x2294) == 10 && H(int, 0x1B8) < 8 && H(float, 0x178) < 0.14000002f) {
                 H(float, 0xF0) += math_fast_sin_or_cos_a(H(float, 0x98)) * 0.014f;
                 H(float, 0xF4) += math_fast_sin_or_cos_b(H(float, 0x98)) * 0.014f;
@@ -2119,7 +2120,7 @@ case 91: case 102: case 110: case 129: case 137: case 146:
             }
         }
     } else {
-        func_PAL_L00_002B6B38();
+        hero_update_airborne_steering_pal();
         if (H(u32, 0x2294) == 18) {
             magnitude = vec_length_xy(HP(0xF0));
             if (magnitude > 0.07400001f) magnitude = 0.07400001f;
@@ -2158,7 +2159,7 @@ case 91: case 102: case 110: case 129: case 137: case 146:
     }
     if (H(u32, 0x2294) == 56 && !H(u8, 0x49E) && H(float, 0xF8) > 0.030000001f)
         EmitHeroTimedEffects_pal();
-    func_PAL_L00_002B6488();
+    ApplyHeroGravityAndJumpMotion_pal();
     ProbeHeroAirborneWallContact_pal();
     goto finish;
 }
@@ -2192,8 +2193,8 @@ case 0x62:
     H(float, 0x1a0) = mat_fast_helper_a(workspace.state_62.difference.x, workspace.state_62.difference.y);
     distance = vec_length_xy(&workspace.state_62.difference);
     if (0.200000003f < distance) {
-        hp32 = (u8 *)g_hero_state;
-        FLD(hp32, float, 0x24b8) = 1.0f;
+        hero_bytes = (u8 *)g_hero_state;
+        FLD(hero_bytes, float, 0x24b8) = 1.0f;
         H(float, 0x1a0) = mat_fast_helper_a(workspace.state_62.difference.x, workspace.state_62.difference.y);
         H(float, 0x1b0) = distance; /* store in ordinary branch delay slot */
         if (distance < g_hero_distance_params[0][2]) H(float, 0x1b0) = g_hero_distance_params[0][1] * 0.020000001f;
@@ -2230,7 +2231,7 @@ turn_done:
                     part_queue_impact_effect(m, H(void *, 0x2290), 0x10000, HP(0xE0), PH_D2, 100.0f);
                     break;
                 case 0x1366:
-                    func_PAL_L00_0038C620();
+                    moby_l00_raise_state_to_8();
                     break;
                 case 0x1367:
                     moby_raise_state_to_eight_copy();
@@ -2343,7 +2344,7 @@ case 0x4B:
 
 case 0x4E:
     H(float,0x1A0)=H(float,0x32C);H(float,0x1B0)=0.11000001f;
-    func_PAL_L00_002B60C0(0.010000001f);
+    ApproachHeroVelocity_pal(0.010000001f);
     hero_apply_mode_transform(&H(Vec4, 0xf0), &H(Vec4, 0x130), 0.0072000003f); goto finish;
 
 
@@ -2351,7 +2352,7 @@ case 0x4E:
 
 case 0x41:
     hero_resolve_stick_direction(0.060000002f, 0);
-    if (!H(s16,0x1E0)) func_PAL_L00_002B6B38();
+    if (!H(s16,0x1E0)) hero_update_airborne_steering_pal();
     hero_apply_mode_transform(HP(0xF0),HP(0xF0),0.0048f);
     if (H(float,0xF8)< -0.20000002f) H(float,0xF8)=-0.20000002f;
     goto finish;
@@ -2374,8 +2375,8 @@ case 0x40: case 0x4C:
         if (math_fabs(H(float,0x1A8))>1.7453294f && H(float,0x24B8)>0.8f) H(u8,0x40F)=1;
     }
     {
-        float firstAngle=ReadPadFloatHistory(0),secondAngle=ReadPadFloatHistory(2);
-        if (FastDiffRots(firstAngle,secondAngle)>2.617994f &&
+        float first_angle=ReadPadFloatHistory(0),second_angle=ReadPadFloatHistory(2);
+        if (FastDiffRots(first_angle,second_angle)>2.617994f &&
             math_fabs(H(float,0x1A8))>1.2217306f && H(float,0x24B8)>0.8f) {
             H(u8,0x40F)=1;H(u8,0x40C)=1;
         }
@@ -2419,8 +2420,8 @@ case 0x49: case 0x4A:
     if (H(u32,0x2294)==0x49) FastVecCross(&workspace.state_49.side,HP(0x2C0),&workspace.state_49.line);
     else FastVecCross(&workspace.state_49.side,&workspace.state_49.line,HP(0x2C0));
     vec_scale_to_length(&workspace.state_49.side,&workspace.state_49.side,0.2f);FastVecAdd(&workspace.state_49.candidate,HP(0x80),&workspace.state_49.side);
-    if (hero_find_ledge_grab_pal(HP(0x80),HP(0x90),0) && hero_find_ledge_grab_pal(&workspace.state_49.candidate,HP(0x90),&workspace.state_49.hitPosition)) {
-        FastVecSub(HP(0xF0),&workspace.state_49.hitPosition,HP(0x80));
+    if (hero_find_ledge_grab_pal(HP(0x80),HP(0x90),0) && hero_find_ledge_grab_pal(&workspace.state_49.candidate,HP(0x90),&workspace.state_49.hit_position)) {
+        FastVecSub(HP(0xF0),&workspace.state_49.hit_position,HP(0x80));
         shared_index=FloatToInt(H(float,0xC38));shared_table=g_hero_shared_table;
         { vec_scale_to_length(HP(0xF0), HP(0xF0), shared_table[shared_index] * 0.5f); goto finish; }
     }
@@ -2538,7 +2539,7 @@ case 0x58:
     hero_build_relative_point(&workspace.state_58.effect_position, 1, 0.0f, 0.0f, -1.0f);
     coll_sweep_from_object(H(u8 *, 0x2290), &workspace.state_58.effect_position, 0x30000,
                  3.5f, 2.0f, 1.0f, 0, 1, 0);
-    if (H(short, 0x1e0) == 0) func_PAL_L00_002B6B38();
+    if (H(short, 0x1e0) == 0) hero_update_airborne_steering_pal();
     hero_apply_mode_transform(&H(Vec4, 0xf0), &H(Vec4, 0xf0), 0.014800001f);
     if (cam_get_view_space_height(&H(Vec4, 0xf0)) < -1.1400001f) {
         shared_speed = -1.1400001f;
@@ -2582,7 +2583,7 @@ case 0x57:
         if (H(u8, 0x40f) != 0) shared_limit = 0.12915438f;
     }
     if (H(short, 0x1454) != 0) {
-        func_PAL_L00_002B34C0();
+        hero_update_turn_from_anim_pal();
     } else {
         H(float, 0x1458) = H(float, 0x98);
         qcopy(&H(Vec4, 0x1440), &H(Vec4, 0x0));

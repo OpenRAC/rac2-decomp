@@ -13,7 +13,7 @@ extern int moby_count_group_not_in_state(int, int);
 extern float vec_distance_xy(void *, void *);
 extern int flag_is_third_pending_set(void *);
 extern int IsPointInCuboid(void *, int);
-extern void func_PAL_002A7E68(void *, int, int, int);
+extern void anim_start_blended_pal(void *, int, int, int);
 extern int coll_test_point(void *, float, int, void *);
 extern void SpawnExplosionEffects_pal(void *, void *, void *, float, float, int, int, int,
                          float, float, float, float, int, float, int, int, int, int, int);
@@ -47,7 +47,7 @@ typedef struct {
     char pad36[0xD];
     u8 anim;
     char pad44[0x1C];
-    u8 animFlags;
+    u8 anim_flags;
     char pad61[7];
     PrisonGateState *state;
     char pad6C[0xC];
@@ -63,18 +63,18 @@ typedef struct {
 
 /* Gate logic: opens when the player nears, is hit open by linked objects, and
    hands off to the next object when it slides clear. */
-void func_PAL_L14_004356C0(PrisonEntity *self)
+void prison_gate_update_pal(PrisonEntity *self)
 {
     float temp[4] __attribute__((aligned(16)));
     float front[4] __attribute__((aligned(16)));
     float left[4] __attribute__((aligned(16)));
     float right[4] __attribute__((aligned(16)));
     /* Passed unwritten to the left/right additions below, as retail does; the matching code needs that. */
-    float offset1[4] __attribute__((aligned(16)));
-    float offset2[4] __attribute__((aligned(16)));
+    float left_offset[4] __attribute__((aligned(16)));
+    float right_offset[4] __attribute__((aligned(16)));
     PrisonGateState *state = self->state;
     int i;
-    int entry;
+    int list_entry;
     int group;
     PrisonEntity *other;
     char *base;
@@ -87,8 +87,8 @@ void func_PAL_L14_004356C0(PrisonEntity *self)
             list = (unsigned short *)g_group_entity_lists[state->group];
             base = D_L14_001B259C_direct;
             do {
-                entry = *list;
-                other = (PrisonEntity *)(base + ((entry & 0x7FFF) << 8));
+                list_entry = *list;
+                other = (PrisonEntity *)(base + ((list_entry & 0x7FFF) << 8));
                 other->flags |= 0x43;
             } while ((group = (short)*list++) >= 0);
         }
@@ -99,7 +99,7 @@ void func_PAL_L14_004356C0(PrisonEntity *self)
             self->mode = 1;
             self->f78 = 0x24C102;
             if (self->anim != 1)
-                func_PAL_002A7E68(self, 1, 0, 0);
+                anim_start_blended_pal(self, 1, 0, 0);
             self->f98 = 0;
 
             /* Release the group's members. */
@@ -109,8 +109,8 @@ void func_PAL_L14_004356C0(PrisonEntity *self)
                 list = (unsigned short *)g_group_entity_lists[state->group];
                 base = D_L14_001B259C_direct;
                 do {
-                    entry = *list;
-                    other = (PrisonEntity *)(base + ((entry & 0x7FFF) << 8));
+                    list_entry = *list;
+                    other = (PrisonEntity *)(base + ((list_entry & 0x7FFF) << 8));
                     other->flags &= 0xFFBC;
                 } while ((group = (short)*list++) >= 0);
             }
@@ -135,18 +135,18 @@ void func_PAL_L14_004356C0(PrisonEntity *self)
                     }
                     self->mode = 1;
                     if (self->anim != 1)
-                        func_PAL_002A7E68(self, 1, 0, 0);
+                        anim_start_blended_pal(self, 1, 0, 0);
                     self->f98 = 0;
                 }
             }
         }
     }
 
-    if (self->mode == 1 && (self->animFlags & 2)) {
+    if (self->mode == 1 && (self->anim_flags & 2)) {
         self->mode = 3;
         self->f78 = 0x224C1;
         if (self->anim != 2)
-            func_PAL_002A7E68(self, 2, 0, 0);
+            anim_start_blended_pal(self, 2, 0, 0);
     }
 
     if (self->mode == 2) {
@@ -166,8 +166,8 @@ void func_PAL_L14_004356C0(PrisonEntity *self)
         temp[0] = math_fast_sin_or_cos_a(self->angle + 3.14159298f) * 0.8f;
         temp[1] = math_fast_sin_or_cos_b(self->angle + 3.14159298f) * 0.8f;
         temp[2] = 0;
-        FastVecAdd(left, left, offset1);
-        FastVecAdd(right, right, offset2);
+        FastVecAdd(left, left, left_offset);
+        FastVecAdd(right, right, right_offset);
         if (coll_test_point(front, 0.6f, 0, self) || coll_test_point(left, 0.68f, 0, self) || coll_test_point(right, 0.68f, 0, self)) {
             prisonStartSound(2, 0, self);
             SpawnExplosionEffects_pal(self, g_identity_l14_matrix, front, 0.0f, 0.0f, 10, 3, 16,
@@ -180,13 +180,13 @@ void func_PAL_L14_004356C0(PrisonEntity *self)
     if (self->mode == 3 && IsPointInCuboid(g_hero_position, state->f14)) {
         self->mode = 4;
         if (self->anim != 3)
-            func_PAL_002A7E68(self, 3, 0, 0);
+            anim_start_blended_pal(self, 3, 0, 0);
     }
 
-    if (self->mode == 4 && (self->animFlags & 2)) {
+    if (self->mode == 4 && (self->anim_flags & 2)) {
         self->mode = 5;
         self->f98 = self->next[4];
         if (self->anim)
-            func_PAL_002A7E68(self, 0, 0, 0);
+            anim_start_blended_pal(self, 0, 0, 0);
     }
 }

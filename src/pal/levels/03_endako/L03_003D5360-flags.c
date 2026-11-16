@@ -24,17 +24,19 @@ extern void level_capture_checkpoint_state(char *a0, char *a1);
 extern int MemcardSave(s32 a0, s32 a1);
 extern u8 *D_L03_001B2A1C_tbl[] __asm__("D_L03_001B2A1C") __attribute__((sda));
 
-void console_remote_view_cleanup_pal(char *a0)
+/* Cleans up after the remote view: resets the hero and carried objects, marks the linked mobys as
+   spawned, queues the follow-up script request and saves the game. */
+void console_remote_view_cleanup_pal(char *moby)
 {
-    char *s0 = a0;
-    char *s1 = *(char **)(s0 + 0x68);
-    char *s2;
-    void *p;
+    char *obj = moby;
+    char *vars = *(char **)(obj + 0x68);
+    char *game_state;
+    void *linked;
 
     hero_reset_carried_objects(0);
-    s2 = D_00189E20_11;
-    *(u16 *)(s2 + 0x24FC) = 0;
-    moby_mark_table_entry_flagged(*(u8 *)(s0 + 0xB0));
+    game_state = D_00189E20_11;
+    *(u16 *)(game_state + 0x24FC) = 0;
+    moby_mark_table_entry_flagged(*(u8 *)(obj + 0xB0));
     g_remote_view_done_flag = 1;
     /* Resident bytes shared by all programs, written at their constant addresses
        (retail's lui $at,0x1A; sb form), as in 0033CB18.c. */
@@ -44,14 +46,14 @@ void console_remote_view_cleanup_pal(char *a0)
     *(u8 *)0x1A7B84 = 1;
     *(u8 *)0x1A7BBC = 1;
     *(u8 *)0x1A7B82 = 1;
-    hero_reset_position_and_direction_pal(s0 + 0x10, s0 + 0xF0, 0, 1);
-    p = *(void **)(s1 + 0x2C);
-    if (p != 0) {
-        moby_mark_spawned(p);
+    hero_reset_position_and_direction_pal(obj + 0x10, obj + 0xF0, 0, 1);
+    linked = *(void **)(vars + 0x2C);
+    if (linked != 0) {
+        moby_mark_spawned(linked);
     }
-    moby_mark_spawned(D_L03_001B2A1C_tbl[0] + (*(s32 *)s1 << 8));
-    *(s32 *)(s0 + 0x78) = 0x80468CDC;
-    script_queue_keyed_request(*(s32 *)(s1 + 0x24), -1);
-    level_capture_checkpoint_state(s2 + 0x80, s2 + 0x90);
+    moby_mark_spawned(D_L03_001B2A1C_tbl[0] + (*(s32 *)vars << 8));
+    *(s32 *)(obj + 0x78) = 0x80468CDC;
+    script_queue_keyed_request(*(s32 *)(vars + 0x24), -1);
+    level_capture_checkpoint_state(game_state + 0x80, game_state + 0x90);
     MemcardSave(0, -1);
 }

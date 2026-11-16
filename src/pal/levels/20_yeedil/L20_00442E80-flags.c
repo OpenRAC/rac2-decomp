@@ -27,14 +27,15 @@ extern void FastVecAdd(void *, const void *, const void *);
 extern void func_002A0F48(void *);
 extern Vector g_camera_l20_position;
 
+/* Updates moby class 4464: a rotating object that turns for a set time, plays a sound while turning, and keeps a copy of itself and any riders moving with it. */
 void rotating_object_update_pal(unsigned char *object) {
-    Vector oldPosition, oldRotation, delta, offset;
+    Vector old_position, old_rotation, delta, offset;
     unsigned char *state = *(unsigned char **)(object + 0x68);
     unsigned char *child;
     unsigned char *slot;
     int index;
-    oldPosition.q = *(Quadword *)(object + 0x10);
-    oldRotation.q = *(Quadword *)(object + 0xF0);
+    old_position.q = *(Quadword *)(object + 0x10);
+    old_rotation.q = *(Quadword *)(object + 0xF0);
     switch (object[0x20]) {
     case 0: {
         float speed = *(float *)(state + 0x74) * 0.017453294f;
@@ -87,8 +88,8 @@ clone_failed:
             moby_set_state(object, 1, -1);
             index = *(int *)(state + 0x90);
             if (index != -1) {
-                unsigned char *stoppedSlot = index * 0x70 + g_sound_state;
-                if (*(unsigned char **)(stoppedSlot + 0x88) == object && stoppedSlot[0x74])
+                unsigned char *stopped_slot = index * 0x70 + g_sound_state;
+                if (*(unsigned char **)(stopped_slot + 0x88) == object && stopped_slot[0x74])
                     snd_stop_voice(index);
             }
             *(int *)(state + 0x90) = -1;
@@ -103,8 +104,8 @@ clone_failed:
         cam_end_override(*(unsigned char **)(state + 0x84));
         *(int *)(state + 0x80) = 0;
     }
-    FastVecSub(&delta, object + 0x10, &oldPosition);
-    mat_combine_and_store(state + 0x20, &delta, &oldRotation, object + 0xF0);
+    FastVecSub(&delta, object + 0x10, &old_position);
+    mat_combine_and_store(state + 0x20, &delta, &old_rotation, object + 0xF0);
     child = *(unsigned char **)(state + 0x88);
     if (child) {
         glow_flicker_update_pal(child, (float *)(state + 0x8C), object[0x20] == 2);

@@ -24,6 +24,7 @@ extern void FontSetWindow(unsigned short *, int, int, int, int, int, int, int, i
 extern void text_draw_window_medium(unsigned short *, unsigned long long, unsigned char *, int);
 extern void subtitle_empty_b(void);
 
+/* Draws the subtitle box and its text, growing, showing and shrinking it by state (v2.00 layout). */
 void DrawSubtitleBox_us2(void)
 {
     unsigned short layout[16];

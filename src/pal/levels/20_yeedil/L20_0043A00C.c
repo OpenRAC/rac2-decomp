@@ -6,26 +6,27 @@ extern s32 path_check_entry_for_moby(char *, s32);
 extern f32 vec_distance_xy(void *, void *);
 extern char *g_path_point_tables[];
 
-s32 moby_is_near_goal_point_pal(char *arg0, s32 arg1) {
-    char *s1 = arg0;
-    s32 s0 = arg1;
-    char *s3;
-    s32 s2;
-    f32 f0;
+/* Tells whether this object is done or close enough to its goal point. */
+s32 moby_is_near_goal_point_pal(char *moby_arg, s32 path_arg) {
+    char *moby = moby_arg;
+    s32 path_index = path_arg;
+    char *state;
+    s32 result;
+    f32 distance;
 
-    s3 = *(char **)(s1 + 0x68);
-    s2 = path_check_entry_for_moby(s1, s0);
-    if (s2 == 0) {
-        if (s0 != -1) {
-            f0 = vec_distance_xy(s1 + 0x10,
-                               g_path_point_tables[s0] + ((*(s16 *)(s3 + 0x1CA) << 4) + 0x10));
-            if (!(*(f32 *)(s3 + 0x134) > f0)) {
+    state = *(char **)(moby + 0x68);
+    result = path_check_entry_for_moby(moby, path_index);
+    if (result == 0) {
+        if (path_index != -1) {
+            distance = vec_distance_xy(moby + 0x10,
+                               g_path_point_tables[path_index] + ((*(s16 *)(state + 0x1CA) << 4) + 0x10));
+            if (!(*(f32 *)(state + 0x134) > distance)) {
             } else {
-                s2 = 1;
+                result = 1;
             }
         }
     }
-    return s2;
+    return result;
 }
 
 

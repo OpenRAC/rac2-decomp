@@ -45,31 +45,32 @@ extern void FastVecAdd(void *, void *, void *);
 
 extern void vec_clear_128(void *);
 
-void func_PAL_L02_003ED450(char *arg0) {
+/* Resets the tether's strand points, heights and wave phases once when they are flagged dirty (PAL timing scale). */
+void tether_reset_strands_pal(char *moby) {
     char *state;
-    float v0[4];
-    float v1[4];
+    float strand_dir[4];
+    float strand_step[4];
     int i;
     int j;
-    short m1;
+    short no_id;
 
-    state = *(char **)(arg0 + 0x68);
+    state = *(char **)(moby + 0x68);
     if (g_tether_strands_dirty != 0) {
         g_tether_strands_dirty = 0;
         g_tether_state_flag = 0;
         g_tether_l02_state_word = (g_tether_reset_value * 5 + 2) / 6;
-        FastVecSub(v0, state + 0x30, state + 0x20);
-        vec_scale_to_length(v1, v0, g_tether_strand_length * 0.05f);
+        FastVecSub(strand_dir, state + 0x30, state + 0x20);
+        vec_scale_to_length(strand_step, strand_dir, g_tether_strand_length * 0.05f);
         *(TI128 *)g_tether_strand_points[0] = *(TI128 *)(state + 0x20);
         for (i = 1; i < 20; i++) {
-            FastVecAdd(g_tether_strand_points[i], g_tether_strand_points[i - 1], v1);
+            FastVecAdd(g_tether_strand_points[i], g_tether_strand_points[i - 1], strand_step);
             g_tether_strand_prev_heights[i] = 0;
             vec_clear_128(g_tether_strand_sideways[i]);
             g_tether_strand_heights[i] = 0;
         }
-        m1 = -1;
+        no_id = -1;
         for (j = 3; j >= 0; j--)
-            g_tether_strand_ids[j] = m1;
+            g_tether_strand_ids[j] = no_id;
         g_tether_strand_lengths[0] = 8;
         g_tether_strand_lengths[4] = 4;
         g_tether_strand_lengths[1] = 4;

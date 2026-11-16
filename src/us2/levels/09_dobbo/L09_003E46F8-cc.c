@@ -48,7 +48,7 @@ typedef struct {
 } ScanMoby;
 extern ScanMoby *g_moby_record_table MACRO_ADDR, *g_moby_record_table_end MACRO_ADDR;
 extern int IsPointInCuboid(void *, int);
-extern int func_US2_00289840(int, int);
+extern int subtitle_request_voice_line_us2(int, int);
 extern void value_set_entry_by_index_us2(int, int);
 extern int snd_play_from_global_bank(int, int, void *);
 
@@ -81,13 +81,13 @@ void region_scan_objects_us2(unsigned char *object)
     if (g_release_busy_flag[0] && !g_item_enabled_flags[12]) {
         for (i = 0; i < 40; i++) {
             m = &g_moby_record_table[s->scan];
-            if (m->oClass == 0xd0f || m->oClass == 0xd57 || m->oClass == 0xd30 ||
-                m->oClass == 0xcbc || m->oClass == 0xd90) {
+            if (m->oClass == MOBY_CLASS_MEGACORP_TROOPER_LEGS || m->oClass == 0xd57 || m->oClass == 0xd30 ||
+                m->oClass == MOBY_CLASS_MEGACORP_HOVER_TANK || m->oClass == 0xd90) {
                 if (m->oClass == 0xd30 && m->vars->busy) {
                     s->scan++;
                     continue;
                 }
-                if (m->oClass == 0xd0f) {
+                if (m->oClass == MOBY_CLASS_MEGACORP_TROOPER_LEGS) {
                     int state = m->state;
                     if (state == 5) {
                         s->scan++;
@@ -116,7 +116,7 @@ void region_scan_objects_us2(unsigned char *object)
 
     if (!g_subtitle_history.flag && g_subtitle_pending_word < 0 && !g_status_flag_b[5]) {
         if (IsPointInCuboid(g_hero_state.position, s->region[0]))
-            func_US2_00289840(0xa02, 0x59);
+            subtitle_request_voice_line_us2(0xa02, 0x59);
     }
     if (IsPointInCuboid(g_hero_state.position, s->region[1]))
         s->entered = 1;
@@ -125,7 +125,7 @@ void region_scan_objects_us2(unsigned char *object)
     if (g_player_state_shorts[4] <= 0 && IsPointInCuboid(g_hero_state.position, s->region[1])) {
         if (g_game_flag_table[0x7a] % 5 == 4 && !s->hint1c && g_hero_state.field2294 != 0x39) {
             if (g_subtitle_history.second >= 0)
-                func_US2_00289840(0x9fb, 0x52);
+                subtitle_request_voice_line_us2(0x9fb, 0x52);
             s->hint1c = 1;
             g_game_flag_table[0x7a]++;
         }
@@ -137,7 +137,7 @@ void region_scan_objects_us2(unsigned char *object)
     if (!g_status_flag_b[7] && IsPointInCuboid(g_hero_state.position, s->region[2])) {
         if (g_game_flag_table[0x79] % 5 == 4 && !s->hint18 && g_hero_state.field2294 != 0x39) {
             if (g_subtitle_history.third >= 0)
-                func_US2_00289840(0x9fe, 0x55);
+                subtitle_request_voice_line_us2(0x9fe, 0x55);
             s->hint18 = 1;
             g_game_flag_table[0x79]++;
         }
@@ -146,7 +146,7 @@ void region_scan_objects_us2(unsigned char *object)
         if ((!g_progress_statistics.flag || g_frame_counter - g_progress_statistics.time > 432000) &&
             g_game_flag_table[0x7d] < 3 && !s->hint14) {
             if (g_subtitle_history.first >= 0)
-                func_US2_00289840(0x9e3, 0x3a);
+                subtitle_request_voice_line_us2(0x9e3, 0x3a);
             g_game_flag_table[0x7d]++;
             s->hint14 = 1;
         }

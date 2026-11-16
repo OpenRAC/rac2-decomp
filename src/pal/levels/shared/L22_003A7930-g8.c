@@ -14,29 +14,29 @@ extern void ref_L22_003A45F0_01(void *, int, int, int);
 
 /* One turn of the orbit: the first flag bit runs the object's own update, the
  * second one hands the result over to the child object. */
-void func_PAL_L22_003A7930(char *a0, int a1, int a2, int a3, int a4, float a5) {
-    char *obj = a0;
-    char *sub = *(char **)(a0 + 0x68);
+void orbit_update_pal(char *moby, int new_state, int state_arg1, int state_arg2, int flags, float default_scale) {
+    char *obj = moby;
+    char *vars = *(char **)(moby + 0x68);
     char *child;
-    float f;
+    float scale;
     float p0;
     float p1;
     float p2;
     float p3;
-    float g0;
-    float g1;
+    float value_a;
+    float value_b;
 
-    if (a4 & 1) {
-        if (*(short *)(sub + 0x34E) == 0) {
-            *(int *)(sub + 0x3EC) = *(unsigned char *)(obj + 0x43);
-            if (a1 == 11) {
+    if (flags & 1) {
+        if (*(short *)(vars + 0x34E) == 0) {
+            *(int *)(vars + 0x3EC) = *(unsigned char *)(obj + 0x43);
+            if (new_state == 11) {
                 p0 = g_orbit_param_c * 0.00040000002f;
                 p1 = g_orbit_param_d * 0.020000001f;
                 p2 = g_orbit_param_e * 6.981318e-06f;
                 p3 = g_orbit_param_f * 0.0003490659f;
                 ref_L22_003A45F0_00(obj, p0, p1, p2, p3);
                 *(float *)(obj + 0x48) = 1.5f;
-                *(float *)(sub + 0x138) = 0.6f;
+                *(float *)(vars + 0x138) = 0.6f;
             } else {
                 p0 = g_orbit_param_a * 0.00040000002f;
                 p1 = g_orbit_param_b * 0.020000001f;
@@ -44,32 +44,32 @@ void func_PAL_L22_003A7930(char *a0, int a1, int a2, int a3, int a4, float a5) {
                 p3 = g_orbit_param_f * 0.0003490659f;
                 ref_L22_003A45F0_00(obj, p0, p1, p2, p3);
                 *(float *)(obj + 0x48) = 1.3f;
-                *(float *)(sub + 0x138) = 0.40000004f;
+                *(float *)(vars + 0x138) = 0.40000004f;
             }
 
-            g0 = *(float *)(sub + 0x128);
-            g1 = *(float *)(sub + 0x134);
-            g0 = g0 + g0;
-            g1 = g1 * 8.0f;
-            *(float *)(sub + 0x128) = g0;
-            *(float *)(sub + 0x134) = g1;
-            if (*(unsigned char *)(obj + 0x43) != a1) {
-                ref_L22_003A45F0_01(obj, a1, a2, a3);
+            value_a = *(float *)(vars + 0x128);
+            value_b = *(float *)(vars + 0x134);
+            value_a = value_a + value_a;
+            value_b = value_b * 8.0f;
+            *(float *)(vars + 0x128) = value_a;
+            *(float *)(vars + 0x134) = value_b;
+            if (*(unsigned char *)(obj + 0x43) != new_state) {
+                ref_L22_003A45F0_01(obj, new_state, state_arg1, state_arg2);
             }
         }
     }
-    if (*(short *)(sub + 0x34C) != 0) {
+    if (*(short *)(vars + 0x34C) != 0) {
         return;
     }
     if (*(unsigned char *)(obj + 0x43) < 11 || *(unsigned char *)(obj + 0x43) > 12) {
-        *(float *)(obj + 0x48) = a5;
+        *(float *)(obj + 0x48) = default_scale;
     }
-    f = *(float *)(obj + 0x48);
-    *(float *)(*(char **)(sub + 0x440) + 0x48) = f;
-    if (a4 & 2) {
-        child = *(char **)(sub + 0x440);
+    scale = *(float *)(obj + 0x48);
+    *(float *)(*(char **)(vars + 0x440) + 0x48) = scale;
+    if (flags & 2) {
+        child = *(char **)(vars + 0x440);
         if (child != 0) {
-            ref_L22_003A45F0_01(child, a1, a2, a3);
+            ref_L22_003A45F0_01(child, new_state, state_arg1, state_arg2);
         }
     }
 }

@@ -20,6 +20,7 @@ extern int func_0029C560(int);
 extern char *tab_menu_get_selected_entry(void *);
 extern void menu_start_action(int);
 
+/* Handles popup input: closes on the counter and mode check, confirms or closes on buttons, and starts the selected entry action on X (PAL). */
 int menu_popup_update_pal(void)
 {
     MenuMessage message;

@@ -38,7 +38,7 @@ extern float g_effect_time_scale __attribute__((sda));
 extern float g_effect_count_divisor __attribute__((sda));
 extern int g_effect_state_value __attribute__((sda));
 
-SpawnObject003979B0 *func_PAL_L05_0039A808(float *pos, float *vec, int a2, SpawnObject003979B0 *a3, int flag)
+SpawnObject003979B0 *moby_spawn_directed_effect_pal(float *pos, float *vec, int param, SpawnObject003979B0 *parent, int flag)
 {
     SpawnObject003979B0 *obj;
 
@@ -48,8 +48,8 @@ SpawnObject003979B0 *func_PAL_L05_0039A808(float *pos, float *vec, int a2, Spawn
         obj = CreateMoby(0x1173);
     if (obj != 0) {
         SpawnState003979B0 *st;
-        float f20;
-        float f21;
+        float step;
+        float one;
         int count;
 
         obj->drawn = 1;
@@ -57,22 +57,22 @@ SpawnObject003979B0 *func_PAL_L05_0039A808(float *pos, float *vec, int a2, Spawn
         obj->dist = 0xFF;
         st = obj->st;
         obj->drawDist = 0x1FF;
-        f20 = g_effect_time_scale * (0.020000001f);
+        step = g_effect_time_scale * (0.020000001f);
         st->flag = flag;
-        f21 = 1.0f;
+        one = 1.0f;
         count = FloatToInt(g_effect_count_divisor);
         st->count = count;
-        st->a2 = a2;
-        st->a3 = (char *)a3;
+        st->a2 = param;
+        st->a3 = (char *)parent;
         st->zero = 0;
-        st->rate = f21 / g_effect_count_divisor;
+        st->rate = one / g_effect_count_divisor;
         st->value = ((s32)(g_effect_state_value) * 5 + 2) / 6;
         qcopy(obj->pos, pos);
         obj->scale = obj->scale * 0.5f;
-        vec_scale_to_length(st, vec, f20);
-        vec_scale_to_length(obj->m0, st, f21);
-        FastVecCross(obj->m1, obj->m0, a3->m2);
-        vec_scale_to_length(obj->m1, obj->m1, f21);
+        vec_scale_to_length(st, vec, step);
+        vec_scale_to_length(obj->m0, st, one);
+        FastVecCross(obj->m1, obj->m0, parent->m2);
+        vec_scale_to_length(obj->m1, obj->m1, one);
         FastVecCross(obj->m2, obj->m1, obj->m0);
     }
     return obj;

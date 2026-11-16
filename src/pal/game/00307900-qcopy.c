@@ -28,7 +28,7 @@ extern void *part_spawn_ground_effect(void *, int, float, float, u32, int, int, 
 extern int FloatToInt(float);
 
 /* Scatter paired impact particles in the plane around the supplied point. */
-void func_PAL_00307900(void *origin, int count)
+void part_spawn_impact_burst_pal(void *origin, int count)
 {
     ParticleVector velocity, position, side, axis, projection, pull;
     char *particle;

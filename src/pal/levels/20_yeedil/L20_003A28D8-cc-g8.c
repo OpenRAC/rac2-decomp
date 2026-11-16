@@ -28,6 +28,7 @@ extern unsigned int g_electric_ribbon_color_b __attribute__((sda));
 extern float g_electric_trail_param __attribute__((sda));
 extern unsigned char g_orb_trail_levels[];
 
+/* Updates and draws the eight lightning trails of the electric orb, adding sparks at their tips. */
 void electric_orb_update_trails_pal(unsigned char *object) {
     Vector points[25];
     Vector origin, offset, rotation;
@@ -43,12 +44,12 @@ void electric_orb_update_trails_pal(unsigned char *object) {
     for (; i < 8; ++i) {
         if (level_is_resident_flag_clear()) {
             Vector *head;
-            int historyIndex;
+            int history_index;
             ++counts[i];
             if (counts[i] > 24) counts[i] = 25;
             last = counts[i] - 1;
-            for (historyIndex = last; historyIndex > 0; --historyIndex)
-                qcopy_nc(&g_orb_arm_vectors[i][historyIndex], &g_orb_arm_vectors[i][historyIndex - 1]);
+            for (history_index = last; history_index > 0; --history_index)
+                qcopy_nc(&g_orb_arm_vectors[i][history_index], &g_orb_arm_vectors[i][history_index - 1]);
             head = g_orb_arm_vectors[i];
             math_build_axis_angle_quat(&rotation, (int)&g_electric_orb_basis_vectors[i], g_electric_trail_angle * 0.017453294f);
             vec_rotate_by_quaternion(head, head, &rotation);

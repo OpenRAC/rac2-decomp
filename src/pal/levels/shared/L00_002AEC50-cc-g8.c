@@ -62,7 +62,9 @@ extern void AdvanceAndDecodeAnimationFrames(void *,void *);
 extern unsigned long math_l00_return_argument(int);
 extern int hero_get_item_aim_adjustment(int,float *);
 extern int hero_get_value_or_default(void *,int);
-void func_PAL_L00_002AEC50(void)
+/* Fades the two on-screen hero item slots in and out, tracks the equipped item ids and modes, and
+   advances their icon animations (PAL copy of update_hero_item_slot_animation_blends). */
+void update_hero_item_slot_animation_blends_pal(void)
 {
  int i,j,enabled,different,active; struct { short v; } transition; float amount;
  for(i=0;i<2;i++) {

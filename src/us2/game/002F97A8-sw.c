@@ -33,7 +33,7 @@ extern int help_start_entry(int);
 extern void script_queue_hint_for_event(int);
 extern void set_animation_parameter(int, int);
 extern void level_forward_pair(int, int);
-extern void func_US2_002FC008(void);
+extern void PrepareVendorSelectionPreview_us2(void);
 #define ITEM (D_00239BA0[D_00139568[D_0021F240.rows[D_0021F240.index].item]])
 #define ROW (D_0021F240.rows[D_0021F240.index])
 #define BUTTONS (D_00138180.buttons)

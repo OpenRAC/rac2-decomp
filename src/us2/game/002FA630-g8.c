@@ -15,6 +15,7 @@ extern u64 GetEffectTextureDescriptor(int);
 extern float IntToFloat(int);
 extern void EmitTexturedRectangle(float, float, float, float, int, int, int, int, u32 *, u64);
 
+/* Prints up to `limit` characters of `text` at (x, y) in the large font, fading each glyph out near the screen edges (USA v2.00). */
 void draw_large_text_edge_faded_us2(u64 color, u8 *text, int limit, float x, float y, float scale)
 {
     u32 colors[4];

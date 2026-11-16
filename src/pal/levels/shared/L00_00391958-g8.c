@@ -46,14 +46,15 @@ extern void *part_spawn_spark(void *, void *, int, int, float, int, int, int, in
 extern void *moby_spawn_template_effect(void *, void *, int, void *);
 extern void moby_mark_spawned(void *);
 
-void func_PAL_L00_00391958(char *object, BurstVector *velocity, BurstVector *normal)
+/* Makes the big burst when a shot lands: flying shards, splash, glowing sparks, sound and camera shake. Then removes the object (PAL: 50 Hz timings). */
+void part_l00_spawn_impact_burst_pal(char *object, BurstVector *velocity, BurstVector *normal)
 {
     int *data = *(int **)(object + 0x68);
     BurstTemplate tmpl;
     BurstVector delta, projected, shard, random, drift, point;
     float scale, distance, height, ground;
-    int c;
-    BurstWeapon *w;
+    int color;
+    BurstWeapon *weapon;
     char *pa, *pb, *pc, *pd, *pe, *pf;
     int *pg;
     int kind, z1, z2;
@@ -85,9 +86,9 @@ void func_PAL_L00_00391958(char *object, BurstVector *velocity, BurstVector *nor
             vec_scale_to_length(&shard, &shard, s1 * math_random_float_range(3.5f, 6.5f) * 0.020000001f);
             FastVecAdd(&shard, &shard, v1);
             lifetime = math_random_int_range(lo, hi);
-            w = &g_weapon_l00_table[g_item_slot_to_record[12]];
+            weapon = &g_weapon_l00_table[g_item_slot_to_record[12]];
             part_spawn_spinning_debris(o1 + 0x10, &shard, lifetime, none,
-            w->enabled != 0);
+            weapon->enabled != 0);
         }
     }
     *(float *)(pa + 0x18) += 1.0f;
@@ -158,12 +159,12 @@ void func_PAL_L00_00391958(char *object, BurstVector *velocity, BurstVector *nor
                 c1 | r1, 0.008f, c2 | r2, on);
             }
         }
-        c = (0x7F << 24) | (cb << 16) | (cg << 8);
+        color = (0x7F << 24) | (cb << 16) | (cg << 8);
         {
             int i;
             int count = 20, full = 0x7F000000, black = 0, lmin = 75, lmax = 125, one = 1, ntex = -1, zero = 0;
             char *o4 = object;
-            int c4 = c;
+            int c4 = color;
             short r3 = cr;
             float h5 = height;
             for (i = 0; i < count; i++) {

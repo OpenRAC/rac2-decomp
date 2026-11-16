@@ -26,6 +26,8 @@ extern void FastVecSub(void *,void *,void *);
 extern void vec_scale_to_length(void *,void *,float);
 extern float mat_fast_helper_a(float,float);
 
+/* Starts the swing shot camera: sets the default offsets and spring settings, copies the start
+   transform and aims it at the current swing node or the hero's facing. */
 void cam_swingshot_init_pal(unsigned char *object)
 {
     unsigned char *data=*(unsigned char **)(object+0x70);

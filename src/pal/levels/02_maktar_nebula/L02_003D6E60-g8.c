@@ -8,13 +8,14 @@ extern int FloatToInt(float);
 extern float fast_vec_dist(void *, void *);
 extern void moby_update_ground_check(char *);
 extern void *part_find_owned_effect_slot(char *, int, int);
-extern int func_PAL_002B1A50(char *, void *, int);
-extern void func_PAL_002A7E68(char *, int, int, int);
+extern int moby_apply_damage_to_object_pal(char *, void *, int);
+extern void anim_start_blended_pal(char *, int, int, int);
 extern void brawler_advance_damage_stage(char *);
 extern void arena_set_current_boss(void *, void *);
 extern void chainblade_reset_to_idle(char *);
 extern int weapon_select_aim_target(char *, int, int, int, float, float);
 
+/* Sets up the Chainblade's starting values on its first frame, then handles the hits it takes and the hurt animations. */
 void chainblade_handle_hits_pal(char *self) {
     char *state = *(char **)(self + 0x68);
     char *damage;
@@ -67,7 +68,7 @@ void chainblade_handle_hits_pal(char *self) {
             }
             g_boss_damage_totals[*(unsigned char *)(state + 0x37)] += (int)(*(float *)(damage + 0x2C) * 32.0f);
         }
-        if (func_PAL_002B1A50(self, state + 0x60, 0)) {
+        if (moby_apply_damage_to_object_pal(self, state + 0x60, 0)) {
             if (*(int *)(self + 0x98) == 0)
                 *(int *)(self + 0x98) = *(int *)(*(char **)(self + 0x24) + 0x10);
             {
@@ -77,11 +78,11 @@ void chainblade_handle_hits_pal(char *self) {
             }
             if (*(unsigned char *)(self + 0x95) == 4) {
                 if (*(unsigned char *)(self + 0x43) != 16)
-                    func_PAL_002A7E68(self, 16, 0, 2);
+                    anim_start_blended_pal(self, 16, 0, 2);
             }
             if (*(unsigned char *)(self + 0x95) == 3 && *(float *)(state + 0x20) <= 0.0f) {
                 if (*(unsigned char *)(self + 0x43) != 4)
-                    func_PAL_002A7E68(self, 4, 0, 2);
+                    anim_start_blended_pal(self, 4, 0, 2);
             }
         }
         if (*(unsigned char *)(self + 0x20) != 0 && *(unsigned char *)(state + 0x2E) == 2) {

@@ -22,35 +22,36 @@ extern void cam_swingshot_init_pal(char *);
 extern void ref_L00_00428F00_00(char *);
 extern void ResolveCameraMovementCollisions(char *, float);
 
-void cam_swingshot_update_node_switch_pal(char *o)
+/* Restarts the swing shot camera when the hero moves on to a new swing node, then resolves collisions. */
+void cam_swingshot_update_node_switch_pal(char *moby)
 {
-    int *t = (int *)(*(char **)(o + 0x70) + 0xB8);
-    int st = g_hero_state.state;
+    int *tracking = (int *)(*(char **)(moby + 0x70) + 0xB8);
+    int state = g_hero_state.state;
     char *pos;
-    int x, y;
+    int cur_node, hero_node;
 
-    if (st == 0x2B) {
-        x = t[2];
-        pos = o + 0x30;
-        y = g_hero_state.fAD4;
+    if (state == 0x2B) {
+        cur_node = tracking[2];
+        pos = moby + 0x30;
+        hero_node = g_hero_state.fAD4;
     } else {
-        pos = o + 0x30;
-        if ((unsigned int)(st - 0x23) >= 3)
+        pos = moby + 0x30;
+        if ((unsigned int)(state - 0x23) >= 3)
             goto done;
-        x = t[2];
-        y = g_hero_state.fAA4;
+        cur_node = tracking[2];
+        hero_node = g_hero_state.fAA4;
     }
-    if (x != y) {
-        char *p = g_scalar_transition_state.dst;
-        *(Q128 *)(p + 0x30) = *(Q128 *)pos;
-        *(Q128 *)p = *(Q128 *)o;
-        *(Q128 *)(p + 0x10) = *(Q128 *)(o + 0x10);
-        *(Q128 *)(p + 0x20) = *(Q128 *)(o + 0x20);
-        cam_swingshot_init_pal(o);
+    if (cur_node != hero_node) {
+        char *dst = g_scalar_transition_state.dst;
+        *(Q128 *)(dst + 0x30) = *(Q128 *)pos;
+        *(Q128 *)dst = *(Q128 *)moby;
+        *(Q128 *)(dst + 0x10) = *(Q128 *)(moby + 0x10);
+        *(Q128 *)(dst + 0x20) = *(Q128 *)(moby + 0x20);
+        cam_swingshot_init_pal(moby);
         g_scalar_transition_state.f314 = 0x25;
     }
 done:
-    ref_L00_00428F00_00(o);
+    ref_L00_00428F00_00(moby);
     ResolveCameraMovementCollisions(pos, 0.5f);
-    *(int *)(*(char **)(o + 0x70) + 0x80) = 0;
+    *(int *)(*(char **)(moby + 0x70) + 0x80) = 0;
 }

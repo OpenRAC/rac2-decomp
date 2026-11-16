@@ -20,7 +20,7 @@ extern void part_spawn_masked_debris(void *,int,void *,float,float,float,float,u
 extern int snd_play_from_global_bank(int,int,void *);
 extern void value_set_entry_by_index_us2(int,int);
 extern int PlayMobySound(int,int,void *);
-extern void func_US2_002A7AA8(void *,int,int);
+extern void SetDeathBits_us2(void *,int,int);
 extern void moby_mark_spawned(void *);
 extern float fast_vec_dist(void *,void *);
 extern void moby_update_ground_check(void *);
@@ -86,85 +86,86 @@ typedef struct {
     float f33C;
     int f340;
 } StateEAE0;
-void laser_bot_init_check_hit_us2(u8 *entity) {
-    StateEAE0 *st=*(StateEAE0 **)(entity+0x68);
+/* Sets up the laser bot on its first frame and handles its death. */
+void laser_bot_init_check_hit_us2(u8 *moby) {
+    StateEAE0 *vars=*(StateEAE0 **)(moby+0x68);
     float point[4],velocity[4];
     void *hit;
-    int pathIndex;
-    float a,b;
-    if(entity[0x20]==0) {
-        if(st->f340!=-1) {
-            snd_stop_voice(st->f340);
-            st->f340=-1;
+    int path_index;
+    float move_speed,turn_speed;
+    if(moby[0x20]==0) {
+        if(vars->f340!=-1) {
+            snd_stop_voice(vars->f340);
+            vars->f340=-1;
         }
-        *(s16 *)(*(u8 **)(entity+0x24)+0x46)=5;
-        if(st->f288) {
-            moby_set_state(entity,4,1);
-            anim_start_immediate(entity,0,0);
-            st->f20=3;
-            st->f24=3;
-            st->f33C=4.5f;
+        *(s16 *)(*(u8 **)(moby+0x24)+0x46)=5;
+        if(vars->f288) {
+            moby_set_state(moby,4,1);
+            anim_start_immediate(moby,0,0);
+            vars->f20=3;
+            vars->f24=3;
+            vars->f33C=4.5f;
         } else {
-            pathIndex=st->f280;
-            if(pathIndex==-1) {
-                if(st->f340!=-1) {
-                    snd_stop_voice(st->f340);
-                    st->f340=-1;
+            path_index=vars->f280;
+            if(path_index==-1) {
+                if(vars->f340!=-1) {
+                    snd_stop_voice(vars->f340);
+                    vars->f340=-1;
                 }
-                moby_mark_spawned(entity);
+                moby_mark_spawned(moby);
                 return;
             }
-            qcopy(entity+0x10,g_path_l03_entry_table[pathIndex]+16);
-            st->f148|=0x210;
-            st->f32C=1;
-            if(st->f28C) {
-                moby_set_state(entity,9,4);
-                anim_start_immediate(entity,0,0);
-                st->f33C=0;
-                *(int *)(entity+0x98)=0;
-                *(u16 *)(entity+0x34)=(*(u16 *)(entity+0x34)|0x41)&0xEFFF;
+            qcopy(moby+0x10,g_path_l03_entry_table[path_index]+16);
+            vars->f148|=0x210;
+            vars->f32C=1;
+            if(vars->f28C) {
+                moby_set_state(moby,9,4);
+                anim_start_immediate(moby,0,0);
+                vars->f33C=0;
+                *(int *)(moby+0x98)=0;
+                *(u16 *)(moby+0x34)=(*(u16 *)(moby+0x34)|0x41)&0xEFFF;
             } else {
-                moby_set_state(entity,3,0);
-                anim_start_immediate(entity,0,0);
-                st->f33C=6;
+                moby_set_state(moby,3,0);
+                anim_start_immediate(moby,0,0);
+                vars->f33C=6;
             }
         }
-        st->f48=FloatToInt(20);
-        st->f4A=FloatToInt(17.6f);
-        st->f70=8;
-        st->fA8=3;
-        st->f90=0.5f;
-        st->f94=0.5f;
-        st->f9C=0.4f;
-        st->fA0=*(float *)(entity+0x18)-1;
-        a=g_robot_speed_scale*0.00027777778f;
-        b=g_robot_turn_scale*0.016666668f;
-        st->f30=0.75f;
-        st->f144=0.05f;
-        st->f114=0.25f;
-        st->f118=0.4f;
-        st->f134=a;
-        st->f110=0.5f;
-        st->f11C=0.4f;
-        st->f120=0.78539824f;
-        st->f140=0.52359885f;
-        st->f330=1;
-        st->f130=a;
-        st->f138=b;
-        *(float *)(entity+0x2C)=*(float *)(*(u8 **)(entity+0x24)+0x24)*g_laser_bot_damage_scale;
-        st->f290=0;
+        vars->f48=FloatToInt(20);
+        vars->f4A=FloatToInt(17.6f);
+        vars->f70=8;
+        vars->fA8=3;
+        vars->f90=0.5f;
+        vars->f94=0.5f;
+        vars->f9C=0.4f;
+        vars->fA0=*(float *)(moby+0x18)-1;
+        move_speed=g_robot_speed_scale*0.00027777778f;
+        turn_speed=g_robot_turn_scale*0.016666668f;
+        vars->f30=0.75f;
+        vars->f144=0.05f;
+        vars->f114=0.25f;
+        vars->f118=0.4f;
+        vars->f134=move_speed;
+        vars->f110=0.5f;
+        vars->f11C=0.4f;
+        vars->f120=0.78539824f;
+        vars->f140=0.52359885f;
+        vars->f330=1;
+        vars->f130=move_speed;
+        vars->f138=turn_speed;
+        *(float *)(moby+0x2C)=*(float *)(*(u8 **)(moby+0x24)+0x24)*g_laser_bot_damage_scale;
+        vars->f290=0;
     }
-    hit=part_find_owned_effect_slot(entity,0x10000,0);
+    hit=part_find_owned_effect_slot(moby,0x10000,0);
     if(hit && *(u8 **)((u8 *)hit+0x20)) {
         u8 *other=*(u8 **)((u8 *)hit+0x20);
-        if(*(s16 *)(other+0xAA)==0xFFD && *(float *)(other+0x18)<*(float *)(entity+0x18)+2) entity[0xA8]=0xFF;
+        if(*(s16 *)(other+0xAA)==MOBY_CLASS_MEGACORP_LASER_BOT && *(float *)(other+0x18)<*(float *)(moby+0x18)+2) moby[0xA8]=0xFF;
     }
-    if(moby_apply_damage_to_object(entity,st->f60,0) && st->f20<=0) {
-        matrix_mul_vec3(point,g_laser_bot_beam_point,entity+0xC0);
-        FastVecAdd(point,point,entity+0x10);
+    if(moby_apply_damage_to_object(moby,vars->f60,0) && vars->f20<=0) {
+        matrix_mul_vec3(point,g_laser_bot_beam_point,moby+0xC0);
+        FastVecAdd(point,point,moby+0x10);
         SpawnExplosion(point,0,25,20,20,20,45,0,0.5f,20.0f,1,0,0,0);
-        vec_scale_to_length(velocity,st->fE0,0.06666667f);
-        part_spawn_masked_debris(entity,31,velocity,3,6,3,6,255);
+        vec_scale_to_length(velocity,vars->fE0,0.06666667f);
+        part_spawn_masked_debris(moby,31,velocity,3,6,3,6,255);
         if(g_game_mode==49) {
             D_L03_001A9044_gp=g_bot_hit_count[0]+1;
             if(D_L03_001A9044_gp>=10 && !g_item_enabled_flags[0x1C]) {
@@ -174,17 +175,17 @@ void laser_bot_init_check_hit_us2(u8 *entity) {
                 g_bot_hit_flag[0]=1;
             }
         }
-        PlayMobySound(3,0,entity);
-        func_US2_002A7AA8(entity,0,3);
-        if(st->f340!=-1) {
-            snd_stop_voice(st->f340);
-            st->f340=-1;
+        PlayMobySound(3,0,moby);
+        SetDeathBits_us2(moby,0,3);
+        if(vars->f340!=-1) {
+            snd_stop_voice(vars->f340);
+            vars->f340=-1;
         }
-        moby_mark_spawned(entity);
+        moby_mark_spawned(moby);
         return;
     }
-    if(entity[0x31] && fast_vec_dist(entity+0x10,g_camera_pose_buffer)<24) {
-        moby_update_ground_check(entity);
-        entity[0x6F]=22;
+    if(moby[0x31] && fast_vec_dist(moby+0x10,g_camera_pose_buffer)<24) {
+        moby_update_ground_check(moby);
+        moby[0x6F]=22;
     }
 }

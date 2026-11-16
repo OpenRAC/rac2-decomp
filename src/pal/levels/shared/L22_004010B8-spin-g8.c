@@ -30,11 +30,12 @@ extern f32 ref_L22_003FC870_06;
 extern const f32 ref_L22_003FC870_07;
 extern u8 ref_L22_003FC870_08[];
 extern u8 * ref_L22_003FC870_09;
-extern void func_PAL_L22_00401788(void *, void *, int, int);
+extern void part_emit_spray_burst_pal(void *, void *, int, int);
 
-void func_PAL_L22_004010B8(u8 *obj) {
+/* Updates a spinning-and-shrinking effect moby: spins and scales its matrix, sprays sparks, follows the hero or its target, and occasionally nudges itself out of walls (PAL: 50 Hz timings). */
+void spin_shrink_update_pal(u8 *obj) {
     u8 *ctl = *(u8 **)(obj + 0x68);
-    f32 f;
+    f32 dist;
     int i;
     u8 *basis;
     f32 side;
@@ -55,9 +56,9 @@ void func_PAL_L22_004010B8(u8 *obj) {
     } scratch __attribute__((aligned(16)));
     if (flag_set_first_pending(obj) && obj[0x20] == 0x10) snd_start_in_slot(0x12, 0, 0);
     if (obj[0x31]) {
-        f = fast_vec_dist(g_hero_state + 0x80, obj + 0x10);
-        *(f32 *)(ctl + 0x44) = f;
-    if (ref_L22_003FC870_07 <= f) obj[0x23] = 127;
+        dist = fast_vec_dist(g_hero_state + 0x80, obj + 0x10);
+        *(f32 *)(ctl + 0x44) = dist;
+    if (ref_L22_003FC870_07 <= dist) obj[0x23] = 127;
     } else *(f32 *)(ctl + 0x44) = 2000.0f;
     if (obj[0x20] == 0) {
         qzero_nc(rot);
@@ -95,7 +96,7 @@ void func_PAL_L22_004010B8(u8 *obj) {
                 FastVecScale(scratch.transform.end, obj + 0xC0, -(ref_L22_003FC870_01 * 1.2f));
                 break;
             }
-            func_PAL_L22_00401788(scratch.transform.start, scratch.transform.end, ref_L22_003FC870_02, 0);
+            part_emit_spray_burst_pal(scratch.transform.start, scratch.transform.end, ref_L22_003FC870_02, 0);
         }
         set_identity_rotation_rows(scratch.transform.scale);
         scratch.transform.scale[0] = scratch.transform.scale[5] = scratch.transform.scale[10] = (37.0f - (f32)*(u16 *)(obj + 0x96) * 0.027027028f) * (ref_L22_003FC870_03 * 0.027027028f);

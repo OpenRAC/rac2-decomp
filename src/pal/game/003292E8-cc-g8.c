@@ -33,7 +33,7 @@ typedef struct {
 /* Pushes every object within range (the smaller of the state's radius and a global one) away
    from this object, unless it is the hero's current object or neither pushable nor flagged
    0x4000. */
-void func_PAL_003292E8(ObjectB40 *self)
+void DamageNearbyMobys_pal(ObjectB40 *self)
 {
     float direction[4];
     struct {

@@ -2,16 +2,16 @@
 #include "names.h"
 
 extern int D_L00_001A904C_1 __attribute__((sda));
-extern int func_PAL_003405B0(int, int);
+extern int simple_page_update_pal(int, int);
 
 /* func_PAL_L00_0030F568, the PAL copy of func_L00_0030D718: the same C with its own offset and
  * handler. */
-int func_PAL_L00_0030F568(int a0)
+int module_l00_call_handler_with_arg_15_pal(int argument)
 {
-    int v = D_L00_001A904C_1;
+    int value = D_L00_001A904C_1;
 
-    if (v != 0) {
-        return func_PAL_003405B0(v + 0x3C898, a0);
+    if (value != 0) {
+        return simple_page_update_pal(value + 0x3C898, argument);
     }
     return 0;
 }
@@ -29,30 +29,30 @@ void module_l00_call_handler_16_pal(void)
         two_toggle_b_draw(value + 0x3D288);
 }
 
-extern int func_PAL_L00_004388F8(int, int);
+extern int menu_handle_page_input_c_pal(int, int);
 
 /* func_PAL_L00_0030F5D8, the PAL copy of func_L00_0030D788: the same C with its own offset and
  * handler. */
-int func_PAL_L00_0030F5D8(int a0)
+int module_l00_call_handler_with_arg_16_pal(int argument)
 {
-    int v = D_L00_001A904C_1;
+    int value = D_L00_001A904C_1;
 
-    if (v != 0) {
-        return func_PAL_L00_004388F8(v + 0x3D288, a0);
+    if (value != 0) {
+        return menu_handle_page_input_c_pal(value + 0x3D288, argument);
     }
     return 0;
 }
 
-extern int func_PAL_0033E460(int, int);
+extern int four_option_menu_update_pal(int, int);
 
 /* func_PAL_L00_0030F618, the PAL copy of func_L00_0030D7C8: the same C with its own offset and
  * handler. */
-int func_PAL_L00_0030F618(int argument)
+int module_l00_call_handler_with_arg_17_pal(int argument)
 {
     int value = D_L00_001A904C_2;
 
     if (value != 0)
-        return func_PAL_0033E460(value + 0x3D568, argument);
+        return four_option_menu_update_pal(value + 0x3D568, argument);
     return 0;
 }
 
@@ -68,16 +68,16 @@ void module_l00_call_handler_17_pal(void)
         four_option_menu_draw(value + 0x3D568);
 }
 
-extern int func_PAL_L00_00437BA8(int, int);
+extern int menu_handle_page_input_a_pal(int, int);
 
 /* func_PAL_L00_0030F688, the PAL copy of func_L00_0030D838: the same C with its own offset and
  * handler. */
-int func_PAL_L00_0030F688(int argument)
+int module_l00_call_handler_with_arg_18_pal(int argument)
 {
     int value = D_L00_001A904C_2;
 
     if (value != 0)
-        return func_PAL_L00_00437BA8(value + 0x3D848, argument);
+        return menu_handle_page_input_a_pal(value + 0x3D848, argument);
     return 0;
 }
 
@@ -93,16 +93,16 @@ void module_l00_call_handler_18_pal(void)
         two_toggle_a_draw(value + 0x3D848);
 }
 
-extern int func_PAL_0033F470(int, int);
+extern int single_toggle_a_update_pal(int, int);
 
 /* func_PAL_L00_0030F6F8, the PAL copy of func_L00_0030D8A8: the same C with its own offset and
  * handler. */
-int func_PAL_L00_0030F6F8(int argument)
+int module_l00_call_handler_with_arg_19_pal(int argument)
 {
     int value = D_L00_001A904C_2;
 
     if (value != 0)
-        return func_PAL_0033F470(value + 0x3DE98, argument);
+        return single_toggle_a_update_pal(value + 0x3DE98, argument);
     return 0;
 }
 
@@ -118,16 +118,16 @@ void module_l00_call_handler_19_pal(void)
         single_toggle_a_draw(value + 0x3DE98);
 }
 
-extern int func_PAL_0033DDC0(int, int);
+extern int screen_adjust_menu_update_pal(int, int);
 
 /* func_PAL_L00_0030F768, the PAL copy of func_L00_0030D918: the same C with its own offset and
  * handler. */
-int func_PAL_L00_0030F768(int argument)
+int module_l00_call_handler_with_arg_20_pal(int argument)
 {
     int value = D_L00_001A904C_2;
 
     if (value != 0)
-        return func_PAL_0033DDC0(value + 0x3E178, argument);
+        return screen_adjust_menu_update_pal(value + 0x3E178, argument);
     return 0;
 }
 
@@ -143,16 +143,16 @@ void level_l00_call_module_handler_pal(void)
         onoff_menu_draw_with_help(value + 0x3E178);
 }
 
-extern int func_PAL_0033E160(int, int);
+extern int onoff_menu_update_pal(int, int);
 
 /* func_PAL_L00_0030F7D8, the PAL copy of func_L00_0030D988: the same C with its own offset and
  * handler. */
-int func_PAL_L00_0030F7D8(int argument)
+int level_l00_call_module_handler_with_arg_pal(int argument)
 {
     int value = D_L00_001A904C_2;
 
     if (value != 0)
-        return func_PAL_0033E160(value + 0x3E458, argument);
+        return onoff_menu_update_pal(value + 0x3E458, argument);
     return 0;
 }
 
@@ -168,16 +168,16 @@ void level_l00_call_module_handler_2_pal(void)
         onoff_menu_draw(value + 0x3E458);
 }
 
-extern int func_PAL_00340348(int, int);
+extern int list_page_update_pal(int, int);
 
 /* func_PAL_L00_0030F848, the PAL copy of func_L00_0030D9F8: the same C with its own offset and
  * handler. */
-int func_PAL_L00_0030F848(int argument)
+int level_l00_call_module_handler_with_arg_2_pal(int argument)
 {
     int value = D_L00_001A904C_2;
 
     if (value != 0)
-        return func_PAL_00340348(value + 0x3F4A0, argument);
+        return list_page_update_pal(value + 0x3F4A0, argument);
     return 0;
 }
 
@@ -189,16 +189,16 @@ void level_l00_call_module_handler_3_pal(void)
         list_page_draw(value + 0x3F4A0);
 }
 
-extern int func_PAL_0033EEF8(int, int);
+extern int audio_menu_update_pal(int, int);
 
 /* func_PAL_L00_0030F8B8, the PAL copy of func_L00_0030DA68: the same C with its own offset and
  * handler. */
-int func_PAL_L00_0030F8B8(int argument)
+int level_l00_call_module_handler_with_arg_3_pal(int argument)
 {
     int value = D_L00_001A904C_2;
 
     if (value != 0)
-        return func_PAL_0033EEF8(value + 0x3DB28, argument);
+        return audio_menu_update_pal(value + 0x3DB28, argument);
     return 0;
 }
 
@@ -210,16 +210,16 @@ void level_l00_call_module_handler_4_pal(void)
         audio_menu_draw(value + 0x3DB28);
 }
 
-extern int func_PAL_L00_00438CC0(int, int);
+extern int menu_update_two_part_flags_a_pal(int, int);
 
 /* func_PAL_L00_0030F928, the PAL copy of func_L00_0030DAD8: the same C with its own offset and
  * handler. */
-int func_PAL_L00_0030F928(int argument)
+int level_l00_call_module_handler_with_arg_4_pal(int argument)
 {
     int value = D_L00_001A904C_2;
 
     if (value != 0)
-        return func_PAL_L00_00438CC0(value + 0x3EC00, argument);
+        return menu_update_two_part_flags_a_pal(value + 0x3EC00, argument);
     return 0;
 }
 

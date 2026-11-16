@@ -9,30 +9,31 @@ extern void menu_set_anchor_pos(void *, float, float);
 extern int snd_play_from_global_bank(int, int, void *);
 extern void UpdateViewContext(void);
 
-int func_PAL_0033E460(u8_Ff4eb83c9 *a0, int a1)
+/* Updates the four-option controls menu: moves the selection, and toggles or cycles the chosen option on X (PAL). */
+int four_option_menu_update_pal(u8_Ff4eb83c9 *menu, int pad_flags)
 {
-    u8_Ff4eb83c9 *p = a0 + 8;
+    u8_Ff4eb83c9 *prompt_bar = menu + 8;
     unsigned int *sfx = (unsigned int *)0x1A7C2C;
     unsigned int *music = (unsigned int *)0x1A7C30;
     int *mode = (int *)0x1A7C34;
     unsigned char *toggle = (unsigned char *)0x1A7C39;
-    float *q;
-    int v;
+    float *anchor;
+    int selection;
 
-    prompt_bar_update_pal(p);
-    q = *(float **)(a0 + 0x2DC);
-    menu_set_anchor_pos(p, q[0], q[1]);
-    if (a1 & 0x1000) {
+    prompt_bar_update_pal(prompt_bar);
+    anchor = *(float **)(menu + 0x2DC);
+    menu_set_anchor_pos(prompt_bar, anchor[0], anchor[1]);
+    if (pad_flags & 0x1000) {
         snd_play_from_global_bank(3, 0, 0);
-        v = *(int *)(a0 + 0x2D8);
-        *(int *)(a0 + 0x2D8) = (v + 3) % 4;
-    } else if (a1 & 0x4000) {
+        selection = *(int *)(menu + 0x2D8);
+        *(int *)(menu + 0x2D8) = (selection + 3) % 4;
+    } else if (pad_flags & 0x4000) {
         snd_play_from_global_bank(3, 0, 0);
-        v = *(int *)(a0 + 0x2D8);
-        *(int *)(a0 + 0x2D8) = (v + 1) % 4;
-    } else if (a1 & 0x40) {
+        selection = *(int *)(menu + 0x2D8);
+        *(int *)(menu + 0x2D8) = (selection + 1) % 4;
+    } else if (pad_flags & 0x40) {
         snd_play_from_global_bank(4, 0, 0);
-        switch (*(int *)(a0 + 0x2D8)) {
+        switch (*(int *)(menu + 0x2D8)) {
         case 0:
             *sfx = *sfx < 1;
             break;
@@ -48,7 +49,7 @@ int func_PAL_0033E460(u8_Ff4eb83c9 *a0, int a1)
             break;
         }
     }
-    return (a1 >> 6) & 1;
+    return (pad_flags >> 6) & 1;
 }
 
 typedef struct { int ids[2]; } OptionPair;
@@ -72,7 +73,8 @@ extern char *GetLocalizedString(int);
 extern int sprintf(char *, const char *, ...);
 extern int text_draw_centered_medium(int, int, unsigned long, char *, int);
 
-void func_PAL_0033E608(char *object)
+/* Draws the four-option controls menu: each option label with its current value, the selected one highlighted (PAL). */
+void four_option_menu_draw_pal(char *object)
 {
     char buffer[128];
     OptionPair onoff;

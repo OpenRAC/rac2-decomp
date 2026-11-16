@@ -26,6 +26,7 @@ typedef struct {
 } MapToc;
 extern MapToc g_copy_setup_data;
 
+/* Resets the map cache and reloads the map data from the disc. */
 void map_reset_cache_and_reload_pal(void)
 {
     int *arena;

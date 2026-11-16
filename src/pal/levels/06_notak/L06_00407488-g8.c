@@ -28,7 +28,7 @@ extern float g_hero_lift_angle NOT_SDA;
 extern s32 FloatToInt(float);
 extern void moby_mark_spawned(void *);
 extern s32 math_random_int_below(s32);
-extern void func_PAL_002A7E68(void *, s32, s32, s32);
+extern void anim_start_blended_pal(void *, s32, s32, s32);
 extern float mat_fast_helper_a(float, float);
 extern float math_approach_target_with_direction_mode(float *, float, float, float, float, float *, s32);
 extern void vec_scale_to_length(void *, void *, float);
@@ -41,7 +41,7 @@ extern s32 IsPointInCuboid(void *, s32);
 extern float FastAddRotations(float,float);
 extern void euler_rotation_basis(void *,void *);
 extern s32 PlayMobySound(s32,s32,void *);
-extern void func_PAL_L06_00407B38(void *,void *);
+extern void part_spawn_splash_burst_pal(void *,void *);
 extern void hero_reset_position_and_direction_pal(void *,void *,s32,s32);
 extern s32 point_in_path_xy(void *,void *,s32);
 extern s32 flag_set_first_pending(void *);
@@ -67,7 +67,7 @@ typedef struct {
     s32 insideWait;
 } LaunchData;
 
-void func_PAL_L06_00407488(char *obj)
+void hero_l06_lift_update_pal(char *obj)
 {
     float pos[4] __attribute__((aligned(16)));
     float step[4] __attribute__((aligned(16)));
@@ -94,7 +94,7 @@ void func_PAL_L06_00407488(char *obj)
             }
             data->point = math_random_int_below(I(g_path_list[data->path],0));
             data->timeout = 500;
-            if (B(obj,0x43) != 1) func_PAL_002A7E68(obj,1,0,8);
+            if (B(obj,0x43) != 1) anim_start_blended_pal(obj,1,0,8);
             F(obj,0x18) = F(g_path_list[data->path],0x18) - g_lift_path_offset;
             data->pathZ = F(obj,0x18);
             B(obj,0x20) = 1;
@@ -123,11 +123,11 @@ void func_PAL_L06_00407488(char *obj)
                 data->speed = 0.16000001f;
                 H(obj,0x34) &= 0xFFFE;
                 PlayMobySound(1,0,obj);
-                if (B(obj,0x43) != 2) func_PAL_002A7E68(obj,2,10,4);
+                if (B(obj,0x43) != 2) anim_start_blended_pal(obj,2,10,4);
                 B(obj,0x20) = 3;
                 qcopy(step,(char *)&g_hero_state+0x80);
                 step[2] = g_hero_state.height;
-                func_PAL_L06_00407B38(obj,step);
+                part_spawn_splash_burst_pal(obj,step);
                 hero_reset_position_and_direction_pal((char *)&g_hero_state+0x80,(char *)&g_hero_state+0x90,111,0);
                 g_hero_state.flag = 1;
             }
@@ -163,10 +163,10 @@ void func_PAL_L06_00407488(char *obj)
         if (data->speed<0.0f && F(obj,0x18)<g_hero_state.height) {
             qcopy_nc(pos,(char *)&g_hero_state+0x80);
             pos[2]=g_hero_state.height;
-            func_PAL_L06_00407B38(obj,pos);
+            part_spawn_splash_burst_pal(obj,pos);
         }
         if (data->speed<0.0f && F(obj,0x18)<data->homeZ) hero_record_play_counters_pal();
-        if ((B(obj,0x60)&2) && B(obj,0x43)!=1) func_PAL_002A7E68(obj,1,0,8);
+        if ((B(obj,0x60)&2) && B(obj,0x43)!=1) anim_start_blended_pal(obj,1,0,8);
         break;
     }
 }

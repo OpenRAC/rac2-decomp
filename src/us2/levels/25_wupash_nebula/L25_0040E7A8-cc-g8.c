@@ -36,9 +36,9 @@ extern int FastTweenColor(unsigned int,unsigned int,float);
 extern void gfx_draw_screen_rectangle(int,int,int,int,int,void *);
 extern int GetIconFrame(int,int);
 extern void hud_draw_sprite_gradient(int,int,int,int,int,void *);
-extern void func_US2_L05_00327640(int);
+extern void level_store_value_plus_one_us2(int);
 extern int level_lookup_step_table(void);
-extern void func_US2_0029CC48(void);
+extern void hud_draw_scaled_us2(void);
 extern void hud_draw_object_markers(void);
 
 /* func_US2_L25_0040E7A8 draws this level's HUD: two counters, the gauges of the selected item, its
@@ -77,6 +77,7 @@ static __inline__ int hud_coord(int mode, float value, float half, float offset,
     return (int)scaled;
 }
 
+/* Draws the whole HUD: counters, health and ammo bars, the selected item icons and the corner sprites. */
 int DrawWupashCombatHud_us2(void)
 {
     char text[128];
@@ -86,21 +87,21 @@ int DrawWupashCombatHud_us2(void)
     float x,y,a,fill;
     int selection=1, color, result;
     char *message;
-    float edge, ammoCount, ammoStart, ammoWidth;
+    float edge, ammo_count, ammo_start, ammo_width;
     float half;
     HudState *hud=(HudState *)g_hud_l25_state;
     char *fmt;
-    int textX, textX2;
+    int text_x_left, text_x_right;
     hud_draw_fading_icon_pairs(0,selection,selection,selection);
     half=0.5f;
     message=GetLocalizedString(0x3067);
     sprintf(text,fmt=g_str_hud_message_format,message,hud->count1);
-    textX=g_hud_text_x_left-60;
-    text_draw_medium(textX,label_y((void *)textX,g_hud_text_y_left-8,g_hud_screen_scale,half,1),0x80808080,text,128);
+    text_x_left=g_hud_text_x_left-60;
+    text_draw_medium(text_x_left,label_y((void *)text_x_left,g_hud_text_y_left-8,g_hud_screen_scale,half,1),0x80808080,text,128);
     message=GetLocalizedString(0x3068);
     sprintf(text,fmt,message,hud->count2+1);
-    textX2=g_hud_text_x_right-60;
-    text_draw_medium(textX2,label_y((void *)textX2,g_hud_text_y_right-8,g_hud_screen_scale,half,1),0x80808080,text,128);
+    text_x_right=g_hud_text_x_right-60;
+    text_draw_medium(text_x_right,label_y((void *)text_x_right,g_hud_text_y_right-8,g_hud_screen_scale,half,1),0x80808080,text,128);
     if (g_hud_l25_resource_base) {
         g_hud_icon_a=table_find_by_id(g_hud_l25_resource_base+0x8710,128);
         g_hud_icon_b=table_find_by_id(g_hud_l25_resource_base+0x8710,129);
@@ -154,15 +155,15 @@ int DrawWupashCombatHud_us2(void)
         edge=fill*200.0f+156.0f;
         if(I(state,0x28)) gfx_draw_screen_rectangle(156,14,(int)edge,27,1,colors);
         selection=table_find_last_used_entry(7);
-        ammoCount=IntToFloat(g_inventory_table[selection].count);
-        fill=ammoCount/IntToFloat(g_inventory_table[selection].maximum);
+        ammo_count=IntToFloat(g_inventory_table[selection].count);
+        fill=ammo_count/IntToFloat(g_inventory_table[selection].maximum);
         color=FastTweenColor(0x800000ff,0x8000ff00,fill);
-        ammoStart=IntToFloat(450);
-        ammoWidth=IntToFloat(386);
-        ammoWidth-=IntToFloat(450);
+        ammo_start=IntToFloat(450);
+        ammo_width=IntToFloat(386);
+        ammo_width-=IntToFloat(450);
         colors2[0]=0x800000ff; colors2[1]=color;
-        ammoWidth*=fill;
-        edge=ammoStart+ammoWidth;
+        ammo_width*=fill;
+        edge=ammo_start+ammo_width;
         if(fill>0.0f) gfx_draw_screen_rectangle(450,8,(int)edge,19,1,colors2);
         {
         Rgba rect[4]={{0x70,0xc0,0xf0,0x55},{0x70,0xc0,0xf0,0x55},{0x70,0xc0,0xf0,0x55},{0x70,0xc0,0xf0,0x55}};
@@ -178,7 +179,7 @@ int DrawWupashCombatHud_us2(void)
         }
         sprintf(text,g_str_l25_hud_ammo_format,g_inventory_table[table_find_last_used_entry(g_hud_selected_weapon)].count,g_inventory_table[table_find_last_used_entry(g_hud_selected_weapon)].maximum);
         text_draw_small(67,5,0x80808080,text,128);
-        func_US2_L05_00327640(2);
+        level_store_value_plus_one_us2(2);
         result=level_lookup_step_table();
         if(result>=0) {
             g_inventory_table[table_find_last_used_entry(g_hud_selected_weapon)].active=0;
@@ -187,7 +188,7 @@ int DrawWupashCombatHud_us2(void)
         }
         gfx_draw_scaled_object(g_hud_icon_c,x,y,0x80f0f0f0,1.0f,0.0f);
     }
-    func_US2_0029CC48();
+    hud_draw_scaled_us2();
     {
     float four=4.0f, half2=0.5f;
     char *tex0, *tex2;

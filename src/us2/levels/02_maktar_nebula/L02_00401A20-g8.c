@@ -17,7 +17,7 @@ extern short g_screen_adjust_offsets[];
 extern float IntToFloat(short);
 extern void VU1_addGSregister(int, long long);
 extern void AppendScreenRectPacket(int, int, int, int, unsigned long, int);
-extern long long func_US2_0027CED8(int);
+extern long long tex_get_effect_descriptor_us2(int);
 extern void DrawTexturedQuad(int, int, int, int, int, int, int, int, unsigned long long, unsigned long long);
 
 /* func_US2_L02_00401A20, the USA v2.00 copy of func_L02_004002E0: the same C, where the height is
@@ -31,10 +31,10 @@ extern void DrawTexturedQuad(int, int, int, int, int, int, int, int, unsigned lo
    D_L02_001B1508 wider on each side and at most D_L02_001B1500 tall. Built with -g
    (config/cflags.txt): retail has two nops in front of the division, which the assembler puts after
    a line label, so the division is a statement of its own. */
-void func_US2_L02_00401A20(char *a0) {
-    char *state = *(char **)(a0 + 0x68);
+void gfx_draw_screen_wipe_us2(char *moby) {
+    char *state = *(char **)(moby + 0x68);
     s32 color;
-    float f20;
+    float ratio;
     float height;
     long long id;
     s32 i;
@@ -47,15 +47,15 @@ void func_US2_L02_00401A20(char *a0) {
     if (*(s16 *)(state + 0x124) < 0)
         *(s16 *)(state + 0x124) = 0;
     color = g_screen_wipe_band_color_start;
-    f20 = IntToFloat(*(u16 *)(state + 0x124));
+    ratio = IntToFloat(*(u16 *)(state + 0x124));
     height = (float)g_screen_adjust_offsets[0xA9];
-    f20 = f20 / height;
-    f20 = f20 * f20;
+    ratio = ratio / height;
+    ratio = ratio * ratio;
     {
         float scale = (float)(s32)((u32)color >> 24);
 
         color &= 0xFFFFFF;
-        color |= (s32)(f20 * scale) << 24;
+        color |= (s32)(ratio * scale) << 24;
     }
     VU1_addGSregister(0x42, 0x8000000049LL);
     for (i = 0; i < g_screen_wipe_band_count; i++)
@@ -63,13 +63,13 @@ void func_US2_L02_00401A20(char *a0) {
     VU1_addGSregister(0x42, 0x8000000044LL);
     screen = g_screen_adjust_offsets;
     AppendScreenRectPacket(0, 0, screen[0xA8], *(s16 *)(state + 0x124), g_screen_wipe_fill_color, 0);
-    id = func_US2_0027CED8(0x10);
+    id = tex_get_effect_descriptor_us2(0x10);
     color = g_screen_wipe_band_color_end;
     {
         float scale = (float)(s32)((u32)color >> 24);
 
         color &= 0xFFFFFF;
-        color |= (s32)(f20 * scale) << 24;
+        color |= (s32)(ratio * scale) << 24;
     }
     VU1_addGSregister(0x42, 0x8000000048LL);
     h = *(s16 *)(state + 0x124);

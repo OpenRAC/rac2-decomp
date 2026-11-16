@@ -26,33 +26,33 @@ extern u8 *g_toggle_link_table_a;
 /* Scales the controller of the object: when the controller is idle its position is copied to
  * the object, otherwise the controller's values are scaled and written back.
  */
-void func_PAL_L22_003F9A10(u8 *obj) {
-    u8 *ctl = *(u8 **)(obj + 0x68);
-    f32 buf[4];
-    f32 a, b, c, d, g, r;
+void sway_update_decaying_pal(u8 *obj) {
+    u8 *vars = *(u8 **)(obj + 0x68);
+    f32 offset[4];
+    f32 phase_sin, amount, dx, dy, decay_rate, new_phase;
 
-    if (*(f32 *)(ctl + 0xBC) == 0.0f) {
-        if (*(f32 *)(ctl + 0xC0) == 0.0f)
+    if (*(f32 *)(vars + 0xBC) == 0.0f) {
+        if (*(f32 *)(vars + 0xC0) == 0.0f)
             return;
-        *(TI128 *)(obj + 0xE0) = *(TI128 *)ctl;
-        *(f32 *)(ctl + 0xC0) = 0.0f;
+        *(TI128 *)(obj + 0xE0) = *(TI128 *)vars;
+        *(f32 *)(vars + 0xC0) = 0.0f;
         return;
     }
-    a = math_fast_sin_or_cos_b(*(f32 *)(ctl + 0xC4));
-    b = *(f32 *)(ctl + 0xBC);
-    c = math_fast_sin_or_cos_a(*(f32 *)(ctl + 0xB0));
-    b = b * a;
-    c = c * b;
-    buf[0] = c;
-    d = math_fast_sin_or_cos_b(*(f32 *)(ctl + 0xB0));
-    d = d * b;
-    buf[1] = d;
-    buf[2] = 0.0f;
-    matrix_mul_vec3(buf, buf, obj + 0xC0);
-    buf[3] = 0.0f;
-    FastVecAdd(obj + 0xE0, buf, ctl);
-    r = FastAddRotations(*(f32 *)(ctl + 0xC4), *(f32 *)(ctl + 0xC0));
-    g = ref_L22_003F5580_00;
-    *(f32 *)(ctl + 0xC4) = r;
-    ApproachValue((f32 *)(ctl + 0xBC), 0.0f, g * (0.020000001f));
+    phase_sin = math_fast_sin_or_cos_b(*(f32 *)(vars + 0xC4));
+    amount = *(f32 *)(vars + 0xBC);
+    dx = math_fast_sin_or_cos_a(*(f32 *)(vars + 0xB0));
+    amount = amount * phase_sin;
+    dx = dx * amount;
+    offset[0] = dx;
+    dy = math_fast_sin_or_cos_b(*(f32 *)(vars + 0xB0));
+    dy = dy * amount;
+    offset[1] = dy;
+    offset[2] = 0.0f;
+    matrix_mul_vec3(offset, offset, obj + 0xC0);
+    offset[3] = 0.0f;
+    FastVecAdd(obj + 0xE0, offset, vars);
+    new_phase = FastAddRotations(*(f32 *)(vars + 0xC4), *(f32 *)(vars + 0xC0));
+    decay_rate = ref_L22_003F5580_00;
+    *(f32 *)(vars + 0xC4) = new_phase;
+    ApproachValue((f32 *)(vars + 0xBC), 0.0f, decay_rate * (0.020000001f));
 }

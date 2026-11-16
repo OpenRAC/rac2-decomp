@@ -6,7 +6,8 @@ extern int FloatToInt(float);
 extern float math_random_float_range(float, float);
 extern unsigned char *g_spinning_particle_colors;
 
-char *func_PAL_L04_00365B68(void *position, void *velocity, int word, int color,
+/* Spawns a spinning particle (record kind 0x32) with a random start angle and a random sideways drift (PAL). */
+char *part_l04_spawn_spinning_pal(void *position, void *velocity, int word, int color,
                            int index, float lifetime, float scale, float size)
 {
     char *particle = part_alloc(0x32);

@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "moby_classes.h"
 #include "names.h"
 
 typedef unsigned char L00_0037F7E8_u8;
@@ -34,6 +35,7 @@ typedef struct L00_0037F7E8_Object {
 extern int ref_L00_001A8F00_00 __attribute__((sda));
 extern L00_0037F7E8_u8 ref_L00_001B267C_00[] __attribute__((sda));
 
+/* Per-frame update for the level objects: runs the sound and particle updates and ticks the special mobys (PAL: 50 Hz timings). */
 void moby_update_level_objects_pal(void)
 {
     L00_0037F7E8_u8 *head;
@@ -59,8 +61,8 @@ void moby_update_level_objects_pal(void)
                     object->field64(object);
                     if ((object->field34 & 4) == 0)
                         func_002A0F48(object);
-                } else if (id == 0xCB2 || id == 0xB02 || id == 0x259
-                           || id == 0xA5C || id == 0x1192) {
+                } else if (id == MOBY_CLASS_SYNTHENOID || id == MOBY_CLASS_KILONOID || id == 0x259
+                           || id == MOBY_CLASS_SHIELD_CHARGER || id == MOBY_CLASS_TESLA_BARRIER) {
                     func_002A05A8((char *)object);
                     func_002A0F48(object);
                 }

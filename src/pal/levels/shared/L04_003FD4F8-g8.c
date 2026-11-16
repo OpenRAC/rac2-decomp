@@ -12,7 +12,7 @@ typedef struct {
 extern unsigned char *ref_L04_003FBD80_00(int kind);
 extern int ref_L04_003FBD80_01(int a0, int a1, void *owner);
 extern float ref_L04_003FBD80_02(float low, float high);
-extern void func_PAL_L04_003FFB98(unsigned char *object, L04_FBD80Vars *vars);
+extern void moby_damage_in_firing_cone_pal(unsigned char *object, L04_FBD80Vars *vars);
 extern int g_shield_dome_sound_handle __attribute__((sda));
 
 /* Spawns a kind-0xABE object for an entity of kind 0xBBC: it takes the entity's 8-byte
@@ -20,7 +20,7 @@ extern int g_shield_dome_sound_handle __attribute__((sda));
    +0xF4 replaced by the entity state's +0x284 when its +0x274 is set), and its state
    points back at the entity with a 0.5 scale and a jitter table of 28 random floats in
    [-10, 10] / 75, the first and last zero. Returns the object, or 0. */
-unsigned char *func_PAL_L04_003FFF88(unsigned char *entity, L04_FBD80Quad *position)
+unsigned char *shield_dome_spawn_pal(unsigned char *entity, L04_FBD80Quad *position)
 {
     float pos[4] __attribute__((aligned(16)));
     unsigned char *object;
@@ -58,7 +58,7 @@ unsigned char *func_PAL_L04_003FFF88(unsigned char *entity, L04_FBD80Quad *posit
             if (i == 0 || i == 27)
                 vars->jitter[i] = 0;
         }
-        func_PAL_L04_003FFB98(object, vars);
+        moby_damage_in_firing_cone_pal(object, vars);
     }
     return object;
 }

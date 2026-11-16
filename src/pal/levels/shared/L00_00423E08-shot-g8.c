@@ -27,8 +27,8 @@ typedef struct {
     unsigned int slot;             
     int pad04[3];
     int frame;                     
-    int ownerIndex;                
-    int ownerKind;                 
+    int owner_index;                
+    int owner_kind;                 
     char *target;                  
     float velocity[3];             
     float speed;                   
@@ -53,7 +53,7 @@ char *SpawnAimedShot_pal(Quad128 *origin, char *owner, char *target)
     char *object, *collision, *hero;
     ShotState *state;
     float speed;
-    int count, ownerIndex, ownerKind;
+    int count, owner_index, owner_kind;
 
     object = CreateMoby(0xC89);
     if (object) {
@@ -102,11 +102,11 @@ char *SpawnAimedShot_pal(Quad128 *origin, char *owner, char *target)
                 *(unsigned short *)(collision + 0x1E) |= 0x80;
         }
         state->fade = 1;
-        ownerIndex = *(short *)(*(char **)(owner + 0x68) + 0x12);
-        state->ownerIndex = ownerIndex;
-        ownerKind = *(short *)(owner + 0xAA);
-        state->ownerKind = ownerKind;
-        if (!save_is_record_value(ownerKind, ownerIndex)) {
+        owner_index = *(short *)(*(char **)(owner + 0x68) + 0x12);
+        state->owner_index = owner_index;
+        owner_kind = *(short *)(owner + 0xAA);
+        state->owner_kind = owner_kind;
+        if (!save_is_record_value(owner_kind, owner_index)) {
             moby_mark_spawned(object);
             return 0;
         }

@@ -107,6 +107,7 @@ typedef struct Object_00441D40 {
     short f84;
 } Object_00441D40;
 
+/* Sets up the starting state of the level's camera object: default position, blocks and rates (PAL: 50 Hz rate). */
 void cam_init_state_pal(Object_00441D40 *object)
 {
     State_00441D40 *state;

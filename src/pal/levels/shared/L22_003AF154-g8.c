@@ -48,7 +48,7 @@ extern void FastVecSub(void *dst, void *a, void *b);
 extern void matrix_mul_vec3(void *dst, void *src, void *matrix);
 extern void FastVecScale(void *dst, void *src, float scale);
 extern void math_apply_axis_rotation_to_quat(void *dst, void *src, void *matrix, float angle);
-extern void *func_PAL_002C23B8(void *position, void *velocity, int a2, int a3, int color, int t1,
+extern void *part_spawn_burst_pal(void *position, void *velocity, int a2, int a3, int color, int t1,
                            float f12, float f13, float f14, float f15, float f16);
 extern void *part_spawn_trailing_spark(void *a0, void *a1, int a2, int a3, int a4, int a5, float f12);
 extern void make_hit_descriptor(void *impact, int attacker, int flags, float damage, void *direction);
@@ -69,7 +69,7 @@ extern void moby_mark_spawned(void *object);
    (state +0x3C); on a hit against anything but the owner it explodes and deletes itself,
    otherwise it commits the predicted position. The trail vectors and the impact request share
    one stack area. */
-void func_PAL_L22_003AF154(u8 *object)
+void spark_projectile_update_pal(u8 *object)
 {
     struct {
         float predicted[4];
@@ -79,7 +79,7 @@ void func_PAL_L22_003AF154(u8 *object)
             } effects;
             Impact_L09_003A01D8 impact;
         } payload;
-    } f;
+    } scratch;
     u8 *state = P(object, 0x68), *hit;
     float length;
     int collision;
@@ -88,52 +88,52 @@ void func_PAL_L22_003AF154(u8 *object)
     if (object[0x20])
         return;
     F(object, 0xF0) = FastAddRotations(F(object, 0xF0), 0.12566373f);
-    FastVecAdd(f.predicted, object + 0x10, state);
+    FastVecAdd(scratch.predicted, object + 0x10, state);
     busy = g_hero_busy_amount_a > 0.9f || g_hero_busy_amount_b > 0.9f;
     if (!busy || !(g_frame_l09_counter & 1)) {
         length = FastVecLength(state);
-        f.payload.effects.axis.q = 0;
-        f.payload.effects.axis.f[0] = math_random_float_range(-1.0f, 1.0f);
-        f.payload.effects.axis.f[1] = math_random_float_range(-1.0f, 1.0f);
-        f.payload.effects.axis.f[2] = math_random_float_range(-1.0f, 1.0f);
-        f.payload.effects.velocity.q = f.payload.effects.axis.q;
-        vec_scale_to_length(f.payload.effects.velocity.f, f.payload.effects.velocity.f,
+        scratch.payload.effects.axis.q = 0;
+        scratch.payload.effects.axis.f[0] = math_random_float_range(-1.0f, 1.0f);
+        scratch.payload.effects.axis.f[1] = math_random_float_range(-1.0f, 1.0f);
+        scratch.payload.effects.axis.f[2] = math_random_float_range(-1.0f, 1.0f);
+        scratch.payload.effects.velocity.q = scratch.payload.effects.axis.q;
+        vec_scale_to_length(scratch.payload.effects.velocity.f, scratch.payload.effects.velocity.f,
                       math_random_float_range(0.04f, 0.08f) * 0.020000001f);
-        FastVecScale(f.payload.effects.point.f, state, math_random_float_range(0.2f, 0.99f));
-        FastVecAdd(f.payload.effects.velocity.f, f.payload.effects.velocity.f,
-                      f.payload.effects.point.f);
-        vec_scale_to_length(f.payload.effects.point.f, state, math_random_float_range(0.0f, 1.0f) * length);
-        FastVecAdd(f.payload.effects.point.f, f.payload.effects.point.f, object + 0x10);
-        func_PAL_002C23B8(object + 0x10, f.payload.effects.velocity.f, 6, 127, 0xB0B0B0, 3,
+        FastVecScale(scratch.payload.effects.point.f, state, math_random_float_range(0.2f, 0.99f));
+        FastVecAdd(scratch.payload.effects.velocity.f, scratch.payload.effects.velocity.f,
+                      scratch.payload.effects.point.f);
+        vec_scale_to_length(scratch.payload.effects.point.f, state, math_random_float_range(0.0f, 1.0f) * length);
+        FastVecAdd(scratch.payload.effects.point.f, scratch.payload.effects.point.f, object + 0x10);
+        part_spawn_burst_pal(object + 0x10, scratch.payload.effects.velocity.f, 6, 127, 0xB0B0B0, 3,
                       40000.0f, 1000.0f, 1.0f, -0.00039999998989515007f, 0.0f);
-        f.payload.effects.axis.q = 0;
-        f.payload.effects.axis.f[2] = 0.01f;
-        matrix_mul_vec3(f.payload.effects.axis.f, f.payload.effects.axis.f, object + 0xC0);
-        math_apply_axis_rotation_to_quat(f.payload.effects.axis.f, f.payload.effects.axis.f, object + 0xC0,
+        scratch.payload.effects.axis.q = 0;
+        scratch.payload.effects.axis.f[2] = 0.01f;
+        matrix_mul_vec3(scratch.payload.effects.axis.f, scratch.payload.effects.axis.f, object + 0xC0);
+        math_apply_axis_rotation_to_quat(scratch.payload.effects.axis.f, scratch.payload.effects.axis.f, object + 0xC0,
                       math_random_angle());
         if (func_001163B0() & 1)
-            part_spawn_trailing_spark(f.payload.effects.point.f, f.payload.effects.axis.f, 0x4F007FFF,
+            part_spawn_trailing_spark(scratch.payload.effects.point.f, scratch.payload.effects.axis.f, 0x4F007FFF,
                           0x1FFFFFFF, 11, 1, 25000.0f);
     }
-    make_hit_descriptor(&f.payload.impact, I(state, 0x3C), 0x10001, F(state, 0x40), state);
-    f.payload.impact.object_class = *(u16 *)(object + 0xAA);
-    FastVecSub(f.payload.impact.direction, object + 0x10, P(state, 0x3C) + 0x10);
-    f.payload.impact.direction[2] = 0.0f;
-    vec_scale_to_length(f.payload.impact.direction, f.payload.impact.direction, 2.0000002f);
-    f.payload.impact.direction[3] = 5627.9248046875f;
-    f.payload.impact.enabled |= 1;
-    f.payload.impact.kind = 4;
-    collision = CollLine(object + 0x10, f.predicted, 0, object, &f.payload.impact);
+    make_hit_descriptor(&scratch.payload.impact, I(state, 0x3C), 0x10001, F(state, 0x40), state);
+    scratch.payload.impact.object_class = *(u16 *)(object + 0xAA);
+    FastVecSub(scratch.payload.impact.direction, object + 0x10, P(state, 0x3C) + 0x10);
+    scratch.payload.impact.direction[2] = 0.0f;
+    vec_scale_to_length(scratch.payload.impact.direction, scratch.payload.impact.direction, 2.0000002f);
+    scratch.payload.impact.direction[3] = 5627.9248046875f;
+    scratch.payload.impact.enabled |= 1;
+    scratch.payload.impact.kind = 4;
+    collision = CollLine(object + 0x10, scratch.predicted, 0, object, &scratch.payload.impact);
     if (collision || coll_test_point(object + 0x10, 1, object, 0.3f)
         || math_fast_float_d(state + 0x38)) {
         hit = g_collision_hit_object;
         if (hit) {
             if (hit == P(state, 0x3C)) {
-                qcopy(object + 0x10, f.predicted);
+                qcopy(object + 0x10, scratch.predicted);
                 return;
             }
             if (*(short *)(hit + 0xAA) != 0x4E)
-                coll_process_hit(object + 0x10, 0, P(state, 0x3C), &f.payload.impact, 0.5f);
+                coll_process_hit(object + 0x10, 0, P(state, 0x3C), &scratch.payload.impact, 0.5f);
             /* The calls are written out per arm: a call ending a block that falls into a label
                gets a (use 0) from flow, which stops jump2 from cross-jumping the tails. */
             SpawnExplosionEffects_pal(object, g_default_particle_vec, 0, 0.0f, 0.0f, 0, 2, 10, 0.0f, 0.0f, 9.0f,
@@ -147,7 +147,7 @@ void func_PAL_L22_003AF154(u8 *object)
             moby_mark_spawned(object);
         }
     } else
-        qcopy(object + 0x10, f.predicted);
+        qcopy(object + 0x10, scratch.predicted);
 }
 
 #undef I

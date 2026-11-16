@@ -11,7 +11,7 @@ extern char g_pause_link_third[];
 extern char g_pause_link_second[];
 extern int g_current_map_index __attribute__((sda));
 extern int g_pause_state_word;
-extern int func_PAL_002B57C8(void);
+extern int get_pal_return_value_a(void);
 extern int menu_get_mode(void);
 extern void snd_send_cmd22(int);
 extern void music_Pause(int);
@@ -48,9 +48,10 @@ typedef struct {
     int f1F4;
 } State_2C9CF8;
 
-void func_PAL_002CAAF0(int mode)
+/* Sets up the pause menu state when the menu opens: pauses sound and music, links the pages and clears the selection fields (PAL). */
+void menu_init_pause_state_pal(int mode)
 {
-    if (func_PAL_002B57C8() != 4 || menu_get_mode() != 8)
+    if (get_pal_return_value_a() != 4 || menu_get_mode() != 8)
         ((State_2C9CF8 *)g_pause_menu_state)->f1F4 = 0;
     if (!((State_2C9CF8 *)g_pause_menu_state)->f1F4) {
         snd_send_cmd22(0x5D);

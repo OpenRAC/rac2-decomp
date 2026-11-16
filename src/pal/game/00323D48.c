@@ -12,14 +12,14 @@ extern int math_random_int_range(int, int);
 extern void vec_add_random_offset(float *, float);
 extern int coll_sweep_from_object(char *, float *, float, int, float, float, int, int, int);
 extern void *part_spawn_gravity_fade(float *, float *, float, float, float, int, int, int, int, int, int);
-extern unsigned char *func_PAL_002C23B8(float *, float *, int, int, int, int,
+extern unsigned char *part_spawn_burst_pal(float *, float *, int, int, int, int,
                                     float, float, float, float, float);
 extern unsigned char *g_particle_texture_table[];
 
 /* Effect at an object's joint: func_002A8C28 at the joint and at two points along its axis,
    three grey func_002C65A0 particles at the joint and one func_PAL_002C23B8 particle at the near
    point, which at random takes flags 0x48 and the 0x707070 tint. */
-void func_PAL_00323D48(char *object, float *position, int joint, float intensity)
+void part_spawn_joint_hit_effects_pal(char *object, float *position, int joint, float intensity)
 {
     float matrix[16] __attribute__((aligned(16)));
     float axis[4] __attribute__((aligned(16)));
@@ -58,7 +58,7 @@ void func_PAL_00323D48(char *object, float *position, int joint, float intensity
     drift[3] = 1.0f;
     FastVecAdd(drift, drift, position);
     for (j = 0; j < 1; j++) {
-        particle = func_PAL_002C23B8(near, drift, 12, 60, 0x606060, 3,
+        particle = part_spawn_burst_pal(near, drift, 12, 60, 0x606060, 3,
                                  1.05e+05f, 2.1e+04f, 1.0f, -0.0002f, 0.0f);
         if (particle) {
             particle[2] = *g_particle_texture_table[23];
@@ -85,7 +85,8 @@ extern void moby_mark_spawned(void *);
 extern int cam_moby_update_pal(char *);
 extern void moby_set_state(unsigned char *, unsigned char, int);
 
-void func_PAL_003242C8(char *object)
+/* Updates one piece of robot debris: it flies, then fades out and goes away. */
+void part_update_fading_debris_pal(char *object)
 {
     char *data = *(char **)(object + 0x68);
     *(float *)(data + 4) -= 0.012f;

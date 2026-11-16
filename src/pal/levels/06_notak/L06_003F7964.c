@@ -29,7 +29,7 @@ extern void flock_release_member(char *, char *);
 typedef struct { Vector velocity; char *owner; char *successor; short timeout; unsigned char handoff, cooldown; } FlockStatePrefix;
 
 /* Move a small flock member, separating it from walls and its live siblings. */
-void func_PAL_L06_003F7964(char *object)
+void flock_member_update_pal(char *object)
 {
     FlockStatePrefix *state = *(FlockStatePrefix **)(object + 0x68);
     struct { Vector old_position, probe, separation; } work;

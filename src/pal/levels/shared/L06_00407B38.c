@@ -16,7 +16,8 @@ extern int FloatToInt(float);
 extern float g_splash_burst_data MACRO_ADDR;
 extern char g_effect_vector[] MACRO_ADDR;
 
-void func_PAL_L06_00407B38(void *unused, void *position)
+/* Spawns a splash burst at a position: sixteen spark particles thrown upward and sixteen tinted splash effects (PAL: velocities and lifetimes scaled for 50 Hz). */
+void part_spawn_splash_burst_pal(void *unused, void *position)
 {
     float vector[4];
     float angle, radius;

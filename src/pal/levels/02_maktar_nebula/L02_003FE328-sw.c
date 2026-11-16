@@ -1,5 +1,6 @@
 #include "include_asm.h"
 #include "names.h"
+#include "moby_classes.h"
 
 typedef unsigned char u8;
 typedef unsigned short u16;
@@ -34,14 +35,14 @@ extern void chainblade_set_helper(char *, char *);
 extern void chainblade_advance_health_phase(char *);
 extern int moby_has_free_child_slot_state2(char *);
 extern void brawler_set_watched_entity(char *, char *);
-extern void func_PAL_L00_003E38E8(int, int);
+extern void tracked_moby_set_state_pal(int, int);
 extern int arena_get_challenge_progress_index(int);
 extern int arena_get_challenge_save_index(int);
 extern void blast_call_helper_no_args(char *);
 extern void arena_tick_controller_pal(char *);
 extern void arena_reset_controller(char *);
-extern void func_PAL_L02_003FF718(char *);
-extern void func_PAL_L02_003FF858(char *);
+extern void arena_start_enemy_tally_pal(char *);
+extern void arena_update_enemy_tally_pal(char *);
 extern int arena_claim_enemy(char *, int);
 extern char * arena_claim_boss(char *, int, int);
 extern void actor_pick_watched_entity(char *);
@@ -57,20 +58,20 @@ extern void actor_update_helper_offsets_pal(char *);
 extern int arena_l02_is_wave_complete(char *);
 extern void scene_start_count_views_pal(char *, int);
 extern void arena_run_scenery_setup(char *);
-extern void func_PAL_L02_00401980(char *);
-extern void func_PAL_L02_00401EC8(char *);
+extern void arena_command_group_attacks_pal(char *);
+extern void cutscene_setup_camera_pal(char *);
 extern void arena_check_hero_at_console(char *);
 extern void arena_update_challenge_menu_pal(char *);
 extern void DrawMaktarChallengeHud(char *);
-extern void func_PAL_L02_00403FA0(char *);
-extern void func_PAL_L02_004042C0(char *);
+extern void moby_try_alloc_enter_state2_pal(char *);
+extern void menu_select_next_usable_pal(char *);
 extern void DrawRadialQuadEffect_pal(char *);
 extern void gfx_draw_screen_wipe(char *);
 extern int arena_start_announcer_message(char *, int);
 extern void actor_pick_watched_message(char *);
 extern void arena_notify_mobys_challenge_start_pal(void);
 extern void part_queue_moby_for_glow(char *, int, void (*)(char *));
-extern void func_PAL_L00_004071F0(int, int);
+extern void global_object_start_pal(int, int);
 extern void SetCamera5Pose(void *, void *, int, int, int);
 extern void cam_set_mode_state(int);
 extern unsigned char g_arena_choice_enabled __attribute__((section(".data")));
@@ -138,7 +139,7 @@ typedef struct MaktarState {
     s32 volume;           
     u8 pad22C[4];
     s32 track;            
-    s32 trackVolume;      
+    s32 track_volume;      
 } MaktarState;
 typedef struct MaktarObj {
     u8 pad00[0x20];
@@ -169,9 +170,10 @@ typedef union { u8 b[0x2600]; s16 h[0x1300]; s32 i[0x980]; float f[0x980]; void 
 #define P(p,o) (*(char **)((p)+(o)))
 #define OBJ ((MaktarObj *)actor)
 
+/* Runs the Maktar arena: state machine for entering, choosing and playing a challenge, tallying waves, spawning enemies and bosses, and ending (PAL timings). */
 void UpdateArenaController_pal(char *actor) {
     MaktarState *st = OBJ->st;
-    float f;
+    float fade_ratio;
     float pos[4];
     char text[112];
     blast_call_helper_no_args(actor);
@@ -194,10 +196,10 @@ void UpdateArenaController_pal(char *actor) {
         if (coll_point_inside_record_volume(g_hero_position,st->zone)) moby_set_state(actor,4,-1);
         else if (IsPointInCuboid(g_hero_position,st->trigger1)) {
             TryClaimNotice(4,0xE61,1);
-            func_PAL_L02_00403FA0(actor);
+            moby_try_alloc_enter_state2_pal(actor);
         } else if (g_game_flag_table[arena_get_challenge_save_index(0)] && coll_point_inside_record_volume(g_hero_position,st->trigger2)) {
             TryClaimNotice(4,0xE61,1);
-            func_PAL_L02_00403FA0(actor);
+            moby_try_alloc_enter_state2_pal(actor);
         }
         if (g_arena_state_flag[0] == 2) {
             g_arena_state_flag[0] = 0;
@@ -217,10 +219,10 @@ void UpdateArenaController_pal(char *actor) {
         }
         if (OBJ->phase==0) {
             if (OBJ->timer<26) {
-                f=IntToFloat(OBJ->timer)*0.05882353f;
-                if (f<1.0f) f=IntToFloat(OBJ->timer)*0.05882353f;
-                else f=1.0f;
-                g_grab_highlight_level=f;
+                fade_ratio=IntToFloat(OBJ->timer)*0.05882353f;
+                if (fade_ratio<1.0f) fade_ratio=IntToFloat(OBJ->timer)*0.05882353f;
+                else fade_ratio=1.0f;
+                g_grab_highlight_level=fade_ratio;
                 break;
             }
             st->fade=g_arena_fade_value;
@@ -244,9 +246,9 @@ void UpdateArenaController_pal(char *actor) {
                 OBJ->timer=0;
                 break;
             }
-            goto beginApproach;
+            goto begin_approach;
         } else if (OBJ->phase==1 && OBJ->timer>=51 && g_arena_state_words[0]!=2) {
-        beginApproach:
+        begin_approach:
             OBJ->phase=3;
             hero_start_loader_state(0);
             hero_start_target_state(arena_get_camera_point(actor),0,0.0f);
@@ -277,7 +279,7 @@ void UpdateArenaController_pal(char *actor) {
             arena_match_active_count_a(actor,0); arena_match_active_count_b(actor,0);
             hero_reset_position_and_direction_pal(arena_get_camera_point(actor),g_zero_l02_vector,0x6f,1);
             level_capture_checkpoint_state(g_hero_position,g_hero_position+0x10);
-            func_PAL_L02_00401EC8(actor);
+            cutscene_setup_camera_pal(actor);
         }
         arena_check_hero_at_console(actor); HERO->f[0x24A4/4]=200.0f;
         break;
@@ -309,7 +311,7 @@ void UpdateArenaController_pal(char *actor) {
             case 1: case 2: case 4: case 5: case 6: case 10: arena_start_announcer_message(actor,math_random_int_below(2)+11); break;
             }
         }
-        func_PAL_L02_004042C0(actor);
+        menu_select_next_usable_pal(actor);
         break;
     case 7: {
         int choice;
@@ -326,8 +328,8 @@ void UpdateArenaController_pal(char *actor) {
         break;
     }
     case 8: {
-        char *row, *e;
-        int n, spawned, allowed;
+        char *row, *list_moby;
+        int frame_count, spawned, allowed;
         arena_get_challenge_save_index(0);
         if (flag_set_first_pending(actor)) {
             int i, k;
@@ -335,7 +337,7 @@ void UpdateArenaController_pal(char *actor) {
             st->wave=0;
             for(k=0;k<6;k++) st->counts[k]=0;
             st->frames=0; st->lost=0;
-            arena_run_scenery_setup(actor); func_PAL_L02_003FF718(actor); func_PAL_L02_00401980(actor);
+            arena_run_scenery_setup(actor); arena_start_enemy_tally_pal(actor); arena_command_group_attacks_pal(actor);
             row=P(g_arena_challenge_table_2[st->cls],4);
             row+=st->wave*20;
             arena_match_active_count_a(actor,H(row,10)); arena_match_active_count_b(actor,H(row,8));
@@ -347,7 +349,7 @@ void UpdateArenaController_pal(char *actor) {
             { char *g=g_hero_state; W(g,0x24cc)=g_current_map_index[4]; }
             arena_notify_mobys_challenge_start_pal();
         }
-        func_PAL_L02_003FF858(actor);
+        arena_update_enemy_tally_pal(actor);
         if (arena_l02_is_wave_complete(actor)) {
             int i, cls1;
             unsigned int cls3;
@@ -361,20 +363,20 @@ void UpdateArenaController_pal(char *actor) {
             st->owner=0;
             if(st->wave>=H(g_arena_challenge_table_2[cls1],0)) {
                 if(cls3-7U<2 || cls1==13) g_moby_class_state_word=g_saved_hero_flag;
-                func_PAL_L00_003E38E8(1,-1); func_PAL_L00_004071F0(1,-1);
+                tracked_moby_set_state_pal(1,-1); global_object_start_pal(1,-1);
                 if(!st->cls && !g_game_flag_table[arena_get_challenge_save_index(0)]) moby_set_state(actor,11,-1);
                 else moby_set_state(actor,5,-1);
                 st->result=st->cls;
                 return;
             }
             if(cls1>=14) st->cls=13;
-            func_PAL_L02_00401980(actor);
+            arena_command_group_attacks_pal(actor);
             row=P(g_arena_challenge_table_2[st->cls],4);
             row+=st->wave*20;
             arena_match_active_count_a(actor,H(row,10)); arena_match_active_count_b(actor,H(row,8));
         }
-        n=++st->frames;
-        if((st->cls==3 && n>=1501) || (st->cls==5 && n>=3001)) {
+        frame_count=++st->frames;
+        if((st->cls==3 && frame_count>=1501) || (st->cls==5 && frame_count>=3001)) {
             char *format, *buffer, *a, *b;
             int sum=0, j, count;
             buffer=text;
@@ -385,31 +387,31 @@ void UpdateArenaController_pal(char *actor) {
             b=GetLocalizedString(0xE86);
             sprintf(buffer,format,a,count,b);
             level_l00_call_module_handler_with_arg_9_pal(buffer,-1);
-            moby_set_state(actor,10,-1); func_PAL_L00_003E38E8(1,-1); func_PAL_L00_004071F0(1,-1);
+            moby_set_state(actor,10,-1); tracked_moby_set_state_pal(1,-1); global_object_start_pal(1,-1);
             return;
         }
         if(st->cls==7 && g_weapon_slot==30 && g_arena_timer_a<=0) {
             allowed=1;
-            for(e=g_moby_l02_list_head[0];e;e=P(e,0x28)) {
-                if(B(e,0x20)==0xfe) continue;
-                if(B(e,0x20)==0xfd) continue;
-                if(H(e,0xaa)==0xc89 || H(e,0xaa)==0xbfe) allowed=0;
+            for(list_moby=g_moby_l02_list_head[0];list_moby;list_moby=P(list_moby,0x28)) {
+                if(B(list_moby,0x20)==0xfe) continue;
+                if(B(list_moby,0x20)==0xfd) continue;
+                if(H(list_moby,0xaa)==0xc89 || H(list_moby,0xaa)==0xbfe) allowed=0;
             }
             if(allowed) {
                 level_l00_call_module_handler_with_arg_9_pal(GetLocalizedString(0x1B39),-1);
-                moby_set_state(actor,10,-1); func_PAL_L00_003E38E8(1,-1); func_PAL_L00_004071F0(1,-1);
+                moby_set_state(actor,10,-1); tracked_moby_set_state_pal(1,-1); global_object_start_pal(1,-1);
                 return;
             }
         } else if(st->cls==8 && g_weapon_slot==42 && g_arena_timer_b<=0) {
             allowed=1;
-            for(e=g_moby_l02_list_head[0];e;e=P(e,0x28)) {
-                if(B(e,0x20)==0xfe) continue;
-                if(B(e,0x20)==0xfd) continue;
-                if((unsigned short)(U(e,0xaa)-0xc06)<=1) allowed=0;
+            for(list_moby=g_moby_l02_list_head[0];list_moby;list_moby=P(list_moby,0x28)) {
+                if(B(list_moby,0x20)==0xfe) continue;
+                if(B(list_moby,0x20)==0xfd) continue;
+                if((unsigned short)(U(list_moby,0xaa)-0xc06)<=1) allowed=0;
             }
             if(allowed) {
                 level_l00_call_module_handler_with_arg_9_pal(GetLocalizedString(0x1B3A),-1);
-                moby_set_state(actor,10,-1); func_PAL_L00_003E38E8(1,-1); func_PAL_L00_004071F0(1,-1);
+                moby_set_state(actor,10,-1); tracked_moby_set_state_pal(1,-1); global_object_start_pal(1,-1);
                 return;
             }
         } else if(st->cls==12) {
@@ -417,19 +419,19 @@ void UpdateArenaController_pal(char *actor) {
                 { MaktarFlags *g=(MaktarFlags *)g_hero_effect_state; if(g->owner==st->owner) g->owner=0; }
                 st->owner=0;
                 level_l00_call_module_handler_with_arg_9_pal(GetLocalizedString(0x1B38),-1);
-                moby_set_state(actor,10,-1); func_PAL_L00_003E38E8(1,-1); func_PAL_L00_004071F0(1,-1);
+                moby_set_state(actor,10,-1); tracked_moby_set_state_pal(1,-1); global_object_start_pal(1,-1);
                 return;
             }
             if(st->frames>=6001) {
                 part_queue_moby_for_glow(st->owner,0,chainblade_reset_to_idle);
                 { MaktarFlags *g=(MaktarFlags *)g_hero_effect_state; if(g->owner==st->owner) g->owner=0; }
                 st->owner=0;
-                moby_set_state(actor,5,-1); func_PAL_L00_003E38E8(1,-1); func_PAL_L00_004071F0(1,-1);
+                moby_set_state(actor,5,-1); tracked_moby_set_state_pal(1,-1); global_object_start_pal(1,-1);
                 return;
             }
         } else if(st->cls==13 && g_request_enabled_flag<g_current_map_index[4]) {
             level_l00_call_module_handler_with_arg_9_pal(GetLocalizedString(0x1B38),-1);
-            moby_set_state(actor,10,-1); func_PAL_L00_003E38E8(1,-1); func_PAL_L00_004071F0(1,-1);
+            moby_set_state(actor,10,-1); tracked_moby_set_state_pal(1,-1); global_object_start_pal(1,-1);
             return;
         }
         gfx_add_draw_callback_first(DrawMaktarChallengeHud,actor);
@@ -438,31 +440,31 @@ void UpdateArenaController_pal(char *actor) {
         arena_clear_spawn_slots(actor); spawned=0; actor_pick_watched_entity(actor);
         if(st->slots[st->slot] && moby_has_free_child_slot_state2(st->slots[st->slot])) {
             int i;
-            for(i=st->counts[3];i<H(row,6);i++) spawned|=arena_claim_enemy(actor,0xc3e);
+            for(i=st->counts[3];i<H(row,6);i++) spawned|=arena_claim_enemy(actor,MOBY_CLASS_PX6_BLADEBALL);
             for(i=st->counts[1];i<H(row,2);i++) spawned|=arena_claim_enemy(actor,0xb22);
-            for(i=st->counts[2];i<H(row,4);i++) spawned|=arena_claim_enemy(actor,0xc3b);
+            for(i=st->counts[2];i<H(row,4);i++) spawned|=arena_claim_enemy(actor,MOBY_CLASS_MEGACORP_SECURITY_ROBOT_FLAMETHROWER);
             for(i=st->counts[0];i<H(row,0);i++) spawned|=arena_claim_enemy(actor,0x9ca);
         }
         if(!st->counts[4] && B(row,16) && !st->counts[5] && B(row,17)) {
             char *a, *b;
-            a=arena_claim_boss(actor,0x9f8,0); b=arena_claim_boss(actor,0xa44,1);
+            a=arena_claim_boss(actor,MOBY_CLASS_CHAINBLADE,0); b=arena_claim_boss(actor,MOBY_CLASS_B2_BRAWLER_LEGS,1);
             chainblade_set_helper(a,b); brawler_set_watched_entity(b,a); chainblade_advance_health_phase(a); st->owner=a;
             { MaktarFlags *g=(MaktarFlags *)g_hero_effect_state; if(!g->owner) { g->owner=a; g->timer=0; } }
             if(!g_boss_owner_slots[0]) { g_boss_owner_slots[0]=a; mem_clear(g_boss_damage_totals,0,224); }
             if(!g_boss_owner_slots[1]) { char *buf=g_boss_damage_totals; g_boss_owner_slots[1]=b; mem_clear(buf+224,0,224); }
-            arena_start_announcer_message(actor,15); script_queue_keyed_request(st->track,st->trackVolume);
+            arena_start_announcer_message(actor,15); script_queue_keyed_request(st->track,st->track_volume);
         } else if(!st->counts[4] && B(row,16)) {
             char *a;
-            a=arena_claim_boss(actor,0x9f8,0); st->owner=a;
+            a=arena_claim_boss(actor,MOBY_CLASS_CHAINBLADE,0); st->owner=a;
             { MaktarFlags *g=(MaktarFlags *)g_hero_effect_state; if(!g->owner) { g->owner=a; g->timer=0; } }
             { char *snd=st->owner; if(!g_boss_owner_slots[0]) { g_boss_owner_slots[0]=snd; mem_clear(g_boss_damage_totals,0,224); } }
-            arena_start_announcer_message(actor,14); script_queue_keyed_request(st->track,st->trackVolume);
+            arena_start_announcer_message(actor,14); script_queue_keyed_request(st->track,st->track_volume);
         } else if(!st->counts[5] && B(row,17)) {
             char *a;
-            a=arena_claim_boss(actor,0xa44,0); st->owner=a;
+            a=arena_claim_boss(actor,MOBY_CLASS_B2_BRAWLER_LEGS,0); st->owner=a;
             { MaktarFlags *g=(MaktarFlags *)g_hero_effect_state; if(!g->owner) { g->owner=a; g->timer=0; } }
             { char *snd=st->owner; if(!g_boss_owner_slots[1]) { char *buf=g_boss_damage_totals; g_boss_owner_slots[1]=snd; mem_clear(buf+224,0,224); } }
-            arena_start_announcer_message(actor,20); script_queue_keyed_request(st->track,st->trackVolume);
+            arena_start_announcer_message(actor,20); script_queue_keyed_request(st->track,st->track_volume);
         }
         if(!U(row,16)) { char *g=g_music_state; if(B(g,0x48)!=st->music && B(g,0x3c)!=st->music) script_queue_keyed_request(st->music,st->volume); }
         if(spawned) arena_activate_spawn_slots(actor);

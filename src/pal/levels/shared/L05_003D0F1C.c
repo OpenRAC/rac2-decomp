@@ -5,7 +5,7 @@
 extern int math_random_int_below(int);
 
 /* func_PAL_L05_003D1160, the PAL copy of func_L05_003CD4C0: the same C, where the alpha steps take PAL's 50 Hz scale. */
-void func_PAL_L05_003D1160(char *object)
+void moby_init_private_vars_pal(char *object)
 {
     char *state = *(char **)(object + 0x68);
     float *f = (float *)state;
@@ -43,15 +43,16 @@ typedef struct { unsigned char pad[9]; unsigned char fade; } Sprite_L05_003CD598
 extern Sprite_L05_003CD598 *part_spawn_fading(void *, void *, int, int, int, int, int, float);
 typedef struct { float phase[4]; float rate[4]; int alpha[4]; float size[4]; } GlowState_L05_003CD598;
 
-void func_PAL_L05_003D1248(unsigned char *a0)
+/* Draws the glow sprites of a pickup: four fading sprites trailing behind it (PAL: 50 Hz timings). */
+void pickup_draw_glow_sprites_pal(unsigned char *moby)
 {
-    GlowState_L05_003CD598 *st = *(GlowState_L05_003CD598 **)(a0 + 0x68);
+    GlowState_L05_003CD598 *st = *(GlowState_L05_003CD598 **)(moby + 0x68);
     float m[4];
     float q[4];
     float src[4];
     int i;
 
-    *(V4_L05_003CD598 *)src = *(V4_L05_003CD598 *)(a0 + 0x10);
+    *(V4_L05_003CD598 *)src = *(V4_L05_003CD598 *)(moby + 0x10);
     src[2] += 0.25f;
     FastVecSub(m, ref_L05_003CD598_00, src);
     vec_scale_to_length(m, m, -0.3f);

@@ -56,7 +56,8 @@ typedef struct {
 
 extern int g_pad_pressed_flags;
 
-extern void func_PAL_L22_002B7B08(void);
+/* Sets the hero's speed targets for its current mode and state, then eases the current speeds toward them (PAL: 50 Hz rates). */
+extern void hero_l22_update_speed_targets_pal(void);
 
 /* the three routines the tuning table points at; their places differ per level */
 typedef unsigned char u8;
@@ -75,60 +76,60 @@ extern float vec_distance_xy(void *, void *);
 extern float ApproachValue(float *, float, float);
 extern float math_spring_float_to_goal(float *, float *, float, float, float, float);
 
-void func_PAL_L22_002B7B08(void) {
-    char *g = g_hero_state;
-    switch (*(u8 *)(g + 0x22B4)) {
+void hero_l22_update_speed_targets_pal(void) {
+    char *hero = g_hero_state;
+    switch (*(u8 *)(hero + 0x22B4)) {
     case 0:
-        *(float *)(g + 0x258) = 0.8f;
-        *(float *)(g + 0x25C) = 0.7f;
-        *(float *)(g + 0x260) = 0.45f;
+        *(float *)(hero + 0x258) = 0.8f;
+        *(float *)(hero + 0x25C) = 0.7f;
+        *(float *)(hero + 0x260) = 0.45f;
         break;
     case 1:
-        *(float *)(g + 0x258) = 0.59999996f;
-        *(float *)(g + 0x25C) = 0.45000002f;
-        *(float *)(g + 0x260) = 0.3f;
+        *(float *)(hero + 0x258) = 0.59999996f;
+        *(float *)(hero + 0x25C) = 0.45000002f;
+        *(float *)(hero + 0x260) = 0.3f;
         break;
     case 2:
-        *(float *)(g + 0x258) = 5.25f;
-        *(float *)(g + 0x25C) = 4.45f;
-        *(float *)(g + 0x260) = 3.75f;
+        *(float *)(hero + 0x258) = 5.25f;
+        *(float *)(hero + 0x25C) = 4.45f;
+        *(float *)(hero + 0x260) = 3.75f;
         break;
     }
     {
-        char *g = g_hero_state;
-        if (*(int *)(g + 0x229C) == 4) {
-            if (*(short *)(g + 0x4AC) < *(int *)(g + 0x1B8) && !*(u8 *)(g + 0x49E))
-                *(float *)(g + 0x25C) = *(float *)(g + 0x4B8);
-        } else if (*(int *)(g + 0x2294) == 6) {
-            *(float *)(g + 0x25C) = 0.5f;
-        } else if (*(int *)(g + 0x2294) == 4) {
-            *(float *)(g + 0x258) = 0.35000002f;
-        } else if ((unsigned)(*(int *)(g + 0x229C) - 17) < 2) {
-            *(float *)(g + 0x258) = 0;
-            *(float *)(g + 0x25C) = 0;
-        } else if (*(u8 *)(g + 0x1492) && *(int *)(g + 0x340)) {
-            *(float *)(g + 0x258) = 0.8f;
-            *(float *)(g + 0x25C) = 0.9f;
+        char *hero = g_hero_state;
+        if (*(int *)(hero + 0x229C) == 4) {
+            if (*(short *)(hero + 0x4AC) < *(int *)(hero + 0x1B8) && !*(u8 *)(hero + 0x49E))
+                *(float *)(hero + 0x25C) = *(float *)(hero + 0x4B8);
+        } else if (*(int *)(hero + 0x2294) == 6) {
+            *(float *)(hero + 0x25C) = 0.5f;
+        } else if (*(int *)(hero + 0x2294) == 4) {
+            *(float *)(hero + 0x258) = 0.35000002f;
+        } else if ((unsigned)(*(int *)(hero + 0x229C) - 17) < 2) {
+            *(float *)(hero + 0x258) = 0;
+            *(float *)(hero + 0x25C) = 0;
+        } else if (*(u8 *)(hero + 0x1492) && *(int *)(hero + 0x340)) {
+            *(float *)(hero + 0x258) = 0.8f;
+            *(float *)(hero + 0x25C) = 0.9f;
         } else {
-            char *g = g_hero_state;
-            if (*(int *)(g + 0x2294) == 0x7C)
-                *(float *)(g + 0x260) = 0.8f;
+            char *hero = g_hero_state;
+            if (*(int *)(hero + 0x2294) == 0x7C)
+                *(float *)(hero + 0x260) = 0.8f;
         }
     }
     {
-        char *g = g_hero_state;
-        if (*(u8 *)(g + 0x287) && *(int *)(g + 0x22A4) != 18 && *(int *)(g + 0x22B0) != 18 &&
-            (*(u8 *)(g + 0x22B4) != 0 || !(*(float *)(g + 0x254) < 0.53f)) &&
-            *(int *)(g + 0x229C) != 17 && !*(u8 *)(g + 0x1494) &&
-            !(vec_distance_xy(g + 0x240, g + 0x80) > *(float *)(g + 0x264) * 0.5f))
+        char *hero = g_hero_state;
+        if (*(u8 *)(hero + 0x287) && *(int *)(hero + 0x22A4) != 18 && *(int *)(hero + 0x22B0) != 18 &&
+            (*(u8 *)(hero + 0x22B4) != 0 || !(*(float *)(hero + 0x254) < 0.53f)) &&
+            *(int *)(hero + 0x229C) != 17 && !*(u8 *)(hero + 0x1494) &&
+            !(vec_distance_xy(hero + 0x240, hero + 0x80) > *(float *)(hero + 0x264) * 0.5f))
             return;
     }
     {
-        float *speeds = (float *)(g_hero_state + 0x250);
-        char *g = (char *)speeds - 0x250;
-        ApproachValue(speeds, *(float *)(g + 0x258), 0.024f);
-        ApproachValue(speeds + 1, *(float *)(g + 0x25C), 0.024f);
-        math_spring_float_to_goal(speeds + 5, speeds + 6, *(float *)(g + 0x260), 0.028800001f, 0.43200004f, 0.080000006f);
+        float *speed_targets = (float *)(g_hero_state + 0x250);
+        char *hero = (char *)speed_targets - 0x250;
+        ApproachValue(speed_targets, *(float *)(hero + 0x258), 0.024f);
+        ApproachValue(speed_targets + 1, *(float *)(hero + 0x25C), 0.024f);
+        math_spring_float_to_goal(speed_targets + 5, speed_targets + 6, *(float *)(hero + 0x260), 0.028800001f, 0.43200004f, 0.080000006f);
     }
 }
 

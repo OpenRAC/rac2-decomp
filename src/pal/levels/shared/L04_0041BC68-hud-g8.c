@@ -91,7 +91,7 @@ extern void menu_draw_box_two_labels();
 extern void DrawRaceTimerHud(u8 *);
 extern void GetAnimationPathPoint(void *, void *, int, int, void *, void *, void *);
 
-typedef struct { char pad[0x1C4]; s32 m1C4, m1C8, m1CC, m1D0; float m1D4; s32 m1D8, m1DC, m1E0; } Marker;
+typedef struct { char pad[0x1C4]; s32 unk_1C4, unk_1C8, unk_1CC, unk_1D0; float unk_1D4; s32 unk_1D8, unk_1DC, unk_1E0; } Marker;
 #define OM(o) ((Marker *)(o))
 #define I(b, o) (*(s32 *)((b) + (o)))
 #define F(b, o) (*(float *)((b) + (o)))
@@ -253,9 +253,10 @@ static __inline__ int label_y5(void *handle, float value, float scale, float hal
 
 /* FAKEMATCH: order hint (owner ruling, 14 November 2026): the marker heading is loaded before the
    heading call's result is copied out of $f0, so local-alloc gives it $f1 and the result keeps $f0;
-   in both func_002AA548 calls &tmp goes to $a0 before $a1 is set. */
+   in both func_002AA548 calls &step_value goes to $a0 before $a1 is set. */
+/* Draws the race ruler HUD: the rank rows and the racer markers along the ruler (PAL). */
 #pragma rac2_sched1_order 3322 3319 3403 3405 3460 3462
-s32 func_PAL_L04_0041BC68(void)
+s32 hud_draw_race_ruler_pal(void)
 {
     T4 A = g_race_ruler_quad_a;
     T4 B = g_race_ruler_quad_b;
@@ -267,15 +268,15 @@ s32 func_PAL_L04_0041BC68(void)
     u8 *e;
     char buf[16];
     Vec m[4];
-    Vec v90[4];
-    Vec vD0, vE0, vF0;
-    float tmp;
+    Vec vec_90[4];
+    Vec vec_D0, vec_E0, vec_F0;
+    float step_value;
     s32 sy, sy2, sy3;
     Vec *m2; /* FAKEMATCH: named &m[2] declared before hp: its alter_reg slot 0x114 precedes hp's 0x118 */
     u8 *hp;
     s32 *psy, *psy2; /* FAKEMATCH: named &sy and &sy2 declared before pa, pb and arr: their slots 0x11C and 0x120 precede pa's 0x124 */
     u8 *pa, *pb, *arr;
-    float fr, fs, fm, fe, f21, fa, fd;
+    float fr, fs, fm, fe, route_heading, fa, fd;
     int n33, n20, ne, i, col, idx, v, va, v3, vy;
     int j;
     int one;
@@ -357,21 +358,21 @@ s32 func_PAL_L04_0041BC68(void)
         if (I(p, 0x360) != 0) {
             float fr;
             va = A.v[I(p, 0x360) - 1];
-            vF0.i[0] = va;
-            vF0.i[1] = va;
-            vF0.i[2] = va;
-            vF0.i[3] = va;
+            vec_F0.i[0] = va;
+            vec_F0.i[1] = va;
+            vec_F0.i[2] = va;
+            vec_F0.i[3] = va;
             idx = 0;
             switch (I(p, 0x360)) {
             case 1: idx = 0; break;
             case 2: idx = 1; break;
             case 3: idx = 2; break;
             }
-            hud_draw_sprite_gradient(GetIconFrame(0x7568, idx), 0x3E, HC(17.0f), 0x28, HC(35.0f), &vF0);
+            hud_draw_sprite_gradient(GetIconFrame(0x7568, idx), 0x3E, HC(17.0f), 0x28, HC(35.0f), &vec_F0);
             fr = (float)I(p, 0x364) / (float)C.v[I(p, 0x360)];
             if (fr > 1.0f) fr = 1.0f;
             if (fr < 0.0f) fr = 0.0f;
-            gfx_draw_screen_rectangle(0x6F, HC(28.0f), (int)(fr * 91.0f) + 0x6F, HC(41.0f), 0xFFFFF0, &vF0);
+            gfx_draw_screen_rectangle(0x6F, HC(28.0f), (int)(fr * 91.0f) + 0x6F, HC(41.0f), 0xFFFFF0, &vec_F0);
         }
         n33 = I(p, 0x33C);
         if (n33 > 0) {
@@ -397,12 +398,12 @@ s32 func_PAL_L04_0041BC68(void)
             fa = (float)I(p, 0x338) * 0.005f;
         if (fa > 1.0f) fa = 1.0f;
         if (fa < 0.0f) fa = 0.0f;
-        vF0.i[0] = 0x603F00B2;
-        vF0.i[1] = 0x603F00B2;
-        vF0.i[2] = 0x603F00B2;
-        vF0.i[3] = 0x603F00B2;
+        vec_F0.i[0] = 0x603F00B2;
+        vec_F0.i[1] = 0x603F00B2;
+        vec_F0.i[2] = 0x603F00B2;
+        vec_F0.i[3] = 0x603F00B2;
         gfx_draw_screen_rectangle(0x1A, bar_y((float)(0x62 - (int)(fa * 74.0f))), 0x26, bar_y(98.0f), 0xFFFFF0,
-                      &vF0);
+                      &vec_F0);
         }
         { void *spr = (void *)(u32)table_find_by_id((void *)(u32)(g_popup_resource_table + 0x8710), 0x3F); gfx_draw_scaled_object_two_axes(spr, 498.0f, 0x60442D00, (float)LY(spr, 10.0f), 1.0f, 1.0f, 0.0f); }
         { void *spr = (void *)(u32)table_find_by_id((void *)(u32)(g_popup_resource_table + 0x8710), 0x40); gfx_draw_scaled_object_two_axes(spr, 498.0f, 0x55F0C070, (float)LY(spr, 10.0f), 1.0f, 1.0f, 0.0f); }
@@ -440,17 +441,17 @@ s32 func_PAL_L04_0041BC68(void)
         AppendScreenRectPacket(0x160, HC(45.0f), 0x1AB, HC(46.0f), 0x25F0C070, 0);
         one3 = 1; /* FAKEMATCH: before i = 0 so one3 is born before the &vF0 copy dies */
         i = 0;
-        FastVecScale(&vD0, h + 0xC0, F(p, 0x30C) + F(p, 0x27C));
+        FastVecScale(&vec_D0, h + 0xC0, F(p, 0x30C) + F(p, 0x27C));
         hp = h + 0x10;
-        transform_vector(&vE0, &vD0, m);
+        transform_vector(&vec_E0, &vec_D0, m);
         arr = p + 0x1E4;
-        fd = FastVecDot(&vE0, &g_route_frame_delta);
+        fd = FastVecDot(&vec_E0, &g_route_frame_delta);
         pa = p + 0x494;
         pb = p + 0x498;
-        FastVecScale(&vD0, &g_route_frame_delta, fd);
-        add_vectors(&vF0, &vE0, &vD0);
-        ApproachValue(&g_race_ruler_scroll_offset, vE0.f[0] * -1.25f, 0.060000002f);
-        psy = (s32 *)&tmp; /* FAKEMATCH: dead store, overwritten next: its &tmp, the first, gives tmp its frame slot (0x100) ahead of sy and sy2 */
+        FastVecScale(&vec_D0, &g_route_frame_delta, fd);
+        add_vectors(&vec_F0, &vec_E0, &vec_D0);
+        ApproachValue(&g_race_ruler_scroll_offset, vec_E0.f[0] * -1.25f, 0.060000002f);
+        psy = (s32 *)&step_value; /* FAKEMATCH: dead store, overwritten next: its &step_value, the first, gives step_value its frame slot (0x100) ahead of sy and sy2 */
         psy = &sy; /* FAKEMATCH: set-once &sy, see decl */
         psy2 = &sy2; /* FAKEMATCH: set-once &sy2, see decl */
         m2 = &m[2]; /* FAKEMATCH: set-once &m[2], see decl */
@@ -486,16 +487,16 @@ s32 func_PAL_L04_0041BC68(void)
                 AppendScreenRectPacket(sy, top, sy + 1, hud_coord_a(55.0f, g_race_hud_layout_scale, rh, one3), mcol, 0);
             }
         }
-        FastVecSub(&vE0, hp, g_route_frame_origin);
-        transform_vector(&vD0, &vE0, m);
-        fa = vD0.f[1] * 0.2f;
+        FastVecSub(&vec_E0, hp, g_route_frame_origin);
+        transform_vector(&vec_D0, &vec_E0, m);
+        fa = vec_D0.f[1] * 0.2f;
         if (fa > 1.0f)
             fa = 1.0f;
         if (fa < -1.0f)
             fa = -1.0f;
         sy3 = (int)(fa * 13.0f) + 0x24;
         obj = (u8 *)(u32)table_find_by_id((void *)(u32)(g_popup_resource_table + 0x8710), 0x3E);
-        f21 = mat_fast_helper_a(g_route_frame_delta, D_L04_001B31A0_view[1]);
+        route_heading = mat_fast_helper_a(g_route_frame_delta, D_L04_001B31A0_view[1]);
         j = 0;
         none = -1; /* FAKEMATCH: set-once -1 after j = 0 puts j's daddu fp before the hoisted -1 (0x1070/0x1090) */
         one2 = 1;
@@ -507,10 +508,10 @@ s32 func_PAL_L04_0041BC68(void)
                 e = g_moby_l04_pool + (ne << 8);
                 o = *(u8 **)(e + 0x68);
                 if (e[0x20] == 2 || h[0xBC] == one2 || h[0xBC] == 3) {
-                    FastVecSub(&vE0, e + 0x10, g_route_frame_origin);
-                    transform_vector(&vD0, &vE0, m);
-                    sy = (int)(vD0.f[0] + vD0.f[0]) + 0x183;
-                    vy = (int)(vD0.f[1] * 4.0f);
+                    FastVecSub(&vec_E0, e + 0x10, g_route_frame_origin);
+                    transform_vector(&vec_D0, &vec_E0, m);
+                    sy = (int)(vec_D0.f[0] + vec_D0.f[0]) + 0x183;
+                    vy = (int)(vec_D0.f[1] * 4.0f);
                     sy2 = vy + 0x24;
                     if ((u32)(vy + 0xD) < 0x1B && sy < 0x1A5 && sy >= 0x168) {
                         if (sy < 0x173)
@@ -527,49 +528,49 @@ s32 func_PAL_L04_0041BC68(void)
                         }
                         mcol = FastTweenColor(0x100040E4, 0x600040E4, fm);
                         {
-                        float t = fast_subtract_rotations(f21, F(e, 0xF8));
-                        float cur = OM(o)->m1D4; /* FAKEMATCH: set-once copy: the heading is read before tmp is stored */
+                        float t = fast_subtract_rotations(route_heading, F(e, 0xF8));
+                        float cur = OM(o)->unk_1D4; /* FAKEMATCH: set-once copy: the heading is read before step_value is stored */
 
-                        tmp = t;
+                        step_value = t;
                         if (cur == -1.0f)
-                            OM(o)->m1D4 = t;
+                            OM(o)->unk_1D4 = t;
                         else
                             math_approach_target_with_direction_mode(o + 0x1D4, t, 0.0033510327f, 0.0033510327f, 4.712389f,
                                           o + 0x1E0, 0);
                         }
-                        v = OM(o)->m1CC;
+                        v = OM(o)->unk_1CC;
                         if (v == none) {
-                            OM(o)->m1CC = sy;
+                            OM(o)->unk_1CC = sy;
                         } else {
-                            tmp = (float)v;
-                            math_step_value_toward_target(&tmp, o + 0x1D8, (float)sy, 0.2f, 0.2f,
+                            step_value = (float)v;
+                            math_step_value_toward_target(&step_value, o + 0x1D8, (float)sy, 0.2f, 0.2f,
                                           7.0000005f);
-                            OM(o)->m1CC = (int)tmp;
+                            OM(o)->unk_1CC = (int)step_value;
                         }
-                        v = OM(o)->m1D0;
+                        v = OM(o)->unk_1D0;
                         if (v == none) {
-                            OM(o)->m1D0 = sy2;
+                            OM(o)->unk_1D0 = sy2;
                         } else {
-                            tmp = (float)v;
-                            math_step_value_toward_target(&tmp, o + 0x1DC, (float)sy2, 0.2f, 0.2f,
+                            step_value = (float)v;
+                            math_step_value_toward_target(&step_value, o + 0x1DC, (float)sy2, 0.2f, 0.2f,
                                           7.0000005f);
-                            OM(o)->m1D0 = (int)tmp;
+                            OM(o)->unk_1D0 = (int)step_value;
                         }
-                        vD0.f[1] = OM(o)->m1D4;
-                        vD0.f[0] = 0.0f;
-                        vD0.f[2] = 0.0f;
-                        euler_to_matrix(v90, &vD0);
-                        FastVecScale(v90, v90, F(obj, 0xC));
-                        FastVecScale(&v90[2], &v90[2], F(obj, 0xC));
-                        DrawNativeQuads(obj, (float)OM(o)->m1CC, (float)label_y(o, (float)OM(o)->m1D0, g_race_hud_layout_scale, half, one2),
-                                      mcol, 0.0f, v90);
+                        vec_D0.f[1] = OM(o)->unk_1D4;
+                        vec_D0.f[0] = 0.0f;
+                        vec_D0.f[2] = 0.0f;
+                        euler_to_matrix(vec_90, &vec_D0);
+                        FastVecScale(vec_90, vec_90, F(obj, 0xC));
+                        FastVecScale(&vec_90[2], &vec_90[2], F(obj, 0xC));
+                        DrawNativeQuads(obj, (float)OM(o)->unk_1CC, (float)label_y(o, (float)OM(o)->unk_1D0, g_race_hud_layout_scale, half, one2),
+                                      mcol, 0.0f, vec_90);
                     } else {
-                        OM(o)->m1D4 = -1.0f;
-                        OM(o)->m1D0 = none;
-                        OM(o)->m1CC = none;
-                        OM(o)->m1E0 = 0;
-                        OM(o)->m1D8 = 0;
-                        OM(o)->m1DC = 0;
+                        OM(o)->unk_1D4 = -1.0f;
+                        OM(o)->unk_1D0 = none;
+                        OM(o)->unk_1CC = none;
+                        OM(o)->unk_1E0 = 0;
+                        OM(o)->unk_1D8 = 0;
+                        OM(o)->unk_1DC = 0;
                     }
                     GetAnimationPathPoint(psy, psy2, I(o, 0x120), I(o, 0x124), o + 0x1C4, o + 0x1C8,
                                       p);
@@ -579,7 +580,7 @@ s32 func_PAL_L04_0041BC68(void)
             }
             j++;
         } while (j < 0x15);
-        fa = fast_subtract_rotations(f21, F(h, 0xF8));
+        fa = fast_subtract_rotations(route_heading, F(h, 0xF8));
         if (F(p, 0x4A4) == -1.0f)
             F(p, 0x4A4) = fa;
         else
@@ -589,14 +590,14 @@ s32 func_PAL_L04_0041BC68(void)
         if (v3 == -1) {
             I(p, 0x4A0) = sy3;
         } else {
-            tmp = (float)v3;
-            math_step_value_toward_target(&tmp, p + 0x4AC, (float)sy3, 0.2f, 0.2f, 7.0000005f);
-            I(p, 0x4A0) = (int)tmp;
+            step_value = (float)v3;
+            math_step_value_toward_target(&step_value, p + 0x4AC, (float)sy3, 0.2f, 0.2f, 7.0000005f);
+            I(p, 0x4A0) = (int)step_value;
         }
-        vD0.f[1] = F(p, 0x4A4);
-        vD0.f[0] = 0.0f;
-        vD0.f[2] = 0.0f;
-        euler_to_matrix(m, &vD0);
+        vec_D0.f[1] = F(p, 0x4A4);
+        vec_D0.f[0] = 0.0f;
+        vec_D0.f[2] = 0.0f;
+        euler_to_matrix(m, &vec_D0);
         FastVecScale(m, m, F(obj, 0xC));
         FastVecScale(m2, m2, F(obj, 0xC));
         DrawNativeQuads(obj, (float)I(p, 0x49C), (float)label_y(obj, (float)I(p, 0x4A0), g_race_hud_layout_scale, 0.5f, 1), 0x8000A6E4, 0.0f, m);

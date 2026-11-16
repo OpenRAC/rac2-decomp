@@ -7,8 +7,9 @@ extern float mat_fast_helper_a(float, float);
 extern float fast_subtract_rotations(float, float);
 extern void moby_update_eased_node(void *, void *, int, float, float);
 extern float vec_distance_xy(const void *, const void *);
-extern void func_PAL_L20_003A1940(unsigned char *);
+extern void object_swing_along_arc_pal(unsigned char *);
 
+/* Turns the trooper toward its target, tilts it up or down to aim, then runs the move step. */
 void trooper_aim_at_target_pal(unsigned char *object) {
     Vector position;
     unsigned char *state = *(unsigned char **)(object + 0x68);
@@ -23,5 +24,5 @@ void trooper_aim_at_target_pal(unsigned char *object) {
     *(float *)(state + 0x174) = -mat_fast_helper_a(vec_distance_xy(&position, state + 0x50),
                                             *(float *)(state + 0x58) - position.f[2]);
     moby_update_eased_node(object, state + 0x110, 1, 0.0432f, 0.43200004f);
-    func_PAL_L20_003A1940(object);
+    object_swing_along_arc_pal(object);
 }

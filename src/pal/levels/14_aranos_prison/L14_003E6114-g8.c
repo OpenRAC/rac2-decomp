@@ -47,7 +47,7 @@ extern int hero_is_current_selected_id(void *);
 extern void moby_copy_pos_rot(void *, void *, void *);
 extern void moby_pass_pos_rot_to_helper(void *, void *, void *);
 extern void moby_rebuild_matrix_scaled(void *);
-extern float func_PAL_L14_003E6618(void *);
+extern float moby_get_state_progress_pal(void *);
 extern void DrawFadingField(char *self);
 extern void part_l14_spawn_flash(void *);
 
@@ -66,26 +66,26 @@ extern int g_emitter_emit_timer __attribute__((sda));
    falling run the same emitter, colour fade and draw (written out in both cases; the compiler
    cross-jumps the copies into one tail, as in retail); the on state can pass a request on to
    the linked entity when that is another field (class 0xAFE). */
-void func_PAL_L14_003E6114(FieldMob *self) {
+void prison_energy_field_update_pal(FieldMob *self) {
     float a[4] __attribute__((aligned(16)));
     float b[4] __attribute__((aligned(16)));
-    int r, g, bl, c;
-    FieldState *s = self->data;
-    unsigned char *e;
+    int red, green, blue, blended_color;
+    FieldState *state = self->data;
+    unsigned char *linked_moby;
 
     switch (self->state) {
     case 0:
-        get_moby_color(self, &r, &g, &bl);
-        s->color = (long long)(int)(0x80000000 + (bl << 16) + (g << 8)) + r;
-        if (s->mobIndex != -1) {
-            s->linked = D_L14_001B259C_base[0] + (s->mobIndex << 8);
+        get_moby_color(self, &red, &green, &blue);
+        state->color = (long long)(int)(0x80000000 + (blue << 16) + (green << 8)) + red;
+        if (state->mobIndex != -1) {
+            state->linked = D_L14_001B259C_base[0] + (state->mobIndex << 8);
         } else {
-            s->linked = 0;
+            state->linked = 0;
         }
-        s->requested = 0;
+        state->requested = 0;
         self->color = 0x80008000;
         self->flags |= 0x10;
-        if (s->proximity) {
+        if (state->proximity) {
             moby_set_state(self, 3, -1);
         } else {
             moby_set_state(self, 1, -1);
@@ -94,23 +94,23 @@ void func_PAL_L14_003E6114(FieldMob *self) {
     case 4:
         if (flag_set_first_pending(self)) {
             self->flags |= 0x100;
-            s->flags = 0;
-            s->requested = 0;
+            state->flags = 0;
+            state->requested = 0;
             self->color = 0x80000080;
-            s->timer = ((s32)(s->closeTime) * 5 + 2) / 6;
-            s->requested = 0;
-            s->emitTimer = ((s32)(g_emitter_emit_timer) * 5 + 2) / 6;
+            state->timer = ((s32)(state->closeTime) * 5 + 2) / 6;
+            state->requested = 0;
+            state->emitTimer = ((s32)(g_emitter_emit_timer) * 5 + 2) / 6;
         }
-        if (math_fast_float_d(&s->timer)) {
+        if (math_fast_float_d(&state->timer)) {
             moby_set_state(self, 1, -1);
         }
-        if (math_fast_float_d(&s->emitTimer)) {
+        if (math_fast_float_d(&state->emitTimer)) {
             part_l14_spawn_flash(self);
-            s->emitTimer = ((s32)(g_emitter_emit_timer) * 5 + 2) / 6;
+            state->emitTimer = ((s32)(g_emitter_emit_timer) * 5 + 2) / 6;
         }
-        c = (long long)(int)(0xFF000000 | (g_emitter_color_red << 16) | (g_emitter_color_green << 8)) | g_emitter_color_blue;
-        c = FastTweenColor(c, s->color, func_PAL_L14_003E6618(self));
-        set_moby_color(self, c & 0xFF, (c >> 8) & 0xFF, (c >> 16) & 0xFF);
+        blended_color = (long long)(int)(0xFF000000 | (g_emitter_color_red << 16) | (g_emitter_color_green << 8)) | g_emitter_color_blue;
+        blended_color = FastTweenColor(blended_color, state->color, moby_get_state_progress_pal(self));
+        set_moby_color(self, blended_color & 0xFF, (blended_color >> 8) & 0xFF, (blended_color >> 16) & 0xFF);
         moby_copy_pos_rot(self, a, b);
         moby_rebuild_matrix_scaled(self);
         moby_pass_pos_rot_to_helper(self, a, b);
@@ -122,7 +122,7 @@ void func_PAL_L14_003E6114(FieldMob *self) {
             self->animation = 0;
             self->flags |= 1;
         }
-        if (s->requested || (s->proximity && self->position[2] > g_hero_height_limit)) {
+        if (state->requested || (state->proximity && self->position[2] > g_hero_height_limit)) {
             moby_set_state(self, 2, -1);
         }
         break;
@@ -131,19 +131,19 @@ void func_PAL_L14_003E6114(FieldMob *self) {
             self->active = 1;
             self->flags = (self->flags | 0x100) & 0xFFFE;
             self->animation = *(int *)(self->model + 0x10);
-            s->timer = ((s32)(s->openTime) * 5 + 2) / 6;
-            s->emitTimer = ((s32)(g_emitter_emit_timer) * 5 + 2) / 6;
+            state->timer = ((s32)(state->openTime) * 5 + 2) / 6;
+            state->emitTimer = ((s32)(g_emitter_emit_timer) * 5 + 2) / 6;
         }
-        if (math_fast_float_d(&s->timer)) {
+        if (math_fast_float_d(&state->timer)) {
             moby_set_state(self, 3, -1);
         }
-        if (math_fast_float_d(&s->emitTimer)) {
+        if (math_fast_float_d(&state->emitTimer)) {
             part_l14_spawn_flash(self);
-            s->emitTimer = ((s32)(g_emitter_emit_timer) * 5 + 2) / 6;
+            state->emitTimer = ((s32)(g_emitter_emit_timer) * 5 + 2) / 6;
         }
-        c = (long long)(int)(0xFF000000 | (g_emitter_color_red << 16) | (g_emitter_color_green << 8)) | g_emitter_color_blue;
-        c = FastTweenColor(c, s->color, func_PAL_L14_003E6618(self));
-        set_moby_color(self, c & 0xFF, (c >> 8) & 0xFF, (c >> 16) & 0xFF);
+        blended_color = (long long)(int)(0xFF000000 | (g_emitter_color_red << 16) | (g_emitter_color_green << 8)) | g_emitter_color_blue;
+        blended_color = FastTweenColor(blended_color, state->color, moby_get_state_progress_pal(self));
+        set_moby_color(self, blended_color & 0xFF, (blended_color >> 8) & 0xFF, (blended_color >> 16) & 0xFF);
         moby_copy_pos_rot(self, a, b);
         moby_rebuild_matrix_scaled(self);
         moby_pass_pos_rot_to_helper(self, a, b);
@@ -152,24 +152,24 @@ void func_PAL_L14_003E6114(FieldMob *self) {
     case 3:
         if (flag_set_first_pending(self)) {
             self->flags &= 0xFEFF;
-            if (s->contact) {
-                s->flags |= 0x20;
+            if (state->contact) {
+                state->flags |= 0x20;
             } else {
-                s->flags |= 1;
+                state->flags |= 1;
             }
-            s->timer = ((s32)(s->activeTime) * 5 + 2) / 6;
+            state->timer = ((s32)(state->activeTime) * 5 + 2) / 6;
             self->color = 0x80008000;
         }
-        if ((hero_is_current_selected_id(self) && !s->contact) || (g_field_mob_contact == self && s->contact)) {
-            e = s->linked;
-            if (e != 0 && *(short *)(e + 0xAA) == 0xAFE) {
-                *(int *)(*(char **)(e + 0x68) + 0x80) = 1;
+        if ((hero_is_current_selected_id(self) && !state->contact) || (g_field_mob_contact == self && state->contact)) {
+            linked_moby = state->linked;
+            if (linked_moby != 0 && *(short *)(linked_moby + 0xAA) == 0xAFE) {
+                *(int *)(*(char **)(linked_moby + 0x68) + 0x80) = 1;
             }
         }
-        if (s->proximity && self->position[2] > g_hero_height_limit) {
-            s->timer = ((s32)(s->activeTime) * 5 + 2) / 6;
+        if (state->proximity && self->position[2] > g_hero_height_limit) {
+            state->timer = ((s32)(state->activeTime) * 5 + 2) / 6;
         }
-        if (math_fast_float_d(&s->timer)) {
+        if (math_fast_float_d(&state->timer)) {
             moby_set_state(self, 4, -1);
         }
         break;

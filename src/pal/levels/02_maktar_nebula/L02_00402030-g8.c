@@ -7,7 +7,7 @@
 extern int mode_get_stack_top(void);
 extern int flag_is_byte_set(void);
 extern int arena_get_challenge_save_index(unsigned int);
-extern int func_PAL_L00_002C4480(int, int);
+extern int hero_l00_set_action_pal(int, int);
 extern int snd_play_from_global_bank(int, int, void *);
 extern int FastDecTimer(short *);
 extern void moby_set_state(u8 *, int, int);
@@ -40,13 +40,16 @@ extern int g_arena_challenge_table_2 __attribute__((sda));
 #define TABLE ((int **)&D_L02_001B1190)
 #define H(o) (*(short *)(state+(o)))
 
+/* Handles the challenge menu input: up/down moves the selection to the next usable entry, cross
+   starts the challenge, triangle cancels, and the four-button cheat combination switches state.
+   Otherwise draws the menu panel (PAL: 50 Hz timings). */
 void arena_update_challenge_menu_pal(u8 *object)
 {
     u8 *state = *(u8 **)(object + 0x68);
     int i, found;
     InputView *input;
     if (mode_get_stack_top()==5) return;
-    if (g_game_mode[0]!=0x6f) func_PAL_L00_002C4480(0x6f,1);
+    if (g_game_mode[0]!=0x6f) hero_l00_set_action_pal(0x6f,1);
     if (H(0x11a)==0) {
         if ((((InputView *)g_pad_state)->field1c4&0x2000) && H(0x118)<13) {
             for (i=H(0x118)+1;i<14;i++) {

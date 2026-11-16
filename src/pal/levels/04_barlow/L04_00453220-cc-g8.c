@@ -12,7 +12,7 @@ extern f32 g_pull_side_speed __attribute__((sda));
 extern f32 g_pull_base_scale __attribute__((sda));
 extern int g_pull_decay_value __attribute__((sda));
 extern f32 g_pull_min_value __attribute__((sda));
-extern void func_PAL_002A7E68(void *, int, int, int);
+extern void anim_start_blended_pal(void *, int, int, int);
 extern float mat_fast_helper_a(float, float);
 extern float fast_subtract_rotations(float, float);
 extern float FastAddRotations(float, float);
@@ -23,23 +23,24 @@ extern float math_fast_sin_or_cos_a(float);
 extern float math_fast_sin_or_cos_b(float);
 extern float IntToFloat(int);
 
-int func_PAL_L04_00453220(u8 *object) {
+/* Pulls the moby toward the hero while it shrinks. Returns 1 when the hero is gone or can no longer be followed (PAL: 50 Hz timings). */
+int object_pull_toward_hero_pal(u8 *moby) {
     float delta[4];
-    u8 *data = *(u8 **)(object + 0x68);
+    u8 *vars = *(u8 **)(moby + 0x68);
     float heading, length, step, ratio, angle, minimum, scale, decay;
     u8 *target;
     int result;
-    if (object[0x43] != g_pull_anim_index)
-        func_PAL_002A7E68(object, g_pull_anim_index, 0, 8);
+    if (moby[0x43] != g_pull_anim_index)
+        anim_start_blended_pal(moby, g_pull_anim_index, 0, 8);
     if (g_hero_l04_moby) {
-        heading = mat_fast_helper_a(*(float *)(object + 0x10) - *(float *)(g_hero_l04_moby + 0x10),
-                               *(float *)(object + 0x14) - *(float *)(g_hero_l04_moby + 0x14));
-        angle = FastAddRotations(*(float *)(object + 0xF8),
-            fast_subtract_rotations(heading, *(float *)(object + 0xF8)) * 0.1f);
+        heading = mat_fast_helper_a(*(float *)(moby + 0x10) - *(float *)(g_hero_l04_moby + 0x10),
+                               *(float *)(moby + 0x14) - *(float *)(g_hero_l04_moby + 0x14));
+        angle = FastAddRotations(*(float *)(moby + 0xF8),
+            fast_subtract_rotations(heading, *(float *)(moby + 0xF8)) * 0.1f);
         target = g_hero_l04_moby + 0x10;
-        *(float *)(object + 0xF8) = angle;
-        FastVecSub((char *)delta, (char *)target, (char *)object + 0x10);
-        delta[2] -= *(float *)(data + 0x220);
+        *(float *)(moby + 0xF8) = angle;
+        FastVecSub((char *)delta, (char *)target, (char *)moby + 0x10);
+        delta[2] -= *(float *)(vars + 0x220);
         length = FastVecLength(delta);
         if (length != 0.0f) {
             float fraction;
@@ -48,24 +49,24 @@ int func_PAL_L04_00453220(u8 *object) {
                 step = length;
             fraction = step / length;
             FastVecScale(delta, delta, fraction);
-            FastVecAdd(object + 0x10, object + 0x10, delta);
+            FastVecAdd(moby + 0x10, moby + 0x10, delta);
             delta[0] = math_fast_sin_or_cos_a(FastAddRotations(heading, 1.5707964897155762f)) * 0.020000001f * g_pull_side_speed;
             delta[1] = math_fast_sin_or_cos_b(FastAddRotations(heading, 1.5707964897155762f)) * 0.020000001f * g_pull_side_speed;
             delta[2] = 0.0f;
-            FastVecAdd(object + 0x10, object + 0x10, delta);
+            FastVecAdd(moby + 0x10, moby + 0x10, delta);
         }
         decay = IntToFloat((((int)(g_pull_decay_value) * 5 + 2) / 6));
         minimum = g_pull_min_value;
-        *(float *)(object + 0x2C) -= *(float *)(data + 0x230) / decay;
-        if (*(float *)(object + 0x2C) < minimum)
-            *(float *)(object + 0x2C) = minimum;
-        ratio = *(float *)(object + 0x2C) / *(float *)(data + 0x230);
+        *(float *)(moby + 0x2C) -= *(float *)(vars + 0x230) / decay;
+        if (*(float *)(moby + 0x2C) < minimum)
+            *(float *)(moby + 0x2C) = minimum;
+        ratio = *(float *)(moby + 0x2C) / *(float *)(vars + 0x230);
         if (ratio > 1.0f)
             ratio = 1.0f;
-        scale = g_pull_base_scale + (*(float *)(data + 0x30) - g_pull_base_scale) * ratio;
+        scale = g_pull_base_scale + (*(float *)(vars + 0x30) - g_pull_base_scale) * ratio;
         {
             u8 *hero = g_hero_l04_moby;
-            *(float *)(data + 0x220) = scale;
+            *(float *)(vars + 0x220) = scale;
             if (!hero || hero[0x20] == 0x5A || (s8)hero[0x20] < 0)
                 result = 1;
             else

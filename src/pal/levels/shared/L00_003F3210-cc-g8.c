@@ -41,6 +41,7 @@ extern void effect_update_owner_records(void *);
 extern void ref_L00_003EEE90_00(void (*)(void *),void *);
 extern void blast_run_effect_frame(void *);
 typedef struct { char pad[0x10]; float phase; int timer; float rate; int alpha, unused, count, handle; } State4BF0;
+/* Updates the blast effect: it grows and spreads a burst of particles, hurts nearby enemies as it grows, fades out, and removes itself when done (PAL: 50 Hz). */
 void blast_l00_update_pal(char *object)
 {
     Vec4BF0 center, query, direction;

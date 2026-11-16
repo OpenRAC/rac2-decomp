@@ -112,7 +112,7 @@ void lock_on_target_tracker_update_pal(u8 *object)
             if (g_lock_on_marker == 0)
                 goto shift;
         }
-        if (*(s16 *)(g_hero_state.vehicle + 0xAA) == 0x905) {
+        if (*(s16 *)(g_hero_state.vehicle + 0xAA) == MOBY_CLASS_GLIDER) {
             g_lock_on_marker->x0 = g_lock_on_marker_x_a;
             g_lock_on_marker->xC = -1.0f;
             g_lock_on_marker->x8 = -1.0f;

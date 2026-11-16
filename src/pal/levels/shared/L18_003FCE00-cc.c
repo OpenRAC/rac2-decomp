@@ -23,9 +23,10 @@ void* menu_init_two_sub_objects(void* param_1);
 /* Calls a fixed chain of sub-object initialisers at 76-byte steps and returns the base pointer. */
 /* Calls a fixed chain of sub-object initialisers at 76-byte steps and returns the base pointer. */
 /* Store the supplied unsigned 32-bit word at owner byte offset 0xB 8. */
-void func_PAL_L18_003FCE00(int param_1, unsigned int param_2)
+/* Stores a word at offset 0xB8 of the owner. */
+void owner_set_word_pal(int owner, unsigned int value)
 {
-  *(unsigned int *)(param_1 + 0xb8) = param_2;
+  *(unsigned int *)(owner + 0xb8) = value;
   return;
 }
 

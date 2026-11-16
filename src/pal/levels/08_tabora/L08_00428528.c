@@ -12,83 +12,83 @@ extern float math_fast_sin_or_cos_a(float);
 extern float math_fast_sin_or_cos_b(float);
 typedef struct {
     u8 pad00[0x20];
-    u8 f20;
-    u8 f21;
+    u8 unk_20;
+    u8 unk_21;
     u8 pad22[0x24 - 0x22];
-    void *f24;
+    void *unk_24;
     u8 pad28[0x2C - 0x28];
-    f32 f2C;
+    f32 unk_2C;
     u8 pad30[0x68 - 0x30];
-    void *f68;
+    void *unk_68;
     u8 pad6C[0x95 - 0x6C];
-    u8 f95;
-    u16 f96;
+    u8 unk_95;
+    u16 unk_96;
     u8 pad98[0xBC - 0x98];
-    u8 fBC;
+    u8 unk_BC;
     u8 padBD[0x100 - 0xBD];
 } Ent;
 typedef struct {
     u8  pad00[0x20];
-    f32 f20;
-    void *f24;
+    f32 unk_20;
+    void *unk_24;
     u8  pad28[0x2C - 0x28];
-    f32 f2C;
+    f32 unk_2C;
     u8  pad30[0x50 - 0x30];
-    u8  f50[0x88 - 0x50];
-    u16 f88;
+    u8  unk_50[0x88 - 0x50];
+    u16 unk_88;
     u8  pad8A[0xE4 - 0x8A];
-    f32 fE4;
+    f32 unk_E4;
     u8  padE8[0x144 - 0xE8];
-    s32 f144;
+    s32 unk_144;
     u8  pad148[0x150 - 0x148];
-    f32 f150[4];
-    f32 f160;
-    f32 f164;
-    f32 f168;
+    f32 unk_150[4];
+    f32 unk_160;
+    f32 unk_164;
+    f32 unk_168;
     u8  pad16C[0x189 - 0x16C];
-    u8  f189;
+    u8  unk_189;
     u8  pad18A[0x18C - 0x18A];
-    u8  f18C;
+    u8  unk_18C;
     u8  pad18D[0x1B0 - 0x18D];
-    f32 f1B0;
-    f32 f1B4;
-    u8  f1B8[0x1BA - 0x1B8];
-    s16 f1BA;
-    s16 f1BC;
-    u16 f1BE;
+    f32 unk_1B0;
+    f32 unk_1B4;
+    u8  unk_1B8[0x1BA - 0x1B8];
+    s16 unk_1BA;
+    s16 unk_1BC;
+    u16 unk_1BE;
     u8  pad1C0[0x1CC - 0x1C0];
-    s32 f1CC;
-    f32 f1D0;
-    f32 f1D4;
-    s32 f1D8;
-    s32 f1DC;
-    u8  f1E0[0x254 - 0x1E0];
-    s32 f254;
+    s32 unk_1CC;
+    f32 unk_1D0;
+    f32 unk_1D4;
+    s32 unk_1D8;
+    s32 unk_1DC;
+    u8  unk_1E0[0x254 - 0x1E0];
+    s32 unk_254;
     u8  pad258[0x40E - 0x258];
-    u16 f40E;
+    u16 unk_40E;
     u8  pad410[0x440 - 0x410];
-    u8  f440[0x448 - 0x440];
-    s32 f448;
-    u8  f44C[0x484 - 0x44C];
-    s32 f484;
-    s32 f488;
-    u8  f48C[8];
+    u8  unk_440[0x448 - 0x440];
+    s32 unk_448;
+    u8  unk_44C[0x484 - 0x44C];
+    s32 unk_484;
+    s32 unk_488;
+    u8  unk_48C[8];
 } Moby;
 typedef struct {
-    f32 f0;
-    f32 f4;
-    f32 f8;
-    f32 fC;
+    f32 unk_0;
+    f32 unk_4;
+    f32 unk_8;
+    f32 unk_C;
 } Quad;
 typedef struct {
     u8  pad00[0x24];
-    f32 f24;
+    f32 unk_24;
 } Sub24;
 extern s32 func_2F9A60();
 extern s32 func_327898(s32, s32);
 extern s32 func_2EA300(void *, void *, s32, s32, s32);
-extern void func_PAL_002B14F8(Ent *, void *, s32, s32, f32);
-extern s32 func_PAL_002B1A50(Ent *, void *, s32);
+extern void value_set_and_smooth_pal(Ent *, void *, s32, s32, f32);
+extern s32 moby_apply_damage_to_object_pal(Ent *, void *, s32);
 extern f32 func_3278F0(f32, f32);
 extern f32 func_2FA3C8(f32);
 extern f32 func_2FA3E0(f32);
@@ -121,28 +121,29 @@ extern f32 math_fast_sin_or_cos_b(f32);
 /* func_L08_004237F0 is matched in its own unit, src/levels/08_tabora/L08_004237F0.c (default flags). */
 
 /* the driver is primed, the entry follows its mount and then its own update runs */
-void func_PAL_L08_00428DD8(Ent *a0)
+/* Checks the sandfly for hits: when it is hurt a timer starts or it begins to die, and its sounds are stopped (PAL version). */
+void sandfly_check_hit_pal(Ent *moby)
 {
-    Moby *s0 = a0->f68;
-    Sub24 *q;
-    f32 f0;
-    s32 r;
+    Moby *vars = moby->unk_68;
+    Sub24 *sub;
+    f32 half_size;
+    s32 hit_result;
 
-    func_PAL_002B14F8(a0, s0->f1E0, 2, 1, 2.5f);
-    vehicle_compute_height_limits(a0);
-    q = a0->f24;
-    f0 = q->f24 * 0.5f;
-    a0->f2C = f0;
-    r = func_PAL_002B1A50(a0, s0->f50, 0);
-    if (r != 0) {
-        if (s0->f20 <= 0.0f) {
-            s0->f88 |= 2;
-            s0->fE4 = 1.0053098f;
+    value_set_and_smooth_pal(moby, vars->unk_1E0, 2, 1, 2.5f);
+    vehicle_compute_height_limits(moby);
+    sub = moby->unk_24;
+    half_size = sub->unk_24 * 0.5f;
+    moby->unk_2C = half_size;
+    hit_result = moby_apply_damage_to_object_pal(moby, vars->unk_50, 0);
+    if (hit_result != 0) {
+        if (vars->unk_20 <= 0.0f) {
+            vars->unk_88 |= 2;
+            vars->unk_E4 = 1.0053098f;
         } else {
-            s0->f1BE = 275;
+            vars->unk_1BE = 275;
         }
-        snd_stop_queued(a0);
-        sandfly_release_sounds(a0);
+        snd_stop_queued(moby);
+        sandfly_release_sounds(moby);
     }
 }
 

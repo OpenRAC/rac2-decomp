@@ -23,7 +23,7 @@ static __inline__ void qcopy(void *dst, const void *src) {
 extern void route_choose_target_point(u8 *, void *, f32 *);
 extern void route_set_node_enabled_flag(u32, u8 *, s32);
 extern s32 coll_test_point(void *, s32, void *, f32);
-extern void func_PAL_002A7E68(void *, int, int, int);
+extern void anim_start_blended_pal(void *, int, int, int);
 extern void moby_set_flag_bit(u8 *entity, s32 enabled);
 extern char g_hero_position[];
 typedef struct {
@@ -72,26 +72,27 @@ s32 route_check_object_points(u8 *, u8 *, u8 *);
 extern s32 math_random_int_below(s32);
 extern f32 g_effect_aim_offset_scale;
 
-void moby_place_held_object_pal(L03_5EE8Moby *m) {
+/* Finds a safe spot for the object this one is holding and puts it down there. If the spot is blocked, it keeps holding the object. */
+void moby_place_held_object_pal(L03_5EE8Moby *moby) {
     f32 pos[4] __attribute__((aligned(16)));
     f32 test[4] __attribute__((aligned(16)));
-    L03_5EE8Vars *v = m->f68;
+    L03_5EE8Vars *vars = moby->f68;
 
-    route_set_node_enabled_flag(v->f220, v->f358 + 0x10, 0);
-    route_choose_target_point(v->f358, g_hero_position, pos);
+    route_set_node_enabled_flag(vars->f220, vars->f358 + 0x10, 0);
+    route_choose_target_point(vars->f358, g_hero_position, pos);
     qcopy(test, pos);
-    test[2] += v->f110 + v->f114;
-    if (coll_test_point(test, 0, m, v->f110) == 0) {
-        qcopy(v->f340, pos);
-        moby_set_flag_bit(v->f358, 0);
-        v->f358 = 0;
-        m->f98 = m->f24->f10;
-        moby_set_state((u8 *)m, 0x11, 4);
-        if (m->f43 != 0) {
-            func_PAL_002A7E68(m, 0, 0, 0x11);
+    test[2] += vars->f110 + vars->f114;
+    if (coll_test_point(test, 0, moby, vars->f110) == 0) {
+        qcopy(vars->f340, pos);
+        moby_set_flag_bit(vars->f358, 0);
+        vars->f358 = 0;
+        moby->f98 = moby->f24->f10;
+        moby_set_state((u8 *)moby, 0x11, 4);
+        if (moby->f43 != 0) {
+            anim_start_blended_pal(moby, 0, 0, 0x11);
         }
     } else {
-        route_set_node_enabled_flag(v->f220, v->f358 + 0x10, 1);
+        route_set_node_enabled_flag(vars->f220, vars->f358 + 0x10, 1);
     }
 }
 

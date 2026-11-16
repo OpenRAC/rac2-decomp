@@ -9,13 +9,13 @@
 extern float IntToFloat(int);
 extern int FloatToInt(float);
 extern float FastAddRotations(float,float);
-extern void func_PAL_0034EF38(void *,int,float);
+extern void menu_show_colored_label_pal(void *,int,float);
 extern int hud_is_open_done(void);
 extern int hud_screen_position(void *,int *,int *);
 extern int sprintf(char *,char *,...);
 extern unsigned int FastTweenColor(unsigned int,unsigned int,float);
-extern void func_PAL_00280218(int,int,unsigned int,char *,int,float);
-extern float func_PAL_00280358(char *,int,int,float);
+extern void text_draw_centered_small_scaled(int,int,unsigned int,char *,int,float);
+extern float text_calc_fit_scale(char *,int,int,float);
 extern char *GetLocalizedString(int);
 extern unsigned int func_001157AC(const char *);
 extern int g_radial_slot_count;
@@ -29,49 +29,50 @@ extern int g_item_ammo_counts[];
 typedef struct { int active; char reserved04[0x44]; short localizedName; char reserved4A[0x3E]; unsigned short sellsAmmo; char reserved8A[4]; unsigned short ammoCapacity; char reserved90[0x50]; } WheelWeaponRecord;
 extern WheelWeaponRecord g_weapon_l00_table[];
 extern char g_str_ammo_format[];
-int func_PAL_0028D0C0(char *o)
+/* Draws the round weapon-select menu: the selected weapon's ammo count and its name, fitted to 80 wide (PAL: scaled text). */
+int weapon_wheel_draw_pal(char *menu)
 {
-    float a,b;
-    int alpha,x,y,i,selected,split,j,len,yy;
+    float fade_in,fade_out;
+    int alpha,x,y,i,selected,split,pos,text_length,text_y;
     unsigned int scratch;
-    char buffer[80], *text,*tail;
+    char buffer[80], *text,*second_line;
     WheelWeaponRecord *record;
-    unsigned char *fade=(unsigned char *)o+0x70;
-    a=IntToFloat(fade[0])/IntToFloat(8);
-    if(a>1.0f) a=1.0f; else if(a<0.0f) a=0.0f;
-    b=IntToFloat(fade[1])/IntToFloat(8);
-    if(b>1.0f) b=1.0f; else if(b<0.0f) b=0.0f;
-    alpha=FloatToInt(a*128.0f);
+    unsigned char *fade=(unsigned char *)menu+0x70;
+    fade_in=IntToFloat(fade[0])/IntToFloat(8);
+    if(fade_in>1.0f) fade_in=1.0f; else if(fade_in<0.0f) fade_in=0.0f;
+    fade_out=IntToFloat(fade[1])/IntToFloat(8);
+    if(fade_out>1.0f) fade_out=1.0f; else if(fade_out<0.0f) fade_out=0.0f;
+    alpha=FloatToInt(fade_in*128.0f);
     i=0;
-    x=F(o,int,0x50); y=F(o,int,0x54);
-    hud_screen_position(o,&x,&y);
+    x=F(menu,int,0x50); y=F(menu,int,0x54);
+    hud_screen_position(menu,&x,&y);
     for(;i<g_radial_slot_count;i++) {
         FastAddRotations(((float)i*2.0f*3.1415927f)/(float)g_radial_slot_count-3.1415927f,1.5707964f);
-        if(F(o,int,0x74)==i && F(g_radial_menu_pages[g_radial_menu_page_index]+i*28,int,0) && g_resident_data_base) {
-            float f=(float)(i+7);
-            if(f>7.0f) f-=8.0f;
-            func_PAL_0034EF38(g_resident_data_base+0x376c8,1,f);
+        if(F(menu,int,0x74)==i && F(g_radial_menu_pages[g_radial_menu_page_index]+i*28,int,0) && g_resident_data_base) {
+            float phase=(float)(i+7);
+            if(phase>7.0f) phase-=8.0f;
+            menu_show_colored_label_pal(g_resident_data_base+0x376c8,1,phase);
         }
         if(F(g_radial_menu_pages[g_radial_menu_page_index]+i*28,int,0) && g_resident_data_base) {
-            char *p=g_resident_data_base+0x38000;
-            F(p,int,0x7a8c)=hud_is_open_done()?FloatToInt((float)alpha*0.5f):0;
+            char *data=g_resident_data_base+0x38000;
+            F(data,int,0x7a8c)=hud_is_open_done()?FloatToInt((float)alpha*0.5f):0;
         }
     }
-    selected=F(o,int,0x74);
+    selected=F(menu,int,0x74);
     if(selected>=0 && F(g_radial_menu_pages[g_radial_menu_page_index]+selected*28,int,0) && !g_notice_owner) {
-        int n=g_weapon_menu_slots[selected], value;
+        int weapon_id=g_weapon_menu_slots[selected], value;
         float opacity;
-        record=&g_weapon_l00_table[g_item_slot_to_record[n]];
-        opacity=a*b;
+        record=&g_weapon_l00_table[g_item_slot_to_record[weapon_id]];
+        opacity=fade_in*fade_out;
 
         if(record->active && record->sellsAmmo) {
-            value=g_item_ammo_counts[n];
+            value=g_item_ammo_counts[weapon_id];
             sprintf(buffer,g_str_ammo_format,value,record->ammoCapacity);
             {
-                unsigned int c;
-                if (value) c=FastTweenColor(0x00f0f0f0,0x80f0f0f0,opacity);
-                else c=FastTweenColor(0x004040ff,0x804040ff,opacity);
-                func_PAL_00280218(x+105,y+112,c,buffer,-1,0.9f);
+                unsigned int ammo_color;
+                if (value) ammo_color=FastTweenColor(0x00f0f0f0,0x80f0f0f0,opacity);
+                else ammo_color=FastTweenColor(0x004040ff,0x804040ff,opacity);
+                text_draw_centered_small_scaled(x+105,y+112,ammo_color,buffer,-1,0.9f);
             }
         }
         scratch=FastTweenColor(0x00f0f0f0,0x80f0f0f0,opacity);
@@ -80,31 +81,31 @@ int func_PAL_0028D0C0(char *o)
         if(text && func_001157AC(text)) {
             unsigned int color=scratch;
             scratch=func_001157AC(text);
-            len=scratch;
-            tail=text;
-            for(j=0;j<len;j++) {
-                tail++;
-                if(*(unsigned char *)tail=='-') {tail++;split=j+2;break;}
+            text_length=scratch;
+            second_line=text;
+            for(pos=0;pos<text_length;pos++) {
+                second_line++;
+                if(*(unsigned char *)second_line=='-') {second_line++;split=pos+2;break;}
             }
             if(!split) {
-                tail=text;
-                for(j=0;j<len;j++) {
-                    tail++;
-                    if(*(unsigned char *)tail==' ') {tail++;split=j+1;break;}
+                second_line=text;
+                for(pos=0;pos<text_length;pos++) {
+                    second_line++;
+                    if(*(unsigned char *)second_line==' ') {second_line++;split=pos+1;break;}
                 }
             }
-            yy=y+100;
-            if(g_weapon_l00_table[g_item_slot_to_record[g_weapon_menu_slots[selected]]].sellsAmmo) yy=y+75;
-            else { int splitY=y+85; yy=split ? splitY : yy; }
+            text_y=y+100;
+            if(g_weapon_l00_table[g_item_slot_to_record[g_weapon_menu_slots[selected]]].sellsAmmo) text_y=y+75;
+            else { int split_y=y+85; text_y=split ? split_y : text_y; }
             if(split) {
-                float k=0.8f;
-                float scale=func_PAL_00280358(text,split,80,k);
-                func_PAL_00280218(x+105,yy,color,text,split,scale);
-                yy+=16;
-                scale=func_PAL_00280358(tail,-1,80,k);
-                func_PAL_00280218(x+105,yy,color,tail,-1,scale);
-            } else func_PAL_00280218(x+105,yy,color,text,-1,0.8f);
+                float min_scale=0.8f;
+                float scale=text_calc_fit_scale(text,split,80,min_scale);
+                text_draw_centered_small_scaled(x+105,text_y,color,text,split,scale);
+                text_y+=16;
+                scale=text_calc_fit_scale(second_line,-1,80,min_scale);
+                text_draw_centered_small_scaled(x+105,text_y,color,second_line,-1,scale);
+            } else text_draw_centered_small_scaled(x+105,text_y,color,text,-1,0.8f);
         }
     }
-    return F(o,int,0x58);
+    return F(menu,int,0x58);
 }

@@ -61,7 +61,7 @@ extern int g_scene_spawn_param_i[] __attribute__((sda));
 extern int g_scene_spawn_param_h[] __attribute__((sda));
 
 extern void anim_start_startup_animations(void);
-extern void func_US2_002E72D8(void *);
+extern void UpdateEquipmentPieces_us2(void *);
 extern void math_store_angle_update_result(void *, void *, unsigned int, unsigned int, float);
 extern void gfx_add_draw_callback_first(void (*)(void), void *);
 extern void todano_refresh_scene_tuning(void);
@@ -80,7 +80,8 @@ extern void vec_add_random_offset(void *, float);
 extern void FastVecSub(void *, void *, void *);
 extern unsigned char *part_l00_spawn_spinning(void *, void *, int);
 
-void func_US2_L12_00300ED0(void)
+/* Todano cutscene scene update (runs every frame). It marks and refreshes the scene objects, and in mode 5 it sprays effects from the two emitters and runs the current story event. (USA v2.00) */
+void todano_scene_update_events_us2(void)
 {
     V a, b, c, d;
     V *velocity;
@@ -98,9 +99,9 @@ void func_US2_L12_00300ED0(void)
             *(unsigned short *)(obj + 0x34) |= 0x800;
         }
         if (*(short *)(obj + 0xAA) == 0xD54) {
-            func_US2_002E72D8(obj);
+            UpdateEquipmentPieces_us2(obj);
         }
-        if (obj && *(short *)(obj + 0xAA) == 0xFA0 && g_current_map_index != 0x33) {
+        if (obj && *(short *)(obj + 0xAA) == MOBY_CLASS_TV_SCREENS && g_current_map_index != 0x33) {
             char *p = *(char **)(obj + 0x68);
             if (p) {
                 math_store_angle_update_result(obj, p + 0xC, 0x80AAAAD2, 0x80396464, 0.061086535f);

@@ -39,7 +39,7 @@ extern void text_draw_right_aligned_medium(int, int, u64, char *, int);
 extern int g_text_right_x_c __attribute__((sda));
 extern int g_text_right_y_c[] __attribute__((sda));
 
-int func_PAL_002CECF8(void)
+int draw_item_stats_menu_pal(void)
 {
     char text[64];
     int inactive, color, width, center, count;

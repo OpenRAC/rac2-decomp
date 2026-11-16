@@ -19,19 +19,19 @@ static inline int RingPending(s16 *ring, s16 index)
 /* func_PAL_L14_003E9570, the PAL copy of func_L14_003E50B8: the same walk over the ring, where each
  * entry takes the 50 Hz scale. The scale makes the loop test too long for jump1 to copy in front of
  * the loop (more than 30 insns), so loop.c hoists first and the test is copied afterwards. */
-void func_PAL_L14_003E9570(char *object)
+void ring_state_advance_pal(char *moby)
 {
-    s16 *ring = *(s16 **)(object + 0x68);
-    s16 index = ring[11];
-    while (RingPending(ring, index)) {
-        ring[11] = (index + 1) % 8;
-        index = ring[11];
+    s16 *ring = *(s16 **)(moby + 0x68);
+    s16 ring_index = ring[11];
+    while (RingPending(ring, ring_index)) {
+        ring[11] = (ring_index + 1) % 8;
+        ring_index = ring[11];
     }
     if (((u16)ring[11] & 1) == 0) {
-        if (*(u8 *)(object + 0x20) != 1)
-            func_321F58(object, 1, -1);
+        if (*(u8 *)(moby + 0x20) != 1)
+            func_321F58(moby, 1, -1);
     } else {
-        if (*(u8 *)(object + 0x20) != 2)
-            func_321F58(object, 2, -1);
+        if (*(u8 *)(moby + 0x20) != 2)
+            func_321F58(moby, 2, -1);
     }
 }

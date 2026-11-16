@@ -11,7 +11,7 @@ extern SceneMaterialPrefix g_effect_definitions;
 extern char g_default_vector[] __attribute__((sda));
 
 /* Emit the two layers of a short particle trail. */
-void func_PAL_L00_003AAFC8(char *moby)
+void EmitParticleTrailLayers_pal(char *moby)
 {
     float point[3], offset[3], step[3], jitter[3];
     float *state = (float *)(*(char **)(moby + 0x68) + 0x14);

@@ -20,19 +20,19 @@ extern void *part_spawn_hero_relative(char *, char *, u32, u32, f32, u32, u32);
 extern s32 FloatToInt(f32);
 
 /* spawns the level's score pickup effect for this object */
-void func_PAL_L16_00424590(char *arg0) {
-    char buf[0x10];
-    char *st = *(char **)(arg0 + 0x68);
-    char *obj;
-    s32 handle;
-    s32 a;
+void part_spawn_spinning_fragment_pal(char *self) {
+    char position[0x10];
+    char *vars = *(char **)(self + 0x68);
+    char *particle;
+    s32 kind;
+    s32 alpha;
 
-    FastVecSub(buf, arg0 + 0x10, st);
-    handle = ((s32)(math_random_int_range(3, 7)) * 5 + 2) / 6 & 0xFF;
-    a = func_00313EA0(0xFF) & 0xFF;
-    obj = (char *)part_spawn_hero_relative(buf, st, 0x60006080, handle, 2.5f, a, 0);
-    if (obj == 0)
+    FastVecSub(position, self + 0x10, vars);
+    kind = ((s32)(math_random_int_range(3, 7)) * 5 + 2) / 6 & 0xFF;
+    alpha = func_00313EA0(0xFF) & 0xFF;
+    particle = (char *)part_spawn_hero_relative(position, vars, 0x60006080, kind, 2.5f, alpha, 0);
+    if (particle == 0)
         return;
-    obj[9] = (u8)(FloatToInt(4.0f) - 16);
+    particle[9] = (u8)(FloatToInt(4.0f) - 16);
 }
 

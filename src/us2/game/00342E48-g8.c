@@ -10,9 +10,10 @@ extern int g_menu_input_flags[];
 extern int list_menu_get_selection(void *);
 extern int *object_get_fourth_field(void *);
 extern void gfx_draw_screen_element_stored(void *);
-extern void func_US2_00348E70(void *);
+extern void option_list_draw_rows_us2(void *);
 extern int math_ping_pong_blend_values(int, int, int, int, int);
 
+/* Draws the rows of a small list menu. */
 void small_list_menu_draw_rows_us2(char *self)
 {
     int count = func_US2_00348E68(self + 0x10);
@@ -32,5 +33,5 @@ void small_list_menu_draw_rows_us2(char *self)
         gfx_draw_screen_element_stored(self + 0xEC);
         gfx_draw_screen_element_stored(self + 0x138);
     }
-    func_US2_00348E70(self + 0x10);
+    option_list_draw_rows_us2(self + 0x10);
 }

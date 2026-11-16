@@ -46,19 +46,21 @@ static __inline__ int pal_frames(int n)
     return (n * 5 + 2) / 6;
 }
 
-void func_PAL_L04_00410E40(unsigned char *m)
+/* Draws the race start banner: five fading markers and the side icons, timed from the race clock
+   (PAL: 50 Hz timings). */
+void hud_draw_race_banner_pal(unsigned char *moby)
 {
     B1202Five x = g_race_banner_keys_x;
     B1202Five y = g_race_banner_keys_y;
     B1202Five start = g_race_banner_keys_start;
     B1202Five end = g_race_banner_keys_end;
     int colors[5];
-    unsigned char *p = *(unsigned char **)(m+0x68);
+    unsigned char *vars = *(unsigned char **)(moby+0x68);
     int frame,i,j,right,a,b,c,d;
-    int sprite,s1;
+    int sprite,icon;
     float angle, sine, sign, fx, fy;
     int one, top, off;
-    if (m[0xbc]==3 || m[0xbc]==4 || m[0xbc]==1 || m[0xbc]==2) frame=125-*(int *)(p+0x394);
+    if (moby[0xbc]==3 || moby[0xbc]==4 || moby[0xbc]==1 || moby[0xbc]==2) frame=125-*(int *)(vars+0x394);
     else frame=g_race_time_ticks+125;
     if (!g_popup_resource_table) return;
     for(i=0;i<5;i++) {
@@ -82,9 +84,9 @@ void func_PAL_L04_00410E40(unsigned char *m)
     for(;i<2;i++) {
         if(i==0) {j=10;right=31;sign=1.0f;} else {j=498;right=478;sign=-1.0f;}
         fx=(float)j;
-        s1=table_find_by_id((char *)g_popup_resource_table+off,58);
+        icon=table_find_by_id((char *)g_popup_resource_table+off,58);
         top=hud_coord(120.0f,g_race_hud_layout_scale,0.5f,one);
-        gfx_draw_scaled_object_two_axes(s1,(float)j,0x60442d00,(float)top,sign,1.0f,0.0f);
+        gfx_draw_scaled_object_two_axes(icon,(float)j,0x60442d00,(float)top,sign,1.0f,0.0f);
         sprite=table_find_by_id((char *)g_popup_resource_table+off,59);
         top=hud_coord(120.0f,g_race_hud_layout_scale,0.5f,one);
         gfx_draw_scaled_object_two_axes(sprite,(float)j,0x55f0c070,(float)top,sign,1.0f,0.0f);
@@ -96,9 +98,9 @@ void func_PAL_L04_00410E40(unsigned char *m)
         }
         VU1_addGSregister(71,0x5360b);
     }
-    if(m[0x20]!=3) {
+    if(moby[0x20]!=3) {
         float turn, ratio;
-        turn=*(float *)(p+0x28c);
+        turn=*(float *)(vars+0x28c);
         turn*=0.008726647f;
         ratio=math_fast_sin_or_cos_b(turn);
         ratio=ratio/math_fast_sin_or_cos_a(turn);

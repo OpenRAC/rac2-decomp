@@ -11,14 +11,15 @@ extern void FastVecAdd(void *, void *, void *);
 extern float math_random_angle(void), IntToFloat(int);
 extern int CollLine(void *, void *, int, void *, int);
 extern int math_fast_helper_a(void *, float);
-extern void func_PAL_0032F7C8(void *, void *);
+extern void part_emit_blast_and_shake_pal(void *, void *);
 extern char g_camera_eye_state[];
 extern float g_blast_moby_height_limit __attribute__((sda));
 extern int g_blast_moby_first_id_a __attribute__((sda)), g_blast_moby_second_id __attribute__((sda));
 extern int g_blast_moby_first_id_b __attribute__((sda)), g_blast_moby_first_id_c __attribute__((sda));
 extern int g_blast_moby_state_short_a __attribute__((sda)), g_blast_moby_state_short_b __attribute__((sda));
 extern int g_blast_moby_state_word __attribute__((sda)), g_blast_moby_extra_word __attribute__((sda));
-char *func_PAL_0032F3B8(int unused, float *position, float *direction, float height)
+/* Creates the blast effect moby at position facing direction and sets its timers (PAL: 50 Hz timers). */
+char *part_spawn_blast_effect_moby_pal(int unused, float *position, float *direction, float height)
 {
     float basis[4], offset[4], sphere[4];
     char *self = CreateMoby(0xD4E);
@@ -76,7 +77,7 @@ char *func_PAL_0032F3B8(int unused, float *position, float *direction, float hei
                 *(int *)(state + 0x40) = 0;
             }
         }
-        func_PAL_0032F7C8(self, basis);
+        part_emit_blast_and_shake_pal(self, basis);
     }
     return self;
 }

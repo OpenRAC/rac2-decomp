@@ -23,6 +23,8 @@ extern void moby_mark_spawned(void *);
 extern void part_draw_shot_glow_sprites(u8 *);
 extern void gfx_add_draw_callback_third(void (*)(void *), void *);
 
+/* Per-frame update of a moving shot (moby class 3545): flies it forward, explodes it on a hit or after
+   240 frames, adds glow effects, and draws it (PAL: 50 Hz timings). */
 void shot_l11_update_pal(u8 *object) {
     EffectVector destination;
     struct CollisionFilter filter;

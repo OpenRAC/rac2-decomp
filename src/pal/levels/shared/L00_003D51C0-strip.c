@@ -20,7 +20,7 @@ extern void vec_random_direction(void *, float, float);
    by 32, turned by a random 10 to 24 degrees about D_0018A580 - 0x20 and by a random 22 to 30
    degrees (mirrored for strip 5) about D_0018A580 - 0x10; the three inner points are
    interpolated between the ends and jittered. */
-void func_PAL_L00_003D6C38(void *object, void *position, int unused)
+void InitEffectStrips_pal(void *object, void *position, int unused)
 {
     char delta[16] __attribute__((aligned(16)));
     char end[16] __attribute__((aligned(16)));

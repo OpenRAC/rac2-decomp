@@ -193,6 +193,7 @@ extern PartsState parts_state __asm__("D_001B8840");
 extern int load_start_disc_read(int, int, int);
 extern void FadeToBlack(int);
 
+/* Loads a set of parts from the disc into the record buffer and points each part at its data. */
 void load_parts_set_from_disc_pal(int index, int flag)
 {
     PartEntry *r;

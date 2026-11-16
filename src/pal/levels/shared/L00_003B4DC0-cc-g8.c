@@ -32,27 +32,28 @@ extern char *part_spawn_firework_spark(void *, void *, int, int, float, int, int
 extern char *part_create_explosion(int, void *, void *, int, unsigned char, unsigned char,
                                unsigned char, unsigned char, float);
 
-void func_PAL_L00_003B4DC0(float x, float y, float z)
+/* Fires a blast at a point: damages and knocks back nearby things, then spawns sparks and layered explosions (PAL: 50 Hz speeds). */
+void trail_spawn_group_burst_pal(float x, float y, float z)
 {
-    Vec16_Fc936841d p, v;
+    Vec16_Fc936841d position, velocity;
     Vec16_Fc936841d delta;
-    EffectSix a, b;
+    EffectSix colors_a, colors_b;
     int c0, c1, c2, r, g, blue;
     /* The initial value only changes gcse's table size, which orders the three
        RGB pointer spills as retail has them; flow deletes the store. */
     int n = 0, ca, cb, t0, t1;
     float distance, fade, speed, one;
 
-    *(EffectQuad *)&p = 0;
-    p.x = x;
-    p.y = y;
-    p.z = z;
-    n = coll_process_hit(&p, 16, g_hero_state.owner, 0, 3.0f);
+    *(EffectQuad *)&position = 0;
+    position.x = x;
+    position.y = y;
+    position.z = z;
+    n = coll_process_hit(&position, 16, g_hero_state.owner, 0, 3.0f);
     one = 1.0f;
-    moby_queue_knockback_for_nodes(g_hero_state.owner, &p, g_area_hit_targets, n, 0, 0x830000, 2, 1, 8.0f, one, one);
-    *(EffectQuad *)&v = 0;
-    v.z = 0.040000003f;
-    FastVecSub(&delta, g_camera_l00_position, &p);
+    moby_queue_knockback_for_nodes(g_hero_state.owner, &position, g_area_hit_targets, n, 0, 0x830000, 2, 1, 8.0f, one, one);
+    *(EffectQuad *)&velocity = 0;
+    velocity.z = 0.040000003f;
+    FastVecSub(&delta, g_camera_l00_position, &position);
     distance = FastVecLength(&delta);
     n = distance < 6.0f ? FloatToInt(distance) + 1 : 4;
     fade = 0.0f;
@@ -63,42 +64,42 @@ void func_PAL_L00_003B4DC0(float x, float y, float z)
         for (count = 0; count < n; count++) {
             speed = math_random_float_range(8.0f, 10.0f) * (0.020000001f);
             speed -= fade * (0.020000001f);
-            a = g_burst_effect_a;
-            b = g_burst_effect_b;
+            colors_a = g_burst_effect_a;
+            colors_b = g_burst_effect_b;
             {
                 int choice = math_random_int_below(6);
                 EffectMaterial *entry = g_weapon_l00_table + g_item_slot_to_record.index;
-                ca = gfx_swap_packed_color_channels(a.v[choice], entry->enabled != 0);
+                ca = gfx_swap_packed_color_channels(colors_a.v[choice], entry->enabled != 0);
                 choice = math_random_int_below(6);
                 entry = g_weapon_l00_table + g_item_slot_to_record.index;
-                cb = gfx_swap_packed_color_channels(b.v[choice], entry->enabled != 0);
+                cb = gfx_swap_packed_color_channels(colors_b.v[choice], entry->enabled != 0);
             }
             t0 = math_random_int_range(12, 17);
             t1 = math_random_int_range(21, 25);
-            part_spawn_firework_spark(&p, &v, ca, cb, 400000.0f, t0, t1, speed, 0, 0);
+            part_spawn_firework_spark(&position, &velocity, ca, cb, 400000.0f, t0, t1, speed, 0, 0);
         }
     }
     if (distance > 9.0f) {
-        part_create_explosion(g_hero_state.owner, &p, &v, 12, 127, 127, 127, 32, one * 4.0f);
+        part_create_explosion(g_hero_state.owner, &position, &velocity, 12, 127, 127, 127, 32, one * 4.0f);
         r = 127;
         g = 32;
         blue = 0;
         swap_color_channel_words(&r, &g, &blue, g_weapon_l00_table[g_item_slot_to_record.index].enabled != 0);
-        part_create_explosion(g_hero_state.owner, &p, &v, 20, r, g, blue, 32, one * 4.0f);
+        part_create_explosion(g_hero_state.owner, &position, &velocity, 20, r, g, blue, 32, one * 4.0f);
     }
     c0 = 127;
     c1 = 63;
     c2 = 0;
     swap_color_channel_words(&c0, &c1, &c2, g_weapon_l00_table[g_item_slot_to_record.index].enabled != 0);
-    part_create_explosion(g_hero_state.owner, &p, &v, 17, c0, c1, c2, 48, one * 4.0f);
+    part_create_explosion(g_hero_state.owner, &position, &velocity, 17, c0, c1, c2, 48, one * 4.0f);
     c0 = 96;
     c1 = 16;
     c2 = 0;
     swap_color_channel_words(&c0, &c1, &c2, g_weapon_l00_table[g_item_slot_to_record.index].enabled != 0);
-    part_create_explosion(g_hero_state.owner, &p, &v, 22, c0, c1, c2, 64, one * 3.5f);
+    part_create_explosion(g_hero_state.owner, &position, &velocity, 22, c0, c1, c2, 64, one * 3.5f);
     c0 = 32;
     c1 = 0;
     c2 = 0;
     swap_color_channel_words(&c0, &c1, &c2, g_weapon_l00_table[g_item_slot_to_record.index].enabled != 0);
-    part_create_explosion(g_hero_state.owner, &p, &v, 24, c0, c1, c2, 32, one * 3.0f);
+    part_create_explosion(g_hero_state.owner, &position, &velocity, 24, c0, c1, c2, 32, one * 3.0f);
 }

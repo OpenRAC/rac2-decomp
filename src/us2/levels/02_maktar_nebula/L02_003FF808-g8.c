@@ -13,7 +13,7 @@ extern int sprintf(char *,char *,...);
 extern void FontSetWindow(void *,int,int,int,int,int,int,int,int);
 extern void text_draw_window_large(void *,u64,char *,int);
 extern void text_draw_window_small(void *,u64,char *,int);
-extern int func_US2_L02_003FF750(void);
+extern int language_at_least_two_us2(void);
 extern unsigned char g_language MACRO_ADDR;
 extern void text_draw_small(int,int,u64,char *,int);
 extern void text_draw_medium(int,int,u64,char *,int);
@@ -89,7 +89,8 @@ static __inline__ int hud_coord(float value, float scale, float half)
     return result;
 }
 
-void func_US2_L02_003FF808(unsigned char *object) {
+/* Draws the arena challenge menu panel: the challenge name, its best result, play count and the hints. */
+void arena_draw_menu_panel_us2(unsigned char *object) {
     unsigned char box[32]; char buffer[64];
     unsigned char *state; char *text,*unit,*str; int *x5,*x7,*x8; int i,value,y2,y3,y4,y5,y6,y7,y8,bx,by,bh; u64 c1,c2,c3,c4,c5,c6,c7,c8; float half,h;
     arena_draw_menu_help_prompts(object,1);
@@ -99,7 +100,7 @@ void func_US2_L02_003FF808(unsigned char *object) {
     by=hud_coord((float)g_arena_panel_box_y, g_hud_label_scale, 0.5f);
     bh=hud_coord((float)g_arena_panel_box_height, g_hud_label_scale, 0.5f);
     FontSetWindow(box,bx,by,g_arena_panel_window_left,g_arena_panel_window_top,g_arena_panel_window_height,bh,g_arena_panel_window_flags,3);
-    if(func_US2_L02_003FF750()) { c1=g_arena_panel_title_color; text_draw_window_small(box,c1,text,func_001157AC(text)); }
+    if(language_at_least_two_us2()) { c1=g_arena_panel_title_color; text_draw_window_small(box,c1,text,func_001157AC(text)); }
     else { c1=g_arena_panel_title_color; text_draw_window_large(box,c1,text,func_001157AC(text)); }
     if(SEL==0 && !g_game_flag_table[arena_get_challenge_save_index(0)]) goto counts;
     {

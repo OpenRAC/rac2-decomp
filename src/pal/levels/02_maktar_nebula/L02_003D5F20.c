@@ -5,7 +5,7 @@ typedef int TI128 __attribute__((mode(TI)));
 extern void armed_enemy_release_held_object(char *, TI128 *);
 extern void vec_random_direction(char *, float, float);
 extern void FastVecAdd(void *, void *, void *);
-extern char *func_PAL_L02_0032D5F8(char *, int, char *, char *, int, int, float *, void *, void *, float);
+extern char *part_spawn_flying_fragment_pal(char *, int, char *, char *, int, int, float *, void *, void *, float);
 extern void moby_mark_spawned(char *);
 extern char g_zero_l02_vector[] __attribute__((sda));
 
@@ -13,7 +13,7 @@ extern char g_zero_l02_vector[] __attribute__((sda));
    offsets it by the vector at D_L02_001A8F20 and passes both to func_PAL_L02_0032D5F8 with the
    sub-object's +0x10 and +0xF0 records; then releases the sub-object in every case. The
    caller's quadword is copied to the stack (as retail does) and not read again. */
-void func_PAL_L02_003D5F20(char *self, TI128 *pos) {
+void armed_enemy_release_held_object_pal(char *self, TI128 *pos) {
     char *state = *(char **)(self + 0x68);
     float copy[4];
     float vec[4];
@@ -22,7 +22,7 @@ void func_PAL_L02_003D5F20(char *self, TI128 *pos) {
     if (*(unsigned char *)(self + 0x31) != 0 && *(char **)(state + 0x2E4) != 0) {
         vec_random_direction((char *)vec, 0.120000005f, 0.20000002f);
         FastVecAdd(vec, vec, g_zero_l02_vector);
-        func_PAL_L02_0032D5F8(self, 0x9D8, *(char **)(state + 0x2E4) + 0x10, *(char **)(state + 0x2E4) + 0xF0,
+        part_spawn_flying_fragment_pal(self, 0x9D8, *(char **)(state + 0x2E4) + 0x10, *(char **)(state + 0x2E4) + 0xF0,
                     0, 0, vec, g_zero_l02_vector, g_zero_l02_vector, 0.004f);
     }
     moby_mark_spawned(*(char **)(state + 0x2E4));

@@ -12,7 +12,7 @@ extern int math_random_int_below(int);
 extern int FloatToInt(float);
 extern float FastAddRotations(float, float);
 extern void vec_random_direction(float *, float, float);
-extern void *func_PAL_002C23B8(void *, void *, int, u32, int, int, float, float, float, float, float);
+extern void *part_spawn_burst_pal(void *, void *, int, u32, int, int, float, float, float, float, float);
 extern void *part_spawn_ground_effect(float, void *, int, float, u32, int, int, void *, int, float);
 
 /* Fifteen particles thrown from the point, as in func_L00_003FC820, then five pairs of trail
@@ -45,7 +45,7 @@ void SpawnParticleTrailBurst_pal(float *point)
         position[0] = point[0] + math_random_signed_float_range(0.0f, 0.2f);
         position[1] = point[1] + math_random_signed_float_range(0.0f, 0.2f);
         position[2] = point[2] + math_random_signed_float_range(0.0f, 0.2f);
-        func_PAL_002C23B8(position, direction, 25, 127, 0x007F7F7F, kind,
+        part_spawn_burst_pal(position, direction, 25, 127, 0x007F7F7F, kind,
                       math_random_float_range(0.1f, 0.3f) * 210000.0f, 500.0f, 1.0f, 0.0f, 0.0f);
     }
     for (j = 0; j < 5; j++) {

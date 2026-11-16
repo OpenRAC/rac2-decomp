@@ -22,10 +22,11 @@ extern f32 math_random_signed_float_range(f32, f32);
 extern float path_l01_compute_segment_lengths(void *);
 extern void moby_set_controller_speed_limits(void *, f32, f32, f32, f32);
 extern s32 math_random_int_range(s32, s32);
-extern void func_PAL_002A7E68(void *, s32, s32, s32);
+extern void anim_start_blended_pal(void *, s32, s32, s32);
 extern u8 *g_path_l01_table[] NOT_SDA;
 extern u8 g_muckdweller_init_data[] SDATA(D_L01_001B0900);
 
+/* Sets up a Muckdweller's tuning values, paths and starting state (PAL copy). */
 void muckdweller_init_pal(u8 *obj) {
     u8 *p = *(u8 **)(obj + 0x68);
     s32 idx;
@@ -110,9 +111,9 @@ void muckdweller_init_pal(u8 *obj) {
             moby_set_state(obj, 1, 3);
         }
         if (*(s32 *)(p + 0x408) != -1) {
-            if (obj[0x43] != 7) func_PAL_002A7E68(obj, 7, 0, math_random_int_range(2, 10));
+            if (obj[0x43] != 7) anim_start_blended_pal(obj, 7, 0, math_random_int_range(2, 10));
         } else if (obj[0x43] != 0) {
-            func_PAL_002A7E68(obj, 0, 0, math_random_int_range(2, 10));
+            anim_start_blended_pal(obj, 0, 0, math_random_int_range(2, 10));
         }
     } else {
         if (*(s32 *)(p + 0x414) != -1) *(s32 *)(p + 0x3F8) = *(s32 *)(p + 0x414);
@@ -123,6 +124,6 @@ void muckdweller_init_pal(u8 *obj) {
         *(u16 *)(obj + 0x34) |= 1;
         *(f32 *)(obj + 0x18) -= 2.0f;
         moby_set_state(obj, 0, 1);
-        if (obj[0x43] != 0) func_PAL_002A7E68(obj, 0, 0, math_random_int_range(2, 10));
+        if (obj[0x43] != 0) anim_start_blended_pal(obj, 0, 0, math_random_int_range(2, 10));
     }
 }

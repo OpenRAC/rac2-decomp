@@ -21,64 +21,64 @@ extern void snd_stop_voice(int);
 typedef struct { int sound, minTime, maxTime, timer, handle, target; float start, end; } AmbientState;
 
 /* Updates an ambient sound inside a transformed volume, including its voice position. */
-void snd_update_ambient_volume_pal(unsigned char *obj)
+void snd_update_ambient_volume_pal(unsigned char *moby)
 {
     float pos[4], scale[4], delta[4], extent[4];
-    AmbientState *s = *(AmbientState **)(obj+8);
+    AmbientState *ambient = *(AmbientState **)(moby+8);
     float outer, distance, time, edge;
     int volume, flags;
     unsigned char *slot;
-    scale[2] = scale[1] = scale[0] = *(float *)(obj+12);
-    FastVecSub(pos,g_tether_zero_vec,obj+0x40);
+    scale[2] = scale[1] = scale[0] = *(float *)(moby+12);
+    FastVecSub(pos,g_tether_zero_vec,moby+0x40);
     pos[3] = 0;
-    matrix_mul_vec3(delta,pos,obj+0x50);
-    matrix_mul_vec3(extent,scale,obj+0x50);
+    matrix_mul_vec3(delta,pos,moby+0x50);
+    matrix_mul_vec3(extent,scale,moby+0x50);
     outer = FastVecLength(extent);
     distance = FastVecLength(delta);
     if (distance < outer) {
         flags = 16;
         if (math_fabs(delta[0]) <= 1.0f && math_fabs(delta[1]) <= 1.0f && math_fabs(delta[2]) <= 1.0f) {
-            volume = *(int *)(g_ambient_sound_table+s->sound*32+12);
+            volume = *(int *)(g_ambient_sound_table+ambient->sound*32+12);
         } else {
             if(delta[0]>1.0f) delta[0]=1.0f; else if(delta[0]<-1.0f) delta[0]=-1.0f;
             if(delta[1]>1.0f) delta[1]=1.0f; else if(delta[1]<-1.0f) delta[1]=-1.0f;
             if(delta[2]>1.0f) delta[2]=1.0f; else if(delta[2]<-1.0f) delta[2]=-1.0f;
             edge=FastVecLength(delta);
-            volume=snd_compute_falloff(g_ambient_sound_table+s->sound*32,distance,edge,outer);
+            volume=snd_compute_falloff(g_ambient_sound_table+ambient->sound*32,distance,edge,outer);
         }
-        if(s->target!=-1) {
-            unsigned char *target=g_moby_l04_pool+s->target*256;
+        if(ambient->target!=-1) {
+            unsigned char *target=g_moby_l04_pool+ambient->target*256;
             if(*(short *)(target+0xAA)==3004) {
                 unsigned char *vars=*(unsigned char **)(target+0x68);
                 int cap;
                 time=*(float *)(vars+0x30C)+*(float *)(vars+0x27C);
-                if(s->end*(0.020000001f)<time) time=s->end*(0.020000001f);
-                time-=s->start*(0.020000001f);
+                if(ambient->end*(0.020000001f)<time) time=ambient->end*(0.020000001f);
+                time-=ambient->start*(0.020000001f);
                 if(time<0) time=0;
-                cap=FloatToInt(IntToFloat(1024)*(time/((s->end-s->start)*(0.020000001f))));
+                cap=FloatToInt(IntToFloat(1024)*(time/((ambient->end-ambient->start)*(0.020000001f))));
                 if(cap<volume) volume=cap;
             }
         }
-        slot=g_sound_state+s->handle*0x70;
-        if(g_ambient_sound_table[s->sound*32+24]) flags=20;
-        if(*(unsigned char **)(slot+0x8C)!=obj || !slot[0x74]) {
-            if(math_fast_float_d(&s->timer)) {
-                s->handle=snd_start_from_table_entry(s->sound,flags,obj,volume);
-                if(s->maxTime>0) s->timer=(s->minTime+math_random_int_below(s->maxTime-s->minTime))*5e+01f;
-            } else s->handle=-1;
+        slot=g_sound_state+ambient->handle*0x70;
+        if(g_ambient_sound_table[ambient->sound*32+24]) flags=20;
+        if(*(unsigned char **)(slot+0x8C)!=moby || !slot[0x74]) {
+            if(math_fast_float_d(&ambient->timer)) {
+                ambient->handle=snd_start_from_table_entry(ambient->sound,flags,moby,volume);
+                if(ambient->maxTime>0) ambient->timer=(ambient->minTime+math_random_int_below(ambient->maxTime-ambient->minTime))*5e+01f;
+            } else ambient->handle=-1;
         }
-        if(s->handle!=-1) {
-            snd_set_slot_field(s->handle,volume);
-            matrix_mul_vec3(pos,delta,obj+0x10);
-            FastVecAdd(pos,pos,obj+0x40);
-            qcopy(g_sound_state+s->handle*0x70+0x90,pos);
+        if(ambient->handle!=-1) {
+            snd_set_slot_field(ambient->handle,volume);
+            matrix_mul_vec3(pos,delta,moby+0x10);
+            FastVecAdd(pos,pos,moby+0x40);
+            qcopy(g_sound_state+ambient->handle*0x70+0x90,pos);
         }
     } else {
-        if(s->handle!=-1) {
-            unsigned char *oldSlot=g_sound_state+s->handle*0x70;
-            if(*(unsigned char **)(oldSlot+0x8C)==obj && oldSlot[0x74]) snd_stop_voice(s->handle);
+        if(ambient->handle!=-1) {
+            unsigned char *old_slot=g_sound_state+ambient->handle*0x70;
+            if(*(unsigned char **)(old_slot+0x8C)==moby && old_slot[0x74]) snd_stop_voice(ambient->handle);
         }
-        s->handle=-1;
+        ambient->handle=-1;
     }
 }
 

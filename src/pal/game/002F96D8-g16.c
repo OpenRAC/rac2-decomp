@@ -30,12 +30,12 @@ extern void snd_send_cmd23(int);
 extern void music_Unpause(void);
 extern int snd_Pump(void);
 
-void func_PAL_002F96D8(void)
+void shop_reset_menu_camera_pal(void)
 {
     Vec4_2F8768 out;
     float dir[4];
     Vec4_2F8768 in;
-    int arg;
+    int pose_flag;
 
     if (g_vendor_menu_state.f7C != -1)
         set_animation_parameter(g_vendor_menu_state.f7C, 0);
@@ -49,14 +49,14 @@ void func_PAL_002F96D8(void)
     g_hero_state[0x22B5] = 0;
     stub_empty_5_pal();
     if (g_vendor_menu_state.f60 == 0) {
-        arg = func_PAL_00299538();
+        pose_flag = func_PAL_00299538();
         qcopy(&in, &g_shop_camera_vec);
         matrix_mul_vec3(&out, &in, g_vendor_menu_state.obj + 0xC0);
         FastVecAdd(&out, &out, g_vendor_menu_state.obj + 0x10);
         dir[0] = 0;
         dir[1] = 0;
         dir[2] = FastAddRotations(*(float *)(g_vendor_menu_state.obj + 0xF8), 3.1415927f);
-        stub_empty_15((char *)&out, dir, 0, arg);
+        stub_empty_15((char *)&out, dir, 0, pose_flag);
         cam_set_mode_state(2);
     }
     g_vendor_menu_state.obj[0x20] = 1;

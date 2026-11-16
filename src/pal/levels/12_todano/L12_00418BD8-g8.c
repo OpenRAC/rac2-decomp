@@ -49,52 +49,52 @@ extern u8 *g_path_zone_table[];
 extern f32 vec_distance_xy(void *a, void *b);
 
 /* Hands the object's path state to the nearest eligible entity of its group. */
-void func_PAL_L12_00418BD8(u8 *a0)
+void path_hand_state_to_nearest_pal(u8 *moby)
 {
-    PathState *state = *(PathState **)(a0 + 0x68);
-    u8 *best;
-    f32 bestd;
+    PathState *state = *(PathState **)(moby + 0x68);
+    u8 *nearest;
+    f32 nearest_dist;
     f32 vec[4];
-    u16 *p;
-    u8 *e;
-    PathState *sub;
-    f32 d;
+    u16 *list_entry;
+    u8 *other;
+    PathState *other_state;
+    f32 dist;
 
     if (state->f2C0 != -1) {
         *(TI128 *)vec = *(TI128 *)(g_path_zone_table[state->f2C0] + 0x10);
-        best = 0;
-        bestd = 100000.0f;
-        for (p = g_moby_l12_group_lists[a0[0x21]];
-             a0[0x21] != 0xFF && a0[0x21] <= g_moby_l12_group_count && p != 0 &&
-             ((p != 0 && (s16)p[-1] >= 0) || p == g_moby_l12_group_lists[a0[0x21]]);
-             p++) {
-            e = D_L12_001B2E9C_base[0] + ((*p & 0x7FFF) << 8);
-            if (e == 0)
+        nearest = 0;
+        nearest_dist = 100000.0f;
+        for (list_entry = g_moby_l12_group_lists[moby[0x21]];
+             moby[0x21] != 0xFF && moby[0x21] <= g_moby_l12_group_count && list_entry != 0 &&
+             ((list_entry != 0 && (s16)list_entry[-1] >= 0) || list_entry == g_moby_l12_group_lists[moby[0x21]]);
+             list_entry++) {
+            other = D_L12_001B2E9C_base[0] + ((*list_entry & 0x7FFF) << 8);
+            if (other == 0)
                 break;
-            sub = *(PathState **)(e + 0x68);
-            d = vec_distance_xy(e + 0x10, vec);
-            if (sub != 0 && (sub->f302 & 1)) {
-                if (d < bestd) {
-                    bestd = d;
-                    best = e;
+            other_state = *(PathState **)(other + 0x68);
+            dist = vec_distance_xy(other + 0x10, vec);
+            if (other_state != 0 && (other_state->f302 & 1)) {
+                if (dist < nearest_dist) {
+                    nearest_dist = dist;
+                    nearest = other;
                 }
             }
         }
-        if (best != 0) {
-            PathState *dst = *(PathState **)(best + 0x68);
+        if (nearest != 0) {
+            PathState *dest_state = *(PathState **)(nearest + 0x68);
 
-            dst->f2B0 = state->f2B0;
-            dst->f2B4 = state->f2B4;
-            dst->f2B8 = state->f2B8;
-            dst->f2BC = state->f2BC;
-            dst->f2C0 = state->f2C0;
-            dst->f2D0 = state->f2D0;
-            dst->f2D4 = state->f2D4;
-            dst->f2E0 = ((s32)g_guard_cooldown_max * 5 + 2) / 6;
-            dst->f2DC = state->f2C0;
-            dst->f2EA = 1;
-            dst->f302 = 2;
-            dst->f303 = state->f303;
+            dest_state->f2B0 = state->f2B0;
+            dest_state->f2B4 = state->f2B4;
+            dest_state->f2B8 = state->f2B8;
+            dest_state->f2BC = state->f2BC;
+            dest_state->f2C0 = state->f2C0;
+            dest_state->f2D0 = state->f2D0;
+            dest_state->f2D4 = state->f2D4;
+            dest_state->f2E0 = ((s32)g_guard_cooldown_max * 5 + 2) / 6;
+            dest_state->f2DC = state->f2C0;
+            dest_state->f2EA = 1;
+            dest_state->f302 = 2;
+            dest_state->f303 = state->f303;
         }
     }
 }

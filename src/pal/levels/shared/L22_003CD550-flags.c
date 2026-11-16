@@ -30,7 +30,7 @@ extern f32 math_random_float_range(f32 low, f32 high);
 extern int PlayMobySound(int index, int a1, char *a2);
 extern int subtitle_request_voice_line(int, int);
 extern f32 FastVecDot(void *, void *);
-extern void func_PAL_L22_003CD898(char *);
+extern void spark_emit_random_pal(char *);
 extern void spark_lane_draw(u8 *);
 extern void gfx_add_draw_callback_first(void (*)(u8 *), void *);
 extern f32 FastAddRotations(f32, f32);
@@ -39,9 +39,10 @@ extern int FastTweenColor(int, int, f32);
 extern u8 g_hero_state[];
 extern f32 fast_vec_dist(void *a0, void *a1);
 
-void func_PAL_L22_003CD550(u8 *obj)
+/* Per-frame update for moby class 2489: sets up four flickering lanes, reacts to the player being near, throws sparks and pulses its colour. (PAL: 50 Hz timings) */
+void spark_lane_update_pal(u8 *obj)
 {
-    u8 *ctl = *(u8 **)(obj + 0x68);
+    u8 *vars = *(u8 **)(obj + 0x68);
     int state = obj[0x20];
     int i;
 
@@ -52,9 +53,9 @@ void func_PAL_L22_003CD550(u8 *obj)
         {
             float *offset, *rate, *radius;
             i = 0;
-            radius = (float *)(ctl + 0x10);
-            rate = (float *)(ctl + 0x30);
-            offset = (float *)(ctl + 0x20);
+            radius = (float *)(vars + 0x10);
+            rate = (float *)(vars + 0x30);
+            offset = (float *)(vars + 0x20);
             for (; i < 4; i++) {
                 *offset++ = (float)i * 0.25f;
                 *rate++ = math_random_float_range(g_spark_rate_min[0], g_spark_rate_min[1]) * 0.020000001f;
@@ -67,7 +68,7 @@ void func_PAL_L22_003CD550(u8 *obj)
         SubtitleHistory *history;
 
         if (fast_vec_dist(g_hero_state + 0x80, obj + 0x10) < 3.0f)
-            g_hero_action_float_param[0] = *(float *)ctl;
+            g_hero_action_float_param[0] = *(float *)vars;
         player = g_hero_state;
         if (*(int *)(player + 0x2294) == 0x81 && *(int *)(player + 0x1B8) == state)
             PlayMobySound(0, 0, (char *)obj);
@@ -99,20 +100,20 @@ void func_PAL_L22_003CD550(u8 *obj)
             }
         }
         if (FastVecDot(obj + 0xE0, g_hero_state + 0x2C0) < -0.6f) {
-            func_PAL_L22_003CD898((char *)obj);
+            spark_emit_random_pal((char *)obj);
             gfx_add_draw_callback_first(spark_lane_draw, obj);
         }
         break;
     }
     }
     if (obj[0x31]) {
-        float f;
-        *(float *)(ctl + 4) = FastAddRotations(*(float *)(ctl + 4),
+        float pulse;
+        *(float *)(vars + 4) = FastAddRotations(*(float *)(vars + 4),
                                             g_spark_angle_scale[0] * 0.0003490659f);
-        f = math_fast_sin_or_cos_b(*(float *)(ctl + 4));
-        f = f * f;
-        f = f * f;
-        *(int *)(obj + 0x78) = FastTweenColor(D_L22_001AFF18_gp[0], g_spark_color_pair[1], f * f);
+        pulse = math_fast_sin_or_cos_b(*(float *)(vars + 4));
+        pulse = pulse * pulse;
+        pulse = pulse * pulse;
+        *(int *)(obj + 0x78) = FastTweenColor(D_L22_001AFF18_gp[0], g_spark_color_pair[1], pulse * pulse);
     }
 }
 

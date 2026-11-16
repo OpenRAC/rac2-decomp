@@ -46,8 +46,8 @@ extern void entry_spawn_list_objects_with_flag_pal(u8 *a0, s32 a1);
 extern GateMoby *CreateMoby(s32 oclass);
 extern u8 *level_find_object_by_class_id(s32 a0);
 extern s32 level_get_saved_value_b(u8 *a0);
-extern void func_PAL_L05_00425FB0(u8 *actor, s32 mission);
-extern void func_PAL_L05_00426200(u8 *a0, s32 a1);
+extern void feltzin_mission_reward_update_pal(u8 *actor, s32 mission);
+extern void feltzin_mission_handle_failure_pal(u8 *a0, s32 a1);
 extern void FastVecSub(void *dst, void *a, void *b);
 extern void FastVecCross(void *dst, void *a, void *b);
 extern void vec_scale_to_length(void *dst, void *src, f32 scale);
@@ -67,18 +67,18 @@ extern char *pickup_spawn_if_not_taken_pal(void *pos, s32 a1, s32 a2, s32 a3);
    reward is paid through func_PAL_L05_00425FB0. */
 void UpdateFeltzinGateCourse_pal(u8 *actor)
 {
-    struct { Vec up, pos, toward, away; } v;
+    struct { Vec up, pos, toward, away; } vecs;
     u8 *state = *(u8 **)(actor + 0x68);
     GatePath *path;
     GateMoby *gate;
     u8 *player;
     u8 **objects;
     s32 found;
-    s32 n;
-    f32 dotPlayer, dotOther;
+    s32 i;
+    f32 dot_player, dot_other;
 
-    v.up.q = 0;
-    v.up.f[2] = 1.0f;
+    vecs.up.q = 0;
+    vecs.up.f[2] = 1.0f;
     if (!g_feltzin_challenge_active) {
         g_feltzin_record_a = 0;
         g_feltzin_record_b = 0;
@@ -101,9 +101,9 @@ void UpdateFeltzinGateCourse_pal(u8 *actor)
         hero_set_state_value_a(0);
         objects = level_get_object_list();
         found = level_get_saved_value();
-        for (n = 0; n < found; n++) {
-            if (*(s16 *)(objects[n] + 0xAA) == 0xF82) {
-                entry_spawn_list_objects_with_flag_pal(objects[n], 1);
+        for (i = 0; i < found; i++) {
+            if (*(s16 *)(objects[i] + 0xAA) == 0xF82) {
+                entry_spawn_list_objects_with_flag_pal(objects[i], 1);
             }
         }
         path = g_gate_l05_path_table[*(s32 *)(state + 0x20)];
@@ -129,7 +129,7 @@ void UpdateFeltzinGateCourse_pal(u8 *actor)
                     gate->forward.i[3] = 0;
                     vec_scale_to_length(&gate->forward, &gate->forward, 1.0f);
                 }
-                FastVecCross(&gate->right, &gate->forward, &v.up);
+                FastVecCross(&gate->right, &gate->forward, &vecs.up);
                 vec_scale_to_length(&gate->right, &gate->right, 1.0f);
                 FastVecCross(&gate->up, &gate->right, &gate->forward);
                 qcopy(&gate->position, &path->points[g_feltzin_path_index]);
@@ -139,16 +139,16 @@ void UpdateFeltzinGateCourse_pal(u8 *actor)
         }
     }
     if (!g_feltzin_record_a && !g_feltzin_record_b && !g_feltzin_failure_flag) {
-        func_PAL_L05_00425FB0(actor, 3);
+        feltzin_mission_reward_update_pal(actor, 3);
         return;
     }
     if (level_get_saved_value_b(level_find_object_by_class_id(0xF82))) {
         g_feltzin_failure_flag = 1;
-        func_PAL_L05_00426200(actor, 3);
+        feltzin_mission_handle_failure_pal(actor, 3);
         entry_init_all_registered();
     } else if (g_feltzin_countdown_timer >= 12) {
         g_feltzin_failure_flag = 1;
-        func_PAL_L05_00426200(actor, 3);
+        feltzin_mission_handle_failure_pal(actor, 3);
         entry_init_all_registered();
     }
     if (g_feltzin_failure_flag) {
@@ -158,17 +158,17 @@ void UpdateFeltzinGateCourse_pal(u8 *actor)
         return;
     }
     player = g_feltzin_target_mobys + (*(s32 *)(state + 0x24) << 8);
-    qcopy(&v.pos, g_origin_vec);
-    FastVecSub(&v.away, &v.pos, &g_feltzin_record_a->position);
-    vec_scale_to_length(&v.away, &v.away, 1.0f);
-    FastVecSub(&v.toward, player + 0x10, &g_feltzin_record_a->position);
-    vec_scale_to_length(&v.toward, &v.toward, 1.0f);
-    dotPlayer = FastVecDot(&g_feltzin_record_a->forward, &v.toward);
-    dotOther = FastVecDot(&g_feltzin_record_a->forward, &v.away);
-    if ((dotPlayer != g_feltzin_best_dot_player && dotPlayer > 0)
-        || (dotOther != g_feltzin_best_dot_other && dotOther > 0)) {
+    qcopy(&vecs.pos, g_origin_vec);
+    FastVecSub(&vecs.away, &vecs.pos, &g_feltzin_record_a->position);
+    vec_scale_to_length(&vecs.away, &vecs.away, 1.0f);
+    FastVecSub(&vecs.toward, player + 0x10, &g_feltzin_record_a->position);
+    vec_scale_to_length(&vecs.toward, &vecs.toward, 1.0f);
+    dot_player = FastVecDot(&g_feltzin_record_a->forward, &vecs.toward);
+    dot_other = FastVecDot(&g_feltzin_record_a->forward, &vecs.away);
+    if ((dot_player != g_feltzin_best_dot_player && dot_player > 0)
+        || (dot_other != g_feltzin_best_dot_other && dot_other > 0)) {
         path = g_gate_l05_path_table[*(s32 *)(state + 0x20)];
-        if (fast_vec_dist(&v.pos, &g_feltzin_record_a->position) <= 1.25f
+        if (fast_vec_dist(&vecs.pos, &g_feltzin_record_a->position) <= 1.25f
             || fast_vec_dist(player + 0x10, &g_feltzin_record_a->position) <= 1.25f) {
             hero_add_clamped_stat(0.5f);
             snd_play_from_class_bank(15, 0, actor, 0xFBF);
@@ -197,7 +197,7 @@ void UpdateFeltzinGateCourse_pal(u8 *actor)
                     gate->forward.i[3] = 0;
                     vec_scale_to_length(&gate->forward, &gate->forward, 1.0f);
                 }
-                FastVecCross(&gate->right, &gate->forward, &v.up);
+                FastVecCross(&gate->right, &gate->forward, &vecs.up);
                 vec_scale_to_length(&gate->right, &gate->right, 1.0f);
                 FastVecCross(&gate->up, &gate->right, &gate->forward);
                 qcopy(&gate->position, &path->points[g_feltzin_path_index]);
@@ -206,8 +206,8 @@ void UpdateFeltzinGateCourse_pal(u8 *actor)
             g_feltzin_path_index++;
         }
     }
-    g_feltzin_best_dot_player = dotPlayer;
-    g_feltzin_best_dot_other = dotOther;
+    g_feltzin_best_dot_player = dot_player;
+    g_feltzin_best_dot_other = dot_other;
     if (g_feltzin_record_a) {
         effect_set_enabled((void *)g_feltzin_record_a, 1);
         if (g_feltzin_record_b) {

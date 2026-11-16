@@ -29,86 +29,86 @@ extern u8 *D_L13_001B291C_gp SDATA(D_L13_001B291C);
 /* Initialize the clock from the console RTC, then advance its hands and hourly sound.
  * The GP view and ordinary view refer to the same moby-array pointer.
  */
-void UpdateBoldanClock_pal(u8 *m) {
-    u8 *d=P(m,0x68), *a;
+void UpdateBoldanClock_pal(u8 *moby) {
+    u8 *vars=P(moby,0x68), *part;
     u8 time[16];
-    int slo, mlo, hlo, sec, min, hour, t;
-    float h, angle;
-    if (m[0x20]==0) {
-        int initialHour;
-        H(m,0x96)=0; m[0x20]=1; m[0x30]=255; H(m,0x32)=800;
-        I(d,0xC)=0; I(d,0x20)=0;
+    int sec_low, min_low, hour_low, sec, min, hour, hour12;
+    float hour_f, angle;
+    if (moby[0x20]==0) {
+        int initial_hour;
+        H(moby,0x96)=0; moby[0x20]=1; moby[0x30]=255; H(moby,0x32)=800;
+        I(vars,0xC)=0; I(vars,0x20)=0;
         sceCdReadClock(time); clock_to_local_time(time);
-        P(d,0x10)=CreateMoby(0xE9F);
-        if (P(d,0x10)) {
-            P(d,0x10)[0x30]=255; H(P(d,0x10),0x32)=800;
-            P(d,0x10)[0x31]=1; P(d,0x10)[0x20]=0;
-            *(u64 *)(P(d,0x10)+0x38)=*(u64 *)(m+0x38);
-            { u8 *hand=P(d,0x10); qcopy_nc(hand+0x10,m+0x10); qcopy_nc(hand+0xF0,m+0xF0);
+        P(vars,0x10)=CreateMoby(0xE9F);
+        if (P(vars,0x10)) {
+            P(vars,0x10)[0x30]=255; H(P(vars,0x10),0x32)=800;
+            P(vars,0x10)[0x31]=1; P(vars,0x10)[0x20]=0;
+            *(u64 *)(P(vars,0x10)+0x38)=*(u64 *)(moby+0x38);
+            { u8 *hand=P(vars,0x10); qcopy_nc(hand+0x10,moby+0x10); qcopy_nc(hand+0xF0,moby+0xF0);
             euler_rotation_basis(hand+0xC0,hand+0xF0); }
         }
-        P(d,0x14)=CreateMoby(0xEA0);
-        if (P(d,0x14)) {
-            P(d,0x14)[0x30]=255; H(P(d,0x14),0x32)=800;
-            P(d,0x14)[0x31]=1; P(d,0x14)[0x20]=0;
-            *(u64 *)(P(d,0x14)+0x38)=*(u64 *)(m+0x38);
-            { u8 *hand=P(d,0x14); qcopy_nc(hand+0x10,m+0x10); qcopy_nc(hand+0xF0,m+0xF0);
+        P(vars,0x14)=CreateMoby(0xEA0);
+        if (P(vars,0x14)) {
+            P(vars,0x14)[0x30]=255; H(P(vars,0x14),0x32)=800;
+            P(vars,0x14)[0x31]=1; P(vars,0x14)[0x20]=0;
+            *(u64 *)(P(vars,0x14)+0x38)=*(u64 *)(moby+0x38);
+            { u8 *hand=P(vars,0x14); qcopy_nc(hand+0x10,moby+0x10); qcopy_nc(hand+0xF0,moby+0xF0);
             euler_rotation_basis(hand+0xC0,hand+0xF0); }
         }
-        a=CreateMoby(0xEA1);
-        if(a) {
-            a[0x30]=255; H(a,0x32)=800; a[0x31]=1; a[0x20]=0;
-            *(u64 *)(a+0x38)=*(u64 *)(m+0x38);
-            qcopy_nc(a+0x10,m+0x10); qcopy_nc(a+0xF0,m+0xF0);
-            euler_rotation_basis(a+0xC0,P(d,0x14)+0xF0);
+        part=CreateMoby(0xEA1);
+        if(part) {
+            part[0x30]=255; H(part,0x32)=800; part[0x31]=1; part[0x20]=0;
+            *(u64 *)(part+0x38)=*(u64 *)(moby+0x38);
+            qcopy_nc(part+0x10,moby+0x10); qcopy_nc(part+0xF0,moby+0xF0);
+            euler_rotation_basis(part+0xC0,P(vars,0x14)+0xF0);
         }
         /* The RTC returns packed BCD hours, minutes and seconds. */
-        I(d,0)=FloatToInt(time[3]); I(d,8)=FloatToInt(time[2]); I(d,4)=FloatToInt(time[1]);
-        slo=FloatToInt(fast_fmod((float)I(d,4),16.0f));
-        sec=FloatToInt((float)(I(d,4)/16))*10+slo;
-        mlo=FloatToInt(fast_fmod((float)I(d,8),16.0f));
-        min=FloatToInt((float)(I(d,8)/16))*10+mlo;
-        hlo=FloatToInt(fast_fmod((float)I(d,0),16.0f));
-        initialHour=FloatToInt((float)(I(d,0)/16))*10+hlo;
-        I(d,8)=min; I(d,4)=sec; I(d,0)=initialHour;
+        I(vars,0)=FloatToInt(time[3]); I(vars,8)=FloatToInt(time[2]); I(vars,4)=FloatToInt(time[1]);
+        sec_low=FloatToInt(fast_fmod((float)I(vars,4),16.0f));
+        sec=FloatToInt((float)(I(vars,4)/16))*10+sec_low;
+        min_low=FloatToInt(fast_fmod((float)I(vars,8),16.0f));
+        min=FloatToInt((float)(I(vars,8)/16))*10+min_low;
+        hour_low=FloatToInt(fast_fmod((float)I(vars,0),16.0f));
+        initial_hour=FloatToInt((float)(I(vars,0)/16))*10+hour_low;
+        I(vars,8)=min; I(vars,4)=sec; I(vars,0)=initial_hour;
     }
-    if(m[0x20]==1 && H(m,0x96)==50) {
-        if(++I(d,4)>=60) { I(d,4)=0; ++I(d,8); }
-        if(I(d,8)>=60) { I(d,8)=0; ++I(d,0); }
-        if(I(d,0)>=24) I(d,0)=0;
-        h=(float)I(d,0); hour=FloatToInt(h);
-        if(h>12.0f) h-=12.0f;
-        t=FloatToInt(h);
-        if(t==0 || t==2 || t==4 || t==6 || t==8 || t==10 || t==12) {
-            ClockMoby *a=&g_object_table_base[I(d,0x28)];
+    if(moby[0x20]==1 && H(moby,0x96)==50) {
+        if(++I(vars,4)>=60) { I(vars,4)=0; ++I(vars,8); }
+        if(I(vars,8)>=60) { I(vars,8)=0; ++I(vars,0); }
+        if(I(vars,0)>=24) I(vars,0)=0;
+        hour_f=(float)I(vars,0); hour=FloatToInt(hour_f);
+        if(hour_f>12.0f) hour_f-=12.0f;
+        hour12=FloatToInt(hour_f);
+        if(hour12==0 || hour12==2 || hour12==4 || hour12==6 || hour12==8 || hour12==10 || hour12==12) {
+            ClockMoby *part=&g_object_table_base[I(vars,0x28)];
             int collision;
 
-            a->flags=(a->flags&0xFFBE)|0x1000;
-            collision=I(a->classData,0x10);
-            a->flags&=0xFFFD;
-            a->collision=collision;
+            part->flags=(part->flags&0xFFBE)|0x1000;
+            collision=I(part->classData,0x10);
+            part->flags&=0xFFFD;
+            part->collision=collision;
         } else {
-            ClockMoby *a=&g_object_table_base[I(d,0x28)];
-            a->collision=0; a->flags=(a->flags&0xEFFF)|0x43;
+            ClockMoby *part=&g_object_table_base[I(vars,0x28)];
+            part->collision=0; part->flags=(part->flags&0xEFFF)|0x43;
         }
         if(hour==3) {
-            if(I(d,0x24)!=-1) { u8 *a=P(D_L13_001B291C_gp+(I(d,0x24)<<8),0x68); if(!I(a,0x38)) I(a,0x38)=1; }
+            if(I(vars,0x24)!=-1) { u8 *part=P(D_L13_001B291C_gp+(I(vars,0x24)<<8),0x68); if(!I(part,0x38)) I(part,0x38)=1; }
         } else {
-            if(I(d,0x24)!=-1) { u8 *a=P(D_L13_001B291C_gp+(I(d,0x24)<<8),0x68); if(I(a,0x38)) I(a,0x38)=0; }
+            if(I(vars,0x24)!=-1) { u8 *part=P(D_L13_001B291C_gp+(I(vars,0x24)<<8),0x68); if(I(part,0x38)) I(part,0x38)=0; }
         }
-        if(I(d,4)==0 && I(d,8)==0) {
-            I(d,0x18)=snd_start_in_slot(0x10,0x21,m); I(d,0xC)=8; I(d,0x20)=FloatToInt(h);
+        if(I(vars,4)==0 && I(vars,8)==0) {
+            I(vars,0x18)=snd_start_in_slot(0x10,0x21,moby); I(vars,0xC)=8; I(vars,0x20)=FloatToInt(hour_f);
         }
-        H(m,0x96)=0;
+        H(moby,0x96)=0;
     }
-    F(m,0xF0)=(float)(I(d,4)*6)*0.01745329424738884f;
-    F(P(d,0x10),0xF0)=((float)I(d,8)*6.0f+(float)I(d,4)*0.1f)*0.01745329424738884f;
-    angle=(float)I(d,0); if(angle>12.0f) angle-=12.0f;
+    F(moby,0xF0)=(float)(I(vars,4)*6)*0.01745329424738884f;
+    F(P(vars,0x10),0xF0)=((float)I(vars,8)*6.0f+(float)I(vars,4)*0.1f)*0.01745329424738884f;
+    angle=(float)I(vars,0); if(angle>12.0f) angle-=12.0f;
     angle *= 30.0f;
-    angle += (float)I(d,8)*0.5f;
-    F(P(d,0x14),0xF0)=angle*0.01745329424738884f;
-    if(H(m,0x96)<65535) ++H(m,0x96);
-    if(math_fast_float_d(d+0xC) && I(d,0x20) && !snd_is_voice_playing_for_owner(m,I(d,0x18))) {
-        I(d,0x18)=-1; snd_start_in_slot(0x11,0x21,m); I(d,0xC)=100; --I(d,0x20);
+    angle += (float)I(vars,8)*0.5f;
+    F(P(vars,0x14),0xF0)=angle*0.01745329424738884f;
+    if(H(moby,0x96)<65535) ++H(moby,0x96);
+    if(math_fast_float_d(vars+0xC) && I(vars,0x20) && !snd_is_voice_playing_for_owner(moby,I(vars,0x18))) {
+        I(vars,0x18)=-1; snd_start_in_slot(0x11,0x21,moby); I(vars,0xC)=100; --I(vars,0x20);
     }
 }

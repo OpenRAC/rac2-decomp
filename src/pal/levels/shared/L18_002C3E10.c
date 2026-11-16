@@ -7,10 +7,11 @@ extern u8 g_hero_state[];
 extern u32 g_pad_pressed_flags;
 extern s32 g_hero_frozen_flag MACRO_ADDR;
 extern void set_hero_animation_pal(s32, s32, float);
-extern u8 *func_PAL_L18_0042D088(u8 *, s32);
+extern u8 *shooter_fire_shot_pal(u8 *, s32);
 #define H ((Hero *)D_00189E20)
 
-void func_PAL_L18_002C3E10(void)
+/* Handles the player grabbing and letting go of a held object, and triggers its pickup effect (PAL: 50 Hz timings). */
+void hero_update_held_grab_pal(void)
 {
     u8 *object;
     object = H->ptr[0x2290 / 4];
@@ -32,13 +33,13 @@ void func_PAL_L18_002C3E10(void)
     object = H->ptr[0x2290 / 4];
     if (object[0x42] == 11 || (*(u64 *)(object + 0x40) & 0xFFFF0000ULL) == 0x0BFF0000ULL) {
         H->f[0xC20 / 4] = 3.0f;
-        if (*(s16 *)(object + 0xAA) == 0xEE1) {
+        if (*(s16 *)(object + 0xAA) == MOBY_CLASS_RECEIVER_BOT) {
             if (H->i[0x1D8 / 4] > 2) {
-                if (H->i[0x1D8 / 4] % 5 == 0) func_PAL_L18_0042D088(object, 0);
-                if ((H->i[0x1D8 / 4] + 2) % 5 == 0) func_PAL_L18_0042D088(H->ptr[0x2290 / 4], 1);
+                if (H->i[0x1D8 / 4] % 5 == 0) shooter_fire_shot_pal(object, 0);
+                if ((H->i[0x1D8 / 4] + 2) % 5 == 0) shooter_fire_shot_pal(H->ptr[0x2290 / 4], 1);
             }
         } else if (*(s16 *)(object + 0xAA) == 0xED4 && H->i[0x1D8 / 4] % 5 != 0) {
-            func_PAL_L18_0042D088(object, 0);
+            shooter_fire_shot_pal(object, 0);
         }
     }
 }

@@ -35,7 +35,7 @@ typedef struct {
 } HeroMotionSequence;
 
 /* Apply gravity and the current jump or hovering motion to the hero's velocity. */
-void func_PAL_L00_002B6488(void)
+void ApplyHeroGravityAndJumpMotion_pal(void)
 {
     float v[4], w[4], u[4], len;
     float speed, distance;

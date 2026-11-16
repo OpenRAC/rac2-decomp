@@ -28,7 +28,8 @@ void* menu_init_two_sub_objects(void* param_1);
 /* Disassembly: jr ra; move v0,a0 (MIPS delay slot) */
 /* Compiled with: -O2 -G0 -ffunction-sections */
 
-void func_US2_L00_00443BF0(char *object, int value) {
+/* Stores a value in the first of two adjacent object fields. */
+void object_set_field_first_us2(char *object, int value) {
     *(int *)(object + 0x159c) = value;
 }
 

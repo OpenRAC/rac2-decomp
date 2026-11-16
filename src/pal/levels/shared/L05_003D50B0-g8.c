@@ -11,7 +11,7 @@ extern float math_random_signed_float_range(float, float);
 extern float math_random_angle(void);
 extern void vec_build_spherical_offset(void *, float, float, float);
 extern int math_random_int_range(int, int);
-extern char *func_PAL_002BE9A8(void *, int, float, float, float, void *, int, int, float);
+extern char *part_spawn_spinning_spark_pal(void *, int, float, float, float, void *, int, int, float);
 extern int math_random_int_below(int);
 struct HitRecord {
     float pos[4];
@@ -24,7 +24,8 @@ struct HitRecord {
     char pad[12];
 };
 
-void func_PAL_L05_003D50B0(char *obj, char *input, float *output)
+/* Applies damage to the thing a shot hit and makes a small spray of sparks when the target is a special one (PAL). */
+void feltzin_shot_hit_pal(char *obj, char *input, float *output)
 {
     struct HitRecord hit __attribute__((aligned(16)));
     float pos[4] __attribute__((aligned(16)));
@@ -52,23 +53,23 @@ void func_PAL_L05_003D50B0(char *obj, char *input, float *output)
         float count = 20.0f, scale = 3.0f, spread = 2.0f;
         qcopy(pos, obj + 0x10);
         for (i = 0; (float)i < count; i++) {
-            float a, b;
-            char *p;
+            float yaw, pitch;
+            char *particle;
             output[0] = pos[0] + math_random_signed_float_range(0.0f, spread);
             output[1] = pos[1] + math_random_signed_float_range(0.0f, spread);
             output[2] = pos[2] + math_random_signed_float_range(0.0f, spread);
-            a = math_random_angle();
-            b = math_random_angle();
-            vec_build_spherical_offset(vel, 0.060000002f, a, b);
-            p = func_PAL_002BE9A8(output, math_random_int_range(-3, 3), 0.0f, 1.0f, 1.0f, vel, 0x7FFFFFFF, 0, scale * 210000.0f);
-            if (p) {
-                char *q = p + 0x20;
-                *(short *)(p + 0xA) = 100;
-                *(unsigned char *)(p + 8) = math_random_int_below(255);
-                p[3] = 0x44;
-                *(int *)(q + 4) = 2;
-                q[0xA] = 127;
-                q[0xB] = *(unsigned char *)(p + 0xA);
+            yaw = math_random_angle();
+            pitch = math_random_angle();
+            vec_build_spherical_offset(vel, 0.060000002f, yaw, pitch);
+            particle = part_spawn_spinning_spark_pal(output, math_random_int_range(-3, 3), 0.0f, 1.0f, 1.0f, vel, 0x7FFFFFFF, 0, scale * 210000.0f);
+            if (particle) {
+                char *particle_data = particle + 0x20;
+                *(short *)(particle + 0xA) = 100;
+                *(unsigned char *)(particle + 8) = math_random_int_below(255);
+                particle[3] = 0x44;
+                *(int *)(particle_data + 4) = 2;
+                particle_data[0xA] = 127;
+                particle_data[0xB] = *(unsigned char *)(particle + 0xA);
             }
         }
     }
@@ -86,32 +87,32 @@ extern float g_particle_params_third[] SDATA(D_L05_001AFC80);
 
 /* For each of two points in the object's frame, either side of it in Y, makes three copies of the
    point and passes each to func_L00_0033C0D0 with a random speed. */
-void func_PAL_L05_003D5800(char *obj)
+void feltzin_enemy_spawn_exhaust_pal(char *obj)
 {
-    float a[4] __attribute__((aligned(16)));
+    float left_offset[4] __attribute__((aligned(16)));
     float speed[4] __attribute__((aligned(16)));
-    float p[4] __attribute__((aligned(16)));
+    float point[4] __attribute__((aligned(16)));
     float p1[4] __attribute__((aligned(16)));
     float p2[4] __attribute__((aligned(16)));
     float p3[4] __attribute__((aligned(16)));
-    float b[4] __attribute__((aligned(16)));
+    float right_offset[4] __attribute__((aligned(16)));
     float factor;
     float y;
 
-    *(TI128 *)a = 0;
-    a[0] = -0.21f;
-    a[1] = 0.061f;
+    *(TI128 *)left_offset = 0;
+    left_offset[0] = -0.21f;
+    left_offset[1] = 0.061f;
     *(TI128 *)speed = 0;
-    a[2] = 0.045f;
-    a[3] = 1.0f;
-    matrix_mul_vec3(p, a, obj + 0xC0);
+    left_offset[2] = 0.045f;
+    left_offset[3] = 1.0f;
+    matrix_mul_vec3(point, left_offset, obj + 0xC0);
     factor = 0.4f;
-    FastVecAdd(p, p, obj + 0x10);
-    p[3] = 0;
-    qcopy(p1, p);
-    qcopy(p2, p);
-    qcopy(p3, p);
-    vec_add_random_offset(p, 0.1f);
+    FastVecAdd(point, point, obj + 0x10);
+    point[3] = 0;
+    qcopy(p1, point);
+    qcopy(p2, point);
+    qcopy(p3, point);
+    vec_add_random_offset(point, 0.1f);
     vec_add_random_offset(p1, 0.1f);
     vec_add_random_offset(p2, 0.1f);
     vec_add_random_offset(p3, 0.1f);
@@ -122,18 +123,18 @@ void func_PAL_L05_003D5800(char *obj)
     speed[0] = -(math_random_float_range(30.0f, 40.0f) * (0.020000001f)) * factor;
     part_spawn_object_relative_particle(obj, p3, speed, g_particle_params_third, 1);
     y = -0.061f;
-    *(TI128 *)b = 0;
-    b[0] = -0.21f;
-    b[1] = y;
-    b[2] = 0.045f;
-    b[3] = 1.0f;
-    matrix_mul_vec3(p, b, obj + 0xC0);
-    FastVecAdd(p, p, obj + 0x10);
-    p[3] = 0;
-    qcopy(p1, p);
-    qcopy(p2, p);
-    qcopy(p3, p);
-    vec_add_random_offset(p, 0.1f);
+    *(TI128 *)right_offset = 0;
+    right_offset[0] = -0.21f;
+    right_offset[1] = y;
+    right_offset[2] = 0.045f;
+    right_offset[3] = 1.0f;
+    matrix_mul_vec3(point, right_offset, obj + 0xC0);
+    FastVecAdd(point, point, obj + 0x10);
+    point[3] = 0;
+    qcopy(p1, point);
+    qcopy(p2, point);
+    qcopy(p3, point);
+    vec_add_random_offset(point, 0.1f);
     vec_add_random_offset(p1, 0.1f);
     vec_add_random_offset(p2, 0.1f);
     vec_add_random_offset(p3, 0.1f);

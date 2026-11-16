@@ -14,7 +14,7 @@ extern int g_beam_blocked_flag __attribute__((sda));
 extern int IsPointInCuboid(void *, int);
 extern void snd_stop_voice(int);
 extern int moby_count_group_not_in_state(int, int);
-extern void func_PAL_L16_003ADB58(void *);
+extern void start_vendor_beam_pulse_pal(void *);
 extern int FastDecTimer(void *);
 extern int snd_play_from_class_bank(int, int, void *, int);
 extern void streak_effect_update(void *);
@@ -39,7 +39,7 @@ static __inline__ void clear_link(char *state)
 
 /* func_PAL_L16_003AD850, the PAL copy of func_L16_003AA108: the same C, with the 50 Hz scale on the two timers. */
 /* Advances the object's timed activation states and maintains its linked effect. */
-void func_PAL_L16_003AD850(char *object)
+void lightning_l16_beam_update_pal(char *object)
 {
     char *state = *(char **)(object + 104);
     char *target;
@@ -66,7 +66,7 @@ active:
         return;
     switch (*(unsigned char *)(object + 32)) {
     case 0:
-        func_PAL_L16_003ADB58(object);
+        start_vendor_beam_pulse_pal(object);
         *(short *)(state + 16) = (*(int *)(state + 12) * 5 + 2) / 6;
         *(unsigned char *)(object + 32) = 1;
         *(float *)(state + 1572) = 2.5f;
@@ -95,7 +95,7 @@ active:
                 *(unsigned char *)(object + 32) = 2;
             *(short *)(state + 16) = 0;
         } else if (*(short *)(state + 18) == 0) {
-            func_PAL_L16_003ADB58(object);
+            start_vendor_beam_pulse_pal(object);
         }
         break;
     }

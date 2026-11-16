@@ -69,7 +69,8 @@ extern void shop_mark_bought_special_items_owned(void);
 
 /* func_US2_L00_00378C38, the v2.00 copy of func_L00_003778F0: the same panel, where the top
  * counter's y depends on ref_US2_L00_00378C38_00 and its icon's y and height on D_001A7B90. */
-void func_US2_L00_00378C38(void) {
+/* Draws the selected item's info panel: corner art, price, name and the top bolt counter (USA v2.00 positions). */
+void shop_draw_selected_item_info_panel_us2(void) {
     PanelColors colors;
     char text[256];
     char *model = (char *)&g_purchase_menu_model;
@@ -119,34 +120,34 @@ typedef struct {
     char pad88[0xBC];
     struct { int price; int rest[6]; } cells[0]; /* Variable-length trailing table. */
 } UpgradeModel;
-extern void func_US2_00280440(int, int, unsigned long long, unsigned char *, int, int, float);
+extern void text_draw_shrunk_to_width_us2(int, int, unsigned long long, unsigned char *, int, int, float);
 extern void hud_draw_sprite(int, int, int, int, int, int);
 
 /* func_US2_L00_00379928, the v2.00 copy of func_L00_00378578: the same panel, with its prompts drawn
  * through func_US2_00280440 at scale 0.7 and moved up when D_001A7B90 is set. */
-void func_US2_L00_00379928(void) {
+void shop_draw_selected_item_purchase_panel_us2(void) {
     UpgradeModel *model = (UpgradeModel *)&g_purchase_menu_model;
     int index = model->index;
     int mode;
     int y;
     if (model->state != 0) {
         if (model->cells[index].price <= g_bolt_count) {
-            func_US2_00280440(444, (int)(g_menu_slide_scale * 190.0f + 0.5f), 0x80F0F0F0ULL,
+            text_draw_shrunk_to_width_us2(444, (int)(g_menu_slide_scale * 190.0f + 0.5f), 0x80F0F0F0ULL,
                               (unsigned char *)GetLocalizedString(0x31C7), -1, 82, 0.7f);
-            func_US2_00280440(444, (int)(g_menu_slide_scale * 214.0f + 0.5f), 0x80F0F0F0ULL,
+            text_draw_shrunk_to_width_us2(444, (int)(g_menu_slide_scale * 214.0f + 0.5f), 0x80F0F0F0ULL,
                               (unsigned char *)GetLocalizedString(0x31C4), -1, 82, 0.7f);
         } else {
             int top;
             mode = g_is_pal_video;
             y = (int)(g_menu_slide_scale * 214.0f + 0.5f);
             top = mode ? y - 11 : y;
-            func_US2_00280440(444, top, 0x80F0F0F0ULL,
+            text_draw_shrunk_to_width_us2(444, top, 0x80F0F0F0ULL,
                               (unsigned char *)GetLocalizedString(0x31B0), -1, 82, 0.7f);
         }
     } else {
-        func_US2_00280440(444, (int)(g_menu_slide_scale * 190.0f + 0.5f), 0x80F0F0F0ULL,
+        text_draw_shrunk_to_width_us2(444, (int)(g_menu_slide_scale * 190.0f + 0.5f), 0x80F0F0F0ULL,
                           (unsigned char *)GetLocalizedString(0x31B1), -1, 82, 0.7f);
-        func_US2_00280440(444, (int)(g_menu_slide_scale * 214.0f + 0.5f), 0x80F0F0F0ULL,
+        text_draw_shrunk_to_width_us2(444, (int)(g_menu_slide_scale * 214.0f + 0.5f), 0x80F0F0F0ULL,
                           (unsigned char *)GetLocalizedString(0x2BE5), -1, 82, 0.7f);
     }
     {
@@ -169,7 +170,7 @@ void func_US2_L00_00379928(void) {
 /* func_L00_00378578 is defined in L00_00378578.c. */
 
 /* Draws the selected purchase prompt, quantity, total price and bolt icon. */
-void func_US2_L00_00379C50(void) {
+void shop_draw_vendor_purchase_panel_us2(void) {
     TextLayout copy;
     /* This 24-byte workspace becomes the four-color array after drawing text. */
     union { TextLayout layout; unsigned int colors[4]; } seed;
@@ -239,7 +240,7 @@ typedef struct {
 extern void *memset(void *, int, unsigned int);
 
 /* Draws the confirmation prompt, with another message and layout when the price is affordable. */
-void func_US2_L00_0037A050(void) {
+void shop_draw_purchase_affordability_prompt_us2(void) {
     TextLayout copy;
     TextLayout layout;
     ConfirmModel *model = (ConfirmModel *)&g_purchase_menu_model;
@@ -274,7 +275,7 @@ void func_US2_L00_0037A050(void) {
 
 /* func_US2_L00_0037A5D0, the v2.00 copy of func_002FAE68: the same state machine, where the
  * prompts are looked up in the text table. */
-void func_US2_L00_0037A5D0(void) {
+void shop_l00_step_message_states_us2(void) {
     {
     static void *rc2_labels[] = {&&rc2_case_0, &&rc2_case_1, &&rc2_case_2, &&rc2_case_3, &&rc2_case_4, &&rc2_case_5, &&rc2_case_6};
     unsigned int rc2_selector = (unsigned int)(g_vendor_menu_state.st);

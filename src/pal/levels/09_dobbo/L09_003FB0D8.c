@@ -7,7 +7,7 @@
 extern unsigned char *CreateMoby(int);
 extern float IntToFloat(int);
 extern void moby_set_state(unsigned char *, int, int);
-extern void func_PAL_002A7E68(unsigned char *, int, int, int);
+extern void anim_start_blended_pal(unsigned char *, int, int, int);
 extern float math_random_angle(void);
 
 typedef struct DobboMoby DobboMoby;
@@ -64,7 +64,7 @@ struct DobboMoby {
 /* Spawns a beam-link moby (class 0xD09) at the given position with a random rotation, the
    class scale and the given direction, owner, partner link, radius, range and duration. A spawn
    without a partner also sets byte 0xBC. Returns the moby, or NULL if none was available. */
-DobboMoby *func_PAL_L09_003FB0D8(void *position, void *direction, DobboMoby *owner, DobboMoby *partner,
+DobboMoby *spawn_beam_link_pal(void *position, void *direction, DobboMoby *owner, DobboMoby *partner,
                                  int duration, float radius, float f2c, float max_distance)
 {
     DobboMoby *moby = (DobboMoby *)CreateMoby(0xD09);
@@ -96,7 +96,7 @@ DobboMoby *func_PAL_L09_003FB0D8(void *position, void *direction, DobboMoby *own
         if (!partner)
             moby->f_bc = !partner;
         if (moby->f43)
-            func_PAL_002A7E68((unsigned char *)moby, 0, 0, 1);
+            anim_start_blended_pal((unsigned char *)moby, 0, 0, 1);
         moby->f31 = 0;
         moby->f48 = 0.5f;
         moby->flags |= 1;

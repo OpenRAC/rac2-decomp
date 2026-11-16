@@ -20,6 +20,7 @@ extern float math_random_angle(void);
 
 
 
+/* Starts a burst of particles and sparks in a direction from a point (PAL: 50 Hz timings). */
 void EmitRingAndDirectionalParticles_pal(char *object, int unused, char *pos, char *direction)
 {
     float a[4], b[4], c[4], d[4];

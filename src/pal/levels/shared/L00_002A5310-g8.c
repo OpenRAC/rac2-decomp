@@ -17,26 +17,26 @@ extern s32 math_random_int_below(s32);
    the helper twice and stores the sum of the two answers. */
 void hero_update_effect_delay_timer_pal(void)
 {
-    u8 *b = g_hero_state;
+    u8 *hero_bytes = g_hero_state;
     s32 first_delay;
     s32 second_delay;
     s32 biased_delay;
     s32 tick;
 
-    if (*(s32 *)(b + 0x1180) != 0)
+    if (*(s32 *)(hero_bytes + 0x1180) != 0)
         return;
-    if (*(s32 *)(b + 0x1188) == 0) {
-        *(s32 *)(b + 0x1184) = ref_L00_002A5310_00 + 25;
+    if (*(s32 *)(hero_bytes + 0x1188) == 0) {
+        *(s32 *)(hero_bytes + 0x1184) = ref_L00_002A5310_00 + 25;
         return;
     }
-    if (g_frame_l00_counter > *(s32 *)(b + 0x1184)) {
-        *(s32 *)(b + 0x1180) = 1;
-        first_delay = math_random_int_below(*(s32 *)(b + 0x1188));
-        second_delay = math_random_int_below(*(s32 *)(b + 0x1188));
+    if (g_frame_l00_counter > *(s32 *)(hero_bytes + 0x1184)) {
+        *(s32 *)(hero_bytes + 0x1180) = 1;
+        first_delay = math_random_int_below(*(s32 *)(hero_bytes + 0x1188));
+        second_delay = math_random_int_below(*(s32 *)(hero_bytes + 0x1188));
         biased_delay = first_delay + 17;
         tick = ref_L00_002A5310_00;
         tick = tick + biased_delay;
         tick = tick + second_delay;
-        *(s32 *)(b + 0x1184) = tick;
+        *(s32 *)(hero_bytes + 0x1184) = tick;
     }
 }

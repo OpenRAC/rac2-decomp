@@ -31,7 +31,7 @@ extern int FloatToInt(float);
 extern void FastVecAdd(void *, void *, void *);
 
 /* Age a smoke particle: fade its colour towards grey and its alpha in and out. */
-void func_PAL_002C21D8(SmokeParticle *p)
+void part_update_smoke_pal(SmokeParticle *p)
 {
     SmokeMotion *m = &p->motion;
     float t;

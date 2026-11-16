@@ -29,7 +29,8 @@ extern int FloatToInt(float);
 extern float IntToFloat(int);
 extern int func_001163B0(void);
 
-void func_PAL_002BE880(void *pos, void *dir, u32 color, s32 flags, s32 frames, f32 size) {
+/* Spawns a growing puff of smoke that starts small and grows to the given size over the given frames. */
+void part_spawn_growing_puff_pal(void *pos, void *dir, u32 color, s32 flags, s32 frames, f32 size) {
     Puff2BDBC0 *p;
     Effect2BDBC0 *e;
     f32 len;

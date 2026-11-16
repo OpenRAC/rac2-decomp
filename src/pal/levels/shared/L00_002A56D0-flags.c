@@ -19,7 +19,7 @@ extern void *CreateMoby(int);
 extern void moby_transform_joint_point(void *, s32, void *);
 extern void func_002A0F48(u8 *);
 extern void copy_matrix3x4(u8 *, void *);
-extern void func_PAL_002A7E68(u8 *, s32, s32, s32);
+extern void anim_start_blended_pal(u8 *, s32, s32, s32);
 extern void euler_to_matrix(void *, void *);
 extern void multiply_matrix(void *, void *, void *);
 typedef struct {
@@ -68,12 +68,12 @@ void hero_update_held_object_pal(void) {
         *(u64 *)(g_hero_state.p1860 + 0x38) = *(u64 *)(g_hero_state.p2290 + 0x38);
         if (g_hero_state.f2294 == 0x4B) {
             if (*(u8 *)(g_hero_state.p1860 + 0x43) != 1) {
-                func_PAL_002A7E68(g_hero_state.p1860, 1, 0, 0x8);
+                anim_start_blended_pal(g_hero_state.p1860, 1, 0, 0x8);
             }
         } else {
             p = g_hero_state.p1860;
             if (*(u8 *)(p + 0x43) != 0) {
-                func_PAL_002A7E68(g_hero_state.p1860, 0, 0, 0xE);
+                anim_start_blended_pal(g_hero_state.p1860, 0, 0, 0xE);
             }
         }
     }

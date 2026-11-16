@@ -22,7 +22,8 @@ extern void gfx_add_draw_callback_third(void (*)(void *), void *);
 extern char g_sound_state[];
 extern void gfx_draw_scrolling_surface_quad(void *);
 
-void func_PAL_L14_00437BB8(char *object)
+/* Scrolling-surface effect: waits a random time in states 2 and 3, plays its looping sound, and draws its quad. (PAL: 50 Hz timings) */
+void prison_scrolling_surface_update_pal(char *object)
 {
     int *state = *(int **)(object + 0x68);
     switch ((unsigned char)object[0x20]) {

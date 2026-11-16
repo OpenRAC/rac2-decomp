@@ -11,7 +11,8 @@ extern int FastTweenColor(int, int, float);
 extern void gfx_draw_owner_effect_slots_pal(void *);
 extern void gfx_draw_billboard_quad(char *, int, unsigned int, int, float, float, float);
 
-void func_PAL_00317768(void *object)
+/* Draws the lock-on launcher's sprites: the effect slots and three pulsing billboards at the emitter (PAL: faster pulse). */
+void lock_on_draw_sprites_pal(void *object)
 {
     float angle = FastAddRotations(g_lock_on_sprite_angle, 0.15f);
     float scale;

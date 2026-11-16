@@ -12,33 +12,34 @@ extern float g_swamp_beast_move_step_param __attribute__((sda));
 extern float g_swamp_beast_angular_accel_param __attribute__((sda));
 extern float g_swamp_beast_angular_speed_param __attribute__((sda));
 extern float g_swamp_beast_angular_step_param __attribute__((sda));
-extern float func_PAL_L01_003BEB40(void);
+extern float level_get_water_height_pal(void);
 extern int FloatToInt(float);
 extern int math_random_int_range(int,int);
 extern void moby_set_controller_speed_limits(u8 *,float,float,float,float);
 extern float path_l01_compute_segment_lengths(unsigned char *);
 extern void moby_set_state(void *,int,int);
-extern void func_PAL_002A7E68(void *,int,int,int);
+extern void anim_start_blended_pal(void *,int,int,int);
 extern float coll_probe_ground_height_below(void *,int,float);
 extern void *moby_spawn_linked_helper(u8 *,void *,u32,float,float);
 
-void swamp_beast_init_state_pal(u8 *object)
+/* Sets up a swimming creature when it appears: fixes its water height, speeds, turn rates and starting animation (PAL version). */
+void swamp_beast_init_state_pal(u8 *moby)
 {
-    u8 *state = *(u8 **)(object+0x68);
-    float height, scale, angularStep, movementStep;
-    float acceleration, velocity, angularAcceleration, angularVelocity;
-    int handle;
-    if (g_oozla_intro_stage == 0 && object[0x21] != 255) *P(state,0x33C) = 0;
-    height = func_PAL_L01_003BEB40();
+    u8 *state = *(u8 **)(moby+0x68);
+    float height, scale, angular_step, movement_step;
+    float acceleration, velocity, angular_acceleration, angular_velocity;
+    int wait_time;
+    if (g_oozla_intro_stage == 0 && moby[0x21] != 255) *P(state,0x33C) = 0;
+    height = level_get_water_height_pal();
     if (height > 0.0f) F(state,0x34C) = height;
     if (!(height > 0.0f) && g_oozla_intro_stage < 4) return;
     I(state,0x378) = 0;
-    if (object[0x21] != 255) {
+    if (moby[0x21] != 255) {
         *P(state,0x368) = 0;
         *P(state,0x36C) = -1;
         *P(state,0x370) = -1;
     }
-    qcopy((state+0x2D0), (object+0x10));
+    qcopy((state+0x2D0), (moby+0x10));
     state[0x48] = FloatToInt(10.0f);
     state[0x4A] = FloatToInt(8.0f);
     I(state,0xA8) = 5;
@@ -50,29 +51,29 @@ void swamp_beast_init_state_pal(u8 *object)
     if (F(state,0x37C) == 0.0f) F(state,0x37C) = 1.0f;
     state[0x28] = 3;
     state[0x2A] = 6;
-    angularStep = g_swamp_beast_angular_step_param * 0.0003490659f;
-    movementStep = g_swamp_beast_move_step_param * 0.020000001f;
+    angular_step = g_swamp_beast_angular_step_param * 0.0003490659f;
+    movement_step = g_swamp_beast_move_step_param * 0.020000001f;
     F(state,0x30) = 0.5f;
     F(state,0x210) = 1.0f;
     F(state,0x21C) = 5.0f;
     F(state,0x220) = 6.0f;
-    F(state,0x218) = angularStep;
-    F(state,0x214) = movementStep;
-    handle = math_random_int_range(100,0);
+    F(state,0x218) = angular_step;
+    F(state,0x214) = movement_step;
+    wait_time = math_random_int_range(100,0);
     scale = F(state,0x37C);
     acceleration = g_swamp_beast_accel_param*(scale*0.00040000002f);
     velocity = g_swamp_beast_speed_param*(scale*0.020000001f);
-    angularAcceleration = g_swamp_beast_angular_accel_param*(scale*6.981318e-06f);
-    angularVelocity = g_swamp_beast_angular_speed_param*(scale*0.0003490659f);
+    angular_acceleration = g_swamp_beast_angular_accel_param*(scale*6.981318e-06f);
+    angular_velocity = g_swamp_beast_angular_speed_param*(scale*0.0003490659f);
     F(state,0x110) = 1.0f;
-    I(state,0x32C) = handle;
+    I(state,0x32C) = wait_time;
     F(state,0x114) = 0.2f;
     F(state,0x118) = 0.25f;
     F(state,0x120) = 0.52359885f;
     F(state,0x11C) = 0.25f;
     F(state,0x140) = 0.52359885f;
     F(state,0x13C) = 0.0072000003f;
-    moby_set_controller_speed_limits(object,acceleration,velocity,angularAcceleration,angularVelocity);
+    moby_set_controller_speed_limits(moby,acceleration,velocity,angular_acceleration,angular_velocity);
     if (I(state,0x30C) != -1) path_l01_compute_segment_lengths(g_path_l01_table[I(state,0x30C)]);
     if (I(state,0x364) != -1) path_l01_compute_segment_lengths(g_path_l01_table[I(state,0x364)]);
     if (I(state,0x308) == -1) {
@@ -80,37 +81,37 @@ void swamp_beast_init_state_pal(u8 *object)
     } else {
         path_l01_compute_segment_lengths(g_path_l01_table[I(state,0x308)]);
         I(state,0x14C) = I(state,0x308);
-        moby_set_state(object,1,1);
-        F(object,0x18) = F(state,0x34C);
+        moby_set_state(moby,1,1);
+        F(moby,0x18) = F(state,0x34C);
     }
     if (I(state,0x374) != 0) {
-        moby_set_state(object,5,1);
-        F(object,0x18) = F(state,0x34C) + -2.0f;
+        moby_set_state(moby,5,1);
+        F(moby,0x18) = F(state,0x34C) + -2.0f;
     }
-    I(object,0x98) = 0;
-    if (object[0x43] != 4) func_PAL_002A7E68(object,4,0,2);
+    I(moby,0x98) = 0;
+    if (moby[0x43] != 4) anim_start_blended_pal(moby,4,0,2);
     goto next;
 grounded:
-    F(object,0x18) = coll_probe_ground_height_below(object+0x10,0,0.5f);
+    F(moby,0x18) = coll_probe_ground_height_below(moby+0x10,0,0.5f);
     if (I(state,0x364) != -1)
         I(state,0x14C) = I(state,0x364);
     else
         I(state,0x14C) = I(state,0x30C);
-    object[0xBC] = 0;
+    moby[0xBC] = 0;
     I(state,0x398) = I(state,0x394);
     F(state,0x39C) = F(state,0x388);
-    moby_set_state(object,1,3);
-    if (object[0x43] != 0) func_PAL_002A7E68(object,0,0,2);
+    moby_set_state(moby,1,3);
+    if (moby[0x43] != 0) anim_start_blended_pal(moby,0,0,2);
 next:
     if (I(state,0x380) != -1) {
-        if (object[0x43] != 20) func_PAL_002A7E68(object,20,0,2);
+        if (moby[0x43] != 20) anim_start_blended_pal(moby,20,0,2);
         I(state,0x14C) = I(state,0x30C);
         I(state,0x398) = I(state,0x390);
         F(state,0x39C) = F(state,0x388);
-        moby_set_state(object,6,3);
+        moby_set_state(moby,6,3);
     }
-    qcopy((state+0x200), (object+0x10));
-    moby_spawn_linked_helper(object,object+0x10,5,0.2f,2.0f);
+    qcopy((state+0x200), (moby+0x10));
+    moby_spawn_linked_helper(moby,moby+0x10,5,0.2f,2.0f);
     I(state,0x39C) = 0;
     I(state,0x398) = I(state,0x390);
 }

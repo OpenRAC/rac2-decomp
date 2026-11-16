@@ -25,12 +25,12 @@ typedef struct {
 /* Particle returned by func_002BDCE8. */
 typedef struct {
     unsigned char pad00[8];
-    unsigned char f08;
+    unsigned char unk_08;
     unsigned char life;
     union {
         short word;
         unsigned char byte;
-    } f0A;
+    } unk_0A;
     unsigned char pad0C[0x14];
     ParticleTail tail;
 } Particle;
@@ -57,7 +57,7 @@ extern int FloatToInt(float);
 /* func_PAL_L06_0033D990, the PAL copy of func_L06_0033BDC0: the same C, where the rates scale by 6/5,
    the particle timer 7 becomes 6 at 50 Hz, and state 0x33 skips the 0xFA0 objects. */
 /* Update special scene objects, then emit the ship's paired exhaust particles. */
-void func_PAL_L06_0033D990(void)
+void notak_scene_effects_update_pal(void)
 {
     Vector left, right, velocity, position, shift;
     Moby *ship;
@@ -73,7 +73,7 @@ void func_PAL_L06_0033D990(void)
             obj->flags |= 0x800;
         if (obj->class_id == 0xD54)
             UpdateEquipmentPieces(obj);
-        if (obj && obj->class_id == 0xFA0 && g_current_map_index != 0x33) {
+        if (obj && obj->class_id == MOBY_CLASS_TV_SCREENS && g_current_map_index != 0x33) {
             char *state = obj->state;
 
             if (state)
@@ -99,32 +99,32 @@ void func_PAL_L06_0033D990(void)
     first = SpawnSpinningSparkParticle(position, 0.1f, 1.0f, 0.9f, rotation, velocity, 315000.0f, 0xDF204080, 0);
     if (first) {
         ParticleTail *tail = &first->tail;
-        first->f0A.word = 6;
+        first->unk_0A.word = 6;
         first->life = FloatToInt(4.0f) + 0x70;
         tail->mode = 2;
         tail->tint = 0xDF;
-        tail->frame = first->f0A.byte;
+        tail->frame = first->unk_0A.byte;
     }
 
     second = SpawnSpinningSparkParticle(position, 0.1f, 1.0f, 0.9f, rotation, velocity, 315000.0f, 0xDF204080, 0);
     if (second) {
         ParticleTail *tail = &second->tail;
-        first->f0A.word = 6;
+        first->unk_0A.word = 6;
         first->life = FloatToInt(4.0f) + 0x70;
         tail->mode = 2;
         tail->tint = 0xDF;
-        tail->frame = first->f0A.byte;
+        tail->frame = first->unk_0A.byte;
     }
 
     spark = SpawnSpinningSparkParticle(position, 0.05f, 1.0f, 0.97f, 16, velocity, 210000.0f, 0xDFFFFFFF, 0);
     if (spark) {
         ParticleTail *tail = &spark->tail;
         spark->life = FloatToInt(4.0f) + 0x70;
-        spark->f0A.word = 6;
-        spark->f08 = math_random_int_below(255);
+        spark->unk_0A.word = 6;
+        spark->unk_08 = math_random_int_below(255);
         tail->mode = 2;
         tail->tint = 0xDF;
-        tail->frame = first->f0A.byte;
+        tail->frame = first->unk_0A.byte;
     }
 
     *(VectorBits *)shift = *(VectorBits *)ship->offset;
@@ -134,31 +134,31 @@ void func_PAL_L06_0033D990(void)
     first = SpawnSpinningSparkParticle(position, 0.1f, 1.0f, 0.9f, 16, velocity, 315000.0f, 0xDF204080, 0);
     if (first) {
         ParticleTail *tail = &first->tail;
-        first->f0A.word = 6;
+        first->unk_0A.word = 6;
         first->life = FloatToInt(4.0f) + 0x70;
         tail->mode = 2;
         tail->tint = 0xDF;
-        tail->frame = first->f0A.byte;
+        tail->frame = first->unk_0A.byte;
     }
 
     second = SpawnSpinningSparkParticle(position, 0.1f, 1.0f, 0.9f, 16, velocity, 315000.0f, 0xDF204080, 0);
     if (second) {
         ParticleTail *tail = &second->tail;
-        first->f0A.word = 6;
+        first->unk_0A.word = 6;
         first->life = FloatToInt(4.0f) + 0x70;
         tail->mode = 2;
         tail->tint = 0xDF;
-        tail->frame = first->f0A.byte;
+        tail->frame = first->unk_0A.byte;
     }
 
     spark = SpawnSpinningSparkParticle(position, 0.05f, 1.0f, 0.97f, 16, velocity, 210000.0f, 0xDFFFFFFF, 0);
     if (spark) {
         ParticleTail *tail = &spark->tail;
         spark->life = FloatToInt(4.0f) + 0x70;
-        spark->f0A.word = 6;
-        spark->f08 = math_random_int_below(255);
+        spark->unk_0A.word = 6;
+        spark->unk_08 = math_random_int_below(255);
         tail->mode = 2;
         tail->tint = 0xDF;
-        tail->frame = first->f0A.byte;
+        tail->frame = first->unk_0A.byte;
     }
 }

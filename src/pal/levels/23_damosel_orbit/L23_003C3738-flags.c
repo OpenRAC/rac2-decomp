@@ -26,8 +26,8 @@ extern int snd_play_from_class_bank(int, int, char *, int);
    The clear of v.c is retail's `sq $zero,0($reg)`, a scheduling barrier (-frac2-zero-ti-barrier): the 1.0f
    is made before it, as retail does, and the table base is one local, so that the `lw 0x2290` and the
    `addiu 0x80` share its register. */
-void hero_launch_hit_effect_pal(char *arg0, float arg1, int unused1, int arg2) {
-    char *state = *(char **)(arg0 + 0x68);
+void hero_launch_hit_effect_pal(char *moby, float radius, int unused1, int side) {
+    char *vars = *(char **)(moby + 0x68);
     struct Vecs v;
     char *base = g_hero_state;
     float one;
@@ -38,12 +38,12 @@ void hero_launch_hit_effect_pal(char *arg0, float arg1, int unused1, int arg2) {
     v.c = 0;
     ((float *)&v.c)[1] = one;
     ((float *)&v.c)[3] = one;
-    if (arg2 != 0)
+    if (side != 0)
         ((float *)&v.c)[1] = -((float *)&v.c)[1];
-    moby_transform_joint_point(*(char **)(state + 0x2A0), arg2, (char *)&v.b);
+    moby_transform_joint_point(*(char **)(vars + 0x2A0), side, (char *)&v.b);
     transform_vector((char *)&v.c, (char *)&v.c, (char *)&v.b);
     FastVecSub((char *)&v.d, (char *)&v.a, (char *)&v.c);
     vec_scale_to_length((char *)&v.d, (char *)&v.d, g_mothership_hit_speed * 0.020000001f);
-    fast_shot_create_child_pal(arg0, (char *)&v.d, (char *)&v.c, 0, arg1);
-    snd_play_from_class_bank(3, 0, arg0, 0x7E5);
+    fast_shot_create_child_pal(moby, (char *)&v.d, (char *)&v.c, 0, radius);
+    snd_play_from_class_bank(3, 0, moby, 0x7E5);
 }

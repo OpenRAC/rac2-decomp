@@ -33,7 +33,8 @@ extern unsigned char *part_spawn_fading(void *, int, unsigned char, int, int, in
 extern void vec_scale_to_length(void *, void *, float);
 extern void FastVecAdd(void *, void *, void *);
 
-void func_PAL_L19_004289C0(char *obj)
+/* Spawns the flickering glow sprites of a pickup object, and sometimes sparks, trailing toward the player (PAL: 50 Hz timings). */
+void EmitGrelbinGlowSprites_pal(char *moby)
 {
     float origin[4] __attribute__((aligned(16)));
     float velocity[4] __attribute__((aligned(16)));
@@ -42,25 +43,25 @@ void func_PAL_L19_004289C0(char *obj)
     float step[4] __attribute__((aligned(16)));
     int i, color, alpha, spacing;
 
-    if (*(short *)(obj + 0xAA) == 0x11C7) {
-        vec_scale_to_length(point, obj + 0xE0, 1.5f);
-        FastVecAdd(origin, obj + 0x10, point);
+    if (*(short *)(moby + 0xAA) == 0x11C7) {
+        vec_scale_to_length(point, moby + 0xE0, 1.5f);
+        FastVecAdd(origin, moby + 0x10, point);
     } else {
-        moby_transform_joint_to_world(obj, 0, origin);
+        moby_transform_joint_to_world(moby, 0, origin);
     }
     if (!math_random_int_below(4)) {
         vec_random_direction(velocity, g_group_release_speed_min_a[0] * 0.020000001f, g_group_release_speed_max_a[0] * 0.020000001f);
         {
-            int glowAlpha = g_group_release_glow_alpha[0];
-            part_spawn_hero_relative(origin, velocity, g_group_release_particle_type_a[0], glowAlpha, math_random_int_below(255), 0,
+            int glow_alpha = g_group_release_glow_alpha[0];
+            part_spawn_hero_relative(origin, velocity, g_group_release_particle_type_a[0], glow_alpha, math_random_int_below(255), 0,
                           g_group_release_particle_scale_a[0]);
         }
         for (i = 2; i >= 0; i--) {
             vec_random_direction(jitter, g_group_release_speed_min_b[0] * 0.020000001f, g_group_release_speed_max_b[0] * 0.020000001f);
             FastVecAdd(velocity, velocity, jitter);
             {
-                int glowAlpha = g_group_release_glow_alpha[0];
-                part_spawn_hero_relative(origin, velocity, g_group_release_particle_type_b[0], glowAlpha, math_random_int_below(255), 0,
+                int glow_alpha = g_group_release_glow_alpha[0];
+                part_spawn_hero_relative(origin, velocity, g_group_release_particle_type_b[0], glow_alpha, math_random_int_below(255), 0,
                               g_group_release_particle_scale_b[0]);
             }
         }
@@ -79,7 +80,7 @@ void func_PAL_L19_004289C0(char *obj)
         if (i & 1)
             alpha = 255 - alpha;
         part_spawn_fading(point, color, alpha, g_group_release_fade_param_b[0], g_group_release_fade_param_a[0], 2, 0,
-                      (IntToFloat(i) + 3.0f) * (*(float *)(obj + 0x2C) / *(float *)(*(char **)(obj + 0x24) + 0x24)));
+                      (IntToFloat(i) + 3.0f) * (*(float *)(moby + 0x2C) / *(float *)(*(char **)(moby + 0x24) + 0x24)));
         FastVecAdd(point, point, step);
     }
 }

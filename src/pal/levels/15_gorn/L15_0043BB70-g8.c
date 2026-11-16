@@ -14,7 +14,7 @@ extern float math_random_float_range(float, float);
 extern void *part_spawn_object_relative_particle(char *, void *, void *, void *, s32);
 
 /* Spawns three jittered particles at each of four transformed exhaust points. */
-void func_PAL_L15_0043C0D8(char *obj)
+void gorn_ship_spawn_exhaust_particles_pal(char *obj)
 {
     GornPoint dir, drift, tail, mark1, mark2, mark3, dir2, dir3, dir4;
     float k;

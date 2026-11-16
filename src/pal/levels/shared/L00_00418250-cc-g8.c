@@ -80,12 +80,12 @@ extern char *part_spawn_ground_effect(void *position, int size, int color, int m
  * wave from their phases, registers the draw callback, and bursts into particles at the end.
  * third and frame stay locals of the burst loop, and size starts at zero there, for the sake of
  * loop.c: frame leaves the loop after third and the colour stays inside it. */
-void func_PAL_L00_00418250(char *object)
+void wave_line_update_effect_pal(char *object)
 {
     BoltHit scratch;
     BoltState *state = *(BoltState **)(object + 0x68);
     float distance = fast_vec_dist(object + 0x10, &state->pos);
-    float burst, ratio, spacing, step, t, a, b;
+    float burst, ratio, spacing, step, speed, azimuth, elevation;
     float point10, amp10, point19, phase19, wave19, amp19, rate19;
     int i, sign, i10, i19;
 
@@ -151,10 +151,10 @@ void func_PAL_L00_00418250(char *object)
             float third = 0.0f;
             float frame = 0.020000001f;
             float size = 0.0f;
-            t = math_random_float_range(1, 6) * frame;
-            a = math_random_angle();
-            b = math_random_angle();
-            vec_build_spherical_offset(&scratch, t, a, b);
+            speed = math_random_float_range(1, 6) * frame;
+            azimuth = math_random_angle();
+            elevation = math_random_angle();
+            vec_build_spherical_offset(&scratch, speed, azimuth, elevation);
             sign = math_random_int_range(1, 4);
             if (math_random_int_below(2)) {
                 sign = -sign;

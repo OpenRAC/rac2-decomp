@@ -78,33 +78,35 @@ extern float vec_distance_xy(void *, void *);
 extern int creature_move_along_ground_pal(char *, char *);
 extern int g_current_map_index __attribute__((section(".sdata")));
 
-int AdvancePathWaypoint_pal(char *obj, char *path)
+/* Moves a creature along a path of waypoints toward its goal node, stepping the current node
+ * once it is within half a unit of it; returns 1 when the goal is reached (PAL). */
+int AdvancePathWaypoint_pal(char *moby, char *path)
 {
-    Walk_409840 *w = ref_L13_00409840_00(obj);
+    Walk_409840 *walk = ref_L13_00409840_00(moby);
 
-    if (w == 0)
+    if (walk == 0)
         return 0;
-    if (path != w->path)
-        path_set_follower_nodes(obj, path, -1, 0);
+    if (path != walk->path)
+        path_set_follower_nodes(moby, path, -1, 0);
     if (g_current_map_index == 0x45) {
-        creature_move_along_ground_pal(obj, path + (w->cur * 16 + 0x10));
-        if (vec_distance_xy(obj + 0x10, path + (w->cur * 16 + 0x10)) <= 0.5f) {
-            if (w->goal == w->cur)
+        creature_move_along_ground_pal(moby, path + (walk->cur * 16 + 0x10));
+        if (vec_distance_xy(moby + 0x10, path + (walk->cur * 16 + 0x10)) <= 0.5f) {
+            if (walk->goal == walk->cur)
                 return 1;
-            if (w->goal < w->cur)
-                w->cur = w->cur - 1;
+            if (walk->goal < walk->cur)
+                walk->cur = walk->cur - 1;
             else
-                w->cur = w->cur + 1;
+                walk->cur = walk->cur + 1;
         }
     } else {
-        creature_move_along_ground_pal(obj, path + (w->goal * 16 + 0x10));
-        if (vec_distance_xy(obj + 0x10, path + (w->goal * 16 + 0x10)) <= 0.5f) {
-            if (w->goal == w->cur)
+        creature_move_along_ground_pal(moby, path + (walk->goal * 16 + 0x10));
+        if (vec_distance_xy(moby + 0x10, path + (walk->goal * 16 + 0x10)) <= 0.5f) {
+            if (walk->goal == walk->cur)
                 return 1;
-            if (w->goal < w->cur)
-                w->cur = w->cur - 1;
+            if (walk->goal < walk->cur)
+                walk->cur = walk->cur - 1;
             else
-                w->cur = w->cur + 1;
+                walk->cur = walk->cur + 1;
         }
     }
     return 0;

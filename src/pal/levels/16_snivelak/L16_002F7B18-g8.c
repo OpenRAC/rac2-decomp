@@ -17,7 +17,7 @@ typedef struct SnivelakScene {
     int state;
     int frame;
     unsigned char pad38[0xC];
-    short objectCount;
+    short object_count;
     unsigned char pad46[0x146];
     char *objects[0];
 } SnivelakScene;
@@ -34,7 +34,7 @@ extern char g_particle_template[] __attribute__((sda));
 typedef struct { unsigned char prefix[0xD4]; u8 *material; } SceneEffectMaterial;
 extern SceneEffectMaterial g_scene_effect_material;
 extern void anim_start_startup_animations(void);
-extern void func_PAL_002E7270(char *);
+extern void update_equipment_pieces_pal(char *);
 extern void math_store_angle_update_result(char *, float *, int, int, float);
 extern int subtract_integer_with_clamp(int);
 extern void moby_transform_joint_point(char *, int, char *);
@@ -48,22 +48,23 @@ extern char *CreateMoby(short);
 extern void moby_init_child_from_parent(char *, char *);
 extern void moby_set_light_color(void *, int);
 extern void matrix_mul_vec3(void *, void *, void *);
-extern void func_PAL_002B15D8(char *, int, void *, float, float, float, float, u8);
+extern void part_spawn_masked_debris_pal(char *, int, void *, float, float, float, float, u8);
 extern void moby_mark_spawned(char *);
 
-void func_PAL_L16_002F7B18(void)
+/* Updates the Snivelak room scene: sets up the scene objects at start, then plays the effects on frames 685 and 725 (PAL). */
+void snivelak_room_scene_update_pal(void)
 {
     union { Quadword q; float f[4]; } position;
-    float orientation[16], step[4], randomPosition[4];
+    float orientation[16], step[4], random_position[4];
     char *object;
     int i = 0;
     anim_start_startup_animations();
-    for (; i < g_snivelak_scene.objectCount; i++) {
+    for (; i < g_snivelak_scene.object_count; i++) {
         char *entry = g_snivelak_scene.objects[i];
         if (entry && *(short *)(entry + 0xaa) == 0xe29)
             *(u16 *)(entry + 0x34) |= 0x800;
         if (*(short *)(entry + 0xaa) == 0xd54)
-            func_PAL_002E7270(entry);
+            update_equipment_pieces_pal(entry);
         if (entry) {
             int id = 4000;
             if (*(short *)(entry + 0xaa) == id && g_current_map_index[0] != 0x33 && *(char **)(entry + 0x68))
@@ -81,7 +82,7 @@ void func_PAL_L16_002F7B18(void)
             g_snivelak_room_fade = 1.0f - fade;
         }
         if (g_snivelak_scene.frame == 685) {
-            int particleIndex;
+            int particle_index;
             position.q = 0;
             position.f[0] = 0.2f;
             position.f[3] = 1.0f;
@@ -90,23 +91,23 @@ void func_PAL_L16_002F7B18(void)
             FastVecScale(step, orientation + 8, 0.15f);
             FastVecAdd(&position, &position, step);
             FastVecScale(step, orientation + 8, -0.03333333507180214f);
-            particleIndex = 29;
+            particle_index = 29;
             do {
                 int random;
                 float scale;
                 char *particle;
-                randomPosition[0] = position.f[0] + math_random_signed_float_range(0.0f, 0.05f);
-                randomPosition[1] = position.f[1] + math_random_signed_float_range(0.0f, 0.05f);
-                randomPosition[2] = position.f[2] + math_random_signed_float_range(0.0f, 0.05f);
+                random_position[0] = position.f[0] + math_random_signed_float_range(0.0f, 0.05f);
+                random_position[1] = position.f[1] + math_random_signed_float_range(0.0f, 0.05f);
+                random_position[2] = position.f[2] + math_random_signed_float_range(0.0f, 0.05f);
                 random = math_random_int_below(255);
                 scale = 42000.0f;
-                part_spawn_gravity_fade(randomPosition, g_particle_template, 17, 0x808080, random, 127, 0, scale, scale, 0.0f, 0);
+                part_spawn_gravity_fade(random_position, g_particle_template, 17, 0x808080, random, 127, 0, scale, scale, 0.0f, 0);
                 scale = 273000.0f;
                 particle = part_spawn_gravity_fade(&position, g_particle_template, 25, 0x406080, random, 16, 0, scale, scale, 0.0f, 0);
                 if (particle) particle[2] = *g_scene_effect_material.material;
                 FastVecAdd(&position, &position, step);
-                particleIndex--;
-            } while (particleIndex >= 0);
+                particle_index--;
+            } while (particle_index >= 0);
         } else if (g_snivelak_scene.frame == 725) {
             object = CreateMoby(0xa79);
             if (object) {
@@ -119,8 +120,8 @@ void func_PAL_L16_002F7B18(void)
                 matrix_mul_vec3(&position, &position, g_scene_origin_transform.matrix);
                 FastVecAdd(&position, &position, g_scene_origin_transform.position);
                 *(Quadword *)(object + 0x10) = position.q;
-                func_PAL_002B15D8(object, 0xfff, g_particle_template, 3.0f, 9.0f, -3.0f, 3.0f, 255);
-                func_PAL_002B15D8(object, 0xfff, g_particle_template, 3.0f, 9.0f, -3.0f, 3.0f, 255);
+                part_spawn_masked_debris_pal(object, 0xfff, g_particle_template, 3.0f, 9.0f, -3.0f, 3.0f, 255);
+                part_spawn_masked_debris_pal(object, 0xfff, g_particle_template, 3.0f, 9.0f, -3.0f, 3.0f, 255);
                 moby_mark_spawned(object);
             }
         }

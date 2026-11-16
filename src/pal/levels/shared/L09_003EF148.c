@@ -9,6 +9,7 @@ extern char *SpawnExplosion(void *p, int a1, int a2, int a3, int a4, int a5, int
                           float f1, float f2, int s1, int s2, int s3, int s4);
 extern void moby_mark_spawned(void *entry);
 
+/* Plays the death sound and explosion for the object, then removes it (PAL). */
 void moby_destroy_with_explosion_pal(char *object)
 {
     PlayMobySound(2, 0, object);

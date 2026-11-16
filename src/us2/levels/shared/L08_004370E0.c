@@ -81,13 +81,13 @@ extern char g_str_mystic_debug[];
 /* An interaction state machine at byte 0x20: offers an item for its price while
    the quantity at D_001A7A00+0x1A covers it, then buys the remaining quantity back
    at 1000 (10000 with the flag at D_001A7A00+0xA) each; afterwards aims the head at the hero. */
-void func_US2_L08_004370E0(u8 *self)
+void item_trader_npc_update_us2(u8 *self)
 {
     float dest[4] __attribute__((aligned(16)));
     float pos[4] __attribute__((aligned(16)));
     float delta[4] __attribute__((aligned(16)));
     u8 *data = *(u8 **)(self + 0x68);
-    int n, active;
+    int bolt_multiplier, active;
     float speed, yaw, pitch, angle;
     float blend = 0.3f;
 
@@ -230,14 +230,14 @@ void func_US2_L08_004370E0(u8 *self)
         if ((*(s16 *)(g_player_stats + 0x1A)) <= 0)
             moby_set_state(self, 6, -1);
         else {
-            n = g_player_stats[0xA] ? 10 : 1;
+            bolt_multiplier = g_player_stats[0xA] ? 10 : 1;
             if (hero_is_reachable_for_count(self, 10, 2.5f)) {
-                n *= 1000;
-                text_print_localized_formatted(0x12E9, (*(s16 *)(g_player_stats + 0x1A)), (*(s16 *)(g_player_stats + 0x1A)) * n, -1);
+                bolt_multiplier *= 1000;
+                text_print_localized_formatted(0x12E9, (*(s16 *)(g_player_stats + 0x1A)), (*(s16 *)(g_player_stats + 0x1A)) * bolt_multiplier, -1);
                 level_apply_index_for_key(self);
                 if (g_pad_held_flags & 0x10) {
                     level_get_saved_count();
-                    g_player_bolts += (*(s16 *)(g_player_stats + 0x1A)) * n;
+                    g_player_bolts += (*(s16 *)(g_player_stats + 0x1A)) * bolt_multiplier;
                     snd_play_from_class_bank(0, 0, self, math_random_int_range(13, 17));
                     (*(s16 *)(g_player_stats + 0x1A)) = 0;
                     func_L00_0030C710(180);

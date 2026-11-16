@@ -32,11 +32,12 @@ extern float IntToFloat(int);
 extern int FloatToInt(float);
 extern int FastTweenColor(int, int, float);
 extern void part_spawn_sprite_line(void *, void *, int, float, float, float, int);
-extern void func_PAL_L05_0041E068(char *);
+extern void UpdateBeamTrailParticles_pal(char *);
 extern int hero_get_shield_value(void);
 extern void gfx_draw_thruster_glow_pal(char *);
 typedef int BeamVec __attribute__((mode(TI)));
 
+/* Draws the beam layers of the thruster flame from sprite lines, widening them with the thruster level (more when an attachment is fitted), then the trail particles and, with a shield, the thruster glow. */
 void DrawInterpolatedBeamLayers_pal(char *object)
 {
     char *state = *(char **)(object + 0x68);
@@ -127,7 +128,7 @@ void DrawInterpolatedBeamLayers_pal(char *object)
         FastVecScale(direction, object + 0xC0, -length2);
         part_spawn_sprite_line(pos, direction, count2, width2, height2, extent2, color2);
     }
-    func_PAL_L05_0041E068(object);
+    UpdateBeamTrailParticles_pal(object);
     if (hero_get_shield_value())
         gfx_draw_thruster_glow_pal(object);
 }

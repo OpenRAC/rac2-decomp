@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_PAL_002B1A50, the PAL copy of func_002B0ED8: the same C, where rename func_002AB8C0 becomes func_PAL_002AC3C0; rename func_002A96A0 becomes func_PAL_002AA108; rename func_002B3380 becomes func_PAL_002B3F18; rename func_002B1350 becomes func_PAL_002B1EE8; scale timeout. */
 #include "common.h"
 #define F(p,o) (*(float *)((char *)(p)+(o)))
@@ -5,7 +6,7 @@
 #define P(p,o) (*(char **)((char *)(p)+(o)))
 #define H(p,o) (*(short *)((char *)(p)+(o)))
 #define U(p,o) (*(u8 *)((char *)(p)+(o)))
-extern void func_PAL_002AC3C0(void *,void *);
+extern void gfx_update_color_fade_pal(void *,void *);
 extern char *part_find_owned_effect_slot(void *,int,int);
 extern int FastDecTimer(void *);
 extern float moby_update_aim_target_strength_pal(void *,void *);
@@ -26,7 +27,8 @@ extern void FastVecScale(void *,void *,float);
 extern int moby_start_hit_reaction_pal(void *,void *,void *,int);
 extern void moby_set_state(void *,int,int);
 
-int func_PAL_002B1A50(char *object,char *state,int special)
+/* Applies a hit to an object: subtracts the damage from its health, grades the hit from light to fatal and starts the matching hit reaction (PAL: 50 Hz timeout). */
+int moby_apply_damage_to_object_pal(char *object,char *state,int special)
 {
     float vector[4] __attribute__((aligned(16)));
     char *health,*callback,*hit;
@@ -37,7 +39,7 @@ int func_PAL_002B1A50(char *object,char *state,int special)
     health=P(P(object,0x68),0);
     callback=P(P(object,0x68),0x1c);
     if (!state || !health) return 0;
-    func_PAL_002AC3C0(object,state);
+    gfx_update_color_fade_pal(object,state);
     original=0.0f;
     hit=part_find_owned_effect_slot(object,0x10000,0);
     if (!FastDecTimer(health+6)) hit=0;

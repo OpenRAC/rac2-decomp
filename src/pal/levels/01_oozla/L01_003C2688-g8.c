@@ -38,30 +38,31 @@ extern void func_00313BF8(void *, f32, f32, f32, void *, f32);
 extern s32 func_003165E8(void *, s32, s32, s32, s32);
 extern s32 func_0031D548(u8 *, void *);
 extern void func_003258B8(s32);
-extern void func_PAL_L01_003C0D50(u8 *, void *, s32, f32, f32, f32, f32, f32, f32);
+extern void part_spawn_radial_dust_puffs_pal(u8 *, void *, s32, f32, f32, f32, f32, f32, f32);
 extern void func_003BD410(u8 *);
 extern void mutant_firefly_init_pal(u8 *);
 extern void func_003BDB28(u8 *);
 extern void func_003BDBB0(u8 *);
 extern void func_003BDBE8(u8 *);
 extern void func_003BDF28(u8 *);
-extern s32 func_PAL_L01_003C1C70(u8 *, f32, f32, f32, f32, f32, f32, f32, f32);
-extern void func_PAL_L01_003C20F0(u8 *);
-extern void func_PAL_L01_003C2268(u8 *);
+extern s32 moby_l01_steer_toward_target_pal(u8 *, f32, f32, f32, f32, f32, f32, f32, f32);
+extern void firefly_update_timers_and_color_pal(u8 *);
+extern void firefly_update_collision_and_light_pal(u8 *);
 extern void func_003E9CF8(u8 *, s32, s32);
 
-void func_PAL_L01_003C2688(u8 *moby)
+/* Updates the Mutant Firefly. It wanders, chases and attacks the player, and is removed when it dies or leaves the level (PAL: 50 Hz timings). */
+void mutant_firefly_update_pal(u8 *moby)
 {
     f32 vec[4] __attribute__((aligned(16)));
     u8 *data;
-    u8 *pos;
-    u8 *p;
+    u8 *moby_pos;
+    u8 *position;
     u8 *target;
-    f32 y;
+    f32 target_height;
     f32 speed;
     s32 hit;
     s32 flags;
-    s32 near;
+    s32 is_near;
 
     data = *(u8 **)(moby + 0x68);
     if (((Hero *)g_hero_state)->i[0x2294 / 4] == 0x6F) {
@@ -83,7 +84,7 @@ void func_PAL_L01_003C2688(u8 *moby)
         moby[0x31] = 1;
     }
     if (moby[0x20] != 0) {
-        func_PAL_L01_003C2268(moby);
+        firefly_update_collision_and_light_pal(moby);
     }
     switch (moby[0x20]) {
     case 0:
@@ -118,22 +119,22 @@ void func_PAL_L01_003C2688(u8 *moby)
         }
         break;
     case 2:
-        y = *(f32 *)(moby + 0x18);
+        target_height = *(f32 *)(moby + 0x18);
         switch (moby[0x95]) {
         case 0:
-            y = *(f32 *)(data + 0x228);
+            target_height = *(f32 *)(data + 0x228);
             break;
         case 1:
-            y = *(f32 *)(data + 0x224) - 1.7f;
+            target_height = *(f32 *)(data + 0x224) - 1.7f;
             break;
         }
-        func_00313BF8(moby + 0x18, y, 0.010000001f, 0.006f, data + 0x1F8, 0.6f);
+        func_00313BF8(moby + 0x18, target_height, 0.010000001f, 0.006f, data + 0x1F8, 0.6f);
         if (func_00306448(moby) < 12.0f) {
             qcopy(vec, moby + 0x10);
             vec[2] = *(f32 *)(data + 0x224);
-            func_PAL_L01_003C0D50(moby, vec, 3, 1.0f, 1.5f, 0.5f, 0.0f, 0.1f, 0.8f);
+            part_spawn_radial_dust_puffs_pal(moby, vec, 3, 1.0f, 1.5f, 0.5f, 0.0f, 0.1f, 0.8f);
         }
-        if (func_002E33E0(*(f32 *)(moby + 0x18) - y) < 0.2f) {
+        if (func_002E33E0(*(f32 *)(moby + 0x18) - target_height) < 0.2f) {
             switch (moby[0x95]) {
             case 0:
                 *(u16 *)(moby + 0x34) |= 0x1000;
@@ -157,11 +158,11 @@ void func_PAL_L01_003C2688(u8 *moby)
         }
         break;
     case 4:
-        pos = moby + 0x10;
-        func_002E3470(pos, pos, data + 0x1F0);
+        moby_pos = moby + 0x10;
+        func_002E3470(moby_pos, moby_pos, data + 0x1F0);
         *(f32 *)(data + 0x1F8) -= 0.00392f;
         *(f32 *)(moby + 0x18) += 0.3f;
-        if (func_002D4CE0(pos, 0, moby, 0.3f) != 0 &&
+        if (func_002D4CE0(moby_pos, 0, moby, 0.3f) != 0 &&
             (g_hit_l01_result[0] == 0 || *(s16 *)(g_hit_l01_result[0] + 0xAA) != 0x945)) {
             if (moby[0x43] != 3) {
                 func_00310138(moby, 3, 0, 3);
@@ -204,7 +205,7 @@ void func_PAL_L01_003C2688(u8 *moby)
         *(f32 *)(data + 0x1E8) = 0.0f;
         func_002E3470(data + 0x1E0, data + 0x1E0, moby + 0x10);
         func_003BDBE8(moby);
-        func_PAL_L01_003C1C70(moby, 360.0f, 180.0f, 560.0f, 20.0f, 0.0f, 16.0f,
+        moby_l01_steer_toward_target_pal(moby, 360.0f, 180.0f, 560.0f, 20.0f, 0.0f, 16.0f,
                       *(f32 *)(data + 0x24C) + func_002E3A60(*(f32 *)(data + 0x274)) * 2.0f, -2.0f);
         if (*(s32 *)(data + 0x230) == 0) {
             if (moby[0x43] != 1) {
@@ -227,7 +228,7 @@ void func_PAL_L01_003C2688(u8 *moby)
             }
             break;
         case 1:
-            func_PAL_L01_003C1C70(moby, 120.0f, 360.0f, 120.0f, 30.0f, 0.0f, 8.0f, *(f32 *)(data + 0x24C) + 1.7f, 1.0f);
+            moby_l01_steer_toward_target_pal(moby, 120.0f, 360.0f, 120.0f, 30.0f, 0.0f, 8.0f, *(f32 *)(data + 0x24C) + 1.7f, 1.0f);
             if (*(s32 *)(data + 0x230) == 0) {
                 func_003BDF28(moby);
                 *(s32 *)(data + 0x230) = ((s32)(func_00310528(0, 0)) * 5 + 2) / 6;
@@ -240,7 +241,7 @@ void func_PAL_L01_003C2688(u8 *moby)
             break;
         case 2:
             qcopy(data + 0x1E0, data + 0x1D0);
-            if (func_PAL_L01_003C1C70(moby, 120.0f, 360.0f, 120.0f, 30.0f, 0.0f, 8.0f, *(f32 *)(data + 0x24C) + 1.7f, 1.0f) & 8) {
+            if (moby_l01_steer_toward_target_pal(moby, 120.0f, 360.0f, 120.0f, 30.0f, 0.0f, 8.0f, *(f32 *)(data + 0x24C) + 1.7f, 1.0f) & 8) {
                 if (moby[0x43] != 2) {
                     func_00310138(moby, 2, 0, 0xA);
                 }
@@ -275,7 +276,7 @@ void func_PAL_L01_003C2688(u8 *moby)
             }
             break;
         case 1:
-            if (func_PAL_L01_003C1C70(moby, 250.0f, 180.0f, 250.0f, 32.0f, 0.1f, 13.0f, *(f32 *)(data + 0x24C) + 1.7f, 1.0f) & 8) {
+            if (moby_l01_steer_toward_target_pal(moby, 250.0f, 180.0f, 250.0f, 32.0f, 0.1f, 13.0f, *(f32 *)(data + 0x24C) + 1.7f, 1.0f) & 8) {
                 *(s32 *)(data + 0x230) = 0;
             }
             if (*(s32 *)(data + 0x230) == 0) {
@@ -301,10 +302,10 @@ void func_PAL_L01_003C2688(u8 *moby)
                 func_00310418(moby, 6, 0);
             }
         } else if (**(s32 **)(data + 0x250) < 3 && *(s32 *)(data + 0x23C) == 0) {
-            p = moby + 0x10;
+            position = moby + 0x10;
             target = data + 0x100;
-            if (func_002E3650(p, target) < 12.0f &&
-                func_003165E8(p, *(s32 *)(data + 0x210), *(s32 *)(data + 0x218), *(s32 *)(data + 0x21C), -1) != 0) {
+            if (func_002E3650(position, target) < 12.0f &&
+                func_003165E8(position, *(s32 *)(data + 0x210), *(s32 *)(data + 0x218), *(s32 *)(data + 0x21C), -1) != 0) {
                 *(s32 *)(data + 0x254) = 1;
                 qcopy(data + 0x1E0, target);
                 *(f32 *)(data + 0x22C) = 0;
@@ -318,7 +319,7 @@ void func_PAL_L01_003C2688(u8 *moby)
         qcopy(data + 0x1E0, data + 0x100);
         switch (moby[0x95]) {
         case 0:
-            func_PAL_L01_003C1C70(moby, 260.0f, 180.0f, 270.0f, 32.0f, 0.2f, 3.5f, 0.4f, 0.5f);
+            moby_l01_steer_toward_target_pal(moby, 260.0f, 180.0f, 270.0f, 32.0f, 0.2f, 3.5f, 0.4f, 0.5f);
             if (func_002E3650(moby + 0x10, data + 0x100) < 1.0f &&
                 func_002E33E0(*(f32 *)(moby + 0x18) - *(f32 *)(*(u8 **)(data + 0x110) + 0x18)) < 1.3f) {
                 if (moby[0x43] != 4) {
@@ -330,14 +331,14 @@ void func_PAL_L01_003C2688(u8 *moby)
             }
             break;
         case 1:
-            func_PAL_L01_003C1C70(moby, 260.0f, 180.0f, 270.0f, 32.0f, 0.2f, 3.5f, 0.4f, 0.5f);
+            moby_l01_steer_toward_target_pal(moby, 260.0f, 180.0f, 270.0f, 32.0f, 0.2f, 3.5f, 0.4f, 0.5f);
             *(f32 *)(data + 0x22C) = 0;
             *(s32 *)(data + 0x29C) = *(s32 *)(data + 0x298);
             func_00310418(moby, 8, 2);
             break;
         case 2:
             speed = 0.4f;
-            func_PAL_L01_003C1C70(moby, 260.0f, 180.0f, 270.0f, 32.0f, 0.2f, 3.5f, speed, 0.5f);
+            moby_l01_steer_toward_target_pal(moby, 260.0f, 180.0f, 270.0f, 32.0f, 0.2f, 3.5f, speed, 0.5f);
             if (moby[0x42] == 4) {
                 if (func_00306448(moby) > 19.5f && func_00306448(moby) < 29.0f) {
                     func_00307390(moby, 1, vec);
@@ -376,10 +377,10 @@ void func_PAL_L01_003C2688(u8 *moby)
         }
         *(f32 *)(data + 0x22C) = 0;
         *(s32 *)(data + 0x29C) = *(s32 *)(data + 0x298);
-        near = func_003165E8(moby + 0x10, *(s32 *)(data + 0x210), *(s32 *)(data + 0x218), *(s32 *)(data + 0x21C), -1) != 0;
+        is_near = func_003165E8(moby + 0x10, *(s32 *)(data + 0x210), *(s32 *)(data + 0x218), *(s32 *)(data + 0x21C), -1) != 0;
         if (*(s32 *)(data + 0x114) == 0 || ((Hero *)g_hero_state)->i[0x2294 / 4] == 0x31 ||
             ((Hero *)g_hero_state)->i[0x229C / 4] == 0x11 || ((Hero *)g_hero_state)->i[0x229C / 4] == 0x12 ||
-            !near || g_hero_l01_control_mode == 2 || ((Hero *)g_hero_state)->i[0x2294 / 4] == 0x6F) {
+            !is_near || g_hero_l01_control_mode == 2 || ((Hero *)g_hero_state)->i[0x2294 / 4] == 0x6F) {
             if (*(s32 *)(data + 0x238) != 0) {
                 func_003BDBB0(moby);
                 *(s32 *)(data + 0x230) = 0;
@@ -395,10 +396,10 @@ void func_PAL_L01_003C2688(u8 *moby)
                 func_002E3738(data + 0x1E0, data + 0x1E0, 5.0f);
                 func_003BDBE8(moby);
                 *(f32 *)(data + 0x244) *= 3.0f;
-                if (near) {
-                    func_PAL_L01_003C1C70(moby, 260.0f, 180.0f, 270.0f, 32.0f, 0.2f, 3.5f, 0.3f, 0.5f);
+                if (is_near) {
+                    moby_l01_steer_toward_target_pal(moby, 260.0f, 180.0f, 270.0f, 32.0f, 0.2f, 3.5f, 0.3f, 0.5f);
                 } else {
-                    func_PAL_L01_003C1C70(moby, 780.0f, 180.0f, 810.0f, 32.0f, 0.2f, 3.5f, 0.3f, 0.5f);
+                    moby_l01_steer_toward_target_pal(moby, 780.0f, 180.0f, 810.0f, 32.0f, 0.2f, 3.5f, 0.3f, 0.5f);
                 }
                 *(s32 *)(data + 0x230) = 0;
                 if (moby[0x43] != 3) {
@@ -446,7 +447,7 @@ void func_PAL_L01_003C2688(u8 *moby)
         func_00306250(moby);
         return;
     }
-    func_PAL_L01_003C20F0(moby);
+    firefly_update_timers_and_color_pal(moby);
     if (*(f32 *)(moby + 0x10) < 30.0f || *(f32 *)(moby + 0x10) > 993.0f ||
         *(f32 *)(moby + 0x14) < 30.0f || *(f32 *)(moby + 0x14) > 993.0f ||
         *(f32 *)(moby + 0x18) < 30.0f || *(f32 *)(moby + 0x18) > 993.0f) {

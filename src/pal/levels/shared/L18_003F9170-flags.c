@@ -8,29 +8,30 @@ extern void protopet_run_state_machine(void *);
 extern void enemy_update_move_by_type(void *);
 extern void protopet_update_step(void *);
 
-void protopet_update_pal(char *a0)
+/* Per-frame update for the Protopet: sets it up on the first frame, then runs its checks and behavior. */
+void protopet_update_pal(char *object)
 {
-    char *s0 = a0;
-    unsigned char v;
+    char *moby = object;
+    unsigned char state_id;
 
     if (g_level_l18_mode_word == 0x13) {
         if (g_game_l18_mode_state == 2) {
-            *(int *)(s0 + 0x98) = 0;
-            *(unsigned short *)(s0 + 0x34) = (*(unsigned short *)(s0 + 0x34) | 0x41) & 0xEFFF;
+            *(int *)(moby + 0x98) = 0;
+            *(unsigned short *)(moby + 0x34) = (*(unsigned short *)(moby + 0x34) | 0x41) & 0xEFFF;
         } else {
-            char *p = *(char **)(s0 + 0x24);
+            char *moby_class = *(char **)(moby + 0x24);
 
-            *(unsigned short *)(s0 + 0x34) = (*(unsigned short *)(s0 + 0x34) & 0xFFBE) | 0x1000;
-            *(int *)(s0 + 0x98) = *(int *)(p + 0x10);
+            *(unsigned short *)(moby + 0x34) = (*(unsigned short *)(moby + 0x34) & 0xFFBE) | 0x1000;
+            *(int *)(moby + 0x98) = *(int *)(moby_class + 0x10);
         }
     }
-    v = *(unsigned char *)(s0 + 0x20);
-    if (v == 0) {
-        protopet_init(s0);
-    } else if (v != 1 && v != 0x13) {
-        protopet_check_hit_target(s0);
-        protopet_run_state_machine(s0);
-        enemy_update_move_by_type(s0);
-        protopet_update_step(s0);
+    state_id = *(unsigned char *)(moby + 0x20);
+    if (state_id == 0) {
+        protopet_init(moby);
+    } else if (state_id != 1 && state_id != 0x13) {
+        protopet_check_hit_target(moby);
+        protopet_run_state_machine(moby);
+        enemy_update_move_by_type(moby);
+        protopet_update_step(moby);
     }
 }

@@ -66,7 +66,9 @@ static __inline__ int label_y(void *handle, float value, float scale, float half
     return result;
 }
 
-s32 func_US2_L15_00431C88(void) {
+/* Draws the Gorn reward panel after a stage (USA v2.00): the title, text box and the bolts won
+   (or the no-reward text). Always returns 1. */
+s32 gorn_reward_panel_draw_us2(void) {
     char buf[128];
     f32 center = IntToFloat(g_screen_width) * 0.5f;
     void *sprite;

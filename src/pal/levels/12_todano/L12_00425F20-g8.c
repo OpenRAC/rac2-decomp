@@ -26,31 +26,32 @@ extern f32 g_explosion_piece_table_b[] SDATA(D_L12_001B2288);
 extern f32 g_explosion_piece_offsets[] SDATA(D_L12_001B22B0);
 extern u8 *CreateMoby(int);
 
-void hit_l12_burst_update_pal(u8 *a0)
+/* Waits until the hero hits it, then shows a flash, a burst of sparks and a sound before removing itself (PAL: 50 Hz timings). */
+void hit_l12_burst_update_pal(u8 *moby)
 {
-    s32 *s = *(s32 **)(a0 + 0x68);
+    s32 *vars = *(s32 **)(moby + 0x68);
     f32 pos[4];
 
-    switch (a0[0x20]) {
+    switch (moby[0x20]) {
     case 0:
-        moby_set_state(a0, 1, -1);
+        moby_set_state(moby, 1, -1);
         break;
     case 1:
-        if (part_find_owned_effect_slot(a0, 0x4010000, 0) != 0 && *s == 0) {
-            moby_set_state(a0, 2, -1);
-            PlayMobySound(0, 0, (s32)a0);
+        if (part_find_owned_effect_slot(moby, 0x4010000, 0) != 0 && *vars == 0) {
+            moby_set_state(moby, 2, -1);
+            PlayMobySound(0, 0, (s32)moby);
         }
-        a0[0xA8] = 0xFF;
+        moby[0xA8] = 0xFF;
         break;
     case 2:
-        part_explode_object_into_pieces_pal(a0, g_burst_piece_params_c, g_burst_piece_params_b, g_burst_piece_params_a, 0xFFFF, 0,
+        part_explode_object_into_pieces_pal(moby, g_burst_piece_params_c, g_burst_piece_params_b, g_burst_piece_params_a, 0xFFFF, 0,
                           g_burst_piece_effect_id, 0, 1, 0xFF, 0);
-        part_explode_object_into_pieces_pal(a0, g_burst_piece_params_d, g_burst_piece_params_b, g_burst_piece_params_a, 0xFFFF, 0,
+        part_explode_object_into_pieces_pal(moby, g_burst_piece_params_d, g_burst_piece_params_b, g_burst_piece_params_a, 0xFFFF, 0,
                           g_burst_piece_effect_id, 1, 0x1FE, 0xFF, 0);
-        vec_local_offset_to_world(a0, pos, g_burst_offset_x, g_burst_offset_y, g_burst_offset_z);
-        SpawnExplosion_pal(pos, 0, 0x19, 0x14, 0x14, 0x14, 0x2D, 0, *(f32 *)(a0 + 0x2C) * 20.0f, 20.0f,
+        vec_local_offset_to_world(moby, pos, g_burst_offset_x, g_burst_offset_y, g_burst_offset_z);
+        SpawnExplosion_pal(pos, 0, 0x19, 0x14, 0x14, 0x14, 0x2D, 0, *(f32 *)(moby + 0x2C) * 20.0f, 20.0f,
                       1, 0, 1, 0);
-        moby_mark_spawned(a0);
+        moby_mark_spawned(moby);
         break;
     }
 }

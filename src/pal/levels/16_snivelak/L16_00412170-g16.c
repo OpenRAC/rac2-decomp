@@ -17,12 +17,12 @@ extern float g_snivelak_shot_angles[3] __attribute__((sda));
 extern float g_snivelak_shot_times[3] __attribute__((sda));
 extern float g_snivelak_missile_progress_limit __attribute__((sda));
 extern int PlayMobySound(int, int, void *);
-extern void snd_stop_voice(int), func_PAL_002A7E68(void *, int, int, int);
+extern void snd_stop_voice(int), anim_start_blended_pal(void *, int, int, int);
 extern float math_step_value_toward_target(float *, float *, float, float, float, float);
 extern void FastVecSub(void *, void *, void *), FastVecAdd(void *, void *, void *);
 extern void FastVecScale(void *, void *, float), vec_scale_to_length(void *, void *, float);
 extern float mat_fast_helper_a(float, float), math_random_signed_float_range(float, float), math_random_float_range(float, float);
-extern void func_PAL_L16_00412C28(u8 *);
+extern void snivelak_emit_smoke_sparks_pal(u8 *);
 extern void StepAngleTowardTarget(float *, int, float, float);
 extern void *part_find_owned_effect_slot(void *, int, int);
 extern u8 *cam_moby_create_pal(void *, int, int, int, void *, void *, void *, int, float, float);
@@ -30,31 +30,31 @@ extern void *SpawnExplosion_pal(void *, int, int, int, int, int, int, int, float
 extern void moby_mark_spawned(void *), moby_set_state(void *, int, int);
 extern int CollLine(void *, void *, int, void *, void *);
 extern int coll_test_point(void *, int, void *, float);
-extern char *func_PAL_0032F3B8(void *, void *, void *, float);
+extern char *part_spawn_blast_effect_moby_pal(void *, void *, void *, float);
 extern int coll_sweep_from_object(void *, void *, float, int, int, float, float, int, int);
 
 /* The sound handle indexes 0x70-byte resident records. The sound owner and
  * active byte are checked before stopping a handle that may have been reused. */
-void func_PAL_L16_004124A0(u8 *moby)
+void snivelak_missile_update_pal(u8 *moby)
 {
     MissileState *state = *(MissileState **)(moby + 0x68);
-    float oldPosition[4] __attribute__((aligned(16)));
+    float old_position[4] __attribute__((aligned(16)));
     float delta[4] __attribute__((aligned(16)));
     float velocity[4] __attribute__((aligned(16)));
     int handle, i;
     MissileTiming *timing;
     float *rate;
-    PositionVector *segmentEnd;
+    PositionVector *segment_end;
     switch (moby[0x20]) {
     case 0: {
         u8 *rec = g_sound_state + state->sound * 0x70;
         if (*(u8 **)(rec + 0x88) != moby || !rec[0x74])
             state->sound = PlayMobySound(0, 4, moby);
-        qcopy(oldPosition, (moby + 0x10));
+        qcopy(old_position, (moby + 0x10));
         qcopy((moby + 0x10), &state->point[0]);
         timing = &state->timing;
         rate = state->timing.rate;
-        segmentEnd = &state->point[1];
+        segment_end = &state->point[1];
         for (i = 0; i < 3; i++) {
             if (i == 0 || timing->progress[i-1] > g_snivelak_missile_progress_limit) {
                 math_step_value_toward_target(&timing->progress[i],
@@ -63,16 +63,16 @@ void func_PAL_L16_004124A0(u8 *moby)
                     g_snivelak_shot_angles[i] * 0.00040000002f,
                     g_snivelak_shot_times[i] * 0.020000001f);
                 if (i == 2 && state->timing.progress[1] > 0.95f && moby[0x43])
-                    func_PAL_002A7E68(moby, 0, 0, 17);
+                    anim_start_blended_pal(moby, 0, 0, 17);
             }
-            FastVecSub(delta, &segmentEnd[i], &state->point[i]);
+            FastVecSub(delta, &segment_end[i], &state->point[i]);
             FastVecScale(delta, delta, timing->progress[i]);
             FastVecAdd(moby + 0x10, moby + 0x10, delta);
         }
         StepAngleTowardTarget((float *)(moby + 0xf8), 0,
             mat_fast_helper_a(g_hero_state.f[0x80 / 4] - *(float *)(moby + 0x10),
                 g_hero_state.f[0x84 / 4] - *(float *)(moby + 0x14)), 0.25132746f);
-        func_PAL_L16_00412C28(moby);
+        snivelak_emit_smoke_sparks_pal(moby);
         if (part_find_owned_effect_slot(moby, 0x10000, 0) || g_snivelak_state == 2) {
             PlayMobySound(2, 0, moby);
             handle = state->sound;
@@ -96,7 +96,7 @@ void func_PAL_L16_004124A0(u8 *moby)
             moby_mark_spawned(moby);
         } else {
             if (state->timing.progress[2] >= 1.0f) moby_set_state(moby, 1, -1);
-            if (CollLine(oldPosition, moby + 0x10, 0, moby, 0)) {
+            if (CollLine(old_position, moby + 0x10, 0, moby, 0)) {
                 if (g_aim_target_moby &&
                     (*(short *)(g_aim_target_moby + 0xaa) == 0xf78 ||
                      *(short *)(g_aim_target_moby + 0xaa) == 0x7e8)) return;
@@ -117,9 +117,9 @@ void func_PAL_L16_004124A0(u8 *moby)
         }
         state->sound = -1;
         PlayMobySound(1, 0, moby);
-        FastVecSub(oldPosition, g_scene_origin_transform, moby + 0x10);
-        vec_scale_to_length(oldPosition, oldPosition, 1.0f);
-        func_PAL_0032F3B8(moby, moby + 0x10, oldPosition, 0.0f);
+        FastVecSub(old_position, g_scene_origin_transform, moby + 0x10);
+        vec_scale_to_length(old_position, old_position, 1.0f);
+        part_spawn_blast_effect_moby_pal(moby, moby + 0x10, old_position, 0.0f);
         coll_sweep_from_object(moby, moby + 0x10, 2.0f, 0x10001, 0, 5.0f, 1.0f, 1, 0);
         moby_mark_spawned(moby);
         break;

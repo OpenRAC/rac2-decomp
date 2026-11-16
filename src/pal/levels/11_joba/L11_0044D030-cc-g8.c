@@ -15,7 +15,7 @@ extern void moby_start_anim_slow_pal(char *);
 extern int security_robot_try_start_attack_pal(char *);
 extern int AimAtGroupEntityInCone_pal(char *);
 extern void security_robot_pick_wander_point(char *,char *);
-extern void func_PAL_L11_0044EDC0(char *,void *);
+extern void security_robot_destroy_held_item_pal(char *,void *);
 extern float vec_normalized_direction_dot(char *,void *);
 extern char *arena_get_center_point(int);
 extern int arena_is_point_in_polygon(int,void *);
@@ -29,7 +29,7 @@ extern float fast_vec_dist(void *,void *);
 extern float vec_distance_squared_xy(void *,void *);
 extern int flag_set_second_pending(char *);
 extern int flag_set_first_pending(char *);
-extern void func_PAL_002A7E68(char *,int,int,int);
+extern void anim_start_blended_pal(char *,int,int,int);
 extern void moby_set_state(char *,int,int);
 extern int math_random_int_below(int);
 extern void moby_aim_at_target_offset_pal(char *,void *);
@@ -41,7 +41,7 @@ extern int moby_dispatch_action_by_kind(char *,void *);
 extern void mem_clear(void *,int,int);
 extern void AttachManipulator(char *,int,void *);
 extern void vec_random_direction(void *,float,float);
-extern void func_PAL_002B15D8(char *,int,void *,float,float,float,float,int);
+extern void part_spawn_masked_debris_pal(char *,int,void *,float,float,float,float,int);
 extern void moby_set_controller_speed_limits(char *,float,float,float,float);
 extern float moby_get_anim_value(char *);
 extern int moby_call_helper_with_blocks_pal(char *);
@@ -54,6 +54,8 @@ extern void FastVecScale(void *,void *,float);
 extern void moby_rotate_about_point(char *,void *,float,float,float);
 extern void euler_rotation_basis(void *,void *);
 
+/* Per-frame update of the Joba security robot: picks its target (held item or hero), turns and
+   walks toward it per state, starts attacks, and handles the death launch (PAL: 50 Hz timings). */
 void security_robot_update_pal(char *self)
 {
     float target[4], temp[4], matrix[16];
@@ -93,7 +95,7 @@ void security_robot_update_pal(char *self)
     case 2:
         if (flag_set_second_pending(self)) {
             p=arena_get_center_point(*(int *)(self+0xB8));
-            if (*(u8 *)(self+0x43)!=3) func_PAL_002A7E68(self,3,0,8);
+            if (*(u8 *)(self+0x43)!=3) anim_start_blended_pal(self,3,0,8);
             *(u8 *)(self+0xBC)=0;
             security_robot_pick_wander_point(self,p);
             *(u16 *)(self+0x96)=10000;
@@ -101,8 +103,8 @@ void security_robot_update_pal(char *self)
         if (*(u8 *)(self+0xBC)==1 && *(u16 *)(self+0x96)>250) {
             int choice=math_random_int_below(2);
             switch(choice) {
-            case 0: if (*(u8 *)(self+0x43)!=1) func_PAL_002A7E68(self,1,0,8); break;
-            case 1: if (*(u8 *)(self+0x43)!=0) func_PAL_002A7E68(self,0,0,8); break;
+            case 0: if (*(u8 *)(self+0x43)!=1) anim_start_blended_pal(self,1,0,8); break;
+            case 1: if (*(u8 *)(self+0x43)!=0) anim_start_blended_pal(self,0,0,8); break;
             }
             *(u16 *)(self+0x96)=math_random_int_below(83);
         }
@@ -144,7 +146,7 @@ void security_robot_update_pal(char *self)
         flags=moby_dispatch_action_by_kind(self,state+0x50);
         if (*(float *)(state+0x20)<=1.0f && *(char **)(state+0x354)) {
             *(Quad004475A0 *)temp=*(Quad004475A0 *)(*(char **)(state+0x354)+0x10);
-            func_PAL_L11_0044EDC0(self,temp);
+            security_robot_destroy_held_item_pal(self,temp);
         }
         if (*(float *)(state+0x20)<=0.0f && !*(u8 *)(state+0x2B1)) {
             mem_clear(state+0x2B0,0,0x40);
@@ -154,7 +156,7 @@ void security_robot_update_pal(char *self)
             *(float *)(state+0x2D4)=0.0001f;
             *(float *)(state+0x2D0)=0.0001f;
             vec_random_direction(temp,0.020000001f,0.060000002f);
-            func_PAL_002B15D8(self,0x20,temp,3.0f,6.0f,3.0f,6.0f,255);
+            part_spawn_masked_debris_pal(self,0x20,temp,3.0f,6.0f,3.0f,6.0f,255);
             if (*(short *)(state+0x36E) && !math_random_int_below(2)) {
                 moby_set_state(self,18,8);
                 return;
@@ -172,12 +174,12 @@ void security_robot_update_pal(char *self)
     case 3:
         if (flag_set_first_pending(self)) {
             *(u8 *)(self+0xBC)=0;
-            if (*(u8 *)(self+0x43)!=0) func_PAL_002A7E68(self,0,0,0);
+            if (*(u8 *)(self+0x43)!=0) anim_start_blended_pal(self,0,0,0);
             *(u16 *)(self+0x96)=0;
         }
         if (*(u8 *)(self+0xBC)==0) {
             if (*(short *)(state+0x36C)<*(u16 *)(self+0x96)) {
-                if (*(u8 *)(self+0x43)!=3) func_PAL_002A7E68(self,3,0,8);
+                if (*(u8 *)(self+0x43)!=3) anim_start_blended_pal(self,3,0,8);
                 *(u8 *)(self+0xBC)=1;
                 break;
             }
@@ -195,7 +197,7 @@ void security_robot_update_pal(char *self)
         if (distance>14.0f) {
             moby_set_controller_speed_limits(self,0.008f,0.124000005f,0.005026549f,0.5026549f);
             moby_set_state(self,7,3);
-            if (*(u8 *)(self+0x43)!=3) func_PAL_002A7E68(self,3,0,8);
+            if (*(u8 *)(self+0x43)!=3) anim_start_blended_pal(self,3,0,8);
         } else if (distance<4.0f || *(int *)(state+0x180)>=26) moby_start_anim_slow_pal(self);
         break;
     case 10:
@@ -203,12 +205,12 @@ void security_robot_update_pal(char *self)
         turn=vec_normalized_direction_dot(self,target);
         if (turn>0.01f) {
             moby_set_state(self,9,-1);
-            if (*(u8 *)(self+0x43)!=5) func_PAL_002A7E68(self,5,0,8);
+            if (*(u8 *)(self+0x43)!=5) anim_start_blended_pal(self,5,0,8);
             if (*(short *)(state+0x36E)) coll_check_move_to_point_pal(self,target);
             else moby_step_at_own_position_factor_pal(self,angle);
         } else if (turn< -0.01f) {
             moby_set_state(self,8,-1);
-            if (*(u8 *)(self+0x43)!=4) func_PAL_002A7E68(self,4,0,8);
+            if (*(u8 *)(self+0x43)!=4) anim_start_blended_pal(self,4,0,8);
             if (*(short *)(state+0x36E)) coll_check_move_to_point_pal(self,target);
             else moby_step_at_own_position_factor_pal(self,angle);
         } else if (distance<4.0f) {moby_set_state(self,11,-1);}
@@ -230,7 +232,7 @@ void security_robot_update_pal(char *self)
     case 8:
         if (vec_normalized_direction_dot(self,target)> -0.01f) {
             moby_set_state(self,10,-1);
-            if (*(u8 *)(self+0x43)!=6) func_PAL_002A7E68(self,6,0,8);
+            if (*(u8 *)(self+0x43)!=6) anim_start_blended_pal(self,6,0,8);
             if (*(short *)(state+0x36E)) moby_call_helper_with_blocks_pal(self);else moby_step_at_own_position_pal(self);
         } else if (moby_get_anim_value(self)>5.0f) {
             old=*(float *)(state+0x130);*(float *)(state+0x130)=0.01745329424738884f;
@@ -241,7 +243,7 @@ void security_robot_update_pal(char *self)
     case 9:
         if (vec_normalized_direction_dot(self,target)<0.01f) {
             moby_set_state(self,10,-1);
-            if (*(u8 *)(self+0x43)!=6) func_PAL_002A7E68(self,6,0,8);
+            if (*(u8 *)(self+0x43)!=6) anim_start_blended_pal(self,6,0,8);
             if (*(short *)(state+0x36E)) moby_call_helper_with_blocks_pal(self);else moby_step_at_own_position_pal(self);
         } else if (moby_get_anim_value(self)>5.0f) {
             old=*(float *)(state+0x130);*(float *)(state+0x130)=0.01745329424738884f;
@@ -250,7 +252,7 @@ void security_robot_update_pal(char *self)
         }
         break;
     case 11:
-        if (flag_set_first_pending(self) && *(u8 *)(self+0x43)!=1) func_PAL_002A7E68(self,1,0,8);
+        if (flag_set_first_pending(self) && *(u8 *)(self+0x43)!=1) anim_start_blended_pal(self,1,0,8);
         if (*(short *)(state+0x36E)) coll_check_move_to_point_pal(self,target);else moby_step_at_own_position_factor_pal(self,angle);
     case 15: case 16:
         if (flags&2) security_robot_play_idle_pal(self);
@@ -260,7 +262,7 @@ void security_robot_update_pal(char *self)
             *(short *)(state+0x368)=0;
             if (g_active_attacker_robot==self) {
                 moby_set_state(self,12,5);
-                if (*(u8 *)(self+0x43)!=7) func_PAL_002A7E68(self,7,0,8);
+                if (*(u8 *)(self+0x43)!=7) anim_start_blended_pal(self,7,0,8);
             } else security_robot_play_idle_pal(self);
         }
         security_robot_damage_along_arm_swing(self);
@@ -277,7 +279,7 @@ void security_robot_update_pal(char *self)
                 qcopy_nc((char *)matrix+i*16,self+0xC0+i*16);
             }
             mat_get_euler_angles(matrix,self+0xF0);
-            if (*(u8 *)(self+0x43)!=13) func_PAL_002A7E68(self,13,0,25);
+            if (*(u8 *)(self+0x43)!=13) anim_start_blended_pal(self,13,0,25);
             *(u16 *)(self+0x34)&=0xEFFF;
         }
         { float gravity=*(float *)(state+0x12C);

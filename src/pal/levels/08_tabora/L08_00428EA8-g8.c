@@ -75,8 +75,10 @@ extern void moby_set_state(char *, int, int);
 extern void moby_mark_spawned(char *);
 
 /* Apply the height gates, dispatch the actor state, and update timers and bounds. */
-void func_PAL_L08_00428EA8(char *actor) {
-    char *p;
+/* Sandfly update: applies the height gates, dispatches on its state and updates timers and bounds (PAL version). */
+/* Sandfly update: applies the height gates, dispatches on its state and updates timers and bounds (PAL version). */
+void sandfly_update_pal(char *actor) {
+    char *vars;
     int ready;
     int condition;
     float local[4];
@@ -91,11 +93,11 @@ void func_PAL_L08_00428EA8(char *actor) {
             if (height < g_init_context.secondHeight && g_init_context.state == mode) return;
         }
     }
-    p = *(char **)(actor + 0x68);
+    vars = *(char **)(actor + 0x68);
     sandfly_check_hit(actor);
     switch (*(unsigned char *)(actor + 0x20)) {
     case 0: {
-        int id = *(int *)(p + 0x184);
+        int id = *(int *)(vars + 0x184);
         if (id != -1) {
             char *other = (char *)g_moby_array + (id << 8);
             if (*(unsigned char *)(other + 0xB0) != 255) {
@@ -112,43 +114,43 @@ void func_PAL_L08_00428EA8(char *actor) {
     }
     case 1:
         ready = 0;
-        switch (*(unsigned char *)(p + 0x18B)) {
+        switch (*(unsigned char *)(vars + 0x18B)) {
         case 0:
             if (!math_random_int_below(7)) {
                 /* Result 2 is false; normalize this with the other nonzero triggers. */
-                condition = SelectNearestListedMoby(actor, p + 0x100,
-                    (float)*(unsigned char *)(p + 0x18D), 0.0f,
-                    *(int *)(p + 0x190), *(int *)(p + 0x198),
-                    *(int *)(p + 0x194), -1) ^ 2;
+                condition = SelectNearestListedMoby(actor, vars + 0x100,
+                    (float)*(unsigned char *)(vars + 0x18D), 0.0f,
+                    *(int *)(vars + 0x190), *(int *)(vars + 0x198),
+                    *(int *)(vars + 0x194), -1) ^ 2;
                 goto normalize;
             }
             break;
         case 1:
-            if (*(int *)(p + 0x180) != -1) ready = moby_l08_is_linked_running_2(*(int *)(p + 0x180)) != 0;
+            if (*(int *)(vars + 0x180) != -1) ready = moby_l08_is_linked_running_2(*(int *)(vars + 0x180)) != 0;
             else {
                 STUB_printf(g_str_sandfly_debug, *(short *)(actor + 0xAA), *(short *)(actor + 0xB2));
-                *(unsigned char *)(p + 0x18B) = 0;
+                *(unsigned char *)(vars + 0x18B) = 0;
             }
             break;
         case 2: condition = *(u8 *)(actor + 0xBC); goto normalize;
-        case 3: ready = moby_l08_is_linked_gone_4(*(int *)(p + 0x1AC)) != 0; break;
-        case 4: ready = moby_l08_is_linked_gone_3(*(int *)(p + 0x180)) != 0; break;
+        case 3: ready = moby_l08_is_linked_gone_4(*(int *)(vars + 0x1AC)) != 0; break;
+        case 4: ready = moby_l08_is_linked_gone_3(*(int *)(vars + 0x180)) != 0; break;
         case 5:
-            condition = moby_l08_is_linked_running_or_gone_2(*(int *)(p + 0x184));
+            condition = moby_l08_is_linked_running_or_gone_2(*(int *)(vars + 0x184));
 normalize:
             ready = condition != 0;
             break;
         }
         if (*(unsigned char *)(actor + 0xBC) & 2) ready = 1;
         if (ready) {
-            *(unsigned char *)(actor + 0x30) = *(unsigned char *)(p + 0x188);
-            qzero(p + 0x170);
-            *(short *)(p + 0x1B8) = math_random_int_range(0, 180);
+            *(unsigned char *)(actor + 0x30) = *(unsigned char *)(vars + 0x188);
+            qzero(vars + 0x170);
+            *(short *)(vars + 0x1B8) = math_random_int_range(0, 180);
             moby_set_state(actor, 3, -1);
         }
         break;
     case 3:
-        if (FastDecTimer((short *)(p + 0x1B8))) {
+        if (FastDecTimer((short *)(vars + 0x1B8))) {
             if (*(unsigned char *)(actor + 0x43)) anim_start_blended(actor, 0, 0, 10);
             *(unsigned char *)(actor + 0x31) = 1;
             *(unsigned short *)(actor + 0x34) &= 0xFFFE;
@@ -158,15 +160,15 @@ normalize:
     case 2:
         z = FIELD(actor, float, 0x18);
         switch (FIELD(actor, u8, 0x95)) {
-        case 0: z = FIELD(p, float, 0x1B4); break;
-        case 1: z = FIELD(p, float, 0x1B0) - 1.7f; break;
+        case 0: z = FIELD(vars, float, 0x1B4); break;
+        case 1: z = FIELD(vars, float, 0x1B0) - 1.7f; break;
         }
         if (flag_set_first_pending(actor)) PlayMobySound(4, 0, actor);
-        math_step_value_toward_target(actor + 0x18, z, p + 0x178,
+        math_step_value_toward_target(actor + 0x18, z, vars + 0x178,
                        0.010000001f, 0.006f, 0.6f);
         if (moby_get_anim_value(actor) < 12.0f) {
             qcopy(local, actor + 0x10);
-            local[2] = FIELD(p, float, 0x1B0);
+            local[2] = FIELD(vars, float, 0x1B0);
             part_spawn_dust_burst(actor, local, 3, 1.0f, 1.5f, 0.5f, 0.0f, 0.1f, 0.8f);
         }
         if (math_fabs(FIELD(actor, float, 0x18) - z) < 0.2f) {
@@ -174,13 +176,13 @@ normalize:
             case 0:
                 FIELD(actor, u16, 0x34) |= 0x1000;
                 if (FIELD(actor, u8, 0x43) != 3) anim_start_blended(actor, 3, 0, 3);
-                FIELD(p, s16, 0x1B8) = ((s32)(math_random_int_range(180, 360)) * 5 + 2) / 6;
+                FIELD(vars, s16, 0x1B8) = ((s32)(math_random_int_range(180, 360)) * 5 + 2) / 6;
                 moby_set_state(actor, 5, -1);
                 break;
             case 1:
                 FIELD(actor, u16, 0x34) &= 0xEFFF;
                 if (FIELD(actor, u8, 0x43) != 1) anim_start_blended(actor, 1, 0, 3);
-                FIELD(p, s16, 0x1B8) = 0;
+                FIELD(vars, s16, 0x1B8) = 0;
                 FIELD(actor, u8, 0x31) = 0;
                 FIELD(actor, u16, 0x34) |= 1;
                 moby_set_state(actor, 1, -1);
@@ -189,44 +191,44 @@ normalize:
         }
         break;
     case 4:
-        FastVecAdd(actor + 0x10, actor + 0x10, p + 0x170);
-        FIELD(p, float, 0x178) -= 0.00392f;
+        FastVecAdd(actor + 0x10, actor + 0x10, vars + 0x170);
+        FIELD(vars, float, 0x178) -= 0.00392f;
         FIELD(actor, float, 0x18) += 0.75f;
         if (coll_test_point(actor + 0x10, 0.75f, 0, actor)) {
             if (g_hero_moby_target == 0 || FIELD(g_hero_moby_target, s16, 0xAA) != 0x945) {
                 if (FIELD(actor, u8, 0x43) != 3) anim_start_blended(actor, 3, 0, 3);
-                FIELD(p, s16, 0x1B8) = ((s32)(math_random_int_range(180, 360)) * 5 + 2) / 6;
+                FIELD(vars, s16, 0x1B8) = ((s32)(math_random_int_range(180, 360)) * 5 + 2) / 6;
                 moby_set_state(actor, 5, -1);
             }
         }
-        if (FIELD(p, float, 0x178) < 0 || FIELD(actor, u16, 0x96) > 200) {
+        if (FIELD(vars, float, 0x178) < 0 || FIELD(actor, u16, 0x96) > 200) {
             if (FIELD(actor, u8, 0x43) != 3) anim_start_blended(actor, 3, 0, 3);
-            FIELD(p, s16, 0x1B8) = ((s32)(math_random_int_range(180, 360)) * 5 + 2) / 6;
+            FIELD(vars, s16, 0x1B8) = ((s32)(math_random_int_range(180, 360)) * 5 + 2) / 6;
             moby_set_state(actor, 5, -1);
         }
         FIELD(actor, float, 0x18) -= 0.75f;
-        FIELD(p, float, 0x178) -= 0.00392f;
-        if (FIELD(actor, float, 0x18) < FIELD(p, float, 0x1B0))
-            FIELD(actor, float, 0x18) = FIELD(p, float, 0x1B0);
+        FIELD(vars, float, 0x178) -= 0.00392f;
+        if (FIELD(actor, float, 0x18) < FIELD(vars, float, 0x1B0))
+            FIELD(actor, float, 0x18) = FIELD(vars, float, 0x1B0);
         break;
     case 5: {
-        float angle = FIELD(p, float, 0x16C);
+        float angle = FIELD(vars, float, 0x16C);
         float phase;
         if (FIELD(actor, u16, 0x96) == 0 || g_frame_l08_counter % 50 == FIELD(actor, s16, 0xB2) % 50) {
             if (angle > 0.0f) angle = math_random_float_range(0.2f, 0.5f) * -1.5707963705062866f;
             else angle = math_random_float_range(0.2f, 0.5f) * 1.5707963705062866f;
         }
-        FIELD(p, float, 0x160) = math_fast_sin_or_cos_a(FastAddRotations(FIELD(actor, float, 0xF8), angle)) * 2.0f;
-        FIELD(p, float, 0x164) = math_fast_sin_or_cos_b(FastAddRotations(FIELD(actor, float, 0xF8), angle)) * 2.0f;
-        FIELD(p, s32, 0x168) = 0;
-        FastVecAdd(p + 0x160, p + 0x160, actor + 0x10);
+        FIELD(vars, float, 0x160) = math_fast_sin_or_cos_a(FastAddRotations(FIELD(actor, float, 0xF8), angle)) * 2.0f;
+        FIELD(vars, float, 0x164) = math_fast_sin_or_cos_b(FastAddRotations(FIELD(actor, float, 0xF8), angle)) * 2.0f;
+        FIELD(vars, s32, 0x168) = 0;
+        FastVecAdd(vars + 0x160, vars + 0x160, actor + 0x10);
         phase = math_wrap_angle_to_pi(IntToFloat(g_frame_l08_counter) * 0.025f);
         sandfly_pick_flight_target(actor);
         if (sandfly_move_toward_target(actor, 360.0f, 180.0f, 560.0f, 20.0f, 0.0f, 16.0f,
-                              FIELD(p, float, 0x15C) + 1.7f + 1.0f + math_fast_sin_or_cos_b(phase), -2.0f))
+                              FIELD(vars, float, 0x15C) + 1.7f + 1.0f + math_fast_sin_or_cos_b(phase), -2.0f))
             angle *= 1.025f;
-        FIELD(p, float, 0x16C) = angle;
-        if (FIELD(p, s16, 0x1B8) == 0) {
+        FIELD(vars, float, 0x16C) = angle;
+        if (FIELD(vars, s16, 0x1B8) == 0) {
             if (FIELD(actor, u8, 0x43) != 1) anim_start_blended(actor, 1, 0, 3);
             moby_set_state(actor, 6, 0);
         }
@@ -235,87 +237,87 @@ normalize:
     case 6:
         switch (FIELD(actor, u8, 0x95)) {
         case 0:
-            if (FIELD(p, s16, 0x1B8) == 0) {
-                FIELD(p, s16, 0x1B8) = ((s32)(math_random_int_range(30, 90)) * 5 + 2) / 6;
-                if (FIELD(p, s16, 0x1B8) >= 7 && FIELD(actor, u8, 0x43) != 3)
+            if (FIELD(vars, s16, 0x1B8) == 0) {
+                FIELD(vars, s16, 0x1B8) = ((s32)(math_random_int_range(30, 90)) * 5 + 2) / 6;
+                if (FIELD(vars, s16, 0x1B8) >= 7 && FIELD(actor, u8, 0x43) != 3)
                     anim_start_blended(actor, 3, 0, 3);
                 moby_set_state(actor, 6, 1);
             }
             break;
         case 1:
             sandfly_move_toward_target(actor, 120.0f, 360.0f, 120.0f, 30.0f, 0.0f, 8.0f,
-                              FIELD(p, float, 0x15C) + 1.7f, 1.0f);
-            if (FIELD(p, s16, 0x1B8) == 0) {
+                              FIELD(vars, float, 0x15C) + 1.7f, 1.0f);
+            if (FIELD(vars, s16, 0x1B8) == 0) {
                 sandfly_pick_random_target(actor);
-                FIELD(p, s16, 0x1B8) = ((s32)(math_random_int_range(0, 0)) * 5 + 2) / 6;
-                if (FIELD(p, s16, 0x1B8) >= 7 && FIELD(actor, u8, 0x43) != 1)
+                FIELD(vars, s16, 0x1B8) = ((s32)(math_random_int_range(0, 0)) * 5 + 2) / 6;
+                if (FIELD(vars, s16, 0x1B8) >= 7 && FIELD(actor, u8, 0x43) != 1)
                     anim_start_blended(actor, 1, 0, 3);
                 moby_set_state(actor, 6, 0);
             }
             break;
         case 2:
-            qcopy(p + 0x160, p + 0x150);
+            qcopy(vars + 0x160, vars + 0x150);
             if (sandfly_move_toward_target(actor, 120.0f, 360.0f, 120.0f, 30.0f, 0.0f, 8.0f,
-                                  FIELD(p, float, 0x15C) + 1.7f, 1.0f) & 8) {
+                                  FIELD(vars, float, 0x15C) + 1.7f, 1.0f) & 8) {
                 if (FIELD(actor, u8, 0x43) != 2) anim_start_blended(actor, 2, 0, 10);
                 moby_set_state(actor, 2, 1);
             }
             break;
         }
-        if (SelectNearestListedMoby(actor, p + 0x100, (float)FIELD(actor, s16, 0x32), 0.0f,
-                             FIELD(p, int, 0x19C), FIELD(p, int, 0x1A4), FIELD(p, int, 0x1A0), -1) != 2) {
+        if (SelectNearestListedMoby(actor, vars + 0x100, (float)FIELD(actor, s16, 0x32), 0.0f,
+                             FIELD(vars, int, 0x19C), FIELD(vars, int, 0x1A4), FIELD(vars, int, 0x1A0), -1) != 2) {
             if (!math_random_int_below(9)) {
-                FIELD(p, s16, 0x1BA) = ((s32)(math_random_int_range(300, 360)) * 5 + 2) / 6;
+                FIELD(vars, s16, 0x1BA) = ((s32)(math_random_int_range(300, 360)) * 5 + 2) / 6;
                 moby_set_state(actor, 7, 0);
             }
-        } else if (FIELD(actor, u8, 0x20) == 6 && FIELD(p, u8, 0x18A) == 0) {
+        } else if (FIELD(actor, u8, 0x20) == 6 && FIELD(vars, u8, 0x18A) == 0) {
             moby_set_state(actor, 6, 2);
         }
         break;
     case 7:
         switch (FIELD(actor, u8, 0x95)) {
         case 0:
-            if (FIELD(p, s16, 0x1B8) == 0) {
-                FIELD(p, s16, 0x1B8) = ((s32)(math_random_int_range(30, 90)) * 5 + 2) / 6;
-                if (FIELD(p, s16, 0x1B8) >= 7 && FIELD(actor, u8, 0x43) != 3)
+            if (FIELD(vars, s16, 0x1B8) == 0) {
+                FIELD(vars, s16, 0x1B8) = ((s32)(math_random_int_range(30, 90)) * 5 + 2) / 6;
+                if (FIELD(vars, s16, 0x1B8) >= 7 && FIELD(actor, u8, 0x43) != 3)
                     anim_start_blended(actor, 3, 0, 3);
                 moby_set_state(actor, 7, 1);
             }
             break;
         case 1:
             if (sandfly_move_toward_target(actor, 250.0f, 180.0f, 250.0f, 32.0f, 0.1f, 13.0f,
-                                  FIELD(p, float, 0x15C) + 1.7f, 1.0f) & 8)
-                FIELD(p, s16, 0x1B8) = 0;
-            if (FIELD(p, s16, 0x1B8) == 0) {
+                                  FIELD(vars, float, 0x15C) + 1.7f, 1.0f) & 8)
+                FIELD(vars, s16, 0x1B8) = 0;
+            if (FIELD(vars, s16, 0x1B8) == 0) {
                 sandfly_pick_random_target(actor);
-                FIELD(p, s16, 0x1B8) = ((s32)(math_random_int_range(0, 0)) * 5 + 2) / 6;
-                if (FIELD(p, s16, 0x1B8) >= 7 && FIELD(actor, u8, 0x43) != 1)
+                FIELD(vars, s16, 0x1B8) = ((s32)(math_random_int_range(0, 0)) * 5 + 2) / 6;
+                if (FIELD(vars, s16, 0x1B8) >= 7 && FIELD(actor, u8, 0x43) != 1)
                     anim_start_blended(actor, 1, 0, 3);
                 moby_set_state(actor, 7, 0);
             }
             break;
         }
-        if (SelectNearestListedMoby(actor, p + 0x100, (float)FIELD(actor, s16, 0x32), (float)FIELD(p, u8, 0x18D),
-                             FIELD(p, int, 0x19C), FIELD(p, int, 0x1A4), FIELD(p, int, 0x1A0), -1) == 2 ||
+        if (SelectNearestListedMoby(actor, vars + 0x100, (float)FIELD(actor, s16, 0x32), (float)FIELD(vars, u8, 0x18D),
+                             FIELD(vars, int, 0x19C), FIELD(vars, int, 0x1A4), FIELD(vars, int, 0x1A0), -1) == 2 ||
             g_hero_state.state == 0x31 || g_hero_state.secondaryState == 0x11 ||
             g_hero_state.secondaryState == 0x12) {
-            FIELD(p, int, 0x144) = 2;
-            if (FIELD(p, s16, 0x1BA) == 0) moby_set_state(actor, 6, 0);
-        } else if (**(int **)(p + 0x1CC) < 3 && FIELD(p, s16, 0x1BC) == 0 &&
-                    vec_distance_xy(actor + 0x10, p + 0x120) < 12.0f) {
-            FIELD(p, u8, 0x18C) = 1;
-            qcopy(p + 0x160, p + 0x120);
+            FIELD(vars, int, 0x144) = 2;
+            if (FIELD(vars, s16, 0x1BA) == 0) moby_set_state(actor, 6, 0);
+        } else if (**(int **)(vars + 0x1CC) < 3 && FIELD(vars, s16, 0x1BC) == 0 &&
+                    vec_distance_xy(actor + 0x10, vars + 0x120) < 12.0f) {
+            FIELD(vars, u8, 0x18C) = 1;
+            qcopy(vars + 0x160, vars + 0x120);
             moby_set_state(actor, 8, 0);
-            ++**(int **)(p + 0x1CC);
+            ++**(int **)(vars + 0x1CC);
         }
         break;
     case 8: {
-        qcopy(p + 0x160, p + 0x120);
+        qcopy(vars + 0x160, vars + 0x120);
         switch (FIELD(actor, u8, 0x95)) {
         case 0:
             sandfly_move_toward_target(actor, 260.0f, 180.0f, 270.0f, 32.0f, 0.15f, 8.0f, 0.4f, 0.5f);
-            if (vec_distance_xy(actor + 0x10, p + 0x120) < 1.5f &&
-                math_fabs(FIELD(actor, float, 0x18) - FIELD(p, float, 0x128)) < 1.1f) {
+            if (vec_distance_xy(actor + 0x10, vars + 0x120) < 1.5f &&
+                math_fabs(FIELD(actor, float, 0x18) - FIELD(vars, float, 0x128)) < 1.1f) {
                 if (FIELD(actor, u8, 0x43) != 4) anim_start_blended(actor, 4, 0, 3);
                 moby_set_state(actor, 8, 1);
             }
@@ -328,11 +330,11 @@ normalize:
             if (FIELD(actor, u8, 0x42) == 4) {
                 if (moby_get_anim_value(actor) > 19.5f && moby_get_anim_value(actor) < 29.0f) {
                     moby_transform_joint_to_world(actor, 1, local);
-                    coll_sweep_from_object(actor, local, 0.5f, (float)FIELD(p, u8, 0x34), 1.0f, 1, 0, 1, 0);
+                    coll_sweep_from_object(actor, local, 0.5f, (float)FIELD(vars, u8, 0x34), 1.0f, 1, 0, 1, 0);
                 }
                 if (FIELD(actor, u8, 0x60) & 2) {
-                    FIELD(p, s16, 0x1B8) = 100;
-                    FIELD(p, s16, 0x1BC) = ((s32)(math_random_int_range(180, 260)) * 5 + 2) / 6;
+                    FIELD(vars, s16, 0x1B8) = 100;
+                    FIELD(vars, s16, 0x1BC) = ((s32)(math_random_int_range(180, 260)) * 5 + 2) / 6;
                     if (FIELD(actor, u8, 0x43) != 1) anim_start_blended(actor, 1, 0, 3);
                     moby_set_state(actor, 8, 3);
                 }
@@ -340,36 +342,36 @@ normalize:
             break;
         case 3:
             sandfly_move_toward_target(actor, 260.0f, 180.0f, 270.0f, 32.0f, 0.15f, 8.0f, 0.3f, 0.5f);
-            if (FastDecTimer((s16 *)(p + 0x1B8))) {
-                if (vec_distance_xy(actor + 0x10, p + 0x120) < 1.5f &&
-                    math_fabs(FIELD(actor, float, 0x18) - FIELD(p, float, 0x128)) < 1.1f) {
+            if (FastDecTimer((s16 *)(vars + 0x1B8))) {
+                if (vec_distance_xy(actor + 0x10, vars + 0x120) < 1.5f &&
+                    math_fabs(FIELD(actor, float, 0x18) - FIELD(vars, float, 0x128)) < 1.1f) {
                     if (FIELD(actor, u8, 0x43) != 4) anim_start_blended(actor, 4, 0, 3);
                     moby_set_state(actor, 8, 1);
                 } else {
-                    qcopy(p + 0x160, p + 0x120);
+                    qcopy(vars + 0x160, vars + 0x120);
                     moby_set_state(actor, 8, 0);
                 }
             }
             break;
         }
-        if (SelectNearestListedMoby(actor, p + 0x100, (float)FIELD(actor, s16, 0x32), (float)FIELD(p, u8, 0x18D),
-                             FIELD(p, int, 0x19C), FIELD(p, int, 0x1A4), FIELD(p, int, 0x1A0), -1) == 2 ||
+        if (SelectNearestListedMoby(actor, vars + 0x100, (float)FIELD(actor, s16, 0x32), (float)FIELD(vars, u8, 0x18D),
+                             FIELD(vars, int, 0x19C), FIELD(vars, int, 0x1A4), FIELD(vars, int, 0x1A0), -1) == 2 ||
             g_hero_state.state == 0x31 || g_hero_state.secondaryState == 0x11 ||
             g_hero_state.secondaryState == 0x12) {
             snd_stop_queued(actor);
-            if (FIELD(p, s16, 0x1BA) != 0) {
-                FIELD(p, s16, 0x1B8) = 0;
+            if (FIELD(vars, s16, 0x1BA) != 0) {
+                FIELD(vars, s16, 0x1B8) = 0;
                 if (FIELD(actor, u8, 0x43) != 3) anim_start_blended(actor, 3, 0, 3);
                 moby_set_state(actor, 6, 0);
             } else {
-                FastVecSub(p + 0x160, actor + 0x10, p + 0x160);
-                FastVecAdd(p + 0x160, p + 0x160, actor + 0x10);
-                vec_scale_to_length(p + 0x160, p + 0x160, 5.0f);
+                FastVecSub(vars + 0x160, actor + 0x10, vars + 0x160);
+                FastVecAdd(vars + 0x160, vars + 0x160, actor + 0x10);
+                vec_scale_to_length(vars + 0x160, vars + 0x160, 5.0f);
                 sandfly_pick_flight_target(actor);
                 sandfly_move_toward_target(actor, 260.0f, 180.0f, 270.0f, 32.0f, 0.15f, 8.0f, 0.3f, 0.5f);
-                FIELD(p, s16, 0x1B8) = 0;
+                FIELD(vars, s16, 0x1B8) = 0;
                 if (FIELD(actor, u8, 0x43) != 3) anim_start_blended(actor, 3, 0, 3);
-                FIELD(p, s16, 0x1BC) = ((s32)(math_random_int_range(180, 260)) * 5 + 2) / 6;
+                FIELD(vars, s16, 0x1BC) = ((s32)(math_random_int_range(180, 260)) * 5 + 2) / 6;
                 moby_set_state(actor, 7, 0);
             }
         }
@@ -377,17 +379,17 @@ normalize:
     }
     case 9: {
         int result;
-        ++FIELD(p, u16, 0x1BE);
+        ++FIELD(vars, u16, 0x1BE);
         if (flag_set_first_pending(actor)) PlayMobySound(0, 0, actor);
-        result = moby_dispatch_action_by_kind(actor, p + 0x50);
+        result = moby_dispatch_action_by_kind(actor, vars + 0x50);
         if (result & 1) {
             moby_set_state(actor, 10, -1);
-        } else if ((result & 2) || FIELD(p, s16, 0x1BE) > 300) {
-            FIELD(p, u8, 0x6A) = 2;
+        } else if ((result & 2) || FIELD(vars, s16, 0x1BE) > 300) {
+            FIELD(vars, u8, 0x6A) = 2;
             if (FIELD(actor, u8, 0x43) != 1) anim_start_blended(actor, 1, 0, 3);
-            FIELD(p, s16, 0x1BE) = 0;
-            qzero(p + 0x170);
-            if (FIELD(p, float, 0x20) <= 0.0f) moby_set_state(actor, 10, -1);
+            FIELD(vars, s16, 0x1BE) = 0;
+            qzero(vars + 0x170);
+            if (FIELD(vars, float, 0x20) <= 0.0f) moby_set_state(actor, 10, -1);
             else moby_set_state(actor, 7, 0);
         }
         break;
@@ -399,7 +401,7 @@ normalize:
         if (flag_set_first_pending(actor)) PlayMobySound(1, 0, actor);
         part_spawn_ground_sparkles(actor);
         part_l08_spawn_spark_shower(actor, g_str_effect_name);
-        SpawnExplosionEffects(actor, p + 0x170, 0, 0.0f, 0.0f, 4, 0, 0,
+        SpawnExplosionEffects(actor, vars + 0x170, 0, 0.0f, 0.0f, 4, 0, 0,
                       2.0f, 1.0f, 9.0f, 1.0f, -1, 0.0f, 0, 0, -1, 1, 0x810001);
         snd_stop_queued(actor);
         SetDeathBits(actor, 0, 3);

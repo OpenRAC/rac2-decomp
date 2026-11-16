@@ -19,49 +19,49 @@ typedef struct {
 } GameState_189E20;
 extern GameState_189E20 g_hero_state;
 
-/* Hand-adapted from func_002AE8C0. */
-void enemy_update_wander_heading_pal(char *obj, char *st, char *ctx)
+/* Moves an enemy along a wandering heading: picks new headings now and then, steers back toward its home point when too far, and turns away from the hero when near (PAL). Hand-adapted from func_002AE8C0. */
+void enemy_update_wander_heading_pal(char *enemy, char *wander, char *context)
 {
     char *pos;
-    float v[4];
-    float f;
+    float target[4];
+    float dist;
 
-    int r;
+    int blocked;
 
-    if (*(short *)(st + 0x28) == 0) {
-        *(float *)(st + 0x24) = *(float *)(st + 0x24) + math_random_signed_float_range(0.78539824f, 2.6179941f);
-        *(short *)(st + 0x2A) = math_random_int_range(*(short *)(st + 0x2C), *(short *)(st + 0x2E));
-        *(short *)(st + 0x28) = 1;
+    if (*(short *)(wander + 0x28) == 0) {
+        *(float *)(wander + 0x24) = *(float *)(wander + 0x24) + math_random_signed_float_range(0.78539824f, 2.6179941f);
+        *(short *)(wander + 0x2A) = math_random_int_range(*(short *)(wander + 0x2C), *(short *)(wander + 0x2E));
+        *(short *)(wander + 0x28) = 1;
     } else {
-        StepAngleTowardTarget((float *)(obj + 0xF8), 0, *(float *)(st + 0x24), *(float *)(st + 0x18));
-        if (FastDecTimer(st + 0x2A) != 0)
-            *(short *)(st + 0x28) = 0;
+        StepAngleTowardTarget((float *)(enemy + 0xF8), 0, *(float *)(wander + 0x24), *(float *)(wander + 0x18));
+        if (FastDecTimer(wander + 0x2A) != 0)
+            *(short *)(wander + 0x28) = 0;
     }
-    pos = obj + 0x10;
-    *(V4_002AE8C0 *)v = *(V4_002AE8C0 *)pos;
-    f = *(float *)(ctx + 0x28);
-    *(float *)(ctx + 0x28) = *(float *)(st + 0x14);
-    v[0] = v[0] + math_fast_sin_or_cos_a(*(float *)(obj + 0xF8)) * 2.0f;
-    v[1] = v[1] + math_fast_sin_or_cos_b(*(float *)(obj + 0xF8)) * 2.0f;
-    *(float *)(ctx + 0x28) = f;
-    r = moby_l01_turn_toward_target_pal(obj, v);
-    *(float *)(obj + 0x18) = coll_probe_ground_height_below(pos, 0, 0.5f);
-    f = vec_distance_xy(pos, st);
-    if (r != 0 || *(float *)(st + 0x1C) < f) {
-        *(float *)(st + 0x24) = mat_fast_helper_a(*(float *)(st + 0x0) - *(float *)(obj + 0x10),
-                                              *(float *)(st + 0x4) - *(float *)(obj + 0x14));
-        *(short *)(st + 0x2A) = math_random_int_range(25, 75);
-        *(short *)(st + 0x28) = 1;
+    pos = enemy + 0x10;
+    *(V4_002AE8C0 *)target = *(V4_002AE8C0 *)pos;
+    dist = *(float *)(context + 0x28);
+    *(float *)(context + 0x28) = *(float *)(wander + 0x14);
+    target[0] = target[0] + math_fast_sin_or_cos_a(*(float *)(enemy + 0xF8)) * 2.0f;
+    target[1] = target[1] + math_fast_sin_or_cos_b(*(float *)(enemy + 0xF8)) * 2.0f;
+    *(float *)(context + 0x28) = dist;
+    blocked = moby_l01_turn_toward_target_pal(enemy, target);
+    *(float *)(enemy + 0x18) = coll_probe_ground_height_below(pos, 0, 0.5f);
+    dist = vec_distance_xy(pos, wander);
+    if (blocked != 0 || *(float *)(wander + 0x1C) < dist) {
+        *(float *)(wander + 0x24) = mat_fast_helper_a(*(float *)(wander + 0x0) - *(float *)(enemy + 0x10),
+                                              *(float *)(wander + 0x4) - *(float *)(enemy + 0x14));
+        *(short *)(wander + 0x2A) = math_random_int_range(25, 75);
+        *(short *)(wander + 0x28) = 1;
     } else {
         float limit;
 
-        f = vec_distance_xy(pos, g_hero_state.pos);
-        limit = *(float *)(st + 0x20);
-        if (f < limit) {
-            f = f / limit;
-            *(float *)(st + 0x24) = math_move_angle_toward_target(*(float *)(st + 0x24),
-                    mat_fast_helper_a(*(float *)(obj + 0x10) - g_hero_state.pos[0],
-                                  *(float *)(obj + 0x14) - g_hero_state.pos[1]), f);
+        dist = vec_distance_xy(pos, g_hero_state.pos);
+        limit = *(float *)(wander + 0x20);
+        if (dist < limit) {
+            dist = dist / limit;
+            *(float *)(wander + 0x24) = math_move_angle_toward_target(*(float *)(wander + 0x24),
+                    mat_fast_helper_a(*(float *)(enemy + 0x10) - g_hero_state.pos[0],
+                                  *(float *)(enemy + 0x14) - g_hero_state.pos[1]), dist);
         }
     }
 }

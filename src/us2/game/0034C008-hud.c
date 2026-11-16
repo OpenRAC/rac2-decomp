@@ -108,7 +108,7 @@ static inline void hud_ammo_fade_lo_34B2C8(char **pobj, f32 lo)
 }
 
 /* The ammo/bolt HUD setup: initialises the HUD's text, sprite and fade widgets. */
-void func_US2_0034C008(char *o, char *font, s32 arg)
+void hud_ammo_bolt_init_us2(char *o, char *font, s32 arg)
 {
     char *self = o;
     char buf[16];

@@ -59,7 +59,7 @@ extern void moby_mark_spawned(void *);
 extern void FastVecSub(void *, void *, void *), FastVecCross(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
 extern float FastVecDot(void *, void *), fast_vec_dist(void *, void *);
-extern void func_PAL_L10_00429620(void *, int), hrugis_reset_mission_state(void *);
+extern void hrugis_finish_mission_reward_pal(void *, int), hrugis_reset_mission_state(void *);
 extern int math_fast_float_d(int *);
 extern char *GetLocalizedString(int);
 extern int level_l00_call_module_handler_with_arg_9_pal(void *, int);
@@ -68,7 +68,10 @@ extern void hero_add_clamped_stat(float);
 extern void effect_set_enabled(void *, int), effect_set_color(void *, int);
 extern char *pickup_spawn_if_not_taken_pal(void *, int, int, int);
 
-void func_PAL_L10_00429E20(GateObject *p)
+/* Updates the gate course mission (PAL): on the first call it resets the state and spawns the first
+   two gate mobys along the path; then it checks the hero and the camera against the first gate,
+   scoring a pass or a miss, advances the gates and colors them. Ends the mission when none are left. */
+void gate_course_update_pal(GateObject *p)
 {
     GateVec up, pos, v1, v2;
     char *st = p->state, *other;
@@ -140,7 +143,7 @@ void func_PAL_L10_00429E20(GateObject *p)
     }
 
     if (!g_gate_first && !g_gate_second && !g_gate_search_flag) {
-        func_PAL_L10_00429620(p, 3);
+        hrugis_finish_mission_reward_pal(p, 3);
         return;
     }
 

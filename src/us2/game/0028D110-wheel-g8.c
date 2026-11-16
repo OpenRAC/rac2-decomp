@@ -24,6 +24,7 @@ extern int g_item_ammo_counts[];
 typedef struct { int active; char reserved04[0x44]; short localizedName; char reserved4A[0x3E]; unsigned short sellsAmmo; char reserved8A[4]; unsigned short ammoCapacity; char reserved90[0x50]; } WheelWeaponRecord;
 extern WheelWeaponRecord g_weapon_l00_table[];
 extern char g_str_ammo_format[];
+/* Draws the weapon wheel: highlights the selected slot and prints its ammo count and name (v2.00). */
 int weapon_wheel_draw_us2(char *o)
 {
     float a,b;

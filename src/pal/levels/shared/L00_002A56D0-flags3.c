@@ -32,6 +32,7 @@ extern void FastVecAdd(void *, void *, void *);
 typedef struct Obj_L00_0033BA68 Obj_L00_0033BA68;
 extern Obj_L00_0033BA68 *part_spawn_glow_effect_pal(char *, int, float);
 
+/* Plays a footstep sound for one foot and, on some ground, spawns a dust puff at that foot (PAL). */
 void hero_play_footstep_sound_dust_pal(int kind, int side, int play_sound, int duration) {
     float point[4];
     float offset[4];

@@ -14,7 +14,8 @@ extern void EmitTexturedRectangle(float x, float y, float draw_width, float draw
                          int u, int v, int width, int height,
                          unsigned int *colors, u64 texture);
 
-void func_US2_0027FCB0(float x, float y, u64 color, u8 *text, s32 character_limit, float scale,
+/* Draws a string with the given font texture and glyph metrics at a float position and scale, handling colour-change and overlay characters. */
+void text_draw_scaled_us2(float x, float y, u64 color, u8 *text, s32 character_limit, float scale,
                    u64 texture, u8 *metrics) {
     struct Glyph_F6668 *glyphs = (struct Glyph_F6668 *)metrics;
     unsigned int colors[4];

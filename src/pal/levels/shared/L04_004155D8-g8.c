@@ -12,7 +12,7 @@ extern int FloatToInt(float);
 
 /* Collects the racers, sorts their recorded times, and records each rank and
    the next racer in the ordered list. */
-void func_PAL_L04_004155D8(u8 *object) {
+void race_sort_racers_by_finish_time_pal(u8 *object) {
     u8 *list[24], **out;
     u8 *state = *(u8 **)(object + 0x68), *obj, *p, *route;
     int *slot = (int *)(state + 0x1E4);
@@ -54,7 +54,7 @@ void func_PAL_L04_004155D8(u8 *object) {
                     u8 *obj = list[j];
                     if (*(s16 *)(obj + 0xAA) == 0xBBC) {
                         a = g_race_time_ticks[0];
-                    } else if (*(s16 *)(obj + 0xAA) == 0xB2D) {
+                    } else if (*(s16 *)(obj + 0xAA) == 0xB2D) /* moby class 2861: enemy hoverbike */ {
                         a = *(int *)(*(u8 **)(obj + 0x68) + 0x1A0);
                     }
                 }
@@ -62,7 +62,7 @@ void func_PAL_L04_004155D8(u8 *object) {
                     u8 *obj = list[j + 1];
                     if (*(s16 *)(obj + 0xAA) == 0xBBC) {
                         b = g_race_time_ticks[0];
-                    } else if (*(s16 *)(obj + 0xAA) == 0xB2D) {
+                    } else if (*(s16 *)(obj + 0xAA) == 0xB2D) /* moby class 2861: enemy hoverbike */ {
                         b = *(int *)(*(u8 **)(obj + 0x68) + 0x1A0);
                     }
                 }
@@ -85,7 +85,7 @@ void func_PAL_L04_004155D8(u8 *object) {
             } else {
                 *(u8 **)(state + 0x3A0) = list[i + 1];
             }
-        } else if (*(s16 *)(obj + 0xAA) == 0xB2D) {
+        } else if (*(s16 *)(obj + 0xAA) == 0xB2D) /* moby class 2861: enemy hoverbike */ {
             p = *(u8 **)(obj + 0x68);
             p[0xA2] = i + 1;
             if (i == n - 1) {

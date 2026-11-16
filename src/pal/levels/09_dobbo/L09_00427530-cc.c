@@ -83,16 +83,17 @@ extern char *g_dobbo_point_table SDATA(D_L09_001B294C);
 
 /* func_L09_0040A2E8 is in L09_0040A2E8-g8.c. */
 
-void func_PAL_L09_00427530(char *a0) {
-    char *s2 = *(char **)(a0 + 0x68);
-    switch (*(u8 *)(a0 + 0x20)) {
+/* Periodic emitter: counts down a random timer, then throws a puff of sparks and re-arms the timer (PAL: 50 Hz timings). */
+void part_update_periodic_emitter_pal(char *moby) {
+    char *vars = *(char **)(moby + 0x68);
+    switch (*(u8 *)(moby + 0x20)) {
     case 0:
-        *(int *)s2 = (((int)(func_316A68(0, 0xF0)) * 5 + 2) / 6);
-        func_316958(a0, 1, -1);
+        *(int *)vars = (((int)(func_316A68(0, 0xF0)) * 5 + 2) / 6);
+        func_316958(moby, 1, -1);
         break;
     case 1:
-        if (func_2EA0E0(s2)) {
-            if (*(u8 *)(a0 + 0x31)) {
+        if (func_2EA0E0(vars)) {
+            if (*(u8 *)(moby + 0x31)) {
                 EffectVector a;
                 EffectVector b;
                 a.bits = 0;
@@ -100,9 +101,9 @@ void func_PAL_L09_00427530(char *a0) {
                 a.value[1] = -0.040000003f;
                 a.value[2] = 0.020000001f;
                 b.value[2] = 2.0f;
-                func_2E8450(a0, b.value, a.value, func_316A68(3, 7), 0, 0.0f, 0.040000003f, 0.7f, 15.0f, 1.0f);
+                func_2E8450(moby, b.value, a.value, func_316A68(3, 7), 0, 0.0f, 0.040000003f, 0.7f, 15.0f, 1.0f);
             }
-            *(int *)s2 = (((int)(func_316A68(0x78, 0xF0)) * 5 + 2) / 6);
+            *(int *)vars = (((int)(func_316A68(0x78, 0xF0)) * 5 + 2) / 6);
         }
         break;
     }

@@ -26,19 +26,20 @@ extern int prompt_bar_destroy(int);
 extern void *F7d9c8805_FUN_003361A8(int);
 extern char *F7d9c8805_FUN_00336968(int);
 
-void *prompt_bar_destroy_us2(int a0)
+/* Destroys the prompt bar: its five text widgets and three sprites. */
+void *prompt_bar_destroy_us2(int object)
 {
-	char *p = (char *)a0 + 12;
+	char *slot = (char *)object + 12;
 	int i;
 
 	for (i = 4; i != -1; i--) {
-		F7d9c8805_FUN_003361A8(p);
-		p += 76;
+		F7d9c8805_FUN_003361A8(slot);
+		slot += 76;
 	}
-	F7d9c8805_FUN_00336968(a0 + 408);
-	F7d9c8805_FUN_00336968(a0 + 496);
-	F7d9c8805_FUN_00336968(a0 + 584);
-	return a0;
+	F7d9c8805_FUN_00336968(object + 408);
+	F7d9c8805_FUN_00336968(object + 496);
+	F7d9c8805_FUN_00336968(object + 584);
+	return object;
 }
 
 
@@ -55,6 +56,7 @@ void prompt_bar_set_extras_enabled_us2(u8 *a0, s32 a1) { *(s32 *)(a0 + 0x2C4) = 
 extern void object_set_first_float4(void *, float, float, float, float);
 extern void object_set_value_float(void *, float);
 
+/* Updates the prompt bar each frame: moves its widgets to the anchor position. */
 void prompt_bar_update_us2(char *object) {
     char *r = object + 12;
     char *q = object + 0x188;
@@ -78,6 +80,7 @@ void prompt_bar_update_us2(char *object) {
 extern void F624a0727_FUN_00336A78(char *target);
 typedef struct { char pad[8]; short n; void (*fn)(char *); } ENTRY_F624a0727;
 
+/* Draws the prompt bar: its sprites and the button prompt texts. */
 void prompt_bar_draw_us2(char *object)
 {
     char *r = object + 12;

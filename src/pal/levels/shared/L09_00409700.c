@@ -46,12 +46,12 @@ typedef struct BounceState {
 } BounceState;
 
 /* Per-frame update of a bouncing object: runs its timed phases, then moves and bounces it. */
-void func_PAL_L09_00409700(BounceObject *object)
+void rotating_bouncing_effect_update_pal(BounceObject *object)
 {
     float point[4];
     float rotation[12];
     float after[4], delta[4], probe[4];
-    float matrix[16], normalStep[4], axis[4];
+    float matrix[16], normal_step[4], axis[4];
     BounceState *state = object->state;
     float radius, length, projection;
     switch (object->phase) {
@@ -102,8 +102,8 @@ void func_PAL_L09_00409700(BounceObject *object)
         projection = ref_L00_003DD2B8_15(state->velocity, ref_L00_003DD2B8_13);
         if (projection < 0.0f) {
             ref_L00_003DD2B8_16(state->velocity, state->velocity, ref_L00_003DD2B8_13);
-            ref_L00_003DD2B8_12(normalStep, ref_L00_003DD2B8_13, projection * 0.5f);
-            ref_L00_003DD2B8_03(state->velocity, state->velocity, normalStep);
+            ref_L00_003DD2B8_12(normal_step, ref_L00_003DD2B8_13, projection * 0.5f);
+            ref_L00_003DD2B8_03(state->velocity, state->velocity, normal_step);
             ref_L00_003DD2B8_12(state->velocity, state->velocity, length);
             ref_L00_003DD2B8_17(axis, ref_L00_003DD2B8_13, state->velocity);
             ref_L00_003DD2B8_12(axis, axis, 1.0f);

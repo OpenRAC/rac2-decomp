@@ -6,12 +6,12 @@ extern void object_set_first_float4(char *, float, float, float, float);
 
 /* Offsets the record position by the two resident biases and hands it to the
    shared spawn helper with no rotation. */
-void circle_menu_position_label_pal(char *a0)
+void circle_menu_position_label_pal(char *menu)
 {
-    if (*(int *)(a0 + 0x21C) != 0) {
-        float *position = *(float **)(a0 + 0x20C);
+    if (*(int *)(menu + 0x21C) != 0) {
+        float *position = *(float **)(menu + 0x20C);
 
-        object_set_first_float4(a0 + 0x170, position[0] + ref_L00_0033A688_00,
+        object_set_first_float4(menu + 0x170, position[0] + ref_L00_0033A688_00,
                       position[1] + g_circle_menu_label_offset_y, 0.0f, 0.0f);
     }
 }
@@ -118,44 +118,45 @@ extern void object_init_derived_arrays(void *, void *, void *);
 extern void object_set_helper_result(void *, void *, int);
 extern char g_circle_menu_header_data[], g_circle_menu_icon_data[];
 
-void circle_menu_init_entries_pal(char *obj, int *arr, char *third)
+/* Builds the circle menu's four icon sprites from the list of label ids, clears the entry modes and stores the entry table (PAL: PAL field offsets). */
+void circle_menu_init_entries_pal(char *menu, int *label_ids, char *entries)
 {
-    char *p = obj + 4;
-    int *q = (int *)&g_circle_menu_icon_colors;
+    char *sprite = menu + 4;
+    int *colors = (int *)&g_circle_menu_icon_colors;
     int i;
-    int n;
-    int *out;
-    int off;
+    int count;
+    int *modes;
+    int offset;
 
     for (i = 3; i >= 0; i--) {
-        if (*arr != 0) {
-            object_init_derived_arrays(p, g_circle_menu_icon_data, *(int *)(obj + 0x210));
-            *(int *)object_get_fourth_field(p) = *q;
-            object_set_helper_result(p, g_resident_data_base[0] + 0x8710, *arr);
+        if (*label_ids != 0) {
+            object_init_derived_arrays(sprite, g_circle_menu_icon_data, *(int *)(menu + 0x210));
+            *(int *)object_get_fourth_field(sprite) = *colors;
+            object_set_helper_result(sprite, g_resident_data_base[0] + 0x8710, *label_ids);
         } else {
-            object_set_helper_result(p, g_resident_data_base[0] + 0x8710, 0);
-            object_set_flag_value(p, 0);
+            object_set_helper_result(sprite, g_resident_data_base[0] + 0x8710, 0);
+            object_set_flag_value(sprite, 0);
         }
-        p += 76;
-        q += 1;
-        arr += 1;
+        sprite += 76;
+        colors += 1;
+        label_ids += 1;
     }
-    *(int *)(obj + 0x208) = 0;
-    *(int *)obj = (int)third;
-    n = 0;
-    if (*(int *)(third + 4) != -1) {
+    *(int *)(menu + 0x208) = 0;
+    *(int *)menu = (int)entries;
+    count = 0;
+    if (*(int *)(entries + 4) != -1) {
         /* The named -1 makes the compiler keep the loop's comparison constant
            in the preheader, where the retail body has it. */
         int minus = -1;
-        off = 0;
-        out = (int *)(obj + 0x1C8);
+        offset = 0;
+        modes = (int *)(menu + 0x1C8);
         do {
-            *out++ = 0;
-            off += 0x18;
-            *(int *)(obj + 0x208) = *(int *)(obj + 0x208) + 1;
-            n++;
-            if (*(int *)(off + (int)*(int *)obj + 4) == minus)
+            *modes++ = 0;
+            offset += 0x18;
+            *(int *)(menu + 0x208) = *(int *)(menu + 0x208) + 1;
+            count++;
+            if (*(int *)(offset + (int)*(int *)menu + 4) == minus)
                 break;
-        } while (n < 16);
+        } while (count < 16);
     }
 }

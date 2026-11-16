@@ -13,7 +13,7 @@
 
 typedef struct { char pad[0x1CC]; unsigned char *entries; int count; int timer; } MenuEntryState;
 typedef struct {
-    int value, displayChoice, selectionMask, requiredBits, icon;
+    int value, display_choice, selection_mask, required_bits, icon;
 } PreviewChoice;
 typedef struct { unsigned char bytes[16]; } MenuCorners;
 
@@ -38,7 +38,7 @@ extern char *GetLocalizedString(int);
 extern int text_draw_centered_medium(int, int, unsigned long long, char *, int);
 extern int text_draw_centered_small(int, int, unsigned long long, char *, int);
 extern int sprintf(char *, char *, ...);
-extern void func_US2_002D4D38(int, int);
+extern void preview_choice_icon_draw_us2(int, int);
 extern void gfx_set_scissor_clamped(int, int, int, int);
 extern void DrawMobysSetup(void), mem_fill_scratch_area(void), mem_save_scratch_area(void);
 extern void tex_upload_object_textures(char *, int), mem_restore_scratch_area(void);
@@ -51,7 +51,7 @@ static __inline__ void draw_logo(int id, int color, float zero)
     gfx_draw_scaled_object_two_axes(table_find_by_id(g_resident_data_base[0] + 0x8710, id), color, (float)(g_screen_width[0] / 2), (float)(g_ui_screen_height_param / 2), 1.0f, g_ui_float_params[0], zero);
 }
 
-int func_US2_002D4ED8(void)
+int options_menu_draw_us2(void)
 {
     MenuCorners corners = g_options_menu_corners;
     char text[32];
@@ -86,14 +86,14 @@ int func_US2_002D4ED8(void)
         index = g_preview_selection - i;
         if (index >= 0 && index < 12) {
             while (index >= 0) {
-                if ((g_equipment_bits[0] & g_preview_choices[index].selectionMask) == g_preview_choices[index].requiredBits)
+                if ((g_equipment_bits[0] & g_preview_choices[index].selection_mask) == g_preview_choices[index].required_bits)
                     break;
                 index--;
                 i++;
             }
             if (index < 0)
                 continue;
-            func_US2_002D4D38(index, x);
+            preview_choice_icon_draw_us2(index, x);
         }
         x -= 56;
     }
@@ -102,14 +102,14 @@ int func_US2_002D4ED8(void)
         index = g_preview_selection + i;
         if (index >= 0 && index < 12) {
             while (index < 12) {
-                if ((g_equipment_bits[0] & g_preview_choices[index].selectionMask) == g_preview_choices[index].requiredBits)
+                if ((g_equipment_bits[0] & g_preview_choices[index].selection_mask) == g_preview_choices[index].required_bits)
                     break;
                 index++;
                 i++;
             }
             if (index >= 12)
                 continue;
-            func_US2_002D4D38(index, x);
+            preview_choice_icon_draw_us2(index, x);
         }
         x += 56;
     }

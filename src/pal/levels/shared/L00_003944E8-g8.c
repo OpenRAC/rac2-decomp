@@ -65,8 +65,8 @@ extern LevelClass g_weapon_l00_table[];
 extern int g_area_hit_targets[];
 extern void level_start_timed_object_once_pal(void);
 extern int ForceClaimNotice(int, void *, int);
-extern void tether_release(Moby *, TetherState *), level_restore_lighting(Moby *, int), func_PAL_L00_003944E8(Moby *, TetherState *);
-extern int func_PAL_L00_0042D540(Moby *, Moby *);
+extern void tether_release(Moby *, TetherState *), level_restore_lighting(Moby *, int), tether_attach_to_parent_pal(Moby *, TetherState *);
+extern int cam_follow_update_target_pal(Moby *, Moby *);
 extern int FloatToInt(float), snd_set_voice_pitch_bend(int, int);
 extern float math_fabs(float), fast_subtract_rotations(float, float), coll_probe_ground_height_below(void *, int, float), ApproachValue(float *, float, float), mat_fast_helper_a(float, float);
 extern void math_build_axis_angle_quat(void *, void *, float), vec_rotate_by_quaternion(void *, void *, void *), part_steer_effect_direction(int, void *, void *), part_queue_ground_shadow(Moby *, float);
@@ -78,21 +78,21 @@ extern void SpawnExplosionEffects_pal(void *, void *, void *, float, float, int,
                          float, float, float, float, int, float, int, int, int, int, int);
 extern int coll_process_hit(float, void *, int, Moby *, int);
 extern void moby_queue_knockback_for_nodes(void *, Vector *, int *, int, int, int, int, int, float, float, float);
-extern void vec_add_random_offset(float *, float), func_PAL_L00_00394630(Moby *, int), cam_compute_view_direction(Vector *, Vector *, int), FastVecCross(void *, void *, void *);
+extern void vec_add_random_offset(float *, float), tether_spawn_impact_effects_pal(Moby *, int), cam_compute_view_direction(Vector *, Vector *, int), FastVecCross(void *, void *, void *);
 extern float PH_DF3;
 
 /* Updates the flying tether's steering, sweep collision, impact burst and attached pieces. */
-void func_PAL_L00_00394A18(Moby *actor) {
-    Vector previous, blast, blastNormal, velocity, contactEdge, scratch;
+void visibomb_missile_update_pal(Moby *actor) {
+    Vector previous, blast, blast_normal, velocity, contact_edge, scratch;
     DamageRecord damage;
     TetherState *state = actor->state;
     Moby *mount, *ignore;
     u8 *sound;
-    float desiredSpeed, angle, turn, height, roll, yaw;
+    float desired_speed, angle, turn, height, roll, yaw;
     Vector *fin;
-    int timer, playerHit = 0, i, hits;
-    blast.quad = 0; blastNormal.quad = 0;
-    blast.f[2] = 0.16000001f; blastNormal.f[2] = 1;
+    int timer, player_hit = 0, i, hits;
+    blast.quad = 0; blast_normal.quad = 0;
+    blast.f[2] = 0.16000001f; blast_normal.f[2] = 1;
     g_visibomb_phase_flag = 1; g_visibomb_missile_active = 1;
     level_start_timed_object_once_pal(); g_cinematic_phase_flag = 1; ForceClaimNotice(6, 0, 1);
     timer = --state->timer;
@@ -105,20 +105,20 @@ void func_PAL_L00_00394A18(Moby *actor) {
     }
     if (timer < 0) {
         if (g_active_tether_object) { tether_release(actor, state); ((Hero *)g_hero_state)->h[0x1E0 / 2] = 10; return; }
-        if (state->attached) func_PAL_L00_0042D540(state->attached, actor);
-        level_restore_lighting(actor, 0); func_PAL_L00_003944E8(actor, state); return;
+        if (state->attached) cam_follow_update_target_pal(state->attached, actor);
+        level_restore_lighting(actor, 0); tether_attach_to_parent_pal(actor, state); return;
     }
-    desiredSpeed = g_visibomb_min_speed * 0.020000001f;
-    if (g_pad_state[0x1A0 / 4] & 0x40) desiredSpeed = g_visibomb_max_speed * 0.020000001f;
-    state->targetSpeed += (desiredSpeed - state->targetSpeed) * g_visibomb_target_speed_blend;
+    desired_speed = g_visibomb_min_speed * 0.020000001f;
+    if (g_pad_state[0x1A0 / 4] & 0x40) desired_speed = g_visibomb_max_speed * 0.020000001f;
+    state->targetSpeed += (desired_speed - state->targetSpeed) * g_visibomb_target_speed_blend;
     state->speed += (state->targetSpeed - state->speed) * g_visibomb_speed_blend;
     if (state->speed > g_visibomb_max_speed * 0.020000001f) state->speed = g_visibomb_max_speed * 0.020000001f;
     snd_set_voice_pitch_bend(state->sound, FloatToInt((state->targetSpeed - (g_visibomb_min_speed * 0.020000001f) /
                       (g_visibomb_max_speed * 0.020000001f - g_visibomb_min_speed * 0.020000001f)) * g_visibomb_pitch_scale));
     if ((u32)(state->timer - 1) < 0x9BF) {
-        float stickX = ((Hero *)g_hero_state)->f[0x1FB0 / 4], stickY = ((Hero *)g_hero_state)->f[0x1FB4 / 4];
-        state->inputX += (stickX - state->inputX) * 0.120000005f;
-        state->inputY += (stickY - state->inputY) * 0.120000005f;
+        float stick_x = ((Hero *)g_hero_state)->f[0x1FB0 / 4], stick_y = ((Hero *)g_hero_state)->f[0x1FB4 / 4];
+        state->inputX += (stick_x - state->inputX) * 0.120000005f;
+        state->inputY += (stick_y - state->inputY) * 0.120000005f;
         if (g_hero_locked_flag) {
             actor->pitch = (state->inputX - actor->pitch) * 0.072000004f;
             actor->yaw = state->inputY * 0.014726217f;
@@ -163,7 +163,7 @@ void func_PAL_L00_00394A18(Moby *actor) {
         actor->position.f[1] > 1018.5f || actor->position.f[2] < 4.5f || actor->position.f[2] > 1018.5f) {
         tether_release(actor, state); return;
     }
-    func_PAL_L00_003944E8(actor, state);
+    tether_attach_to_parent_pal(actor, state);
     build_axis_rotation_quaternion(&state->leftFin->position, 1,
                   -(state->inputY * 0.5f + math_fabs(state->inputX * 0.33333334f) + (state->inputX - actor->pitch) * 1.1f) * 0.7f);
     fin = &state->rightFin->position;
@@ -178,10 +178,10 @@ void func_PAL_L00_00394A18(Moby *actor) {
     if (state->timer > 0x99C) ignore = ((Hero *)g_hero_state)->ptr[0x2290 / 4];
     if (moby_find_accepting_table_object(&actor->position)) {
         actor->hit = 2;
-        qcopy(&contactEdge, &g_cam_follow_matrix);
+        qcopy(&contact_edge, &g_cam_follow_matrix);
         scratch.quad = 0; scratch.f[2] = 1; scratch.f[3] = 1;
         vec_fast_normalize(&blast, &velocity, &scratch); vec_scale_to_length(&blast, &blast, 0.040000003f);
-        vec_scale_to_length(&blastNormal, &scratch, 1);
+        vec_scale_to_length(&blast_normal, &scratch, 1);
         if (state->sound != -1) {
             sound = g_sound_state + state->sound * 0x70;
             if (*(Moby **)(sound + 0x88) == actor && sound[0x74]) snd_stop_voice(state->sound);
@@ -191,13 +191,13 @@ void func_PAL_L00_00394A18(Moby *actor) {
         CollisionResult *col = &g_collision_result;
         Moby *hit = col->hit;
         if (hit) {
-            if (hit == ((Hero *)g_hero_state)->ptr[0x2290 / 4]) playerHit = 1;
+            if (hit == ((Hero *)g_hero_state)->ptr[0x2290 / 4]) player_hit = 1;
             actor->hit = 2;
             qcopy(&actor->position, &col->position);
-            FastVecSub(&contactEdge, &col->edgeStart, &col->edgeEnd);
-            vec_scale_to_length(&contactEdge, &contactEdge, 1);
+            FastVecSub(&contact_edge, &col->edgeStart, &col->edgeEnd);
+            vec_scale_to_length(&contact_edge, &contact_edge, 1);
             vec_fast_normalize(&blast, &velocity, &col->normal); vec_scale_to_length(&blast, &blast, 0.040000003f);
-            vec_scale_to_length(&blastNormal, &col->normal, 1);
+            vec_scale_to_length(&blast_normal, &col->normal, 1);
             if (state->sound != -1) {
                 sound = g_sound_state + state->sound * 0x70;
                 if (*(Moby **)(sound + 0x88) == actor && sound[0x74]) snd_stop_voice(state->sound);
@@ -205,10 +205,10 @@ void func_PAL_L00_00394A18(Moby *actor) {
             state->sound = -1;
         } else if (col->mesh > 0) {
             actor->hit = 1; qcopy(&actor->position, &col->position);
-            FastVecSub(&contactEdge, &col->edgeStart, &col->edgeEnd);
-            vec_scale_to_length(&contactEdge, &contactEdge, 1);
+            FastVecSub(&contact_edge, &col->edgeStart, &col->edgeEnd);
+            vec_scale_to_length(&contact_edge, &contact_edge, 1);
             vec_fast_normalize(&blast, &velocity, &col->normal); vec_scale_to_length(&blast, &blast, 0.040000003f);
-            vec_scale_to_length(&blastNormal, &col->normal, 1);
+            vec_scale_to_length(&blast_normal, &col->normal, 1);
             if (state->sound != -1) {
                 sound = g_sound_state + state->sound * 0x70;
                 if (*(Moby **)(sound + 0x88) == actor && sound[0x74]) snd_stop_voice(state->sound);
@@ -226,7 +226,7 @@ after_rebound:
         state->sound = -1;
     }
     if (actor->hit) {
-        if (!playerHit) {
+        if (!player_hit) {
             SpawnExplosionEffects_pal(actor, &blast, 0, 0, 0, 10, 3, 16, 4, 2, 0, 1, 1, 20, 1, 1, -1, 0, 0x810001);
             hits = coll_process_hit(4, &actor->position, 16, actor, 0);
             scratch.quad = actor->position.quad;
@@ -239,12 +239,12 @@ after_rebound:
         else state->timer = -1;
         qcopy(&scratch, &actor->position);
         for (i = 4; i >= 0; --i) {
-            qcopy(&actor->position, &scratch); vec_add_random_offset(actor->position.f, 1.5f); func_PAL_L00_00394630(actor, 1);
+            qcopy(&actor->position, &scratch); vec_add_random_offset(actor->position.f, 1.5f); tether_spawn_impact_effects_pal(actor, 1);
             qcopy(&actor->position, &scratch);
         }
         velocity.f[0] = 0; actor->hit = 0;
     }
-    if (state->attached) func_PAL_L00_0042D540(state->attached, actor);
+    if (state->attached) cam_follow_update_target_pal(state->attached, actor);
     if (!g_hero_locked_flag) return;
     cam_compute_view_direction(&actor->position, &actor->forward, 1);
     FastVecCross(&scratch, &actor->right, &actor->forward); vec_scale_to_length(&actor->up, &scratch, 1);

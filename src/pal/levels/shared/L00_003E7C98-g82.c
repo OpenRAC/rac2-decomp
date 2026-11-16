@@ -20,7 +20,7 @@ extern void vec_compute_object_to_target(char *, char *, char *, float);
 extern void FastVecSub(void *, void *, void *);
 extern float FastVecDot(void *, void *);
 extern void FastVecScale(void *, void *, float);
-extern char *func_PAL_L00_003F9060(void *, void *, int, int);
+extern char *vaporizer_bolt_spawn_pal(void *, void *, int, int);
 extern void ApplyAreaHitOrEmitParticles_pal(char *, void *);
 extern void FastVecAdd(void *, void *, void *);
 extern int coll_process_hit(void *, int, void *, void *, float);
@@ -77,7 +77,7 @@ void AimAndSpawnBeamWithMuzzleFlashes_pal(char *moby)
          moby_is_in_special_class_range(g_collision_result[6]))) {
         ApplyAreaHitOrEmitParticles_pal(moby, targetPosition);
     } else {
-        beam = func_PAL_L00_003F9060(origin, velocity, *(int *)(state + 0x18), mode);
+        beam = vaporizer_bolt_spawn_pal(origin, velocity, *(int *)(state + 0x18), mode);
         if (beam)
             *(char **)(beam + 0xB8) = moby;
     }

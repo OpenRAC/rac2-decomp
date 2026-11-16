@@ -13,13 +13,13 @@ extern f32 g_effect_spawner_seconds __attribute__((sda));
 
 /* Counts the record's own timer down once, then hands the sub-object's four packed
    colour bytes and the measured scale to the level's own setter. */
-void func_PAL_L17_003D0990(s32 a0)
+void effect_l17_spawner_update_pal(s32 moby_ref)
 {
-    s32 obj = a0;
+    s32 obj = moby_ref;
     u32 *p = *(u32 **)(obj + 0x68);
     u32 packed;
     s32 r;
-    f32 f20;
+    f32 scale;
 
     if (*(u8 *)(obj + 0x20) == 0) {
         u8 one = 1;
@@ -39,9 +39,9 @@ void func_PAL_L17_003D0990(s32 a0)
     packed |= p[2] << 16;
     packed |= p[1] << 8;
     packed |= p[0];
-    f20 = *(f32 *)&p[4] * 210000.0f;
+    scale = *(f32 *)&p[4] * 210000.0f;
     r = FloatToInt((g_effect_spawner_seconds * 300.0f + 2.0f) * 0.16666667f);
-    if (part_l17_spawn_fading(f20, obj, packed, r) != 0)
+    if (part_l17_spawn_fading(scale, obj, packed, r) != 0)
         *(u16 *)(obj + 0x96) = FloatToInt((g_effect_spawner_seconds * 300.0f + 2.0f) * 0.16666667f);
     else
         *(u16 *)(obj + 0x96) = 1;

@@ -22,7 +22,7 @@ extern void vec_fast_divide_helper(char *, char *, float);
 extern int coll_process_hit(char *, int, char *, int, float);
 extern void moby_queue_knockback_for_nodes(char *, char *, char *, int, int, int, int, int, float, float, float);
 extern int math_random_int_range(int, int);
-extern char *func_PAL_003098C8(char *, char *, int, int, int);
+extern char *part_spawn_spinning_debris_pal(char *, char *, int, int, int);
 extern int FloatToInt(float);
 extern int gfx_swap_packed_color_channels(int, int);
 extern char *part_spawn_firework_spark(char *, char *, int, int, float, int, int, float, int, int);
@@ -162,7 +162,8 @@ extern void vec_scale_to_length(char *object, char *other, float value);
 /* Fold an angle into the measured 1.8325959 ceiling, ease the remaining gap and
  * hand the result to the setter. */
 /* Dispatches on a byte mode at object+32: mode 0 updates two float angles from a linked node and runs a follow-up call; mode 1 refreshes a 16-byte block and a node copy then calls a final update. */
-void func_PAL_L00_00390F48(char *object, char *direction, char *axis)
+/* Makes a big explosion with sparks, smoke and glow at the object, and shakes the camera more when the player is close (PAL: 50 Hz timings). */
+void part_spawn_big_explosion_pal(char *object, char *direction, char *axis)
 {
     V1306Packet packet;
     V1306Vec delta, temp, vector, random;
@@ -194,7 +195,7 @@ void func_PAL_L00_00390F48(char *object, char *direction, char *axis)
         vec_scale_to_length((char *)&vector, (char *)&vector, scale * math_random_float_range(3.5f, 6.5f) * (0.020000001f));
         FastVecAdd((char *)&vector, (char *)&vector, direction);
         life1 = math_random_int_range(50,100);
-        func_PAL_003098C8(object+0x10, (char *)&vector, life1, 0, V1306_FLAG);
+        part_spawn_spinning_debris_pal(object+0x10, (char *)&vector, life1, 0, V1306_FLAG);
     }
     twice = length + length;
     for (n = 0; n < 4; n++) {
@@ -209,7 +210,7 @@ void func_PAL_L00_00390F48(char *object, char *direction, char *axis)
         vec_scale_to_length((char *)&vector, (char *)&vector, scale * math_random_float_range(6.5f, 10.0f) * (0.020000001f));
         FastVecAdd((char *)&vector, (char *)&vector, direction);
         life1 = math_random_int_range(50,75);
-        func_PAL_003098C8(object+0x10, (char *)&vector, life1, 1, V1306_FLAG);
+        part_spawn_spinning_debris_pal(object+0x10, (char *)&vector, life1, 1, V1306_FLAG);
     }
     random.q = 0;
     random.f[0] = math_random_float_range(-1.0f, 1.0f);
@@ -222,7 +223,7 @@ void func_PAL_L00_00390F48(char *object, char *direction, char *axis)
     FastVecAdd((char *)&vector, (char *)&vector, (char *)&delta);
     vec_fast_divide_helper((char *)&vector, (char *)&vector, 0.20000002f);
     life1 = math_random_int_range(50,75);
-    func_PAL_003098C8(object+0x10, (char *)&vector, life1, 1, V1306_FLAG);
+    part_spawn_spinning_debris_pal(object+0x10, (char *)&vector, life1, 1, V1306_FLAG);
     if (length < 6.0f) i = FloatToInt(length) + 1;
     else i = 4;
     twice = 0.0f;

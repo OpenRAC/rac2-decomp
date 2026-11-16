@@ -11,7 +11,7 @@ extern void FastVecSub(void *, void *, void *), FastVecAdd(void *, void *, void 
 extern void math_apply_axis_rotation_to_quat(float, void *, void *, void *);
 extern char *part_spawn_ground_effect(float, void *, int, float, int, int, int, void *, int, float);
 /* Emits two particles per iteration, with opposite signed orientation. */
-void func_PAL_L02_003D5FF0(float *pos, int count) {
+void part_spawn_dust_pairs_pal(float *pos, int count) {
     float vel[4] __attribute__((aligned(16)));
     float out[4] __attribute__((aligned(16)));
     float dir[4] __attribute__((aligned(16)));

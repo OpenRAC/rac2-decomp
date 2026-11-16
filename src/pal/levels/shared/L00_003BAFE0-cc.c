@@ -13,7 +13,8 @@ extern int g_two_color_sparkle_colors[2][2] __attribute__((sda));
 extern int g_two_color_sparkle_kind_min __attribute__((sda));
 extern int g_two_color_sparkle_kind_ranges[] __attribute__((sda));
 
-void func_PAL_L00_003BAFE0(char *object, void *position)
+/* Spawns two small sparkles at a position, colored by the object's state. (PAL: 50 Hz timings) */
+void part_spawn_two_colored_sparkles_pal(char *object, void *position)
 {
     float velocity[4];
     void *first = *(void **)(object + 0x68);

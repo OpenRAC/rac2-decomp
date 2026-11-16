@@ -13,7 +13,8 @@ extern int math_random_int_range(int, int);
 extern void vec_build_spherical_offset(float *, float, float, float);
 extern char *part_spawn_scaling(void *, void *, unsigned int, int, int, int, int, int);
 
-void func_PAL_002ABCB8(void *owner, char *offset, void *filter)
+/* Scatters sparks at random points inside the given shapes (PAL: 50 Hz timings). */
+void part_spawn_sparks_around_moby_pal(void *owner, char *offset, void *filter)
 {
     float vectors[20][4];
     float position[4];

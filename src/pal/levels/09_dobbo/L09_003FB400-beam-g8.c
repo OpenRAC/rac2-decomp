@@ -7,7 +7,7 @@ extern float FastAddRotations(float, float);
 extern float math_random_float_range(float, float);
 extern float IntToFloat(int);
 extern void moby_set_state(unsigned char *, int, int);
-extern void func_PAL_002A7E68(unsigned char *, int, int, int);
+extern void anim_start_blended_pal(unsigned char *, int, int, int);
 extern int math_fast_float_d(char *);
 extern void vec_add_random_offset(void *, float);
 extern int math_random_int_below(int);
@@ -126,7 +126,7 @@ void UpdateBeamLink_pal(DobboMoby *moby)
     case 1:
         if (moby->f60 & 2) {
             if (moby->f43 != 1)
-                func_PAL_002A7E68((unsigned char *)moby, 1, 0, 10);
+                anim_start_blended_pal((unsigned char *)moby, 1, 0, 10);
             moby->f48 = 2;
         }
         moby_blend_pos_toward_target((unsigned char *)moby,
@@ -140,7 +140,7 @@ void UpdateBeamLink_pal(DobboMoby *moby)
     case 3:
         if (moby->f60 & 2) {
             if (moby->f43 != 1)
-                func_PAL_002A7E68((unsigned char *)moby, 1, 0, 10);
+                anim_start_blended_pal((unsigned char *)moby, 1, 0, 10);
             moby->f48 = 2;
         }
         moby_blend_pos_toward_target((unsigned char *)moby, g_beam_blend_rate);

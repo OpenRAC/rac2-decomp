@@ -16,24 +16,25 @@ typedef struct {
     float angles[3];
 } RotState;
 
-void func_PAL_L07_0037B4C0(unsigned char *a0)
+/* Slowly spins the linked groups of level pieces around their own centers (PAL: 50 Hz timings). */
+void rotating_transform_groups_update_pal(unsigned char *moby)
 {
-    RotState *state = *(RotState **)(a0 + 0x68);
+    RotState *state = *(RotState **)(moby + 0x68);
     int i;
-    unsigned short *p;
-    unsigned char *e;
-    float v[4];
-    float loc[3];
-    float *q;
-    int k;
-    int m;
-    float t;
-    float ang;
+    unsigned short *id_ptr;
+    unsigned char *record;
+    float rot_euler[4];
+    float saved_pos[3];
+    float *saved;
+    int axis;
+    int axis2;
+    float scale_len;
+    float angle;
 
-    switch (a0[0x20]) {
+    switch (moby[0x20]) {
     case 0:
-        a0[0x30] = 0xFF;
-        moby_set_state(a0, 1, -1);
+        moby[0x30] = 0xFF;
+        moby_set_state(moby, 1, -1);
         break;
     case 1:
         if (g_cutscene_l07_active_flag != 0)
@@ -43,26 +44,26 @@ void func_PAL_L07_0037B4C0(unsigned char *a0)
                 continue;
             }
             /* The transfer helper also preserves the original address recomputation. */
-            qzero_nc(v);
-            ang = FastAddRotations(state->angles[i], g_group_rotation_speeds[i] * 0.0003490659f);
-            state->angles[i] = ang;
-            v[2] = ang;
-            for (p = g_group_l07_id_lists[state->groups[i]];
-                 p != 0 && ((short)p[-1] >= 0 || p == g_group_l07_id_lists[state->groups[i]]);
-                 p++) {
-                e = g_matrix_l07_record_table + ((*p & 0x7FFF) << 6);
-                if (e == 0)
+            qzero_nc(rot_euler);
+            angle = FastAddRotations(state->angles[i], g_group_rotation_speeds[i] * 0.0003490659f);
+            state->angles[i] = angle;
+            rot_euler[2] = angle;
+            for (id_ptr = g_group_l07_id_lists[state->groups[i]];
+                 id_ptr != 0 && ((short)id_ptr[-1] >= 0 || id_ptr == g_group_l07_id_lists[state->groups[i]]);
+                 id_ptr++) {
+                record = g_matrix_l07_record_table + ((*id_ptr & 0x7FFF) << 6);
+                if (record == 0)
                     break;
-                q = loc;
-                for (k = 0; k < 3; k++)
-                    q[k] = *(float *)(e + 0xC + k * 16);
-                t = FastVecLength(e);
-                euler_rotation_basis(e, v);
-                vec_scale_to_length(e, e, t);
-                vec_scale_to_length(e + 0x10, e + 0x10, t);
-                for (m = 0; m < 3; m++)
-                    *(float *)(e + 0xC + m * 16) = q[m];
-                gfx_setup_scale_record(*p & 0x7FFF, 1);
+                saved = saved_pos;
+                for (axis = 0; axis < 3; axis++)
+                    saved[axis] = *(float *)(record + 0xC + axis * 16);
+                scale_len = FastVecLength(record);
+                euler_rotation_basis(record, rot_euler);
+                vec_scale_to_length(record, record, scale_len);
+                vec_scale_to_length(record + 0x10, record + 0x10, scale_len);
+                for (axis2 = 0; axis2 < 3; axis2++)
+                    *(float *)(record + 0xC + axis2 * 16) = saved[axis2];
+                gfx_setup_scale_record(*id_ptr & 0x7FFF, 1);
             }
         }
         break;

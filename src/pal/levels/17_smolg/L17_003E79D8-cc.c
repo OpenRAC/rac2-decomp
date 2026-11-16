@@ -21,18 +21,18 @@ extern float g_grulch_approach_speed_a SDATA(D_L17_001B0CB0);
 extern float g_grulch_approach_speed_b SDATA(D_L17_001B0CB4);
 typedef struct { char pad[0x80]; float x,y; } L17HeroRecord;
 extern L17HeroRecord g_hero_state;
-extern void func_PAL_L17_003E89B0(char *);
+extern void grulch_init_state_check_hits_pal(char *);
 extern void platform_set_path_index(char *,char *);
 extern int ride_platform_can_start(char *);
 extern void ride_platform_start(char *);
-extern void func_PAL_L17_003E7938(char *);
-extern void func_PAL_L17_003E8D68(char *);
+extern void grulch_activate_group_members_pal(char *);
+extern void grulch_turn_and_fall_pal(char *);
 extern void grulch_update_animation(char *);
-extern int func_PAL_L17_003E90E8(char *);
+extern int grulch_update_pulled_in_pal(char *);
 extern int math_fast_float_d(int *);
 extern int FastDecTimer(short *);
 extern void moby_set_state(char *,int,int);
-extern void func_PAL_002A7E68(char *,int,int,int);
+extern void anim_start_blended_pal(char *,int,int,int);
 extern void anim_start_immediate(char *,int,int);
 extern int math_random_int_below(int);
 extern int math_random_int_range(int,int);
@@ -49,7 +49,7 @@ extern float mat_fast_helper_a(float,float);
 extern void StepAngleTowardTarget(float *,int,float,float);
 extern int flag_set_first_pending(char *);
 extern float vec_distance_xy(void *,void *);
-extern int func_PAL_002AF6C0(char *,float);
+extern int math_is_value_within_step_pal(char *,float);
 extern int PlayMobySound(int,int,char *);
 extern int coll_sweep_from_object(char *,float,void *,int,float,float,int,int,int);
 extern void moby_set_controller_speed_limits(char *,float,float,float,float);
@@ -62,7 +62,8 @@ extern void add_vectors(void *,void *,void *);
 extern float FastAddRotations(float,float);
 extern float MobySpringTurn(char *,float,float *,float,float,float);
 
-void func_PAL_L17_003E79D8(char *object)
+/* Main update of the Grulch enemy (PAL: 50 Hz timings): reacts to the player, wanders, chases, attacks and handles its states. */
+void grulch_update_pal(char *object)
 {
     float movement[4], position[4];
     char *vars, *other;
@@ -82,7 +83,7 @@ void func_PAL_L17_003E79D8(char *object)
         I(object,0x98)=I(P(object,0x24),0x10);
         I(vars,0x454)=0;
     }
-    func_PAL_L17_003E89B0(object);
+    grulch_init_state_check_hits_pal(object);
     math_fast_float_d((int *)(vars+0x440));
     if (I(vars,0x450)!=-1) {
         other=(char *)((I(vars,0x450)<<8)+(u32)g_moby_l17_pool[0]);
@@ -98,14 +99,14 @@ void func_PAL_L17_003E79D8(char *object)
             !ride_platform_can_start(g_moby_l17_pool[0]+(I(vars,0x428)<<8))) {
             math_fast_float_d((int *)(vars+0x41C));
             if(H(vars,0x404)==1 && I(vars,0x440)==0) {
-                func_PAL_L17_003E7938(object);
+                grulch_activate_group_members_pal(object);
                 if(I(vars,0x428)!=-1) {
                     if(!ride_platform_can_start(g_moby_l17_pool[0]+(I(vars,0x428)<<8))) break;
                     ride_platform_start(g_moby_l17_pool[0]+(I(vars,0x428)<<8));
-                    { char *entityBase = g_moby_l17_pool[0];
+                    { char *entity_base = g_moby_l17_pool[0];
                     U(object,0x34)&=0xFFBE;
                     I(object,0x98)=I(P(object,0x24),0x10);
-                    if(H((I(vars,0x428)<<8)+(u32)entityBase,0xAA)==0x929) {
+                    if(H((I(vars,0x428)<<8)+(u32)entity_base,0xAA)==0x929) {
                         moby_set_state(object,8,3);
                         anim_start_immediate(object,9,0);
                         F(object,0xF8)=F((char *)((I(vars,0x428)<<8)+(u32)g_moby_l17_pool[0]),0xF8);
@@ -113,14 +114,14 @@ void func_PAL_L17_003E79D8(char *object)
                     } else {
                         I(vars,0x428)=-1;
                         moby_set_state(object,10,2);
-                        if(B(object,0x43)!=2) func_PAL_002A7E68(object,2,0,12);
-                        goto restoreCollision;
+                        if(B(object,0x43)!=2) anim_start_blended_pal(object,2,0,12);
+                        goto restore_collision;
                     }
                     }
                 } else {
                     moby_set_state(object,10,2);
-                    if(B(object,0x43)!=2) func_PAL_002A7E68(object,2,0,12);
-restoreCollision:
+                    if(B(object,0x43)!=2) anim_start_blended_pal(object,2,0,12);
+restore_collision:
                     U(object,0x34)&=0xFFBE;
                     I(object,0x98)=I(P(object,0x24),0x10);
                 }
@@ -134,12 +135,12 @@ restoreCollision:
         break;
     case 1:
         if(H(vars,0x404)==1 && I(vars,0x440)==0) {
-            func_PAL_L17_003E7938(object);
+            grulch_activate_group_members_pal(object);
             moby_set_state(object,10,2);
-            if(B(object,0x43)!=2) func_PAL_002A7E68(object,2,0,12);
+            if(B(object,0x43)!=2) anim_start_blended_pal(object,2,0,12);
         } else if(I(vars,0x3FC)==0) {
             moby_set_state(object,1,0);
-            if(B(object,0x43)!=0) func_PAL_002A7E68(object,0,0,10);
+            if(B(object,0x43)!=0) anim_start_blended_pal(object,0,0,10);
         }
         break;
     case 2:
@@ -161,9 +162,9 @@ restoreCollision:
             }
             if(flags&2) {
                 if(H(vars,0x404)==1 && I(vars,0x440)==0) {
-                    func_PAL_L17_003E7938(object);
+                    grulch_activate_group_members_pal(object);
                     moby_set_state(object,4,2);
-                    if(B(object,0x43)!=9) func_PAL_002A7E68(object,9,0,12);
+                    if(B(object,0x43)!=9) anim_start_blended_pal(object,9,0,12);
                 } else {
                     moby_set_state(object,2,1);
                     I(vars,0x3FC)=FloatToInt((math_random_float_range(F(vars,0x3F8)*0.8f,F(vars,0x3F8)*1.2f)*300.0f+2.0f)*0.16666667f);
@@ -191,43 +192,43 @@ restoreCollision:
     case 1:
         FastDecTimer((short *)(vars+0x400));
         if(B(object,0x43)==0 && H(vars,0x400)!=0) {
-            if(B(object,0x43)!=9) func_PAL_002A7E68(object,9,0,12);
+            if(B(object,0x43)!=9) anim_start_blended_pal(object,9,0,12);
         }
         if(H(vars,0x400)>17) ApproachValue((float *)(vars+0x124),g_grulch_approach_speed_a*0.020000001f,0.0028000001f);
         else ApproachValue((float *)(vars+0x124),0.0f,0.0028000001f);
         if(B(object,0x43)==9) {
             F(object,0x48)=0.8f;
             if(H(vars,0x400)==0) {
-                if(B(object,0x43)!=math_random_int_below(2)) func_PAL_002A7E68(object,math_random_int_below(2),0,10);
+                if(B(object,0x43)!=math_random_int_below(2)) anim_start_blended_pal(object,math_random_int_below(2),0,10);
             }
             moby_wander_around_home_point_pal(object,vars+0x110,0.35f,0.25f);
         } else if((B(object,0x43)==0 || B(object,0x43)==1) && (B(object,0x60)&2)) {
             H(vars,0x400)=math_random_int_range(100,417);
-            if(B(object,0x43)!=9) func_PAL_002A7E68(object,9,0,10);
+            if(B(object,0x43)!=9) anim_start_blended_pal(object,9,0,10);
         }
         break;
     case 2:
         FastDecTimer((short *)(vars+0x400));
         if(B(object,0x43)!=9 && B(object,0x43)!=5 && B(object,0x43)!=4) {
-            if(B(object,0x43)!=9) func_PAL_002A7E68(object,9,0,12);
+            if(B(object,0x43)!=9) anim_start_blended_pal(object,9,0,12);
         }
         if(H(vars,0x400)>17) ApproachValue((float *)(vars+0x124),g_grulch_approach_speed_b*0.020000001f,0.0028000001f);
         else ApproachValue((float *)(vars+0x124),0.0f,0.0028000001f);
         if(B(object,0x43)==9) {
             if(H(vars,0x400)==0) {
-                func_PAL_002A7E68(object,5,0,10);
-                if(math_random_int_below(2)==1 && B(object,0x43)!=4) func_PAL_002A7E68(object,4,0,10);
+                anim_start_blended_pal(object,5,0,10);
+                if(math_random_int_below(2)==1 && B(object,0x43)!=4) anim_start_blended_pal(object,4,0,10);
             }
             moby_wander_around_home_point_pal(object,vars+0x110,0.35f,0.25f);
         } else if((B(object,0x43)==4 || B(object,0x43)==5) && (B(object,0x60)&2)) {
             H(vars,0x400)=math_random_int_range(100,167);
-            if(B(object,0x43)!=9) func_PAL_002A7E68(object,9,0,10);
+            if(B(object,0x43)!=9) anim_start_blended_pal(object,9,0,10);
         }
-        goto restoreAnimationSpeed;
+        goto restore_animation_speed;
     case 10:
         if(B(object,0x60)&2) {
             moby_set_state(object,4,-1);
-            if(B(object,0x43)!=9) func_PAL_002A7E68(object,9,0,12);
+            if(B(object,0x43)!=9) anim_start_blended_pal(object,9,0,12);
         }
         StepAngleTowardTarget((float *)(object+0xF8),0,mat_fast_helper_a(g_hero_state.x-F(object,0x10),g_hero_state.y-F(object,0x14)),0.12566373f);
         break;
@@ -236,7 +237,7 @@ restoreCollision:
         F(object,0x48)=1.0f;
         if(vec_distance_xy(object+0x10,P(vars,0x408)+0x10)<=g_grulch_near_distance) {
             moby_set_state(object,5,2);
-            if(B(object,0x43)!=6) func_PAL_002A7E68(object,6,2,5);
+            if(B(object,0x43)!=6) anim_start_blended_pal(object,6,2,5);
             F(vars,0x414)=0;
         } else if(math_fast_float_d((int *)(vars+0x418))) {
             /* The separate magnitude lets angle avoid crossing the side call, so its store
@@ -250,26 +251,26 @@ restoreCollision:
             }
             I(vars,0x418)=math_random_int_range(125,167);
             moby_set_state(object,5,2);
-            if(B(object,0x43)!=6) func_PAL_002A7E68(object,6,2,5);
+            if(B(object,0x43)!=6) anim_start_blended_pal(object,6,2,5);
         }
         break;
     case 5:
         if(B(object,0x42)==6) {
-            if(func_PAL_002AF6C0(object,8.0f)) PlayMobySound(3,0,object);
+            if(math_is_value_within_step_pal(object,8.0f)) PlayMobySound(3,0,object);
             if(B(object,0x42)==6) {
-                if(func_PAL_002AF6C0(object,10.0f)) {
+                if(math_is_value_within_step_pal(object,10.0f)) {
                     if(coll_sweep_from_object(object,1.0f,object+0x10,0x4000001,F(vars,0x430),1.0f,0,1,0)>0) I(vars,0x448)=1;
                     else I(vars,0x448)=0;
-                } else if(B(object,0x42)==6 && ((B(object,0x60)&2) || func_PAL_002AF6C0(object,11.0f))) {
+                } else if(B(object,0x42)==6 && ((B(object,0x60)&2) || math_is_value_within_step_pal(object,11.0f))) {
                     if(vec_distance_xy(object+0x10,P(vars,0x408)+0x10)>g_grulch_near_distance) {
                         if((vec_distance_xy(object+0x10,P(vars,0x408)+0x10)==0.0f ? 1.0f : 0.0f)>g_grulch_near_distance) {
                             if(math_random_int_range(0,7)>0) {
                                 moby_set_state(object,11,2);
-                                if(B(object,0x43)!=7) func_PAL_002A7E68(object,7,0,12);
+                                if(B(object,0x43)!=7) anim_start_blended_pal(object,7,0,12);
                             }
                         } else {
                             moby_set_state(object,6,2);
-                            if(B(object,0x43)!=9) func_PAL_002A7E68(object,9,0,12);
+                            if(B(object,0x43)!=9) anim_start_blended_pal(object,9,0,12);
                         }
                     }
                 }
@@ -279,7 +280,7 @@ restoreCollision:
     case 11:
         if(B(object,0x60)&2) {
             moby_set_state(object,4,2);
-            if(B(object,0x43)!=9) func_PAL_002A7E68(object,9,0,0);
+            if(B(object,0x43)!=9) anim_start_blended_pal(object,9,0,0);
         }
         break;
     case 6:
@@ -293,19 +294,19 @@ restoreCollision:
         }
         moby_move_to_target_temp_limits_pal(object,vars+0x3E0,16,mat_fast_helper_a(F(vars,0x3E0)-F(object,0x10),F(vars,0x3E4)-F(object,0x14)),-1.0f,-1.0f);
         if(B(object,0x42)==2 && (B(object,0x60)&2)) {
-            if(B(object,0x43)!=9) func_PAL_002A7E68(object,9,0,8);
+            if(B(object,0x43)!=9) anim_start_blended_pal(object,9,0,8);
             F(object,0x48)=1.0f;
         }
         if(B(object,0x42)==9 && (B(object,0x60)&2)) {
             if(I(vars,0x448)==0) {
                 moby_set_state(object,4,2);
-                if(B(object,0x43)!=9) func_PAL_002A7E68(object,9,0,5);
+                if(B(object,0x43)!=9) anim_start_blended_pal(object,9,0,5);
             } else {
                 moby_set_state(object,11,2);
-                if(B(object,0x43)!=7) func_PAL_002A7E68(object,7,0,12);
+                if(B(object,0x43)!=7) anim_start_blended_pal(object,7,0,12);
                 I(vars,0x448)=0;
             }
-restoreAnimationSpeed:
+restore_animation_speed:
             F(object,0x48)=1.0f;
         }
         break;
@@ -321,17 +322,17 @@ restoreAnimationSpeed:
         MobySpringTurn(object,angle,(float *)(vars+0x410),0.05f,0.3f,0.12566373f);
         if(B(object,0x60)&2) {
             moby_set_state(object,4,-1);
-            if(B(object,0x43)!=9) func_PAL_002A7E68(object,9,0,12);
+            if(B(object,0x43)!=9) anim_start_blended_pal(object,9,0,12);
         }
         break;
     case 9:
-        if(func_PAL_L17_003E90E8(object)) {
+        if(grulch_update_pulled_in_pal(object)) {
             SetDeathBits_pal(object,0,3);
             moby_mark_spawned(object);
             return;
         }
         break;
     }
-    if(B(object,0x20)!=8 && B(object,0x20)!=9 && B(object,0x20)!=6) func_PAL_L17_003E8D68(object);
+    if(B(object,0x20)!=8 && B(object,0x20)!=9 && B(object,0x20)!=6) grulch_turn_and_fall_pal(object);
     grulch_update_animation(object);
 }

@@ -44,7 +44,7 @@ extern void make_hit_descriptor(void *packet, char *owner, int flags, void *dire
 extern void QueueMobyImpact(char *target, void *packet);
 extern int StartAttachedEffect_pal(char *target, int kind, int value);
 extern int PlayMobySound(int index, int mode, char *object);
-extern void func_PAL_L00_003C11A0(void *pos, void *direction, int count, unsigned int color);
+extern void part_l00_spawn_spark_burst_2_pal(void *pos, void *direction, int count, unsigned int color);
 static inline Class3BBB68 *Class3BBB68At(int index)
 {
     return &g_weapon_l00_table[index];
@@ -123,7 +123,7 @@ void effect_update_spark_slots_pal(char *owner)
             StartAttachedEffect_pal(slot->target, 0x3E, *(int *)(owner + 0xB8));
             PlayMobySound(1, 0, owner);
             vec_scale_to_length(v, v, -1.0f);
-            func_PAL_L00_003C11A0(&slot->pos, v, 9, 0xFF0000);
+            part_l00_spawn_spark_burst_2_pal(&slot->pos, v, 9, 0xFF0000);
             slot->hit = 1;
         }
         if (math_fast_float_d(&slot->life)) {

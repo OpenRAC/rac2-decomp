@@ -72,7 +72,7 @@ extern int get_ammo(int);
 extern int weapon_spend_ammo(int, int);
 extern void hud_add_moby_marker(void *, float, u32, void *, int, float, int, float, int);
 extern void cancel_hero_item_animation_pal(void);
-extern void func_PAL_L00_002AF458(void);
+extern void start_equipped_item_animation_pal(void);
 extern void anim_start_blended_with_flags(void *, int, int, int, int);
 extern int slot_copy_records_to_free(void *);
 extern void slot_reset_active(int);
@@ -80,13 +80,13 @@ extern float math_random_angle(void);
 extern float IntToFloat(int);
 extern int PlayMobySound(int, int, void *);
 extern void ref_L00_003D1D28_01(void *, void *);
-extern void func_PAL_L00_003D6F08(u8 *);
-extern void func_PAL_L00_003D7400(u8 *);
+extern void RenderRadialRingAndQuad_pal(u8 *);
+extern void lightning_update_arcs_pal(u8 *);
 extern void matrix_mul_vec3(void *, void *, void *);
 extern void FastVecAdd(void *, void *, void *);
 extern void FastVecScale(void *, void *, float);
 extern u8 *part_spawn_pulled_particle(void *, int, float, float, u32, int, int, void *, int, int, int, int);
-extern void func_PAL_L00_003D6C38(u8 *, void *, int);
+extern void InitEffectStrips_pal(u8 *, void *, int);
 extern s32 coll_process_hit(f32, void *, s32, void *, s32);
 extern void QueueMobyImpact(u8 *, Hit *);
 extern int StartAttachedEffect_pal(u8 *, int, u8 *);
@@ -110,39 +110,39 @@ static inline void SetShake(float amount)
     g_scalar_transition_state.i16C = 0;
 }
 
-void func_PAL_L00_003D5C90(u8 *self)
+void UpdateSpreadWeapon_pal(u8 *self)
 {
-    Vec4 a;
-    Vec4 b;
-    TurretState *st = *(TurretState **)(self + 0x68);
+    Vec4 local_vec;
+    Vec4 world_vec;
+    TurretState *turret_state = *(TurretState **)(self + 0x68);
     int ready;
     u8 *p;
 
     if (self[0x20] == 0) {
         self[0x20] = 1;
-        st->handle = -1;
-        st->t8 = 0;
-        st->tA = 0;
-        st->t28 = 0;
-        st->t44 = 0;
-        st->t4C = 0;
+        turret_state->handle = -1;
+        turret_state->t8 = 0;
+        turret_state->tA = 0;
+        turret_state->t28 = 0;
+        turret_state->t44 = 0;
+        turret_state->t4C = 0;
     }
     if (self[0x20] == 6) {
-        if (FastDecTimer(&st->t4))
+        if (FastDecTimer(&turret_state->t4))
             self[0x20] = 1;
     }
     if (((Hero *)g_hero_state)->i[0x2294 / 4] == 1)
         ref_L00_003D1D28_00(0x1D, 1);
-    vec_fast_helper_b(st);
+    vec_fast_helper_b(turret_state);
     if (((Hero *)g_hero_state)->i[0x2294 / 4] == 0x1D) {
         u32 color;
-        if (st->timer > 0.0f && get_ammo(-1))
+        if (turret_state->timer > 0.0f && get_ammo(-1))
             color = 0x600000FF;
         else
             color = 0x600FFF0F;
         hud_add_moby_marker(self, 1.3f, color, 0, 0x21, 0.0f, -1, 90.0f, 4);
     }
-    if (st->t4C != 0 && math_fast_float_d(&st->t4C))
+    if (turret_state->t4C != 0 && math_fast_float_d(&turret_state->t4C))
         cancel_hero_item_animation_pal();
     if (self[0x42] == self[0x43] && (self[0x60] & 2))
         anim_start_blended_with_flags(self, 1, 0, 2, 0);
@@ -150,7 +150,7 @@ void func_PAL_L00_003D5C90(u8 *self)
      * they keep the insn count and the PRE expression numbers that give retail's spill slots at 0x23C-0x270. */
     {
         u8 *moby = self;
-        TurretState *state = st;
+        TurretState *state = turret_state;
         int large = 6;
         int small = 3;
         ready = 1;
@@ -160,49 +160,49 @@ void func_PAL_L00_003D5C90(u8 *self)
         } else {
             ((Hero *)g_hero_state)->i[0x2534 / 4] = 0x21;
         }
-        if (self[0x20] == 1 && ((Hero *)g_hero_state)->b[0x22BC] == 0 && st->timer == 0.0f && ((Hero *)g_hero_state)->i[0x1240 / 4] >= 0x13 && ready) {
+        if (self[0x20] == 1 && ((Hero *)g_hero_state)->b[0x22BC] == 0 && turret_state->timer == 0.0f && ((Hero *)g_hero_state)->i[0x1240 / 4] >= 0x13 && ready) {
             if ((((Hero *)g_pad_state)->i[0x1A0 / 4] & ((Hero *)g_hero_state)->i[0x1230 / 4]) && weapon_spend_ammo(-1, 1)) {
                 if (((Hero *)g_hero_state)->ptr[0x2290 / 4][0x43] == ((WeaponEntry *)((u8 *)g_weapon_l00_table + g_hero_weapon_id_index * 0xE0))->id || ((Hero *)g_hero_state)->i[0x229C / 4] != 0 || ((Hero *)g_hero_state)->h[0x24EC / 2] != 0) {
-                    st->t6 = ((s32)g_effect_state_param_a * 5 + 2) / 6;
-                    st->t40 = 1;
+                    turret_state->t6 = ((s32)g_effect_state_param_a * 5 + 2) / 6;
+                    turret_state->t40 = 1;
                 } else {
-                    st->t6 = 2;
-                    st->t40 = 0;
+                    turret_state->t6 = 2;
+                    turret_state->t40 = 0;
                 }
-                func_PAL_L00_002AF458();
-                st->handle = slot_copy_records_to_free(g_effect_handle_records);
+                start_equipped_item_animation_pal();
+                turret_state->handle = slot_copy_records_to_free(g_effect_handle_records);
                 anim_start_blended_with_flags(self, 2, 0, 2, 0);
-                st->t4C = ((s32)g_effect_state_param * 5 + 2) / 6;
+                turret_state->t4C = ((s32)g_effect_state_param * 5 + 2) / 6;
                 self[0x20] = 2;
-                st->fC = math_random_angle();
-                st->t8 = ((s32)g_effect_state_param_b * 5 + 2) / 6;
-                st->f20 = 1.0f / IntToFloat(st->t8);
-                st->t8 += 2;
-                st->tA = ((s32)g_effect_state_param_c * 5 + 2) / 6;
-                st->f24 = 1.0f / IntToFloat(st->tA);
-                st->t28 = ((s32)g_effect_timer_limit_a * 5 + 2) / 6;
-                st->f2C = 1.0f / IntToFloat(st->t28);
-                st->t44 = ((s32)g_effect_timer_limit_b * 5 + 2) / 6;
-                st->f48 = 1.0f / IntToFloat(st->t44);
-                st->t44 += 2;
+                turret_state->fC = math_random_angle();
+                turret_state->t8 = ((s32)g_effect_state_param_b * 5 + 2) / 6;
+                turret_state->f20 = 1.0f / IntToFloat(turret_state->t8);
+                turret_state->t8 += 2;
+                turret_state->tA = ((s32)g_effect_state_param_c * 5 + 2) / 6;
+                turret_state->f24 = 1.0f / IntToFloat(turret_state->tA);
+                turret_state->t28 = ((s32)g_effect_timer_limit_a * 5 + 2) / 6;
+                turret_state->f2C = 1.0f / IntToFloat(turret_state->t28);
+                turret_state->t44 = ((s32)g_effect_timer_limit_b * 5 + 2) / 6;
+                turret_state->f48 = 1.0f / IntToFloat(turret_state->t44);
+                turret_state->t44 += 2;
             } else if (((Hero *)g_pad_state)->i[0x1A4 / 4] & ((Hero *)g_hero_state)->i[0x1230 / 4]) {
                 PlayMobySound(5, 0, self);
             }
             if (!(((Hero *)g_pad_state)->i[0x1A0 / 4] & ((Hero *)g_hero_state)->i[0x1230 / 4]) || !get_ammo(-1) || ((Hero *)g_hero_state)->b[0x22B8] == 0) {
-                if (st->handle >= 0) {
-                    slot_reset_active(st->handle);
-                    st->handle = -1;
+                if (turret_state->handle >= 0) {
+                    slot_reset_active(turret_state->handle);
+                    turret_state->handle = -1;
                 }
             }
         }
-        if (st->t6 == 0) {
-            FastDecTimer(&st->tA);
-            FastDecTimer(&st->t8);
-            math_fast_float_d(&st->t28);
-            math_fast_float_d(&st->t44);
-            if (st->t8 != 0 || st->tA != 0 || st->t28 != 0 || st->t44 != 0)
-                ref_L00_003D1D28_01(func_PAL_L00_003D6F08, self);
-            func_PAL_L00_003D7400(self);
+        if (turret_state->t6 == 0) {
+            FastDecTimer(&turret_state->tA);
+            FastDecTimer(&turret_state->t8);
+            math_fast_float_d(&turret_state->t28);
+            math_fast_float_d(&turret_state->t44);
+            if (turret_state->t8 != 0 || turret_state->tA != 0 || turret_state->t28 != 0 || turret_state->t44 != 0)
+                ref_L00_003D1D28_01(RenderRadialRingAndQuad_pal, self);
+            lightning_update_arcs_pal(self);
         }
         if (self[0x20] == 2 || self[0x20] == 3) {
             u8 *turret = moby;
@@ -211,51 +211,51 @@ void func_PAL_L00_003D5C90(u8 *self)
                 if (turret[0x20] == 2) {
                     turret[0x20] = 3;
                     qcopy(shot->q30, g_strip_axis);
-                    a[0] = g_effect_local_pos_x;
-                    a[1] = g_local_pos_y_offset - 0.25f;
-                    a[2] = g_local_pos_z_offset;
-                    a[3] = 1.0f;
-                    matrix_mul_vec3(b, a, turret + 0xC0);
-                    FastVecAdd(b, b, turret + 0x10);
+                    local_vec[0] = g_effect_local_pos_x;
+                    local_vec[1] = g_local_pos_y_offset - 0.25f;
+                    local_vec[2] = g_local_pos_z_offset;
+                    local_vec[3] = 1.0f;
+                    matrix_mul_vec3(world_vec, local_vec, turret + 0xC0);
+                    FastVecAdd(world_vec, world_vec, turret + 0x10);
                     {
-                        u8 *q = part_spawn_pulled_particle(b, large, 0.4f, 8.0f, 0x80FFFFFF, 2, 0, g_default_vector, 0, 0, 6, 0);
+                        u8 *q = part_spawn_pulled_particle(world_vec, large, 0.4f, 8.0f, 0x80FFFFFF, 2, 0, g_default_vector, 0, 0, 6, 0);
                         if (q)
-                            *(TI128 *)(q + 0x10) = *(TI128 *)(b);
+                            *(TI128 *)(q + 0x10) = *(TI128 *)(world_vec);
                     }
                     {
-                        u8 *q = part_spawn_pulled_particle(b, small, 0.5f, 12.0f, 0x3CFF1010, 2, 0, g_default_vector, 3, 0, 6, 0);
+                        u8 *q = part_spawn_pulled_particle(world_vec, small, 0.5f, 12.0f, 0x3CFF1010, 2, 0, g_default_vector, 3, 0, 6, 0);
                         if (q)
-                            *(TI128 *)(q + 0x10) = *(TI128 *)(b);
+                            *(TI128 *)(q + 0x10) = *(TI128 *)(world_vec);
                     }
                     {
-                        u8 *q = part_spawn_pulled_particle(b, small, 0.5f, 4.0f, 0x80FFFFFF, 2, 0, g_default_vector, 3, 0, 6, 0);
+                        u8 *q = part_spawn_pulled_particle(world_vec, small, 0.5f, 4.0f, 0x80FFFFFF, 2, 0, g_default_vector, 3, 0, 6, 0);
                         if (q)
-                            *(TI128 *)(q + 0x10) = *(TI128 *)(b);
+                            *(TI128 *)(q + 0x10) = *(TI128 *)(world_vec);
                     }
-                    a[2] = -a[2];
-                    matrix_mul_vec3(b, a, turret + 0xC0);
-                    FastVecAdd(b, b, turret + 0x10);
+                    local_vec[2] = -local_vec[2];
+                    matrix_mul_vec3(world_vec, local_vec, turret + 0xC0);
+                    FastVecAdd(world_vec, world_vec, turret + 0x10);
                     {
-                        u8 *q = part_spawn_pulled_particle(b, large, 0.4f, 8.0f, 0x80FFFFFF, 2, 0, g_default_vector, 0, 0, 6, 0);
+                        u8 *q = part_spawn_pulled_particle(world_vec, large, 0.4f, 8.0f, 0x80FFFFFF, 2, 0, g_default_vector, 0, 0, 6, 0);
                         if (q)
-                            *(TI128 *)(q + 0x10) = *(TI128 *)(b);
-                    }
-                    {
-                        u8 *q = part_spawn_pulled_particle(b, small, 0.5f, 12.0f, 0x3CFF1010, 2, 0, g_default_vector, 3, 0, 6, 0);
-                        if (q)
-                            *(TI128 *)(q + 0x10) = *(TI128 *)(b);
+                            *(TI128 *)(q + 0x10) = *(TI128 *)(world_vec);
                     }
                     {
-                        u8 *q = part_spawn_pulled_particle(b, small, 0.5f, 4.0f, 0x80FFFFFF, 2, 0, g_default_vector, 3, 0, 6, 0);
+                        u8 *q = part_spawn_pulled_particle(world_vec, small, 0.5f, 12.0f, 0x3CFF1010, 2, 0, g_default_vector, 3, 0, 6, 0);
                         if (q)
-                            *(TI128 *)(q + 0x10) = *(TI128 *)(b);
+                            *(TI128 *)(q + 0x10) = *(TI128 *)(world_vec);
                     }
-                    a[2] = 0.0f;
-                    a[1] = g_local_pos_y_offset;
-                    matrix_mul_vec3(b, a, turret + 0xC0);
-                    FastVecAdd(shot->v10, b, turret + 0x10);
-                    func_PAL_L00_003D6C38(turret, shot->v10, 0);
-                    ref_L00_003D1D28_01(func_PAL_L00_003D6F08, turret);
+                    {
+                        u8 *q = part_spawn_pulled_particle(world_vec, small, 0.5f, 4.0f, 0x80FFFFFF, 2, 0, g_default_vector, 3, 0, 6, 0);
+                        if (q)
+                            *(TI128 *)(q + 0x10) = *(TI128 *)(world_vec);
+                    }
+                    local_vec[2] = 0.0f;
+                    local_vec[1] = g_local_pos_y_offset;
+                    matrix_mul_vec3(world_vec, local_vec, turret + 0xC0);
+                    FastVecAdd(shot->v10, world_vec, turret + 0x10);
+                    InitEffectStrips_pal(turret, shot->v10, 0);
+                    ref_L00_003D1D28_01(RenderRadialRingAndQuad_pal, turret);
                     PlayMobySound(0, 0, turret);
                     if (shot->t40)
                         SetShake(0.12f);
@@ -289,11 +289,11 @@ void func_PAL_L00_003D5C90(u8 *self)
                     hit.oclass = *(u16 *)(turret + 0xAA);
                     hit.damage = ((WeaponEntry *)((u8 *)g_weapon_l00_table + g_item_slot_to_record[0x1A] * 0xE0))->damage;
                     hit.source = turret;
-                    FastVecScale(a, turret + 0xD0, -1.35f);
-                    FastVecAdd(a, a, turret + 0x10);
-                    FastVecScale(b, turret + 0xC0, 0.275f);
-                    FastVecAdd(a, a, b);
-                    n = coll_process_hit(1.5f, a, 1, ((Hero *)g_hero_state)->ptr[0x2290 / 4], 0);
+                    FastVecScale(local_vec, turret + 0xD0, -1.35f);
+                    FastVecAdd(local_vec, local_vec, turret + 0x10);
+                    FastVecScale(world_vec, turret + 0xC0, 0.275f);
+                    FastVecAdd(local_vec, local_vec, world_vec);
+                    n = coll_process_hit(1.5f, local_vec, 1, ((Hero *)g_hero_state)->ptr[0x2290 / 4], 0);
                     for (h = 0; h < n; h++) {
                         if (g_area_hit_targets[h] != ((Hero *)g_hero_state)->ptr[0x2290 / 4]) {
                             FastVecScale(hit.pos, turret + 0xD0, -1.5f);

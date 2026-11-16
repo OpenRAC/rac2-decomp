@@ -23,7 +23,7 @@ typedef struct GornMoby {
     char pad21[0x47];
     char *vars;
     char pad6C[0x10];
-    short x7C;
+    short unk_7C;
     char pad7E[0x42];
     float rotation[16];
 } GornMoby;
@@ -47,14 +47,14 @@ extern int math_random_int_below(int);
 
 /* Clears the arena's 128 records of 0x60 bytes, then walks the entry's two-byte id list and puts
    every object back at its saved position, on the first point of its path. */
-void func_PAL_L15_0043BB70(u8 *self) {
+void gorn_ships_reset_pal(u8 *self) {
     GornSlot *slots;
     int i;
     u16 *list;
-    u16 *p;
+    u16 *cursor;
     int id;
     char *state;
-    u8 *owner;
+    u8 *motion;
     GornPath *path;
     u8 *velocity;
 
@@ -65,12 +65,12 @@ void func_PAL_L15_0043BB70(u8 *self) {
     list = g_moby_list_address_table[self[0x21]];
     if (list == 0)
         return;
-    p = list;
+    cursor = list;
     do {
-        id = *p & 0x7FFF;
+        id = *cursor & 0x7FFF;
         state = g_moby_base[0][id].vars;
-        owner = moby_get_motion_data(&g_moby_base[0][id]);
-        g_moby_base[0][id].x7C = 0x3F;
+        motion = moby_get_motion_data(&g_moby_base[0][id]);
+        g_moby_base[0][id].unk_7C = 0x3F;
         GornCopyQuad((char *)&g_moby_base[0][id] + 0x10, state + 0x430);
         set_identity_rotation_rows(g_moby_base[0][id].rotation);
         *(int *)(state + 0x27C) = 0;
@@ -83,12 +83,12 @@ void func_PAL_L15_0043BB70(u8 *self) {
         GornCopyQuad((char *)&g_moby_base[0][id] + 0x10, &path->points[0]);
         *(int *)&g_moby_base[0][id].position[3] = 0;
         follower_set_state(&g_moby_base[0][id], 2);
-        velocity = owner + 0x90;
+        velocity = motion + 0x90;
         follower_set_push_vector(&g_moby_base[0][id], &path->points[(*(int *)(state + 0x44C))++]);
-        FastVecSub(velocity, owner + 0x60, (char *)&g_moby_base[0][id] + 0x10);
+        FastVecSub(velocity, motion + 0x60, (char *)&g_moby_base[0][id] + 0x10);
         vec_scale_to_length(velocity, velocity, 0.020000001f);
-        *(int *)(owner + 0x130) = 1666667;
+        *(int *)(motion + 0x130) = 1666667;
         *(int *)(state + 0x450) = 0;
         *(int *)(state + 0x454) = math_random_int_below(2);
-    } while (*(short *)p++ >= 0);
+    } while (*(short *)cursor++ >= 0);
 }

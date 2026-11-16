@@ -70,20 +70,20 @@ extern void FastVecScale(void *out, float scale, void *in);
 extern void FastVecCross(void *out, void *a, void *b);
 extern void transform_vector(void *out, void *point, void *matrix);
 extern void draw_world_quad(EffectQuad *quad, void *a1, int a2);
-extern void func_PAL_L00_003B7FC0(Moby *moby, float fade);
+extern void mesh_draw_four_signs_pal(Moby *moby, float fade);
 extern void jitter_trail_draw(void);
 
 /* Draws the active rings, growing and fading with age, and a flickering core quad, all
    facing D_L00_001B8DC0; the effect fades out over the last 30 frames of its life. */
-void func_PAL_L00_003B7BB8(Moby *moby)
+void draw_timed_quad_effects_pal(Moby *moby)
 {
     EffectQuad quad;
     Vector billboard[4];
     Vector corner;
     float fade;
     float t;
-    float startAlpha;
-    float fadeAlpha;
+    float start_alpha;
+    float fade_alpha;
     float size;
     float radius;
     int i;
@@ -129,9 +129,9 @@ void func_PAL_L00_003B7BB8(Moby *moby)
             if (t > 1.0f)
                 t = 1.0f;
             size = g_ring_start_size + (g_ring_end_size - g_ring_start_size) * t;
-            startAlpha = IntToFloat(g_ring_start_alpha);
-            fadeAlpha = IntToFloat(g_ring_start_alpha);
-            alpha = FloatToInt(fade * (startAlpha + -fadeAlpha * t));
+            start_alpha = IntToFloat(g_ring_start_alpha);
+            fade_alpha = IntToFloat(g_ring_start_alpha);
+            alpha = FloatToInt(fade * (start_alpha + -fade_alpha * t));
             quad.colors[0] = quad.colors[1] = quad.colors[2] = quad.colors[3]
                 = (g_ring_color & 0xFFFFFF) | ((u32)alpha << 24);
             for (j = 0; j < 4; ++j) {
@@ -154,7 +154,7 @@ void func_PAL_L00_003B7BB8(Moby *moby)
             transform_vector(&quad.corners[k], &corner, billboard);
         }
         draw_world_quad(&quad, 0, 0);
-        func_PAL_L00_003B7FC0(moby, fade);
+        mesh_draw_four_signs_pal(moby, fade);
     }
     jitter_trail_draw();
 }

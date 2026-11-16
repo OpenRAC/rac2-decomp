@@ -53,7 +53,8 @@ extern void FastVecSub(void *, void *, void *);
 extern float fast_subtract_rotations(float, float), vec_length_xy(void *);
 extern void moby_update_eased_node(s32, s32, s32, float, float);
 
-void func_PAL_L17_00423A58(s32 obj) {
+/* Runs a machine that sells something for bolts: it checks the price, takes the bolts and gives the item, while its head follows the player (PAL: 50 Hz timings). */
+void bolt_purchase_moby_update_pal(s32 obj) {
     V target, raised, delta;
     s32 data = I(obj, 0x68), active;
     float speed, rate, yaw, pitch, ang;

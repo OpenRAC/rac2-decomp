@@ -10,62 +10,64 @@ extern void moby_save_vectors(void);
 extern void moby_restore_vectors(void);
 extern float IntToFloat(int);
 
-void func_PAL_00270D50(char *from)
+/* Applies a new camera matrix to the active camera for its current mode and starts the mode change
+   (PAL copy of cam_begin_mode_change). */
+void cam_begin_mode_change_pal(char *src_matrix)
 {
-    unsigned char *r = (unsigned char *)g_active_camera + 0x290;
-    float a[4] __attribute__((aligned(16)));
-    float b[4] __attribute__((aligned(16)));
-    float c[4] __attribute__((aligned(16)));
-    unsigned char sub;
+    unsigned char *cam = (unsigned char *)g_active_camera + 0x290;
+    float right[4] __attribute__((aligned(16)));
+    float up[4] __attribute__((aligned(16)));
+    float forward[4] __attribute__((aligned(16)));
+    unsigned char mode;
 
-    if (*(short *)r == 1) {
-        sub = r[3];
-        if (sub == 0) {
-            qcopy(r + 0x50, from + 0x30);
-            mat_transform_via_copy(r + 0x60, from);
-        } else if (sub == 2) {
-            qcopy(r + 0xC0, from + 0x30);
-            mat_transform_via_copy(r + 0xD0, from);
+    if (*(short *)cam == 1) {
+        mode = cam[3];
+        if (mode == 0) {
+            qcopy(cam + 0x50, src_matrix + 0x30);
+            mat_transform_via_copy(cam + 0x60, src_matrix);
+        } else if (mode == 2) {
+            qcopy(cam + 0xC0, src_matrix + 0x30);
+            mat_transform_via_copy(cam + 0xD0, src_matrix);
             cam_rebuild_look_at_from_hero();
         } else {
-            char *g = g_hero_state;
+            char *hero = g_hero_state;
 
-            vec_scale_to_length(a, (float *)(*(char **)(g + 0x2290) + 0xC0), 1.0f);
-            vec_scale_to_length(b, (float *)(*(char **)(g + 0x2290) + 0xD0), 1.0f);
-            vec_scale_to_length(c, (float *)(*(char **)(g + 0x2290) + 0xE0), 1.0f);
-            cam_compute_aim_angles((float *)(r + 0x70), (float *)(from + 0x30),
-                          (float *)(*(char **)(r - 0x100) + 0x30), a, b, c);
-            mat_transform_via_copy(r + 0xB0, from);
-            qcopy(r + 0xD0, r + 0xB0);
+            vec_scale_to_length(right, (float *)(*(char **)(hero + 0x2290) + 0xC0), 1.0f);
+            vec_scale_to_length(up, (float *)(*(char **)(hero + 0x2290) + 0xD0), 1.0f);
+            vec_scale_to_length(forward, (float *)(*(char **)(hero + 0x2290) + 0xE0), 1.0f);
+            cam_compute_aim_angles((float *)(cam + 0x70), (float *)(src_matrix + 0x30),
+                          (float *)(*(char **)(cam - 0x100) + 0x30), right, up, forward);
+            mat_transform_via_copy(cam + 0xB0, src_matrix);
+            qcopy(cam + 0xD0, cam + 0xB0);
         }
     } else {
-        sub = r[3];
-        if (sub == 2) {
+        mode = cam[3];
+        if (mode == 2) {
             moby_save_vectors();
             cam_rebuild_look_at_from_hero();
-        } else if (sub == 1) {
+        } else if (mode == 1) {
             moby_save_vectors();
-            qcopy(r + 0xB0, r + 0xD0);
-        } else if (sub == 0) {
+            qcopy(cam + 0xB0, cam + 0xD0);
+        } else if (mode == 0) {
             moby_restore_vectors();
         }
     }
     *(short *)g_camera_mode_state = 3;
-    r[2] = r[3];
-    if (r[2] == 0) {
-        unsigned char *l = r + 0x10;
+    cam[2] = cam[3];
+    if (cam[2] == 0) {
+        unsigned char *blend = cam + 0x10;
 
-        *(float *)(l + 0x10) = *(float *)(l + 0x14);
-        *(int *)(l + 0xC) = 0;
-        qcopy(r + 0x40, r + 0x50);
-        *(int *)(r + 0x10) = 0;
-        *(float *)(l + 0x4) = *(float *)(l + 0x8);
-        qcopy(r + 0x30, r + 0x60);
+        *(float *)(blend + 0x10) = *(float *)(blend + 0x14);
+        *(int *)(blend + 0xC) = 0;
+        qcopy(cam + 0x40, cam + 0x50);
+        *(int *)(cam + 0x10) = 0;
+        *(float *)(blend + 0x4) = *(float *)(blend + 0x8);
+        qcopy(cam + 0x30, cam + 0x60);
     } else {
-        unsigned char *o = r + 0x70;
-        int n = ((s32)(++*(int *)(o + 0x14)) * 5 + 2) / 6;
+        unsigned char *trans = cam + 0x70;
+        int steps = ((s32)(++*(int *)(trans + 0x14)) * 5 + 2) / 6;
 
-        *(int *)(o + 0xC) = n;
-        *(float *)(o + 0x10) = 1.0f / IntToFloat(n);
+        *(int *)(trans + 0xC) = steps;
+        *(float *)(trans + 0x10) = 1.0f / IntToFloat(steps);
     }
 }

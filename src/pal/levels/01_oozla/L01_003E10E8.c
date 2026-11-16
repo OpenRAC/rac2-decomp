@@ -41,6 +41,7 @@ extern u8 g_moby_nibble_table[];
 extern u8 *g_camera_path_configs __attribute__((sda));
 extern s32 cam_is_hero_in_trigger(void *);
 
+/* Pulls an object toward the platform or rider object its state points at, easing it each frame (PAL copy). */
 void moby_follow_attached_pal(void *arg, void *fallback) {
     f32 pos[4] __attribute__((aligned(16)));
     f32 delta[4] __attribute__((aligned(16)));
@@ -78,9 +79,9 @@ void moby_follow_attached_pal(void *arg, void *fallback) {
         FastVecAdd(obj+0x10,obj+0x10,delta);
         if (*(f32 *)(obj+0x18)<pos[2]) *(f32 *)(obj+0x18)=pos[2]+0.001f;
     } else {
-        s32 pathIndex=*(s32 *)(state+0x1FC);
-        if(pathIndex!=-1) {
-            path=g_path_l01_table[pathIndex];
+        s32 path_index=*(s32 *)(state+0x1FC);
+        if(path_index!=-1) {
+            path=g_path_l01_table[path_index];
             if(path && !point_in_path_xy(obj+0x10,path+0x10,*(s32 *)path)) qcopy(obj+0x10,fallback);
         }
         {

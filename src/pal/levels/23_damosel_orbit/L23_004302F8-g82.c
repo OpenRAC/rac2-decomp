@@ -108,6 +108,7 @@ extern void follow_camera_set_distance(s32, f32, f32);
 extern void follow_camera_set_height(f32, f32);
 extern void cam_set_tuning_value(f32);
 
+/* Updates the camera while the hero is inside a control zone: picks the follow distance, height and turn speeds from the zone settings and the hero state (PAL). */
 void cam_update_control_zone_pal(Moby_004402D8 *moby)
 {
     Entry_004402D8 *entry = (Entry_004402D8 *)(moby->f84 * 32 + (s32)g_control_zone_table);
@@ -172,14 +173,14 @@ void cam_update_control_zone_pal(Moby_004402D8 *moby)
         vars->f50 = 250;
     }
     if (g_hero_state.f22B4 == 2) {
-        s32 n;
+        s32 fall_frames;
 
         g_hero_l23_state_block.cam->f70->f250 = 2;
-        n = 0;
+        fall_frames = 0;
         if (g_hero_state.f49E != 0) {
-            n = FloatToInt(hero_find_collision_time(90.0f, g_hero_state.f520, -1.0f));
+            fall_frames = FloatToInt(hero_find_collision_time(90.0f, g_hero_state.f520, -1.0f));
         }
-        if (g_hero_state.f2294 == 0x5B && (g_hero_state.f49E == 0 || n >= 17)) {
+        if (g_hero_state.f2294 == 0x5B && (g_hero_state.f49E == 0 || fall_frames >= 17)) {
             cam_set_speeds_if_nonzero(0.5f, 1.0f);
             cam_set_turn_speeds_if_nonzero(0.05f, 0.2f);
             moby_push_axis_to_linked_node(0.04f, 0.0f);
@@ -189,10 +190,10 @@ void cam_update_control_zone_pal(Moby_004402D8 *moby)
             g_control_zone_angle_rad = g_control_zone_angle_deg * 0.017453294f;
             cam_set_tuning_value(g_control_zone_tuning_deg * 0.017453294f);
         } else {
-            f32 d;
-            f32 t;
-            f32 a;
-            f32 b;
+            f32 dist;
+            f32 blend_t;
+            f32 value_a;
+            f32 value_b;
 
             cam_set_aim_offset_target(0, g_control_zone_aim_offset_a, 0.03f);
             if (g_hero_state.f229C == 2) {
@@ -200,17 +201,17 @@ void cam_update_control_zone_pal(Moby_004402D8 *moby)
             } else {
                 cam_set_turn_speeds_if_nonzero(0.015f, 0.2f);
             }
-            d = fast_vec_dist(g_hero_state.f80, g_hero_state.fB0) - vars->f24;
-            if (g_control_zone_blend_dist < d) {
-                d = g_control_zone_blend_dist;
-            } else if (d < 0.0f) {
-                d = 0.0f;
+            dist = fast_vec_dist(g_hero_state.f80, g_hero_state.fB0) - vars->f24;
+            if (g_control_zone_blend_dist < dist) {
+                dist = g_control_zone_blend_dist;
+            } else if (dist < 0.0f) {
+                dist = 0.0f;
             }
-            t = d / g_control_zone_blend_dist;
-            a = (g_control_zone_blend_a_end - g_control_zone_blend_a_start) * t + g_control_zone_blend_a_start;
-            b = (g_control_zone_blend_b_end - g_control_zone_blend_b_start) * t + g_control_zone_blend_b_start;
-            follow_camera_set_distance(1, a, 0.005f);
-            follow_camera_set_height(b, 0.005f);
+            blend_t = dist / g_control_zone_blend_dist;
+            value_a = (g_control_zone_blend_a_end - g_control_zone_blend_a_start) * blend_t + g_control_zone_blend_a_start;
+            value_b = (g_control_zone_blend_b_end - g_control_zone_blend_b_start) * blend_t + g_control_zone_blend_b_start;
+            follow_camera_set_distance(1, value_a, 0.005f);
+            follow_camera_set_height(value_b, 0.005f);
         }
         if (g_control_zone_gravity_dist < gravity_get_center_distance(g_hero_l23_state_block.f140)) {
             g_control_zone_mode = 3;
@@ -239,22 +240,22 @@ void cam_update_control_zone_pal(Moby_004402D8 *moby)
             follow_camera_set_distance(0, 4.0f, 0.003f);
             follow_camera_set_height(6.0f, 0.003f);
         } else {
-            f32 d;
-            f32 t;
-            f32 a;
-            f32 b;
+            f32 dist;
+            f32 blend_t;
+            f32 value_a;
+            f32 value_b;
 
-            d = fast_vec_dist(g_hero_state.f80, g_hero_state.fB0) - vars->f24;
-            if (g_control_zone_blend_dist < d) {
-                d = g_control_zone_blend_dist;
-            } else if (d < 0.0f) {
-                d = 0.0f;
+            dist = fast_vec_dist(g_hero_state.f80, g_hero_state.fB0) - vars->f24;
+            if (g_control_zone_blend_dist < dist) {
+                dist = g_control_zone_blend_dist;
+            } else if (dist < 0.0f) {
+                dist = 0.0f;
             }
-            t = d / g_control_zone_blend_dist;
-            a = (vars->f48 - vars->f40) * t + vars->f40;
-            b = (vars->f4C - vars->f44) * t + vars->f44;
-            follow_camera_set_distance(0, a, 0.003f);
-            follow_camera_set_height(b, 0.003f);
+            blend_t = dist / g_control_zone_blend_dist;
+            value_a = (vars->f48 - vars->f40) * blend_t + vars->f40;
+            value_b = (vars->f4C - vars->f44) * blend_t + vars->f44;
+            follow_camera_set_distance(0, value_a, 0.003f);
+            follow_camera_set_height(value_b, 0.003f);
         }
     }
 }

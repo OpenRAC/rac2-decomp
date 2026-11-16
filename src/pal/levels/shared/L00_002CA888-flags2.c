@@ -30,11 +30,12 @@ extern u8 g_item_slot_to_record[];
 extern Entry_2CAF20 g_weapon_l00_table[];
 extern s32 hero_slot_item_id(s32);
 extern void cancel_hero_item_animation_pal(void);
-extern int func_PAL_L00_002C4480(int a0, int a1);
+extern int hero_l00_set_action_pal(int a0, int a1);
 extern void set_hero_animation_pal(void *, int, f32);
 extern void vec_clamp_length(float *, float);
 
-int func_PAL_L00_002CB2C8(void)
+/* Tries to start the hero's grab onto the nearby object, and returns 1 when it started. */
+int hero_try_start_grab_pal(void)
 {
     Hero_2CAF20 *h = &g_hero_state;
     int idx;
@@ -47,7 +48,7 @@ int func_PAL_L00_002CB2C8(void)
         return 0;
     }
     moby = (g_weapon_l00_table + g_item_slot_to_record[idx])->moby;
-    if (func_PAL_L00_002C4480(0, 0) == 0)
+    if (hero_l00_set_action_pal(0, 0) == 0)
         return 0;
     vec_clamp_length(h->v160, 0.030000001f);
     if (0.030000001f < h->f1B4)
@@ -67,7 +68,8 @@ extern int g_input_block_flag __attribute__((section(".sdata")));
 extern s32 FastDecTimer(s32);
 extern void level_set_flag_d_true(void);
 
-void func_PAL_L00_002CB5E8(void)
+/* Counts down the hero's button-hold timers and starts the special action when the button is pressed again in time. */
+void hero_update_button_hold_timers_pal(void)
 {
     char *b;
     char *o;
@@ -99,13 +101,13 @@ void func_PAL_L00_002CB5E8(void)
 }
 
 extern int hero_pick_linked_anim_pair(int, void *, void *);
-extern void func_PAL_002A7E68(void *, int, int, int);
+extern void anim_start_blended_pal(void *, int, int, int);
 extern char D_00189E20_36[];
 
 /* func_L00_002CB3A8 is in the sibling file L00_002CB3A8-decider.c (its own profile). */
 
 /* loads two object pointers from fixed data, bails out when either is null or when the first object's byte 67 differs from 1, fills two stack ints through a helper, then applies a four-argument operation to each object with those ints */
-void func_PAL_L00_002D1FE8(void)
+void hero_set_linked_objects_anim_pal(void)
 {
     char *p = D_00189E20_36;
     void *s0;
@@ -126,6 +128,6 @@ void func_PAL_L00_002D1FE8(void)
     if (hero_pick_linked_anim_pair(0, buf, buf + 1) == 0)
         return;
 
-    func_PAL_002A7E68(s0, buf[0], 0, 6);
-    func_PAL_002A7E68(s1, buf[1], 0, 6);
+    anim_start_blended_pal(s0, buf[0], 0, 6);
+    anim_start_blended_pal(s1, buf[1], 0, 6);
 }

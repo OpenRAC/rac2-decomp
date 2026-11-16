@@ -35,14 +35,14 @@ extern FlagTarget *g_extras_page_flag_targets[];
 typedef struct { char p00[8]; int f08; char p0c[8]; int f14; int f18; char pad[0xE4]; int f100; int f104; char pad2[0x38]; int f140; } GameObj;
 
 
-int func_PAL_002D1120(void)
+int menu_handle_extras_page_input_pal(void)
 {
-    int a = -1;
-    int b = -1;
-    int c = -1;
+    int sound = -1;
+    int movie_a = -1;
+    int movie_b = -1;
     int result = 0;
     int flags = ((CallbackMenuState *)&g_pad_state)->flags;
-    int old = g_extras_page_cursor;
+    int old_cursor = g_extras_page_cursor;
 
     if (flags & 0x10) {
         int value;
@@ -75,29 +75,29 @@ finish:
         if (((CallbackMenuState *)&g_pad_state)->flags & 0x40) {
             switch (g_extras_page_cursor) {
             case 2:
-                if (g_extras_page_unlocked[g_extras_page_cursor] != 0) { a = 4; b = 0xBD; c = 0xBE; } else a = 5;
+                if (g_extras_page_unlocked[g_extras_page_cursor] != 0) { sound = 4; movie_a = 0xBD; movie_b = 0xBE; } else sound = 5;
                 break;
             case 3:
-                if (g_extras_page_unlocked[g_extras_page_cursor] != 0) { a = 4; b = 0xC1; } else a = 5;
+                if (g_extras_page_unlocked[g_extras_page_cursor] != 0) { sound = 4; movie_a = 0xC1; } else sound = 5;
                 break;
             case 1:
                 if (g_extras_page_unlocked[g_extras_page_cursor] != 0) {
                     menu_restore_saved_screen_image(1);
-                    a = 4;
+                    sound = 4;
                     g_extras_menu_page = 2;
                     ((GameObj *)&g_pause_menu_state)->f100 = ((GameObj *)&g_pause_menu_state)->f14;
                     ((GameObj *)&g_pause_menu_state)->f104 = ((GameObj *)&g_pause_menu_state)->f08;
                     request_begin_slot(9, 1, 0, 0, 0);
-                } else a = 5;
+                } else sound = 5;
                 break;
             case 0:
                 g_pause_menu_state.value = (int)g_extras_page_value_block;
-                a = 4;
+                sound = 4;
                 break;
             default:
                 break;
             }
-            if (b != -1) {
+            if (movie_a != -1) {
                 char *obj;
                 menu_restore_saved_screen_image(0);
                 ((GameObj *)&g_pause_menu_state)->f100 = ((GameObj *)&g_pause_menu_state)->f14;
@@ -105,25 +105,25 @@ finish:
                 ((GameObj *)&g_pause_menu_state)->f140 = g_loader_state_word;
                 D_001A7478_sda = 2;
                 obj = g_loader_movie;
-                req_push_queue(obj, b);
-                if (c != -1)
-                    req_push_queue(obj, c);
+                req_push_queue(obj, movie_a);
+                if (movie_b != -1)
+                    req_push_queue(obj, movie_b);
                 req_launch_queued(obj);
             }
-            if (a != -1)
-                snd_play_from_global_bank(a, 0, 0);
+            if (sound != -1)
+                snd_play_from_global_bank(sound, 0, 0);
         }
         if (g_extras_page_cursor >= 2)
             ((MenuFields *)&g_extras_page_fields)->f58 = g_extras_page_cursor + 1;
         else
             ((MenuFields *)&g_extras_page_fields)->f58 = g_extras_page_cursor;
         if (D_001ABA08_gp[g_extras_page_cursor] != 0) {
-            if (old == g_extras_page_cursor) {
+            if (old_cursor == g_extras_page_cursor) {
                 if (g_sequence_active_flag[0] == 0) {
                     MenuFields *menu = &g_extras_page_fields;
-                    if (menu->f50 == old && menu->f44 == 2) {
+                    if (menu->f50 == old_cursor && menu->f44 == 2) {
                         g_extras_page_flag_targets[0]->flags &= -5;
-                    } else if (menu->f54 == old && menu->f44 == 4) {
+                    } else if (menu->f54 == old_cursor && menu->f44 == 4) {
                         g_extras_page_flag_targets[0]->flags &= -5;
                     }
                 }

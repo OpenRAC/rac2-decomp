@@ -26,18 +26,19 @@ extern V2 g_helper_hit_position;
 extern void func_37CB80(void *, void *, float, void *);
 extern NODE *func_3100D8();
 
-void helper_update_hit_test_pal(NODE *a0)
+/* Updates the helper object by testing its position, with an extra offset when one is set. (PAL) */
+void helper_update_hit_test_pal(NODE *object)
 {
-    NODE *o = a0->f68;
+    NODE *vars = object->f68;
 
-    if (o->f24 == 0)
+    if (vars->f24 == 0)
         return;
-    if (o->f2C == 0) {
-        func_37CB80(o, (char *)o + 0x10, 1.0f, 0);
+    if (vars->f2C == 0) {
+        func_37CB80(vars, (char *)vars + 0x10, 1.0f, 0);
     } else {
-        V2 v = g_helper_hit_position;
+        V2 offset = g_helper_hit_position;
 
-        func_37CB80(o, (char *)o + 0x10, 1.0f, &v);
+        func_37CB80(vars, (char *)vars + 0x10, 1.0f, &offset);
     }
 }
 

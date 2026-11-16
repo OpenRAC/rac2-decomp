@@ -48,34 +48,34 @@ struct L02Kind330Object {
 /* Turns the object's angle and its mirrored scale into its word at +0x78; when the frame
    counter D_L02_001B30C8 differs from the object's word at +0x330, walks the object's group
    and refreshes every live entity of kind 0xA4E, then registers func_L02_003CEFD8. */
-void chickenbot_update_group_pulse_color_pal(struct L02Kind330Object *a0) {
-    struct L02Kind330 *o = a0->obj;
-    struct L02PairWord v = g_chickenbot_color_pair;
-    float f;
-    unsigned short *q;
-    struct L02Kind330Entity *e;
-    struct L02Kind330 *s0;
+void chickenbot_update_group_pulse_color_pal(struct L02Kind330Object *moby) {
+    struct L02Kind330 *pulse = moby->obj;
+    struct L02PairWord colors = g_chickenbot_color_pair;
+    float value;
+    unsigned short *member;
+    struct L02Kind330Entity *entity;
+    struct L02Kind330 *entity_data;
 
-    f = FastAddRotations(o->f328, 0.25132746f);
-    o->f328 = f;
-    f = math_fast_sin_or_cos_b(f);
-    o->f32C = f * 0.5f + 0.5f;
-    a0->f78 = FastTweenColor(v.a, v.b, o->f32C);
-    if (o->f330 != g_frame_l02_counter) {
-        for (q = (unsigned short *)g_entity_group_lists[a0->group];
-             a0->group != 0xFF && a0->group <= g_group_max_index && q != 0 &&
-             ((q != 0 && (short)q[-1] >= 0) || q == (unsigned short *)g_entity_group_lists[a0->group]);
-             q++) {
-            e = (struct L02Kind330Entity *)(g_moby_l02_pool + ((*q & 0x7FFF) << 8));
-            if (e == 0)
+    value = FastAddRotations(pulse->f328, 0.25132746f);
+    pulse->f328 = value;
+    value = math_fast_sin_or_cos_b(value);
+    pulse->f32C = value * 0.5f + 0.5f;
+    moby->f78 = FastTweenColor(colors.a, colors.b, pulse->f32C);
+    if (pulse->f330 != g_frame_l02_counter) {
+        for (member = (unsigned short *)g_entity_group_lists[moby->group];
+             moby->group != 0xFF && moby->group <= g_group_max_index && member != 0 &&
+             ((member != 0 && (short)member[-1] >= 0) || member == (unsigned short *)g_entity_group_lists[moby->group]);
+             member++) {
+            entity = (struct L02Kind330Entity *)(g_moby_l02_pool + ((*member & 0x7FFF) << 8));
+            if (entity == 0)
                 break;
-            if (e->f31 != 0 && e->type == 0xA4E && e->state != 0xFE && e->state != 0xFD) {
-                s0 = e->obj;
-                moby_transform_joint_point((char *)e, 0, (char *)s0 + 0x220);
-                s0->f330 = g_frame_l02_counter;
+            if (entity->f31 != 0 && entity->type == MOBY_CLASS_MEGACORP_CHICKENBOT && entity->state != 0xFE && entity->state != 0xFD) {
+                entity_data = entity->obj;
+                moby_transform_joint_point((char *)entity, 0, (char *)entity_data + 0x220);
+                entity_data->f330 = g_frame_l02_counter;
             }
         }
-        gfx_add_draw_callback_first((void *)chickenbot_emit_sparks, a0);
+        gfx_add_draw_callback_first((void *)chickenbot_emit_sparks, moby);
     }
 }
 

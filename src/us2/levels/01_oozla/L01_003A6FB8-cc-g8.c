@@ -33,11 +33,12 @@ extern void moby_set_state(void *,int,int);
 extern void OozlaSpawnSplashParticles(void *);
 extern void part_spawn_scaled_bolts(void *,int,float);
 extern int math_fast_float_d(void *);
+/* Flies a target along its path. When it is shot it falls into the water, makes a splash and disappears. */
 void path_flying_target_update_us2(u8 *object)
 {
     u8 *state = *(u8 **)(object + 0x68);
     u8 *path = g_path_l01_table[I(state,0x50)];
-    float first, last, oldHeight;
+    float first, last, old_height;
     int mode, count;
     switch (object[0x20]) {
     case 0:
@@ -52,14 +53,14 @@ void path_flying_target_update_us2(u8 *object)
         F(object,0x2C) *= g_flying_target_damping;
         object[0x30] = 255;
     case 1:
-        oldHeight = F(object,0x18);
+        old_height = F(object,0x18);
         path_sample_position(F(state,0x5C),path,I(state,0x70),object+0x10,object+0xF0,0);
         F(object,0xF4) *= 0.5f;
         F(object,0x18) += F(state,0x54);
         F(state,0x5C) += F(state,0x74);
         if (F(state,0x5C) > I(path,0)) F(state,0x5C) -= I(path,0);
         if (object[0x60] & 2) {
-            if (oldHeight < F(object,0x18)) {
+            if (old_height < F(object,0x18)) {
                 if (object[0x43] != 0) anim_start_blended(object,0,0,10);
             } else if (object[0x43] != 1) anim_start_blended(object,1,0,10);
         }

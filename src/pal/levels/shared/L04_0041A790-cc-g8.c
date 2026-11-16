@@ -37,10 +37,11 @@ extern int math_fast_float_d(int *);
 extern int FastTweenColor(int, int, float);
 extern void trail_update_active_entries(void *);
 extern void gfx_add_draw_callback_first(void (*)(void *), void *);
-void func_PAL_L04_0041A790(void)
+/* Moves the trails left behind by the racers: drops them to the ground, ages them, adds new points and fades finished ones away (PAL). */
+void racer_update_trails_pal(void)
 {
     float local[4] __attribute__((aligned(16)));
-    float floorZ, scale;
+    float floor_z, scale;
     Trail416018 *trail;
     float *point, *velocity;
     float gravity;
@@ -56,12 +57,12 @@ void func_PAL_L04_0041A790(void)
         if (*(short *)(owner + 0xaa) == 0xbbc) {
             /* Through a pointer, as retail keeps the hero base in a register. */
             unsigned char *hero = g_hero_state;
-            floorZ = *(float *)(hero + 0x318) + 0.1f;
+            floor_z = *(float *)(hero + 0x318) + 0.1f;
         } else {
-            floorZ = *(float *)(owner + 0x18) - 0.25f;
+            floor_z = *(float *)(owner + 0x18) - 0.25f;
         }
         for (j = 0; j < count; j++) {
-            float widthStep = 0.0009f;
+            float width_step = 0.0009f;
             gravity = 0.0028000001f;
             point = trail->points[j];
             age = &trail->ages[j];
@@ -74,15 +75,15 @@ void func_PAL_L04_0041A790(void)
             FastVecAdd(point, point, velocity);
             FastVecScale(local, trail->impulse, scale);
             FastVecAdd(point, point, local);
-            if (point[2] < floorZ) {
-                point[2] = floorZ;
+            if (point[2] < floor_z) {
+                point[2] = floor_z;
                 trail->landed[j] = 1;
             }
-            point[3] = trail->ages[0] * widthStep + 0.01f + *age * widthStep;
+            point[3] = trail->ages[0] * width_step + 0.01f + *age * width_step;
         }
         if (count < 8 &&
             ((*(short *)(trail->owner + 0xaa) == 0xbbc && g_race_bike_mode) ||
-             (*(short *)(trail->owner + 0xaa) == 0xb2d &&
+             (*(short *)(trail->owner + 0xaa) == 0xb2d && /* moby class 2861 */
               *(int *)(*(char **)(trail->owner + 0x68) + 0x244)))) {
             if (trail->ages[count - 1] < 3)
                 continue;

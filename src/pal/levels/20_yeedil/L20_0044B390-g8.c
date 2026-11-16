@@ -33,6 +33,7 @@ typedef struct {
     int callback;
 } YeedilActivation;
 
+/* Runs the glowing floor switch (moby class 4617). When the hero stands on it, it switches on its linked objects and sets off its event. (PAL) */
 void floor_l20_switch_update_pal(unsigned char *object)
 {
     float point[4] __attribute__((aligned(16)));

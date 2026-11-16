@@ -12,9 +12,10 @@ extern void matrix_mul_vec3(void *, void *, void *);
 extern double __extendsfdf2(float);
 extern void STUB_printf(char *, ...);
 extern char g_str_spark_burst_debug[];
-extern void func_PAL_L00_00328480(char *, void *, int, float, int, void *, float, unsigned int, float, float, int);
+extern void part_spawn_glow_fade_effects_pal(char *, void *, int, float, int, void *, float, unsigned int, float, float, int);
 
-void part_emit_spark_burst_remove_pal(char *a0) {
+/* Sprays sparks from the object's front side, then removes it. */
+void part_emit_spark_burst_remove_pal(char *moby) {
     float pos[4], vel[4];
     int count = 13, i;
     if (g_spark_burst_threshold < 0.9f && g_level_float_param < 0.9f) count = 40;
@@ -25,14 +26,14 @@ void part_emit_spark_burst_remove_pal(char *a0) {
         vel[0] = pos[0] * 0.0049720327f;
         vel[1] = -0.16000001f;
         vel[2] = math_random_float_range(3.0f, 7.0f) * 0.020000001f;
-        matrix_mul_vec3(pos, pos, a0 + 0xC0);
-        FastVecAdd(pos, pos, a0 + 0x10);
-        matrix_mul_vec3(vel, vel, a0 + 0xC0);
+        matrix_mul_vec3(pos, pos, moby + 0xC0);
+        FastVecAdd(pos, pos, moby + 0x10);
+        matrix_mul_vec3(vel, vel, moby + 0xC0);
         STUB_printf(g_str_spark_burst_debug, __extendsfdf2(pos[0]), __extendsfdf2(pos[1]), __extendsfdf2(pos[2]), __extendsfdf2(vel[0]), __extendsfdf2(vel[1]), __extendsfdf2(vel[2]));
-        func_PAL_L00_00328480(a0, pos, 1, 0.0f, 1, vel, 3.0f, 0x50808040, 1.0f, 5.5f, 0);
-        PlayMobySound(0, 0, a0);
+        part_spawn_glow_fade_effects_pal(moby, pos, 1, 0.0f, 1, vel, 3.0f, 0x50808040, 1.0f, 5.5f, 0);
+        PlayMobySound(0, 0, moby);
     }
-    moby_mark_spawned(a0);
+    moby_mark_spawned(moby);
 }
 
 extern void part_spawn_debris_mask(char *, int, void *, int, float, float, float, float);
@@ -42,6 +43,7 @@ extern float math_fast_sin_or_cos_b(float);
 extern char *cam_moby_create_pal(char *, int, int, int, char *, char *,
                            float *, int, float, float);
 
+/* Spawns a drifting debris particle for each bit set in the mask, with random speed and life. */
 void part_spawn_debris_mask_pal(char *object, int mask, void *offset, int color,
                       float speed_min, float speed_max,
                       float vertical_min, float vertical_max)

@@ -2,22 +2,22 @@
 
 #include "common.h"
 typedef struct {
-    u8 pad0[0x28], field28, field29, field2a, pad2b[3], field2e, pad2f;
-    float field30;
-    u8 pad34[0x14], field48, pad49, field4a, pad4b[0x35];
-    u8 field80[16], pad90[0x24];
-    int fieldb4, fieldb8, fieldbc;
-    u8 padc0[8];
-    int fieldc8;
-    u8 padcc[4];
-    float fieldd0, fieldd4;
-    int *fieldd8;
-    u8 fielddc, fielddd, padde[2];
-    int fielde0;
-    u8 pade4[4];
-    int fielde8;
-    u8 padec[4];
-    int fieldf0;
+    u8 pad_0[0x28], field_28, field_29, field_2a, pad_2b[3], field_2e, pad_2f;
+    float field_30;
+    u8 pad_34[0x14], field_48, pad_49, field_4a, pad_4b[0x35];
+    u8 field_80[16], pad_90[0x24];
+    int field_b4, field_b8, field_bc;
+    u8 pad_c0[8];
+    int field_c8;
+    u8 pad_cc[4];
+    float field_d0, field_d4;
+    int *field_d8;
+    u8 field_dc, field_dd, pad_de[2];
+    int field_e0;
+    u8 pad_e4[4];
+    int field_e8;
+    u8 pad_ec[4];
+    int field_f0;
 } OozlaSpawnState;
 extern s32 FloatToInt(f32);
 extern float path_l01_compute_segment_lengths(u32);
@@ -27,52 +27,53 @@ extern int g_oozla_intro_stage[] __attribute__((sda));
 extern u32 g_path_l01_table[];
 extern u8 *g_moby_l01_table MACRO_ADDR;
 
-void swamp_monster_arm_init_pal(u8 *a0)
+/* Sets up the swamp monster arm when it appears, then starts its idle or attack animation (PAL). */
+void swamp_monster_arm_init_pal(u8 *moby)
 {
-    OozlaSpawnState *p = *(OozlaSpawnState **)(a0 + 0x68);
+    OozlaSpawnState *vars = *(OozlaSpawnState **)(moby + 0x68);
 
-    p->field48 = FloatToInt(5.0f);
-    p->field4a = FloatToInt(32.0f);
-    p->field29 = 1;
-    *(float *)(a0 + 0x2C) = *(float *)(*(u8 **)(a0 + 0x24) + 0x24) * 2.5f;
-    qcopy(p->field80, a0 + 0x10);
-    if (!g_oozla_intro_stage[0] && a0[0x21] != 255)
-        *p->fieldd8 = 0;
-    p->field30 = 2.0f;
-    p->field2a = 8;
-    p->field28 = 3;
-    p->field2e = 3;
-    p->fieldbc = 0;
-    if (p->fieldb8 != -1)
-        path_l01_compute_segment_lengths(g_path_l01_table[p->fieldb8]);
-    p->fieldf0 = p->fielde8;
-    if (p->fielddd)
-        *(u16 *)(a0 + 0x34) |= 0x8000;
-    if (p->fieldb4 != -1) {
-        p->fieldf0 = p->fielde0;
-        if ((g_moby_l01_table + (p->fieldb4 << 8)) &&
-            (g_moby_l01_table + (p->fieldb4 << 8))[0x20] != 254 &&
-            (g_moby_l01_table + (p->fieldb4 << 8))[0x20] != 253) {
-            *(u16 *)(a0 + 0x32) = 0x3FF;
-            a0[0x30] = 255;
-            if (p->fieldd0 > 0.0f)
-                *(float *)(a0 + 0x18) = p->fieldd0;
-            if (p->fieldc8)
-                anim_start_immediate(a0, 8, 0);
+    vars->field_48 = FloatToInt(5.0f);
+    vars->field_4a = FloatToInt(32.0f);
+    vars->field_29 = 1;
+    *(float *)(moby + 0x2C) = *(float *)(*(u8 **)(moby + 0x24) + 0x24) * 2.5f;
+    qcopy(vars->field_80, moby + 0x10);
+    if (!g_oozla_intro_stage[0] && moby[0x21] != 255)
+        *vars->field_d8 = 0;
+    vars->field_30 = 2.0f;
+    vars->field_2a = 8;
+    vars->field_28 = 3;
+    vars->field_2e = 3;
+    vars->field_bc = 0;
+    if (vars->field_b8 != -1)
+        path_l01_compute_segment_lengths(g_path_l01_table[vars->field_b8]);
+    vars->field_f0 = vars->field_e8;
+    if (vars->field_dd)
+        *(u16 *)(moby + 0x34) |= 0x8000;
+    if (vars->field_b4 != -1) {
+        vars->field_f0 = vars->field_e0;
+        if ((g_moby_l01_table + (vars->field_b4 << 8)) &&
+            (g_moby_l01_table + (vars->field_b4 << 8))[0x20] != 254 &&
+            (g_moby_l01_table + (vars->field_b4 << 8))[0x20] != 253) {
+            *(u16 *)(moby + 0x32) = 0x3FF;
+            moby[0x30] = 255;
+            if (vars->field_d0 > 0.0f)
+                *(float *)(moby + 0x18) = vars->field_d0;
+            if (vars->field_c8)
+                anim_start_immediate(moby, 8, 0);
             else
-                anim_start_immediate(a0, 5, 0);
-            moby_set_state(a0, 0, 1);
+                anim_start_immediate(moby, 5, 0);
+            moby_set_state(moby, 0, 1);
         } else {
-            p->fieldb4 = -1;
+            vars->field_b4 = -1;
         }
     }
-    if (p->fieldb4 == -1) {
-        if (p->fieldd4 > 0.0f)
-            *(float *)(a0 + 0x18) = p->fieldd4;
-        p->fieldbc = 100;
-        anim_start_immediate(a0, 0, 0);
-        *(float *)(a0 + 0x48) = 0.0f;
-        *(u16 *)(a0 + 0x34) &= 0xEFFF;
-        moby_set_state(a0, 0, 4);
+    if (vars->field_b4 == -1) {
+        if (vars->field_d4 > 0.0f)
+            *(float *)(moby + 0x18) = vars->field_d4;
+        vars->field_bc = 100;
+        anim_start_immediate(moby, 0, 0);
+        *(float *)(moby + 0x48) = 0.0f;
+        *(u16 *)(moby + 0x34) &= 0xEFFF;
+        moby_set_state(moby, 0, 4);
     }
 }

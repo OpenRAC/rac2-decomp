@@ -25,7 +25,7 @@ extern float g_raritanium_pickup_start_progress __attribute__((sda));
 extern float g_raritanium_pickup_drain_scale __attribute__((sda));
 extern float g_pickup_pull_scale __attribute__((sda));
 extern int g_raritanium_pickup_timer __attribute__((sda));
-extern void func_PAL_002A7E68(u8 *object, int bank, int anim, int frames);
+extern void anim_start_blended_pal(u8 *object, int bank, int anim, int frames);
 extern float coll_probe_ground_height_below(void *position, int flags, float distance);
 extern float vec_distance_xy(void *a, void *b);
 extern void FastVecSub(void *out, void *a, void *b);
@@ -34,16 +34,17 @@ extern void vec_fast_divide_helper(void *out, void *a, float magnitude);
 extern void FastVecAdd(void *out, void *a, void *b);
 extern int math_fast_float_d(int *timer);
 extern void moby_mark_spawned(void *object);
-extern void func_PAL_L08_003D7F30(u8 *object);
+extern void spawn_particles_and_draw_glow_rings_pal(u8 *object);
 
 typedef struct { u8 p[0x464]; u8 x[1]; } Hist;
 typedef struct { u8 p[0x8e]; short lock; } VData;
 typedef struct { u8 p[0x31]; u8 held; u8 p2[2]; u16 flags; u8 p3[0x12]; float scale; } OView;
-void func_PAL_L08_003D81E8(u8 *object)
+/* Updates a pickup (moby class 2458, Raritanium): it waits to be grabbed, is pulled towards the mining vehicle, then follows the hero while its amount drains, and disappears when used up (PAL: 50 Hz timings). */
+void raritanium_pickup_update_pal(u8 *object)
 {
     PickupState *data = *(PickupState **)(object + 0x68);
     u8 *vehicle;
-    u8 *vehicleData;
+    u8 *vehicle_data;
     unsigned short id;
     float cost;
     float movement[4] __attribute__((aligned(16)));
@@ -66,7 +67,7 @@ void func_PAL_L08_003D81E8(u8 *object)
         *(unsigned short *)(object + 0x34) |= 1;
         data->timer = data->duration * 50;
         if (object[0x43])
-            func_PAL_002A7E68(object, 0, 0, 2);
+            anim_start_blended_pal(object, 0, 0, 2);
         object[0x20] = 1;
         value = coll_probe_ground_height_below(object + 0x10, 0, 200.0f);
         if (value != 0.0f)
@@ -76,21 +77,21 @@ void func_PAL_L08_003D81E8(u8 *object)
     case 1: {
         float value;
         vehicle = g_hero_state.vehicle;
-        if (vehicle == 0 || *(short *)(vehicle + 0xaa) != 0xeef ||
+        if (vehicle == 0 || *(short *)(vehicle + 0xaa) != MOBY_CLASS_MINING_VEHICLE ||
             vehicle[0x20] == 254 || vehicle[0x20] == 253 ||
             g_hero_state.mode != 0x31)
             return;
-        vehicleData = *(u8 **)(vehicle + 0x68);
-        *(u8 **)(vehicleData + 0x1b0) = object;
+        vehicle_data = *(u8 **)(vehicle + 0x68);
+        *(u8 **)(vehicle_data + 0x1b0) = object;
         value = vec_distance_xy(object + 0x10, &g_hero_state.position);
-        if (value < *(float *)(vehicleData + 0x68)) {
-            *(float *)(vehicleData + 0x68) = value;
-            *(u8 **)(vehicleData + 0x6c) = object;
+        if (value < *(float *)(vehicle_data + 0x68)) {
+            *(float *)(vehicle_data + 0x68) = value;
+            *(u8 **)(vehicle_data + 0x6c) = object;
         }
         if (!(value < g_hud_l08_bar_threshold) || !(*g_pad_pressed_flags & 0x80))
             return;
-        { u8 *activeVehicle = g_hero_state.vehicle;
-        if (activeVehicle == 0 || (activeVehicle[0x42] != 2 && activeVehicle[0x43] != 2))
+        { u8 *active_vehicle = g_hero_state.vehicle;
+        if (active_vehicle == 0 || (active_vehicle[0x42] != 2 && active_vehicle[0x43] != 2))
             return; }
         FastVecSub(movement, &g_hero_state.position, object + 0x10);
         FastVecScale(movement, movement, 0.1f);
@@ -99,14 +100,14 @@ void func_PAL_L08_003D81E8(u8 *object)
         FastVecAdd(object + 0x10, object + 0x10, movement);
         if (!math_fast_float_d(&data->timer))
             return;
-        ((VData *)vehicleData)->lock = 180;
+        ((VData *)vehicle_data)->lock = 180;
         data->timer = (((int)(g_raritanium_pickup_timer) * 5 + 2) / 6);
         qcopy(object + 0x10, &g_hero_state.position);
         ((OView *)object)->held = 1;
         ((OView *)object)->flags = (((OView *)object)->flags & 0xfffe) | 0x800;
         data->progress = g_raritanium_pickup_start_progress;
         if (object[0x43] != 1)
-            func_PAL_002A7E68(object, 1, 0, 30);
+            anim_start_blended_pal(object, 1, 0, 30);
         ((OView *)object)->scale = data->progress * 2.0f;
         object[0x20] = 2;
         break;
@@ -142,7 +143,7 @@ kill:
                 return;
             }
         }
-        func_PAL_L08_003D7F30(object);
+        spawn_particles_and_draw_glow_rings_pal(object);
         break;
     }
     }

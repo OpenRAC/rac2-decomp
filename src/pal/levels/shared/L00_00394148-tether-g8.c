@@ -31,7 +31,7 @@ extern char *moby_get_private_value_2(u8 *);
 extern float FastVecLength(void *);
 extern void level_save_and_dim_lighting(void *), func_002A0F48(void *);
 extern char *cam_follow_create(void *);
-extern int func_PAL_L00_002C4480(int a0, int a1);
+extern int hero_l00_set_action_pal(int a0, int a1);
 extern void mem_clear(void *, int, int), AttachManipulator(u8 *, u32, u8 *);
 extern char *tether_create_fin_piece(char *);
 extern void hero_copy_field_to_moby(u8 *);
@@ -80,7 +80,7 @@ char *visibomb_create_missile_pal(char *owner, char *position, float yaw, float 
         {
             char *attachment = cam_follow_create(actor);
             state->attachment = attachment;
-            func_PAL_L00_002C4480(28, 1);
+            hero_l00_set_action_pal(28, 1);
         }
         mem_clear(state->matrix24, 0, 64);
         mem_clear(state->matrix28, 0, 64);

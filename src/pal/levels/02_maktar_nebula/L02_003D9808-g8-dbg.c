@@ -31,7 +31,8 @@ extern int FloatToInt(float);
 extern char *SpawnExplosion_pal(void *, float, float, int, int, int, int, int, int, int, int, int, int, char *);
 extern int coll_sweep_from_object(void *, void *, int, int, int, int, float, float, float);
 
-int func_PAL_L02_003D9808(char *self, int joint) {
+/* Plays the chain throw: five links fly out along the joint and back, and a hit effect fires at the impact point. Returns 1 when the links are out and 2 when the throw is over. */
+int chainblade_update_chain_throw_pal(char *self, int joint) {
     float origin[4] __attribute__((aligned(16)));
     float end[4] __attribute__((aligned(16)));
     float direction[4] __attribute__((aligned(16)));
@@ -48,7 +49,7 @@ int func_PAL_L02_003D9808(char *self, int joint) {
     float phase;
     float time;
     int i;
-    int trajectoryOffset;
+    int trajectory_offset;
     int rounded;
     int timer;
     int elapsed;
@@ -63,7 +64,7 @@ int func_PAL_L02_003D9808(char *self, int joint) {
     travel -= 5.3f;
     outbound = travel * 0.7142857f;
     inbound = travel * 0.5555555f;
-    for (i = 0, slots = (char **)(state + 0x2A0), trajectoryOffset = 0; i < 5; i++, slots++, trajectoryOffset += sizeof(float)) {
+    for (i = 0, slots = (char **)(state + 0x2A0), trajectory_offset = 0; i < 5; i++, slots++, trajectory_offset += sizeof(float)) {
         if (*slots) {
             moby_copy_joint_transform_to_object(self, *slots, joint, joint != 1 ? 0 : 6);
             time = (float)*(short *)(state + 0x31E);
@@ -77,7 +78,7 @@ int func_PAL_L02_003D9808(char *self, int joint) {
                 phase = (outbound * 5.0f + 2.0f) * ((float)i * 0.058333337f) - (time - ((outbound + 5.0f) * 5.0f + 2.0f) * 0.16666667f) * 1.8000001f;
                 if (phase < 0.0f) phase = 0.0f;
             }
-            vec_scale_to_length(delta, direction, phase + *(float *)((char *)g_chainblade_throw_trajectory + trajectoryOffset));
+            vec_scale_to_length(delta, direction, phase + *(float *)((char *)g_chainblade_throw_trajectory + trajectory_offset));
             FastVecAdd(*slots + 0x10, origin, delta);
             func_002A10E8(*slots);
             if (*(char **)(state + 0x300)) chainblade_free_effect_trail(*(char **)(state + 0x300));

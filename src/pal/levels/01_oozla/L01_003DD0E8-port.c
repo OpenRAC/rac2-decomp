@@ -31,28 +31,29 @@ extern void *part_find_owned_effect_slot(void *, s32, s32);
 extern void moby_set_state(void *, s32, s32);
 extern s32 ref_L01_003D9830_02 __attribute__((sda));
 
-void func_PAL_L01_003DDD18(void *arg0) {
-    s16 temp_v1;
-    u8 temp_v1_2;
-    void *temp_s1;
-    void *temp_v0;
-    void *temp_v0_2;
-    void *temp_v0_3;
+/* Sinks the platform when it is hit by an effect from a hit-class object, as long as its attached moby is idle (PAL: 50 Hz timer). */
+void platform_sink_when_hit_pal(void *moby) {
+    s16 hit_class;
+    u8 attached_state;
+    void *vars;
+    void *effect_slot;
+    void *hit_moby;
+    void *attached;
 
-    temp_s1 = (*(void **)((s8 *)(arg0) + (0x68)));
-    temp_v0 = part_find_owned_effect_slot(arg0, 1, 0);
-    if ((temp_v0 != NULL) && (temp_v0_2 = (*(void **)((s8 *)(temp_v0) + (0x20))), (temp_v0_2 != NULL))) {
-        temp_v1 = (*(s16 *)((s8 *)(temp_v0_2) + (0xAA)));
-        if ((temp_v1 == 0xB24) || (temp_v1 == 0xA54)) {
-            temp_v0_3 = (*(void **)((s8 *)(temp_s1) + (0xC8)));
-            if (temp_v0_3 != NULL) {
-                temp_v1_2 = (*(u8 *)((s8 *)(temp_v0_3) + (0x20)));
-                if ((temp_v1_2 != 1) && (temp_v1_2 != 4) && (temp_v1_2 != 5)) {
-                    (*(s32 *)((s8 *)(temp_s1) + (0xC4))) = (((s32)(ref_L01_003D9830_02) * 5 + 2) / 6);
-                    moby_set_state(arg0, 2, -1);
+    vars = (*(void **)((s8 *)(moby) + (0x68)));
+    effect_slot = part_find_owned_effect_slot(moby, 1, 0);
+    if ((effect_slot != NULL) && (hit_moby = (*(void **)((s8 *)(effect_slot) + (0x20))), (hit_moby != NULL))) {
+        hit_class = (*(s16 *)((s8 *)(hit_moby) + (0xAA)));
+        if ((hit_class == 0xB24) || (hit_class == 0xA54)) {
+            attached = (*(void **)((s8 *)(vars) + (0xC8)));
+            if (attached != NULL) {
+                attached_state = (*(u8 *)((s8 *)(attached) + (0x20)));
+                if ((attached_state != 1) && (attached_state != 4) && (attached_state != 5)) {
+                    (*(s32 *)((s8 *)(vars) + (0xC4))) = (((s32)(ref_L01_003D9830_02) * 5 + 2) / 6);
+                    moby_set_state(moby, 2, -1);
                 }
             }
         }
     }
-    (*(u8 *)((s8 *)(arg0) + (0xA8))) = 0xFF;
+    (*(u8 *)((s8 *)(moby) + (0xA8))) = 0xFF;
 }

@@ -68,6 +68,7 @@ static inline void NextFace(int *value)
     *value = *value + 1;
 }
 
+/* Draws the distorting quad faces of the blast over the screen and turns the wobble angles (PAL: same as USA v1.01). */
 void DrawQuadFaces_pal(char *object)
 {
     RenderPacket packet;

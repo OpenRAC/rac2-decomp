@@ -9,9 +9,10 @@ extern int hero_is_state_flag_set(void);
 extern int FloatToInt(float);
 extern float IntToFloat(int);
 extern int table_find_last_used_entry(int);
-extern void func_PAL_L05_004485A0(void *);
+extern void ship_start_record_playback_pal(void *);
 extern void hero_record_play_counters_pal(void);
 
+/* Applies damage to the hero: absorbed by the armor slot first, the rest taken from health (PAL). */
 void hero_apply_damage_pal(float amount)
 {
     int slot,remaining,damage;
@@ -38,7 +39,7 @@ void hero_apply_damage_pal(float amount)
         if (state[0x28/4] <= 0) {
             state[0x88/4]++;
             state[0x28/4] = 0;
-            if (*(s16 *)(g_hero_l05_moby+0x86) == 25) func_PAL_L05_004485A0(g_hero_l05_moby);
+            if (*(s16 *)(g_hero_l05_moby+0x86) == 25) ship_start_record_playback_pal(g_hero_l05_moby);
             else hero_record_play_counters_pal();
         }
     }

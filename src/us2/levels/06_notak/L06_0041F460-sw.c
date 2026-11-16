@@ -11,7 +11,7 @@ extern void actor_init_and_check_hits(char *);
 extern void actor_choose_idle_anim(char *);
 extern int math_random_int_range(int, int);
 extern int moby_dispatch_action_by_kind(char *, char *);
-extern void func_US2_002A7AA8(char *, int, int);
+extern void SetDeathBits_us2(char *, int, int);
 extern void part_queue_moby_for_glow(char *, int, int);
 extern float FastDiffRots(float, float);
 extern int *g_path_list[];
@@ -87,7 +87,7 @@ void patrol_shooter_update_us2(char *obj)
     case 3:
         hit = moby_dispatch_action_by_kind(obj, st + 0x60);
         if (hit & 1) {
-            func_US2_002A7AA8(obj, 0, 3);
+            SetDeathBits_us2(obj, 0, 3);
             part_queue_moby_for_glow(obj, 0, 0);
             return;
         }

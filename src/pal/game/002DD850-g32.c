@@ -32,15 +32,16 @@ extern char g_save_slot_screen[];
 extern void popup_set_row_pal(char *, int);
 extern void save_start_to_slot(int, int);
 extern void menu_set_confirm_pending(void);
-extern int func_PAL_002D6710(int, char *);
+extern int menu_send_request_pal(int, char *);
 extern int request_begin_slot(int, int, int, int, int);
 extern int menu_get_counter(void);
 extern int menu_get_mode(void);
 extern int snd_play_from_global_bank(int, unsigned int, void *);
-extern int func_PAL_00299518(void);
-extern int func_PAL_00299520(void);
+extern int menu_get_pending_value_pal(void);
+extern int menu_take_pending_value_pal(void);
 
-int func_PAL_002DD850(SaveMenu *menu)
+/* Save slot menu input: picks a slot with up and down, saves into an empty slot, or asks to confirm before overwriting a used one. */
+int save_slot_menu_update_pal(SaveMenu *menu)
 {
     int old;
     int buttons;
@@ -54,7 +55,7 @@ int func_PAL_002DD850(SaveMenu *menu)
     if (menu->stage == 1) {
         save_start_to_slot(menu->f48, menu->cursor);
         g_pause_menu_state.busy = 1;
-        func_PAL_00299520();
+        menu_take_pending_value_pal();
         g_pause_menu_state.delay = 0xC0D;
     }
     menu->stage = 2;
@@ -67,7 +68,7 @@ int func_PAL_002DD850(SaveMenu *menu)
         if (g_pause_menu_state.ready < 11)
             return 0;
         g_pause_menu_state.busy = 0;
-        if (g_memcard_state.f16c != 0 || g_memcard_state.f10 != 0 || func_PAL_00299518() != 0) {
+        if (g_memcard_state.f16c != 0 || g_memcard_state.f10 != 0 || menu_get_pending_value_pal() != 0) {
             g_save_menu_flags |= 0x80;
             if (g_memcard_state.f17c != 0) {
                 g_memcard_state.f17c = 0;
@@ -103,7 +104,7 @@ finish:
         return status;
     }
     if (g_save_menu_screen == 9)
-        func_PAL_002D6710(4, g_menu_panel_active ? g_save_slot_screen_alt : g_save_slot_screen);
+        menu_send_request_pal(4, g_menu_panel_active ? g_save_slot_screen_alt : g_save_slot_screen);
     else if (g_save_menu_screen != 16 && g_save_menu_screen != 1) {
         if (menu_get_counter() == 0 && menu_get_mode() == 1)
             request_begin_slot(4, 1, 1, (int)g_pause_menu_state.owner, 0);

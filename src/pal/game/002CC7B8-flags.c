@@ -42,26 +42,26 @@ extern s32 g_menu_action_callback_b;
 extern s8 g_menu_request_screen_data[];
 extern s32 g_pal_flag_words[];
 extern void select_moby_context(s32);
-extern void func_PAL_002B5570(s32);
+extern void request_set_setting_b_pal(s32);
 extern s32 request_begin_slot(s32, s32, s32, s32, s32);
-extern s32 func_PAL_002D6710(s32, s8 *);
+extern s32 menu_send_request_pal(s32, s8 *);
 
-s32 func_PAL_002CC7B8(s32 arg0) {
-    s32 r;
+s32 menu_handle_command_pal(s32 action) {
+    s32 result;
 
-    r = 0;
+    result = 0;
     {
     static void *rc2_labels[] = {&&rc2_case_0, &&rc2_case_1, &&rc2_case_2, &&rc2_case_3, &&rc2_case_4};
-    u32 rc2_selector = (u32)(arg0);
+    u32 rc2_selector = (u32)(action);
     if (rc2_selector > 4U) goto rc2_switch_end;
 goto *D_0026CCE0[rc2_selector];
 
     rc2_case_0:
         g_menu_command_flag.a = 8;
-        r = 1;
+        result = 1;
         goto rc2_switch_end;
     rc2_case_1:
-        r = 1;
+        result = 1;
         g_menu_command_flag.a = 8;
         if (g_menu_action_callback_a != 0) {
             select_moby_context(0);
@@ -70,7 +70,7 @@ goto *D_0026CCE0[rc2_selector];
         }
         goto rc2_switch_end;
     rc2_case_2:
-        r = 1;
+        result = 1;
         g_menu_command_flag.a = 8;
         if (g_menu_action_callback_b != 0) {
             select_moby_context(0);
@@ -79,17 +79,17 @@ goto *D_0026CCE0[rc2_selector];
         }
         goto rc2_switch_end;
     rc2_case_3:
-        r = func_PAL_002D6710(3, g_menu_request_screen_data);
+        result = menu_send_request_pal(3, g_menu_request_screen_data);
         goto rc2_switch_end;
     rc2_case_4:
         if (request_begin_slot(4, 2, 8, 4, 0) == 0) {
-            func_PAL_002B5570(3);
+            request_set_setting_b_pal(3);
             g_pal_flag_words[0] = 1;
-            r = 1;
+            result = 1;
         }
         goto rc2_switch_end;
     
 rc2_switch_end: ;
 }
-    return r;
+    return result;
 }

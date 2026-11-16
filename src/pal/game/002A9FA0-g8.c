@@ -4,7 +4,8 @@ extern int g_ping_pong_counter_a __attribute__((sda));
 extern int g_ping_pong_counter_b __attribute__((sda));
 extern int FastTweenColor(int, int, float);
 
-int func_PAL_002A9FA0(int first, int second, int span, int mode, int reset)
+/* Blends two colors back and forth over a time span using a shared counter (PAL: span scaled to 50 Hz). */
+int math_ping_pong_blend_values_pal(int first, int second, int span, int mode, int reset)
 {
     int *counter = &g_ping_pong_counter_b;
     int phase;

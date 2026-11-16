@@ -22,32 +22,34 @@ extern float g_cam_blend_end_rotation[4] MACRO_ADDR;
 extern float g_cam_blend_start_offset[4] MACRO_ADDR;
 extern float g_cam_blend_end_offset[4] MACRO_ADDR;
 
+/* Blends the camera smoothly from its start view to the target view over time and applies the
+ * result (PAL: 50 Hz rates). */
 void BlendCameraPose_pal(char *object)
 {
     BlendWorkspace local;
-    char *state=*(char **)(object+0x68);
-    float startAngle,endAngle,startLength,endLength,startHeight,endHeight,angle,length;
+    char *vars=*(char **)(object+0x68);
+    float start_angle,end_angle,start_length,end_length,start_height,end_height,angle,length;
     float *position;
-    if (*(int *)(state+4)==-1) return;
-    if (*(float *)(state+0x4c)<1.0f) math_step_value_toward_target((float *)(state+0x4c),1.0f,(float *)(state+0x50),0.00026640002f,0.00026640002f,0.013320001f);
-    euler_rotation_basis(local.source,state+0x20);
-    if (*(float *)(state+0x4c)<1.0f) {
-        startAngle=mat_fast_helper_a(g_cam_blend_start_offset[0],g_cam_blend_start_offset[1]);
-        endAngle=mat_fast_helper_a(g_cam_blend_end_offset[0],g_cam_blend_end_offset[1]);
-        startLength=vec_length_xy(g_cam_blend_start_offset);
-        endLength=vec_length_xy(g_cam_blend_end_offset);
-        startHeight=g_cam_blend_start_offset[2]; endHeight=g_cam_blend_end_offset[2];
-        angle=math_move_angle_toward_target(startAngle,endAngle,*(float *)(state+0x4c));
-        length=(endLength-startLength)*(*(float *)(state+0x4c))+startLength;
+    if (*(int *)(vars+4)==-1) return;
+    if (*(float *)(vars+0x4c)<1.0f) math_step_value_toward_target((float *)(vars+0x4c),1.0f,(float *)(vars+0x50),0.00026640002f,0.00026640002f,0.013320001f);
+    euler_rotation_basis(local.source,vars+0x20);
+    if (*(float *)(vars+0x4c)<1.0f) {
+        start_angle=mat_fast_helper_a(g_cam_blend_start_offset[0],g_cam_blend_start_offset[1]);
+        end_angle=mat_fast_helper_a(g_cam_blend_end_offset[0],g_cam_blend_end_offset[1]);
+        start_length=vec_length_xy(g_cam_blend_start_offset);
+        end_length=vec_length_xy(g_cam_blend_end_offset);
+        start_height=g_cam_blend_start_offset[2]; end_height=g_cam_blend_end_offset[2];
+        angle=math_move_angle_toward_target(start_angle,end_angle,*(float *)(vars+0x4c));
+        length=(end_length-start_length)*(*(float *)(vars+0x4c))+start_length;
         local.position[0]=math_fast_sin_or_cos_a(angle)*length;
         local.position[1]=math_fast_sin_or_cos_b(angle)*length;
         local.position[2]=0.0f;
-        local.position[2]=(endHeight-startHeight)*(*(float *)(state+0x4c))+startHeight;
+        local.position[2]=(end_height-start_height)*(*(float *)(vars+0x4c))+start_height;
     } else { qcopy(local.position,g_cam_blend_end_offset); }
     position=local.position;
     matrix_mul_vec3(position,position,local.source);
-    FastVecAdd(position,position,state+0x10);
-    vec_fast_normalize3(&local.quaternion,g_cam_blend_start_rotation,g_cam_blend_end_rotation,*(float *)(state+0x4c));
+    FastVecAdd(position,position,vars+0x10);
+    vec_fast_normalize3(&local.quaternion,g_cam_blend_start_rotation,g_cam_blend_end_rotation,*(float *)(vars+0x4c));
     quaternion_to_rotation_basis(&local.quaternion,local.rotation);
     mat_get_euler_angles((float *)local.rotation,(float *)&local.angles);
     object_copy_vector_to_selected(position);

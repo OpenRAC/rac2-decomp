@@ -47,6 +47,7 @@ extern void FastVecAdd(void *, void *, void *);
 #define SI(o) (*(int *)(slot + (o)))
 #define SF(o) (*(float *)(slot + (o)))
 
+/* Checks whether the hero can grab the object it is next to and, if asked, starts the grab and pushes the hero toward it. Returns 1 when a grab is possible. */
 int hero_try_grab_object_us2(int apply)
 {
     float v[4] __attribute__((aligned(16)));

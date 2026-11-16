@@ -11,16 +11,17 @@ extern u8 g_movie_seen_flags[] __attribute__((section(".sdata")));
 /* func_00347F80 is built from 00345358-wrap.c. */
 
 
-void menu_set_entry_table_pal(u8 *a0,f32 *a1) {
+/* Stores the entry table and counts its entries (until a non-positive first float), wrapping the selection if it is out of range. (PAL) */
+void menu_set_entry_table_pal(u8 *menu,f32 *records) {
  f32 *end;
- *(f32 **)(a0+0x68)=a1;
- *(s32 *)(a0+0xC0)=0;
- end=a1+0x50;
- if(a1[0]>0.0f) {
+ *(f32 **)(menu+0x68)=records;
+ *(s32 *)(menu+0xC0)=0;
+ end=records+0x50;
+ if(records[0]>0.0f) {
   do {
-   a1+=5;
-   (*(s32 *)(a0+0xC0))++;
-  } while(*a1>0.0f && (s32)a1<(s32)end);
+   records+=5;
+   (*(s32 *)(menu+0xC0))++;
+  } while(*records>0.0f && (s32)records<(s32)end);
  }
- if(*(s32 *)(a0+0x60)>=*(s32 *)(a0+0xC0)) *(s32 *)(a0+0x60)=0;
+ if(*(s32 *)(menu+0x60)>=*(s32 *)(menu+0xC0)) *(s32 *)(menu+0x60)=0;
 }

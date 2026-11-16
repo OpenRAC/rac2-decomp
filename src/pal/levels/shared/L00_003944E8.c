@@ -10,7 +10,8 @@ extern void transform_vector(void *, void *, void *);
 extern void FastVecAdd(void *, void *, void *);
 extern void func_002A10E8(void *);
 
-void func_PAL_L00_003944E8(char *parent, char *context)
+/* Places the attached child object relative to its parent: eases its height value toward 0.45 and sets its matrix and position. (PAL: 50 Hz step) */
+void tether_attach_to_parent_pal(char *parent, char *context)
 {
     Quad matrices[12];
     union { Quad quad; float f[4]; } offset;
@@ -41,15 +42,15 @@ typedef struct { int color[6]; } EffectPalette;
 extern EffectPalette g_tether_impact_palette_a, g_tether_impact_palette_b;
 extern char g_camera_l00_position[];
 extern float g_effect_fade_value_a MACRO_ADDR;
-extern void *func_PAL_002BD400(void *, int, int, float, float, float, float, float);
+extern void *part_spawn_flash_pal(void *, int, int, float, float, float, float, float);
 extern void FastVecSub(void *, void *, void *), vec_clear_128(Quad *);
 extern float FastVecLength(void *), math_random_float_range(float, float);
 extern int FloatToInt(float), math_random_int_below(s32), math_random_int_range(s32, s32);
 extern void *part_spawn_firework_spark(void *, void *, int, int, int, int, int, int, float, float);
-extern char *func_PAL_003096D0(void *, void *, void *, int, int, int, int, int, float);
+extern char *part_spawn_shockwave_ring_pal(void *, void *, void *, int, int, int, int, int, float);
 
 /* Emits the tether's impact smoke, distance-weighted sparks and colored fragments. */
-void func_PAL_L00_00394630(char *actor, int fragments) {
+void tether_spawn_impact_effects_pal(char *actor, int fragments) {
     float point[4] __attribute__((aligned(16)));
     float delta[4], velocity[4];
     EffectPalette first, second;
@@ -58,9 +59,9 @@ void func_PAL_L00_00394630(char *actor, int fragments) {
     float distance, nearPenalty, speed;
     qcopy(point, actor + 0x10);
     point[2] += 0.3f;
-    func_PAL_002BD400(point, 1, 0x40808080, 0.3f, 1.01f, 1.075f, 0.05f, 50000.0f);
+    part_spawn_flash_pal(point, 1, 0x40808080, 0.3f, 1.01f, 1.075f, 0.05f, 50000.0f);
     for (k = 0; k < 5; k++)
-        func_PAL_002BD400(point, 1, 0x40808080, 0.3f, 1.01f, 1.07f, 0.05f, 50000.0f);
+        part_spawn_flash_pal(point, 1, 0x40808080, 0.3f, 1.01f, 1.07f, 0.05f, 50000.0f);
     if (!fragments) return;
     FastVecSub(delta, g_camera_l00_position, actor + 0x10);
     vec_clear_128((Quad *)velocity);
@@ -82,12 +83,12 @@ void func_PAL_L00_00394630(char *actor, int fragments) {
                       400000.0f, speed);
     }
     if (g_effect_fade_value_a < 0.95f) {
-        func_PAL_003096D0(actor, actor + 0x10, velocity, 12, 0x7F, 0x7F, 0x7F, 0x20, 3.0f);
-        func_PAL_003096D0(actor, actor + 0x10, velocity, 20, 0x7F, 0x20, 0, 0x20, 2.0f);
+        part_spawn_shockwave_ring_pal(actor, actor + 0x10, velocity, 12, 0x7F, 0x7F, 0x7F, 0x20, 3.0f);
+        part_spawn_shockwave_ring_pal(actor, actor + 0x10, velocity, 20, 0x7F, 0x20, 0, 0x20, 2.0f);
     }
-    func_PAL_003096D0(actor, actor + 0x10, velocity, 17, 0x7F, 0x40, 0, 0x30, 3.0f);
-    func_PAL_003096D0(actor, actor + 0x10, velocity, 22, 0x60, 0x10, 0, 0x40, 2.0f);
-    func_PAL_003096D0(actor, actor + 0x10, velocity, 24, 0x20, 0, 0, 0x20, 1.0f);
+    part_spawn_shockwave_ring_pal(actor, actor + 0x10, velocity, 17, 0x7F, 0x40, 0, 0x30, 3.0f);
+    part_spawn_shockwave_ring_pal(actor, actor + 0x10, velocity, 22, 0x60, 0x10, 0, 0x40, 2.0f);
+    part_spawn_shockwave_ring_pal(actor, actor + 0x10, velocity, 24, 0x20, 0, 0, 0x20, 1.0f);
 }
 
 

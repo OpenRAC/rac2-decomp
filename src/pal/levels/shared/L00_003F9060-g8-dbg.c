@@ -15,7 +15,7 @@ extern char *level_get_slot_body(int,int);
 extern void cam_compute_view_direction(void *,void *,int);
 extern void FastVecScale(void *,void *,float);
 extern void func_PAL_L00_003F95E0(char *,char *);
-extern void func_PAL_L00_003FA3D0(char *);
+extern void vaporizer_bolt_start_trail_sample_pal(char *);
 extern float FastVecLength(void *);
 extern void vec_scale_to_length(void *,void *,float);
 extern void FastVecAdd(void *,void *,void *);
@@ -41,7 +41,7 @@ typedef struct {
     TI128 velocity, origin;
 } BoltState;
 
-char *func_PAL_L00_003F9060(char *position,char *velocity,int id,int mode)
+char *vaporizer_bolt_spawn_pal(char *position,char *velocity,int id,int mode)
 {
     TI128 direction, previous;
     char *object,*location;
@@ -78,7 +78,7 @@ char *func_PAL_L00_003F9060(char *position,char *velocity,int id,int mode)
         if (g_vaporizer_bolt_slot_counter > 3) g_vaporizer_bolt_slot_counter=0;
         state->slot=g_vaporizer_bolt_slot_counter;
         g_vaporizer_bolt_slot_counter=((int)(g_vaporizer_bolt_slot_counter+1))%3;
-        func_PAL_L00_003FA3D0(object);
+        vaporizer_bolt_start_trail_sample_pal(object);
         if (mode == 1) {
             qcopy(&state->origin,g_camera_l00_position);
             vec_scale_to_length(&state->velocity,g_camera_l00_position + 0x230,FastVecLength(velocity));

@@ -12,7 +12,7 @@ extern void vec_scale_to_length(void *, void *, float);
 extern int FloatToInt(float);
 extern int math_random_int_below(int);
 extern char *part_spawn_firework_spark(void *, void *, int, int, float, int, int, float, int, int);
-extern char *func_PAL_003096D0(void *, void *, void *, float, int, int, int, int, int);
+extern char *part_spawn_shockwave_ring_pal(void *, void *, void *, float, int, int, int, int, int);
 extern int PlayMobySound(int, int, void *);
 extern char *moby_spawn_template_effect(void *, void *, int, int);
 typedef struct { int colors[6]; } __attribute__((packed)) BurstColors;
@@ -41,8 +41,8 @@ typedef struct { char unknown[32]; float scale[3]; } BlastEffect;
 extern BlastEffect g_blast_effect_a, g_blast_effect_b;
 extern void part_init_effect_record(void *, void *, int, float);
 extern int coll_process_hit(float, void *, int, void *, void *);
-extern void *func_PAL_002BD790(void *, void *, int, int, float, int, int, int, int, int);
-extern void *func_PAL_003098C8(void *, void *, int, int, int);
+extern void *part_spawn_spark_pal(void *, void *, int, int, float, int, int, int, int, int);
+extern void *part_spawn_spinning_debris_pal(void *, void *, int, int, int);
 extern void FastVecAdd(void *, void *, void *);
 extern void vec_fast_divide_helper(void *, void *, float);
 extern void part_spawn_color_blend(void *, void *, int, int, int, float);
@@ -50,6 +50,7 @@ extern int math_fast_helper_a(void *, float);
 extern float IntToFloat(int);
 extern void vec_build_spherical_offset(void *, float, float, float);
 
+/* Creates an explosion at a position with sparks, flashes, smoke, debris, damage, camera shake and sound (PAL). */
 void SpawnExplosionEffects_pal(char *owner, void *direction, float *position,
     float radius, float damage, int sparks, int flashes, int smoke,
     float glow, float white, float cutoff, float scale, int sound, float blast,
@@ -91,7 +92,7 @@ void SpawnExplosionEffects_pal(char *owner, void *direction, float *position,
                 c1 = gfx_swap_packed_color_channels(0x4F007FFF, channels);
                 c2 = gfx_swap_packed_color_channels(0x1F00007F, channels);
                 life = math_random_int_range(50, 100);
-                func_PAL_002BD790(position, vector, c1, c2, scale * 40000.0f, life - quality * 10, 1, -1, -1, 0);
+                part_spawn_spark_pal(position, vector, c1, c2, scale * 40000.0f, life - quality * 10, 1, -1, -1, 0);
             }
         }
     }
@@ -112,7 +113,7 @@ void SpawnExplosionEffects_pal(char *owner, void *direction, float *position,
                 vec_scale_to_length(delta, delta, (distance + distance) * 0.020000001f);
                 FastVecAdd(v.vector, v.vector, delta);
                 vec_fast_divide_helper(v.vector, v.vector, 0.20000002f);
-                func_PAL_003098C8(position, v.vector, math_random_int_range(50, 75), 0, 0);
+                part_spawn_spinning_debris_pal(position, v.vector, math_random_int_range(50, 75), 0, 0);
             }
             debris--;
             for (i = 0; i < debris; i++) {
@@ -132,7 +133,7 @@ void SpawnExplosionEffects_pal(char *owner, void *direction, float *position,
                     if (rem == 0) special = one;
                 }
                 life = math_random_int_range(50, 75);
-                func_PAL_003098C8(position, v.random, life, special, 0);
+                part_spawn_spinning_debris_pal(position, v.random, life, special, 0);
             }
         }
     }
@@ -204,12 +205,12 @@ void SpawnExplosionEffects_pal(char *owner, void *direction, float *position,
             else { r = 35; g = 0; b = 250; r2 = 32; g2 = 0; b2 = 100; }
         }
         if (g_frame_time_scale[0] < 0.949999988079071f && cutoff < distance) {
-            func_PAL_003096D0(owner, position, drift, glow, 13, r, g, b, 32);
-            func_PAL_003096D0(owner, position, drift, glow, 18, r2 & 255, g2 & 255, b2 + 80, 32);
+            part_spawn_shockwave_ring_pal(owner, position, drift, glow, 13, r, g, b, 32);
+            part_spawn_shockwave_ring_pal(owner, position, drift, glow, 18, r2 & 255, g2 & 255, b2 + 80, 32);
         }
-        func_PAL_003096D0(owner, position, drift, glow, 25, r2 & 255, g2 & 255, b2, 48);
+        part_spawn_shockwave_ring_pal(owner, position, drift, glow, 25, r2 & 255, g2 & 255, b2, 48);
     }
-    if (owner && white > 0.0f) func_PAL_003096D0(owner, position, drift, white, 22, 255, 255, 255, 32);
+    if (owner && white > 0.0f) part_spawn_shockwave_ring_pal(owner, position, drift, white, 22, 255, 255, 255, 32);
     if (shake) {
         {
             float vector[4];

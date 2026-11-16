@@ -45,7 +45,7 @@ extern u32 g_frame_counter[] __attribute__((sda));
 extern int g_current_map_index;
 extern int g_frame_l03_counter __attribute__((nosda));
 /* The published map identifies the persistent save block at this base. */
-typedef struct { u8 pad00[0x12]; u8 field12; u8 pad13[0xFA]; u8 mapDataSet; u8 pad10E[0xD804 - 0x10E]; } PlayerProgress;
+typedef struct { u8 pad00[0x12]; u8 field12; u8 pad13[0xFA]; u8 map_data_set; u8 pad10E[0xD804 - 0x10E]; } PlayerProgress;
 extern PlayerProgress g_player_bolts __attribute__((sda));
 extern u8 g_help_voice_suppress_flags[] __attribute__((sda));
 extern void state_set_flag_one(void);
@@ -59,25 +59,27 @@ extern int req_launch_queued(void *);
 extern void game_set_stored_value_pair(void *,void *);
 extern void endako_boss_start_area_objects_pal(void *);
 extern int math_fast_float_d(void *);
-extern int func_PAL_00289730(int,int);
+extern int subtitle_request_voice_line_pal(int,int);
 extern void subtitle_begin_close(void);
-extern void func_PAL_L01_002EBFB8(int,int,int,int,int);
+extern void trigger_subtitle_in_cuboid_pal(int,int,int,int,int);
 extern float fast_vec_dist(void *,void *);
 extern int level_count_active_entries(void);
 extern void gfx_add_draw_callback_first(void *,void *);
 extern void blast_call_helper_no_args(void *);
 #define I(p,n) (*(int *)((p)+(n)))
-void func_PAL_L03_003F5090(u8 *entity) {
+/* Endako help voice: on start, sets up the area objects; each frame, plays the right help line
+   when the hero is in one of the trigger boxes, with the timing limits scaled for 50 Hz. */
+void endako_help_voice_update_pal(u8 *entity) {
     u8 *state = *(u8 **)(entity+0x68);
     int mode = entity[0x20];
-    u16 *p;
+    u16 *id_list;
     u8 *record;
     union { float f[4]; unsigned int q __attribute__((mode(TI))); } point;
     switch (mode) {
     case 0:
         entity[0x30] = 0xFF;
         I(state,0x74) = 0;
-        if (g_player_bolts.mapDataSet) {
+        if (g_player_bolts.map_data_set) {
             if (!g_game_flag_table.bytes[0xD]) {
                 u8 *entry;
                 state_set_flag_one();
@@ -85,11 +87,11 @@ void func_PAL_L03_003F5090(u8 *entity) {
                 hero_reset_position_and_direction_pal(entry+0x30,entry+0x70,0,1);
                 moby_handle_request_slot_state(13);
             }
-            if (g_player_bolts.mapDataSet) {
-                for(p=g_entity_id_lists[I(state,0x80)];
-                    (I(state,0x80)&255)!=255 && I(state,0x80)<=g_object_group_count && p &&
-                    ((p != 0 && (short)p[-1]>=0) || p==g_entity_id_lists[I(state,0x80)]); p++) {
-                    record = g_moby_record_base[0] + ((*p&0x7fff)<<8);
+            if (g_player_bolts.map_data_set) {
+                for(id_list=g_entity_id_lists[I(state,0x80)];
+                    (I(state,0x80)&255)!=255 && I(state,0x80)<=g_object_group_count && id_list &&
+                    ((id_list != 0 && (short)id_list[-1]>=0) || id_list==g_entity_id_lists[I(state,0x80)]); id_list++) {
+                    record = g_moby_record_base[0] + ((*id_list&0x7fff)<<8);
                     if(!record) break;
                     moby_mark_spawned(record);
                 }
@@ -107,7 +109,7 @@ void func_PAL_L03_003F5090(u8 *entity) {
         }
         if (!g_hero_state.field22B4 && IsPointInCuboid(g_hero_state.position,I(state,8))) {
             if (math_fast_float_d(state+0x60)) {
-                func_PAL_00289730(0x9CB,0x22);
+                subtitle_request_voice_line_pal(0x9CB,0x22);
                 I(state,0x60)=500;
             }
         } else if (IsPointInCuboid(g_hero_state.position,I(state,0xC))) {
@@ -121,7 +123,7 @@ void func_PAL_L03_003F5090(u8 *entity) {
         if(IsPointInCuboid(g_hero_state.position,I(state,0x10)) && !g_help_voice_state.active && g_help_voice_state.key==-1) {
             u32 prev = g_subtitle_history[35].time;
             if (((s32)g_frame_counter[0] * 5 + 2) / 6 - prev > 100) {
-                func_PAL_00289730(0x9CC,0x23);
+                subtitle_request_voice_line_pal(0x9CC,0x23);
                 if (g_subtitle_history[35].time < ((s32)g_frame_counter[0] * 5 + 2) / 6) g_subtitle_history[35].time = ((s32)g_frame_counter[0] * 5 + 2) / 6;
             } else {
                 if (prev < ((s32)g_frame_counter[0] * 5 + 2) / 6) g_subtitle_history[35].time = ((s32)g_frame_counter[0] * 5 + 2) / 6;
@@ -133,7 +135,7 @@ void func_PAL_L03_003F5090(u8 *entity) {
             }
         }
         if(IsPointInCuboid(g_hero_state.position,I(state,0x18))) {
-            if(((s32)g_frame_counter[0] * 5 + 2) / 6-g_subtitle_history[36].time>2000) func_PAL_00289730(0x9CD,0x24);
+            if(((s32)g_frame_counter[0] * 5 + 2) / 6-g_subtitle_history[36].time>2000) subtitle_request_voice_line_pal(0x9CD,0x24);
         } else if(IsPointInCuboid(g_hero_state.position,I(state,0x1C))) {
             g_game_flag_table.bytes[0xA2]=1;
             g_subtitle_history[36].count=65535;
@@ -141,20 +143,20 @@ void func_PAL_L03_003F5090(u8 *entity) {
         }
         if(IsPointInCuboid(g_hero_state.position,I(state,0x64)) && !g_subtitle_history[123].count) {
             g_game_flag_table.bytes[0xA2]=1;
-            func_PAL_00289730(0xA24,0x7B);
+            subtitle_request_voice_line_pal(0xA24,0x7B);
         }
-        func_PAL_L01_002EBFB8(0x9D3,0x2A,0,I(state,0x20),-1);
+        trigger_subtitle_in_cuboid_pal(0x9D3,0x2A,0,I(state,0x20),-1);
         if(IsPointInCuboid(g_hero_state.position,I(state,0x24)) && ((g_game_flag_table.bytes[0x78] ^ 1) & 1)) {
             u32 prev=g_subtitle_history[131].time;
-            if(((s32)g_frame_counter[0] * 5 + 2) / 6-prev>900 || !prev) func_PAL_00289730(0xA2C,0x83);
+            if(((s32)g_frame_counter[0] * 5 + 2) / 6-prev>900 || !prev) subtitle_request_voice_line_pal(0xA2C,0x83);
             else if(prev<((s32)g_frame_counter[0] * 5 + 2) / 6) g_subtitle_history[131].time=((s32)g_frame_counter[0] * 5 + 2) / 6;
         }
-        func_PAL_L01_002EBFB8(0x9D5,0x2C,0,I(state,0x40),-1);
-        func_PAL_L01_002EBFB8(0x9E5,0x3C,2,I(state,0x54),-1);
+        trigger_subtitle_in_cuboid_pal(0x9D5,0x2C,0,I(state,0x40),-1);
+        trigger_subtitle_in_cuboid_pal(0x9E5,0x3C,2,I(state,0x54),-1);
         if(IsPointInCuboid(g_hero_state.position,I(state,0x2C))) g_subtitle_history[43].count=65535;
         else if(IsPointInCuboid(g_hero_state.position,I(state,0x28))) {
             if(g_hero_state.field2294==0x23 && g_hero_state.field1B8==1) ++I(state,0x30);
-            if(I(state,0x30)>=3 && g_hero_state.field2294==0x23) func_PAL_00289730(0x9D4,0x2B);
+            if(I(state,0x30)>=3 && g_hero_state.field2294==0x23) subtitle_request_voice_line_pal(0x9D4,0x2B);
         }
         if(g_hero_state.position[2]<155.5f) {
             point.q = 0;
@@ -163,24 +165,24 @@ void func_PAL_L03_003F5090(u8 *entity) {
             point.f[2]=155.0f;
             if(fast_vec_dist(g_hero_state.position,point.f)<24.0f) g_subtitle_history[37].time=0;
         }
-        func_PAL_L01_002EBFB8(0x9CE,0x25,1,I(state,0x28),I(state,0x2C));
-        func_PAL_L01_002EBFB8(0x9CE,0x25,3,I(state,0x28),I(state,0x2C));
+        trigger_subtitle_in_cuboid_pal(0x9CE,0x25,1,I(state,0x28),I(state,0x2C));
+        trigger_subtitle_in_cuboid_pal(0x9CE,0x25,3,I(state,0x28),I(state,0x2C));
         if(IsPointInCuboid(g_hero_state.position,I(state,0x7C))) {
             if(!g_progress_statistics.fieldF0 || ((s32)g_frame_counter[0] * 5 + 2) / 6-g_progress_statistics.fieldF4>60000) {
                 u32 seen = g_subtitle_history[32].levels & (1 << g_current_map_index);
-                if (!seen) func_PAL_00289730(0x9C9,0x20);
+                if (!seen) subtitle_request_voice_line_pal(0x9C9,0x20);
             }
         }
         if(!g_player_bolts.field12 && g_frame_l03_counter>0 && !(g_frame_l03_counter&0x7F) && !g_help_voice_suppress_flags[0] && !level_count_active_entries()) {
             u32 count = g_subtitle_history[138].count;
             if (count < 3) {
-                if (!count && IsPointInCuboid(g_hero_state.position,I(state,0x78))) func_PAL_00289730(0xA33,0x8A);
-                else if (((s32)g_frame_counter[0] * 5 + 2) / 6 - g_subtitle_history[138].time > 30000) func_PAL_00289730(0xA33,0x8A);
+                if (!count && IsPointInCuboid(g_hero_state.position,I(state,0x78))) subtitle_request_voice_line_pal(0xA33,0x8A);
+                else if (((s32)g_frame_counter[0] * 5 + 2) / 6 - g_subtitle_history[138].time > 30000) subtitle_request_voice_line_pal(0xA33,0x8A);
             }
         }
         if(((s32)g_frame_counter[0] * 5 + 2) / 6-g_progress_statistics.field70>90000 && IsPointInCuboid(g_hero_state.position,I(state,0x78))) {
             u32 seen = g_subtitle_history[12].levels & (1 << g_current_map_index);
-            if (!seen) func_PAL_00289730(0x9B5,0xC);
+            if (!seen) subtitle_request_voice_line_pal(0x9B5,0xC);
         }
         break;
     }

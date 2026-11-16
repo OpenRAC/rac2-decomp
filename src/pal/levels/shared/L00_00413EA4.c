@@ -21,7 +21,7 @@
 /* Reads the halfword at +0x1A of the object's node and grades it: 4 at or above 90, 3 above 60,
    2 above 30, else 1. The two lower bounds stay in variables, which is what keeps them in
    registers instead of an immediate compare. */
-int func_PAL_L00_00415648(char *object)
+int object_value_to_grade_pal(char *object)
 {
     int value = *(short *)(*(int *)(object + 0x68) + 0x1A);
     int upper = 0x32;

@@ -50,7 +50,7 @@ extern void *part_spawn_hero_relative(void *, void *, int, int, int, int, float)
    two-layer ribbon (func_L00_002EBE88) with the two colours faded by +0xC, and while
    D_L02_001A8F00 is zero a spark of the second kind is thrown from a random point on a random
    segment, falling at a speed drawn between the last two range words. */
-void func_PAL_L02_004176A8(u8 *a0) {
+void beam_draw_wavy_to_target_pal(u8 *moby) {
     SparkRange range = g_spark_l02_range_2;
     SparkSizes sizes = g_spark_sizes;
     SparkColours colours = g_spark_colours;
@@ -78,25 +78,25 @@ void func_PAL_L02_004176A8(u8 *a0) {
     amp = 1.0f;
     *(TI128 *)&front = 0;
     front.z = 1.5f;
-    state = *(u8 **)(a0 + 0x68);
-    matrix_mul_vec3(&front, &front, a0 + 0xC0);
-    FastVecAdd(&front, &front, a0 + 0x10);
+    state = *(u8 **)(moby + 0x68);
+    matrix_mul_vec3(&front, &front, moby + 0xC0);
+    FastVecAdd(&front, &front, moby + 0x10);
     FastVecSub(&delta, g_matrix_l02_record_table + (*(s32 *)state << 7) + 0x30, &front);
     FastVecScale(&delta, &delta, amp / IntToFloat(12));
     qcopy(&pts[0], &front);
     for (i = 0; i < 12; i++) {
-        Vec4 *p = &pts[i + 1];
+        Vec4 *next = &pts[i + 1];
 
-        FastVecAdd(p, &pts[i], &delta);
-        p->w = widths.f[0];
+        FastVecAdd(next, &pts[i], &delta);
+        next->w = widths.f[0];
     }
     phase = *(float *)(state + 0x14);
     step = 1.0f / IntToFloat(13) * 3.1415927f;
     for (j = 1; j < 13; j++) {
-        Vec4 *q = &pts[j];
+        Vec4 *point = &pts[j];
 
         t = math_fast_sin_or_cos_b(phase);
-        q->z += amp * t * math_fast_sin_or_cos_b((float)j * step);
+        point->z += amp * t * math_fast_sin_or_cos_b((float)j * step);
         phase = FastAddRotations(phase, step + step);
     }
     col0 = FastTweenColor(beam.rgba[0] & 0xFFFFFF, beam.rgba[0], *(float *)(state + 0xC));

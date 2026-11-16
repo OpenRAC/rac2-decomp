@@ -22,7 +22,7 @@ extern void moby_update_color_scale(char *);
 extern void vec_scale_to_length(void *, void *, float);
 extern int CollLine(void *, void *, int, void *, void *);
 extern void part_l00_spawn_spark_burst_3_pal(void *, int, int);
-extern int func_PAL_00335DD0(void *, int, int);
+extern int weapon_start_health_drain_pal(void *, int, int);
 extern int PlayMobySound(int, int, char *);
 extern int math_fast_float_d(void *);
 extern void part_spawn_small_spark_spray_pal(void *);
@@ -46,12 +46,13 @@ extern unsigned char *g_effect_param_pointer_a;
 extern int g_frame_l00_counter __attribute__((sda));
 extern char glowing_trail_update[];
 
-void UpdateHomingMissile_pal(char *obj)
+/* Per-frame update of the homing missile. It steers toward its target, flies forward, damages what it hits, leaves a smoke trail, then explodes and removes itself (PAL: 50 Hz timings). */
+void UpdateHomingMissile_pal(char *missile)
 {
     float scratch[4], previous[4], delta[4], temp[4];
     unsigned char hit[48];
     float particle[4];
-    char *state = *(char **)(obj + 0x68);
+    char *state = *(char **)(missile + 0x68);
     char *target;
     char *info;
     char *p;
@@ -61,11 +62,11 @@ void UpdateHomingMissile_pal(char *obj)
 
     if (!save_is_record_value(*(int *)(state + 0x18), *(int *)(state + 0x14))) {
         table_clear_entry_flag(*(int *)(state + 0x34));
-        moby_mark_spawned(obj);
+        moby_mark_spawned(missile);
         return;
     }
-    cam_compute_view_direction(obj + 0x10, scratch, 1);
-    qcopy(previous, obj + 0x10);
+    cam_compute_view_direction(missile + 0x10, scratch, 1);
+    qcopy(previous, missile + 0x10);
     target = *(char **)(state + 0x1C);
     if (target) {
         if (*(unsigned char *)(target + 0x20) == 0xFE) goto clear_target;
@@ -73,7 +74,7 @@ void UpdateHomingMissile_pal(char *obj)
         if (coll_is_living_hittable_target(target)) goto clear_target;
         {
             { float *t = delta;
-            FastVecSub(t, *(char **)(state + 0x1C) + 0x10, obj + 0x10);
+            FastVecSub(t, *(char **)(state + 0x1C) + 0x10, missile + 0x10);
             tracking_delta = t;
             info = moby_get_private_value_0(*(char **)(state + 0x1C));
             if (info) {
@@ -96,50 +97,50 @@ void UpdateHomingMissile_pal(char *obj)
 clear_target:
     *(char **)(state + 0x1C) = 0;
 target_done:
-    switch (*(unsigned char *)(obj + 0x20)) {
+    switch (*(unsigned char *)(missile + 0x20)) {
     case 0:
         part_steer_effect_direction(*(int *)(state + 0x34), state + 0x20, 0);
-        FastVecAdd(obj + 0x10, obj + 0x10, state + 0x20);
-        vec_transform_or_copy(obj + 0x10, obj + 0x10);
-        *(float *)(obj + 0xF0) = FastAddRotations(*(float *)(obj + 0xF0), *(float *)(state + 0x44));
-        *(float *)(obj + 0xF4) = FastAddRotations(*(float *)(obj + 0xF4), *(float *)(state + 0x48));
-        *(float *)(obj + 0xF8) = FastAddRotations(*(float *)(obj + 0xF8), *(float *)(state + 0x4C));
-        moby_update_color_scale(obj);
-        *(char **)(hit + 0x10) = obj;
+        FastVecAdd(missile + 0x10, missile + 0x10, state + 0x20);
+        vec_transform_or_copy(missile + 0x10, missile + 0x10);
+        *(float *)(missile + 0xF0) = FastAddRotations(*(float *)(missile + 0xF0), *(float *)(state + 0x44));
+        *(float *)(missile + 0xF4) = FastAddRotations(*(float *)(missile + 0xF4), *(float *)(state + 0x48));
+        *(float *)(missile + 0xF8) = FastAddRotations(*(float *)(missile + 0xF8), *(float *)(state + 0x4C));
+        moby_update_color_scale(missile);
+        *(char **)(hit + 0x10) = missile;
         *(int *)(hit + 0x14) = 0x10000;
         *(float *)(hit + 0x1C) = ((B2510Entry *)((unsigned char)g_item_slot_to_record[0x1E] * 0xE0 + (char *)g_weapon_l00_table))->value;
         *(int *)(hit + 0x20) = 1;
         qcopy(hit, state + 0x20);
         vec_scale_to_length(hit, hit, 1.0f);
         *(float *)(hit + 0xC) = 5627.925f;
-        *(short *)(hit + 0x1A) = *(unsigned short *)(obj + 0xAA);
+        *(short *)(hit + 0x1A) = *(unsigned short *)(missile + 0xAA);
         hit[0x18] = 1;
         hit[0x19] = 1;
-        if (CollLine(previous, obj + 0x10, 0, g_hero_moby, hit)) {
+        if (CollLine(previous, missile + 0x10, 0, g_hero_moby, hit)) {
             if (!g_collision_result.target) part_l00_spawn_spark_burst_3_pal(g_collision_result.position, 15, 0);
             else if (*(int *)(g_collision_result.target + 0x98)) {
                 part_l00_spawn_spark_burst_3_pal(g_collision_result.position, 10, 1);
-                func_PAL_00335DD0(g_collision_result.target, 0x1E, *(int *)(obj + 0xB8));
+                weapon_start_health_drain_pal(g_collision_result.target, 0x1E, *(int *)(missile + 0xB8));
             }
-            PlayMobySound(0, 0, obj);
-            *(unsigned char *)(obj + 0x20) = 1;
+            PlayMobySound(0, 0, missile);
+            *(unsigned char *)(missile + 0x20) = 1;
             *(char **)(state + 0x1C) = 0;
-            *(unsigned short *)(obj + 0x34) |= 0x41;
+            *(unsigned short *)(missile + 0x34) |= 0x41;
             *(int *)(state + 0x38) = 5;
         } else if (math_fast_float_d(state + 0x38)) {
-            part_spawn_small_spark_spray_pal(obj + 0x10);
-            *(unsigned char *)(obj + 0x20) = 1;
+            part_spawn_small_spark_spray_pal(missile + 0x10);
+            *(unsigned char *)(missile + 0x20) = 1;
             *(char **)(state + 0x1C) = 0;
-            *(unsigned short *)(obj + 0x34) |= 0x41;
+            *(unsigned short *)(missile + 0x34) |= 0x41;
             *(int *)(state + 0x38) = 5;
         }
         work = math_random_int_below(255);
-        p = part_spawn_gravity_fade(obj + 0x10, g_default_vector, 2, 0x202080, work, 64, 16, 420000.0f, 420000.0f, 0.0f, 1);
+        p = part_spawn_gravity_fade(missile + 0x10, g_default_vector, 2, 0x202080, work, 64, 16, 420000.0f, 420000.0f, 0.0f, 1);
         if (p) p[2] = *g_effect_param_pointer_b;
-        p = part_spawn_gravity_fade(obj + 0x10, g_default_vector, 2, 0x202080, (work + 128) % 255, 64, 16, 420000.0f, 420000.0f, 0.0f, 1);
+        p = part_spawn_gravity_fade(missile + 0x10, g_default_vector, 2, 0x202080, (work + 128) % 255, 64, 16, 420000.0f, 420000.0f, 0.0f, 1);
         if (p) p[2] = *g_effect_param_pointer_b;
         work = (int)delta;
-        FastVecSub((void *)work, obj + 0x10, previous);
+        FastVecSub((void *)work, missile + 0x10, previous);
         FastVecScale((char *)work, (char *)work, 0.2f);
         qcopy(temp, previous);
         tracking_delta = (float *)work;
@@ -153,24 +154,24 @@ target_done:
             FastVecAdd(temp, temp, tracking_delta);
         }
         if (g_frame_l00_counter % 10 == 0) {
-            p = part_spawn_gravity_fade(obj + 0x10, g_default_vector, 25, 0x202080, 0, 32, 0, 2100.0f, 420000.0f, 0.0f, 1);
+            p = part_spawn_gravity_fade(missile + 0x10, g_default_vector, 25, 0x202080, 0, 32, 0, 2100.0f, 420000.0f, 0.0f, 1);
             if (p) p[2] = *g_effect_param_pointer_a;
         }
-        ref_L00_003E2510_00(glowing_trail_update, obj);
+        ref_L00_003E2510_00(glowing_trail_update, missile);
         break;
     case 1:
         if (math_fast_float_d(state + 0x38)) {
             table_clear_entry_flag(*(int *)(state + 0x34));
-            moby_mark_spawned(obj);
+            moby_mark_spawned(missile);
             return;
         }
-        ref_L00_003E2510_00(glowing_trail_update, obj);
+        ref_L00_003E2510_00(glowing_trail_update, missile);
         break;
     }
-    if (*(float *)(obj + 0x10) < 2.0f || *(float *)(obj + 0x10) > 1021.0f ||
-        *(float *)(obj + 0x14) < 2.0f || *(float *)(obj + 0x14) > 1021.0f ||
-        *(float *)(obj + 0x18) < 2.0f || *(float *)(obj + 0x18) > 1021.0f) {
+    if (*(float *)(missile + 0x10) < 2.0f || *(float *)(missile + 0x10) > 1021.0f ||
+        *(float *)(missile + 0x14) < 2.0f || *(float *)(missile + 0x14) > 1021.0f ||
+        *(float *)(missile + 0x18) < 2.0f || *(float *)(missile + 0x18) > 1021.0f) {
         table_clear_entry_flag(*(int *)(state + 0x34));
-        moby_mark_spawned(obj);
+        moby_mark_spawned(missile);
     }
 }

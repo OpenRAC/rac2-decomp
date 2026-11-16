@@ -10,9 +10,9 @@ extern void UpdateViewContext(void);
 extern unsigned char g_display_mode_flag;
 
 /* func_PAL_0033E160, the PAL copy of func_0033C2D8: the same C, with the three-string setup added. */
-int func_PAL_0033E160(char *object, int mask)
+int onoff_menu_update_pal(char *object, int mask)
 {
-    float *v;
+    float *position;
     char *child;
     char *text, *second;
 
@@ -21,8 +21,8 @@ int func_PAL_0033E160(char *object, int mask)
     second = GetLocalizedString(0xB5F);
     prompt_bar_set_texts_pal(child, text, second, GetLocalizedString(0xB60));
     prompt_bar_update_pal(child);
-    v = *(float **)(object + 0x2DC);
-    menu_set_anchor_pos(child, v[0], v[1]);
+    position = *(float **)(object + 0x2DC);
+    menu_set_anchor_pos(child, position[0], position[1]);
     if ((mask & 0x40) != 0 && *(int *)(object + 0x2D8) == 0) {
         g_display_mode_flag = g_display_mode_flag == 0;
         snd_play_from_global_bank(4, 0, 0);

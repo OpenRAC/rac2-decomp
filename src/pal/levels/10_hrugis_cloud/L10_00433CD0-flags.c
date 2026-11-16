@@ -10,7 +10,9 @@ extern char *g_tether_l10_hit_result NOT_SDA;
 extern char *g_cloud_boss_actor __attribute__((sda));
 extern Vector4 g_probe_hit_vector;
 
-void func_PAL_L10_004342B0(char *object)
+/* Tests the cloud object against a point; on a hit it gets a velocity, toward the boss for a class 0xFBF
+   hit, otherwise bounced from the hit vector. */
+void cloud_object_bounce_velocity_pal(char *object)
 {
     Vector4 direction;
     char *work=FIELD(char *,object,0x68),*hit;

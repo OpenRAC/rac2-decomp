@@ -24,56 +24,56 @@ extern void vec_transform_or_copy(void *, void *);
    the hero's and the partner's distances to the camera becomes the hero's distance alone. */
 /* Camera follow step for a target object: aims at a point offset from the target and
    adjusts the orbit by the hero's distance; returns 0 on the easing path, else 1. */
-int func_US2_L00_00429510(char *self, char *target)
+int cam_follow_update_target_us2(char *camera_moby, char *target)
 {
     V4_F428000 offset, pos;
-    char *cam = *(char **)(self + 0x70);
-    float *orbit = (float *)(cam + 0x64);
-    char *info;
+    char *camera = *(char **)(camera_moby + 0x70);
+    float *orbit = (float *)(camera + 0x64);
+    char *follow_info;
     float angle;
-    float d;
+    float distance;
 
-    *(char **)(cam + 0xF4) = target;
+    *(char **)(camera + 0xF4) = target;
     if (target != 0) {
         offset.q = 0;
         offset.f[0] = g_cam_target_offset[0];
         offset.f[2] = 0.12f;
-        info = *(char **)(target + 0x68);
+        follow_info = *(char **)(target + 0x68);
         matrix_mul_vec3(&offset, &offset, target + 0xC0);
         FastVecAdd(&pos, target + 0x10, &offset);
-        if (*(int *)(info + 0x10) == -1) {
-            vec_copy5_blend_first(orbit, self + 0x50, 0.0f);
+        if (*(int *)(follow_info + 0x10) == -1) {
+            vec_copy5_blend_first(orbit, camera_moby + 0x50, 0.0f);
             orbit[2] = 6.0f;
             orbit[1] = orbit[3];
             orbit[3] = 0.0f;
-            cam_set_target_and_weight(self, orbit, 0.0f, &pos);
+            cam_set_target_and_weight(camera_moby, orbit, 0.0f, &pos);
         }
-        if (*(int *)(info + 0x10) <= 0) {
-            *(float *)(cam + 0xAC) = FastAddRotations(*(float *)(cam + 0xAC), *(float *)(info + 0x18));
-            *(float *)(info + 0x18) *= 0.97f;
+        if (*(int *)(follow_info + 0x10) <= 0) {
+            *(float *)(camera + 0xAC) = FastAddRotations(*(float *)(camera + 0xAC), *(float *)(follow_info + 0x18));
+            *(float *)(follow_info + 0x18) *= 0.97f;
             angle = FastDiffRots(mat_fast_helper_a(g_scalar_transition_state.pos.f[0] - g_hero_state.pos.f[0],
                                                 g_scalar_transition_state.pos.f[1] - g_hero_state.pos.f[1]),
                                   g_scalar_transition_state.yaw);
-            d = vec_distance_xy(&g_hero_state.pos, &g_scalar_transition_state.pos);
-            if (d < 0.77f) {
+            distance = vec_distance_xy(&g_hero_state.pos, &g_scalar_transition_state.pos);
+            if (distance < 0.77f) {
                 if (angle < 1.5707965f) {
-                    *(float *)(cam + 0x1C) -= 0.7f - d;
-                    *(int *)(info + 4) = 0;
+                    *(float *)(camera + 0x1C) -= 0.7f - distance;
+                    *(int *)(follow_info + 4) = 0;
                 } else {
-                    *(float *)(cam + 0x1C) += 0.7f - d;
+                    *(float *)(camera + 0x1C) += 0.7f - distance;
                 }
             } else {
-                *(float *)(cam + 0x1C) += *(float *)(info + 4);
-                *(float *)(info + 4) *= 0.97f;
+                *(float *)(camera + 0x1C) += *(float *)(follow_info + 4);
+                *(float *)(follow_info + 4) *= 0.97f;
             }
-            qcopy(cam + 0x80, &pos);
-            vec_transform_or_copy(cam + 0x80, cam + 0x80);
+            qcopy(camera + 0x80, &pos);
+            vec_transform_or_copy(camera + 0x80, camera + 0x80);
             return 0;
         }
-        *(float *)(cam + 0xAC) = *(float *)(target + 0xF0) * 0.5f;
-        *(float *)(cam + 0x20) += (*(float *)(target + 0xF4) - *(float *)(cam + 0x20)) * 0.05f;
-        qcopy(cam + 0x80, &pos);
-        qcopy(cam + 0xC0, target + 0xF0);
+        *(float *)(camera + 0xAC) = *(float *)(target + 0xF0) * 0.5f;
+        *(float *)(camera + 0x20) += (*(float *)(target + 0xF4) - *(float *)(camera + 0x20)) * 0.05f;
+        qcopy(camera + 0x80, &pos);
+        qcopy(camera + 0xC0, target + 0xF0);
     }
     return 1;
 }

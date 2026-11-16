@@ -33,12 +33,13 @@ extern int help_start_entry(int);
 extern void script_queue_hint_for_event(int);
 extern void set_animation_parameter(int, int);
 extern void level_forward_pair(int, int);
-extern void func_US2_002FC008(void);
+extern void PrepareVendorSelectionPreview_us2(void);
 #define ITEM (D_00239BA0[D_00139568[D_0021F240.rows[D_0021F240.index].item]])
 #define ROW (D_0021F240.rows[D_0021F240.index])
 #define BUTTONS (D_00138180.buttons)
 extern int ref_US2_002F97A8_00(int, int);
 
+/* Runs the buy dialog in the vendor screen: works out how many the player can afford, reads the buttons, and completes or cancels the purchase (USA v2.00). */
 void VendorPurchaseDialogUpdate_us2(int *cancel, int *confirm)
 {
     PurchaseItem result;
@@ -171,6 +172,6 @@ void VendorPurchaseDialogUpdate_us2(int *cancel, int *confirm)
             }
         } else PlayMobySound(0, 17, g_vendor_menu_state.moby);
         g_vendor_menu_state.state = 0;
-        func_US2_002FC008();
+        PrepareVendorSelectionPreview_us2();
     }
 }

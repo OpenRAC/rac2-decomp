@@ -7,7 +7,7 @@ extern short g_menu_command_flag;
 extern void pad_clear_port_state(void);
 extern int request_end_slot(int, int);
 
-void func_US2_00287108(void)
+void menu_exit_overlay_us2(void)
 {
     pad_clear_port_state();
     g_menu_command_flag = 10;

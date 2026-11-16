@@ -44,10 +44,10 @@ extern int request_begin_slot(int, int, int, int, int);
 extern int menu_get_counter(void);
 extern int menu_get_mode(void);
 extern void snd_play_menu_sound_if_enabled(int, int);
-extern int func_US2_00299960(void);
-extern int func_US2_00299968(void);
+extern int pending_request_get_us2(void);
+extern int pending_request_take_us2(void);
 
-int func_US2_002DE168(SaveMenu *menu)
+int save_slot_menu_update_with_confirm_us2(SaveMenu *menu)
 {
     int old;
     int buttons;
@@ -68,7 +68,7 @@ int func_US2_002DE168(SaveMenu *menu)
             save_clear_slot_and_start(menu->f48, menu->cursor);
         g_memcard_state.f17c = 1;
         g_pause_menu_state.busy = 1;
-        func_US2_00299968();
+        pending_request_take_us2();
         g_pause_menu_state.ready = 0;
         g_pause_menu_state.delay = 0x2C92;
     }
@@ -82,7 +82,7 @@ int func_US2_002DE168(SaveMenu *menu)
         if (g_pause_menu_state.ready < 11)
             return 0;
         g_pause_menu_state.busy = 0;
-        if (save->f16c != 0 || save->f10 != 0 || func_US2_00299960() != 0) {
+        if (save->f16c != 0 || save->f10 != 0 || pending_request_get_us2() != 0) {
             if (g_menu_panel_flag != 0) {
                 g_save_menu_flags |= 0x80;
                 request_begin_slot(4, 1, 5, (int)g_pause_menu_state.owner, 0);

@@ -6,7 +6,7 @@
    has no unused space below the hit point, so pts holds only the hit point [0] and the origin [1].
    The effect's 0x3C store is written last so the scheduler emits retail's store order. */
 typedef union { int q __attribute__((mode(TI))); float f[4]; } V598;
-typedef struct __attribute__((packed, aligned(4))) { u64 a; u32 b; } P598;
+typedef struct __attribute__((packed, aligned(4))) { u64 glow_left; u32 glow_right; } P598;
 extern P598 g_vehicle_gun_aim_params;
 typedef struct { char pad[0x1A0]; union { unsigned long long held; unsigned int flags[2]; } buttons; int pressed; } Input598;
 extern Input598 g_pad_state;
@@ -27,7 +27,9 @@ extern void CalculateAimedLaunchVelocity_pal(void *,void *,void *,float,float,fl
 #define F598(p,o) (*(float *)((p)+(o)))
 #define I598(p,o) (*(int *)((p)+(o)))
 #define B598(p,o) (*(unsigned char *)((p)+(o)))
-void func_PAL_00331118(char *obj)
+/* Aims and fires the vehicle gun: picks a target in front, turns the barrels toward it, and
+   fires bolts or charges a shot depending on the buttons held. */
+void vehicle_update_gun_aiming_pal(char *obj)
 {
     V598 pts[2]; /* [0] hit point, [1] origin */
     P598 params;
@@ -35,7 +37,7 @@ void func_PAL_00331118(char *obj)
     int output;
     char *rec=*(char **)(obj+0x68);
     char *target,*effect,*other;
-    float a,b,old1,old2;
+    float glow_left,glow_right,old_phase_a,old_phase_b;
     moby_transform_joint_to_world(obj,0,&pts[1]);
     params=g_vehicle_gun_aim_params;
     target=SelectBestTargetInCone(&pts[1],obj+0xC0,6.2831855f,6.2831855f,&output,0,0,0,10.0f,0.0f,0.0f,0,&params);
@@ -85,15 +87,15 @@ void func_PAL_00331118(char *obj)
     F598(effect,0x20)=1.0f; F598(effect,0x24)=1.0f; F598(effect,0x28)=1.0f; I598(effect,0x2C)=0;
     F598(effect,0x3C)=1.0f;
     if (g_pad_state.buttons.flags[0]&0x80) {
-        a=1.0f-math_square((math_fast_sin_or_cos_a(g_vehicle_gun_aim_phase_a)+1.0f)*0.5f)*0.5f;
-        b=1.0f-math_square((math_fast_sin_or_cos_a(g_vehicle_gun_aim_phase_b)+1.0f)*0.5f)*0.5f;
+        glow_left=1.0f-math_square((math_fast_sin_or_cos_a(g_vehicle_gun_aim_phase_a)+1.0f)*0.5f)*0.5f;
+        glow_right=1.0f-math_square((math_fast_sin_or_cos_a(g_vehicle_gun_aim_phase_b)+1.0f)*0.5f)*0.5f;
         effect=slot_get_by_index(I598(rec,0x70));
         other=slot_get_by_index(I598(rec,0x74));
-        old1=g_vehicle_gun_aim_phase_a; old2=g_vehicle_gun_aim_phase_b;
-        F598(effect,0x20)=a; F598(other,0x20)=b;
-        g_vehicle_gun_aim_phase_a=FastAddRotations(old1,0.43982303f);
+        old_phase_a=g_vehicle_gun_aim_phase_a; old_phase_b=g_vehicle_gun_aim_phase_b;
+        F598(effect,0x20)=glow_left; F598(other,0x20)=glow_right;
+        g_vehicle_gun_aim_phase_a=FastAddRotations(old_phase_a,0.43982303f);
         g_vehicle_gun_aim_phase_b=FastAddRotations(g_vehicle_gun_aim_phase_b,0.43982303f);
-        if (old1<0.0f && g_vehicle_gun_aim_phase_a>=0.0f) {
+        if (old_phase_a<0.0f && g_vehicle_gun_aim_phase_a>=0.0f) {
             moby_transform_joint_to_world(obj,2,&work[0]);
             moby_transform_joint_point(obj,2,&work[4]);
             if (target) {
@@ -103,7 +105,7 @@ void func_PAL_00331118(char *obj)
             PlayMobySound(6,0,obj);
             SpawnRandomParticlePairs_pal(&work[0],&work[1]);
             moby_spawn_directed_pal(obj,&work[0],&work[1]);
-        } else if (old2<0.0f && g_vehicle_gun_aim_phase_b>=0.0f) {
+        } else if (old_phase_b<0.0f && g_vehicle_gun_aim_phase_b>=0.0f) {
             moby_transform_joint_to_world(obj,1,&work[0]);
             moby_transform_joint_point(obj,1,&work[1]);
             if (target) {

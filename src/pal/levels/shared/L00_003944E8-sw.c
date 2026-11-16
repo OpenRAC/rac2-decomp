@@ -38,12 +38,12 @@ extern void cam_compute_view_direction(void *, void *, int), FastVecScale(void *
 extern char *moby_get_private_value_0(char *);
 extern void matrix_mul_vec3(void *, void *, void *), vec_scale_to_length(void *, void *, float);
 extern void moby_transform_joint_to_world(void *, int, void *);
-extern void func_PAL_0030B4E0(char *), func_PAL_L00_00396350(char *), func_PAL_0030CE20(void *);
+extern void initialize_electric_water_bolt_effect_pal(char *), hero_l00_tether_beam_update_pal(char *), beam_draw_ribbons_pal(void *);
 extern void ref_L00_00392530_00(void (*)(void *), void *), snd_stop_voice(int);
-extern void func_PAL_L00_002AF458(void), cancel_hero_item_animation_pal(void), gfx_free_point_light(int);
+extern void start_equipped_item_animation_pal(void), cancel_hero_item_animation_pal(void), gfx_free_point_light(int);
 
 /* Maintains two beam targets, their acquisition delays, ammunition and the light/sound state. */
-void func_PAL_L00_00395680(char *actor) {
+void tesla_l00_claw_update_pal(char *actor) {
     Vector direction, offset;
     float local[4] __attribute__((aligned(16)));
     DualBeamState *beam;
@@ -132,9 +132,9 @@ void func_PAL_L00_00395680(char *actor) {
                 vec_scale_to_length(&beam->end, &g_hero_state.f[0x730 / 4], beam->length);
                 FastVecAdd(&beam->end, &beam->start, &beam->end);
             }
-            func_PAL_0030B4E0(actor);
-            func_PAL_L00_00396350(actor);
-            ref_L00_00392530_00(func_PAL_0030CE20, actor);
+            initialize_electric_water_bolt_effect_pal(actor);
+            hero_l00_tether_beam_update_pal(actor);
+            ref_L00_00392530_00(beam_draw_ribbons_pal, actor);
             } else {
                 beam->target = 0;
                 beam->secondary = 0;
@@ -186,7 +186,7 @@ void func_PAL_L00_00395680(char *actor) {
     case 1:
         math_fast_float_d(&beam->timer);
         if (active) {
-            func_PAL_L00_002AF458();
+            start_equipped_item_animation_pal();
             actor[0x20] = 3;
         }
         if ((g_pad_state[0x1A4 / 4] & g_hero_state.u[0x1230 / 4]) && !g_hero_state.b[0x22BC]) {
@@ -194,7 +194,7 @@ void func_PAL_L00_00395680(char *actor) {
                 if (g_statistics_table[18].count < 0xFFFF) g_statistics_table[18].count++;
                 if (g_statistics_table[18].maximum < ((s32)g_frame_counter * 5 + 2) / 6) g_statistics_table[18].maximum = ((s32)g_frame_counter * 5 + 2) / 6;
                 g_statistics_table[18].levels = (g_statistics_table[18].levels | (1u << g_current_map_index)) | 0x80000000u;
-                func_PAL_L00_002AF458();
+                start_equipped_item_animation_pal();
                 actor[0x20] = 3;
             } else {
                 beam->target = 0;

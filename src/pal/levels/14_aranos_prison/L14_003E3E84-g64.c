@@ -67,12 +67,12 @@ extern int g_effect_state_param __attribute__((sda));
 extern s32 FastDecTimer(s16 *);
 extern int math_fast_float_d(void *);
 extern int vec_fast_helper_b(void *);
-extern s32 func_PAL_L00_002C4480(int, int);
+extern s32 hero_l00_set_action_pal(int, int);
 extern int get_ammo(int);
 extern int weapon_spend_ammo(int, int);
 extern void hud_add_moby_marker(void *, float, u32, void *, int, float, int, float, int);
 extern void cancel_hero_item_animation_pal(void);
-extern void func_PAL_L00_002AF458(void);
+extern void start_equipped_item_animation_pal(void);
 extern void anim_start_blended_with_flags(void *, int, int, int, int);
 extern int slot_copy_records_to_free(void *);
 extern void slot_reset_active(int);
@@ -80,13 +80,13 @@ extern float math_random_angle(void);
 extern float IntToFloat(int);
 extern int PlayMobySound(int, int, void *);
 extern void gfx_add_draw_callback_third(void *, void *);
-extern void func_PAL_L00_003D6F08(u8 *);
-extern void func_PAL_L00_003D7400(u8 *);
+extern void RenderRadialRingAndQuad_pal(u8 *);
+extern void lightning_update_arcs_pal(u8 *);
 extern void matrix_mul_vec3(void *, void *, void *);
 extern void FastVecAdd(void *, void *, void *);
 extern void FastVecScale(void *, void *, float);
 extern u8 *part_spawn_pulled_particle(void *, int, float, float, u32, int, int, void *, int, int, int, int);
-extern void func_PAL_L00_003D6C38(u8 *, void *, int);
+extern void InitEffectStrips_pal(u8 *, void *, int);
 extern s32 coll_process_hit(f32, void *, s32, void *, s32);
 extern void QueueMobyImpact(u8 *, Hit *);
 extern int StartAttachedEffect_pal(u8 *, int, u8 *);
@@ -110,7 +110,8 @@ static inline void SetShake(float amount)
     g_scalar_transition_state.i16C = 0;
 }
 
-void func_PAL_L14_003E3E84(u8 *self)
+/* Per-frame update of the spread-shot weapon (PAL copy of UpdateSpreadWeapon, 50 Hz timings): charges, fires a shot and the damage rays. */
+void spread_weapon_update_pal(u8 *self)
 {
     Vec4 a;
     Vec4 b;
@@ -132,7 +133,7 @@ void func_PAL_L14_003E3E84(u8 *self)
             self[0x20] = 1;
     }
     if (((Hero *)g_hero_state)->i[0x2294 / 4] == 1)
-        func_PAL_L00_002C4480(0x1D, 1);
+        hero_l00_set_action_pal(0x1D, 1);
     vec_fast_helper_b(st);
     if (((Hero *)g_hero_state)->i[0x2294 / 4] == 0x1D) {
         u32 color;
@@ -171,7 +172,7 @@ void func_PAL_L14_003E3E84(u8 *self)
                     st->t40 = 0;
                     st->t6 = 2;
                 }
-                func_PAL_L00_002AF458();
+                start_equipped_item_animation_pal();
                 st->handle = slot_copy_records_to_free(g_effect_handle_records);
                 anim_start_blended_with_flags(self, 2, 0, 2, 0);
                 st->t4C = ((s32)(g_effect_state_param) * 5 + 2) / 6;
@@ -203,8 +204,8 @@ void func_PAL_L14_003E3E84(u8 *self)
             math_fast_float_d(&st->t28);
             math_fast_float_d(&st->t44);
             if (st->t8 != 0 || st->tA != 0 || st->t28 != 0 || st->t44 != 0)
-                gfx_add_draw_callback_third(func_PAL_L00_003D6F08, self);
-            func_PAL_L00_003D7400(self);
+                gfx_add_draw_callback_third(RenderRadialRingAndQuad_pal, self);
+            lightning_update_arcs_pal(self);
         }
         if (self[0x20] == 2 || self[0x20] == 3) {
             u8 *turret = moby;
@@ -256,8 +257,8 @@ void func_PAL_L14_003E3E84(u8 *self)
                     a[1] = g_local_pos_y_offset;
                     matrix_mul_vec3(b, a, turret + 0xC0);
                     FastVecAdd(shot->v10, b, turret + 0x10);
-                    func_PAL_L00_003D6C38(turret, shot->v10, 0);
-                    gfx_add_draw_callback_third(func_PAL_L00_003D6F08, turret);
+                    InitEffectStrips_pal(turret, shot->v10, 0);
+                    gfx_add_draw_callback_third(RenderRadialRingAndQuad_pal, turret);
                     PlayMobySound(0, 0, turret);
                     if (shot->t40)
                         SetShake(0.12f);

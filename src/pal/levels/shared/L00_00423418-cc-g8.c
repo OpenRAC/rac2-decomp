@@ -25,7 +25,8 @@ extern int FloatToInt(float);
 extern void math_apply_axis_rotation_to_quat(void *, void *, void *, float);
 extern char *part_spawn_ground_effect(void *, int, unsigned int, float, float, int, int, void *, int, float);
 
-void func_PAL_L00_00423418(float *origin, int count, int mode)
+/* Sprays a burst of sparks out from a hit point, with a color that depends on the weapon type (PAL: 50 Hz timings). */
+void part_l00_spawn_hit_sparks_pal(float *origin, int count, int mode)
 {
     float velocity[4] __attribute__((aligned(16)));
     float previous[4] __attribute__((aligned(16)));

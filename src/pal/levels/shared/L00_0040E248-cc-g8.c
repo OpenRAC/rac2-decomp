@@ -79,7 +79,7 @@ extern void part_queue_ground_shadow(void *, float);
 
 /* Resolve motion and contacts, select a nearby target, and apply the object's
  * impact response. The query and impact layouts reflect their measured fields. */
-void func_PAL_L00_0040E248(char *object)
+void bouncing_blast_projectile_update_pal(char *object)
 {
     CollisionVector direction, previous;
     CollisionShape shape[1];

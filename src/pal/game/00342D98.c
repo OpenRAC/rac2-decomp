@@ -11,6 +11,7 @@ extern char *hud_construct_widget_base(char *);
 extern void *object_construct_derived_b(void *);
 extern void *object_construct_derived_c(void *);
 
+/* Constructs the six widgets of the small menu and returns the menu pointer (PAL). */
 u8 *small_menu_construct_pal(u8 *self)
 {
     object_construct_derived_a(self);
@@ -85,23 +86,25 @@ extern char *func_L00_0042C290_6(u8 *);
 extern unsigned long long func_00347EA0_1(u8 *);
 
 /* initialises eight in-place sub-records of one object by four routines, then returns the object pointer */
-u8 *tab_menu_construct_pal(u8 *a0) {
-    func_L00_0042BAD0_6(a0);
-    func_L00_0042BAD0_6(a0 + 76);
-    func_L00_0042BAD0_6(a0 + 152);
-    func_L00_0042BAD0_6(a0 + 228);
-    func_L00_0042BAD0_6(a0 + 304);
-    func_L00_0042BFF8_5(a0 + 380);
-    func_L00_0042C290_6(a0 + 464);
-    func_00347EA0_1(a0 + 568);
-    return a0;
+u8 *tab_menu_construct_pal(u8 *self) {
+    func_L00_0042BAD0_6(self);
+    func_L00_0042BAD0_6(self + 76);
+    func_L00_0042BAD0_6(self + 152);
+    func_L00_0042BAD0_6(self + 228);
+    func_L00_0042BAD0_6(self + 304);
+    func_L00_0042BFF8_5(self + 380);
+    func_L00_0042C290_6(self + 464);
+    func_00347EA0_1(self + 568);
+    return self;
 }
 
 typedef int s32;
 
 /* stores three consecutive words; byte-identical across all 27 levels. */
-void tab_menu_set_tables_pal(u8 *a0, s32 a1, s32 a2, s32 a3) { *(s32 *)(a0 + 0x310) = a1; *(s32 *)(a0 + 0x314) = a2; *(s32 *)(a0 + 0x318) = a3; }
+/* Stores the three record tables of the tab menu (PAL). */
+void tab_menu_set_tables_pal(u8 *self, s32 table_a, s32 table_b, s32 table_c) { *(s32 *)(self + 0x310) = table_a; *(s32 *)(self + 0x314) = table_b; *(s32 *)(self + 0x318) = table_c; }
 
 /* Measured target: byte-identical across all 27 levels. */
-void tab_menu_set_enabled_pal(u8 *a0, s32 a1) { *(s32 *)(a0 + 0x230) = a1; }
+/* Sets whether the tab menu is enabled (PAL). */
+void tab_menu_set_enabled_pal(u8 *self, s32 enabled) { *(s32 *)(self + 0x230) = enabled; }
 

@@ -22,15 +22,15 @@ extern void moby_mark_spawned(u8 *);
    record, then queues the messages 0x2D, 3 and 0x2E on D_L02_001C0700, sets the byte and calls
    func_002A7750 with 2. Kind 2 runs func_002AD7B8 and func_002AF0A8 with 3 and calls
    func_002A7750 with 3, unless func_002F5D10 answers yes. */
-void message_sequence_update_us2(u8 *a0) {
-    u8 *state = *(u8 **)(a0 + 0x68);
+void message_sequence_update_us2(u8 *moby) {
+    u8 *state = *(u8 **)(moby + 0x68);
 
-    switch (a0[0x20]) {
+    switch (moby[0x20]) {
     case 0:
         if (state == 0)
-            moby_mark_spawned(a0);
+            moby_mark_spawned(moby);
         else
-            moby_set_state(a0, 1, -1);
+            moby_set_state(moby, 1, -1);
         break;
     case 1:
         if (g_unlock_flag_c == 0 && g_message_sequence_flags[4] == 0 &&
@@ -40,14 +40,14 @@ void message_sequence_update_us2(u8 *a0) {
             req_push_queue(g_message_queue, 0x2E);
             req_launch_queued(g_message_queue);
             g_message_sequence_flags[4] = 1;
-            moby_set_state(a0, 2, -1);
+            moby_set_state(moby, 2, -1);
         }
         break;
     case 2:
         if (game_is_either_mode_two() == 0) {
             moby_mark_flag_and_append_to_list(3);
             snd_play_indexed(3);
-            moby_set_state(a0, 3, -1);
+            moby_set_state(moby, 3, -1);
         }
         break;
     }

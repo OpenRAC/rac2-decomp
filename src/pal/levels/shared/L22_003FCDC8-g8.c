@@ -19,21 +19,21 @@ extern void moby_mark_spawned(void *);
 /* Runs the object's speed ramp, then either tears it down (no controller slot, or a
  * slot of kind 0xFE/0xFD) or points it along the level's direction vector and stores
  * the turn it must make plus the angle it turns at. */
-void ramping_flyer_update_pal(u8 *a0) {
-    u8 *obj = a0;
-    u8 *ctl = *(u8 **)(obj + 0x68);
-    u8 *sub = *(u8 **)(obj + 0x24);
-    u8 *p;
+void ramping_flyer_update_pal(u8 *moby) {
+    u8 *obj = moby;
+    u8 *vars = *(u8 **)(obj + 0x68);
+    u8 *class_data = *(u8 **)(obj + 0x24);
+    u8 *slot;
     u8 *dst;
     u8 *buf;
-    f32 v[8];
-    f32 t;
+    f32 offset[8];
+    f32 dist;
     f32 x, y, z, angle, scale, control_speed;
 
-    *(f32 *)(obj + 0x2C) = *(f32 *)(sub + 0x24)
-        * (g_flyer_ramp_start + (g_flyer_ramp_end - g_flyer_ramp_start) * *(f32 *)(ctl + 0x18));
-    p = *(u8 **)(ctl + 0x10);
-    if (p == 0 || *(u8 *)(p + 0x20) == 0xFE || *(u8 *)(p + 0x20) == 0xFD) {
+    *(f32 *)(obj + 0x2C) = *(f32 *)(class_data + 0x24)
+        * (g_flyer_ramp_start + (g_flyer_ramp_end - g_flyer_ramp_start) * *(f32 *)(vars + 0x18));
+    slot = *(u8 **)(vars + 0x10);
+    if (slot == 0 || *(u8 *)(slot + 0x20) == 0xFE || *(u8 *)(slot + 0x20) == 0xFD) {
         moby_mark_spawned(obj);
         return;
     }
@@ -42,18 +42,18 @@ void ramping_flyer_update_pal(u8 *a0) {
     x = g_flyer_offset_x;
     y = g_flyer_offset_y;
     z = g_flyer_offset_z;
-    *(f32 *)(ctl + 0xC) = control_speed;
-    v[0] = x;
-    v[1] = y;
-    v[2] = z;
-    matrix_mul_vec3(v, v, g_tether_origin + 0x230);
-    buf = (u8 *)(v + 4);
-    FastVecAdd(buf, (u8 *)v, g_tether_origin);
+    *(f32 *)(vars + 0xC) = control_speed;
+    offset[0] = x;
+    offset[1] = y;
+    offset[2] = z;
+    matrix_mul_vec3(offset, offset, g_tether_origin + 0x230);
+    buf = (u8 *)(offset + 4);
+    FastVecAdd(buf, (u8 *)offset, g_tether_origin);
     qcopy(dst, buf);
-    *(f32 *)(obj + 0xF8) = mat_fast_helper_a(*(f32 *)(ctl + 0x0) - *(f32 *)(obj + 0x10),
-                                         *(f32 *)(ctl + 0x4) - *(f32 *)(obj + 0x14));
-    t = vec_distance_xy(dst, ctl);
-    angle = -mat_fast_helper_a(t, *(f32 *)(ctl + 0x8) - *(f32 *)(obj + 0x18));
+    *(f32 *)(obj + 0xF8) = mat_fast_helper_a(*(f32 *)(vars + 0x0) - *(f32 *)(obj + 0x10),
+                                         *(f32 *)(vars + 0x4) - *(f32 *)(obj + 0x14));
+    dist = vec_distance_xy(dst, vars);
+    angle = -mat_fast_helper_a(dist, *(f32 *)(vars + 0x8) - *(f32 *)(obj + 0x18));
     scale = g_flyer_scale;
     *(f32 *)(obj + 0xF4) = angle;
     *(f32 *)(obj + 0xF0) = FastAddRotations(*(f32 *)(obj + 0xF0), scale * 0.0003490659f);

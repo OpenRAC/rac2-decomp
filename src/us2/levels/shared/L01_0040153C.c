@@ -42,48 +42,48 @@ extern char ref_L01_003FFFE8_06[];
 extern int ref_L01_003FFFE8_07 __attribute__((sda));
 
 /* a trigger moby: reports bad setup, waits to be activated, plays its effects and removes itself */
-void func_US2_L01_0040153C(char *m)
+void activation_trigger_update_us2(char *moby)
 {
-    char *d = *(char **)(m + 0x68);
+    char *vars = *(char **)(moby + 0x68);
     int active;
 
-    switch (*(unsigned char *)(m + 0x20)) {
+    switch (*(unsigned char *)(moby + 0x20)) {
     case 0:
-        if (*(int *)d == -1)
-            STUB_printf(ref_L01_003FFFE8_01, *(short *)(m + 0xB2));
-        if (*(short *)(d + 4) == -1)
-            STUB_printf(ref_L01_003FFFE8_02, *(short *)(m + 0xB2));
-        if (*(int *)(d + 8) == -1)
-            STUB_printf(ref_L01_003FFFE8_03, *(short *)(m + 0xB2));
-        if (*(unsigned char *)(m + 0xB0) != 255) {
-            if (g_moby_group_flags[*(unsigned char *)(m + 0xB0) + (g_current_map_index << 4)] & 128) {
-                moby_mark_spawned(m);
+        if (*(int *)vars == -1)
+            STUB_printf(ref_L01_003FFFE8_01, *(short *)(moby + 0xB2));
+        if (*(short *)(vars + 4) == -1)
+            STUB_printf(ref_L01_003FFFE8_02, *(short *)(moby + 0xB2));
+        if (*(int *)(vars + 8) == -1)
+            STUB_printf(ref_L01_003FFFE8_03, *(short *)(moby + 0xB2));
+        if (*(unsigned char *)(moby + 0xB0) != 255) {
+            if (g_moby_group_flags[*(unsigned char *)(moby + 0xB0) + (g_current_map_index << 4)] & 128) {
+                moby_mark_spawned(moby);
                 break;
             }
         } else
-            STUB_printf(ref_L01_003FFFE8_04, *(short *)(m + 0xB2));
-        moby_set_state(m, 1, -1);
+            STUB_printf(ref_L01_003FFFE8_04, *(short *)(moby + 0xB2));
+        moby_set_state(moby, 1, -1);
         break;
     case 1:
         active = 0;
-        if (*(unsigned char *)(m + 0xBC) ||
-            (*(int *)d != -1 && coll_point_inside_region(g_hero_position, *(int *)d) &&
-             (*(int *)(d + 0x18) || *(int *)(g_hero_position + 0x2C0))))
+        if (*(unsigned char *)(moby + 0xBC) ||
+            (*(int *)vars != -1 && coll_point_inside_region(g_hero_position, *(int *)vars) &&
+             (*(int *)(vars + 0x18) || *(int *)(g_hero_position + 0x2C0))))
             active = 1;
         if (active) {
             int ready;
 
-            *(unsigned char *)(m + 0x30) = 255;
+            *(unsigned char *)(moby + 0x30) = 255;
             FadeToBlack(20);
-            if (*(int *)(d + 0xC) != -1) {
-                char *p = ref_L01_003FFFE8_05 + (*(int *)(d + 0xC) << 7);
+            if (*(int *)(vars + 0xC) != -1) {
+                char *p = ref_L01_003FFFE8_05 + (*(int *)(vars + 0xC) << 7);
 
                 hero_reset_position_and_direction(p + 0x30, p + 0x70, -1, 1);
             }
-            if (*(int *)(d + 8) != -1)
-                load_scene_chunk(*(int *)(d + 8), 0);
+            if (*(int *)(vars + 8) != -1)
+                load_scene_chunk(*(int *)(vars + 8), 0);
             ready = 1;
-            if (g_current_map_index == 8 && *(short *)(d + 4) == 0) {
+            if (g_current_map_index == 8 && *(short *)(vars + 4) == 0) {
                 if (req_push_queue(ref_L01_003FFFE8_06, 0x57)) {
                     req_push_queue(ref_L01_003FFFE8_06, 9);
                     req_push_queue(ref_L01_003FFFE8_06, 0x58);
@@ -94,35 +94,35 @@ void func_US2_L01_0040153C(char *m)
                     ready = 0;
             }
             if (ready)
-                moby_set_state(m, 3, -1);
+                moby_set_state(moby, 3, -1);
         }
         break;
     case 3:
         ref_L01_003FFFE8_00[1] = 1;
         if (!game_is_either_mode_two()) {
             ref_L01_003FFFE8_00[1] = 0;
-            if (*(short *)(d + 6) != -1) {
-                moby_mark_flag_and_append_to_list(*(short *)(d + 6));
-                snd_play_indexed_us2(*(short *)(d + 6));
+            if (*(short *)(vars + 6) != -1) {
+                moby_mark_flag_and_append_to_list(*(short *)(vars + 6));
+                snd_play_indexed_us2(*(short *)(vars + 6));
             }
-            moby_set_state(m, 4, -1);
+            moby_set_state(moby, 4, -1);
         }
         break;
     case 4:
-        if (*(unsigned char *)(m + 0xB0) != 255) {
-            int n = *(unsigned char *)(m + 0xB0);
+        if (*(unsigned char *)(moby + 0xB0) != 255) {
+            int n = *(unsigned char *)(moby + 0xB0);
 
             if (!(g_moby_group_flags[n + (g_current_map_index << 4)] & 128)) {
                 moby_mark_table_entry_flagged(n);
-                level_capture_checkpoint_state(m + 0x10, m + 0xF0);
+                level_capture_checkpoint_state(moby + 0x10, moby + 0xF0);
             }
         }
         hero_start_move_state_walk_or_run(0);
         ref_US2_L01_0040153C_00(0, 1);
-        script_queue_keyed_request(*(int *)(d + 0x14), *(int *)(d + 0x10));
-        if (*(unsigned char *)(m + 0xB0) != 255 || *(short *)(d + 6) != -1)
+        script_queue_keyed_request(*(int *)(vars + 0x14), *(int *)(vars + 0x10));
+        if (*(unsigned char *)(moby + 0xB0) != 255 || *(short *)(vars + 6) != -1)
             MemcardSave(0, -1);
-        moby_mark_spawned(m);
+        moby_mark_spawned(moby);
         break;
     }
 }

@@ -1,6 +1,8 @@
 #include "include_asm.h"
+#include "names.h"
 
-float func_US2_003396E8(void *object, int index)
+/* Returns the text scale for a panel mode: 0.7, 0.8 or 1.0 (new in v2.00). */
+float text_panel_get_scale_us2(void *object, int index)
 {
     switch (index) {
     case 0:

@@ -73,61 +73,61 @@ typedef struct {
     short h77C;
 } L14State_423000;
 
-void actor_init_pal(char *a0)
+void actor_init_pal(char *moby)
 {
-    L14State_423000 *s = *(L14State_423000 **)(a0 + 0x68);
-    short n;
+    L14State_423000 *vars = *(L14State_423000 **)(moby + 0x68);
+    short start_state;
 
-    s->b70 = 8;
-    s->iA8 = 4;
-    s->f80 = 0.080000006f;
-    s->b71 = 0x11;
-    s->f7C = 0.120000005f;
-    s->f84 = 0.006f;
-    s->f90 = 0.5f;
-    s->f94 = 0.5f;
-    s->f9C = 0.4f;
-    s->bCC = 3;
-    s->bCD = 6;
-    s->bCE = 3;
-    s->b76 = 0x12;
-    s->f88 = 0.012f;
-    s->f20 = 16.0f;
-    s->b72 = 0x11;
-    s->b77 = 0x13;
-    s->f8C = 0.006f;
-    s->bCF = 6;
-    s->bD2 = 0xD;
-    s->bD3 = 0x1A;
-    s->h24 = 0x10;
-    s->b28 = 3;
-    *(unsigned char *)(a0 + 0x30) = 0xC8;
-    *(unsigned short *)(a0 + 0x32) = 0xC8;
-    s->f144 = 0.25f;
-    s->f110 = 0.4f;
-    s->f114 = 0.5f;
-    s->f118 = 0.5f;
-    s->f11C = 0.5f;
-    s->f140 = 0.2617994248867035f;
-    s->f13C = 0.008f;
-    s->i14C = -1;
-    s->f120 = 3.141590118408203f;
-    moby_set_controller_speed_limits(a0, 0.0048f, 0.120000005f,
+    vars->b70 = 8;
+    vars->iA8 = 4;
+    vars->f80 = 0.080000006f;
+    vars->b71 = 0x11;
+    vars->f7C = 0.120000005f;
+    vars->f84 = 0.006f;
+    vars->f90 = 0.5f;
+    vars->f94 = 0.5f;
+    vars->f9C = 0.4f;
+    vars->bCC = 3;
+    vars->bCD = 6;
+    vars->bCE = 3;
+    vars->b76 = 0x12;
+    vars->f88 = 0.012f;
+    vars->f20 = 16.0f;
+    vars->b72 = 0x11;
+    vars->b77 = 0x13;
+    vars->f8C = 0.006f;
+    vars->bCF = 6;
+    vars->bD2 = 0xD;
+    vars->bD3 = 0x1A;
+    vars->h24 = 0x10;
+    vars->b28 = 3;
+    *(unsigned char *)(moby + 0x30) = 0xC8;
+    *(unsigned short *)(moby + 0x32) = 0xC8;
+    vars->f144 = 0.25f;
+    vars->f110 = 0.4f;
+    vars->f114 = 0.5f;
+    vars->f118 = 0.5f;
+    vars->f11C = 0.5f;
+    vars->f140 = 0.2617994248867035f;
+    vars->f13C = 0.008f;
+    vars->i14C = -1;
+    vars->f120 = 3.141590118408203f;
+    moby_set_controller_speed_limits(moby, 0.0048f, 0.120000005f,
                 0.005026549f, 0.25132746f);
 
-    s->f740 = s->f740 * 0.01745329424738884f;
-    s->p158 = s->area680;
-    s->p15C = s->area600;
-    if (s->i738 != -1)
-        s->i14C = s->i738;
-    s->i750 = path_build_route_nodes(a0, s->i73C, s->area200, 0x20);
-    s->h77C = math_random_int_below(2);
+    vars->f740 = vars->f740 * 0.01745329424738884f;
+    vars->p158 = vars->area680;
+    vars->p15C = vars->area600;
+    if (vars->i738 != -1)
+        vars->i14C = vars->i738;
+    vars->i750 = path_build_route_nodes(moby, vars->i73C, vars->area200, 0x20);
+    vars->h77C = math_random_int_below(2);
 
-    s->vec710 = *(L14_TI128 *)(a0 + 0x10);
+    vars->vec710 = *(L14_TI128 *)(moby + 0x10);
 
-    n = s->h774;
-    if (n > 0 && (n != 3 || s->i730 != -1))
-        moby_set_state(a0, n, 1);
+    start_state = vars->h774;
+    if (start_state > 0 && (start_state != 3 || vars->i730 != -1))
+        moby_set_state(moby, start_state, 1);
     else
-        moby_set_state(a0, 1, 1);
+        moby_set_state(moby, 1, 1);
 }

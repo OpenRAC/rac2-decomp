@@ -23,7 +23,8 @@ extern void moby_mark_spawned(void *);
 extern int g_active_effect_moby __attribute__((sda));
 extern void func_L05_003CD598(char *);
 
-void func_US2_L05_003CE768(char *object)
+/* Flies the pickup toward the player; on arrival shows a random message and adds to a value slot, clamped to its limit (v2.00 version). */
+void pickup_fly_add_slot_value_us2(char *object)
 {
     char *state = *(char **)(object + 0x68);
     float scale;
@@ -37,14 +38,14 @@ void func_US2_L05_003CE768(char *object)
             goto check_scale;
         }
         if (scale < 60.0f) {
-            float *p = *(float **)(object + 0x24);
-            float v = p[9] * 0.02222222276031971f * scale;
+            float *class_data = *(float **)(object + 0x24);
+            float scaled = class_data[9] * 0.02222222276031971f * scale;
 
-            *(float *)(object + 0x2C) = v;
+            *(float *)(object + 0x2C) = scaled;
             {
-                float cap = p[9] * 0.30000001192092896f;
+                float cap = class_data[9] * 0.30000001192092896f;
 
-                if (v < cap)
+                if (scaled < cap)
                     *(float *)(object + 0x2C) = cap;
             }
             vec_spring_to_target(object + 0x10, (void *)(g_active_effect_moby + 0x10), state + 0x40,

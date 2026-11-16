@@ -12,7 +12,7 @@ extern int g_glow_ring_follow_moby __attribute__((sda));
 extern void glow_l05_ring_draw(char *);
 
 /* Same shape as func_L05_004260B8, on its own data slot and with its own tail. */
-void func_US2_L05_004283E0(char *object)
+void glow_pickup_collect_slot3_us2(char *object)
 {
     char *state = *(char **)(object + 0x68);
     float scale;
@@ -26,14 +26,14 @@ void func_US2_L05_004283E0(char *object)
             goto check_scale;
         }
         if (scale < 60.0f) {
-            float *p = *(float **)(object + 0x24);
-            float v = p[9] * 0.02222222276031971f * scale;
+            float *class_data = *(float **)(object + 0x24);
+            float scaled = class_data[9] * 0.02222222276031971f * scale;
 
-            *(float *)(object + 0x2C) = v;
+            *(float *)(object + 0x2C) = scaled;
             {
-                float cap = p[9] * 0.30000001192092896f;
+                float cap = class_data[9] * 0.30000001192092896f;
 
-                if (v < cap)
+                if (scaled < cap)
                     *(float *)(object + 0x2C) = cap;
             }
             vec_spring_to_target(object + 0x10, (void *)(g_glow_ring_follow_moby + 0x10), state + 0x40,

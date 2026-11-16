@@ -9,7 +9,7 @@ extern float math_fast_sin_or_cos_a(float);
 extern float math_fast_sin_or_cos_b(float);
 extern float math_random_float_range(float low, float high);
 extern void matrix_mul_vec3(float *out, float *in, char *matrix);
-extern char *func_PAL_L06_00469110(char *moby, float *position, float *velocity,
+extern char *part_spawn_spark_moby_pal(char *moby, float *position, float *velocity,
                              int flags, float size, float life);
 
 /* Emit three rings of particles around the moby's local frame.
@@ -42,7 +42,7 @@ void part_emit_rings_pal(char *moby)
                 position[2] = *(float *)(moby + 0x18) + 0.75f + shell * 0.5f;
                 size = math_random_float_range(0.25f, 1.0f);
                 life = math_random_float_range(0.25f, 1.25f);
-                func_PAL_L06_00469110(moby, position, velocity, 0, size, life);
+                part_spawn_spark_moby_pal(moby, position, velocity, 0, size, life);
             }
             spoke++;
         } while (spoke < 4);

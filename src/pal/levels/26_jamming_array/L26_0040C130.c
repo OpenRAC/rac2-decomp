@@ -11,7 +11,7 @@ extern void moby_init_controller_params_pal(char *, char *, char *, char *, char
                           char *, char *, char *);
 extern void moby_set_state(char *, int, int);
 extern void moby_update_sway_pal(char *, char *, int);
-extern int func_PAL_00289730(int, int);
+extern int subtitle_request_voice_line_pal(int, int);
 extern int g_hero_tether_enabled[] __attribute__((sda));
 extern int g_current_map_index[] __attribute__((sda)) NOT_SDA;
 typedef struct {
@@ -38,44 +38,45 @@ typedef struct {
 extern D_L26_0027D5C8_t g_level_state_block;
 extern D_0018C750_t g_progress_statistics;
 
-void looping_effect_update_pal(char *a0) {
-    char *s1 = a0;
-    char *s0 = *(char **)(s1 + 0x68);
-    Quad_L26_0040C8A8 v;
+/* Sets up a looping effect and keeps it swaying (PAL). */
+void looping_effect_update_pal(char *moby_arg) {
+    char *moby = moby_arg;
+    char *vars = *(char **)(moby + 0x68);
+    Quad_L26_0040C8A8 params;
 
-    switch (*(u8 *)(s1 + 0x20)) {
+    switch (*(u8 *)(moby + 0x20)) {
     case 0:
-        qzero_nc(&v);
-        if (*(int *)(s0 + 0x120) != 0)
-            v.b = (float)*(int *)(s0 + 0x120) * 1.7f;
-        moby_init_controller_params_pal(s1, s0 + 0x60, (char *)&v, 0, 0, 0, 0, 0, 0, 0, 0);
-        if (*(int *)(s0 + 0x120) != 0) {
-            *(int *)(s0 + 0xD0) = 0;
-            *(int *)(s0 + 0x100) = 0;
-            *(int *)(s0 + 0xD4) = 0;
+        qzero_nc(&params);
+        if (*(int *)(vars + 0x120) != 0)
+            params.b = (float)*(int *)(vars + 0x120) * 1.7f;
+        moby_init_controller_params_pal(moby, vars + 0x60, (char *)&params, 0, 0, 0, 0, 0, 0, 0, 0);
+        if (*(int *)(vars + 0x120) != 0) {
+            *(int *)(vars + 0xD0) = 0;
+            *(int *)(vars + 0x100) = 0;
+            *(int *)(vars + 0xD4) = 0;
         }
-        moby_set_state(s1, 1, -1);
+        moby_set_state(moby, 1, -1);
         break;
     case 1:
-        moby_update_sway_pal(s1, s0 + 0x60, 0);
+        moby_update_sway_pal(moby, vars + 0x60, 0);
         break;
     }
 }
 
 /* func_PAL_L26_0040C130, the PAL copy of func_L26_004070F8: the same C, where 0x1A5E0 becomes
    0x15F90, the frame counter is scaled to 50 Hz and 0x4B1 becomes 0x3E9. */
-void func_PAL_L26_0040C130(char *a0) {
-    char *m = a0;
-    char *ctl = *(char **)(m + 0x68);
-    u8 kind = *(u8 *)(m + 0x20);
+void jamming_array_update_subtitle_triggers_pal(char *moby_arg) {
+    char *moby = moby_arg;
+    char *vars = *(char **)(moby + 0x68);
+    u8 kind = *(u8 *)(moby + 0x20);
     unsigned int mask;
 
     switch (kind) {
     case 0:
-        *(u8 *)(m + 0x30) = 0xFF;
-        *(int *)(ctl + 0x4) = 0;
-        *(int *)(ctl + 0x10) = 0;
-        moby_set_state(m, 1, -1);
+        *(u8 *)(moby + 0x30) = 0xFF;
+        *(int *)(vars + 0x4) = 0;
+        *(int *)(vars + 0x10) = 0;
+        moby_set_state(moby, 1, -1);
         break;
     case 1:
         if (g_hero_tether_enabled[0] != 0) {
@@ -83,7 +84,7 @@ void func_PAL_L26_0040C130(char *a0) {
                 unsigned int flags = g_subtitle_history[28].levels;
                 flags &= (unsigned int)kind << g_current_map_index[0];
                 if (flags == 0) {
-                    func_PAL_00289730(0x9C5, 0x1C);
+                    subtitle_request_voice_line_pal(0x9C5, 0x1C);
                 }
             }
         }
@@ -94,7 +95,7 @@ void func_PAL_L26_0040C130(char *a0) {
                 unsigned int flags = g_subtitle_history[12].levels;
                 mask = 1u << g_current_map_index[0];
                 if ((flags & mask) == 0) {
-                    func_PAL_00289730(0x9B5, 0xC);
+                    subtitle_request_voice_line_pal(0x9B5, 0xC);
                 }
             }
         }

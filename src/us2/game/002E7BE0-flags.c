@@ -19,6 +19,7 @@ extern State2E71B8 ref_L00_00360ED0_04;
 extern void gfx_select_packet_buffer_setup(void);
 extern void level_transition_scene_start_us2(int);
 
+/* Starts a scene: resets the fade, sets up its memory block and marks the scene as running (USA v2.00). */
 void scene_init_playback_state_us2(void)
 {
     int base;

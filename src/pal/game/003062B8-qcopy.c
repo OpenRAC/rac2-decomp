@@ -18,40 +18,40 @@ extern s32 PlayMobySound(s32, s32, char *);
 #define ENTRY() (D_00239BA0 + D_00139568[0x29] * 0xE0)
 
 /* One step of an object's launch routine: aims the pending hit and counts it down. */
-void func_PAL_003062B8(char *obj)
+void miniturret_fire_shot_pal(char *moby)
 {
-    V4_F305058 a, b, c, d, e;
-    char *rec = *(char **)(obj + 0x68);
-    char *link;
-    char *tgt;
-    float scale;
-    char *ent;
+    V4_F305058 up_dir, target_pos, shot_velocity, muzzle_pos, target_motion;
+    char *vars = *(char **)(moby + 0x68);
+    char *target_info;
+    char *target;
+    float speed;
+    char *weapon_def;
 
-    moby_transform_joint_to_world(obj, 1, d);
-    moby_get_facing_direction(obj + 0x10, a);
-    if (*(float *)(rec + 0x5C) == 0.0f) {
-        if (*(s32 *)(rec + 0x50) != 0) {
-            if (*(char **)(rec + 0x68) != 0) {
-                link = moby_get_private_value_0(*(char **)(rec + 0x68));
-                tgt = *(char **)(rec + 0x68);
-                qcopy(b, tgt + 0x10);
-                if (link != 0) {
-                    FastVecScale(e, tgt + 0xE0, *(float *)(link + 0x10));
-                    FastVecAdd(b, b, e);
+    moby_transform_joint_to_world(moby, 1, muzzle_pos);
+    moby_get_facing_direction(moby + 0x10, up_dir);
+    if (*(float *)(vars + 0x5C) == 0.0f) {
+        if (*(s32 *)(vars + 0x50) != 0) {
+            if (*(char **)(vars + 0x68) != 0) {
+                target_info = moby_get_private_value_0(*(char **)(vars + 0x68));
+                target = *(char **)(vars + 0x68);
+                qcopy(target_pos, target + 0x10);
+                if (target_info != 0) {
+                    FastVecScale(target_motion, target + 0xE0, *(float *)(target_info + 0x10));
+                    FastVecAdd(target_pos, target_pos, target_motion);
                 }
-                ent = ENTRY();
-                scale = *(float *)(ent + 0x50) * 0.020000001f;
-                FastVecSub(c, b, d);
-                vec_scale_to_length(c, c, scale);
-                vec_add_transformed_or_copy(c, c, d);
-                part_add_trail_entry_pal(obj, c);
-                PlayMobySound(0, 0, obj);
-                *(s32 *)(rec + 0x40) = ((s32)(g_miniturret_shot_param) * 5 + 2) / 6;
-                *(s32 *)(rec + 0x44) = 5;
-                if (--*(s32 *)(rec + 0x60) <= 0)
-                    *(u8 *)(obj + 0x20) = 8;
-                ent = ENTRY();
-                *(float *)(rec + 0x5C) = 1.0f / *(float *)(ent + 0x54);
+                weapon_def = ENTRY();
+                speed = *(float *)(weapon_def + 0x50) * 0.020000001f;
+                FastVecSub(shot_velocity, target_pos, muzzle_pos);
+                vec_scale_to_length(shot_velocity, shot_velocity, speed);
+                vec_add_transformed_or_copy(shot_velocity, shot_velocity, muzzle_pos);
+                part_add_trail_entry_pal(moby, shot_velocity);
+                PlayMobySound(0, 0, moby);
+                *(s32 *)(vars + 0x40) = ((s32)(g_miniturret_shot_param) * 5 + 2) / 6;
+                *(s32 *)(vars + 0x44) = 5;
+                if (--*(s32 *)(vars + 0x60) <= 0)
+                    *(u8 *)(moby + 0x20) = 8;
+                weapon_def = ENTRY();
+                *(float *)(vars + 0x5C) = 1.0f / *(float *)(weapon_def + 0x54);
             }
         }
     }

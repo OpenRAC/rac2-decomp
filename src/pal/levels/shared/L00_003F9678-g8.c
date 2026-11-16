@@ -28,7 +28,7 @@ extern char *g_area_hit_targets[] __attribute__((nosda));
 extern void *SpawnExplosion_pal(void *, float, float, int, int, int, int, int, int, int, int, int, int, int);
 extern void vec_scale_to_length(void *, void *, float);
 extern int coll_process_hit(void *, int, void *, void *, float);
-extern int func_PAL_00335DD0(char *, int, int);
+extern int weapon_start_health_drain_pal(char *, int, int);
 extern int math_random_int_range(int, int);
 extern int math_random_int_below(int);
 extern float math_random_signed_float_range(float, float);
@@ -63,7 +63,7 @@ void ApplyAreaHitOrEmitParticles_pal(char *object, HitVector *source)
         scratch.u.request.classId = *(unsigned short *)(object + 0xAA);
         count = coll_process_hit(&scratch.position, 1, *(char **)(g_hero_state + 0x2290), &scratch.u.request, 2.0f);
         for (i = 0; i < count; i++)
-            func_PAL_00335DD0(g_area_hit_targets[i], 0x42, *(int *)(object + 0xB8));
+            weapon_start_health_drain_pal(g_area_hit_targets[i], 0x42, *(int *)(object + 0xB8));
     } else {
         int negative;
         HitVector *jitter, *zero;

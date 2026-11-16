@@ -22,7 +22,7 @@ extern float g_blade_ball_spread_max __attribute__((sda));
 extern float g_blade_ball_up_speed_min __attribute__((sda));
 extern float g_blade_ball_up_speed_max __attribute__((sda));
 extern float g_blade_ball_ground_effect_param __attribute__((sda));
-extern void func_PAL_L02_00411720(u8 *);
+extern void blade_ball_update_common_pal(u8 *);
 extern float mat_fast_helper_a(float, float);
 extern float vec_distance_xy(void *, void *);
 extern void FastVecAdd(void *, void *, void *);
@@ -31,7 +31,7 @@ extern s32 coll_test_point(void *, s32, void *, float);
 extern s32 math_random_int_below(s32);
 extern s32 coll_sweep_from_object(void *, void *, u32, float, float, float, s32, s32, s32);
 extern void moby_set_state(u8 *, u8, s32);
-extern void func_PAL_002A7E68(void *, s32, s32, s32);
+extern void anim_start_blended_pal(void *, s32, s32, s32);
 extern void moby_set_anim_type_three_pal(void *, s32, s32);
 extern void blade_ball_explode_pal(u8 *);
 extern char *arena_get_camera_point(char *);
@@ -57,7 +57,7 @@ extern void *part_spawn_ground_effect(float, float, float, void *, s32, u32, s32
 extern void blade_ball_update_hit_reaction(u8 *);
 
 /* Follow the patrol path, handle landing and contact states, then emit the trail. */
-void func_PAL_L02_00410A1C(u8 *object)
+void blade_ball_update_pal(u8 *object)
 {
     PatrolVector target;
     PatrolVector point;
@@ -71,7 +71,7 @@ void func_PAL_L02_00410A1C(u8 *object)
     if (object[0x20] == 1 || object == 0 || object[0x20] == 0xFE || object[0x20] == 0xFD)
         return;
     state = *(u8 **)(object + 0x68);
-    func_PAL_L02_00411720(object);
+    blade_ball_update_common_pal(object);
     if (*(u8 **)(state + 0x184)) {
         target.quad = *(TI128 *)(*(u8 **)(state + 0x184) + 0x10);
         mat_fast_helper_a(*(float *)(*(u8 **)(state + 0x184) + 0x10) - *(float *)(object + 0x10), *(float *)(*(u8 **)(state + 0x184) + 0x14) - *(float *)(object + 0x14));
@@ -91,7 +91,7 @@ void func_PAL_L02_00410A1C(u8 *object)
             coll_sweep_from_object(object, object + 0x10, 0x10000, 0.5f, (float)(state[0x34] * 3), 1.0f, 0, 1, 0);
             if (*(float *)(state + 0x20) > 0.0f) {
                 moby_set_state(object, 8, 3);
-                if (object[0x43]) func_PAL_002A7E68(object, 0, 0, 4);
+                if (object[0x43]) anim_start_blended_pal(object, 0, 0, 4);
             } else {
                 moby_set_anim_type_three_pal(object, 0, 1);
                 blade_ball_explode_pal(object);
@@ -117,7 +117,7 @@ void func_PAL_L02_00410A1C(u8 *object)
         break;
     case 4:
         if (*(u16 *)(object + 0x96) > 21) {
-            if (object[0x43]) func_PAL_002A7E68(object, 0, 0, 4);
+            if (object[0x43]) anim_start_blended_pal(object, 0, 0, 4);
             moby_set_state(object, 8, 3);
         }
         break;
@@ -178,9 +178,9 @@ void func_PAL_L02_00410A1C(u8 *object)
         }
         break;
     case 9:
-        if (flag_set_first_pending(object) && object[0x43] != 2) func_PAL_002A7E68(object, 2, 0, 2);
+        if (flag_set_first_pending(object) && object[0x43] != 2) anim_start_blended_pal(object, 2, 0, 2);
         if (object[0x60] & 2) {
-            if (object[0x43] != 3) func_PAL_002A7E68(object, 3, 0, 4);
+            if (object[0x43] != 3) anim_start_blended_pal(object, 3, 0, 4);
             moby_set_state(object, 11, -1);
         }
         /* Emits nothing, but keeps a label here, so case 9's tail stays apart from case 12's. */
@@ -207,25 +207,25 @@ void func_PAL_L02_00410A1C(u8 *object)
         } while (++i < 4);
         if (g_hero_state.contact == object) {
             moby_set_state(object, 12, -1);
-            if (object[0x43] != 4) func_PAL_002A7E68(object, 4, 0, 4);
+            if (object[0x43] != 4) anim_start_blended_pal(object, 4, 0, 4);
             *(float *)(object + 0x48) = 1.0f;
         }
         if (range > 4.0f && *(u16 *)(object + 0x96) > 100) {
-            if (object[0x43] != 5) func_PAL_002A7E68(object, 5, 0, 12);
+            if (object[0x43] != 5) anim_start_blended_pal(object, 5, 0, 12);
             moby_set_state(object, 4, -1);
             *(float *)(object + 0x48) = 1.0f;
         }
         break;
     case 12:
         if (object[0x60] & 2) {
-            if (object[0x43]) func_PAL_002A7E68(object, 0, 0, 12);
+            if (object[0x43]) anim_start_blended_pal(object, 0, 0, 12);
             moby_set_state(object, 8, -1);
         }
         break;
     case 10:
         if (*(u16 *)(object + 0x96) > 36) {
             moby_set_state(object, 9, -1);
-            if (object[0x43] != 2) func_PAL_002A7E68(object, 2, 0, 2);
+            if (object[0x43] != 2) anim_start_blended_pal(object, 2, 0, 2);
             *(float *)(object + 0x48) = 1.0f;
         }
         break;

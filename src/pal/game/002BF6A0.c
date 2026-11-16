@@ -6,6 +6,7 @@ extern void Fc10c1216_FUN_002B9180(char *);
 extern int Fc10c1216_FUN_00283CF0(float);
 extern void Fc10c1216_FUN_00282CC0(char *, char *, char *);
 
+/* Updates a pulsing glow: its alpha swells and fades, it grows and spins, and it moves by its velocity (PAL: 50 Hz timings). */
 void part_update_glow_pulse_pal(char *p)
 {
     float *q = (float *)(p + 32);
@@ -50,7 +51,8 @@ extern void part_kill(char *);
 
 /* func_002BEE70 is in 002BEE70-g.c (it needs -g for its line notes' pre-division nops). */
 
-void func_PAL_002C0218(char *o)
+/* Updates a glow that follows its parent particle, fading its colour and pulsing its alpha, and dies with the parent. */
+void part_update_following_glow_pal(char *o)
 {
     float *s;
     char *parent;

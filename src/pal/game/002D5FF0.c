@@ -6,26 +6,26 @@
 extern char *g_resident_data_base[] __attribute__((sda));
 extern void menu_clear_counter(void);
 extern void tab_menu_set_tables_pal(char *, char *, char *, char *);
-extern void func_PAL_00343690(char *, int);
+extern void tab_menu_switch_tab_pal(char *, int);
 extern char g_extras_tab_table_a[], g_extras_tab_table_b[], g_extras_tab_table_c[];
 
-int func_PAL_002D6058(void)
+int menu_preview_data_init_pal(void)
 {
     menu_clear_counter();
     if (g_resident_data_base[0] != 0) {
         tab_menu_set_tables_pal(g_resident_data_base[0] + 0x3C210, g_extras_tab_table_a, g_extras_tab_table_b, g_extras_tab_table_c);
-        func_PAL_00343690(g_resident_data_base[0] + 0x3C210, 1);
+        tab_menu_switch_tab_pal(g_resident_data_base[0] + 0x3C210, 1);
     }
     return 0;
 }
 
 /* func_PAL_002D60C8, the PAL copy of func_L00_0034E950: the same C, calling PAL's func_PAL_0029D8A0. */
 extern int g_menu_input_flags;
-extern int func_PAL_0029D8A0(int);
+extern int resident_popup_update_position(int);
 
-int func_PAL_002D60C8(void)
+int menu_page_draw_with_pad_state_pal(void)
 {
-    func_PAL_0029D8A0(g_menu_input_flags);
+    resident_popup_update_position(g_menu_input_flags);
     return 0;
 }
 
@@ -34,18 +34,20 @@ extern int func_0029CF08(int);
 extern int g_menu_input_flags;
 extern int func_0029CF08(int);
 
+/* Passes the current pad buttons to the page button handler (PAL). */
 int menu_handle_buttons_pal(void) {
     func_0029CF08(g_menu_input_flags);
     return 0;
 }
 
 #include "common.h"
-extern void func_PAL_0029D870(void);
+extern void resident_menu_draw_with_prompts(void);
 
-int func_PAL_002D6118(void)
+/* Draws a menu page between the start and end of screen drawing (PAL). */
+int menu_page_draw_fourth_pal(void)
 {
   SetupGifPaging(0);
-  func_PAL_0029D870();
+  resident_menu_draw_with_prompts();
   DoGifPaging();
   return 0;
 }
@@ -54,12 +56,13 @@ int func_PAL_002D6118(void)
 
 
 
-extern void func_PAL_0029D4B8(void);
+extern void resident_small_list_menu_draw_rows(void);
 
-int func_PAL_002D62F0(void)
+/* Draws a menu page between the start and end of screen drawing (PAL). */
+int menu_page_draw_list_pal(void)
 {
   SetupGifPaging(0);
-  func_PAL_0029D4B8();
+  resident_small_list_menu_draw_rows();
   DoGifPaging();
   return 0;
 }
@@ -70,7 +73,8 @@ extern void menu_set_value(char *, int);
 extern void list_menu_set_records_pal(char *, char *);
 extern char g_list_menu_records_first[];
 
-int func_PAL_002D6320(void)
+/* Sets up the first list menu page: enables it and gives it its records (PAL). */
+int menu_page_text_init_first_pal(void)
 {
     if (g_resident_data_base[0] != 0) {
         menu_set_value(g_resident_data_base[0] + 0x3EA78, 1);
@@ -81,12 +85,13 @@ int func_PAL_002D6320(void)
 
 
 
-extern void func_PAL_0029D448(void);
+extern void resident_menu_draw_if_active(void);
 
-int func_PAL_002D6448(void)
+/* Draws a menu page between the start and end of screen drawing (PAL). */
+int menu_page_draw_list_second_pal(void)
 {
   SetupGifPaging(0);
-  func_PAL_0029D448();
+  resident_menu_draw_if_active();
   DoGifPaging();
   return 0;
 }
@@ -97,7 +102,8 @@ extern void list_menu_set_record_table_pal(char *, char *);
 
 extern char g_ui_object_data[];
 
-int func_PAL_002D6478(void)
+/* Sets up the second list menu page: enables it and gives it its record table (PAL). */
+int menu_page_text_init_second_pal(void)
 {
     if (g_resident_data_base[0] != 0) {
         list_menu_set_enabled(g_resident_data_base[0] + 0x3E810, 1);
@@ -118,6 +124,7 @@ extern void SetupGifPaging(long arg0);
 extern void SetupGifPaging(long param_1);
 extern void func_0029CED8(void);
 
+/* Draws a menu page between the start and end of screen drawing (PAL). */
 long long menu_page_draw_gif_pal(void)
 {
     SetupGifPaging(0);
@@ -128,7 +135,8 @@ long long menu_page_draw_gif_pal(void)
 
 extern int g_menu_choice;
 
-int func_PAL_002D6528(void) {
+/* Clears the menu choice to -1 (PAL). */
+int menu_clear_choice_pal(void) {
     g_menu_choice = -1;
     return 0;
 }
@@ -147,10 +155,11 @@ extern int stub_empty_25(void);
 extern int stub_empty_25(void);
 extern void data_set_small_value_and_refresh(int, int);
 extern int request_begin_slot(int, int, int, int, int);
-extern int func_PAL_0029CDA8(int);
+extern int menu_update_info_panel_pal(int);
 extern int stub_empty_24(void);
 
-int func_PAL_002D6548(void)
+/* Handles input on the map page: close, select or move the map target, starting the level load or message when a new target is chosen (PAL). */
+int menu_page_select_handle_input_pal(void)
 {
     int result = 0;
     int flags = g_menu_input_flags;
@@ -194,7 +203,7 @@ int func_PAL_002D6548(void)
             FadeToBlack(4);
         }
     } else {
-        func_PAL_0029CDA8(flags);
+        menu_update_info_panel_pal(flags);
     }
 finish:
     return result;
@@ -203,6 +212,7 @@ finish:
 
 extern void func_0029CB20(void);
 
+/* Draws a menu page between the start and end of screen drawing (PAL). */
 int menu_page_draw_second_pal(void) {
     SetupGifPaging(0);
     func_0029CB20();
@@ -210,12 +220,13 @@ int menu_page_draw_second_pal(void) {
     return 0;
 }
 
-extern int func_PAL_002D6730(int, int, int *);
+extern int menu_process_request_pal(int, int, int *);
 
-int func_PAL_002D6710(int first, int second) {
+/* Processes a menu request with a throwaway result slot (PAL). */
+int menu_send_request_pal(int type, int value) {
     int result[4];
     result[0] = 0;
-    return func_PAL_002D6730(first, second, result);
+    return menu_process_request_pal(type, value, result);
 }
 
 
@@ -249,7 +260,7 @@ extern void snd_play_menu_sound_if_enabled(int, int);
    through `result` and return 1 (type 7 falls through into type 8). The dispatch reads the table
    retail already has at D_0026CD60 (fourteen code addresses, one per type; types 0 and 1 go to the
    common return); `cases` only keeps the labels alive. */
-int func_PAL_002D6730(int type, int value, int *result)
+int menu_process_request_pal(int type, int value, int *result)
 {
     static void *cases[12] = {&&L3, &&L4, &&L5, &&L6, &&L7, &&L8, &&L10, &&L11, &&L9, &&L2, &&L12, &&L13};
     int ret = 0;
@@ -352,17 +363,19 @@ done:
 }
 
 
-int func_PAL_002D6A10(char *object, int arg, int *result)
+/* Processes the request stored in the selected row of a menu object (PAL). */
+int menu_process_selected_row_request_pal(char *object, int arg, int *result)
 {
     typedef struct { int first, value, third; } Func002D5E38Row;
     Func002D5E38Row *rows = *(Func002D5E38Row **)(object + 0x34);
     int index = *(int *)(object + 0x40);
-    return func_PAL_002D6730(arg, rows[index].value, result);
+    return menu_process_request_pal(arg, rows[index].value, result);
 }
 
 
-void func_PAL_002D6A48(char *object, int *result) {
-    func_PAL_002D6730(*(short *)(object + 2), *(int *)(object + 4), result);
+/* Processes the request stored in a menu entry (PAL). */
+void menu_process_entry_request_pal(char *object, int *result) {
+    menu_process_request_pal(*(short *)(object + 2), *(int *)(object + 4), result);
 }
 
 

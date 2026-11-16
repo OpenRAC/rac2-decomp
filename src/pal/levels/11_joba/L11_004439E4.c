@@ -15,6 +15,8 @@ extern u8 *g_arena_camera_table __attribute__((sda));
 extern u8 g_hero_state[];
 extern u8 g_music_state[];
 
+/* Ends the arena controller's frame: bumps its frame counter, runs the level script and a closing
+   helper (PAL: 50 Hz timings). */
 void arena_end_frame_pal(u8 *obj) {
     u8 *state = *(u8 **)(obj + 0x68);
     u16 *counter = (u16 *)(obj + 0x96);

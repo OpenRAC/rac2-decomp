@@ -39,7 +39,7 @@ extern int g_sparkle_chance __attribute__((sda));
 extern float math_fast_sin_or_cos_b(float);
 extern float FastAddRotations(float, float);
 extern int math_random_int_below(int);
-extern void func_PAL_L01_0041C0D8(Obj_397870 *);
+extern void gfx_draw_glow_rings_pal(Obj_397870 *);
 
 extern float g_class_float_scale __attribute__((sda));
 extern float g_class_float_base __attribute__((sda));
@@ -47,25 +47,26 @@ extern float g_class_float_random_scale __attribute__((sda));
 extern float g_class_rotation_scale __attribute__((sda));
 extern int g_class_random_range __attribute__((sda));
 
-void func_PAL_L01_0041BF10(Obj_397870 *a0)
+/* Bobbing moby update: sizes the moby, bobs and spins it, redraws its glow rings and sometimes spawns a sparkle (PAL copy). */
+void bobbing_l01_moby_update_2_pal(Obj_397870 *moby)
 {
-    State_397870 *s1 = a0->st;
-    float f;
+    State_397870 *vars = moby->st;
+    float sine;
 
-    a0->f2C = a0->cls->f24 * g_class_float_scale;
+    moby->f2C = moby->cls->f24 * g_class_float_scale;
 
-    if (a0->b20 == 1) {
-        f = math_fast_sin_or_cos_b(a0->fFC);
-        a0->f18 = s1->f18 + g_class_float_base + g_class_float_random_scale * f;
-        a0->fF0 = FastAddRotations(a0->fF0, s1->f68);
-        a0->fF4 = FastAddRotations(a0->fF4, s1->f64);
-        a0->fF8 = FastAddRotations(a0->fF8, s1->f60);
-        a0->fFC = FastAddRotations(a0->fFC, 0.0003490659f * g_class_rotation_scale);
+    if (moby->b20 == 1) {
+        sine = math_fast_sin_or_cos_b(moby->fFC);
+        moby->f18 = vars->f18 + g_class_float_base + g_class_float_random_scale * sine;
+        moby->fF0 = FastAddRotations(moby->fF0, vars->f68);
+        moby->fF4 = FastAddRotations(moby->fF4, vars->f64);
+        moby->fF8 = FastAddRotations(moby->fF8, vars->f60);
+        moby->fFC = FastAddRotations(moby->fFC, 0.0003490659f * g_class_rotation_scale);
     }
 
-    func_PAL_L01_0041C0D8(a0);
+    gfx_draw_glow_rings_pal(moby);
     if (math_random_int_below(g_class_random_range) == 0)
-        part_spawn_sparkle_drift_pal(a0);
+        part_spawn_sparkle_drift_pal(moby);
 }
 
 

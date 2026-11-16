@@ -12,7 +12,8 @@ extern SelectorOwner g_music_state;
 extern SelectorRow g_subtitle_history[];
 extern int g_current_game_mode __attribute__((sda));
 extern int g_game_time __attribute__((sda));
-int func_PAL_00289730(int key, int selection)
+/* Queues a voice line for the subtitle system if nothing is playing and the line is valid. */
+int subtitle_request_voice_line_pal(int key, int selection)
 {
     SelectorState *state = &ref_L00_00288E18_00;
     if (state->active == 0 && state->key == -1 && g_music_state.active == 0 &&

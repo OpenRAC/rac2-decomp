@@ -71,7 +71,8 @@ typedef struct BurstObject {
     u8 pad6C[0x54];
     float forward[4], right[4];
 } BurstObject;
-void func_PAL_L00_0041AE28(BurstObject *object)
+/* Sets off a bigger explosion with fire, sparks, smoke and a shockwave (PAL: 50 Hz speeds and lifetimes). */
+void part_l00_spawn_explosion_burst_2_pal(BurstObject *object)
 {
     float position[4] __attribute__((aligned(16)));
     float velocity[4] __attribute__((aligned(16)));

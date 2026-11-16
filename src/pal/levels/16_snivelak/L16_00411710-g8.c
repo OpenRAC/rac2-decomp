@@ -2,9 +2,9 @@
 /* func_PAL_L16_00411710, the PAL copy of func_L16_0040C840: the same C, where the frame counts and
    rates take PAL's 50 Hz values and all three timer rolls are scaled by 5/6. */
 /* Preserve the observed integer/FP argument banks and the dispatcher's 64-bit flags. */
-extern void func_PAL_L16_00411C78(u8 *), func_PAL_L16_00411E88(u8 *), func_PAL_L16_00412170(u8 *);
+extern void small_enemy_part_update_pal(u8 *), turret_l16_aim_at_hero_pal(u8 *), EmitSnivelakBoneParticles_pal(u8 *);
 extern int math_random_int_below(int), math_random_int_range(int, int), FastDecTimer(short *);
-extern void moby_set_state(void *, u8, int), func_PAL_002A7E68(void *, int, int, int);
+extern void moby_set_state(void *, u8, int), anim_start_blended_pal(void *, int, int, int);
 typedef struct {
     u8 reserved_00[0x18];
     u8 enabled, count, kind;
@@ -20,9 +20,9 @@ extern u8 *cam_moby_create_pal(void *, int, int, int, void *, void *, void *, in
 extern u8 *CreateMoby(int);
 extern void moby_init_child_from_parent(void *, void *), hero_copy_field_to_moby(void *), moby_fade_out_update(void *);
 extern float coll_probe_ground_height_below(void *, int, float);
-extern char *func_PAL_L13_004170F0(void *, int, int, int, int, int, int, int, float, int, int);
+extern char *part_l13_spawn_flash_pal(void *, int, int, int, int, int, int, int, float, int, int);
 extern void SetDeathBits_pal(void *, int, int), moby_mark_spawned(void *);
-extern int func_PAL_002AF6C0(void *, float);
+extern int math_is_value_within_step_pal(void *, float);
 extern void FastVecSub(void *, void *, void *);
 extern void moby_transform_joint_to_world(char *, int, char *);
 extern void vec_scale_to_length(void *, void *, float);
@@ -42,7 +42,7 @@ extern struct {
 } D_L16_001B99C0;
 
 /* Updates the object's activation states, death debris and timed aiming sequence. */
-void func_PAL_L16_00411710(u8 *moby)
+void snivelak_activation_and_debris_update_pal(u8 *moby)
 {
     u8 *state = *(u8 **)(moby + 0x68);
     float velocity[4] __attribute__((aligned(16)));
@@ -50,12 +50,12 @@ void func_PAL_L16_00411710(u8 *moby)
     DispatchFlags flags;
     u8 *child;
     int i;
-    func_PAL_L16_00411C78(moby);
+    small_enemy_part_update_pal(moby);
     switch (moby[0x95]) {
     case 0:
         *(short *)(state + 0x23e) = math_random_int_below(30);
         if (*(int *)(state + 0x240) == 1 && FastDecTimer((short *)(state + 0x23e))) {
-            if (moby[0x43] != 1) func_PAL_002A7E68(moby, 1, 0, 8);
+            if (moby[0x43] != 1) anim_start_blended_pal(moby, 1, 0, 8);
             moby_set_state(moby, 3, 2);
             break;
         }
@@ -93,7 +93,7 @@ void func_PAL_L16_00411710(u8 *moby)
             moby_init_child_from_parent(child, moby);
             *(float *)(child + 0x18) = coll_probe_ground_height_below(moby + 0x10, 0, 0.5f);
             hero_copy_field_to_moby(child);
-            func_PAL_L13_004170F0(moby + 0x10, 0, 45, 40, 40, 40, 45, 1, 1.0f, 1, 1);
+            part_l13_spawn_flash_pal(moby + 0x10, 0, 45, 40, 40, 40, 45, 1, 1.0f, 1, 1);
             g_snivelak_hero_state.lifetime = 75;
             g_snivelak_hero_state.strength = 0.2f;
             g_snivelak_hero_state.duration = 50;
@@ -114,7 +114,7 @@ void func_PAL_L16_00411710(u8 *moby)
         }
         if ((flags & 2UL) == 2UL) {
             if (*(int *)(state + 0x240) == 1 || *(int *)(state + 0x354) == 1) {
-                if (moby[0x43] != 1) func_PAL_002A7E68(moby, 1, 0, 8);
+                if (moby[0x43] != 1) anim_start_blended_pal(moby, 1, 0, 8);
                 moby_set_state(moby, 3, 2);
             } else {
                 moby_set_state(moby, 2, 1);
@@ -129,7 +129,7 @@ void func_PAL_L16_00411710(u8 *moby)
     case 2:
         break;
     case 3:
-        if (func_PAL_002AF6C0(moby, 1.0f)) {
+        if (math_is_value_within_step_pal(moby, 1.0f)) {
             moby_transform_joint_to_world((char *)moby, 2, (char *)velocity);
             FastVecSub(aim, state + 0x1f0, velocity);
             vec_scale_to_length(aim, aim, 0.50000006f);
@@ -138,7 +138,7 @@ void func_PAL_L16_00411710(u8 *moby)
         if (*(int *)(state + 0x24c) != -1)
             path_check_entry_for_moby_pal((char *)moby, *(int *)(state + 0x24c));
         if (*(unsigned short *)(moby + 0x96) > 180) {
-            if (moby[0x43]) func_PAL_002A7E68(moby, 0, 0, 8);
+            if (moby[0x43]) anim_start_blended_pal(moby, 0, 0, 8);
             moby_set_state(moby, 4, -1);
         }
         break;
@@ -146,11 +146,11 @@ void func_PAL_L16_00411710(u8 *moby)
         if (*(int *)(state + 0x24c) != -1)
             path_check_entry_for_moby_pal((char *)moby, *(int *)(state + 0x24c));
         if (*(unsigned short *)(moby + 0x96) > 180) {
-            if (moby[0x43] != 1) func_PAL_002A7E68(moby, 1, 0, 8);
+            if (moby[0x43] != 1) anim_start_blended_pal(moby, 1, 0, 8);
             moby_set_state(moby, 3, -1);
         }
         break;
     }
-    func_PAL_L16_00411E88(moby);
-    func_PAL_L16_00412170(moby);
+    turret_l16_aim_at_hero_pal(moby);
+    EmitSnivelakBoneParticles_pal(moby);
 }

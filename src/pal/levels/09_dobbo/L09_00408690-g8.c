@@ -47,47 +47,48 @@ extern void vec_scale_to_length(void *, void *, float);
 extern void part_spawn_masked_debris(char *, int, void *, u8, float, float, float, float);
 extern void SetDeathBits(char *, int, int);
 extern void moby_mark_spawned(char *);
-extern void func_PAL_L09_00408090(char *);
+extern void dobbo_tick_timers_age_pal(char *);
 extern void dobbo_update_height_separation_pal(char *);
 extern void part_spawn_bone_sparks(char *);
 
-void func_PAL_L09_00408690(char *obj)
+/* Per-frame update of the Dobbo path enemy (moby class 3415): it waits, follows its path, walks up to the hero, and blows up when hit (PAL: 50 Hz timings). */
+void dobbo_path_enemy_update_pal(char *obj)
 {
-    char *p = *(char **)(obj + 0x68);
+    char *vars = *(char **)(obj + 0x68);
     int state, flags, index;
     int *path;
     float length;
-    float v[4];
+    float away[4];
 
     dobbo_update_large_release_record(obj);
     dobbo_restore_saved_height(obj);
     state = (u8)obj[0x95];
     switch (state) {
     case 0:
-        if (*(int *)(p + 0x234) == 1 || *(s16 *)(p + 0x26C)) {
+        if (*(int *)(vars + 0x234) == 1 || *(s16 *)(vars + 0x26C)) {
             dobbo_alert_path_enemies(obj);
             if ((u8)obj[0x43] != 2)
                 anim_start_blended(obj, 2, 0, 4);
-            *(int *)(p + 0x28C) = *(int *)(p + 0x244);
-            *(float *)(p + 0x290) = 0;
-            *(int *)(p + 0x138) |= 4;
+            *(int *)(vars + 0x28C) = *(int *)(vars + 0x244);
+            *(float *)(vars + 0x290) = 0;
+            *(int *)(vars + 0x138) |= 4;
             moby_set_state(obj, 4, 1);
         }
         break;
     case 2:
-        if (*(int *)(p + 0x234) == 1 || *(s16 *)(p + 0x26C)) {
+        if (*(int *)(vars + 0x234) == 1 || *(s16 *)(vars + 0x26C)) {
             dobbo_alert_path_enemies(obj);
-            *(u16 *)(p + 0x26C) = ((s32)(g_dobbo_timer_value) * 5 + 2) / 6;
+            *(u16 *)(vars + 0x26C) = ((s32)(g_dobbo_timer_value) * 5 + 2) / 6;
             if ((u8)obj[0x43] != state)
                 anim_start_blended(obj, 2, 0, 4);
             moby_set_controller_speed_limits(obj, 0.0096f, 0.080000006f, 1.0053098f, 1.0053098f);
-            *(int *)(p + 0x13C) = *(int *)(p + 0x254);
-            *(int *)(p + 0x28C) = *(int *)(p + 0x244);
+            *(int *)(vars + 0x13C) = *(int *)(vars + 0x254);
+            *(int *)(vars + 0x28C) = *(int *)(vars + 0x244);
             moby_set_state(obj, 3, 3);
         }
         break;
     case 3:
-        if (!*(int *)(p + 0x234) && !*(s16 *)(p + 0x26C)) {
+        if (!*(int *)(vars + 0x234) && !*(s16 *)(vars + 0x26C)) {
             moby_set_controller_speed_limits(obj, 0.0096f, 0.080000006f, 1.0053098f, 1.0053098f);
             if (*(u8 *)(obj + 0x43) != 0)
                 anim_start_blended(obj, 0, 0, 20);
@@ -98,7 +99,7 @@ void func_PAL_L09_00408690(char *obj)
 
     switch ((u8)obj[0x20]) {
     case 2:
-        enemy_update_wander_heading(obj, p + 0x1F0, p + 0x100);
+        enemy_update_wander_heading(obj, vars + 0x1F0, vars + 0x100);
         break;
     case 3:
         if (obj[0x60] & 2)
@@ -109,25 +110,25 @@ void func_PAL_L09_00408690(char *obj)
             if (*(u8 *)(obj + 0x43) != 0)
                 anim_start_blended(obj, 0, 0, 20);
         }
-        path = g_path_l09_table[*(int *)(p + 0x250)];
+        path = g_path_l09_table[*(int *)(vars + 0x250)];
         length = IntToFloat(*path);
-        *(float *)(p + 0x290) += length / (*(float *)(p + 0x25C) * 60.0f);
-        if (length <= *(float *)(p + 0x290)) {
-            *(float *)(p + 0x290) = length;
+        *(float *)(vars + 0x290) += length / (*(float *)(vars + 0x25C) * 60.0f);
+        if (length <= *(float *)(vars + 0x290)) {
+            *(float *)(vars + 0x290) = length;
             moby_set_controller_speed_limits(obj, 0.0096f, 0.080000006f, 1.0053098f, 1.0053098f);
-            *(int *)(p + 0x138) &= ~4;
+            *(int *)(vars + 0x138) &= ~4;
             moby_set_state(obj, 5, 3);
         }
-        table_run_entry_by_index(*(int *)(p + 0x250), 0, obj + 0x10, obj + 0xF0, 0,
-                         *(float *)(p + 0x290));
+        table_run_entry_by_index(*(int *)(vars + 0x250), 0, obj + 0x10, obj + 0xF0, 0,
+                         *(float *)(vars + 0x290));
         break;
     case 5:
         if (obj[0x60] & 2) {
             if (*(u8 *)(obj + 0x43) != 0)
                 anim_start_blended(obj, 0, 0, 20);
         }
-        enemy_update_wander_heading(obj, p + 0x1F0, p + 0x100);
-        if (*(s16 *)(p + 0x26A)) {
+        enemy_update_wander_heading(obj, vars + 0x1F0, vars + 0x100);
+        if (*(s16 *)(vars + 0x26A)) {
             moby_set_controller_speed_limits(obj, 0.0096f, 0.080000006f, 1.0053098f, 1.0053098f);
             if ((u8)obj[0x43] != 2)
                 anim_start_blended(obj, 2, 0, 4);
@@ -143,11 +144,11 @@ void func_PAL_L09_00408690(char *obj)
         break;
     case 7:
         if (flag_set_first_pending(obj)) {
-            DobboSoundAnchor *entry = (DobboSoundAnchor *)(g_sound_state + *(s16 *)(p + 0x274) * 0x70);
+            DobboSoundAnchor *entry = (DobboSoundAnchor *)(g_sound_state + *(s16 *)(vars + 0x274) * 0x70);
             if (entry->owner != obj || !entry->active)
-                *(s16 *)(p + 0x274) = PlayMobySound(g_dobbo_path_sound, 4, obj);
+                *(s16 *)(vars + 0x274) = PlayMobySound(g_dobbo_path_sound, 4, obj);
         }
-        moby_turn_toward_target_and_step(obj, p + 0x220, 0.0f);
+        moby_turn_toward_target_and_step(obj, vars + 0x220, 0.0f);
         if (g_hero_state.target == obj || vec_distance_xy(obj + 0x10, g_hero_state.position) < 1.2f) {
             if ((u8)obj[0x43] != 4)
                 anim_start_blended(obj, 4, 0, 4);
@@ -162,26 +163,26 @@ void func_PAL_L09_00408690(char *obj)
         }
         break;
     case 9:
-        flags = moby_dispatch_action_by_kind(obj, p + 0x50);
+        flags = moby_dispatch_action_by_kind(obj, vars + 0x50);
         if (flags & 1) {
-            STUB_printf(g_str_dobbo_path_debug, *(s16 *)(p + 0x274), *(s16 *)(obj + 0xB2));
-            index = *(s16 *)(p + 0x274);
+            STUB_printf(g_str_dobbo_path_debug, *(s16 *)(vars + 0x274), *(s16 *)(obj + 0xB2));
+            index = *(s16 *)(vars + 0x274);
             if (index != -1) {
                 DobboSoundAnchor *entry = (DobboSoundAnchor *)(g_sound_state + index * 0x70);
                 if (entry->owner == obj && entry->active)
                     snd_stop_voice(index);
             }
-            *(s16 *)(p + 0x274) = -1;
-            FastVecSub(v, obj + 0x10, g_hero_position);
-            vec_transform_and_set_height(obj, v, v, 0, 0.0f);
-            vec_scale_to_length(v, v, 0.120000005f);
-            part_spawn_masked_debris(obj, 0x3F, v, 0xFF, 3.0f, 6.0f, 3.0f, 6.0f);
+            *(s16 *)(vars + 0x274) = -1;
+            FastVecSub(away, obj + 0x10, g_hero_position);
+            vec_transform_and_set_height(obj, away, away, 0, 0.0f);
+            vec_scale_to_length(away, away, 0.120000005f);
+            part_spawn_masked_debris(obj, 0x3F, away, 0xFF, 3.0f, 6.0f, 3.0f, 6.0f);
             PlayMobySound(0, 0, obj);
             SetDeathBits(obj, 0, 3);
             moby_mark_spawned(obj);
             return;
         } else if (flags & 2) {
-            *(u16 *)(p + 0x26C) = ((s32)(g_dobbo_timer_value) * 5 + 2) / 6;
+            *(u16 *)(vars + 0x26C) = ((s32)(g_dobbo_timer_value) * 5 + 2) / 6;
             moby_set_state(obj, 5, 3);
             PlayMobySound(3, 0, obj);
         }
@@ -189,15 +190,15 @@ void func_PAL_L09_00408690(char *obj)
     }
 
     if ((u8)obj[0x20] != 7) {
-        index = *(s16 *)(p + 0x274);
+        index = *(s16 *)(vars + 0x274);
         if (index != -1) {
             DobboSoundAnchor *entry = (DobboSoundAnchor *)(g_sound_state + index * 0x70);
             if (entry->owner == obj && entry->active)
                 snd_stop_voice(index);
         }
-        *(s16 *)(p + 0x274) = -1;
+        *(s16 *)(vars + 0x274) = -1;
     }
-    func_PAL_L09_00408090(obj);
+    dobbo_tick_timers_age_pal(obj);
     dobbo_update_height_separation_pal(obj);
     part_spawn_bone_sparks(obj);
 }

@@ -23,28 +23,33 @@ extern u8 g_str_linked_door_msg_b[];
 extern u8 g_game_flag_table[];
 extern u8 g_str_rising_platform_sound[];
 
-void func_PAL_L13_003E5340(u8 *a0) {
-    *(f32 *)(a0 + 0xF4) = FastAddRotations(*(f32 *)(a0 + 0xF4), 0.020943955f);
+/* Spins the moby around its yaw by 1.2 degrees each frame. */
+void moby_spin_yaw_pal(u8 *moby) {
+    *(f32 *)(moby + 0xF4) = FastAddRotations(*(f32 *)(moby + 0xF4), 0.020943955f);
 }
 
 
-void func_PAL_L13_003E5378(u8 *a0) {
-    *(f32 *)(a0 + 0xF4) = FastAddRotations(*(f32 *)(a0 + 0xF4), 0.020943955f);
+/* Spins the moby around its yaw by 1.2 degrees each frame (alternate copy). */
+void moby_spin_yaw_alt_pal(u8 *moby) {
+    *(f32 *)(moby + 0xF4) = FastAddRotations(*(f32 *)(moby + 0xF4), 0.020943955f);
 }
 
 
-void func_PAL_L13_003E53B0(u8 *a0) {
-    *(f32 *)(a0 + 0xF4) = FastAddRotations(*(f32 *)(a0 + 0xF4), 0.03490659f);
+/* Spins the moby around its yaw by 2 degrees each frame. */
+void moby_spin_yaw_fast_pal(u8 *moby) {
+    *(f32 *)(moby + 0xF4) = FastAddRotations(*(f32 *)(moby + 0xF4), 0.03490659f);
 }
 
 
-void func_PAL_L13_003E53E8(u8 *a0) {
-    *(f32 *)(a0 + 0xF4) = FastAddRotations(*(f32 *)(a0 + 0xF4), 0.020943955f);
+/* Spins the moby around its yaw by 1.2 degrees each frame (slow copy). */
+void moby_spin_yaw_slow_pal(u8 *moby) {
+    *(f32 *)(moby + 0xF4) = FastAddRotations(*(f32 *)(moby + 0xF4), 0.020943955f);
 }
 
 
-void func_PAL_L13_003E5420(u8 *a0) {
-    *(f32 *)(a0 + 0xF4) = FastAddRotations(*(f32 *)(a0 + 0xF4), 0.020943955f);
+/* Spins the moby around its yaw by 1.2 degrees each frame (small copy). */
+void moby_spin_yaw_small_pal(u8 *moby) {
+    *(f32 *)(moby + 0xF4) = FastAddRotations(*(f32 *)(moby + 0xF4), 0.020943955f);
 }
 
 
@@ -54,13 +59,13 @@ extern u32 g_frame_counter[] __attribute__((sda));
 extern u8 g_item_enabled_flags[] __attribute__((sda));
 extern s32 g_scene_trigger_flag[] __attribute__((sda));
 extern s32 g_hint_index;
-extern s32 IsPointInCuboid(void *a0, s32 a1);
-extern int snd_play_from_global_bank(s32 a0, s32 a1, s32 a2);
-extern void value_set_entry_by_index_pal(s32 a0, s32 a1);
-extern int func_PAL_00289730(s32 a0, s32 a1);
+extern s32 IsPointInCuboid(void *moby, s32 a1);
+extern int snd_play_from_global_bank(s32 moby, s32 a1, s32 a2);
+extern void value_set_entry_by_index_pal(s32 moby, s32 a1);
+extern int subtitle_request_voice_line_pal(s32 moby, s32 a1);
 
 /* func_PAL_L13_003EC9C0, the PAL copy of func_L13_003E8850: the same C, where the frame counter is scaled to 50 Hz and 0x69780 becomes 0x57E40. */
-void func_PAL_L13_003EC9C0(u8 *self)
+void trigger_hint_update_pal(u8 *self)
 {
     u8 *state = *(u8 **)(self + 0x68);
     s16 h;
@@ -101,7 +106,7 @@ void func_PAL_L13_003EC9C0(u8 *self)
     counters = g_game_flag_table;
     if (counters[0x7E] < 2 && *(s16 *)(state + 0xC) == 0) {
         if (g_hint_index >= 0)
-            func_PAL_00289730(0x9E3, 0x3A);
+            subtitle_request_voice_line_pal(0x9E3, 0x3A);
         counters[0x7E] = counters[0x7E] + 1;
         *(s16 *)(state + 0xC) = 1;
     }

@@ -17,7 +17,8 @@ extern int g_sparkle_field_a __attribute__((sda));
 extern int g_sparkle_field_b[] __attribute__((sda));
 extern Triangle g_sparkle_triangle;
 extern char g_particle_template[] __attribute__((sda));
-void func_PAL_L16_004114A0(char *object)
+/* Spawns one sparkle at a random point inside a triangle around the object (PAL: 50 Hz lifetime). */
+void part_spawn_sparkle_in_triangle_pal(char *object)
 {
     float weights[4];
     Vector128 point[1],temporary[1];

@@ -16,7 +16,7 @@ extern f32 math_interpolate_between_limits(s32, s32, f32, f32);
 extern void boss_reset_with_children(void *);
 extern void *part_find_owned_effect_slot(void *, u32, s32);
 extern f32 moby_update_aim_target_strength_pal(void *, void *);
-extern void func_PAL_002AC290(void *, void *, s32);
+extern void gfx_start_color_fade_pal(void *, void *, s32);
 extern f32 ApproachValue(f32 *, f32, f32);
 extern s32 weapon_select_aim_target(void *, s32, void *, s32, f32, f32);
 #define F(p, o) (*(f32 *)((p) + (o)))
@@ -24,92 +24,93 @@ extern s32 weapon_select_aim_target(void *, s32, void *, s32, f32, f32);
 #define H(p, o) (*(s16 *)((p) + (o)))
 #define U(p, o) (*(u16 *)((p) + (o)))
 
-void UpdatePhasedDamageState_pal(u8 *object)
+/* Updates a Siberius enemy that has several health stages. It spawns two attached parts when it starts, takes damage, and switches animation each time a stage is lost. */
+void UpdatePhasedDamageState_pal(u8 *moby)
 {
-    u8 *state = *(u8 **)(object + 0x68);
+    u8 *vars = *(u8 **)(moby + 0x68);
     u8 *child;
     f32 damage, scale;
 
-    if (object[0x20] == 0) {
+    if (moby[0x20] == 0) {
         if (g_moby_update_inhibit_flag[0]) {
-            moby_set_state(object, 1, 2);
-            moby_mark_spawned(object);
+            moby_set_state(moby, 1, 2);
+            moby_mark_spawned(moby);
             return;
         }
-        state[0x48] = FloatToInt(30.0f);
-        state[0x4A] = FloatToInt(11.2f);
-        state[0x2E] = 1;
-        object[0x30] = 255;
+        vars[0x48] = FloatToInt(30.0f);
+        vars[0x4A] = FloatToInt(11.2f);
+        vars[0x2E] = 1;
+        moby[0x30] = 255;
         child = CreateMoby(0xD41);
         if (child) {
-            moby_init_child_from_parent(child, object);
+            moby_init_child_from_parent(child, moby);
             U(child, 0x34) |= 0x400;
-            *(u8 **)(state + 0x410) = child;
+            *(u8 **)(vars + 0x410) = child;
         }
         child = CreateMoby(0xD45);
         if (child) {
-            moby_init_child_from_parent(child, object);
-            *(u8 **)(state + 0x414) = child;
+            moby_init_child_from_parent(child, moby);
+            *(u8 **)(vars + 0x414) = child;
             U(child, 0x34) |= 0x100;
         }
-        if (H(state, 0x24) == 0) {
-            H(state, 0x24) = 100;
-            F(state, 0x20) = 100.0f;
+        if (H(vars, 0x24) == 0) {
+            H(vars, 0x24) = 100;
+            F(vars, 0x20) = 100.0f;
         } else {
             scale = 1.0f - math_interpolate_between_limits(5, 20, 0.0f, 0.5f);
-            H(state, 0x24) = FloatToInt(scale * (f32)H(state, 0x24));
-            F(state, 0x20) *= scale;
+            H(vars, 0x24) = FloatToInt(scale * (f32)H(vars, 0x24));
+            F(vars, 0x20) *= scale;
         }
         {
             s32 active = g_boss_active_flag;
 
-            H(*(u8 **)(object + 0x24), 0x46) = 5;
-            U(object, 0x34) |= 0x5000;
+            H(*(u8 **)(moby + 0x24), 0x46) = 5;
+            U(moby, 0x34) |= 0x5000;
             if (active)
                 g_boss_counter++;
         }
         g_boss_active_flag = 0;
-        moby_set_state(object, 1, 2);
-        boss_reset_with_children(object);
+        moby_set_state(moby, 1, 2);
+        boss_reset_with_children(moby);
     }
-    F(state, 0x30) = g_boss_default_param;
-    damage = moby_update_aim_target_strength_pal(object, part_find_owned_effect_slot(object, 0x10000, 0));
-    if ((I(state, 0x420) >= 3 || (u32)(object[0x20] - 10) >= 5) &&
-        (damage != 0.0f || state[0x2E] == 2)) {
+    F(vars, 0x30) = g_boss_default_param;
+    damage = moby_update_aim_target_strength_pal(moby, part_find_owned_effect_slot(moby, 0x10000, 0));
+    if ((I(vars, 0x420) >= 3 || (u32)(moby[0x20] - 10) >= 5) &&
+        (damage != 0.0f || vars[0x2E] == 2)) {
         s32 amount = (s32)(damage * 32.0f);
 
-        g_boss_hit_counters[state[0x37]] += amount;
-        state[0x167] = 150;
-        func_PAL_002AC290(object, state + 0x160, amount);
-        if (I(state, 0x420) < 2)
-            ApproachValue((f32 *)(state + 0x20), F(state, 0x430), damage);
+        g_boss_hit_counters[vars[0x37]] += amount;
+        vars[0x167] = 150;
+        gfx_start_color_fade_pal(moby, vars + 0x160, amount);
+        if (I(vars, 0x420) < 2)
+            ApproachValue((f32 *)(vars + 0x20), F(vars, 0x430), damage);
         else
-            ApproachValue((f32 *)(state + 0x20), 0.0f, damage);
-        if (state[0x2E] == 2) {
-            if ((f32)I(state, 0x420) <= 1.0f)
-                F(state, 0x20) = F(state, 0x430);
+            ApproachValue((f32 *)(vars + 0x20), 0.0f, damage);
+        if (vars[0x2E] == 2) {
+            if ((f32)I(vars, 0x420) <= 1.0f)
+                F(vars, 0x20) = F(vars, 0x430);
             else
-                F(state, 0x20) = 0.0f;
+                F(vars, 0x20) = 0.0f;
         }
-        if (F(state, 0x20) <= F(state, 0x430)) {
-            F(state, 0x430) = (f32)H(state, 0x24) - (f32)H(state, 0x24) *
-                ((f32)(I(state, 0x420) + 2) * 0.16694492f);
-            I(state, 0x420)++;
-            I(state, 0x458) = FloatToInt(math_interpolate_between_limits(3, 7, 1.0f, 4.0f));
-            if (F(state, 0x20) - 1.0f < F(state, 0x430))
-                F(state, 0x430) = F(state, 0x20) - 1.0f;
-            if (F(state, 0x430) < 0.0f)
-                F(state, 0x430) = 0.0f;
-            if (object[0x95] == 0)
-                moby_set_state(object, 10, -1);
+        if (F(vars, 0x20) <= F(vars, 0x430)) {
+            F(vars, 0x430) = (f32)H(vars, 0x24) - (f32)H(vars, 0x24) *
+                ((f32)(I(vars, 0x420) + 2) * 0.16694492f);
+            I(vars, 0x420)++;
+            I(vars, 0x458) = FloatToInt(math_interpolate_between_limits(3, 7, 1.0f, 4.0f));
+            if (F(vars, 0x20) - 1.0f < F(vars, 0x430))
+                F(vars, 0x430) = F(vars, 0x20) - 1.0f;
+            if (F(vars, 0x430) < 0.0f)
+                F(vars, 0x430) = 0.0f;
+            if (moby[0x95] == 0)
+                moby_set_state(moby, 10, -1);
             else
-                moby_set_state(object, 12, -1);
+                moby_set_state(moby, 12, -1);
         }
     }
-    object[0xA8] = 255;
-    state[0x2E] = 1;
-    if (object[0x95] == 0)
-        weapon_select_aim_target(object, -1, g_hero_position, 0, 16.0f, 4.0f);
+    moby[0xA8] = 255;
+    vars[0x2E] = 1;
+    if (moby[0x95] == 0)
+        weapon_select_aim_target(moby, -1, g_hero_position, 0, 16.0f, 4.0f);
     else
-        weapon_select_aim_target(object, I(state, 0x188), 0, 0, 0.0f, 0.0f);
+        weapon_select_aim_target(moby, I(vars, 0x188), 0, 0, 0.0f, 0.0f);
 }

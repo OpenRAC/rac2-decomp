@@ -27,6 +27,7 @@ extern void multiply_matrix(void *, void *, void *);
 extern unsigned long GetEffectTextureDescriptor(int);
 extern void draw_world_quad(void *, void *, int);
 
+/* Draws a pair of crossed, spinning textured quads at the object, turned along its direction. */
 void gfx_draw_spinning_quad_pair_pal(unsigned char *object)
 {
     RotorQuad quad;

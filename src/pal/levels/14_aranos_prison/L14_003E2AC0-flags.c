@@ -35,7 +35,7 @@ extern float vec_distance_xy(void *, void *);
 
 /* Move between the initial height and the projection-table height, updating
  * the collision displacement and keeping the movement sound active. */
-void func_PAL_L14_003E2E50(char *self) {
+void lift_l14_projection_update_pal(char *self) {
     Vec delta, velocity;
     char *state = *(char **)(self + 0x68);
     float target, speed;
@@ -48,9 +48,9 @@ void func_PAL_L14_003E2E50(char *self) {
             return;
         }
         {
-            float originalHeight = *(float *)(self + 0x18);
+            float original_height = *(float *)(self + 0x18);
             *(int *)(state + 0x7C) = 0;
-            *(float *)(state + 0x70) = originalHeight;
+            *(float *)(state + 0x70) = original_height;
         }
         gfx_draw_moby_edge_lines(self, 0);
         moby_set_state(self, 1, -1);
@@ -120,15 +120,15 @@ void func_PAL_L14_003E2E50(char *self) {
         break;
     }
     if (math_fabs(*(float *)(state + 0x74)) > 0.01f) {
-        unsigned char *e = (unsigned char *)g_sound_state + *(int *)(state + 0x78) * 0x70;
-        if (*(char **)(e + 0x88) != self || !e[0x74])
+        unsigned char *voice = (unsigned char *)g_sound_state + *(int *)(state + 0x78) * 0x70;
+        if (*(char **)(voice + 0x88) != self || !voice[0x74])
             *(int *)(state + 0x78) = PlayMobySound(0, 4, self);
     } else {
-        int n = *(int *)(state + 0x78);
-        if (n != -1) {
-            unsigned char *e = (unsigned char *)g_sound_state + n * 0x70;
-            if (*(char **)(e + 0x88) == self && e[0x74])
-                snd_stop_voice(n);
+        int voice_index = *(int *)(state + 0x78);
+        if (voice_index != -1) {
+            unsigned char *voice = (unsigned char *)g_sound_state + voice_index * 0x70;
+            if (*(char **)(voice + 0x88) == self && voice[0x74])
+                snd_stop_voice(voice_index);
         }
         *(int *)(state + 0x78) = -1;
     }

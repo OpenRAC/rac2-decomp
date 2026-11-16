@@ -11,6 +11,7 @@ extern char g_menu_item_table_first[];
 extern char g_preview_extra_value_first[];
 extern char *g_resident_data_base[] __attribute__((sda));
 
+/* Sets up the first model preview object of the menu with its model data. (USA v2.00) */
 int menu_preview_object_init_first_us2(void)
 {
     if (g_resident_data_base[0] != 0) {
@@ -25,6 +26,7 @@ int menu_preview_object_init_first_us2(void)
 extern char g_menu_item_table_second[];
 extern char g_preview_extra_value_second[];
 
+/* Sets up the second model preview object of the menu with its model data. (USA v2.00) */
 int menu_preview_object_init_second_us2(void)
 {
     if (g_resident_data_base[0] != 0) {

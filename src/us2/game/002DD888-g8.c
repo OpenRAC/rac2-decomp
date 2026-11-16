@@ -17,8 +17,8 @@ extern void value_set_entry_by_index_us2(int, int);
 /* Corresponds to RAC1 process_unlock_code_input. */
 void process_unlock_code_input_us2(void) {
     char *pad = g_pad_state;
-    int lim0, lim;
-    int va, vb, vc;
+    int code_limit_init, code_limit;
+    int moby_index, game_flag_index, enabled_index;
     int pressed, direction, j, code, index, matched;
     if ((*(long *)(pad + 0x1C0) & 0xF) == 6) {
         pressed = *(int *)(pad + 0x1C4);
@@ -35,9 +35,9 @@ void process_unlock_code_input_us2(void) {
         if (g_unlock_code_length != 20) return;
         code = -1;
         index = 2;
-        lim0 = 0x93;
-        lim = *(int *)&lim0;
-        for (; index < lim; index++) {
+        code_limit_init = 0x93;
+        code_limit = *(int *)&code_limit_init;
+        for (; index < code_limit; index++) {
             matched = 1;
             for (j = 0; j < 20; j++) {
                 if (g_unlock_code_input[j] != g_unlock_code_table[(j * index + index) & 0xff]) {
@@ -51,19 +51,19 @@ void process_unlock_code_input_us2(void) {
             }
         }
         if (code == -1) return;
-        va = code - 55;
-        vb = code - 74;
-        vc = code - 80;
+        moby_index = code - 55;
+        game_flag_index = code - 74;
+        enabled_index = code - 80;
         if (code < 56) {
             g_item_owned_flags[code] = 1;
             g_help_unlocked_flags[code] = 1;
         } else if ((unsigned)(code - 56) < 18) {
-            moby_mark_flag_and_append_to_list(va);
-        } else if ((unsigned)vb < 6) {
-            g_game_flag_table[vb] = 1;
-        } else if ((unsigned)vc < 30) {
-            if (!g_item_enabled_flags[vc]) {
-                g_item_enabled_flags[vc] = 1;
+            moby_mark_flag_and_append_to_list(moby_index);
+        } else if ((unsigned)game_flag_index < 6) {
+            g_game_flag_table[game_flag_index] = 1;
+        } else if ((unsigned)enabled_index < 30) {
+            if (!g_item_enabled_flags[enabled_index]) {
+                g_item_enabled_flags[enabled_index] = 1;
                 snd_play_from_global_bank(1, 0, 0);
                 value_set_entry_by_index_us2(0x1233, -1);
                 g_unlock_code_entered = 1;

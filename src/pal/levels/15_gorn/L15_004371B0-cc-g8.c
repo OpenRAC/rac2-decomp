@@ -85,7 +85,7 @@ static __inline__ int label_y(void *handle, float value, float scale, float half
                       b, c);                                                                        \
     }
 
-void func_PAL_L15_004371B0(s32 first, s32 timed, s32 third, s32 fourth)
+void gorn_hud_draw_sprites_pal(s32 first, s32 timed, s32 third, s32 fourth)
 {
     HudTimerVars *vars = *(HudTimerVars **)(g_gorn_hud_moby + 0x68);
     f32 fade;
@@ -135,9 +135,9 @@ void func_PAL_L15_004371B0(s32 first, s32 timed, s32 third, s32 fourth)
             }
             sprintf(text, g_str_gorn_hud_format, g_current_map_index[3]);
             {
-                s32 textX = g_gorn_hud_badge_x + 5;
+                s32 text_x = g_gorn_hud_badge_x + 5;
 
-                text_draw_medium(textX, label_y((void *)textX, (f32)(g_gorn_hud_badge_y + 2), g_screen_l15_scale, 0.5f, 1),
+                text_draw_medium(text_x, label_y((void *)text_x, (f32)(g_gorn_hud_badge_y + 2), g_screen_l15_scale, 0.5f, 1),
                               0x80808080, text, 128);
             }
         timed_done:;

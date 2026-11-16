@@ -82,9 +82,9 @@ extern void gfx_draw_screen_rectangle(s32, s32, s32, s32, s32, u32 *);
 extern int GetIconFrame(s32, s32);
 extern void hud_draw_sprite_gradient(void *, s32, s32, s32, s32, Block *);
 extern void text_draw_small(s32, s32, u64, char *, s32);
-extern void func_US2_L05_00327640(s32);
+extern void level_store_value_plus_one_us2(s32);
 extern s32 level_lookup_step_table(void);
-extern void func_US2_0029CC48(void), hud_draw_object_markers(void);
+extern void hud_draw_scaled_us2(void), hud_draw_object_markers(void);
 
 /* The shape of scaled_screen_coord in src/game/002D3390.c, with this level's display scale. */
 static __inline__ s32 screen_coord(s32 mode, f32 value, f32 offset)
@@ -117,61 +117,63 @@ static __inline__ int label_y(void *handle, float value, float scale, float half
     return result;
 }
 
-s32 func_US2_L15_0042F6D0(void) {
+/* Draws the Gorn stage HUD (USA v2.00): the stage text, health and ammo bars, weapon icons and
+   corner sprites. Always returns 1. */
+s32 gorn_stage_hud_draw_us2(void) {
     char text[128];
     char *label;
     u32 colors[2], colors2[2];
-    Block b0, b1, b2;
-    s32 a, b, c, idx, newidx, color, textX;
+    Block color_a, color_b, color_c;
+    s32 minutes, seconds, hundredths, idx, new_index, color, text_x;
     HudBlinkVars *data = *(HudBlinkVars **)(g_gorn_hud_moby + 0x68);
-    f32 x, y, ratio, tmp, base, end, fill, tweenColor;
+    f32 x, y, ratio, bar_end, base, end, fill, tween_color;
     void *sprite0, *sprite2;
 
     switch (g_challenge_menu_choice) {
     case 0: {
-        s32 textX2;
+        s32 text_x2;
 
         gorn_hud_draw_sprites(0, 1, 0, 1);
         label = GetLocalizedString(0x3067);
         sprintf(text, g_str_gorn_label_count, label, group_count_alive(level_find_object_by_class_id(0x1211)));
-        textX2 = g_gorn_hud_text_x - 60;
-        text_draw_medium(textX2, label_y((void *)textX2, g_gorn_hud_text_y - 8, g_screen_l15_scale, 0.5f, 1), 0x80808080, text, 128);
+        text_x2 = g_gorn_hud_text_x - 60;
+        text_draw_medium(text_x2, label_y((void *)text_x2, g_gorn_hud_text_y - 8, g_screen_l15_scale, 0.5f, 1), 0x80808080, text, 128);
         break;
     }
     case 1: {
-        s32 textX2;
+        s32 text_x2;
 
         gorn_hud_draw_sprites(0, 1, 0, 1);
         label = GetLocalizedString(0x3067);
         sprintf(text, g_str_gorn_label_count, label, g_gorn_challenge_vars.count);
-        textX2 = g_gorn_hud_text_x - 60;
-        text_draw_medium(textX2, label_y((void *)textX2, g_gorn_hud_text_y - 8, g_screen_l15_scale, 0.5f, 1), 0x80808080, text, 128);
+        text_x2 = g_gorn_hud_text_x - 60;
+        text_draw_medium(text_x2, label_y((void *)text_x2, g_gorn_hud_text_y - 8, g_screen_l15_scale, 0.5f, 1), 0x80808080, text, 128);
         break;
     }
     case 2: {
-        s32 textX2;
+        s32 text_x2;
 
         gorn_hud_draw_sprites(0, 1, 0, 1);
         label = GetLocalizedString(0x3067);
         sprintf(text, g_str_gorn_label_count, label, CountActiveLinkedListObjects(level_find_object_by_class_id(0x1211)));
-        textX2 = g_gorn_hud_text_x - 60;
-        text_draw_medium(textX2, label_y((void *)textX2, g_gorn_hud_text_y - 8, g_screen_l15_scale, 0.5f, 1), 0x80808080, text, 128);
+        text_x2 = g_gorn_hud_text_x - 60;
+        text_draw_medium(text_x2, label_y((void *)text_x2, g_gorn_hud_text_y - 8, g_screen_l15_scale, 0.5f, 1), 0x80808080, text, 128);
         break;
     }
     case 3: {
         f32 half = 0.5f;
-        s32 textX2;
+        s32 text_x2;
 
         gorn_hud_draw_sprites(1, 1, 0, 1);
         label = GetLocalizedString(0x306d);
         sprintf(text, g_str_gorn_label_count, label, g_gorn_course_miss_count);
-        textX = g_gorn_hud_text_x - 60;
-        text_draw_medium(textX, label_y((void *)textX, g_gorn_hud_text_y - 8, g_screen_l15_scale, half, 1), 0x80808080, text, 128);
-        math_split_time_into_parts(g_gorn_course_timer, &a, &b, &c);
+        text_x = g_gorn_hud_text_x - 60;
+        text_draw_medium(text_x, label_y((void *)text_x, g_gorn_hud_text_y - 8, g_screen_l15_scale, half, 1), 0x80808080, text, 128);
+        math_split_time_into_parts(g_gorn_course_timer, &minutes, &seconds, &hundredths);
         label = GetLocalizedString(0x2e19);
-        sprintf(text, g_str_gorn_label_time, label, a, b, c);
-        textX2 = g_gorn_hud_icon_x - 80;
-        text_draw_medium(textX2, label_y((void *)textX2, g_gorn_hud_icon_y - 8, g_screen_l15_scale, half, 1), 0x80808080, text, 128);
+        sprintf(text, g_str_gorn_label_time, label, minutes, seconds, hundredths);
+        text_x2 = g_gorn_hud_icon_x - 80;
+        text_draw_medium(text_x2, label_y((void *)text_x2, g_gorn_hud_icon_y - 8, g_screen_l15_scale, half, 1), 0x80808080, text, 128);
         break;
     }
     }
@@ -194,36 +196,36 @@ s32 func_US2_L15_0042F6D0(void) {
         switch (idx) {
         case 6:
             if (ratio > 0.0f) {
-                tweenColor = FastTweenColor(0x800000ff, 0x8000ff00, ratio);
-                gfx_draw_scaled_object(g_label_sprite_d, x, y, (s32)tweenColor, 1.0f, 0.0f);
+                tween_color = FastTweenColor(0x800000ff, 0x8000ff00, ratio);
+                gfx_draw_scaled_object(g_label_sprite_d, x, y, (s32)tween_color, 1.0f, 0.0f);
             }
             break;
         case 12:
             if (ratio > 0.5f) {
                 ratio -= 0.5f;
-                tweenColor = FastTweenColor(0x800000ff, 0x8000ff00, ratio + ratio);
-                gfx_draw_scaled_object(g_label_sprite_e, x, y, (s32)tweenColor, 1.0f, 0.0f);
+                tween_color = FastTweenColor(0x800000ff, 0x8000ff00, ratio + ratio);
+                gfx_draw_scaled_object(g_label_sprite_e, x, y, (s32)tween_color, 1.0f, 0.0f);
                 gfx_draw_scaled_object(g_label_sprite_d, x, y, 0x8000ff00, 1.0f, 0.0f);
             } else if (ratio > 0.0f) {
-                tweenColor = FastTweenColor(0x800000ff, 0x8000ff00, ratio + ratio);
-                gfx_draw_scaled_object(g_label_sprite_d, x, y, (s32)tweenColor, 1.0f, 0.0f);
+                tween_color = FastTweenColor(0x800000ff, 0x8000ff00, ratio + ratio);
+                gfx_draw_scaled_object(g_label_sprite_d, x, y, (s32)tween_color, 1.0f, 0.0f);
             }
             break;
         case 14:
             if (ratio > 0.6666667f) {
                 ratio -= 0.6666667f;
-                tweenColor = FastTweenColor(0x800000ff, 0x8000ff00, ratio * 3.0f);
-                gfx_draw_scaled_object(g_label_sprite_f, x, y, (s32)tweenColor, 1.0f, 0.0f);
+                tween_color = FastTweenColor(0x800000ff, 0x8000ff00, ratio * 3.0f);
+                gfx_draw_scaled_object(g_label_sprite_f, x, y, (s32)tween_color, 1.0f, 0.0f);
                 gfx_draw_scaled_object(g_label_sprite_e, x, y, 0x8000ff00, 1.0f, 0.0f);
                 gfx_draw_scaled_object(g_label_sprite_d, x, y, 0x8000ff00, 1.0f, 0.0f);
             } else if (ratio > 0.33333334f) {
                 ratio -= 0.33333334f;
-                tweenColor = FastTweenColor(0x800000ff, 0x8000ff00, ratio * 3.0f);
-                gfx_draw_scaled_object(g_label_sprite_e, x, y, (s32)tweenColor, 1.0f, 0.0f);
+                tween_color = FastTweenColor(0x800000ff, 0x8000ff00, ratio * 3.0f);
+                gfx_draw_scaled_object(g_label_sprite_e, x, y, (s32)tween_color, 1.0f, 0.0f);
                 gfx_draw_scaled_object(g_label_sprite_d, x, y, 0x8000ff00, 1.0f, 0.0f);
             } else if (ratio > 0.0f) {
-                tweenColor = FastTweenColor(0x800000ff, 0x8000ff00, ratio * 3.0f);
-                gfx_draw_scaled_object(g_label_sprite_d, x, y, (s32)tweenColor, 1.0f, 0.0f);
+                tween_color = FastTweenColor(0x800000ff, 0x8000ff00, ratio * 3.0f);
+                gfx_draw_scaled_object(g_label_sprite_d, x, y, (s32)tween_color, 1.0f, 0.0f);
             }
             break;
         }
@@ -238,9 +240,9 @@ s32 func_US2_L15_0042F6D0(void) {
         }
         colors[1] = FastTweenColor(0x800000ff, 0x8000ff00, fill);
         colors[0] = 0x800000ff;
-        tmp = fill * 200.0f + 156.0f;
+        bar_end = fill * 200.0f + 156.0f;
         if (data->blinkOn)
-            gfx_draw_screen_rectangle(156, 14, (s32)tmp, 27, 1, colors);
+            gfx_draw_screen_rectangle(156, 14, (s32)bar_end, 27, 1, colors);
 
         /* Ammo bar. */
         idx = table_find_last_used_entry(7);
@@ -253,35 +255,35 @@ s32 func_US2_L15_0042F6D0(void) {
         colors2[0] = 0x800000ff;
         colors2[1] = color;
         end = end * fill;
-        tmp = base + end;
+        bar_end = base + end;
         if (fill > 0.0f)
-            gfx_draw_screen_rectangle(450, 8, (s32)tmp, 19, 1, colors2);
+            gfx_draw_screen_rectangle(450, 8, (s32)bar_end, 19, 1, colors2);
 
         /* Weapon icons and the fill count. */
-        b0 = g_gorn_hud_color_a;
-        b1 = g_gorn_hud_color_b;
-        b2 = g_gorn_hud_color_c;
-        hud_draw_sprite_gradient(GetIconFrame(0xea97, 1), 21, 7, 30, 30, &b1);
-        hud_draw_sprite_gradient(GetIconFrame(0xea97, 0), 21, 7, 30, 30, &b0);
-        hud_draw_sprite_gradient(GetIconFrame(0xea97, g_weapon_l15_table[table_find_last_used_entry(g_gorn_weapon_slot_index)].icon), 21, 7, 30, 30, &b2);
-        hud_draw_sprite_gradient(GetIconFrame(0xea97, 1), 462, 9, 30, 30, &b1);
-        hud_draw_sprite_gradient(GetIconFrame(0xea97, g_weapon_l15_table[table_find_last_used_entry(7)].icon), 462, 9, 30, 30, &b2);
+        color_a = g_gorn_hud_color_a;
+        color_b = g_gorn_hud_color_b;
+        color_c = g_gorn_hud_color_c;
+        hud_draw_sprite_gradient(GetIconFrame(0xea97, 1), 21, 7, 30, 30, &color_b);
+        hud_draw_sprite_gradient(GetIconFrame(0xea97, 0), 21, 7, 30, 30, &color_a);
+        hud_draw_sprite_gradient(GetIconFrame(0xea97, g_weapon_l15_table[table_find_last_used_entry(g_gorn_weapon_slot_index)].icon), 21, 7, 30, 30, &color_c);
+        hud_draw_sprite_gradient(GetIconFrame(0xea97, 1), 462, 9, 30, 30, &color_b);
+        hud_draw_sprite_gradient(GetIconFrame(0xea97, g_weapon_l15_table[table_find_last_used_entry(7)].icon), 462, 9, 30, 30, &color_c);
         sprintf(text, g_str_gorn_label_value, g_weapon_l15_table[table_find_last_used_entry(g_gorn_weapon_slot_index)].value,
                       g_weapon_l15_table[table_find_last_used_entry(g_gorn_weapon_slot_index)].maxAmmo);
         text_draw_small(67, 5, 0x80808080, text, 128);
 
         /* Weapon switch. */
-        func_US2_L05_00327640(2);
-        newidx = level_lookup_step_table();
-        if (newidx >= 0) {
+        level_store_value_plus_one_us2(2);
+        new_index = level_lookup_step_table();
+        if (new_index >= 0) {
             g_weapon_l15_table[table_find_last_used_entry(g_gorn_weapon_slot_index)].active = 0;
-            g_gorn_weapon_slot_index = newidx;
-            g_weapon_l15_table[table_find_last_used_entry(newidx)].active = 1;
+            g_gorn_weapon_slot_index = new_index;
+            g_weapon_l15_table[table_find_last_used_entry(new_index)].active = 1;
         }
         gfx_draw_scaled_object(g_label_sprite_c, x, y, 0x80f0f0f0, 1.0f, 0.0f);
     }
 
-    func_US2_0029CC48();
+    hud_draw_scaled_us2();
     sprite0 = table_find_by_id(g_challenge_menu_data + 0x8710, 186);
     /* data, done with, holds the second sprite. */
     data = table_find_by_id(g_challenge_menu_data + 0x8710, 187);

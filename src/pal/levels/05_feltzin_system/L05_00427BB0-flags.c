@@ -37,53 +37,53 @@ extern s32 g_sdata_word_unused_a __attribute__((sda));
 /* State 0 waits for func_L00_00367720, then enters state 1. State 1 calls func_L05_0037B538 and, when the
    +0x26C timer of its state expires, picks an entry of the object's id list and passes that object
    (this one when the list has fewer than two entries) to func_PAL_L05_00427D70. */
-void feltzin_target_spawner_update_pal(u8 *arg0)
+void feltzin_target_spawner_update_pal(u8 *moby)
 {
-    u8 *s1 = *(u8 **)(arg0 + 0x68);
+    u8 *vars = *(u8 **)(moby + 0x68);
     u8 *target;
     s32 i;
-    s32 n;
+    s32 list_count;
 
-    if (arg0[0x20] == 0) {
-        arg0[0x30] = 0xFF;
-        if (state_get_stored_pointer_value(arg0) == 0)
+    if (moby[0x20] == 0) {
+        moby[0x30] = 0xFF;
+        if (state_get_stored_pointer_value(moby) == 0)
             return;
-        feltzin_target_spawner_init_pal(arg0);
-        if (*(s32 *)(s1 + 0x264) == 0)
+        feltzin_target_spawner_init_pal(moby);
+        if (*(s32 *)(vars + 0x264) == 0)
             return;
-        level_append_object(arg0, 0, 0, 0);
+        level_append_object(moby, 0, 0, 0);
         return;
     }
 
-    moby_process_collision_hit(arg0, 0, 1, 1);
-    if (*(s32 *)(s1 + 0x264) == 0)
+    moby_process_collision_hit(moby, 0, 1, 1);
+    if (*(s32 *)(vars + 0x264) == 0)
         return;
-    if (math_fast_float_d(s1 + 0x26C) == 0)
+    if (math_fast_float_d(vars + 0x26C) == 0)
         return;
     target = 0;
-    n = list_count_ready_objects(arg0);
+    list_count = list_count_ready_objects(moby);
 
-    if (n >= 2) {
-        s32 count = math_random_int_range(0, n - 1);
-        u16 *p = (u16 *)g_spawn_list_table[arg0[0x21]];
-        u16 v;
+    if (list_count >= 2) {
+        s32 count = math_random_int_range(0, list_count - 1);
+        u16 *entry_ptr = (u16 *)g_spawn_list_table[moby[0x21]];
+        u16 entry;
         i = 0;
         do {
-            v = *p;
-            n = v & 0x7FFF;
+            entry = *entry_ptr;
+            list_count = entry & 0x7FFF;
             if (i == count)
                 goto found;
             i++;
-            p++;
-        } while ((s16)v >= 0);
+            entry_ptr++;
+        } while ((s16)entry >= 0);
         goto done;
 found:
-        target = g_feltzin_target_mobys[0] + (n << 8);
+        target = g_feltzin_target_mobys[0] + (list_count << 8);
     } else {
-        target = arg0;
+        target = moby;
     }
 done:
     if (target != 0)
         feltzin_target_spawn_random_pal(target);
-    *(s32 *)(s1 + 0x26C) = 0x64;
+    *(s32 *)(vars + 0x26C) = 0x64;
 }

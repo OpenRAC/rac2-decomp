@@ -65,7 +65,7 @@ static __inline__ int label_y(void *handle, float value, float scale, float half
     return result;
 }
 
-s32 func_US2_L10_004254C8(void) {
+s32 menu_draw_reward_panel_us2(void) {
     char buf[128];
     f32 center = IntToFloat(g_screen_width) * 0.5f;
     void *sprite;

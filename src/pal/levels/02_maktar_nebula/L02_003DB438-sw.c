@@ -4,7 +4,7 @@
 typedef int Vector __attribute__((mode(TI)));
 extern float g_sliding_platform_local_offset[4] __attribute__((sda));
 extern void moby_set_state(char *, int, int);
-extern void func_PAL_002A7E68(char *, int, int, int);
+extern void anim_start_blended_pal(char *, int, int, int);
 extern void vec_scale_to_length(void *, void *, float);
 extern void FastVecAdd(void *, void *, void *);
 extern char *CreateMoby(int);
@@ -18,6 +18,7 @@ extern int FastDecTimer(void *);
 extern float IntToFloat(int);
 extern void chainblade_release_held_actors_pal(char *);
 
+/* Per-frame update for moby class 2581. Updates a lift-like moby that slides along its direction while its animation plays, and keeps a child moby stuck to its joint. */
 void sliding_l02_platform_update_pal(char *self) {
     float offset[4] __attribute__((aligned(16)));
     /* Separate initial and final query events use four measured local vectors. */
@@ -35,7 +36,7 @@ void sliding_l02_platform_update_pal(char *self) {
         *(int *)(state + 0x14) = 0;
         *(int *)(state + 0x18) = 0;
         moby_set_state(self, 2, -1);
-        if (*(unsigned char *)(self + 0x43) != 0) func_PAL_002A7E68(self, 0, 0, 0);
+        if (*(unsigned char *)(self + 0x43) != 0) anim_start_blended_pal(self, 0, 0, 0);
         *(float *)(self + 0x48) = 0.0f;
         vec_scale_to_length(updated, self + 0xD0, 2.0f);
         FastVecAdd(self + 0x10, self + 0x10, updated);
@@ -94,7 +95,7 @@ void sliding_l02_platform_update_pal(char *self) {
     case 4:
         moby_set_state(self, 5, -1);
         *(float *)(self + 0x48) = 1.0f;
-        if (*(unsigned char *)(self + 0x43) != 1) func_PAL_002A7E68(self, 1, 0, 0);
+        if (*(unsigned char *)(self + 0x43) != 1) anim_start_blended_pal(self, 1, 0, 0);
         chainblade_release_held_actors_pal(self);
         break;
     case 5:
@@ -107,7 +108,7 @@ void sliding_l02_platform_update_pal(char *self) {
     case 6:
         if (!*(short *)(state + 0x20)) {
         *(float *)(self + 0x48) = 1.0f;
-        if (*(unsigned char *)(self + 0x43) != 2) func_PAL_002A7E68(self, 2, 0, 0);
+        if (*(unsigned char *)(self + 0x43) != 2) anim_start_blended_pal(self, 2, 0, 0);
         moby_set_state(self, 7, -1);
         } else {
             FastDecTimer(state + 0x20);
@@ -115,7 +116,7 @@ void sliding_l02_platform_update_pal(char *self) {
         break;
     case 7:
         if (*(unsigned char *)(self + 0x60) & 2) {
-            if (*(unsigned char *)(self + 0x43) != 3) func_PAL_002A7E68(self, 3, 0, 0);
+            if (*(unsigned char *)(self + 0x43) != 3) anim_start_blended_pal(self, 3, 0, 0);
             moby_set_state(self, 1, -1);
         }
         break;
@@ -130,15 +131,15 @@ void sliding_l02_platform_update_pal(char *self) {
             func_002A0F48(child);
         }
         {
-        char *childMatrix = *(char **)(state + 0x1C);
+        char *child_matrix = *(char **)(state + 0x1C);
         source = (Vector *)(self + 0xC0);
-        destination = (Vector *)(childMatrix + 0xC0);
+        destination = (Vector *)(child_matrix + 0xC0);
         for (i = 0; i < 3; i++) {
             *destination = *source;
             source++;
             destination++;
         }
-        mat_normalize_columns(childMatrix + 0xC0);
+        mat_normalize_columns(child_matrix + 0xC0);
         }
         func_002A10E8(*(char **)(state + 0x1C));
         *(unsigned short *)(*(char **)(state + 0x1C) + 0x34) |= 6;

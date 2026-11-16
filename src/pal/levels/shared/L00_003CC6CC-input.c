@@ -22,14 +22,15 @@ extern void CalculateAimedLaunchVelocity(void *, void *, int, int, float, float,
 extern int coll_trace_projectile_to_impact_pal(void *, void *, void *, void *, void *, int, int, float);
 extern int math_fast_float_d(void *);
 extern int weapon_spend_ammo(int, int);
-extern void func_PAL_L00_002AF458(void);
+extern void start_equipped_item_animation_pal(void);
 extern int PlayMobySound(int, int, void *);
-extern char *func_PAL_L00_0038D7E8(void *, void *, void *);
+extern char *megaturret_spawn_shot_pal(void *, void *, void *);
 extern void cancel_hero_item_animation_pal(void);
 extern void ref_L00_003C8828_00(void (*)(void *), void *);
 extern void owner_effect_draw_active_pal(void *);
 
-void func_PAL_L00_003CC6CC(char *owner)
+/* Per-frame update of the Megaturret Glove weapon (moby class 2661). It aims, waits for the fire button, then after a short delay launches the turret and cools down (PAL). */
+void megaturret_glove_update_pal(char *owner)
 {
     InputVector origin, target;
     InputVector *targetVector;
@@ -60,7 +61,7 @@ void func_PAL_L00_003CC6CC(char *owner)
     case 1:
         if ((g_pad_held_flags & g_hero_state.input) && !g_hero_state.flag && allowed) {
             if (weapon_spend_ammo(-1, 1)) {
-                func_PAL_L00_002AF458();
+                start_equipped_item_animation_pal();
                 FIELD(owner, unsigned char, 0x20) = 2;
                 FIELD(context, int, 0x20) = 17;
             } else {
@@ -71,7 +72,7 @@ void func_PAL_L00_003CC6CC(char *owner)
     case 2:
         if (math_fast_float_d(context + 0x20)) {
             PlayMobySound(0, 0, owner);
-            func_PAL_L00_0038D7E8(owner, &origin, targetVector);
+            megaturret_spawn_shot_pal(owner, &origin, targetVector);
             cancel_hero_item_animation_pal();
             FIELD(owner, unsigned char, 0x20) = 3;
             FIELD(context, int, 0x20) = 8;

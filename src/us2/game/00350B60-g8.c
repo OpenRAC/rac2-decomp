@@ -10,11 +10,11 @@ extern void BuildFrameDmaChain(void *, int);
 
 /* FMV GS packet builder: one 0x40-byte header record, then a 0x60-byte record per
    (row, column), then the closing A_B word pair at the end of the run. */
-void mpeg_build_frame_packet_us2(void *a0, int a1, int a2, int a3, int t0)
+void mpeg_build_frame_packet_us2(void *packet, int data_addr, int height, int width, int buffer_index)
 {
-    u8 *p = (u8 *)a0;
-    int rows = a2 >> 4;
-    int cols = a3 >> 4;
+    u8 *p = (u8 *)packet;
+    int rows = height >> 4;
+    int cols = width >> 4;
     int i, j;
     u64 c00, c10, c18, c28, c38, c40;
     u32 off, addr;
@@ -48,15 +48,15 @@ void mpeg_build_frame_packet_us2(void *a0, int a1, int a2, int a3, int t0)
             *(u64 *)(p + 0x40) = c40;
             *(u64 *)(p + 0x48) = 0;
             *(u32 *)(p + 0x50) = 0x30000040;
-            *(u32 *)(p + 0x54) = a1 & 0x0FFFFFFF;
+            *(u32 *)(p + 0x54) = data_addr & 0x0FFFFFFF;
             *(u64 *)(p + 0x58) = 0;
-            a1 += 0x400;
+            data_addr += 0x400;
             p += 0x60;
         }
     }
 
     *(u32 *)(p + 0x00) = 0x20000000;
-    off = (t0 << 14) + 0x1C81C0;
+    off = (buffer_index << 14) + 0x1C81C0;
     addr = g_movie_buffer_base + off;
     *(u32 *)(p + 0x0C) = 0;
     *(u32 *)(p + 0x08) = 0;

@@ -53,11 +53,12 @@ typedef struct {
 extern char g_str_ripple_error_a[], g_str_ripple_error_b[];
 extern Sequence g_ribbon_variant_sequence;
 extern float g_ripple_fade_duration __attribute__((sda));
-extern void func_PAL_L06_003E8E68(void);
+extern void gfx_l06_draw_ribbon_effect_pal(void);
 
-void func_PAL_L06_003E8A88(char *obj) {
-    Object *m = (Object *)obj;
-    Data *data = m->data;
+/* Updates a flowing ribbon of glowing strips. It picks a random order for the strips, plays a hum, and starts drawing the ribbon when the player is near (PAL). */
+void ribbon_effect_update_pal(char *obj) {
+    Object *moby = (Object *)obj;
+    Data *data = moby->data;
     /* State 0's shuffle and state 2's sphere share their temporary storage. */
     union {
         Sequence seq;
@@ -69,7 +70,7 @@ void func_PAL_L06_003E8A88(char *obj) {
         STUB_printf(g_str_ripple_error_b, *(short *)(obj + 0xB2));
         moby_mark_spawned(obj);
     }
-    switch (m->state) {
+    switch (moby->state) {
     case 0: {
         int i, j, k;
         float r;
@@ -80,20 +81,20 @@ void func_PAL_L06_003E8A88(char *obj) {
         buffer.seq = g_ribbon_variant_sequence;
         for (i = 0; i < 10; i++) {
             for (j = 0; j < math_random_int_below(9); j++) {
-                u8 b = buffer.seq.x[j + 1];
+                u8 swap = buffer.seq.x[j + 1];
                 buffer.seq.x[j + 1] = buffer.seq.x[j];
-                buffer.seq.x[j] = b;
+                buffer.seq.x[j] = swap;
             }
         }
         for (k = 0; k < data->count; k++)
             data->order[k] = buffer.seq.x[k];
-        r = FastAddRotations(m->angle, 1.5707964897155762f);
-        m->mode = 0x60;
-        m->state = 1;
-        m->angle = r;
+        r = FastAddRotations(moby->angle, 1.5707964897155762f);
+        moby->mode = 0x60;
+        moby->state = 1;
+        moby->angle = r;
         data->effect = -1;
         data->timer = ((s32)(FloatToInt(g_ripple_fade_duration * 60.0f)) * 5 + 2) / 6;
-        m->flags |= 0x41;
+        moby->flags |= 0x41;
         break;
     }
     case 1: {
@@ -106,7 +107,7 @@ void func_PAL_L06_003E8A88(char *obj) {
         sphere[3] = square_root(h * h + r * r);
         if (fast_vec_dist(obj + 0x10, g_hero_l06_position) < 80.0f) {
             if ((float)math_fast_helper_a(sphere, 80.0f) >= 0.0f)
-                gfx_add_draw_callback_third(func_PAL_L06_003E8E68, obj);
+                gfx_add_draw_callback_third(gfx_l06_draw_ribbon_effect_pal, obj);
         }
         if (!snd_is_voice_playing_for_owner(obj, data->effect))
             data->effect = PlayMobySound(0, 4, obj);
@@ -118,8 +119,8 @@ void func_PAL_L06_003E8A88(char *obj) {
         math_fast_float_d(&data->timer);
         i = data->effect;
         if (i != -1) {
-            Effect *e = (Effect *)(g_sound_state + i * 0x70);
-            if (e->owner == obj && e->active)
+            Effect *sound = (Effect *)(g_sound_state + i * 0x70);
+            if (sound->owner == obj && sound->active)
                 snd_stop_voice(i);
         }
         data->effect = -1;
@@ -130,7 +131,7 @@ void func_PAL_L06_003E8A88(char *obj) {
         buffer.f[3] = square_root(h * h + r * r);
         if (fast_vec_dist(obj + 0x10, g_hero_l06_position) < 80.0f &&
             (float)math_fast_helper_a(&buffer, 80.0f) >= 0.0f)
-            gfx_add_draw_callback_third(func_PAL_L06_003E8E68, obj);
+            gfx_add_draw_callback_third(gfx_l06_draw_ribbon_effect_pal, obj);
         break;
     }
     }

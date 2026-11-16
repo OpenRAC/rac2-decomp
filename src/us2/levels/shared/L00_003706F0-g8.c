@@ -49,9 +49,9 @@ extern int request_begin_slot(int, int, int, int, int);
 /* The neighbouring stub in most programs; another function in six of them. */
 extern unsigned int ref_L00_0036F488_00(void);
 extern int level_is_mode_in_set(void);
-extern int func_US2_L00_0030AF78(void);
+extern int level_get_int_value_b_us2(void);
 extern int func_US2_00299980(void);
-extern int func_US2_L00_002D6C98(void);
+extern int game_mode_is_98_to_100_us2(void);
 extern int level_run_mode_update_zero(void);
 extern int level_is_tracked_object_of_selected_class(int);
 extern int level_is_special_mode_active(void);
@@ -72,7 +72,7 @@ extern void level_run_per_frame_passes(void);
 extern void level_count_active_records(void);
 extern void moby_update_visible_objects(void);
 extern void snd_run_callbacks(void);
-extern void func_US2_L00_002A6DD0(void);
+extern void hero_l00_update_frame_2_us2(void);
 extern void part_update_all(void);
 extern void part_l00_update_effect_slots(void);
 extern void cam_update_state(void);
@@ -80,21 +80,22 @@ extern s32 UpdateSoundVoices(void);
 extern void UpdateLightingEnvironment(void);
 extern void gfx_compute_light_direction(void);
 extern int hud_update_record_timers(int);
-extern void func_US2_0029CA98(void);
+extern void resident_menus_update_us2(void);
 extern void subtitle_update_state_machine(void);
 extern void game_update_idle_frame_counters(void);
 
-void func_US2_L00_003706F0(void)
+/* Checks the pad and hero state each frame to open the menus or HUD, then runs the per-frame update chain (USA v2.00). */
+void level_update_game_frame_input_us2(void)
 {
     int blocked;
     int special;
 
     if (level_get_flag_b() && !request_begin_slot(4, 1, 1, 0, 0))
         return;
-    if (func_US2_L00_0030AF78() && !g_game_l00_mode && (g_save_menu_flags & 0x600)
+    if (level_get_int_value_b_us2() && !g_game_l00_mode && (g_save_menu_flags & 0x600)
         && !request_begin_slot(4, 1, 1, 0, 0))
         return;
-    if (func_US2_00299980() && !g_game_l00_mode && func_US2_L00_0030AF78()
+    if (func_US2_00299980() && !g_game_l00_mode && level_get_int_value_b_us2()
         && !request_begin_slot(4, 1, 1, 0, 0))
         return;
     if (ref_L00_0036F488_00())
@@ -115,7 +116,7 @@ void func_US2_L00_003706F0(void)
     level_update_countdown_state_machine();
 
     if (PadPressedWithin(16, g_pad_press_window, 0) && g_pad_hold_frame_count >= 8) {
-        if (g_hero_state.state != 0x6F && !func_US2_L00_002D6C98() && g_hero_state.mode != 2
+        if (g_hero_state.state != 0x6F && !game_mode_is_98_to_100_us2() && g_hero_state.mode != 2
             && g_hero_state.state != 0x31 && blocked && g_hero_state.state != 0x1C && !g_game_l00_mode
             && g_hero_scalar_transition_value < 0.2f && g_hero_state.f22B4 < 2 && !g_input_block_flag && g_language_settings[3]) {
             hud_request_open();
@@ -132,7 +133,7 @@ void func_US2_L00_003706F0(void)
         if ((g_pad_state.pressed & 0x800) || g_pad_device_idle_flag) {
             if (g_pad_hold_frame_count < 8)
                 goto normal;
-            if (g_hero_state.state != 0x6F && !func_US2_L00_002D6C98()
+            if (g_hero_state.state != 0x6F && !game_mode_is_98_to_100_us2()
                 && (g_hero_state.mode != 2 || g_hero_state.submode == 10)) {
                 if (!blocked || g_game_l00_mode)
                     goto second;
@@ -146,7 +147,7 @@ void func_US2_L00_003706F0(void)
     }
 second:
     if (g_pad_hold_frame_count >= 8 && (g_pad_state.pressed & 0x500)) {
-        if (g_hero_state.f229C != 22 && g_hero_state.state != 0x6F && !func_US2_L00_002D6C98()
+        if (g_hero_state.f229C != 22 && g_hero_state.state != 0x6F && !game_mode_is_98_to_100_us2()
             && blocked && g_hero_state.state != 0x1C
             && !g_game_l00_mode) {
             if (level_is_mode_in_set()) {
@@ -196,7 +197,7 @@ normal:
         level_count_active_records();
         moby_update_visible_objects();
         snd_run_callbacks();
-        func_US2_L00_002A6DD0();
+        hero_l00_update_frame_2_us2();
         part_update_all();
         part_l00_update_effect_slots();
         cam_update_state();
@@ -204,7 +205,7 @@ normal:
         UpdateLightingEnvironment();
         gfx_compute_light_direction();
         hud_update_record_timers(1);
-        func_US2_0029CA98();
+        resident_menus_update_us2();
         subtitle_update_state_machine();
         game_update_idle_frame_counters();
     }

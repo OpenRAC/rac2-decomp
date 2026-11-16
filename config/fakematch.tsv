@@ -41,9 +41,9 @@ src/pal/game/002CD520-hud-g8.c	-	the #pragma rac2_sched2_order list fixes the po
 src/pal/game/002CD520-hud-g8.c	func_PAL_002CD520	dead shift/unshift on stand-in globals (v1.01 func_002CC6B0's win_shift/win_unshift)
 src/pal/game/002CD520-hud-g8.c	func_PAL_002CD520	dead stand-in values: combine cancels the pairs, the four loads stay until
 src/pal/game/002CD520-hud-g8.c	func_PAL_002CD520	loop group weights the text references (allocation priority)
-src/pal/game/002CD520-hud-g8.c	func_PAL_002CD520	loop groups weight a21/a23
+src/pal/game/002CD520-hud-g8.c	func_PAL_002CD520	loop groups weight center_y/center_x
 src/pal/game/002CD520-hud-g8.c	func_PAL_002CD520	mask kept in the reused stand-in
-src/pal/game/002CD520-hud-g8.c	func_PAL_002CD520	nested loop groups weight the wflags/a23 references (allocation priority)
+src/pal/game/002CD520-hud-g8.c	func_PAL_002CD520	nested loop groups weight the wflags/center_x references (allocation priority)
 src/pal/game/002CD520-hud-g8.c	func_PAL_002CD520	second dead shift/unshift pair
 src/pal/game/002CD520-hud-g8.c	func_PAL_002CD520	shift stand-in, then the 0x20000 mask
 src/pal/game/002CD520-hud-g8.c	func_PAL_002CD520	unshift after the s[0] copy
@@ -65,7 +65,7 @@ src/pal/levels/17_smolg/L17_003ED568-fighter-g8.c	func_PAL_L17_003ED568	see o1..
 src/pal/levels/shared/L04_0041BC68-hud-g8.c	-	order hint (owner ruling, 14 November 2026): the marker heading is loaded before the
 src/pal/levels/shared/L04_0041BC68-hud-g8.c	func_PAL_L04_0041BC68	before i = 0 so one3 is born before the &vF0 copy dies
 src/pal/levels/shared/L04_0041BC68-hud-g8.c	func_PAL_L04_0041BC68	call inside the rank-row group so the 24.0 li.s precedes the s copy (0xAF8); label_y4 with n20 active keeps n20 (23/250 = 0.368..0.375 window) above s and below the s1 allocno
-src/pal/levels/shared/L04_0041BC68-hud-g8.c	func_PAL_L04_0041BC68	dead store, overwritten next: its &tmp, the first, gives tmp its frame slot (0x100) ahead of sy and sy2
+src/pal/levels/shared/L04_0041BC68-hud-g8.c	func_PAL_L04_0041BC68	dead store, overwritten next: its &step_value, the first, gives step_value its frame slot (0x100) ahead of sy and sy2
 src/pal/levels/shared/L04_0041BC68-hud-g8.c	func_PAL_L04_0041BC68	fz
 src/pal/levels/shared/L04_0041BC68-hud-g8.c	func_PAL_L04_0041BC68	index precomputed outside the group
 src/pal/levels/shared/L04_0041BC68-hud-g8.c	func_PAL_L04_0041BC68	named &m[2] declared before hp: its alter_reg slot 0x114 precedes hp's 0x118
@@ -76,7 +76,7 @@ src/pal/levels/shared/L04_0041BC68-hud-g8.c	func_PAL_L04_0041BC68	set-once &sy, 
 src/pal/levels/shared/L04_0041BC68-hud-g8.c	func_PAL_L04_0041BC68	set-once &sy2, see decl
 src/pal/levels/shared/L04_0041BC68-hud-g8.c	func_PAL_L04_0041BC68	set-once -1 after j = 0 puts j's daddu fp before the hoisted -1 (0x1070/0x1090)
 src/pal/levels/shared/L04_0041BC68-hud-g8.c	func_PAL_L04_0041BC68	set-once copy: sy is read after the top row
-src/pal/levels/shared/L04_0041BC68-hud-g8.c	func_PAL_L04_0041BC68	set-once copy: the heading is read before tmp is stored
+src/pal/levels/shared/L04_0041BC68-hud-g8.c	func_PAL_L04_0041BC68	set-once copy: the heading is read before step_value is stored
 src/pal/levels/shared/L04_0041BC68-hud-g8.c	func_PAL_L04_0041BC68	set-once zero, hoisted first (retail preheader order)
 src/pal/levels/shared/L04_0041BC68-hud-g8.c	func_PAL_L04_0041BC68	was HCN; drops one n20 ref so n20 lands at 23/250
 src/pal/levels/shared/L04_0041BC68-hud-g8.c	label_y4	label_y plus a second dead mode test (D_L04_001B2D40 + 1 == active): one more n20 reference, no code
@@ -95,7 +95,7 @@ src/us2/game/0034DBE0-menu-g8.c	func_US2_0034DBE0	do { } while (0) adds loop not
 src/us2/game/0034DBE0-menu-g8.c	func_US2_0034DBE0	volatile load, see above
 src/us2/game/0034DBE0-menu-g8.c	func_US2_0034DBE0	volatile x store + volatile D_001B18D4 load below keep the x/y/color zero stores ahead of the slot-table load (retail +0x114..+0x124)
 src/us2/levels/shared/L04_004188B8-hud-g8.c	-	order hint (owner ruling, 14 November 2026): the marker heading and the -1.0 constant
-src/us2/levels/shared/L04_004188B8-hud-g8.c	func_US2_L04_004188B8	before i = 0 so one3 is born before the &vF0 copy dies
+src/us2/levels/shared/L04_004188B8-hud-g8.c	func_US2_L04_004188B8	before i = 0 so one3 is born before the &vec_f0 copy dies
 src/us2/levels/shared/L04_004188B8-hud-g8.c	func_US2_L04_004188B8	call inside the rank-row group so the 24.0 li.s precedes the s copy (0xAF8); label_y4 with n20 active keeps n20 (23/250 = 0.368..0.375 window) above s and below the s1 allocno
 src/us2/levels/shared/L04_004188B8-hud-g8.c	func_US2_L04_004188B8	dead store, overwritten next: its &tmp, the first, gives tmp its frame slot (0xF0) ahead of sy and sy2
 src/us2/levels/shared/L04_004188B8-hud-g8.c	func_US2_L04_004188B8	fz

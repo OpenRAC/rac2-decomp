@@ -2,12 +2,13 @@
 #include "names.h"
 
 extern void FastVecSub(float *out, const float *a, const float *b);
-extern int coll_update_controller(char *arg0, char *arg1, void *arg2);
+extern int coll_update_controller(char *moby, char *target, void *arg2);
 
-void moby_aim_at_target_offset_pal(char *arg0, char *arg1) {
-    int tmp[4];
+/* Updates the collision controller with the vector from the moby to the target. */
+void moby_aim_at_target_offset_pal(char *moby, char *target) {
+    int offset[4];
 
-    FastVecSub((float *)tmp, (const float *)arg1, (const float *)(arg0 + 0x10));
-    coll_update_controller(arg0, arg1, tmp);
+    FastVecSub((float *)offset, (const float *)target, (const float *)(moby + 0x10));
+    coll_update_controller(moby, target, offset);
 }
 

@@ -9,22 +9,23 @@ extern char *moby_get_private_value_0(u8 *);
 extern void level_store_value_pair_pal(s32, s32);
 extern void hero_reset_speeds_and_vectors(void);
 extern void attachment_reset_all(void);
-extern void func_PAL_0028C778(u8 *);
-extern void func_PAL_0028C7C8(u8 *);
-extern int func_PAL_0028D0C0(u8 *);
+extern void menu_init_panel_layout_pal(u8 *);
+extern void weapon_wheel_update_select_pal(u8 *);
+extern int weapon_wheel_draw_pal(u8 *);
 extern s32 hud_set_slot_contents(s32, s32, void (*)(u8 *), void (*)(u8 *), void (*)(u8 *), s32, s32);
 extern s32 level_run_slot_callback(u32);
 extern void hero_clear_tracked_slots(void);
 extern void hero_clear_queued_anim(void);
 extern s32 anim_copy_entry_data(char *, s32, s32, s32);
 extern void cam_reset_default(void);
-extern s32 func_PAL_L20_002D7920(s32, s32);
+extern s32 hero_l20_set_state_pal(s32, s32);
 
 /* Apart from the leading state-1 block this is the same code as func_L18_002CFF48
    (src/levels/shared/L18_002CFD68-qcopy.c), and it needs the same grouped-copy profile.
    The state-1 block and the rest each take the hero block's address on their own: retail
    rebuilds it from the %hi kept in $s2.  D_L20_001A8F00 is declared as an sda array, as in
    the sibling, which gives retail's lui + lw into the same register. */
+/* Takes the hero out of vehicle or ride mode and puts it back on foot. (PAL version) */
 void hero_exit_vehicle_mode_pal(s32 keep)
 {
     u8 *hero = g_hero_state;
@@ -66,7 +67,7 @@ void hero_exit_vehicle_mode_pal(s32 keep)
     }
     attachment_reset_all();
     g_hero_state[0x22B4] = 0;
-    hud_set_slot_contents(35, 0, func_PAL_0028C778, func_PAL_0028C7C8, func_PAL_0028D0C0, 0, 0);
+    hud_set_slot_contents(35, 0, menu_init_panel_layout_pal, weapon_wheel_update_select_pal, weapon_wheel_draw_pal, 0, 0);
     level_run_slot_callback(3);
     attached = *(u8 **)(g_hero_state + 0xC14);
     if (attached) *(u16 *)(attached + 0x34) &= ~6;
@@ -93,7 +94,7 @@ void hero_exit_vehicle_mode_pal(s32 keep)
         goto done;
     }
 reset:
-    func_PAL_L20_002D7920(0, 1);
+    hero_l20_set_state_pal(0, 1);
 done:
     if (g_hero_state[0x22B4] == 4) cam_reset_default();
 }

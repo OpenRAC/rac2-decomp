@@ -30,31 +30,32 @@ typedef struct {
     char *pVars;      
 } Moby449FD0;
 
-char *yeedil_projectile_spawn_pal(char *arg0, char *arg1, char *arg2, float arg3, int arg4,
-                        float arg5) {
-    char *obj;
+/* Creates a new projectile (moby class 4846) at a position, with a direction, speed and lifetime, and returns it. */
+char *yeedil_projectile_spawn_pal(char *parent, char *position, char *direction, float speed, int lifetime,
+                        float extra_value) {
+    char *projectile;
     char *state;
 
-    obj = CreateMoby(0x12EE);
-    if (obj != 0) {
-        moby_init_child_from_parent((u8 *)obj, (u8 *)arg0);
-        qcopy(obj + 0x10, arg1);
-        *(float *)(obj + 0xF0) = math_random_angle();
-        *(float *)(obj + 0xF4) = math_random_angle();
-        euler_rotation_basis(obj + 0xC0, obj + 0xF0);
-        ((Moby449FD0 *)obj)->state = 1;
-        ((Moby449FD0 *)obj)->flags |= 0x100;
-        ((Moby449FD0 *)obj)->scale =
-            *(float *)(((Moby449FD0 *)obj)->pClass + 0x24) * g_yeedil_projectile_radius;
-        state = ((Moby449FD0 *)obj)->pVars;
-        qcopy(state, arg2);
-        *(float *)(state + 0x14) = arg3 * 0.019867549f;
-        *(int *)(state + 0x18) = arg4;
-        *(float *)(state + 0x1C) = arg5;
+    projectile = CreateMoby(0x12EE);
+    if (projectile != 0) {
+        moby_init_child_from_parent((u8 *)projectile, (u8 *)parent);
+        qcopy(projectile + 0x10, position);
+        *(float *)(projectile + 0xF0) = math_random_angle();
+        *(float *)(projectile + 0xF4) = math_random_angle();
+        euler_rotation_basis(projectile + 0xC0, projectile + 0xF0);
+        ((Moby449FD0 *)projectile)->state = 1;
+        ((Moby449FD0 *)projectile)->flags |= 0x100;
+        ((Moby449FD0 *)projectile)->scale =
+            *(float *)(((Moby449FD0 *)projectile)->pClass + 0x24) * g_yeedil_projectile_radius;
+        state = ((Moby449FD0 *)projectile)->pVars;
+        qcopy(state, direction);
+        *(float *)(state + 0x14) = speed * 0.019867549f;
+        *(int *)(state + 0x18) = lifetime;
+        *(float *)(state + 0x1C) = extra_value;
         *(int *)(state + 0x20) = 0x32;
         *(float *)(state + 0x10) = math_random_float_range(10.0f, 20.0f) * 0.00040000002f;
     }
-    return obj;
+    return projectile;
 }
 
 extern float g_turret_small_turn_step __attribute__((sda));
@@ -64,11 +65,12 @@ extern float math_approach_target_with_direction_mode(char *a, char *b, int c, f
                             float g);
 extern float ApproachValue(float *, float, float);
 
-void turret_turn_toward_target_pal(char *arg0) {
-    char *state = *(char **)(arg0 + 0x68);
-    char *p = arg0 + 0xF8;
-    float a = *(float *)(state + 0x140) - *(float *)(arg0 + 0x10);
-    float b = *(float *)(state + 0x144) - *(float *)(arg0 + 0x14);
+/* Turns the turret to face its target and eases its yaw and pitch toward the aimed angles. */
+void turret_turn_toward_target_pal(char *moby) {
+    char *state = *(char **)(moby + 0x68);
+    char *p = moby + 0xF8;
+    float a = *(float *)(state + 0x140) - *(float *)(moby + 0x10);
+    float b = *(float *)(state + 0x144) - *(float *)(moby + 0x14);
     float c = g_turret_small_turn_step * 6.981318e-06f;
     float d = g_turret_turn_step * 0.0003490659f;
     float r;
@@ -76,8 +78,8 @@ void turret_turn_toward_target_pal(char *arg0) {
     r = mat_fast_helper_a(a, b);
     math_approach_target_with_direction_mode(p, state + 0x1A4, 0, r, c, c, d);
     d = d * 4.0f;
-    ApproachValue(arg0 + 0xF0, *(float *)(state + 0x1A8), d);
+    ApproachValue(moby + 0xF0, *(float *)(state + 0x1A8), d);
     *(float *)(state + 0x1A8) = 0.0f;
-    ApproachValue(arg0 + 0x0F4, *(float *)(state + 0x1AC), d);
+    ApproachValue(moby + 0x0F4, *(float *)(state + 0x1AC), d);
     *(float *)(state + 0x1AC) = 0.0f;
 }

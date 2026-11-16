@@ -6,13 +6,14 @@ extern float math_random_float_range(float, float);
 extern void func_002A0F48(char *);
 typedef int TI128 __attribute__((mode(TI)));
 
-char *func_PAL_L06_003F77D8(char *owner, TI128 *position, TI128 *motion, int field1a, int field1c)
+/* Creates one flying child for a spawner, with a random spin, its launch motion and the spawner as owner (PAL: 50 Hz timings). */
+char *flock_create_member_pal(char *owner, TI128 *position, TI128 *motion, int kind, int slot_index)
 {
     char *record;
     char *created;
     float angle;
-    u8 byte1c = (u8)field1c;
-    u8 byte1a = (u8)field1a;
+    u8 slot_byte = (u8)slot_index;
+    u8 kind_byte = (u8)kind;
 
     created = (char *)CreateMoby(0x75E);
     if (created != 0) {
@@ -34,8 +35,8 @@ char *func_PAL_L06_003F77D8(char *owner, TI128 *position, TI128 *motion, int fie
         *(unsigned char *)(created + 0x20) = 0;
         angle = *(float *)(*(int *)(created + 0x24) + 0x24) * 0.3f;
         *(float *)(created + 0x2C) = angle;
-        *(unsigned char *)(record + 0x1C) = byte1c;
-        *(unsigned char *)(record + 0x1A) = byte1a;
+        *(unsigned char *)(record + 0x1C) = slot_byte;
+        *(unsigned char *)(record + 0x1A) = kind_byte;
         *(unsigned char *)(record + 0x1B) = 0;
         func_002A0F48(created);
     }

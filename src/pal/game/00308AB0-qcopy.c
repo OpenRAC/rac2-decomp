@@ -17,41 +17,41 @@ extern char *shot_moby_create_pal(void *, void *, float, float, float, float, un
 #define ENTRY() (D_00239BA0 + D_00139568[0x29] * 0xE0)
 
 /* One step of an object's launch routine: fires the pending shot and counts it down. */
-void func_PAL_00308AB0(char *obj)
+void megaturret_fire_shot_pal(char *moby)
 {
-    V4_F307808 a, b, c, d, e;
-    char *rec = *(char **)(obj + 0x68);
-    char *link;
-    char *tgt;
-    float scale;
-    char *ent;
-    char *fx;
+    V4_F307808 up_dir, target_pos, shot_velocity, muzzle_pos, target_motion;
+    char *vars = *(char **)(moby + 0x68);
+    char *target_info;
+    char *target;
+    float speed;
+    char *weapon_def;
+    char *effect;
 
-    moby_transform_joint_to_world(obj, 1, d);
-    moby_get_facing_direction(obj + 0x10, a);
-    if (*(float *)(rec + 0x5C) == 0.0f) {
-        if (*(s32 *)(rec + 0x50) != 0) {
-            if (*(char **)(rec + 0x64) != 0) {
-                link = moby_get_private_value_0(*(char **)(rec + 0x64));
-                tgt = *(char **)(rec + 0x64);
-                qcopy(b, tgt + 0x10);
-                if (link != 0) {
-                    FastVecScale(e, tgt + 0xE0, *(float *)(link + 0x10));
-                    FastVecAdd(b, b, e);
+    moby_transform_joint_to_world(moby, 1, muzzle_pos);
+    moby_get_facing_direction(moby + 0x10, up_dir);
+    if (*(float *)(vars + 0x5C) == 0.0f) {
+        if (*(s32 *)(vars + 0x50) != 0) {
+            if (*(char **)(vars + 0x64) != 0) {
+                target_info = moby_get_private_value_0(*(char **)(vars + 0x64));
+                target = *(char **)(vars + 0x64);
+                qcopy(target_pos, target + 0x10);
+                if (target_info != 0) {
+                    FastVecScale(target_motion, target + 0xE0, *(float *)(target_info + 0x10));
+                    FastVecAdd(target_pos, target_pos, target_motion);
                 }
-                ent = ENTRY();
-                scale = *(float *)(ent + 0x50) * 0.020000001f;
-                FastVecSub(c, b, d);
-                vec_scale_to_length(c, c, scale);
-                snd_play_from_class_bank(0, 0, obj, 0x1367);
-                fx = shot_moby_create_pal(d, c, 2.0f, 15.0f, 0.5f, 3.0f, 0x50, 0xC8, 1, 0, 0x10E, *(char **)(rec + 0x64));
-                if (fx != 0)
-                    *(s32 *)(fx + 0xB8) = *(s32 *)(rec + 0x68);
-                *(s32 *)(rec + 0x40) = ((s32)(g_megaturret_shot_param) * 5 + 2) / 6;
-                *(s32 *)(rec + 0x44) = 5;
-                if (--*(s32 *)(rec + 0x60) <= 0)
-                    *(u8 *)(obj + 0x20) = 8;
-                *(float *)(rec + 0x5C) = 0.6666667f;
+                weapon_def = ENTRY();
+                speed = *(float *)(weapon_def + 0x50) * 0.020000001f;
+                FastVecSub(shot_velocity, target_pos, muzzle_pos);
+                vec_scale_to_length(shot_velocity, shot_velocity, speed);
+                snd_play_from_class_bank(0, 0, moby, 0x1367);
+                effect = shot_moby_create_pal(muzzle_pos, shot_velocity, 2.0f, 15.0f, 0.5f, 3.0f, 0x50, 0xC8, 1, 0, 0x10E, *(char **)(vars + 0x64));
+                if (effect != 0)
+                    *(s32 *)(effect + 0xB8) = *(s32 *)(vars + 0x68);
+                *(s32 *)(vars + 0x40) = ((s32)(g_megaturret_shot_param) * 5 + 2) / 6;
+                *(s32 *)(vars + 0x44) = 5;
+                if (--*(s32 *)(vars + 0x60) <= 0)
+                    *(u8 *)(moby + 0x20) = 8;
+                *(float *)(vars + 0x5C) = 0.6666667f;
             }
         }
     }

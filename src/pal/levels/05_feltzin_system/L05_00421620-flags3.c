@@ -13,7 +13,7 @@ extern void hero_apply_damage_pal(float value);
 extern char g_beam_burst_colors[8];
 extern void vec_scale_to_length(void *, void *, float);
 extern int math_random_int_range(int, int);
-extern char *func_PAL_002BE9A8(char *, float, float, float, float, int, char *, int, int);
+extern char *part_spawn_spinning_spark_pal(char *, float, float, float, float, int, char *, int, int);
 extern float math_random_float_range(float a, float b);
 extern int func_001163B0(void);
 extern int FloatToInt(float);
@@ -31,12 +31,12 @@ void beam_fire_burst_pal(char *object)
     char origin[16] __attribute__((aligned(16)));
     char colors[8];
     char *state = *(char **)(object + 0x68);
-    char *v = moby_get_motion_data(object);
+    char *motion = moby_get_motion_data(object);
     int i;
     char *position;
-    if (!v || !*(char **)(v + 0x120) || *(int *)(state + 0x268)) return;
+    if (!motion || !*(char **)(motion + 0x120) || *(int *)(state + 0x268)) return;
     position = object + 0x10;
-    FastVecSub(delta, *(char **)(v + 0x120) + 0x10, position);
+    FastVecSub(delta, *(char **)(motion + 0x120) + 0x10, position);
     {
         float speed = 0.70000005f;
         qcopy_nc(pos, position);
@@ -59,7 +59,7 @@ void beam_fire_burst_pal(char *object)
         float scale = 1.0f, size = 210000.0f;
         for (i = 0; i < 3; i++) {
             int kind = math_random_int_range(1, 5);
-            char *particle = func_PAL_002BE9A8(origin, 0.0f, scale, 1.01f, math_random_float_range(0.25f, scale) * size,
+            char *particle = part_spawn_spinning_spark_pal(origin, 0.0f, scale, 1.01f, math_random_float_range(0.25f, scale) * size,
                                            kind, velocity, 0x5A182, 1);
             __builtin_memcpy(colors, g_beam_burst_colors, 8);
             if (particle) {

@@ -11,7 +11,9 @@ extern unsigned char *g_part_tex_drifting_table[];
 extern float g_drift_speed_range_low __attribute__((sda));
 extern float g_drift_speed_range_high __attribute__((sda));
 extern float g_drift_spawn_min __attribute__((sda));
-char *func_PAL_002C84A8(char *pos, char *velocity, int life)
+/* Spawns a drifting particle at pos with velocity that lasts life frames (PAL: scaled to
+   50 Hz). */
+char *part_spawn_drifting_2_pal(char *pos, char *velocity, int life)
 {
     char *state;
     char *p = part_alloc(0x60);

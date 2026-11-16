@@ -12,17 +12,20 @@ extern s32 g_level_progress_flag;
 extern u8 g_level_progress_flag_a NOT_SDA;
 extern u8 g_level_progress_flag_b NOT_SDA;
 
-void level_update_progress_flags_pal(u8 *arg0) {
-    u8 *v1 = arg0;
-    int s0 = v1[0x20];
+/* Controller that watches the arena and the creature bursts. When the arena reaches level 6 with
+   no riders left, and again after 12 bursts, it plays a sound and sets the level progress flag
+   once each. */
+void level_update_progress_flags_pal(u8 *object) {
+    u8 *moby = object;
+    int state = moby[0x20];
     int enabled;
 
-    if (s0 != 1) {
-        if (s0 < 2) {
-            if (s0 == 0) {
-                v1[0x30] = 0xFF;
+    if (state != 1) {
+        if (state < 2) {
+            if (state == 0) {
+                moby[0x30] = 0xFF;
                 g_creature_burst_count = 0;
-                moby_set_state(v1, 1, -1);
+                moby_set_state(moby, 1, -1);
             }
         }
         return;

@@ -12,7 +12,7 @@ typedef struct {
     float position[4];
 } Hero;
 
-extern int func_PAL_L14_0042ED80(void *);
+extern int enemy_update_common_pal(void *);
 extern int flag_set_second_pending(void *);
 extern int moby_dispatch_action_by_kind(void *, void *);
 extern int flag_set_first_pending(void *);
@@ -28,14 +28,14 @@ extern float mat_fast_helper_a(float, float);
 extern float FastDiffRots(float, float);
 extern float moby_get_anim_value(void *);
 extern void moby_set_controller_speed_limits(void *, float, float, float, float);
-extern void func_PAL_L14_0042F200(void *);
+extern void climbing_enemy_die_pal(void *);
 extern void moby_mark_spawned(void *);
 extern void moby_set_state(void *, int, int);
-extern void func_PAL_002A7E68(void *, int, int, int);
+extern void anim_start_blended_pal(void *, int, int, int);
 extern int moby_step_at_own_position_pal(void *);
 extern void moby_l14_set_state_value(void *, int);
 extern void moby_transform_joint_to_world(void *, int, void *);
-extern void func_PAL_L14_0042F0D8(void *);
+extern void climbing_enemy_update_parts_pal(void *);
 
 extern float g_climbing_enemy_rate_a __attribute__((sda));
 extern float g_climbing_enemy_rate_b __attribute__((sda));
@@ -48,149 +48,151 @@ extern int g_climbing_enemy_choices[4];
 extern char *g_climbing_enemy_moby_list[];
 
 
-void func_PAL_L14_0042E5F8(char *self)
+/* Per-frame update of a climbing enemy: picks its next action, climbs up or down towards the hero, swings its arms and
+   mauls the player, and dies when hit. (PAL: 50 Hz timings) */
+void climbing_enemy_update_pal(char *moby)
 {
-    char *s = *(char **)(self + 0x68);
-    int r, i;
-    float angle, t;
+    char *vars = *(char **)(moby + 0x68);
+    int result, i;
+    float angle, anim_frame;
     union {
         int choices[4];
         float pos[4];
     } scratch;
 
-    if (func_PAL_L14_0042ED80(self)) {
-        moby_mark_spawned(self);
+    if (enemy_update_common_pal(moby)) {
+        moby_mark_spawned(moby);
         return;
     }
     {
-        switch (B(self, 0x95)) {
+        switch (B(moby, 0x95)) {
         case 0:
-            if (W(s, 0x2F0) == 1 && B(self, 0x20) == 1)
-                moby_set_state(self, 5, 1);
+            if (W(vars, 0x2F0) == 1 && B(moby, 0x20) == 1)
+                moby_set_state(moby, 5, 1);
             break;
         case 1:
-            if (flag_set_second_pending(self))
-                moby_set_controller_speed_limits(self,
+            if (flag_set_second_pending(moby))
+                moby_set_controller_speed_limits(moby,
                     g_climbing_enemy_rate_a * 0.00040000002f,
                     g_climbing_enemy_rate_b * 0.020000001f,
                     g_climbing_enemy_rate_c * 6.981318e-06f,
                     g_climbing_enemy_rate_d * 0.0003490659f);
-            if (W(s, 0x2F0) != 1) {
-                moby_set_state(self, 1, 0);
-                W(s, 0x30C) = (math_random_int_range(580, 600) * 5 + 2) / 6;
+            if (W(vars, 0x2F0) != 1) {
+                moby_set_state(moby, 1, 0);
+                W(vars, 0x30C) = (math_random_int_range(580, 600) * 5 + 2) / 6;
             }
             break;
         case 2:
-            r = moby_dispatch_action_by_kind(self, s + 0x140);
-            if (r & 1) {
-                func_PAL_L14_0042F200(self);
-                moby_mark_spawned(self);
+            result = moby_dispatch_action_by_kind(moby, vars + 0x140);
+            if (result & 1) {
+                climbing_enemy_die_pal(moby);
+                moby_mark_spawned(moby);
                 return;
             }
-            if (r & 2) {
-                if (W(s, 0x2F0) == 1)
-                    moby_set_state(self, 5, 1);
+            if (result & 2) {
+                if (W(vars, 0x2F0) == 1)
+                    moby_set_state(moby, 5, 1);
                 else {
-                    moby_set_state(self, 1, 0);
-                    W(s, 0x30C) = (math_random_int_range(580, 600) * 5 + 2) / 6;
+                    moby_set_state(moby, 1, 0);
+                    W(vars, 0x30C) = (math_random_int_range(580, 600) * 5 + 2) / 6;
                 }
             }
             break;
         }
     }
 
-    switch (B(self, 0x20)) {
+    switch (B(moby, 0x20)) {
     case 1:
-        if (flag_set_first_pending(self) && B(self, 0x43) != 6)
-            func_PAL_002A7E68(self, 6, 0, 17);
-        if (B(self, 0x60) & 2) {
+        if (flag_set_first_pending(moby) && B(moby, 0x43) != 6)
+            anim_start_blended_pal(moby, 6, 0, 17);
+        if (B(moby, 0x60) & 2) {
             __builtin_memcpy(scratch.choices, g_climbing_enemy_choices, 16);
-            if (B(self, 0x43) != scratch.choices[math_random_int_below(4)])
-                func_PAL_002A7E68(self, scratch.choices[math_random_int_below(4)], 0, 17);
+            if (B(moby, 0x43) != scratch.choices[math_random_int_below(4)])
+                anim_start_blended_pal(moby, scratch.choices[math_random_int_below(4)], 0, 17);
         }
-        if (W(s, 0x2B8) != -1)
-            moby_step_at_own_position_pal(self);
-        if ((g_frame_tick_counter & 15) == (((int)self >> 8) & 15)) {
-            if (W(s, 0x2B8) == -1)
+        if (W(vars, 0x2B8) != -1)
+            moby_step_at_own_position_pal(moby);
+        if ((g_frame_tick_counter & 15) == (((int)moby >> 8) & 15)) {
+            if (W(vars, 0x2B8) == -1)
                 break;
-            if (W(s, 0x31C) && ((Hero *)g_hero_state)->position[2] + 2.0f < F(self, 0x18) &&
-                vec_distance_xy(self + 0x10, (((Hero *)g_hero_state)->position)) < 16.0f) {
-                moby_set_state(self, 2, -1);
+            if (W(vars, 0x31C) && ((Hero *)g_hero_state)->position[2] + 2.0f < F(moby, 0x18) &&
+                vec_distance_xy(moby + 0x10, (((Hero *)g_hero_state)->position)) < 16.0f) {
+                moby_set_state(moby, 2, -1);
                 break;
             }
-            if (!W(s, 0x31C) && F(self, 0x18) < ((Hero *)g_hero_state)->position[2] - 2.0f &&
-                vec_distance_xy(self + 0x10, (((Hero *)g_hero_state)->position)) < 8.0f)
-                moby_set_state(self, 3, -1);
+            if (!W(vars, 0x31C) && F(moby, 0x18) < ((Hero *)g_hero_state)->position[2] - 2.0f &&
+                vec_distance_xy(moby + 0x10, (((Hero *)g_hero_state)->position)) < 8.0f)
+                moby_set_state(moby, 3, -1);
         } else {
-            angle = mat_fast_helper_a(((Hero *)g_hero_state)->position[0] - F(self, 0x10),
-                                 ((Hero *)g_hero_state)->position[1] - F(self, 0x14));
-            if (FastDiffRots(F(self, 0xF8), angle) > 0.7853982449f)
-                moby_set_state(self, 4, -1);
+            angle = mat_fast_helper_a(((Hero *)g_hero_state)->position[0] - F(moby, 0x10),
+                                 ((Hero *)g_hero_state)->position[1] - F(moby, 0x14));
+            if (FastDiffRots(F(moby, 0xF8), angle) > 0.7853982449f)
+                moby_set_state(moby, 4, -1);
         }
         break;
     case 4:
-        if (flag_set_first_pending(self) && B(self, 0x43) != 8)
-            func_PAL_002A7E68(self, 8, 0, 17);
-        angle = mat_fast_helper_a(((Hero *)g_hero_state)->position[0] - F(self, 0x10),
-                             ((Hero *)g_hero_state)->position[1] - F(self, 0x14));
-        moby_start_effect_from_entry(self, angle);
-        if (FastDiffRots(F(self, 0xF8), angle) < 0.05235988274f)
-            moby_set_state(self, 1, -1);
+        if (flag_set_first_pending(moby) && B(moby, 0x43) != 8)
+            anim_start_blended_pal(moby, 8, 0, 17);
+        angle = mat_fast_helper_a(((Hero *)g_hero_state)->position[0] - F(moby, 0x10),
+                             ((Hero *)g_hero_state)->position[1] - F(moby, 0x14));
+        moby_start_effect_from_entry(moby, angle);
+        if (FastDiffRots(F(moby, 0xF8), angle) < 0.05235988274f)
+            moby_set_state(moby, 1, -1);
         break;
     case 2:
-        if (flag_set_first_pending(self)) {
-            if (B(self, 0x43) != 8)
-                func_PAL_002A7E68(self, 8, 0, 17);
-            moby_l14_set_state_value(g_moby_l14_pool + W(s, 0x2B8) * 256, 0);
+        if (flag_set_first_pending(moby)) {
+            if (B(moby, 0x43) != 8)
+                anim_start_blended_pal(moby, 8, 0, 17);
+            moby_l14_set_state_value(g_moby_l14_pool + W(vars, 0x2B8) * 256, 0);
         }
-        if (moby_l01_turn_toward_target_pal(self, g_moby_l14_pool + W(s, 0x2B8) * 256 + 0x10) & 128) {
-            moby_l14_set_state_value(g_moby_l14_pool + W(s, 0x2B8) * 256, 1);
-            W(s, 0x31C) = 0;
-            moby_set_state(self, 1, -1);
+        if (moby_l01_turn_toward_target_pal(moby, g_moby_l14_pool + W(vars, 0x2B8) * 256 + 0x10) & 128) {
+            moby_l14_set_state_value(g_moby_l14_pool + W(vars, 0x2B8) * 256, 1);
+            W(vars, 0x31C) = 0;
+            moby_set_state(moby, 1, -1);
         }
         break;
     case 3:
-        if (flag_set_first_pending(self)) {
-            if (B(self, 0x43) != 8)
-                func_PAL_002A7E68(self, 8, 0, 17);
-            moby_l14_set_state_value(g_moby_l14_pool + W(s, 0x2B8) * 256, 0);
+        if (flag_set_first_pending(moby)) {
+            if (B(moby, 0x43) != 8)
+                anim_start_blended_pal(moby, 8, 0, 17);
+            moby_l14_set_state_value(g_moby_l14_pool + W(vars, 0x2B8) * 256, 0);
         }
-        if (moby_l01_turn_toward_target_pal(self, s + 0x2E0) & 128) {
-            W(s, 0x31C) = 1;
-            moby_set_state(self, 1, -1);
+        if (moby_l01_turn_toward_target_pal(moby, vars + 0x2E0) & 128) {
+            W(vars, 0x31C) = 1;
+            moby_set_state(moby, 1, -1);
         }
         break;
     case 5:
-        if (flag_set_first_pending(self) && B(self, 0x43) != 16)
-            func_PAL_002A7E68(self, 16, 7, 6);
-        t = moby_get_anim_value(self);
-        if (t < 19.0f) {
-            angle = mat_fast_helper_a(F(s, 0x210) - F(self, 0x10),
-                                 F(s, 0x214) - F(self, 0x14));
-            moby_start_effect_from_entry(self, angle);
-            W(s, 0x320) = 1;
-        } else if (t <= 22.0f && W(s, 0x320)) {
-            coll_sweep_from_object(self, *(char **)(s + 0x300) + 0x10,
+        if (flag_set_first_pending(moby) && B(moby, 0x43) != 16)
+            anim_start_blended_pal(moby, 16, 7, 6);
+        anim_frame = moby_get_anim_value(moby);
+        if (anim_frame < 19.0f) {
+            angle = mat_fast_helper_a(F(vars, 0x210) - F(moby, 0x10),
+                                 F(vars, 0x214) - F(moby, 0x14));
+            moby_start_effect_from_entry(moby, angle);
+            W(vars, 0x320) = 1;
+        } else if (anim_frame <= 22.0f && W(vars, 0x320)) {
+            coll_sweep_from_object(moby, *(char **)(vars + 0x300) + 0x10,
                           0.57f, 2.0f, 1, 1.5f, 0, 1, 0);
-            coll_sweep_from_object(self, *(char **)(s + 0x304) + 0x10,
+            coll_sweep_from_object(moby, *(char **)(vars + 0x304) + 0x10,
                           0.57f, 2.0f, 1, 1.5f, 0, 1, 0);
-            moby_transform_joint_to_world(self, 6, scratch.pos);
-            r = coll_sweep_from_object(self, scratch.pos, 0.57f, 2.0f, 1, 2.0f, 0, 1, 0);
-            for (i = 0; i < r; i++)
-                if (*(short *)(g_climbing_enemy_moby_list[i] + 0xAA) == 2404)
-                    W(s, 0x320) = 0;
+            moby_transform_joint_to_world(moby, 6, scratch.pos);
+            result = coll_sweep_from_object(moby, scratch.pos, 0.57f, 2.0f, 1, 2.0f, 0, 1, 0);
+            for (i = 0; i < result; i++)
+                if (*(short *)(g_climbing_enemy_moby_list[i] + 0xAA) == MOBY_CLASS_GADGEBOT)
+                    W(vars, 0x320) = 0;
         }
         break;
     case 7:
-        if (coll_point_inside_region((((Hero *)g_hero_state)->position), W(s, 0x2BC)))
-            moby_set_state(self, 8, -1);
+        if (coll_point_inside_region((((Hero *)g_hero_state)->position), W(vars, 0x2BC)))
+            moby_set_state(moby, 8, -1);
         break;
     case 8:
-        if (flag_set_first_pending(self) && B(self, 0x43) != 1)
-            func_PAL_002A7E68(self, 1, 0, 2);
-        if (B(self, 0x60) & 2)
-            moby_set_state(self, 1, 0);
+        if (flag_set_first_pending(moby) && B(moby, 0x43) != 1)
+            anim_start_blended_pal(moby, 1, 0, 2);
+        if (B(moby, 0x60) & 2)
+            moby_set_state(moby, 1, 0);
         break;
     }
-    func_PAL_L14_0042F0D8(self);
+    climbing_enemy_update_parts_pal(moby);
 }

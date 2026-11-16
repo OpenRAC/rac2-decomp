@@ -16,7 +16,7 @@ extern float g_yeedil_small_accel_a __attribute__((sda));
 extern Vector g_yeedil_small_local_vec SDATA(D_L20_001B2010);
 extern void yeedil_small_enemy_init_damage(char *), moby_mark_spawned(char *);
 extern void moby_enter_state_six(char *), moby_set_state(char *, int, int);
-extern void func_PAL_002A7E68(char *, int, int, int);
+extern void anim_start_blended_pal(char *, int, int, int);
 extern void matrix_mul_vec3(void *, void *, void *), FastVecAdd(void *, void *, void *);
 extern void euler_rotation_basis(void *, void *);
 extern s32 cam_moby_update(char *);
@@ -28,15 +28,16 @@ extern int FloatToInt(float);
 extern char *part_find_owned_effect_slot(char *, int, int);
 extern float moby_update_aim_target_strength_pal(char *, char *);
 extern void FastVecSub(void *, void *, void *);
-extern int func_PAL_002B1A50(char *, char *, int);
+extern int moby_apply_damage_to_object_pal(char *, char *, int);
 extern int weapon_select_aim_target(char *, int, void *, int, float, float);
 
-void yeedil_small_enemy_init_damage_pal(char *arg0) {
-    char *st = *(char **)(arg0 + 0x68);
-    Vector a;
-    Vector b;
+/* Sets up the small enemy when it first appears. Each frame it also handles being hit, dying, and remembering the hero position. */
+void yeedil_small_enemy_init_damage_pal(char *moby) {
+    char *st = *(char **)(moby + 0x68);
+    Vector offset_before;
+    Vector offset_after;
 
-    if (*(unsigned char *)(arg0 + 0x20) == 0) {
+    if (*(unsigned char *)(moby + 0x20) == 0) {
         *(float *)(st + 0x170) = 0.5f;
         *(unsigned char *)(st + 0x150) = 5;
         *(int *)(st + 0x188) = 2;
@@ -69,50 +70,50 @@ void yeedil_small_enemy_init_damage_pal(char *arg0) {
             *(short *)(st + 0x24) = 3;
             *(float *)(st + 0x20) = 3.0f;
         }
-        *(int *)(arg0 + 0x98) = 0;
-        *(unsigned short *)(arg0 + 0x34) = (*(unsigned short *)(arg0 + 0x34) | 0x41) & 0xEFFF;
-        moby_set_state(arg0, 6, 3);
-        if (*(unsigned char *)(arg0 + 0x43) != 0) {
-            func_PAL_002A7E68(arg0, 0, 0, 0);
+        *(int *)(moby + 0x98) = 0;
+        *(unsigned short *)(moby + 0x34) = (*(unsigned short *)(moby + 0x34) | 0x41) & 0xEFFF;
+        moby_set_state(moby, 6, 3);
+        if (*(unsigned char *)(moby + 0x43) != 0) {
+            anim_start_blended_pal(moby, 0, 0, 0);
         }
     }
 
     *(float *)(st + 0x180) = g_level_shared_float;
-    if (*(unsigned char *)(arg0 + 0x20) == 6) {
+    if (*(unsigned char *)(moby + 0x20) == 6) {
         return;
     }
     if (*(unsigned char *)(st + 0x2E) == 2) {
-        *(int *)(arg0 + 0x98) = 0;
-        *(unsigned short *)(arg0 + 0x34) = (*(unsigned short *)(arg0 + 0x34) | 0x41) & 0xEFFF;
-        moby_set_state(arg0, 6, 3);
+        *(int *)(moby + 0x98) = 0;
+        *(unsigned short *)(moby + 0x34) = (*(unsigned short *)(moby + 0x34) | 0x41) & 0xEFFF;
+        moby_set_state(moby, 6, 3);
     }
     *(unsigned char *)(st + 0x2E) = 1;
 
-    if (*(unsigned char *)(arg0 + 0x20) == 7 && *(float *)(st + 0x20) > 0.0f) {
-        char *hit = part_find_owned_effect_slot(arg0, 0x10000, 0);
-        float damage = moby_update_aim_target_strength_pal(arg0, hit);
+    if (*(unsigned char *)(moby + 0x20) == 7 && *(float *)(st + 0x20) > 0.0f) {
+        char *hit = part_find_owned_effect_slot(moby, 0x10000, 0);
+        float damage = moby_update_aim_target_strength_pal(moby, hit);
 
         ApproachValue(st + 0x20, 0.0f, damage);
-        *(unsigned char *)(arg0 + 0xA8) = 0xFF;
+        *(unsigned char *)(moby + 0xA8) = 0xFF;
         if (*(float *)(st + 0x20) <= 0.0f) {
-            *(float *)(arg0 + 0xF4) = 0.0f;
-            *(float *)(arg0 + 0xF0) = 0.0f;
-            matrix_mul_vec3(&a, st + 0x230, arg0 + 0xC0);
-            euler_rotation_basis(arg0 + 0xC0, arg0 + 0xF0);
-            matrix_mul_vec3(&b, st + 0x230, arg0 + 0xC0);
-            FastVecSub(&b, &b, &a);
-            FastVecSub(arg0 + 0x10, arg0 + 0x10, &b);
+            *(float *)(moby + 0xF4) = 0.0f;
+            *(float *)(moby + 0xF0) = 0.0f;
+            matrix_mul_vec3(&offset_before, st + 0x230, moby + 0xC0);
+            euler_rotation_basis(moby + 0xC0, moby + 0xF0);
+            matrix_mul_vec3(&offset_after, st + 0x230, moby + 0xC0);
+            FastVecSub(&offset_after, &offset_after, &offset_before);
+            FastVecSub(moby + 0x10, moby + 0x10, &offset_after);
         }
     } else {
-        func_PAL_002B1A50(arg0, st + 0x140, 0);
+        moby_apply_damage_to_object_pal(moby, st + 0x140, 0);
     }
-    weapon_select_aim_target(arg0, *(int *)(st + 0x270), 0, 0, 64.0f, 0.0f);
+    weapon_select_aim_target(moby, *(int *)(st + 0x270), 0, 0, 64.0f, 0.0f);
 
     if (*(int *)(st + 0x204) == 0) {
-        char *g = (char *)&g_hero_state;
+        char *hero = (char *)&g_hero_state;
 
-        *(char **)(st + 0x200) = *(char **)(g + 0x2290);
-        qcopy(st + 0x1F0, *(char **)(g + 0x2290) + 0x10);
+        *(char **)(st + 0x200) = *(char **)(hero + 0x2290);
+        qcopy(st + 0x1F0, *(char **)(hero + 0x2290) + 0x10);
         *(int *)(st + 0x204) = 1;
     }
 }

@@ -75,68 +75,69 @@ extern void func_002A0F48(MenuLine_002D4948 *);
 
 /* Builds the options menu from the settings word D_001A7AF0, then finds the preset
    matching the settings. */
-extern void func_US2_002CAFD8(void);
+extern void view_reset_fov_and_fog(void);
 
-int func_US2_002D5540(void)
+/* Builds the options menu lines from the settings word, finds the matching preset and resets the preview position. (USA v2.00) */
+int model_preview_menu_init_us2(void)
 {
-    int kind3 = 3;
-    int kind4 = 4;
+    int kind_3 = 3;
+    int kind_4 = 4;
     unsigned int settings;
-    int a, b, c, d, e, f, g;
+    int setting_a, setting_b, setting_c, setting_d, setting_e, setting_f, setting_g;
     MenuLine_002D4948 *line;
     int n;
     int i;
 
-    func_US2_002CAFD8();
+    view_reset_fov_and_fog();
     settings = g_equipment_bits;
-    a = (settings >> 2) & 3;
-    b = (settings >> 4) & 1;
-    c = (settings >> 6) & 1;
-    d = (settings >> 7) & 3;
-    e = (settings >> 9) & 1;
-    f = (settings >> 10) & 3;
-    g = (settings >> 14) & 3;
+    setting_a = (settings >> 2) & 3;
+    setting_b = (settings >> 4) & 1;
+    setting_c = (settings >> 6) & 1;
+    setting_d = (settings >> 7) & 3;
+    setting_e = (settings >> 9) & 1;
+    setting_f = (settings >> 10) & 3;
+    setting_g = (settings >> 14) & 3;
     g_pause_menu_state.items = menu_stream_chunk_claim_free(1);
     line = (MenuLine_002D4948 *)g_pause_menu_state.items;
     moby_init_instance(line, 0xD54);
     line->kind = 9;
     line = (MenuLine_002D4948 *)(g_pause_menu_state.items + 0x100);
-    moby_init_instance(line, g_robot_part_ids_b[a]);
+    moby_init_instance(line, g_robot_part_ids_b[setting_a]);
     line->kind = 8;
     line = (MenuLine_002D4948 *)(g_pause_menu_state.items + 0x200);
-    moby_init_instance(line, g_robot_part_ids_b[a]);
+    moby_init_instance(line, g_robot_part_ids_b[setting_a]);
     line->kind = 8;
     line->style |= 0x8000;
     line = (MenuLine_002D4948 *)(g_pause_menu_state.items + 0x300);
-    moby_init_instance(line, g_robot_part_ids_c[b]);
+    moby_init_instance(line, g_robot_part_ids_c[setting_b]);
     line->kind = 0;
     line = (MenuLine_002D4948 *)(g_pause_menu_state.items + 0x400);
-    moby_init_instance(line, g_robot_part_ids_d[c]);
+    moby_init_instance(line, g_robot_part_ids_d[setting_c]);
     line->kind = 1;
     line = (MenuLine_002D4948 *)(g_pause_menu_state.items + 0x500);
-    moby_init_instance(line, g_robot_part_ids_d[c]);
+    moby_init_instance(line, g_robot_part_ids_d[setting_c]);
     line->kind = 1;
     line->style |= 0x8000;
     n = 6;
-    if (g_robot_part_ids_e[d] != 0) {
+    if (g_robot_part_ids_e[setting_d] != 0) {
         line = (MenuLine_002D4948 *)(g_pause_menu_state.items + 0x600);
         n = 7;
-        moby_init_instance(line, g_robot_part_ids_e[d]);
+        moby_init_instance(line, g_robot_part_ids_e[setting_d]);
         line->kind = 2;
     }
     line = (MenuLine_002D4948 *)(g_pause_menu_state.items + n++ * 0x100);
-    moby_init_instance(line, g_robot_part_ids_f[e]);
-    line->kind = kind3;
+    moby_init_instance(line, g_robot_part_ids_f[setting_e]);
+    line->kind = kind_3;
     line = (MenuLine_002D4948 *)(g_pause_menu_state.items + n++ * 0x100);
-    moby_init_instance(line, g_robot_part_ids_f[e]);
-    line->kind = kind3;
+    moby_init_instance(line, g_robot_part_ids_f[setting_e]);
+    line->kind = kind_3;
     line->style |= 0x8000;
     line = (MenuLine_002D4948 *)(g_pause_menu_state.items + n++ * 0x100);
-    moby_init_instance(line, g_robot_part_ids_g[f]);
-    line->kind = kind4;
+    moby_init_instance(line, g_robot_part_ids_g[setting_f]);
+    line->kind = kind_4;
     line = (MenuLine_002D4948 *)(g_pause_menu_state.items + n++ * 0x100);
-    moby_init_instance(line, g_robot_part_ids_g[f]);
-    line->kind = kind4;
+    moby_init_instance(line, g_robot_part_ids_g[setting_f]);
+    line->kind = kind_4;
     line->style |= 0x8000;
     if ((g_equipment_bits >> 12) & 1) {
         line = (MenuLine_002D4948 *)(g_pause_menu_state.items + n++ * 0x100);
@@ -148,9 +149,9 @@ int func_US2_002D5540(void)
         moby_init_instance(line, 0x10E4);
         line->kind = 6;
     }
-    if (g != 0) {
+    if (setting_g != 0) {
         line = (MenuLine_002D4948 *)(g_pause_menu_state.items + n++ * 0x100);
-        moby_init_instance(line, g_robot_part_ids_h[g]);
+        moby_init_instance(line, g_robot_part_ids_h[setting_g]);
         line->kind = 7;
     }
     for (i = 0; i < n; i++) {

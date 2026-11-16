@@ -17,6 +17,7 @@ extern char *part_spawn_falling_drop(void *,void *,int,int,float,int,int);
 typedef struct { float v[4]; } GravityTable;
 extern GravityTable g_falling_drop_gravity;
 
+/* Updates a falling drop. It falls, fades near the end and near the camera, and splashes into a small drop when it lands (PAL: 50 Hz timings). */
 void part_update_falling_drop_pal(char *p)
 {
  char *q=p+32,*pos;

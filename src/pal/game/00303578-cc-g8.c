@@ -67,7 +67,7 @@ typedef struct BoltSpawnObject {
     ParticleVector rotation;
 } BoltSpawnObject;
 /* Allocate the denomination near the camera and initialize its pickup motion. */
-BoltSpawnObject *func_PAL_00303578(BoltSpawnObject *source, void *position, void *velocity, u32 flags, int value, int kind)
+BoltSpawnObject *moby_spawn_bolt_pickup_pal(BoltSpawnObject *source, void *position, void *velocity, u32 flags, int value, int kind)
 {
     BoltSpawnObject *object, *parent;
     BoltVars *state;

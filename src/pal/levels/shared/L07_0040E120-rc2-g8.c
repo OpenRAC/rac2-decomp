@@ -33,25 +33,26 @@ extern s32 ref_L07_00409300_00 __attribute__((sda));
 extern void ref_L07_00409300_01(s8 *, s32, s32);
 extern void ref_L07_00409300_02(s8 *, s8 *, s32, s32, f32);
 
-void func_PAL_L07_0040E120(s8 *arg0) {
-    s8 *s;
-    u8 t;
+/* Updates a TV Screens moby: sets it up in state 0, then keeps its screen picture running in state 1 (PAL: 50 Hz rates). */
+void tv_l07_screens_update_pal(s8 *moby) {
+    s8 *vars;
+    u8 state;
 
-    t = *(u8 *)(arg0 + 0x20);
-    s = *(s8 **)(arg0 + 0x68);
-    switch (t) {
+    state = *(u8 *)(moby + 0x20);
+    vars = *(s8 **)(moby + 0x68);
+    switch (state) {
     case 0:
-        ref_L07_00409300_01(arg0, 1, -1);
+        ref_L07_00409300_01(moby, 1, -1);
         return;
     case 1:
         if (g_current_map_index == 0x33) {
             break;
         }
-        if (s != 0) {
+        if (vars != 0) {
             if (ref_L07_00409300_00 == 2) {
-                ref_L07_00409300_02(arg0, s + 0xC, 0x80AABED2, 0x80466464, 0.06632252f);
+                ref_L07_00409300_02(moby, vars + 0xC, 0x80AABED2, 0x80466464, 0.06632252f);
             } else {
-                ref_L07_00409300_02(arg0, s + 0xC, 0x8096AAAA, 0x80466464, 0.04537857f);
+                ref_L07_00409300_02(moby, vars + 0xC, 0x8096AAAA, 0x80466464, 0.04537857f);
             }
         }
         break;

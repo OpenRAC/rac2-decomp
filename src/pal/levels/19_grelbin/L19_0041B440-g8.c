@@ -55,11 +55,11 @@ extern u8 g_moby_nibble_table[];
 extern void SetDeathBits_pal(void *,int,int);
 extern void func_002A0F48(void *);
 extern void hero_copy_field_to_moby(void *);
-extern void func_PAL_002A7E68(void *,int,int,int);
-extern void func_PAL_002AC3C0(void *,void *);
+extern void anim_start_blended_pal(void *,int,int,int);
+extern void gfx_update_color_fade_pal(void *,void *);
 extern int FastDecTimer(void *);
 extern float moby_update_aim_target_strength_pal(void *,void *);
-extern void func_PAL_002AC290(void *,void *);
+extern void gfx_start_color_fade_pal(void *,void *);
 extern int g_active_yeti_count MACRO_ADDR;
 typedef struct {
     u8 pad0[0x80];
@@ -137,18 +137,19 @@ typedef struct {
     int w304;
 } GrelbinUpdateState;
 
-int func_PAL_L19_0041C498(GrelbinMoby *obj)
+/* Sets up the Leviathan's helper object on its first frame, takes hit damage, and watches for a Y.E.T.I. to grab. Returns 1 when the object should be removed. (PAL version) */
+int leviathan_update_helper_pal(GrelbinMoby *moby)
 {
-    GrelbinUpdateState *state=obj->pvars;
+    GrelbinUpdateState *state=moby->pvars;
     void *other;
     GrelbinMoby *spawn;
     u8 *data;
     int i;
     float top[4] __attribute__((aligned(16)));
     float bottom[4] __attribute__((aligned(16)));
-    if (obj->state==0) {
-        obj->w98=0;
-        obj->flags=(obj->flags|1)&0xEFFF;
+    if (moby->state==0) {
+        moby->w98=0;
+        moby->flags=(moby->flags|1)&0xEFFF;
         state->w304=0;
         if (state->sourceIndex!=-1) state->source=g_moby_l19_array+state->sourceIndex;
         else {
@@ -157,20 +158,20 @@ int func_PAL_L19_0041C498(GrelbinMoby *obj)
         success:
             return 1;
             }
-            moby_init_child_from_parent(state->source,obj);
-            state->source->group=obj->group;
-            state->source->drawDistance=obj->drawDistance;
+            moby_init_child_from_parent(state->source,moby);
+            state->source->group=moby->group;
+            state->source->drawDistance=moby->drawDistance;
             state->source->flags|=0x100;
-            qcopy(top,obj->position); qcopy(bottom,obj->position);
+            qcopy(top,moby->position); qcopy(bottom,moby->position);
             top[2]+=1.f; bottom[2]-=10.f;
-            CollLine(top,bottom,2,obj,0);
+            CollLine(top,bottom,2,moby,0);
             mat_align_to_dir(state->source->transform,g_hit_matrix_buf,0);
         }
         {
         float half=0.5f;
         float one=1.f;
-        state->height=state->previousHeight=obj->position[2];
-        { u16 distance=90; obj->group=distance; obj->drawDistance=distance; }
+        state->height=state->previousHeight=moby->position[2];
+        { u16 distance=90; moby->group=distance; moby->drawDistance=distance; }
         state->f228=0.1f; state->w22C=0; state->f230=one; state->f234=0.1f;
         state->f170=half;state->f174=half;state->b1B7=1;
         state->f238=0.1f; state->b150=12; state->w188=3; state->b156=5;
@@ -179,12 +180,12 @@ int func_PAL_L19_0041C498(GrelbinMoby *obj)
         }
         state->w50=0;state->f84=0.5f;state->f54=0.2f;state->f5C=state->f58=0.75f;
         state->f60=1.5707965f;state->f80=0.52359885f;
-        moby_set_controller_speed_limits(obj,0.0048f,0.120000005f,0.010053098f,1.0053098f);
+        moby_set_controller_speed_limits(moby,0.0048f,0.120000005f,0.010053098f,1.0053098f);
         state->flags|=2;
-        moby_set_state(obj,1,0);
-        if(obj->animation!=7) func_PAL_002A7E68(obj,7,0,0);
+        moby_set_state(moby,1,0);
+        if(moby->animation!=7) anim_start_blended_pal(moby,7,0,0);
     {
-        u16 id=obj->uid;
+        u16 id=moby->uid;
         int value;
         if (g_trigger_active_table.active[(s16)id]) goto replace;
         value=g_moby_nibble_table[((s16)id>>1)+(g_current_map_index<<10)];
@@ -195,7 +196,7 @@ int func_PAL_L19_0041C498(GrelbinMoby *obj)
             replacement=CreateMoby(0x1208);
             if (!replacement) goto success;
             moby_init_child_from_parent(replacement,state->source);
-            replacement->group=obj->group;replacement->drawDistance=obj->drawDistance;
+            replacement->group=moby->group;replacement->drawDistance=moby->drawDistance;
             { float (*src)[4]=state->source->transform;
             for(i=0;i<4;i++) qcopy(replacement->transform[i],src[i]); }
             moby_mark_spawned(state->source);
@@ -208,10 +209,10 @@ int func_PAL_L19_0041C498(GrelbinMoby *obj)
     if(state->phase==2) {
         u16 id;
         u8 *count;
-        SetDeathBits_pal(obj,0,3);
+        SetDeathBits_pal(moby,0,3);
         spawn=CreateMoby(0x1266);
         if(!spawn) goto success;
-        id=obj->uid;
+        id=moby->uid;
         if(id&1) { count=((s16)id>>1)+(g_current_map_index<<10)+g_moby_nibble_table; if(((*count>>4)&7)!=7) *count+=16;}
         else { count=((s16)id>>1)+(g_current_map_index<<10)+g_moby_nibble_table; if((*count&7)!=7) *count+=1;}
         spawn->opacity=80;spawn->flags|=0x800;spawn->drawDistance=255;spawn->group=255;
@@ -219,56 +220,56 @@ int func_PAL_L19_0041C498(GrelbinMoby *obj)
         qcopy(spawn->position,state->source->position);
         spawn->position[2]+=1.f;func_002A0F48(spawn);hero_copy_field_to_moby(spawn);
         data=spawn->pvars;F(data,0)=0.1f;
-        func_PAL_002A7E68(spawn,1,0,20);
+        anim_start_blended_pal(spawn,1,0,20);
         { float duration=F(data,0); spawn->state=2;spawn->f48=duration+duration; }
         goto success;
     }
-    func_PAL_002AC3C0(obj,&state->damageState);
+    gfx_update_color_fade_pal(moby,&state->damageState);
     {
-    other=part_find_owned_effect_slot(obj,0x10000,0);
+    other=part_find_owned_effect_slot(moby,0x10000,0);
     if(!FastDecTimer((u8 *)state+0x26)) other=0;
     if(other) {
         float damage=F(other,0x2C);
         if(state->damageScale!=0.f) {
             GrelbinMoby *source=*(GrelbinMoby **)(other+0x20);
-            if(source && obj->classId==source->classId) F(other,0x2C)=damage*state->damageScale;
+            if(source && moby->classId==source->classId) F(other,0x2C)=damage*state->damageScale;
         }
         {
-            float damage=moby_update_aim_target_strength_pal(obj,other);
-            obj->bA8=255;state->damageTimer=200;
+            float damage=moby_update_aim_target_strength_pal(moby,other);
+            moby->bA8=255;state->damageTimer=200;
             state->health-=damage;
         }
-        func_PAL_002AC290(obj,&state->damageState);
+        gfx_start_color_fade_pal(moby,&state->damageState);
         if(state->health<=0.f) {
             GrelbinMoby *target;
-            if(obj->animation!=5) func_PAL_002A7E68(obj,5,0,17);
-            moby_set_state(obj,12,3);
+            if(moby->animation!=5) anim_start_blended_pal(moby,5,0,17);
+            moby_set_state(moby,12,3);
             target=state->target;
-            if(target && target->classId==0x10D0) {
+            if(target && target->classId==MOBY_CLASS_YETI) {
                 g_active_yeti_count=g_active_yeti_count-1;
                 moby_mark_spawned(target);
                 state->target=g_hero_state.object;
                 state->targetSet=1;qcopy(state->targetPosition,g_hero_state.previousPosition);
             }
         }
-        obj->bA8=255;
+        moby->bA8=255;
     }
     }
-    if(obj->state!=11) {
-    state->w2FC=weapon_select_aim_target(obj,state->w210,36.f,0,10.f,0);
-    if(obj->b95) {
-        state->w2F8=weapon_select_aim_target(obj,state->w2F4,state->f214*1.5f,0,0.f,0);
+    if(moby->state!=11) {
+    state->w2FC=weapon_select_aim_target(moby,state->w210,36.f,0,10.f,0);
+    if(moby->b95) {
+        state->w2F8=weapon_select_aim_target(moby,state->w2F4,state->f214*1.5f,0,0.f,0);
         if(state->w2F4==-1) {
-            if(vec_distance_xy(obj->position,g_hero_position)<32.f) state->w2F8=1;
+            if(vec_distance_xy(moby->position,g_hero_position)<32.f) state->w2F8=1;
             else state->w2F8=0;
         }
     }
     if(g_hero_state.mode==49) qcopy(state->targetPosition,g_hero_state.position);
     other=g_leviathan_other_moby;
     while(other) {
-        if(((GrelbinMoby *)other)->classId==0x10D0 && obj->state!=4 && obj->state!=9 && obj->state!=8 && state->health>0.f) {
-            if(obj->state==7 && obj->timer>=16) break;
-            if(vec_distance_xy(obj->position,((GrelbinMoby *)other)->position)<16.f && vec_distance_xy(obj->position,((GrelbinMoby *)other)->position)>15.f && ((GrelbinMoby *)other)->b95 && I(((GrelbinMoby *)other)->pvars,0x254)) {
+        if(((GrelbinMoby *)other)->classId==MOBY_CLASS_YETI && moby->state!=4 && moby->state!=9 && moby->state!=8 && state->health>0.f) {
+            if(moby->state==7 && moby->timer>=16) break;
+            if(vec_distance_xy(moby->position,((GrelbinMoby *)other)->position)<16.f && vec_distance_xy(moby->position,((GrelbinMoby *)other)->position)>15.f && ((GrelbinMoby *)other)->b95 && I(((GrelbinMoby *)other)->pvars,0x254)) {
                 state->target=other;state->targetSet=1;qcopy(state->targetPosition,((GrelbinMoby *)other)->position);break;
             }
         }
@@ -277,12 +278,12 @@ int func_PAL_L19_0041C498(GrelbinMoby *obj)
     }
     {
     GrelbinMoby *target=state->target;
-    if(target && target->classId==0x10D0 && vec_distance_xy(obj->position,target->position)<16.f && vec_distance_xy(obj->position,state->target->position)>15.f && obj->state!=11 && obj->b95) {
+    if(target && target->classId==MOBY_CLASS_YETI && vec_distance_xy(moby->position,target->position)<16.f && vec_distance_xy(moby->position,state->target->position)>15.f && moby->state!=11 && moby->b95) {
         state->height=state->previousHeight;
-        if(obj->animation!=6) func_PAL_002A7E68(obj,6,0,16);
-        moby_set_state(obj,11,-1);
+        if(moby->animation!=6) anim_start_blended_pal(moby,6,0,16);
+        moby_set_state(moby,11,-1);
         state->target->state=23;state->target->b95=4;
-        func_PAL_002A7E68(state->target,6,0,12);
+        anim_start_blended_pal(state->target,6,0,12);
     }
     }
     return 0;

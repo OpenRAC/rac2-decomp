@@ -132,14 +132,15 @@ extern void moby_set_controller_speed_limits(Moby_003BF9B0 *, f32, f32, f32, f32
 extern f32 fast_vec_dist(void *, void *);
 extern void moby_update_ground_check(Moby_003BF9B0 *);
 extern Found_003BF9B0 *part_find_owned_effect_slot(Moby_003BF9B0 *, s32, s32);
-extern int func_PAL_002B1A50(Moby_003BF9B0 *, void *, s32);
+extern int moby_apply_damage_to_object_pal(Moby_003BF9B0 *, void *, s32);
 extern void cam_compute_view_direction(void *, void *, s32);
 extern void vec_negate_and_forward(void *, void *, s32);
 
-void func_PAL_L23_003C3258(Moby_003BF9B0 *moby)
+/* Sets up a flying enemy on its first frame, then keeps its size, child moby and facing up to date. (PAL) */
+void flying_enemy_init_and_update_pal(Moby_003BF9B0 *moby)
 {
     State_003BF9B0 *vars = moby->pVars;
-    f32 k;
+    f32 scale_factor;
 
     if (moby->state == 0) {
         f32 fps;
@@ -211,17 +212,17 @@ void func_PAL_L23_003C3258(Moby_003BF9B0 *moby)
     if (moby->state == 13)
         return;
     moby_set_controller_speed_limits(moby, 0.0064000003f, 0.16000001f, 0.0025132746f, 0.25132746f);
-    k = 1.4f;
+    scale_factor = 1.4f;
     if (moby->state == 2)
-        k = 0.7f;
-    moby->scale = moby->pClass->scale * k;
+        scale_factor = 0.7f;
+    moby->scale = moby->pClass->scale * scale_factor;
     if (vars->child != 0) {
         vars->child->f32 = moby->f32;
         vars->child->f30 = moby->f30;
         vars->child->f38 = moby->f38;
         vars->child->f78 = moby->f78;
         vars->child->f31 = 1;
-        vars->child->scale = vars->child->pClass->scale * k;
+        vars->child->scale = vars->child->pClass->scale * scale_factor;
         if (vars->child->f31 != 0 && fast_vec_dist(vars->child->pos, g_camera_l23_position) < 24.0f) {
             moby_update_ground_check(vars->child);
             vars->child->f6F = 22;
@@ -239,7 +240,7 @@ void func_PAL_L23_003C3258(Moby_003BF9B0 *moby)
     }
     if (moby->state == 2)
         vars->f178 = 0;
-    func_PAL_002B1A50(moby, vars->f140, 0);
+    moby_apply_damage_to_object_pal(moby, vars->f140, 0);
     cam_compute_view_direction(moby->pos, vars->f280, 0);
     vec_negate_and_forward(moby->fC0, vars->f280, 0);
 }

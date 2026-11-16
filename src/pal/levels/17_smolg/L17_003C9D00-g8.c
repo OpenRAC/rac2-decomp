@@ -13,6 +13,7 @@ extern void FastVecSub(void *, void *, void *);
 extern void mat_combine_and_store(void *, void *, void *, void *);
 typedef unsigned int StateQuad __attribute__((mode(TI)));
 
+/* Falling breakable (PAL): drops to the ground while idle, and after it is hit it swaps to its broken model, plays the break animation, and removes itself when the timer runs out. */
 void falling_breakable_update_pal(char *self) {
     union { StateQuad q; float f[4]; } oldpos, delta;
     char *data = *(char **)(self + 0x68);

@@ -53,18 +53,19 @@ extern float g_weapon_aim_in_level __attribute__((sda)), g_weapon_aim15_level __
     func_003349E8(snd, fl, lv); \
     qcopy(to, from); return; }
 
-void func_PAL_L00_00425F08(char *moby)
+/* Decides which pose the held weapon is in (idle, aiming, firing or putting away), based on what the hero is doing, and starts the blend into it (PAL: 50 Hz timings). */
+void weapon_update_held_anim_state_pal(char *moby)
 {
-    char *p = *(char **)(moby + 0x70);
-    Anim *s = (Anim *)(p + 0x60);
+    char *vars = *(char **)(moby + 0x70);
+    Anim *s = (Anim *)(vars + 0x60);
     if (g_weapon_anim_skip_flag) { g_weapon_anim_skip_flag = 0; return; }
     if (s->state == 0) {
         if (g_hero_state.ctrl == 2 || g_hero_state.ctrl == 30) GO(1, g_weapon_anim_ctrl2_frames)
-        if (g_hero_state.state == 15) AIM(3, g_weapon_aim15_in_frames, g_weapon_aim_out_frames, g_weapon_aim15_level, 1, p + 0x90, p + 0x70, p + 0x80)
+        if (g_hero_state.state == 15) AIM(3, g_weapon_aim15_in_frames, g_weapon_aim_out_frames, g_weapon_aim15_level, 1, vars + 0x90, vars + 0x70, vars + 0x80)
         if (g_hero_state.state == 12) GO(8, g_weapon_anim_state12_frames)
-        if (g_hero_state.state == 11) AIM(6, g_weapon_aim_in_frames, g_weapon_aim_out_frames, g_weapon_aim_in_level, 0, p + 0x90, p + 0x70, p + 0x80)
+        if (g_hero_state.state == 11) AIM(6, g_weapon_aim_in_frames, g_weapon_aim_out_frames, g_weapon_aim_in_level, 0, vars + 0x90, vars + 0x70, vars + 0x80)
         if ((unsigned)(g_hero_state.state - 13) < 2) {
-            AIM(5, g_weapon_aim5_in_frames, g_weapon_anim_state12_frames, g_weapon_aim5_level, 1, p + 0x90, p + 0x70, p + 0x80)
+            AIM(5, g_weapon_aim5_in_frames, g_weapon_anim_state12_frames, g_weapon_aim5_level, 1, vars + 0x90, vars + 0x70, vars + 0x80)
         }
         if (g_hero_state.ctrl == 4) GO(2, g_weapon_anim_ctrl4_frames)
         return;
@@ -106,13 +107,13 @@ void func_PAL_L00_00425F08(char *moby)
     if ((s->state == 9 && (g_hero_state.ctrl == 2 || g_hero_state.h34C >= 0x2E)) ||
         (s->state == 10 && (g_hero_state.ctrl == 2 || g_hero_state.h34C >= 0x2E))) {
         float one = 1.0f;
-        char *q;
+        char *cam_blend;
         s->prev = s->state; s->state = 1;
         s->timer = ((s32)(g_weapon_anim_return_frames) * 5 + 2) / 6;
         s->rate = one / IntToFloat(s->timer);
-        q = *(char **)(moby + 0x70) + 0x20;
-        *(short *)q = ((s32)(g_camera_default_frame_count) * 5 + 2) / 6;
-        *(float *)(q + 0x24) = one / IntToFloat(*(short *)q);
+        cam_blend = *(char **)(moby + 0x70) + 0x20;
+        *(short *)cam_blend = ((s32)(g_camera_default_frame_count) * 5 + 2) / 6;
+        *(float *)(cam_blend + 0x24) = one / IntToFloat(*(short *)cam_blend);
         qcopy(moby + 0x40, moby);
         return;
     }

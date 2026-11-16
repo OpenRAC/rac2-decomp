@@ -13,7 +13,7 @@ extern float math_random_float_range(float, float);
 extern float math_random_angle(void);
 extern void vec_build_spherical_offset(float *, float, float, float);
 extern int math_random_int_range(int, int);
-extern char *func_PAL_002BE9A8(float, float, float, float, char *, int, char *, unsigned int, int);
+extern char *part_spawn_spinning_spark_pal(float, float, float, float, char *, int, char *, unsigned int, int);
 extern int func_001163B0(void);
 extern int FloatToInt(float);
 extern float IntToFloat(int);
@@ -59,7 +59,7 @@ void SpawnHealthDrainSparks_pal(char *object)
                 position[1] += *(float *)(owner + 4) * 0.0009765f;
                 position[2] += *(float *)(owner + 8) * 0.0009765f;
                 kind = math_random_int_range(1, 5);
-                particle = func_PAL_002BE9A8(0.0f, 1.0f, 1.01f,
+                particle = part_spawn_spinning_spark_pal(0.0f, 1.0f, 1.01f,
                                          math_random_float_range(0.25f, 1.0f) * 210000.0f,
                                          (char *)position, kind, (char *)direction, 0x5A182, 1);
                 palette = g_effect_palette_table[0];

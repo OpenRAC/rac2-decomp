@@ -28,36 +28,36 @@ extern int MemcardSave(int, int);
    +0x22C8; otherwise it takes scene func_002A77E0(2) + 0x1E, adds the two scores and starts
    func_US2_L00_0030D9F8(0x168). For a1 == 10
    with the once-only byte clear it sets it, starts func_002E5E58 and raises D_001A903C. */
-void arena_start_challenge_result_scene_us2(char *a0, int a1) {
-    char *state = *(char **)(a0 + 0x68);
+void arena_start_challenge_result_scene_us2(char *moby, int challenge) {
+    char *state = *(char **)(moby + 0x68);
     int saved;
-    int v;
+    int bolts;
 
-    if (a1 == 0 && g_game_flag_table[arena_get_challenge_flag_index(0)] == 0) {
+    if (challenge == 0 && g_game_flag_table[arena_get_challenge_flag_index(0)] == 0) {
         saved = g_hero_state.w22C8;
-        arena_queue_voice_line(a0, 1);
+        arena_queue_voice_line(moby, 1);
         help_unlock_entry(0x13);
         moby_handle_request_slot_state(0x13);
         g_hero_state.w22C8 = saved;
-    } else if (a1 == 1 && g_game_flag_table[arena_get_challenge_flag_index(1)] == 0) {
+    } else if (challenge == 1 && g_game_flag_table[arena_get_challenge_flag_index(1)] == 0) {
         saved = g_hero_state.w22C8;
-        arena_queue_voice_line(a0, 3);
+        arena_queue_voice_line(moby, 3);
         help_unlock_entry(0x33);
         g_hero_state.w22C8 = saved;
     } else {
-        arena_queue_voice_line(a0, math_random_int_below(2) + 0x1E);
-        g_challenge_score_words[1] = g_challenge_score_words[1] + moby_compute_scaled_entry_value_shifted(a1);
-        v = moby_compute_scaled_entry_value(a1);
-        *(int *)(state + 0x1E0) = v;
-        g_player_bolts = g_player_bolts + v;
+        arena_queue_voice_line(moby, math_random_int_below(2) + 0x1E);
+        g_challenge_score_words[1] = g_challenge_score_words[1] + moby_compute_scaled_entry_value_shifted(challenge);
+        bolts = moby_compute_scaled_entry_value(challenge);
+        *(int *)(state + 0x1E0) = bolts;
+        g_player_bolts = g_player_bolts + bolts;
         module_l00_call_handler_with_arg_4_us2(0x168);
     }
-    if (a1 == 10 && g_item_enabled_flags == 0) {
+    if (challenge == 10 && g_item_enabled_flags == 0) {
         g_item_enabled_flags = 1;
         snd_play_from_global_bank(1, 0, 0);
         value_set_entry_by_index_us2(0x1233, -1);
         g_scene_trigger_flag = 1;
     }
-    g_game_flag_table[arena_get_challenge_flag_index(a1)] += 1;
+    g_game_flag_table[arena_get_challenge_flag_index(challenge)] += 1;
     MemcardSave(0, -1);
 }

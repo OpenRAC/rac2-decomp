@@ -15,7 +15,8 @@ extern float math_random_float_range(float, float);
 extern float math_fast_sin_or_cos_a(float);
 extern float math_fast_sin_or_cos_b(float);
 
-void snivelak_fire_body_shots_pal(u8 *arg)
+/* Fires two shots from the boss's body toward the player, one straight and one with a small random offset. */
+void snivelak_fire_body_shots_pal(u8 *moby)
 {
     float matrix[16];
     float origin[4];
@@ -26,15 +27,15 @@ void snivelak_fire_body_shots_pal(u8 *arg)
     float radius;
     float zero = 0.0f;
     float scale = 0.020000001f;
-    state = *(u8 **)(arg + 0x68);
+    state = *(u8 **)(moby + 0x68);
     moby_transform_joint_point(*(void **)(state + 0x1F0), 2, matrix);
     transform_vector(origin, g_snivelak_muzzle_offset, matrix);
     FastVecSub(direction, g_snivelak_shot_origin, origin);
     vec_scale_to_length(direction, direction, g_snivelak_shot_speed * scale);
-    SpawnEA7Moby_pal(arg, direction, origin, 0, (float)state[0x34]);
+    SpawnEA7Moby_pal(moby, direction, origin, 0, (float)state[0x34]);
     angle = math_random_angle();
     radius = math_random_float_range(zero, 4.0f);
-    FastVecSub(direction, g_snivelak_shot_origin, arg + 0x10);
+    FastVecSub(direction, g_snivelak_shot_origin, moby + 0x10);
     vec_scale_to_length(direction, direction, -4.0f);
     FastVecAdd(direction, direction, g_snivelak_shot_origin);
     offset[0] = math_fast_sin_or_cos_a(angle) * radius;
@@ -43,5 +44,5 @@ void snivelak_fire_body_shots_pal(u8 *arg)
     FastVecAdd(direction, direction, offset);
     FastVecSub(direction, direction, origin);
     vec_scale_to_length(direction, direction, g_snivelak_shot_speed * scale);
-    SpawnEA7Moby_pal(arg, direction, origin, 0, (float)state[0x34]);
+    SpawnEA7Moby_pal(moby, direction, origin, 0, (float)state[0x34]);
 }

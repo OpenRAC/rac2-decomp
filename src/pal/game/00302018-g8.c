@@ -76,14 +76,14 @@ extern void mat_get_euler_angles(void *,void *),mat_build_rotation_from_angles(v
 extern void func_00301F18(void *,void *,int);
 extern void vec_fast_normalize3(void *,void *,void *,float),lerp_vector(void *,void *,void *,float);
 extern int pickup_start_fly_to_target_pal(void *,void *,float,float);
-extern void moby_mark_spawned(void *),func_PAL_00303950(void *,int),transform_vector(void *,void *,void *);
+extern void moby_mark_spawned(void *),part_spawn_trail_puff_pal(void *,int),transform_vector(void *,void *,void *);
 extern void vec_clamp_length(void *,float), matrix_mul_vec3(void *,void *,void *), euler_rotation_basis(void *,void *);
 extern f32 ApproachValue(void *,float,float);
-extern void func_PAL_00302E18(void *);
+extern void CollectBolts_pal(void *);
 extern int PlayMobySound(int,int,void *);
 
 /* Update a bolt pickup through initialization, falling, hopping, idle and collection. */
-void func_PAL_00302018(PickupMoby *m)
+void UpdateBoltPickupMoby_pal(PickupMoby *pickup)
 {
     /* The matrix scratch overlaps vectors used in mutually exclusive states. */
     union {
@@ -91,122 +91,122 @@ void func_PAL_00302018(PickupMoby *m)
         struct { float basis[12], offset[4], angles[4]; } attract;
     } scratch;
     float matrix[12];
-    int x,y,z;
-    BoltVars *p=m->pVars;
-    switch(m->state) {
+    int color_r,color_g,color_b;
+    BoltVars *vars=pickup->pVars;
+    switch(pickup->state) {
     case 0: {
         int collided;
-        m->state=3;
-        m->opacity=20;
-        m->flags|=0x100;
-        m->renderDistance=32;
-        m->updateDistance=32;
-        if(!math_random_int_below(2)) p->flags55|=1;
-        vec_scale_to_length(scratch.ground.vector,&m->orientation[8],0.2f);
-        FastVecAdd(scratch.ground.vector,scratch.ground.vector,&m->position[0]);
-        vec_scale_to_length(scratch.ground.other,&m->orientation[8],-3.0f);
-        FastVecAdd(scratch.ground.other,scratch.ground.other,&m->position[0]);
+        pickup->state=3;
+        pickup->opacity=20;
+        pickup->flags|=0x100;
+        pickup->renderDistance=32;
+        pickup->updateDistance=32;
+        if(!math_random_int_below(2)) vars->flags55|=1;
+        vec_scale_to_length(scratch.ground.vector,&pickup->orientation[8],0.2f);
+        FastVecAdd(scratch.ground.vector,scratch.ground.vector,&pickup->position[0]);
+        vec_scale_to_length(scratch.ground.other,&pickup->orientation[8],-3.0f);
+        FastVecAdd(scratch.ground.other,scratch.ground.other,&pickup->position[0]);
         collided=CollLine(scratch.ground.vector,scratch.ground.other,0x22,0,0);
-        if(!p->flags54&&collided) {
-            qcopy_nc(p->position,&g_collision_hit.position[0]);
-            vec_clear_128(&p->rotation[0]);
-            p->rotation[2]=mat_fast_helper_a(g_collision_hit.normal[0],g_collision_hit.normal[1]);
-            p->rotation[1]=mat_fast_helper_a(g_collision_hit.normal[2],vec_length_xy(&g_collision_hit.normal[0]));
+        if(!vars->flags54&&collided) {
+            qcopy_nc(vars->position,&g_collision_hit.position[0]);
+            vec_clear_128(&vars->rotation[0]);
+            vars->rotation[2]=mat_fast_helper_a(g_collision_hit.normal[0],g_collision_hit.normal[1]);
+            vars->rotation[1]=mat_fast_helper_a(g_collision_hit.normal[2],vec_length_xy(&g_collision_hit.normal[0]));
             if(g_collision_hit.surface&&moby_get_private_value_2(g_collision_hit.surface)) {
                 PickupMoby *surface=g_collision_hit.surface;
-                p->surface=surface;
-                moby_get_attachment_rotation_angles(m,surface,p->position,&p->rotation[0],p->position,&p->rotation[0]);
+                vars->surface=surface;
+                moby_get_attachment_rotation_angles(pickup,surface,vars->position,&vars->rotation[0],vars->position,&vars->rotation[0]);
             }
         }
         else {
-            qcopy_nc(p->position,&m->position[0]);
-            vec_clear_128(&p->rotation[0]);
+            qcopy_nc(vars->position,&pickup->position[0]);
+            vec_clear_128(&vars->rotation[0]);
         }
-        p->random0=math_random_angle();
-        p->random1=math_random_angle();
-        p->initialHeight=m->position[2];
-        moby_set_light_color(m,g_moby_light_color);
-        get_moby_color(m,&x,&y,&z);
-        gfx_pack_render_command_fields(m,0,13,0,0);
-        set_moby_color(m,x,y,z);
-        switch((s16)(m->classId-13)) {
-        case 0:m->scale=F(m->pClass,0x24)*g_moby_scale_mult_a;
+        vars->random0=math_random_angle();
+        vars->random1=math_random_angle();
+        vars->initialHeight=pickup->position[2];
+        moby_set_light_color(pickup,g_moby_light_color);
+        get_moby_color(pickup,&color_r,&color_g,&color_b);
+        gfx_pack_render_command_fields(pickup,0,13,0,0);
+        set_moby_color(pickup,color_r,color_g,color_b);
+        switch((s16)(pickup->classId-13)) {
+        case 0:pickup->scale=F(pickup->pClass,0x24)*g_moby_scale_mult_a;
             break;
-        case 1:m->scale=F(m->pClass,0x24)*g_moby_scale_mult_b;
+        case 1:pickup->scale=F(pickup->pClass,0x24)*g_moby_scale_mult_b;
             break;
-        case 2:m->scale=F(m->pClass,0x24)*g_moby_scale_mult_c;
+        case 2:pickup->scale=F(pickup->pClass,0x24)*g_moby_scale_mult_c;
             break;
-        case 3:m->scale=F(m->pClass,0x24)*g_moby_scale_mult_d;
+        case 3:pickup->scale=F(pickup->pClass,0x24)*g_moby_scale_mult_d;
             break;
-        case 4:m->scale=F(m->pClass,0x24)*g_moby_scale_mult_e;
+        case 4:pickup->scale=F(pickup->pClass,0x24)*g_moby_scale_mult_e;
             break;
-        case 5:m->scale=F(m->pClass,0x24)*g_moby_scale_mult_f;
+        case 5:pickup->scale=F(pickup->pClass,0x24)*g_moby_scale_mult_f;
             break;
-        case 6:m->scale=F(m->pClass,0x24)*g_moby_scale_mult_g;
+        case 6:pickup->scale=F(pickup->pClass,0x24)*g_moby_scale_mult_g;
             break;
         }
         break;
     }
     case 1: {
         float distance, t;
-        distance=vec_distance_xy(&m->position[0],&g_hero_state.motion.position[0]);
-        if(!p->activated&&distance<g_hero_state.motion.pickupRadius&&math_fabs(m->position[2]-g_hero_state.motion.position[2])<g_hero_state.motion.pickupHeight) p->activated=1;
-        p->velocity[2]-=0.0043200003f;
-        FastVecAdd(&m->position[0],&m->position[0],&p->velocity[0]);
-        quaternion_to_rotation_basis(&p->spin[0],scratch.ground.basis);
-        multiply_matrix3x3(&m->orientation[0],scratch.ground.basis,&m->orientation[0]);
-        if(m->position[2]<p->initialHeight-2.0f&&m->position[2]<g_hero_state.motion.position[2]-2.0f) {
+        distance=vec_distance_xy(&pickup->position[0],&g_hero_state.motion.position[0]);
+        if(!vars->activated&&distance<g_hero_state.motion.pickupRadius&&math_fabs(pickup->position[2]-g_hero_state.motion.position[2])<g_hero_state.motion.pickupHeight) vars->activated=1;
+        vars->velocity[2]-=0.0043200003f;
+        FastVecAdd(&pickup->position[0],&pickup->position[0],&vars->velocity[0]);
+        quaternion_to_rotation_basis(&vars->spin[0],scratch.ground.basis);
+        multiply_matrix3x3(&pickup->orientation[0],scratch.ground.basis,&pickup->orientation[0]);
+        if(pickup->position[2]<vars->initialHeight-2.0f&&pickup->position[2]<g_hero_state.motion.position[2]-2.0f) {
             t=math_random_float_range(-15.0f,15.0f);
-            pickup_start_fly_to_target_pal(m,g_hero_state.motion.moby,t*0.017453294f,0);
+            pickup_start_fly_to_target_pal(pickup,g_hero_state.motion.moby,t*0.017453294f,0);
             goto sparkle;
         }
-        if(coll_test_point(&m->position[0],0x22,m,0.25f)) {
-            qcopy_nc(p->position,&g_collision_hit.position[0]);
-            vec_clear_128(&p->rotation[0]);
-            p->rotation[2]=mat_fast_helper_a(g_collision_hit.normal[0],g_collision_hit.normal[1]);
-            p->rotation[1]=mat_fast_helper_a(g_collision_hit.normal[2],vec_length_xy(&g_collision_hit.normal[0]));
-            FastVecSub(scratch.ground.vector,&m->position[0],&g_collision_hit.position[0]);
-            vec_fast_normalize(&p->velocity[0],&p->velocity[0],scratch.ground.vector);
-            if(g_hero_state.motion.magnetEnabled && (p->activated ||
-            (vec_distance_xy(&m->position[0],&g_hero_state.motion.position[0]) < g_hero_state.motion.pickupRadius &&
-            math_fabs(m->position[2]-g_hero_state.motion.position[2]) < g_hero_state.motion.pickupHeight) ||
+        if(coll_test_point(&pickup->position[0],0x22,pickup,0.25f)) {
+            qcopy_nc(vars->position,&g_collision_hit.position[0]);
+            vec_clear_128(&vars->rotation[0]);
+            vars->rotation[2]=mat_fast_helper_a(g_collision_hit.normal[0],g_collision_hit.normal[1]);
+            vars->rotation[1]=mat_fast_helper_a(g_collision_hit.normal[2],vec_length_xy(&g_collision_hit.normal[0]));
+            FastVecSub(scratch.ground.vector,&pickup->position[0],&g_collision_hit.position[0]);
+            vec_fast_normalize(&vars->velocity[0],&vars->velocity[0],scratch.ground.vector);
+            if(g_hero_state.motion.magnetEnabled && (vars->activated ||
+            (vec_distance_xy(&pickup->position[0],&g_hero_state.motion.position[0]) < g_hero_state.motion.pickupRadius &&
+            math_fabs(pickup->position[2]-g_hero_state.motion.position[2]) < g_hero_state.motion.pickupHeight) ||
             GetCollHitMaterial() != -1)) {
-                vec_scale_to_length(&p->velocity[0],&p->velocity[0],0.16000001f);
-                pickup_start_fly_to_target_pal(m,g_hero_state.motion.moby,0,0);
+                vec_scale_to_length(&vars->velocity[0],&vars->velocity[0],0.16000001f);
+                pickup_start_fly_to_target_pal(pickup,g_hero_state.motion.moby,0,0);
             }
             else if(mat_fast_helper_a(scratch.ground.vector[2],vec_length_xy(scratch.ground.vector))<0.78539824f&&mat_fast_helper_a(g_collision_hit.normal[2],vec_length_xy(&g_collision_hit.normal[0]))<0.78539824f) {
-                m->state=2;
-                p->hopLength=p->hopRemaining=FloatToInt((math_random_float_range(30,40)*5.0f+2.0f)*0.16666667f);
+                pickup->state=2;
+                vars->hopLength=vars->hopRemaining=FloatToInt((math_random_float_range(30,40)*5.0f+2.0f)*0.16666667f);
                 if(g_collision_hit.surface&&moby_get_private_value_2(g_collision_hit.surface)) {
                     PickupMoby *surface=g_collision_hit.surface;
-                    p->surface=surface;
-                    moby_get_attachment_rotation_angles(m,surface,p->position,&p->rotation[0],p->position,&p->rotation[0]);
+                    vars->surface=surface;
+                    moby_get_attachment_rotation_angles(pickup,surface,vars->position,&vars->rotation[0],vars->position,&vars->rotation[0]);
                 }
-                mat_get_euler_angles(&m->orientation[0],scratch.ground.other);
-                mat_build_rotation_from_angles(&p->spin[0],scratch.ground.other);
+                mat_get_euler_angles(&pickup->orientation[0],scratch.ground.other);
+                mat_build_rotation_from_angles(&vars->spin[0],scratch.ground.other);
             }
         }
         goto sparkle;
     }
     case 2: {
         float distance, r, s;
-        distance=vec_distance_xy(&m->position[0],&g_hero_state.motion.position[0]);
-        if(!p->activated&&distance<g_hero_state.motion.pickupRadius&&math_fabs(m->position[2]-g_hero_state.motion.position[2])<g_hero_state.motion.pickupHeight)p->activated=1;
-        func_00301F18(m,scratch.ground.other,0);
+        distance=vec_distance_xy(&pickup->position[0],&g_hero_state.motion.position[0]);
+        if(!vars->activated&&distance<g_hero_state.motion.pickupRadius&&math_fabs(pickup->position[2]-g_hero_state.motion.position[2])<g_hero_state.motion.pickupHeight)vars->activated=1;
+        func_00301F18(pickup,scratch.ground.other,0);
         scratch.ground.other[2]+=0.25f;
-        mat_get_euler_angles(&m->orientation[0],scratch.ground.vector);
+        mat_get_euler_angles(&pickup->orientation[0],scratch.ground.vector);
         mat_build_rotation_from_angles(scratch.ground.basis,scratch.ground.vector);
         r=1.0f/
-        IntToFloat(p->hopRemaining);
-        s=IntToFloat(p->hopRemaining) / IntToFloat(p->hopLength);
-        vec_fast_normalize3(&p->spin[0],&p->spin[0],scratch.ground.basis,r);
-        lerp_vector(&m->position[0],&m->position[0],scratch.ground.other,s);
+        IntToFloat(vars->hopRemaining);
+        s=IntToFloat(vars->hopRemaining) / IntToFloat(vars->hopLength);
+        vec_fast_normalize3(&vars->spin[0],&vars->spin[0],scratch.ground.basis,r);
+        lerp_vector(&pickup->position[0],&pickup->position[0],scratch.ground.other,s);
         s-=0.5f;
-        m->position[2]+=(0.25f-s*s)*0.025f*p->hopLength;
-        quaternion_to_rotation_basis(&p->spin[0],&m->orientation[0]);
-        if(--p->hopRemaining==0){
-            m->state=3;
-            p->hopLength=p->hopRemaining=FloatToInt((math_random_float_range(10,20)*5.0f+2.0f)*0.16666667f);
+        pickup->position[2]+=(0.25f-s*s)*0.025f*vars->hopLength;
+        quaternion_to_rotation_basis(&vars->spin[0],&pickup->orientation[0]);
+        if(--vars->hopRemaining==0){
+            pickup->state=3;
+            vars->hopLength=vars->hopRemaining=FloatToInt((math_random_float_range(10,20)*5.0f+2.0f)*0.16666667f);
         }
         goto sparkle;
     }
@@ -214,12 +214,12 @@ void func_PAL_00302018(PickupMoby *m)
         int v;
         BoltHeroMotion *motion = &g_hero_state.motion;
         float distance, s;
-        distance=vec_distance_xy(&m->position[0],motion->position);
-        if(p->activated || (distance<g_hero_state.motion.pickupRadius&&math_fabs(m->position[2]-g_hero_state.motion.position[2])<g_hero_state.motion.pickupHeight)) {
-            pickup_start_fly_to_target_pal(m,motion->moby,0,0);
+        distance=vec_distance_xy(&pickup->position[0],motion->position);
+        if(vars->activated || (distance<g_hero_state.motion.pickupRadius&&math_fabs(pickup->position[2]-g_hero_state.motion.position[2])<g_hero_state.motion.pickupHeight)) {
+            pickup_start_fly_to_target_pal(pickup,motion->moby,0,0);
         }
-        else if((u32)D_001B1B60_gp<(u32)m&&distance>32.0f&&!m->visible) {
-            switch((s16)(m->classId-13)) {
+        else if((u32)D_001B1B60_gp<(u32)pickup&&distance>32.0f&&!pickup->visible) {
+            switch((s16)(pickup->classId-13)) {
             default:case 0:v=1;
                 break;
             case 1:v=5;
@@ -236,23 +236,23 @@ void func_PAL_00302018(PickupMoby *m)
                 break;
             }
             g_player_bolts.pendingBolts+=v;
-            moby_mark_spawned(m);
+            moby_mark_spawned(pickup);
             return;
         }
         else {
-            if(m->visible||p->surface) {
-                func_00301F18(m,0,0);
-                if(p->hopRemaining){
-                    s=IntToFloat(p->hopRemaining) / IntToFloat(p->hopLength);
+            if(pickup->visible||vars->surface) {
+                func_00301F18(pickup,0,0);
+                if(vars->hopRemaining){
+                    s=IntToFloat(vars->hopRemaining) / IntToFloat(vars->hopLength);
                     s-=0.5f;
-                    m->position[2]+=(0.25f-s*s)*0.0125f*p->hopLength;
-                    --p->hopRemaining;
+                    pickup->position[2]+=(0.25f-s*s)*0.0125f*vars->hopLength;
+                    --vars->hopRemaining;
                 }
             }
-            else if(p->hopRemaining)--p->hopRemaining;
+            else if(vars->hopRemaining)--vars->hopRemaining;
         }
     sparkle:
-        if(m->visible)func_PAL_00303950(m,1);
+        if(pickup->visible)part_spawn_trail_puff_pal(pickup,1);
         break;
     }
     case 4: {
@@ -260,58 +260,58 @@ void func_PAL_00302018(PickupMoby *m)
         float speed;
         float t, s;
         v=0;
-        if((s16)p->target->classId==0){
-            FastVecSub(scratch.ground.vector,&m->position[0],&g_hero_state.motion.cameraPosition[0]);
+        if((s16)vars->target->classId==0){
+            FastVecSub(scratch.ground.vector,&pickup->position[0],&g_hero_state.motion.cameraPosition[0]);
             transform_vector(scratch.ground.vector,scratch.ground.vector,&g_hero_state.rotation[0]);
             if(scratch.ground.vector[2]<0)v=1;
         }
         if(v){
             vec_scale_to_length(scratch.ground.vector,&g_hero_state.matrix[8],0.16000001f);
-            FastVecSub(scratch.ground.other,scratch.ground.vector,&p->velocity[0]);
+            FastVecSub(scratch.ground.other,scratch.ground.vector,&vars->velocity[0]);
             vec_clamp_length(scratch.ground.other,0.020000001f);
-            FastVecAdd(&p->velocity[0],&p->velocity[0],scratch.ground.other);
+            FastVecAdd(&vars->velocity[0],&vars->velocity[0],scratch.ground.other);
         }
         else {
             t=0.0096f;
-            if(FastVecLength(&p->velocity[0])>t){
-                vec_scale_to_length(scratch.ground.vector,&p->velocity[0],t);
-                FastVecSub(&p->velocity[0],&p->velocity[0],scratch.ground.vector);
+            if(FastVecLength(&vars->velocity[0])>t){
+                vec_scale_to_length(scratch.ground.vector,&vars->velocity[0],t);
+                FastVecSub(&vars->velocity[0],&vars->velocity[0],scratch.ground.vector);
             }
-            ApproachValue(&p->acceleration,0.64000005f,t);
+            ApproachValue(&vars->acceleration,0.64000005f,t);
         }
         speed=FastVecLength(&g_hero_state.motion.velocity[0]);
         if(speed>0.080000006f){
             vec_scale_to_length(scratch.ground.vector,&g_hero_state.motion.velocity[0],speed-0.080000006f);
-            FastVecAdd(&m->position[0],&m->position[0],scratch.ground.vector);
+            FastVecAdd(&pickup->position[0],&pickup->position[0],scratch.ground.vector);
         }
-        quaternion_to_rotation_basis(&p->spin[0],scratch.attract.basis);
-        multiply_matrix3x3(&m->orientation[0],scratch.attract.basis,&m->orientation[0]);
-        FastVecAdd(&m->position[0],&m->position[0],&p->velocity[0]);
-        if((s16)p->target->classId==0)FastVecSub(scratch.attract.offset,&g_hero_state.motion.boltTarget[0],&m->position[0]);
-        else FastVecSub(scratch.attract.offset,p->target->position,&m->position[0]);
-        if(FastVecLength(scratch.attract.offset)>p->acceleration) {
-            if(p->angleZ!=0||p->angleX!=0){
+        quaternion_to_rotation_basis(&vars->spin[0],scratch.attract.basis);
+        multiply_matrix3x3(&pickup->orientation[0],scratch.attract.basis,&pickup->orientation[0]);
+        FastVecAdd(&pickup->position[0],&pickup->position[0],&vars->velocity[0]);
+        if((s16)vars->target->classId==0)FastVecSub(scratch.attract.offset,&g_hero_state.motion.boltTarget[0],&pickup->position[0]);
+        else FastVecSub(scratch.attract.offset,vars->target->position,&pickup->position[0]);
+        if(FastVecLength(scratch.attract.offset)>vars->acceleration) {
+            if(vars->angleZ!=0||vars->angleX!=0){
                 matrix_mul_vec3(scratch.attract.offset,scratch.attract.offset,&g_hero_state.rotation[0]);
                 s=mat_fast_helper_a(scratch.attract.offset[0],scratch.attract.offset[1]);
                 vec_clear_128(scratch.attract.angles);
-                scratch.attract.angles[1]=p->angleX;
+                scratch.attract.angles[1]=vars->angleX;
                 if(s<1.5707964f&&s>-1.5707964f)scratch.attract.angles[1]=-scratch.attract.angles[1];
-                scratch.attract.angles[2]=p->angleZ;
+                scratch.attract.angles[2]=vars->angleZ;
                 euler_rotation_basis(matrix,scratch.attract.angles);
                 matrix_mul_vec3(scratch.attract.offset,scratch.attract.offset,matrix);
                 matrix_mul_vec3(scratch.attract.offset,scratch.attract.offset,g_hero_state.matrix);
             }
-            vec_scale_to_length(scratch.attract.offset,scratch.attract.offset,p->acceleration);
-            FastVecAdd(&m->position[0],&m->position[0],scratch.attract.offset);
+            vec_scale_to_length(scratch.attract.offset,scratch.attract.offset,vars->acceleration);
+            FastVecAdd(&pickup->position[0],&pickup->position[0],scratch.attract.offset);
             goto sparkle_attract;
         }
         {
-            func_PAL_00302E18(m);
-            PlayMobySound(0,32,m);
-            if(m<g_moby_pool_end.start){
-                g_bolt_collection_table.collected[m->mission]=m->uid+2;
+            CollectBolts_pal(pickup);
+            PlayMobySound(0,32,pickup);
+            if(pickup<g_moby_pool_end.start){
+                g_bolt_collection_table.collected[pickup->mission]=pickup->uid+2;
                 {
-                    int uid = m->uid;
+                    int uid = pickup->uid;
                     if (uid != 255) {
                         int index = uid & 255;
                         if (B(g_render_command_flags, index) & 128)
@@ -322,11 +322,11 @@ void func_PAL_00302018(PickupMoby *m)
                                 goto delete_pickup;
                         }
                     }
-                    g_bolt_collection_checkpoint.collected[m->mission] = uid + 2;
+                    g_bolt_collection_checkpoint.collected[pickup->mission] = uid + 2;
                 }
             }
         delete_pickup:
-            moby_mark_spawned(m);
+            moby_mark_spawned(pickup);
             goto done;
         }
         break;
@@ -334,6 +334,6 @@ void func_PAL_00302018(PickupMoby *m)
     }
     return;
 sparkle_attract:
-    if(m->visible)func_PAL_00303950(m,0);
+    if(pickup->visible)part_spawn_trail_puff_pal(pickup,0);
 done:;
 }

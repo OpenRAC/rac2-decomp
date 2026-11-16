@@ -11,6 +11,7 @@ extern void gfx_render_frame_all_layers(void);
 extern void RenderFrame(void);
 extern void transition_render_scene(void);
 
+/* Draws the background of the transition screen for the current transition type. */
 void transition_draw_background_pal(void)
 {
     switch (g_transition_mode) {

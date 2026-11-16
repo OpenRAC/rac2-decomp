@@ -3,6 +3,7 @@
 
 extern void ref_L22_003A4FF8_00(void);
 
+/* Calls a level helper and always says it worked (USA v2.00 copy). */
 int level_call_helper_return_true_us2(void) {
     ref_L22_003A4FF8_00();
     return 1;

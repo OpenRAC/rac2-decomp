@@ -102,17 +102,17 @@ extern int g_pad_pressed_flags[];
  * machine's offset advances the object and a second lookup asks for a transition when it
  * succeeds.  A set state word, a timer past 0.9 and a state other than the idle one ask for the
  * same transition, and a zero second argument asks for it with another code. */
-int hero_try_start_move_from_buffer_pal(int arg0, int arg1)
+int hero_try_start_move_from_buffer_pal(int window, int no_idle_fallback)
 {
     int index;
     int r;
     char *p;
 
-    if (PadPressedWithin(0x40, arg0, &index) == 0)
+    if (PadPressedWithin(0x40, window, &index) == 0)
         return 0;
     r = hero_get_step_offset_from_direction();
     if ((g_pad_pressed_flags[0] & 8) && r > 0) {
-        if (pad_presses_within_frames(0x40, 0x1F000, arg0 + r, r) != 0) {
+        if (pad_presses_within_frames(0x40, 0x1F000, window + r, r) != 0) {
             hero_l00_set_action(0xB, 1);
             return 1;
         }
@@ -126,7 +126,7 @@ int hero_try_start_move_from_buffer_pal(int arg0, int arg1)
             }
         }
     }
-    if (arg1 != 0)
+    if (no_idle_fallback != 0)
         return 0;
     hero_l00_set_action(7, 1);
     return 1;

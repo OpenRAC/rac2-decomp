@@ -17,7 +17,8 @@ extern float coll_probe_ground_height_below(char *, int, float);
 extern int coll_test_point(void *, int, void *, float);
 extern u8 *trooper_spawn_from_free_slot_pal(void *, int, const float *);
 
-void func_PAL_L20_00448428(char *object)
+/* Every so often tries to place new helper enemies at random spots along the edge of the arena, four at a time or six when the boss is angry. (PAL: 50 Hz timings) */
+void yeedil_boss_spawn_minions_edge_pal(char *object)
 {
     /* Interpolation, ground probing and collision use the complete quadword,
      * including the fourth lane even though this controller edits only XYZ. */

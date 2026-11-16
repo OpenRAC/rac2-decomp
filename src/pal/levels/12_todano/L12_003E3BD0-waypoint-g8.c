@@ -8,12 +8,12 @@ typedef struct WaypointPath { s32 points[10]; } WaypointPath;
 #define H(p,o) (*(s16 *)((u8 *)(p)+(o)))
 #define U(p,o) (*(u16 *)((u8 *)(p)+(o)))
 #define F(p,o) (*(f32 *)((u8 *)(p)+(o)))
-extern void func_PAL_L12_003E4728(void *);
-extern void func_PAL_L12_003E4A20(void *);
+extern void todano_creature_update_pal(void *);
+extern void joint_pair_advance_counter_pal(void *);
 extern s32 moby_dispatch_action_by_kind(void *,void *);
-extern int func_PAL_00289730(s32,s32);
+extern int subtitle_request_voice_line_pal(s32,s32);
 extern void moby_set_state(void *,s32,s32);
-extern void func_PAL_002A7E68(void *,s32,s32,s32);
+extern void anim_start_blended_pal(void *,s32,s32,s32);
 extern void part_spawn_explosion_with_sparks_pal(void *,void *,s32,f32,f32);
 extern void SetDeathBits_pal(void *,s32,s32);
 extern void FastVecSub(void *,void *,void *);
@@ -52,159 +52,159 @@ extern s32 g_tourist_active_flag;
 #define REST(o) { I(o,0x98)=0; U(o,0x34)=(U(o,0x34)|0x41)&0xEFFF; }
 /* Waypoint-following state machine for a level 12 object: walks a path of 0x80-byte
  * waypoints, looks at targets, and counts hits in D_L12_001B09F0 (50/100/150/200). */
-void func_PAL_L12_003E3BD0(u8 *o) {
-    u8 *s=*(u8 **)(o+0x68);
-    f32 v[4] __attribute__((aligned(16)));
+void space_l12_tourist_update_pal(u8 *moby) {
+    u8 *vars=*(u8 **)(moby+0x68);
+    f32 vec[4] __attribute__((aligned(16)));
     f32 angle,angle2,speed,yaw,pitch;
     PathTarget *target;
     s32 hit;
-    func_PAL_L12_003E4728(o);
-    if (o[0x95]==1) goto states;
-    if (o[0x95]==3) {
-        hit=moby_dispatch_action_by_kind(o,s+0x60);
+    todano_creature_update_pal(moby);
+    if (moby[0x95]==1) goto states;
+    if (moby[0x95]==3) {
+        hit=moby_dispatch_action_by_kind(moby,vars+0x60);
         if (hit&1) {
             g_tourist_hit_count++;
-            if (g_tourist_hit_count==50) func_PAL_00289730(0xA2D,0x84);
-            else if (g_tourist_hit_count==100) func_PAL_00289730(0xA2E,0x85);
-            else if (g_tourist_hit_count==150) func_PAL_00289730(0xA2F,0x86);
-            else if (g_tourist_hit_count==200) func_PAL_00289730(0xA30,0x87);
-            moby_set_state(o,1,0);
-            ANIM(o,4,17);
+            if (g_tourist_hit_count==50) subtitle_request_voice_line_pal(0xA2D,0x84);
+            else if (g_tourist_hit_count==100) subtitle_request_voice_line_pal(0xA2E,0x85);
+            else if (g_tourist_hit_count==150) subtitle_request_voice_line_pal(0xA2F,0x86);
+            else if (g_tourist_hit_count==200) subtitle_request_voice_line_pal(0xA30,0x87);
+            moby_set_state(moby,1,0);
+            ANIM(moby,4,17);
             g_tourist_wait_counter++;
-            part_spawn_explosion_with_sparks_pal(o,o+0x10,-1,1.0f,0.0f);
-            SetDeathBits_pal(o,0,3);
-            H(s,0x98)=0;
-            F(s,0x20)=H(s,0x24);
-            REST(o);
-        } else if (hit&2) moby_set_state(o,4,1);
+            part_spawn_explosion_with_sparks_pal(moby,moby+0x10,-1,1.0f,0.0f);
+            SetDeathBits_pal(moby,0,3);
+            H(vars,0x98)=0;
+            F(vars,0x20)=H(vars,0x24);
+            REST(moby);
+        } else if (hit&2) moby_set_state(moby,4,1);
     }
 states:
-    switch(o[0x20]) {
+    switch(moby[0x20]) {
     case 2:
         g_tourist_wait_counter=0;
-        I(s,0x7B8)=0;
-        FastVecSub(v,s+0x740,o+0x10);
+        I(vars,0x7B8)=0;
+        FastVecSub(vec,vars+0x740,moby+0x10);
         speed=0.120000005f;
-        if (FastVecLength(v)>speed) { vec_scale_to_length(v,v,speed); goto add; }
-        moby_set_state(o,3,-1);
-        ANIM(o,4,17);
+        if (FastVecLength(vec)>speed) { vec_scale_to_length(vec,vec,speed); goto add; }
+        moby_set_state(moby,3,-1);
+        ANIM(moby,4,17);
         goto add;
     case 3: {
-        WaypointPath *path=(WaypointPath *)(s+0x518);
-        matrix_mul_vec3(v,s+0x770,&g_path_waypoint_table[path->points[I(s,0x794)]]);
-        FastVecAdd(v,v,g_path_waypoint_table[path->points[I(s,0x794)]].position);
-        ComputeRegionRouteHeading(o+0x10,v,&angle,s+0x110,I(s,0x790),0.0f,F(s,0x7A4),s+0x79C,s+0x7A0);
-        if (I(s,0x540) && I(s,0x540)==I(s,0x794)-1) {
+        WaypointPath *path=(WaypointPath *)(vars+0x518);
+        matrix_mul_vec3(vec,vars+0x770,&g_path_waypoint_table[path->points[I(vars,0x794)]]);
+        FastVecAdd(vec,vec,g_path_waypoint_table[path->points[I(vars,0x794)]].position);
+        ComputeRegionRouteHeading(moby+0x10,vec,&angle,vars+0x110,I(vars,0x790),0.0f,F(vars,0x7A4),vars+0x79C,vars+0x7A0);
+        if (I(vars,0x540) && I(vars,0x540)==I(vars,0x794)-1) {
             speed=0.060000002f;
-            if (!I(s,0x7B8)) {
-                I(s,0x7B8)=squirrel_alert_for_object_pal(I(s,0x544),o);
-                if (I(s,0x7B8)) { moby_set_state(o,7,2); ANIM(o,5,8); }
+            if (!I(vars,0x7B8)) {
+                I(vars,0x7B8)=squirrel_alert_for_object_pal(I(vars,0x544),moby);
+                if (I(vars,0x7B8)) { moby_set_state(moby,7,2); ANIM(moby,5,8); }
             }
-        } else speed=F(s,0x7AC);
-        if (!math_fast_float_d(s+0x7B0)) angle=FastAddRotations(angle,F(s,0x7B4));
-        if (!I(s,0x7B0) && I(s,0x5D0)>50) {
-            I(s,0x7B0)=50;
-            F(s,0x7B4)=math_random_signed_float_range(90.0f,135.0f)*0.01745329424738884f;
+        } else speed=F(vars,0x7AC);
+        if (!math_fast_float_d(vars+0x7B0)) angle=FastAddRotations(angle,F(vars,0x7B4));
+        if (!I(vars,0x7B0) && I(vars,0x5D0)>50) {
+            I(vars,0x7B0)=50;
+            F(vars,0x7B4)=math_random_signed_float_range(90.0f,135.0f)*0.01745329424738884f;
         }
-        if (moby_move_to_target_temp_limits_pal(o,v,1,angle,speed,-1.0f)&0x80) {
-            moby_set_state(o,4,-1);
-            ANIM(o,1,17);
-            if (I(s,0x540) && I(s,0x540)==I(s,0x794)) I(s,0x7A8)=((s32)(math_random_int_range(80,180)) * 5 + 2) / 6;
-            else I(s,0x7A8)=((s32)(math_random_int_range(10,160)) * 5 + 2) / 6;
+        if (moby_move_to_target_temp_limits_pal(moby,vec,1,angle,speed,-1.0f)&0x80) {
+            moby_set_state(moby,4,-1);
+            ANIM(moby,1,17);
+            if (I(vars,0x540) && I(vars,0x540)==I(vars,0x794)) I(vars,0x7A8)=((s32)(math_random_int_range(80,180)) * 5 + 2) / 6;
+            else I(vars,0x7A8)=((s32)(math_random_int_range(10,160)) * 5 + 2) / 6;
         }
-        if (F(o,0x18)<50.0f) moby_set_state(o,1,0);
-        if (I(s,0x5D0)>167) {
-            moby_set_state(o,1,0);
-            ANIM(o,4,17);
-            part_spawn_explosion_with_sparks_pal(o,o+0x10,-1,1.0f,0.0f);
-            SetDeathBits_pal(o,0,3);
-            F(s,0x20)=H(s,0x24);
-            REST(o);
-        } else if (F(s,0x7A4)>=0.5f && F(s,0x61C)<4.0f) F(s,0x7A4)=0.4f;
-        if (I(s,0x794)!=I(s,0x798) && I(s,0x7A8)>17) I(s,0x7A8)=17;
+        if (F(moby,0x18)<50.0f) moby_set_state(moby,1,0);
+        if (I(vars,0x5D0)>167) {
+            moby_set_state(moby,1,0);
+            ANIM(moby,4,17);
+            part_spawn_explosion_with_sparks_pal(moby,moby+0x10,-1,1.0f,0.0f);
+            SetDeathBits_pal(moby,0,3);
+            F(vars,0x20)=H(vars,0x24);
+            REST(moby);
+        } else if (F(vars,0x7A4)>=0.5f && F(vars,0x61C)<4.0f) F(vars,0x7A4)=0.4f;
+        if (I(vars,0x794)!=I(vars,0x798) && I(vars,0x7A8)>17) I(vars,0x7A8)=17;
         break;
     }
     case 5:
-        ComputeRegionRouteHeading(o+0x10,s+0x740,&angle2,s+0x110,I(s,0x790),0.0f,F(s,0x7A4),s+0x79C,s+0x7A0);
-        if (!math_fast_float_d(s+0x7B0)) angle2=FastAddRotations(angle2,F(s,0x7B4));
-        moby_move_to_target_temp_limits_pal(o,s+0x740,1,angle2,F(s,0x7AC),-1.0f);
-        if (F(o,0x18)<50.0f) moby_set_state(o,1,0);
-        if (!I(s,0x7B0) && I(s,0x5D0)>50) {
-            I(s,0x7B0)=50;
-            F(s,0x7B4)=math_random_signed_float_range(90.0f,135.0f)*0.01745329424738884f;
+        ComputeRegionRouteHeading(moby+0x10,vars+0x740,&angle2,vars+0x110,I(vars,0x790),0.0f,F(vars,0x7A4),vars+0x79C,vars+0x7A0);
+        if (!math_fast_float_d(vars+0x7B0)) angle2=FastAddRotations(angle2,F(vars,0x7B4));
+        moby_move_to_target_temp_limits_pal(moby,vars+0x740,1,angle2,F(vars,0x7AC),-1.0f);
+        if (F(moby,0x18)<50.0f) moby_set_state(moby,1,0);
+        if (!I(vars,0x7B0) && I(vars,0x5D0)>50) {
+            I(vars,0x7B0)=50;
+            F(vars,0x7B4)=math_random_signed_float_range(90.0f,135.0f)*0.01745329424738884f;
         }
-        if (IsPointInCuboid(o+0x10,I(s,0x54C))) { moby_set_state(o,6,-1); ANIM(o,3,17); }
+        if (IsPointInCuboid(moby+0x10,I(vars,0x54C))) { moby_set_state(moby,6,-1); ANIM(moby,3,17); }
         break;
     case 4: {
-        if (I(s,0x794)!=I(s,0x798) && math_fast_float_d(s+0x7A8)) {
-            if (I(s,0x798)>=6) {
+        if (I(vars,0x794)!=I(vars,0x798) && math_fast_float_d(vars+0x7A8)) {
+            if (I(vars,0x798)>=6) {
                 if (!g_tourist_wait_counter && !g_item_enabled_flags[10]) {
                     g_item_enabled_flags[10]=1;
                     snd_play_from_global_bank(1,0,0);
                     value_set_entry_by_index_pal(0x1233,-1);
                     g_tourist_active_flag=1;
                 }
-                gate_compute_sight_points((PathTarget *)(g_moby_list_start+(I(s,0x514)<<8)),s+0x740,s+0x750);
-                moby_set_state(o,5,-1);
-                ANIM(o,4,17);
+                gate_compute_sight_points((PathTarget *)(g_moby_list_start+(I(vars,0x514)<<8)),vars+0x740,vars+0x750);
+                moby_set_state(moby,5,-1);
+                ANIM(moby,4,17);
             } else {
-                I(s,0x794)=I(s,0x798);
-                moby_set_state(o,3,-1);
-                ANIM(o,4,17);
-                F(s,0x7A4)=math_random_float_range(0.5f,0.7f);
+                I(vars,0x794)=I(vars,0x798);
+                moby_set_state(moby,3,-1);
+                ANIM(moby,4,17);
+                F(vars,0x7A4)=math_random_float_range(0.5f,0.7f);
             }
             break;
         }
-        if (U(o,0x96)<2 || math_fast_float_d(s+0x7BC)) {
-            if ((u32)(I(s,0x794)-1)<4 && (U(o,0x96)<2 || math_random_int_below(2))) {
-                qcopy(s+0x780,g_path_waypoint_table[I(s+((u32)(I(s,0x794)-1)<<2),0x530)].position);
+        if (U(moby,0x96)<2 || math_fast_float_d(vars+0x7BC)) {
+            if ((u32)(I(vars,0x794)-1)<4 && (U(moby,0x96)<2 || math_random_int_below(2))) {
+                qcopy(vars+0x780,g_path_waypoint_table[I(vars+((u32)(I(vars,0x794)-1)<<2),0x530)].position);
             } else {
-                target=(PathTarget *)((I(s,0x548)<<8)+g_moby_list_start);
-                if ((target->flags^1)&1) { qcopy(s+0x780,target->position); F(s,0x788)+=0.5f; }
+                target=(PathTarget *)((I(vars,0x548)<<8)+g_moby_list_start);
+                if ((target->flags^1)&1) { qcopy(vars+0x780,target->position); F(vars,0x788)+=0.5f; }
                 else {
-                    f32 randomYaw=math_random_angle();
-                    F(s,0x780)=math_fast_sin_or_cos_a(randomYaw);
-                    F(s,0x784)=math_fast_sin_or_cos_b(randomYaw);
-                    I(s,0x788)=0;
-                    F(s,0x788)+=math_random_float_range(F(s,0x788),0.5f);
-                    FastVecAdd(s+0x780,s+0x780,o+0x10);
+                    f32 random_yaw=math_random_angle();
+                    F(vars,0x780)=math_fast_sin_or_cos_a(random_yaw);
+                    F(vars,0x784)=math_fast_sin_or_cos_b(random_yaw);
+                    I(vars,0x788)=0;
+                    F(vars,0x788)+=math_random_float_range(F(vars,0x788),0.5f);
+                    FastVecAdd(vars+0x780,vars+0x780,moby+0x10);
                 }
             }
-            I(s,0x7BC)=((s32)(math_random_int_range(60,120)) * 5 + 2) / 6;
+            I(vars,0x7BC)=((s32)(math_random_int_range(60,120)) * 5 + 2) / 6;
         }
-        FastVecSub(v,s+0x780,o+0x10);
-        yaw=mat_fast_helper_a(v[0],v[1]);
-        pitch=-mat_fast_helper_a(vec_length_xy(v),v[2]);
-        moby_step_at_own_position_factor_pal(o,yaw);
-        F(s,0x6A4)=F(s,0x724)=pitch*0.5f;
+        FastVecSub(vec,vars+0x780,moby+0x10);
+        yaw=mat_fast_helper_a(vec[0],vec[1]);
+        pitch=-mat_fast_helper_a(vec_length_xy(vec),vec[2]);
+        moby_step_at_own_position_factor_pal(moby,yaw);
+        F(vars,0x6A4)=F(vars,0x724)=pitch*0.5f;
         break;
     }
     case 8:
-        if (U(o,0x96)>=5) {
-            REST(o);
-            part_spawn_explosion_with_sparks_pal(o,o+0x10,-1,1.0f,0.0f);
-            moby_set_state(o,1,0);
+        if (U(moby,0x96)>=5) {
+            REST(moby);
+            part_spawn_explosion_with_sparks_pal(moby,moby+0x10,-1,1.0f,0.0f);
+            moby_set_state(moby,1,0);
         }
     case 6:
-        FastVecSub(v,s+0x750,o+0x10);
+        FastVecSub(vec,vars+0x750,moby+0x10);
         speed=0.120000005f;
-        if (FastVecLength(v)>speed) {
-            vec_scale_to_length(v,v,speed);
+        if (FastVecLength(vec)>speed) {
+            vec_scale_to_length(vec,vec,speed);
         } else {
-            moby_set_state(o,1,0);
-            ANIM(o,4,17);
-            U(o,0x7C)=1<<math_random_int_below(6);
-            REST(o);
+            moby_set_state(moby,1,0);
+            ANIM(moby,4,17);
+            U(moby,0x7C)=1<<math_random_int_below(6);
+            REST(moby);
         }
 add:
-        FastVecAdd(o+0x10,o+0x10,v);
+        FastVecAdd(moby+0x10,moby+0x10,vec);
         break;
     case 7:
-        if (o[0x60]&2) { moby_set_state(o,3,1); ANIM(o,7,8); }
+        if (moby[0x60]&2) { moby_set_state(moby,3,1); ANIM(moby,7,8); }
         break;
     case 1:
-        REST(o);
+        REST(moby);
         break;
     }
-    func_PAL_L12_003E4A20(o);
+    joint_pair_advance_counter_pal(moby);
 }

@@ -31,8 +31,8 @@ extern u8 g_status_flag_b[0x40] __attribute__((sda));
 
 /* Projects the state position onto its path, clamps lateral displacement,
  * advances the path blend nearby, and maintains its movement sound. */
-void func_PAL_L03_00423128(u8 *entity) {
-    u8 *state = *(u8 **)(entity + 0x68);
+void rivet_bot_move_along_path_pal(u8 *moby) {
+    u8 *state = *(u8 **)(moby + 0x68);
     u8 *entry = (u8 *)g_path_l03_entry_table[*(int *)(state + 0x210)];
     float delta[4], along[4], across[4], axis[4], point[4], scaled[4];
     float distance;
@@ -58,19 +58,19 @@ void func_PAL_L03_00423128(u8 *entity) {
         float target = (side < 0.0f);
         ApproachValue(state + 0x340, target, 0.020000001f);
     }
-    if (fast_vec_dist(entity + 0x10, point) >= 0.5f) {
+    if (fast_vec_dist(moby + 0x10, point) >= 0.5f) {
         u8 *sound = g_sound_l03_slot_table + *(int *)(state + 0x350) * 0x70;
-        if (*(u8 **)(sound + 0x88) != entity || !sound[0x74])
-            *(int *)(state + 0x350) = PlayMobySound(0, 4, entity);
+        if (*(u8 **)(sound + 0x88) != moby || !sound[0x74])
+            *(int *)(state + 0x350) = PlayMobySound(0, 4, moby);
     } else {
         int slot = *(int *)(state + 0x350);
         if (slot != -1) {
             u8 *sound = g_sound_l03_slot_table + slot * 0x70;
-            if (*(u8 **)(sound + 0x88) == entity && sound[0x74]) snd_stop_voice(slot);
+            if (*(u8 **)(sound + 0x88) == moby && sound[0x74]) snd_stop_voice(slot);
         }
         *(int *)(state + 0x350) = -1;
     }
-    moby_l01_turn_toward_target_pal(entity, point);
+    moby_l01_turn_toward_target_pal(moby, point);
     *(int *)(state + 0x1A8) = 0;
 }
 

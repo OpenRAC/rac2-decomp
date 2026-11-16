@@ -191,7 +191,7 @@ extern void add_vectors(void *, void *, void *);
 extern float FastVecDot(void *, void *);
 extern float vec_length_xy(void *);
 extern float mat_fast_helper_a(float, float);
-extern void func_PAL_L04_00410678(void *, void *, int, int);
+extern void part_l04_spawn_burst_pal(void *, void *, int, int);
 extern Collision g_probe_hit;
 extern CollisionHit g_spark_origin_quad;
 
@@ -234,45 +234,45 @@ typedef struct {
    leaves an effect where one is blocked. gcse numbers the two spilled pointers in hash-bucket
    order, and retail's stack slots need at least 228 insns there: the argument locals, range
    and the initial values of angle, angle0, angle1, sign and i supply them, and leave no code. */
-void func_PAL_L04_003FFB98(unsigned char *m, void *vars)
+void moby_damage_in_firing_cone_pal(unsigned char *moby, void *vars)
 {
-    unsigned char *v = vars;
-    float radius = *(float *)(v + 0x70) * *(float *)(v + 0x7C);
+    unsigned char *vars_bytes = vars;
+    float radius = *(float *)(vars_bytes + 0x70) * *(float *)(vars_bytes + 0x7C);
     float angle = 0.0f, angle0 = 0.0f, angle1 = 0.0f, sign = 0.0f;
     int count, n, side, i = 0;
-    int soundId = 10, soundArg = 0;
-    int rayMask = 18;
-    void *rayResult = 0;
-    int sparkKind = 8, sparkArg = 0;
+    int sound_id = 10, sound_arg = 0;
+    int ray_mask = 18;
+    void *ray_result = 0;
+    int spark_kind = 8, spark_arg = 0;
     if (radius < 0.75f) radius = 0.75f;
-    n = coll_process_hit(radius, m + 0x10, 16, *(void **)(v + 0x74), 0);
+    n = coll_process_hit(radius, moby + 0x10, 16, *(void **)(vars_bytes + 0x74), 0);
     for (count = 0; count < n; count++) {
-        if (g_special_moby_list[count] == *(unsigned char **)(v + 0x74)) continue;
-        if (*(float *)(v + 0x7C) > 0) {
-            angle = mat_fast_helper_a(*(float *)(g_special_moby_list[count] + 0x10) - *(float *)(m + 0x10),
-                                  *(float *)(g_special_moby_list[count] + 0x14) - *(float *)(m + 0x14));
-            if (FastDiffRots(angle, *(float *)(m + 0xF8)) > 0.741765022277832f) continue;
-            angle = mat_fast_helper_a(vec_distance_xy(m + 0x10, g_special_moby_list[count] + 0x10),
-                                  *(float *)(g_special_moby_list[count] + 0x18) - *(float *)(m + 0x18));
-            if (FastDiffRots(angle, -*(float *)(m + 0xF4)) > 0.523598849773407f) continue;
+        if (g_special_moby_list[count] == *(unsigned char **)(vars_bytes + 0x74)) continue;
+        if (*(float *)(vars_bytes + 0x7C) > 0) {
+            angle = mat_fast_helper_a(*(float *)(g_special_moby_list[count] + 0x10) - *(float *)(moby + 0x10),
+                                  *(float *)(g_special_moby_list[count] + 0x14) - *(float *)(moby + 0x14));
+            if (FastDiffRots(angle, *(float *)(moby + 0xF8)) > 0.741765022277832f) continue;
+            angle = mat_fast_helper_a(vec_distance_xy(moby + 0x10, g_special_moby_list[count] + 0x10),
+                                  *(float *)(g_special_moby_list[count] + 0x18) - *(float *)(moby + 0x18));
+            if (FastDiffRots(angle, -*(float *)(moby + 0xF4)) > 0.523598849773407f) continue;
         }
-        if (fast_vec_dist((char *)m + 0x10, (char *)g_special_moby_list[count] + 0x10) > radius * 0.75f) {
+        if (fast_vec_dist((char *)moby + 0x10, (char *)g_special_moby_list[count] + 0x10) > radius * 0.75f) {
             B990Impact impact;
-            impact.source = *(void **)(v + 0x74);
+            impact.source = *(void **)(vars_bytes + 0x74);
             impact.flags = 0x230000;
             impact.unk18 = 2;
             impact.unk19 = 3;
-            impact.objectClass = *(unsigned short *)(m + 0xAA);
+            impact.objectClass = *(unsigned short *)(moby + 0xAA);
             impact.strength = 1.0f;
             impact.unk20 = 0x230000;
-            angle = mat_fast_helper_a(*(float *)(g_special_moby_list[count] + 0x10) - *(float *)(m + 0x10),
-                                  *(float *)(g_special_moby_list[count] + 0x14) - *(float *)(m + 0x14));
+            angle = mat_fast_helper_a(*(float *)(g_special_moby_list[count] + 0x10) - *(float *)(moby + 0x10),
+                                  *(float *)(g_special_moby_list[count] + 0x14) - *(float *)(moby + 0x14));
             impact.vector[0] = math_fast_sin_or_cos_a(angle);
             impact.vector[1] = math_fast_sin_or_cos_b(angle);
             impact.vector[2] = 1.0f;
             impact.vector[3] = 5627.9248046875f;
             QueueMobyImpact(g_special_moby_list[count], &impact);
-            PlayMobySound(soundId, soundArg, *(void **)(v + 0x74));
+            PlayMobySound(sound_id, sound_arg, *(void **)(vars_bytes + 0x74));
         }
     }
     {
@@ -283,13 +283,13 @@ void func_PAL_L04_003FFB98(unsigned char *m, void *vars)
         for (i = 0; i < 5; i++) {
             angle0 = math_fast_float_g(IntToFloat(i) * sign * 0.1396263688802719f);
             angle1 = math_fast_float_g(IntToFloat(i + 1) * sign * 0.1396263688802719f);
-            vec_build_spherical_offset(ray[0], range, FastAddRotations(angle0, *(float *)(m + 0xF8)), -*(float *)(m + 0xF4));
-            vec_build_spherical_offset(ray[1], range, FastAddRotations(angle1, *(float *)(m + 0xF8)), -*(float *)(m + 0xF4));
-            add_vectors(ray[2], ray[0], m + 0x10);
-            add_vectors(ray[2], ray[1], m + 0x10);
-            if (CollLine(ray[0], ray[1], rayMask, *(void **)(v + 0x74), rayResult)) {
-                vec_build_spherical_offset(ray[2], 0.40000004f, *(float *)(m + 0xF8), -*(float *)(m + 0xF4));
-                func_PAL_L04_00410678(&g_spark_origin_quad, ray[2], sparkKind, sparkArg);
+            vec_build_spherical_offset(ray[0], range, FastAddRotations(angle0, *(float *)(moby + 0xF8)), -*(float *)(moby + 0xF4));
+            vec_build_spherical_offset(ray[1], range, FastAddRotations(angle1, *(float *)(moby + 0xF8)), -*(float *)(moby + 0xF4));
+            add_vectors(ray[2], ray[0], moby + 0x10);
+            add_vectors(ray[2], ray[1], moby + 0x10);
+            if (CollLine(ray[0], ray[1], ray_mask, *(void **)(vars_bytes + 0x74), ray_result)) {
+                vec_build_spherical_offset(ray[2], 0.40000004f, *(float *)(moby + 0xF8), -*(float *)(moby + 0xF4));
+                part_l04_spawn_burst_pal(&g_spark_origin_quad, ray[2], spark_kind, spark_arg);
             }
         }
     }
@@ -321,7 +321,7 @@ extern void moby_mark_spawned(void *);
 extern void StepAngleTowardTarget(void *, int, float, float);
 extern void snd_stop_voice(int);
 extern void gfx_add_draw_callback_second(void *, void *);
-extern void func_PAL_L04_003FFB98(unsigned char *, void *);
+extern void moby_damage_in_firing_cone_pal(unsigned char *, void *);
 extern void DrawDomeEffect(void);
 extern unsigned char g_sound_state[];
 extern int g_shield_dome_sound_handle __attribute__((sda));

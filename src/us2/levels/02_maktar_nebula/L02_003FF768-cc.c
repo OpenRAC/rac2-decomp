@@ -126,11 +126,11 @@ extern int arena_get_challenge_save_index(int);
    order); any other value gives 0x2F48. The dispatch reads the level's own jump table (fourteen
    words in the level's data at 0x2A5600, one per value); `cases` only keeps the labels alive, and
    each label is named after the value that reaches it. */
-s32 func_US2_L02_003FF768(u32 a0) {
+s32 arena_get_challenge_name_text_us2(u32 index) {
     static void *cases[14] = {&&c0, &&c1, &&c2, &&c3, &&c4, &&c5, &&c6, &&c7, &&c8, &&c9, &&c10,
                               &&c11, &&c12, &&c13};
-    if (a0 < 14)
-        goto *D_L02_002A5600[a0];
+    if (index < 14)
+        goto *D_L02_002A5600[index];
     goto dflt;
 c0:
     return 0x2dde;

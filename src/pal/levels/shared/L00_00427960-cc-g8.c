@@ -134,25 +134,27 @@ extern void follow_camera_set_height(float,float),follow_camera_set_distance(int
 extern void cam_set_aim_offset_target(int,float,float),cam_set_speeds_if_nonzero(float,float);
 extern void set_follow_camera_orbit_clamp_mode(int);
 
-void func_PAL_L00_00427960(CameraMoby *obj)
+/* Per-frame update of the follow camera: applies the hero state's distance, height and aim overrides,
+   eases toward a locked target, tracks the stick and checks the area for hits on the camera. */
+void cam_follow_update_pal(CameraMoby *moby)
 {
     float local[4];
-    CameraVars *p=obj->vars;
-    int *state=p->state;
-    CameraRates *r=&p->rates;
-    CameraOffsets *q=&p->offsets;
+    CameraVars *cam_vars=moby->vars;
+    int *state=cam_vars->state;
+    CameraRates *base_rates=&cam_vars->rates;
+    CameraOffsets *offsets=&cam_vars->offsets;
     int special=0, mode=cam_update_overrides(), i, count;
     float a,b;
-    if (g_hero_state.state==124 || g_hero_state.state==120) r->h4e=1;
-    if (!g_hero_state.i340 || q->ticks) {
-        float a=q->fF0;
+    if (g_hero_state.state==124 || g_hero_state.state==120) base_rates->h4e=1;
+    if (!g_hero_state.i340 || offsets->ticks) {
+        float a=offsets->fF0;
         if (a>2.0f) a=2.0f;
-        q->weight=(g_camera_default_view_y-0.002f)*(a*0.5f)+0.002f;
-        if (g_hero_state.i340) math_fast_float_d(&q->ticks);
-        else q->ticks=12;
+        offsets->weight=(g_camera_default_view_y-0.002f)*(a*0.5f)+0.002f;
+        if (g_hero_state.i340) math_fast_float_d(&offsets->ticks);
+        else offsets->ticks=12;
     }
     if (g_hero_state.moveState==30) {
-        obj->vars->offsets.distance=0.75f;
+        moby->vars->offsets.distance=0.75f;
         ref_L00_004224D0_00(0.04f,0.2f);
     }
     if (g_current_map_index==1 && g_hero_state.state==48 && g_hero_state.position[2]>75.0f && g_hero_state.position[2]<105.0f) {
@@ -168,27 +170,27 @@ void func_PAL_L00_00427960(CameraMoby *obj)
         cam_set_lock_flag();
     }
     if (g_hero_state.moveState==17) {
-        obj->vars->offsets.distance=0.25f;
+        moby->vars->offsets.distance=0.25f;
         follow_camera_set_height(0.5f,0.003f);
     }
     if (g_hero_state.moveState==5 && !g_hero_locked_flag) {
-        CameraOffsets *specialVars=&obj->vars->offsets; special=1;
+        CameraOffsets *special_vars=&moby->vars->offsets; special=1;
         if (g_hero_state.b22b4==1 && mode==-1) {
-            specialVars->distance=0.25f;
+            special_vars->distance=0.25f;
             follow_camera_set_height(1.5f,0.003f);
         } else {
-            specialVars->distance=0.25f;
+            special_vars->distance=0.25f;
             follow_camera_set_height(2.5f,0.003f);
         }
     }
-    if (g_hero_state.moveState==16) obj->vars->offsets.distance=0.25f;
+    if (g_hero_state.moveState==16) moby->vars->offsets.distance=0.25f;
     if (g_hero_state.b22b4==1) {
         if (!state[0] && mode==-1) {
-            CameraOffsets *followVars=&obj->vars->offsets;
+            CameraOffsets *follow_vars=&moby->vars->offsets;
             follow_camera_set_distance(1,3.0f,0.003f);
-            if (!special) { followVars->distance=1.0f;follow_camera_set_height(1.0f,0.003f); }
+            if (!special) { follow_vars->distance=1.0f;follow_camera_set_height(1.0f,0.003f); }
         }
-        obj->vars->rates.f3c=0.6f;
+        moby->vars->rates.f3c=0.6f;
     }
     if (g_hero_state.b22b4==2) {
         if (state[4]<2) {
@@ -196,30 +198,30 @@ void func_PAL_L00_00427960(CameraMoby *obj)
             follow_camera_set_distance(1,g_cam_follow_distance_target,0.003f);
             follow_camera_set_height(g_cam_follow_height_target,0.003f);
             if (g_scalar_transition_state.state<2) {
-                CameraVars *base=obj->vars;
+                CameraVars *base=moby->vars;
                 FollowParameters *follow=&base->follow;
-                float *pos=obj->position,*dir=g_hero_state.position,*aim=q->vector50;
+                float *pos=moby->position,*dir=g_hero_state.position,*aim=offsets->vector50;
                 follow->distance=g_cam_follow_distance_target;
                 follow->height=g_cam_follow_height_target;
-                q->distance=g_cam_follow_aim_distance;
+                offsets->distance=g_cam_follow_aim_distance;
                 cam_follow_update_orientation(1);
                 {
-                CameraRates *rates=&obj->vars->rates;
-                CameraVars *vars=obj->vars;
+                CameraRates *rates=&moby->vars->rates;
+                CameraVars *vars=moby->vars;
                 CameraParams *params=&vars->params;
                 FastVecScale(local,g_hero_state.direction,-follow->height);
                 FastVecAdd(aim,dir,local);
                 FastVecSub(follow,pos,aim);
                 qcopy(base->follow.copy,follow->vector);
-                FastVecScale(local,g_hero_state.direction,-q->distance);
-                FastVecAdd(q->vector40,dir,local);
-                qcopy(q->vector90,q->vector40);
-                qcopy(q->position,dir);
-                qcopy(q->vector60,q->position);
+                FastVecScale(local,g_hero_state.direction,-offsets->distance);
+                FastVecAdd(offsets->vector40,dir,local);
+                qcopy(offsets->vector90,offsets->vector40);
+                qcopy(offsets->position,dir);
+                qcopy(offsets->vector60,offsets->position);
                 qcopy(vars,pos);
                 qcopy((char *)vars+0x210,pos);
                 rates->i30=0;params->f14=0.0f;
-                params->distance=q->distance;
+                params->distance=offsets->distance;
                 {
                     float zero=params->f14;
                     params->height=follow->height;
@@ -233,7 +235,7 @@ void func_PAL_L00_00427960(CameraMoby *obj)
         }
         cam_set_snap_flag();
         {
-            CameraRates *rates=&obj->vars->rates;
+            CameraRates *rates=&moby->vars->rates;
             rates->f3c=g_cam_follow_rate_a;
             rates->f44=g_cam_follow_rate_b;
         }
@@ -246,9 +248,9 @@ void func_PAL_L00_00427960(CameraMoby *obj)
     camera=(FollowCameraGlobal *)((char *)hooks-0x3a0);
     target=camera->target;
     if (target && state[4]<2) {
-        int targetState=B(target,0x20);
-        if (targetState==254) camera->target=0;
-        else if (targetState==253) camera->target=0;
+        int target_state=B(target,0x20);
+        if (target_state==254) camera->target=0;
+        else if (target_state==253) camera->target=0;
         else {
             if (math_fabs(g_pad_state.stickX)>=0.3f || math_fabs(g_pad_state.stickY)>=0.3f) camera->targetTicks=533;
             if (g_scalar_transition_state.targetTicks>333) {
@@ -283,31 +285,31 @@ void func_PAL_L00_00427960(CameraMoby *obj)
     }
     if (state[4]<2 && g_hero_state.state!=129 &&
         (g_hero_state.state==126 || g_hero_state.state==130 || g_hero_state.h1454) && (g_pad_state.buttons&3)) {
-        CameraVars *resetVars;
+        CameraVars *reset_vars;
         set_follow_camera_orbit_clamp_mode(0);cam_set_lock_flag();cam_set_speeds_if_nonzero(0.04f,0.2f);
-        resetVars=obj->vars;resetVars->timer16=0;resetVars->timer12=0;resetVars->timer14=0;
+        reset_vars=moby->vars;reset_vars->timer16=0;reset_vars->timer12=0;reset_vars->timer14=0;
     } else if (g_cam_follow_mode_flag) {
-        CameraVars *timerVars=obj->vars;a=0;
+        CameraVars *timer_vars=moby->vars;a=0;
         for(i=0;i<4;i++) { local[i]=FastDiffRots(g_camera_move_state.samples[i],g_camera_move_state.samples[i+1]);a+=local[i]; }
         b=5.0f;a*=0.25f;b=a*b;if(b>1)b=1;b=1-b;
-        if (b<g_cam_follow_timer_threshold) timerVars->timer12=27;
-        if (timerVars->timer12) {
-            if (FastDecTimer(&timerVars->timer12)) timerVars->timer14=37;
-            cam_set_lock_flag();timerVars->timer16++;
-            if (timerVars->timer16>25) timerVars->timer16=25;
-            a=IntToFloat(timerVars->timer16);a/=IntToFloat(25);
+        if (b<g_cam_follow_timer_threshold) timer_vars->timer12=27;
+        if (timer_vars->timer12) {
+            if (FastDecTimer(&timer_vars->timer12)) timer_vars->timer14=37;
+            cam_set_lock_flag();timer_vars->timer16++;
+            if (timer_vars->timer16>25) timer_vars->timer16=25;
+            a=IntToFloat(timer_vars->timer16);a/=IntToFloat(25);
             cam_set_speeds_if_nonzero((g_cam_follow_speed_max-0.015f)*a+0.015f,0.2f);
             g_follow_cam_lerp_factor=0;
         } else {
-            if (timerVars->timer14) {
-                FastDecTimer(&timerVars->timer14);
-                a=IntToFloat(timerVars->timer14);a/=IntToFloat(37);
+            if (timer_vars->timer14) {
+                FastDecTimer(&timer_vars->timer14);
+                a=IntToFloat(timer_vars->timer14);a/=IntToFloat(37);
                 a*=-0.85f;
                 a+=0.85f;
                 g_follow_cam_lerp_factor=a;
-                timerVars->timer16=0;
+                timer_vars->timer16=0;
             } else {
-                timerVars->timer16=0;
+                timer_vars->timer16=0;
                 g_follow_cam_lerp_factor=0.85f;
             }
         }
@@ -315,9 +317,9 @@ void func_PAL_L00_00427960(CameraMoby *obj)
     state[4]=0;
     count=coll_process_hit(g_hero_state.position,1,(int)g_hero_state.p2290,0,15.0f);
     if (count>0) {
-    int targetIndex;
-    for(targetIndex=0;targetIndex<count;targetIndex++) {
-        char *candidate=moby_get_private_value_0(g_area_hit_targets[targetIndex]);
+    int target_index;
+    for(target_index=0;target_index<count;target_index++) {
+        char *candidate=moby_get_private_value_0(g_area_hit_targets[target_index]);
         if (candidate && (float)B(candidate,0xd)!=0.0f) { state[4]=1;break; }
     }
     }

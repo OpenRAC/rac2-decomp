@@ -43,16 +43,16 @@ extern int GetIconFrame(int, int);
 extern void hud_draw_sprite_gradient(int, int, int, int, int, void *);
 
 /* Draws the selected vendor item, its price and the purchase/maximum-ammo prompt. */
-void func_US2_002FB718(void)
+void DrawVendorPurchasePrompt_us2(void)
 {
     char text[256];
     char info[224];
     int available = 1;
-    VendorState *v;
+    VendorState *vendor;
     int color = 0x80F0F0F0;
-    v = &g_vendor_menu_state;
-    if (v->slots[v->index].kind == available) {
-        int id = v->slots[v->index].id;
+    vendor = &g_vendor_menu_state;
+    if (vendor->slots[vendor->index].kind == available) {
+        int id = vendor->slots[vendor->index].id;
         char *copied;
         char *fmt = g_str_vendor_format;
         if (g_item_ammo_counts[id] >=
@@ -61,8 +61,8 @@ void func_US2_002FB718(void)
         copied = strcpy(text, GetLocalizedString(((VendorItem *)(g_weapon_table + g_item_slot_to_record[id] * 224))->text));
         sprintf(text, fmt, copied, GetLocalizedString(0x2C5F));
         text_draw_centered_medium(g_screen_width >> 1, (int)(g_pal_aspect_scale * 274.0f + 0.5f), 0x80F0F0F0L, text, -1);
-        text_format_number_with_separators(text, ((VendorItem *)(g_weapon_table + g_item_slot_to_record[v->slots[v->index].id] * 224))->price);
-        if (g_player_bolts < ((VendorItem *)(g_weapon_table + g_item_slot_to_record[v->slots[v->index].id] * 224))->price)
+        text_format_number_with_separators(text, ((VendorItem *)(g_weapon_table + g_item_slot_to_record[vendor->slots[vendor->index].id] * 224))->price);
+        if (g_player_bolts < ((VendorItem *)(g_weapon_table + g_item_slot_to_record[vendor->slots[vendor->index].id] * 224))->price)
             color = (int)0x802020F0;
     } else {
         if (g_vendor_menu_state.slots[g_vendor_menu_state.index].owned) {

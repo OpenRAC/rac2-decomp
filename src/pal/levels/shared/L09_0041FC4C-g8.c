@@ -42,36 +42,37 @@ typedef struct {
     u8 activated;
 } TriggerObject;
 
-void func_PAL_L09_0041FC4C(TriggerObject *obj)
+/* Updates a floor switch: pulses its colour, then lights up and counts a press when the player steps on it or an ally gets close (PAL: 6 degree pulse step). */
+void floor_l09_switch_update_pal(TriggerObject *trigger)
 {
-    TriggerState *s = obj->state;
+    TriggerState *trigger_state = trigger->state;
     int shade, level;
     int green, red;
     char *player;
     float pos[4] __attribute__((aligned(16)));
 
-    switch (obj->status) {
+    switch (trigger->status) {
     case 0:
-        s->angle = math_random_angle();
-        obj->status = 1;
-        obj->position[2] -= 0.35f;
+        trigger_state->angle = math_random_angle();
+        trigger->status = 1;
+        trigger->position[2] -= 0.35f;
         break;
     case 1:
         /* Pulse the colour: the angle advances 6 degrees per update. */
-        s->angle = FastAddRotations(s->angle, 0.12566373f);
-        shade = FloatToInt((math_fast_sin_or_cos_b(s->angle) * 4.0f - 3.0f) * 128.0f);
+        trigger_state->angle = FastAddRotations(trigger_state->angle, 0.12566373f);
+        shade = FloatToInt((math_fast_sin_or_cos_b(trigger_state->angle) * 4.0f - 3.0f) * 128.0f);
         if (shade > 128) shade = 128;
         else if (shade < 32) shade = 32;
         green = (shade << 8) | (int)0x80000000;
         red = shade << 16;
-        obj->color = (red | green) | shade;
-        if (g_hero_state.standing != (char *)obj || g_hero_state.busy) {
+        trigger->color = (red | green) | shade;
+        if (g_hero_state.standing != (char *)trigger || g_hero_state.busy) {
             /* Loaded only on this path: reorg moves it into the bne delay slot. */
             level = g_current_map_index;
-            if (!(g_moby_group_flags[obj->owner + level * 16] & 0x80) || s->enabled) {
+            if (!(g_moby_group_flags[trigger->owner + level * 16] & 0x80) || trigger_state->enabled) {
                 int id;
-                if (!s->enabled) return;
-                id = obj->id;
+                if (!trigger_state->enabled) return;
+                id = trigger->id;
                 if (!g_dobbo_flags.spent[(short)id]) {
                     int count = g_moby_nibble_table[((short)id >> 1) + (level << 10)];
                     if (id & 1) {
@@ -84,11 +85,11 @@ void func_PAL_L09_0041FC4C(TriggerObject *obj)
 activate:
         {
             int id;
-            obj->status = 2;
-            obj->activated = 1;
-            obj->color = 0x80208020;
-            PlayMobySound(0, 0, obj);
-            id = obj->id;
+            trigger->status = 2;
+            trigger->activated = 1;
+            trigger->color = 0x80208020;
+            PlayMobySound(0, 0, trigger);
+            id = trigger->id;
             if (id & 1) {
                 u8 *counts = &g_moby_nibble_table[((short)id >> 1) + (g_current_map_index << 10)];
                 if (((*counts >> 4) & 7) != 7) *counts += 16;
@@ -98,17 +99,17 @@ activate:
             }
         }
 proximity:
-        if (s->enabled) {
+        if (trigger_state->enabled) {
             player = g_floor_l09_switch_player;
             if (!player) {
                 player = g_floor_l09_switch_player_2;
                 if (!player) return;
             }
             /* Retail fills this raised copy but measures from the position itself. */
-            qcopy(pos, obj->position);
+            qcopy(pos, trigger->position);
             pos[2] += 0.35f;
-            if (vec_distance_xy(obj->position, player + 0x10) < 0.5f) {
-                int id = obj->id;
+            if (vec_distance_xy(trigger->position, player + 0x10) < 0.5f) {
+                int id = trigger->id;
                 if (id & 1) {
                     u8 *counts = &g_moby_nibble_table[((short)id >> 1) + (g_current_map_index << 10)];
                     if (((*counts >> 4) & 7) != 7) *counts += 16;
@@ -116,10 +117,10 @@ proximity:
                     u8 *counts = &g_moby_nibble_table[((short)id >> 1) + (g_current_map_index << 10)];
                     if ((*counts & 7) != 7) ++*counts;
                 }
-                obj->status = 2;
-                obj->activated = 1;
-                obj->color = 0x80208020;
-                PlayMobySound(0, 0, obj);
+                trigger->status = 2;
+                trigger->activated = 1;
+                trigger->color = 0x80208020;
+                PlayMobySound(0, 0, trigger);
             }
         }
         break;

@@ -11,7 +11,7 @@ extern s32 g_streak_fade_end __attribute__((sda));
 extern s32 g_lightning_beam_machine_blocked __attribute__((sda));
 extern s32 math_fast_helper_a(void *a0, f32 f12);
 extern s32 FastDecTimer(void *a0);
-extern void func_PAL_L13_0041F2B8(u8 *a0);
+extern void lightning_beam_build_pal(u8 *a0);
 extern void streak_effect_update(u8 *a0);
 extern void gfx_add_draw_callback_third(void *a0, u8 *a1);
 extern u8 gfx_draw_electric_beam[];
@@ -20,7 +20,8 @@ typedef struct {
     f32 f[4];
 } __attribute__((aligned(16))) L13_Quad;
 
-void func_PAL_L13_0041F0C0(u8 *self)
+/* Lightning beam machine: builds a new beam on a timer and, while its beam is alive, updates the streak and draws the electric beam. */
+void lightning_beam_machine_update_pal(u8 *self)
 {
     u8 *state;
     s32 one;
@@ -38,7 +39,7 @@ void func_PAL_L13_0041F0C0(u8 *self)
     one = 1;
     switch (self[0x20]) {
     case 0:
-        func_PAL_L13_0041F2B8(self);
+        lightning_beam_build_pal(self);
         *(u16 *)(state + 0x10) = (*(s32 *)(state + 0xC) * 5 + 2) / 6;
         self[0x20] = 2;
         *(f32 *)(state + 0x624) = 2.5f;
@@ -48,14 +49,14 @@ void func_PAL_L13_0041F0C0(u8 *self)
     case 1:
         if (g_lightning_beam_countdown != 0 && *(s16 *)(state + 0x12) == 0) {
             g_lightning_beam_countdown = g_lightning_beam_countdown - 1;
-            func_PAL_L13_0041F2B8(self);
+            lightning_beam_build_pal(self);
         }
         break;
     case 2:
         if (FastDecTimer(state + 0x10) != 0) {
             self[0x20] = 3;
             *(u16 *)(state + 0x10) = ((int)(*(s16 *)(state + 4)) * 5 + 2) / 6;
-            func_PAL_L13_0041F2B8(self);
+            lightning_beam_build_pal(self);
         }
         break;
     case 3:
@@ -64,7 +65,7 @@ void func_PAL_L13_0041F0C0(u8 *self)
                 self[0x20] = 2;
             *(s16 *)(state + 0x10) = 4;
         } else if (*(s16 *)(state + 0x12) == 0) {
-            func_PAL_L13_0041F2B8(self);
+            lightning_beam_build_pal(self);
         }
         break;
     }

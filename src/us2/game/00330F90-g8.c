@@ -48,7 +48,7 @@ extern int coll_process_triangles(void *, float);
    collapses them. moby's number follows the declarations before it, so the
    function's named scalars are what bring it to that pseudo; type and surface
    add no insn at gcse, which keeps the 87 buckets. */
-void func_US2_00330F90(char *object)
+void SweepMobyArcProbe_us2(char *object)
 {
     float base[4], sum[4], axis[4], first[4], rotated[4], temporary[4], inverse[4];
     float endpoint[4], opposite[4], normal[4], correction[4];

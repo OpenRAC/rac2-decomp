@@ -11,7 +11,7 @@ extern float math_random_signed_float_range(float, float);
 
 /* func_PAL_0032C620, the PAL copy of func_0032AE30: the same C, where the lifetime is scaled to 50 Hz
  * and the angle factor 0.00029088824f becomes 0.0003490659f. */
-void func_PAL_0032C620(char *owner, void *position, int value)
+void part_claim_trail_node_pal(char *owner, void *position, int value)
 {
     unsigned char *base = g_trail_nodes;
     int scale = 6;

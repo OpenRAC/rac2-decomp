@@ -1,6 +1,8 @@
 #include "include_asm.h"
+#include "names.h"
 
-unsigned int func_US2_002D1150(void)
+/* Menu callback that does nothing. */
+unsigned int menu_noop_callback_c_us2(void)
 {
     return 0;
 }

@@ -22,14 +22,14 @@ extern char g_hero_position[];
 extern char g_subtitle_history[];
 extern float g_hero_frame_time __attribute__((nosda));
 
-extern void func_PAL_L00_002D29E8(void);
+extern void AdvanceHeroAnimation_pal(void);
 extern void hero_update_frame_input_pal(void);
 extern void hero_process_action_command(void);
 extern int hero_find_ledge_grab_pal(char *, char *, char *);
 extern void UpdateHeroMotionResponseParameters_pal(void);
 extern s32 FastDecTimer(s32);
-extern s32 func_PAL_L20_002D7920(s32, s32);
-extern s32 func_PAL_00289730(s32, s32);
+extern s32 hero_l20_set_state_pal(s32, s32);
+extern s32 subtitle_request_voice_line_pal(s32, s32);
 extern void hero_l20_decide_state_transition(void);
 extern void RebuildRegionObjectMembership(void);
 extern void UpdateDelayedSounds_pal(void);
@@ -50,13 +50,13 @@ extern void func_002A677C(s32);
    in mode 0x6F) the arming check and the resident timestamp catch-up; then the sub-updates,
    gated twice more by the state byte, and the hand-off of the hero's record. Same game code as
    func_L18_002C41F0. */
-void func_PAL_L20_002B9270(void)
+void hero_l20_update_frame_pal(void)
 {
     char *base;
-    char *blk;
+    char *history_block;
     char *hero;
 
-    func_PAL_L00_002D29E8();
+    AdvanceHeroAnimation_pal();
     hero_update_frame_input_pal();
     hero_process_action_command();
 
@@ -71,15 +71,15 @@ void func_PAL_L20_002B9270(void)
                 if (*(int *)(base + 0x2294) != 0x6F) {
                     if (FastDecTimer(*(int *)(*(int *)(base + 0x2290) + 0x68) + 0x3BC) != 0) {
                         *(int *)(base + 0x24CC) = 0;
-                        func_PAL_L20_002D7920(0x91, 1);
+                        hero_l20_set_state_pal(0x91, 1);
                     }
                     if (g_current_map_index == 0x14) {
                         if (g_hero_frame_flag == 0) {
-                            blk = g_subtitle_history;
-                            if (((s32)g_frame_counter * 5 + 2) / 6 - *(unsigned int *)(blk + 0x7900) >= 0x97) {
-                                if (func_PAL_00289730(0xA15, 0x6C) != 0) {
-                                    if (*(unsigned int *)(blk + 0x7900) < ((s32)g_frame_counter * 5 + 2) / 6) {
-                                        *(unsigned int *)(blk + 0x7900) = ((s32)g_frame_counter * 5 + 2) / 6;
+                            history_block = g_subtitle_history;
+                            if (((s32)g_frame_counter * 5 + 2) / 6 - *(unsigned int *)(history_block + 0x7900) >= 0x97) {
+                                if (subtitle_request_voice_line_pal(0xA15, 0x6C) != 0) {
+                                    if (*(unsigned int *)(history_block + 0x7900) < ((s32)g_frame_counter * 5 + 2) / 6) {
+                                        *(unsigned int *)(history_block + 0x7900) = ((s32)g_frame_counter * 5 + 2) / 6;
                                     }
                                 }
                             }
@@ -118,13 +118,13 @@ void func_PAL_L20_002B9270(void)
     }
     {
         char *pos = g_hero_position;
-        char *g;
+        char *hero_base;
 
         coll_clear_map_bits_around_pos(pos);
-        g = pos - 0x80;
-        if (*(u8 *)(g + 0x22B4) == 4 && g_hero_hazard_flag == 0 && *(s16 *)(g + 0x1E0) == 0 &&
-            *(int *)(g + 0x2294) != 0x6F)
-            receiver_bot_start_sequence(*(int *)(g + 0x2290));
+        hero_base = pos - 0x80;
+        if (*(u8 *)(hero_base + 0x22B4) == 4 && g_hero_hazard_flag == 0 && *(s16 *)(hero_base + 0x1E0) == 0 &&
+            *(int *)(hero_base + 0x2294) != 0x6F)
+            receiver_bot_start_sequence(*(int *)(hero_base + 0x2290));
     }
     UpdateHeroMobyProbedHeightBounds();
     hero = g_hero_state;

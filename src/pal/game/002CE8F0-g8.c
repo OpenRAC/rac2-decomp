@@ -9,6 +9,7 @@ extern int func_0029C4F0(int);
 extern char *tab_menu_get_selected_entry(void *);
 extern void menu_start_action(int);
 
+/* Handles menu input and, when the confirm button is pressed, starts the action of the selected entry (PAL). */
 int menu_handle_input_send_selection_pal(void)
 {
     struct { short reserved; unsigned short key; int value; } message;

@@ -4,11 +4,12 @@
 typedef unsigned char u8;
 extern int TryClaimNotice(int, int, int);
 
-void hud_show_message_for_state_us2(u8 *a0) {
-    int v = *(int *)(*(void **)(a0 + 0x68) + 0x10);
+/* Shows the help message that matches the moby's state value (USA v2.00). */
+void hud_show_message_for_state_us2(u8 *moby) {
+    int message_state = *(int *)(*(void **)(moby + 0x68) + 0x10);
     int msg;
 
-    switch (v) {
+    switch (message_state) {
     case 1:
         msg = 0x130B;
         break;

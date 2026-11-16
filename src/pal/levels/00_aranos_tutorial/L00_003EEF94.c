@@ -15,28 +15,29 @@ extern int FloatToInt(float);
 /* EE integer and floating-point argument banks retain their independent order. */
 extern void *aranos_spark_spawn(void *, void *, int, float, int, int);
 
-void func_PAL_L00_003EEF94(unsigned char *p) {
+/* Emits bursts of small particles from the object, waiting a random time between bursts (PAL: 50 Hz timings). */
+void particle_burst_emitter_update_pal(unsigned char *p) {
     float v[4], pos[4];
-    float radius, secondRadius, z;
-    int *s = *(int **)(p + 0x68);
+    float radius, second_radius, z;
+    int *vars = *(int **)(p + 0x68);
     unsigned char *base;
 
     if (p[0x20] == 0) {
         p[0x30] = 0x80;
         p[0x20] = 1;
-        s[1] = 17;
-        s[0] = 0;
+        vars[1] = 17;
+        vars[0] = 0;
     }
     if (p[0x20] == 1) {
-        if (math_fast_float_d(s)) {
+        if (math_fast_float_d(vars)) {
             p[0x20] = 2;
-            s[0] = ((s32)math_random_int_range(50, 120) * 5 + 2) / 6;
+            vars[0] = ((s32)math_random_int_range(50, 120) * 5 + 2) / 6;
         }
     }
     if (p[0x20] == 2) {
-        if (math_fast_float_d(s + 1)) {
+        if (math_fast_float_d(vars + 1)) {
             p[0x20] = 1;
-            s[1] = ((s32)math_random_int_range(10, 25) * 5 + 2) / 6;
+            vars[1] = ((s32)math_random_int_range(10, 25) * 5 + 2) / 6;
         } else {
             v[0] = math_fast_sin_or_cos_a(*(float *)(p + 0xf8) - 1.570796489715576171875f)
                    * 0.50000006f;
@@ -52,8 +53,8 @@ void func_PAL_L00_003EEF94(unsigned char *p) {
                              FloatToInt(math_random_signed_float_range(1.0f, 4.0f)), 0x40808080);
             qcopy(pos, base);
             pos[2] += math_random_signed_float_range(z, 0.5f);
-            secondRadius = math_random_float_range(0.1f, 3.0f);
-            aranos_spark_spawn(pos, v, 250, secondRadius,
+            second_radius = math_random_float_range(0.1f, 3.0f);
+            aranos_spark_spawn(pos, v, 250, second_radius,
                              FloatToInt(math_random_signed_float_range(1.0f, 4.0f)), 0x40808080);
         }
     }

@@ -7,9 +7,10 @@ extern u8 D_001A63A8_4[];
 extern u8 g_hero_state[];
 extern void moby_explode(u8 *a0, int a1, int a2);
 
-void moby_trigger_explosion_pal(u8 *a0) {
-    int v = *(int *)(a0 + 0x68);
-    moby_explode(a0, v, v);
-    *(u8 *)(a0 + 0x30) = 0xFF;
+/* Runs the explosion routine for the object and makes it fully visible. */
+void moby_trigger_explosion_pal(u8 *moby) {
+    int explode_arg = *(int *)(moby + 0x68);
+    moby_explode(moby, explode_arg, explode_arg);
+    *(u8 *)(moby + 0x30) = 0xFF;
 }
 

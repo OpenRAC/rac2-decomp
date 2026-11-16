@@ -26,7 +26,7 @@ extern float FastVecLength(void *), math_fabs(float), mat_fast_helper_a(float, f
 extern int coll_test_point(void *, int, void *, float), FloatToInt(float);
 
 /* Integrates a linked particle chain with collision response and projected facing. */
-void func_PAL_002BFB58(ChainParticle *particle) {
+void part_update_linked_effect_pal(ChainParticle *particle) {
     Vector point, delta, force;
     ChainParticle *node, *attachment;
     ChainParticleDynamics *link;

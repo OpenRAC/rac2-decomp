@@ -30,16 +30,17 @@ extern int PlayMobySound(int,int,void *);
 extern float math_fast_sin_or_cos_a(float),math_move_angle_toward_target(float,float,float);
 extern void hero_detach_from_object_us2(int),mat_combine_and_store(void *,void *,void *,void *);
 
-void func_US2_L19_00412B80(u8 *obj)
+/* Updates a mover (moby class 4333): it waits for a trigger or a hit, then glides smoothly to its target spot and turn, and flags a linked object when done (USA v2.00 copy). */
+void triggered_l19_mover_update_us2(u8 *obj)
 {
-    float oldpos[4] __attribute__((aligned(16)));
-    float oldrot[4] __attribute__((aligned(16)));
+    float old_position[4] __attribute__((aligned(16)));
+    float old_rotation[4] __attribute__((aligned(16)));
     float delta[4] __attribute__((aligned(16)));
     float offset[4] __attribute__((aligned(16)));
     u8 *state = *(u8 **)(obj+0x68);
-    float t;
-    *(TI128 *)oldpos = *(TI128 *)(obj+0x10);
-    *(TI128 *)oldrot = *(TI128 *)(obj+0xF0);
+    float ease_t;
+    *(TI128 *)old_position = *(TI128 *)(obj+0x10);
+    *(TI128 *)old_rotation = *(TI128 *)(obj+0xF0);
     switch (B(obj,0x20)) {
     case 0:
         if (I(state,0x80)==-1) {
@@ -91,14 +92,14 @@ void func_US2_L19_00412B80(u8 *obj)
         if (flag_set_first_pending(obj) && (*(s16 *)(obj+0xAA)==0xEDB || *(s16 *)(obj+0xAA)==0x1146)) PlayMobySound(0,0,obj);
         F(state,0x88)+=1.0f/F(state,0x84);
         if (F(state,0x88)>1) F(state,0x88)=1;
-        t=1.0f-math_fast_sin_or_cos_a(F(state,0x88)*3.1415927f);
-        t*=0.5f;
+        ease_t=1.0f-math_fast_sin_or_cos_a(F(state,0x88)*3.1415927f);
+        ease_t*=0.5f;
         FastVecSub(delta,g_waypoint_table[I(state,0x80)].position,state+0x60);
-        FastVecScale(delta,delta,t);
+        FastVecScale(delta,delta,ease_t);
         FastVecAdd(obj+0x10,state+0x60,delta);
-        R(obj,0xF8)=math_move_angle_toward_target(F(state,0x78),g_waypoint_table[I(state,0x80)].rotation[2],t);
-        R(obj,0xF4)=math_move_angle_toward_target(F(state,0x74),g_waypoint_table[I(state,0x80)].rotation[1],t);
-        R(obj,0xF0)=math_move_angle_toward_target(F(state,0x70),g_waypoint_table[I(state,0x80)].rotation[0],t);
+        R(obj,0xF8)=math_move_angle_toward_target(F(state,0x78),g_waypoint_table[I(state,0x80)].rotation[2],ease_t);
+        R(obj,0xF4)=math_move_angle_toward_target(F(state,0x74),g_waypoint_table[I(state,0x80)].rotation[1],ease_t);
+        R(obj,0xF0)=math_move_angle_toward_target(F(state,0x70),g_waypoint_table[I(state,0x80)].rotation[0],ease_t);
         if (F(state,0x88)>=1) moby_set_state(obj,3,-1);
         break;
     case 3:
@@ -108,7 +109,7 @@ void func_US2_L19_00412B80(u8 *obj)
         break;
     }
     if (B(obj,0x20)<3) {
-        FastVecSub(delta,obj+0x10,oldpos);
-        mat_combine_and_store(state+0x20,delta,oldrot,obj+0xF0);
+        FastVecSub(delta,obj+0x10,old_position);
+        mat_combine_and_store(state+0x20,delta,old_rotation,obj+0xF0);
     }
 }

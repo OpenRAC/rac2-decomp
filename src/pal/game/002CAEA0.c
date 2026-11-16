@@ -49,28 +49,28 @@ extern s32 UpdateSoundVoices_pal(void);
 extern s16 snd_pump_music_and_disc_read_pal(int);
 extern void pad_clear_port_state(void);
 
-void func_PAL_002CB5D0(void)
+void restore_menu_display_state_pal(void)
 {
-    GameState_PAL_2CB5D0 *s = (GameState_PAL_2CB5D0 *)(void *)g_pause_menu_state;
+    GameState_PAL_2CB5D0 *menu = (GameState_PAL_2CB5D0 *)(void *)g_pause_menu_state;
     TI128 *dst;
     int mode;
 
     *(int *)(void *)g_pause_menu_state = 0;
     gfx_select_packet_buffer_setup();
     dst = (TI128 *)g_camera_eye_state;
-    qcopy(dst, &s->field_050);
-    qcopy(dst + 1, &s->field_060);
-    mem_copy_aligned((char *)dst + 0x230, s->field_200, 0x30);
-    *(float *)g_fov_tangent = s->field_0F8;
+    qcopy(dst, &menu->field_050);
+    qcopy(dst + 1, &menu->field_060);
+    mem_copy_aligned((char *)dst + 0x230, menu->field_200, 0x30);
+    *(float *)g_fov_tangent = menu->field_0F8;
     UpdateViewContext();
     gfx_build_view_matrices();
     select_moby_context(0);
     gfx_apply_display_config();
-    mode = s->field_01C;
-    s->field_11C = 0;
-    s->field_114 = 0;
-    s->field_020 = 0;
-    s->field_118 = 0;
+    mode = menu->field_01C;
+    menu->field_11C = 0;
+    menu->field_114 = 0;
+    menu->field_020 = 0;
+    menu->field_118 = 0;
     if (mode == 3 || mode == 4 || mode == 6 || mode == 5) {
         FadeToBlack(0xD);
     }

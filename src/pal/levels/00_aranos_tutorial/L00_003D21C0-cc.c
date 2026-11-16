@@ -59,7 +59,7 @@ extern void moby_set_state(void *, int, int);
 extern void snd_stop_voice(int);
 extern void moby_mark_spawned(void *);
 extern void func_002A0F48(void *);
-extern void func_PAL_002A7E68(void *, int, int, int);
+extern void anim_start_blended_pal(void *, int, int, int);
 extern LiftObject *CreateMoby(int);
 extern void FastVecSub(void *, void *, void *);
 extern void mat_combine_and_store(void *, void *, void *, void *);
@@ -131,7 +131,7 @@ void UpdateAranosLift_pal(LiftObject *obj) {
         qcopy(&child->position, &obj->position);
         child->position.f[2] += 0.15f;
         func_002A0F48(ctx->child);
-        if (obj->animation != 2) func_PAL_002A7E68(obj, 2, 0, 0);
+        if (obj->animation != 2) anim_start_blended_pal(obj, 2, 0, 0);
         ctx->phase = math_random_angle();
         break;
     }
@@ -144,11 +144,11 @@ void UpdateAranosLift_pal(LiftObject *obj) {
         color = (value << 16) | brightness;
         ctx->child->color = color | value;
         if (vec_distance_xy(&obj->position, &g_hero_state.position) < 6.0f && obj->animation == 2)
-            func_PAL_002A7E68(obj, 1, 0, 5);
+            anim_start_blended_pal(obj, 1, 0, 5);
         if (hero_is_current_selected_id((int)ctx->child)) {
             if (!ctx->active) {
                 moby_set_state(obj, 3, -1);
-                if (obj->animation != 2) func_PAL_002A7E68(obj, 2, 0, 5);
+                if (obj->animation != 2) anim_start_blended_pal(obj, 2, 0, 5);
                 ctx->child->animationData = 0;
                 ctx->child->color = 0x8000DF2A;
                 snd_play_from_class_bank(0, 0, obj, 0x8A1);
@@ -180,7 +180,7 @@ void UpdateAranosLift_pal(LiftObject *obj) {
                 ctx->active = 0;
                 STOP_SOUND();
                 moby_set_state(obj, 1, -1);
-                if (obj->animation != 1) func_PAL_002A7E68(obj, 1, 0, 5);
+                if (obj->animation != 1) anim_start_blended_pal(obj, 1, 0, 5);
                 ctx->child->color = 0x808C8C8C;
                 ctx->child->animationData = ctx->child->model->animation;
             } else {
@@ -189,7 +189,7 @@ void UpdateAranosLift_pal(LiftObject *obj) {
                     ctx->frames = 0;
                 }
                 STOP_SOUND();
-                if (obj->animation != 1) func_PAL_002A7E68(obj, 1, 0, 5);
+                if (obj->animation != 1) anim_start_blended_pal(obj, 1, 0, 5);
             }
         }
         break;
@@ -213,7 +213,7 @@ void UpdateAranosLift_pal(LiftObject *obj) {
             ctx->active = 1;
             STOP_SOUND();
             moby_set_state(obj, 1, -1);
-            if (obj->animation != 1) func_PAL_002A7E68(obj, 1, 0, 5);
+            if (obj->animation != 1) anim_start_blended_pal(obj, 1, 0, 5);
             ctx->child->color = 0x808C8C8C;
             ctx->child->animationData = ctx->child->model->animation;
         } else {
@@ -222,7 +222,7 @@ void UpdateAranosLift_pal(LiftObject *obj) {
                 ctx->frames = 0;
             }
             STOP_SOUND();
-            if (obj->animation != 1) func_PAL_002A7E68(obj, 1, 0, 5);
+            if (obj->animation != 1) anim_start_blended_pal(obj, 1, 0, 5);
         }
         break;
     }

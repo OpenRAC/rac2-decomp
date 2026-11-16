@@ -12,16 +12,16 @@ extern char *moby_get_motion_data(u8 *);
 extern void *state_get_stored_pointer_value(void);
 extern void flying_object_restore_state_pal(u8 *);
 extern void level_append_object(int, int, int, int);
-extern void func_PAL_L05_0037E8E0(u8 *);
+extern void follower_l05_update_pal(u8 *);
 extern int moby_process_collision_hit(u8 *, int, int, int);
 extern void snd_stop_voice(s32);
 extern int PlayMobySound(int, int, char *);
 extern void moby_check_player_in_view_and_range(u8 *, int, float);
-extern void func_PAL_L10_0041DF98(void *);
+extern void lightning_object_update_state_pal(void *);
 extern int moby_can_take_next_step(char *);
-extern void func_PAL_L05_0037DE20(char *);
+extern void follower_start_wander_pal(char *);
 extern int math_fast_float_d(void *);
-extern void func_PAL_L10_0041E0F8(u8 *);
+extern void part_l10_spawn_tail_trail_marks_pal(u8 *);
 extern int coll_process_hit(void *, int, void *, int, float);
 extern int snd_play_from_class_bank(int, int, char *, int);
 typedef struct { char pad0[0x104]; int f104; int f108; int pad10c; int f110; int pad114[2]; int f11C; u8 *f120; } Motion;
@@ -43,7 +43,7 @@ void flying_l10_enemy_update_pal(u8 *self) {
         break;
     case 1:
         *(float *)(self + 0x2C) = 0.019999999552965164f;
-        func_PAL_L05_0037E8E0(self);
+        follower_l05_update_pal(self);
         if (moby_process_collision_hit(self, 0, 0, 0)) {
             handle = *(int *)(state + 0x26C);
             if (handle != -1) {
@@ -59,15 +59,15 @@ void flying_l10_enemy_update_pal(u8 *self) {
                 motion->f11C = 1;
                 motion->f120 = g_moby_base_table + (*(int *)(state + 0x260) << 8);
             }
-            if (motion->f108 && motion->f104) func_PAL_L10_0041DF98(self);
-            if (moby_can_take_next_step((char *)self)) func_PAL_L05_0037DE20((char *)self);
+            if (motion->f108 && motion->f104) lightning_object_update_state_pal(self);
+            if (moby_can_take_next_step((char *)self)) follower_start_wander_pal((char *)self);
             math_fast_float_d(state + 0x268);
-            func_PAL_L10_0041E0F8(self);
+            part_l10_spawn_tail_trail_marks_pal(self);
         }
         break;
     case 2:
         *(float *)(self + 0x2C) = 0.07999999821186066f;
-        func_PAL_L05_0037E8E0(self);
+        follower_l05_update_pal(self);
         moby_process_collision_hit(self, 0, 0, 0);
         if (!motion->f110) break;
         moby_check_player_in_view_and_range(self, 0, 176.0f);
@@ -90,10 +90,10 @@ void flying_l10_enemy_update_pal(u8 *self) {
                 }
             }
         }
-        if (motion->f104) func_PAL_L10_0041DF98(self);
-        if (moby_can_take_next_step((char *)self)) func_PAL_L05_0037DE20((char *)self);
+        if (motion->f104) lightning_object_update_state_pal(self);
+        if (moby_can_take_next_step((char *)self)) follower_start_wander_pal((char *)self);
         math_fast_float_d(state + 0x268);
-        func_PAL_L10_0041E0F8(self);
+        part_l10_spawn_tail_trail_marks_pal(self);
         break;
     }
     {

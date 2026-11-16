@@ -15,7 +15,7 @@ static __inline__ void qcopy(void *dst, const void *src) {
                          : : "r"(dst), "r"(src) : "$2", "memory");
 }
 
-extern int func_PAL_002B1A50(void *, void *, int);
+extern int moby_apply_damage_to_object_pal(void *, void *, int);
 extern int PlayMobySound(int, int, char *);
 extern void vec_scale_to_length(void *, void *, float);
 extern void FastVecAdd(void *, void *, void *);
@@ -36,31 +36,32 @@ typedef struct {
 } L13_CD48Vars;
 
 extern void level_list_add_key(Obj_389848 *object);
-void enemy_update_explode_pal(unsigned char *m)
+/* Updates an enemy that explodes as soon as its health has run out (PAL). */
+void enemy_update_explode_pal(unsigned char *moby)
 {
-    L13_CD48Vars *v = *(L13_CD48Vars **)(m + 0x68);
-    float p[4] __attribute__((aligned(16)));
-    float b[4] __attribute__((aligned(16)));
-    float a[4] __attribute__((aligned(16)));
+    L13_CD48Vars *vars = *(L13_CD48Vars **)(moby + 0x68);
+    float pos[4] __attribute__((aligned(16)));
+    float forward[4] __attribute__((aligned(16)));
+    float back[4] __attribute__((aligned(16)));
 
-    if (m[0x20] == 0) {
-        level_list_add_key((Obj_389848 *)m);
-        m[0x20] = 1;
+    if (moby[0x20] == 0) {
+        level_list_add_key((Obj_389848 *)moby);
+        moby[0x20] = 1;
     }
-    v->b6A = 2;
-    v->fA8 = 0.01f;
-    v->b61 = 0xFF;
-    v->b62 = 0xFF;
-    if (func_PAL_002B1A50(m, v->sub50, 0) != 0) {
-        PlayMobySound(0, 0, (char *)m);
+    vars->b6A = 2;
+    vars->fA8 = 0.01f;
+    vars->b61 = 0xFF;
+    vars->b62 = 0xFF;
+    if (moby_apply_damage_to_object_pal(moby, vars->sub50, 0) != 0) {
+        PlayMobySound(0, 0, (char *)moby);
     }
-    if (v->f20 <= 0.0f) {
-        qcopy(p, m + 0x10);
-        vec_scale_to_length(a, m + 0xD0, -2.0f);
-        FastVecAdd(p, a, p);
-        vec_scale_to_length(b, m + 0xC0, 1.5f);
-        FastVecAdd(p, b, p);
-        SpawnExplosion_pal(p, 0, 0x19, 0x14, 0x14, 0x14, 0x2D, 1, 0.75f, 20.0f, 1, 0, 0, 0);
-        moby_mark_spawned(m);
+    if (vars->f20 <= 0.0f) {
+        qcopy(pos, moby + 0x10);
+        vec_scale_to_length(back, moby + 0xD0, -2.0f);
+        FastVecAdd(pos, back, pos);
+        vec_scale_to_length(forward, moby + 0xC0, 1.5f);
+        FastVecAdd(pos, forward, pos);
+        SpawnExplosion_pal(pos, 0, 0x19, 0x14, 0x14, 0x14, 0x2D, 1, 0.75f, 20.0f, 1, 0, 0, 0);
+        moby_mark_spawned(moby);
     }
 }

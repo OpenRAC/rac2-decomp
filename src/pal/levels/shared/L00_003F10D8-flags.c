@@ -27,11 +27,11 @@ extern float IntToFloat(int);
 extern float math_random_float_range(float, float);
 
 /* Allocate a projectile and initialize its position, velocity and random phases. */
-char *func_PAL_L00_003F10D8(char *position, char *source, char *target)
+char *homing_l00_shot_spawn_pal(char *position, char *source, char *target)
 {
-    Vector a,b,c,d;
+    Vector vec_a,vec_b,vec_c,vec_d;
     char *object = CreateMoby(0xCBB);
-    char *state, *info;
+    char *state, *private_data;
     float speed;
     if (object) {
         *(unsigned char *)(object+0x30) = 255;
@@ -44,16 +44,16 @@ char *func_PAL_L00_003F10D8(char *position, char *source, char *target)
         speed = (*(ProjectileTuning *)(g_kilonoid_weapon_index * 224 + (char *)g_weapon_l00_table)).speed * 0.020000001f;
         if (g_hero_state.mode==29 && (*(unsigned short *)(g_hero_state.camera+0x34)&1)) {
             qcopy(object+0x10,g_camera_l00_position);
-            FastVecScale((char *)&a,g_camera_l00_position+0x250,-0.5f);
-            FastVecAdd(object+0x10,object+0x10,&a);
-            FastVecScale((char *)&b,g_camera_l00_position+0x240,-0.25f);
-            FastVecAdd(object+0x10,object+0x10,&b);
-            FastVecScale((char *)&c,g_camera_l00_position+0x230,0.1f);
-            FastVecAdd(object+0x10,object+0x10,&c);
-            FastVecScale((char *)&d,g_camera_l00_position+0x230,20.0f);
-            FastVecAdd(&d,g_camera_l00_position,&d);
-            if(CollLine(g_camera_l00_position,&d,0,g_hero_state.camera,0)) qcopy(&d,g_hero_l00_position);
-            FastVecSub(state+0x20,&d,object+0x10);
+            FastVecScale((char *)&vec_a,g_camera_l00_position+0x250,-0.5f);
+            FastVecAdd(object+0x10,object+0x10,&vec_a);
+            FastVecScale((char *)&vec_b,g_camera_l00_position+0x240,-0.25f);
+            FastVecAdd(object+0x10,object+0x10,&vec_b);
+            FastVecScale((char *)&vec_c,g_camera_l00_position+0x230,0.1f);
+            FastVecAdd(object+0x10,object+0x10,&vec_c);
+            FastVecScale((char *)&vec_d,g_camera_l00_position+0x230,20.0f);
+            FastVecAdd(&vec_d,g_camera_l00_position,&vec_d);
+            if(CollLine(g_camera_l00_position,&vec_d,0,g_hero_state.camera,0)) qcopy(&vec_d,g_hero_l00_position);
+            FastVecSub(state+0x20,&vec_d,object+0x10);
             vec_scale_to_length(state+0x20,state+0x20,speed);
         } else {
             if (g_hero_state.alternate==1) {
@@ -61,14 +61,14 @@ char *func_PAL_L00_003F10D8(char *position, char *source, char *target)
                 qcopy(object+0x10,position);
             } else {
                 if(target) {
-                    qcopy(&a,target+0x10);
-                    info=moby_get_private_value_0(target);
-                    if(info) {
-                        cam_compute_view_direction(target+0x10,&b,1);
-                        FastVecScale((char *)&b,(char *)&b,*(float *)(info+0x10));
-                        FastVecAdd(&a,&a,&b);
+                    qcopy(&vec_a,target+0x10);
+                    private_data=moby_get_private_value_0(target);
+                    if(private_data) {
+                        cam_compute_view_direction(target+0x10,&vec_b,1);
+                        FastVecScale((char *)&vec_b,(char *)&vec_b,*(float *)(private_data+0x10));
+                        FastVecAdd(&vec_a,&vec_a,&vec_b);
                     }
-                    FastVecSub(state+0x20,&a,position);
+                    FastVecSub(state+0x20,&vec_a,position);
                     vec_scale_to_length(state+0x20,state+0x20,speed);
                 } else vec_scale_to_length(state+0x20,source+0xC0,speed);
                 qcopy(object+0x10,position);
@@ -84,8 +84,8 @@ char *func_PAL_L00_003F10D8(char *position, char *source, char *target)
         object[0x20]=0;
         *(char **)(state+0x1C)=target;
         if(target) {
-            info=moby_get_private_value_0(target);
-            if(info) *(unsigned short *)(info+0x1E)|=0x80;
+            private_data=moby_get_private_value_0(target);
+            if(private_data) *(unsigned short *)(private_data+0x1E)|=0x80;
         }
         *(float *)(state+0x30)=0.0f;
         *(float *)(state+0x40)=1.0f;

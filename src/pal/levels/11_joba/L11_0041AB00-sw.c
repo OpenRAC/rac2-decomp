@@ -43,75 +43,75 @@ extern f32 math_step_value_toward_target(void *, void *, f32, f32, f32, f32);
 
 /* Steps a seven-state swing, easing the angle at 0xF0 between -90 and -75/-85 degrees, then
    places the linked table entity at this one's position, offset along two of its axes. */
-void func_PAL_L11_0041B670(u8 *arg0) {
-    f32 tmp[4], tmp2[4];
-    u8 *s2 = arg0;
-    u8 *s1 = *(u8 **)(s2 + 0x68);
-    u8 *s0 = g_moby_l11_table[0] + *(s32 *)s1 * 256;
-    u8 *pos;
+void swinging_linked_moby_update_pal(u8 *moby) {
+    f32 up_offset[4], side_offset[4];
+    u8 *swing = moby;
+    u8 *vars = *(u8 **)(swing + 0x68);
+    u8 *linked = g_moby_l11_table[0] + *(s32 *)vars * 256;
+    u8 *linked_pos;
 
-    switch (*(u8 *)(s2 + 0x20)) {
+    switch (*(u8 *)(swing + 0x20)) {
     case 0:
-        moby_set_state(s2, 1, -1);
+        moby_set_state(swing, 1, -1);
         break;
     case 1:
-        if (flag_is_third_pending_set(s0)) {
-            PlayMobySound(0, 0, s2);
-            moby_set_state(s2, 2, -1);
+        if (flag_is_third_pending_set(linked)) {
+            PlayMobySound(0, 0, swing);
+            moby_set_state(swing, 2, -1);
         }
-        if (g_moby_group_flags[g_current_map_index[0]][*(u8 *)(s2 + 0xB0)] & 0x80) {
-            *(f32 *)(s2 + 0xF0) = fast_subtract_rotations(*(f32 *)(s2 + 0xF0), 1.5707965f);
-            moby_set_state(s2, 6, -1);
+        if (g_moby_group_flags[g_current_map_index[0]][*(u8 *)(swing + 0xB0)] & 0x80) {
+            *(f32 *)(swing + 0xF0) = fast_subtract_rotations(*(f32 *)(swing + 0xF0), 1.5707965f);
+            moby_set_state(swing, 6, -1);
         }
         break;
     case 2:
-        math_step_value_toward_target(s2 + 0xF0, s1 + 4, -1.5707965f, 0.000767945f,
+        math_step_value_toward_target(swing + 0xF0, vars + 4, -1.5707965f, 0.000767945f,
                       251.32744f, 349.06592f);
-        if (*(f32 *)(s2 + 0xF0) <= -1.5707965f) {
-            *(s32 *)(s1 + 4) = 0;
-            moby_set_state(s2, 3, -1);
-            PlayMobySound(1, 0, s2);
+        if (*(f32 *)(swing + 0xF0) <= -1.5707965f) {
+            *(s32 *)(vars + 4) = 0;
+            moby_set_state(swing, 3, -1);
+            PlayMobySound(1, 0, swing);
         }
         break;
     case 3:
-        math_step_value_toward_target(s2 + 0xF0, s1 + 4, -1.308997f, 0.025132746f,
+        math_step_value_toward_target(swing + 0xF0, vars + 4, -1.308997f, 0.025132746f,
                       0.00062831864f, 1.0471977f);
-        if (*(f32 *)(s2 + 0xF0) >= -1.308997f) {
-            *(s32 *)(s1 + 4) = 0;
-            moby_set_state(s2, 4, -1);
+        if (*(f32 *)(swing + 0xF0) >= -1.308997f) {
+            *(s32 *)(vars + 4) = 0;
+            moby_set_state(swing, 4, -1);
         }
         break;
     case 4:
-        math_step_value_toward_target(s2 + 0xF0, s1 + 4, -1.5707965f, 0.00062831864f,
+        math_step_value_toward_target(swing + 0xF0, vars + 4, -1.5707965f, 0.00062831864f,
                       0.25132746f, 3.4906592f);
-        if (*(f32 *)(s2 + 0xF0) <= -1.5707965f) {
-            *(s32 *)(s1 + 4) = 0;
-            moby_set_state(s2, 5, -1);
-            PlayMobySound(1, 0, s2);
+        if (*(f32 *)(swing + 0xF0) <= -1.5707965f) {
+            *(s32 *)(vars + 4) = 0;
+            moby_set_state(swing, 5, -1);
+            PlayMobySound(1, 0, swing);
         }
         break;
     case 5:
-        math_step_value_toward_target(s2 + 0xF0, s1 + 4, -1.48353f, 0.025132746f,
+        math_step_value_toward_target(swing + 0xF0, vars + 4, -1.48353f, 0.025132746f,
                       0.00062831864f, 1.0471977f);
-        if (*(f32 *)(s2 + 0xF0) >= -1.48353f) {
-            *(s32 *)(s1 + 4) = 0;
-            moby_set_state(s2, 6, -1);
+        if (*(f32 *)(swing + 0xF0) >= -1.48353f) {
+            *(s32 *)(vars + 4) = 0;
+            moby_set_state(swing, 6, -1);
         }
         break;
     case 6:
-        math_step_value_toward_target(s2 + 0xF0, s1 + 4, -1.5707965f, 0.00062831864f,
+        math_step_value_toward_target(swing + 0xF0, vars + 4, -1.5707965f, 0.00062831864f,
                       0.25132746f, 3.4906592f);
-        if (*(f32 *)(s2 + 0xF0) <= -1.5707965f) {
-            *(s32 *)(s1 + 4) = 0;
-            moby_set_state(s2, 7, -1);
-            PlayMobySound(1, 0, s2);
+        if (*(f32 *)(swing + 0xF0) <= -1.5707965f) {
+            *(s32 *)(vars + 4) = 0;
+            moby_set_state(swing, 7, -1);
+            PlayMobySound(1, 0, swing);
         }
         break;
     }
-    pos = s0 + 0x10;
-    qcopy(pos, s2 + 0x10);
-    vec_scale_to_length(tmp, s2 + 0xE0, 5.7f);
-    FastVecAdd(pos, pos, tmp);
-    vec_scale_to_length(tmp2, s2 + 0xD0, 0.35f);
-    FastVecAdd(pos, pos, tmp2);
+    linked_pos = linked + 0x10;
+    qcopy(linked_pos, swing + 0x10);
+    vec_scale_to_length(up_offset, swing + 0xE0, 5.7f);
+    FastVecAdd(linked_pos, linked_pos, up_offset);
+    vec_scale_to_length(side_offset, swing + 0xD0, 0.35f);
+    FastVecAdd(linked_pos, linked_pos, side_offset);
 }

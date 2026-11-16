@@ -23,11 +23,12 @@ extern float math_random_angle(void);
 extern s32 math_random_int_range(s32, s32);
 extern void *part_spawn_hero_relative(void *, void *, s32, float, s32, s32, s32);
 
+/* (PAL copy of part_emit_robot_laser.) */
 /* Advances four animation phases and emits particles around the referenced object.
    The bounds share their measured parameter block; offset reads retain the
    absolute form while the separate scalar scale bound uses small data.
    func_002C3150 keeps the EE integer and FP argument banks in order. */
-void func_PAL_L11_0044C6C0(char *object)
+void part_emit_robot_laser_pal(char *object)
 {
     float position[4], velocity[4];
     char *state = *(char **)(object + 0x68);

@@ -25,105 +25,106 @@ extern int PlayMobySound(int,int,void *);
 extern void SpawnExplosionEffects(void *,void *,void *,float,float,int,int,int,float,float,float,float,int,float,int,int,int,int,int);
 extern void part_spawn_masked_debris(void *,int,void *,float,float,float,float,int);
 extern void moby_mark_spawned(void *);
-void gate_l00_update_pal(GateObject *m)
+/* Sliding gate: opens when the hero is near, slides and animates, and blows up when its linked child objects are destroyed or it hits something. */
+void gate_l00_update_pal(GateObject *moby)
 {
-    GateContext *d=m->context;
+    GateContext *ctx=moby->context;
     int i;
-    float v[4] __attribute__((aligned(16)));
-    float a[4] __attribute__((aligned(16)));
-    float b[4] __attribute__((aligned(16)));
-    float c[4] __attribute__((aligned(16)));
-    float vb[4] __attribute__((aligned(16)));
-    float vc[4] __attribute__((aligned(16)));
-    if(m->state==0) {
-        if(g_turn_state_table[d->group] && moby_count_group_not_in_state(d->group,-1)>=2) {
+    float offset[4] __attribute__((aligned(16)));
+    float probe_a[4] __attribute__((aligned(16)));
+    float probe_b[4] __attribute__((aligned(16)));
+    float probe_c[4] __attribute__((aligned(16)));
+    float step_b[4] __attribute__((aligned(16)));
+    float step_c[4] __attribute__((aligned(16)));
+    if(moby->state==0) {
+        if(g_turn_state_table[ctx->group] && moby_count_group_not_in_state(ctx->group,-1)>=2) {
             GateObject *base=g_moby_array_base;
-            short *p=g_turn_state_table[d->group];
+            short *list=g_turn_state_table[ctx->group];
             do {
-                GateObject *o=base+(*p&0x7fff);
-                o->flags|=0x43;
-                o->collision=0;
-            } while(*p++>=0);
+                GateObject *member=base+(*list&0x7fff);
+                member->flags|=0x43;
+                member->collision=0;
+            } while(*list++>=0);
         }
-        if(vec_distance_xy(m->position,g_hero_position)<6.0f &&
-           !IsPointInCuboid(g_hero_position,d->close_volume) &&
-           !IsPointInCuboid(g_hero_position,d->block_volume)) {
-            m->state=1; m->render_flags=0x24c102;
-            if(m->animation!=1) anim_start_blended(m,1,0,0);
-            m->collision=0;
-            if(g_turn_state_table[d->group] && moby_count_group_not_in_state(d->group,-1)>=2) {
+        if(vec_distance_xy(moby->position,g_hero_position)<6.0f &&
+           !IsPointInCuboid(g_hero_position,ctx->close_volume) &&
+           !IsPointInCuboid(g_hero_position,ctx->block_volume)) {
+            moby->state=1; moby->render_flags=0x24c102;
+            if(moby->animation!=1) anim_start_blended(moby,1,0,0);
+            moby->collision=0;
+            if(g_turn_state_table[ctx->group] && moby_count_group_not_in_state(ctx->group,-1)>=2) {
                 GateObject *base=g_moby_array_base;
-                short *p=g_turn_state_table[d->group];
+                short *list=g_turn_state_table[ctx->group];
                 do {
-                    GateObject *o=base+(*p&0x7fff);
-                    o->flags&=0xffbc;
-                    o->collision=o->object_class->collision;
-                } while(*p++>=0);
+                    GateObject *member=base+(*list&0x7fff);
+                    member->flags&=0xffbc;
+                    member->collision=member->object_class->collision;
+                } while(*list++>=0);
             }
-        } else if(IsPointInCuboid(g_hero_position,d->close_volume)) m->state=5;
+        } else if(IsPointInCuboid(g_hero_position,ctx->close_volume)) moby->state=5;
         for(i=0;i<4;i++) {
-            if(d->child[i]!=-1) {
-                GateObject *o=g_moby_array_base+d->child[i];
-                if(o->destroyed || (s8)o->state<0) {
-                    if(d->destroy_on_child) {
+            if(ctx->child[i]!=-1) {
+                GateObject *member=g_moby_array_base+ctx->child[i];
+                if(member->destroyed || (s8)member->state<0) {
+                    if(ctx->destroy_on_child) {
                         {
-    m->state=12;
-    qcopy(v,m->position);v[2]+=1.0f;
-    PlayMobySound(2,0,m);
-    a[0]=math_fast_sin_or_cos_a(m->angle-1.5707964897155762f)*0.36f;
-    a[1]=math_fast_sin_or_cos_b(m->angle-1.5707964897155762f)*0.36f;a[2]=0;
-    SpawnExplosionEffects(m,g_default_vector,v,0,0,10,3,16,4,2,9,1,-1,15,0,9,-1,0,0x810001);
-    part_spawn_masked_debris(m,255,a,3,6,3,6,255);
+    moby->state=12;
+    qcopy(offset,moby->position);offset[2]+=1.0f;
+    PlayMobySound(2,0,moby);
+    probe_a[0]=math_fast_sin_or_cos_a(moby->angle-1.5707964897155762f)*0.36f;
+    probe_a[1]=math_fast_sin_or_cos_b(moby->angle-1.5707964897155762f)*0.36f;probe_a[2]=0;
+    SpawnExplosionEffects(moby,g_default_vector,offset,0,0,10,3,16,4,2,9,1,-1,15,0,9,-1,0,0x810001);
+    part_spawn_masked_debris(moby,255,probe_a,3,6,3,6,255);
 
-    moby_mark_spawned(m);return;
+    moby_mark_spawned(moby);return;
 }
                     }
-                    m->state=1;
-                    if(m->animation!=1)anim_start_blended(m,1,0,0);
-                    m->collision=0;
+                    moby->state=1;
+                    if(moby->animation!=1)anim_start_blended(moby,1,0,0);
+                    moby->collision=0;
                 }
             }
         }
     }
-    if(m->state==1 && (m->anim_flags&2)) {
-        m->state=3;m->render_flags=0x224c1;
-        if(m->animation!=2)anim_start_blended(m,2,0,0);
+    if(moby->state==1 && (moby->anim_flags&2)) {
+        moby->state=3;moby->render_flags=0x224c1;
+        if(moby->animation!=2)anim_start_blended(moby,2,0,0);
     }
-    if(m->state==2) {
-        v[0]=math_fast_sin_or_cos_a(m->angle-1.5707964897155762f)*0.36f;
-        v[1]=math_fast_sin_or_cos_b(m->angle-1.5707964897155762f)*0.36f;v[2]=0;
-        FastVecAdd(m->position,m->position,v);
-        qcopy(a,m->position);qcopy(b,m->position);qcopy(c,m->position);
-        a[2]+=0.75f;b[2]+=0.75f;c[2]+=0.75f;
-        v[0]=math_fast_sin_or_cos_a(m->angle)*0.8f;
-        v[1]=math_fast_sin_or_cos_b(m->angle)*0.8f;v[2]=0;
-        v[0]=math_fast_sin_or_cos_a(m->angle+3.1415929794311523f)*0.8f;
-        v[1]=math_fast_sin_or_cos_b(m->angle+3.1415929794311523f)*0.8f;v[2]=0;
-        FastVecAdd(b,b,vb);FastVecAdd(c,c,vc);
-        if(coll_test_point(a,0.6f,0,m) || coll_test_point(b,0.68f,0,m) || coll_test_point(c,0.68f,0,m)) {
-            PlayMobySound(2,0,m);
-            SpawnExplosionEffects(m,g_default_vector,a,0,0,10,3,16,4,2,9,1,-1,15,0,9,-1,0,0x810001);
+    if(moby->state==2) {
+        offset[0]=math_fast_sin_or_cos_a(moby->angle-1.5707964897155762f)*0.36f;
+        offset[1]=math_fast_sin_or_cos_b(moby->angle-1.5707964897155762f)*0.36f;offset[2]=0;
+        FastVecAdd(moby->position,moby->position,offset);
+        qcopy(probe_a,moby->position);qcopy(probe_b,moby->position);qcopy(probe_c,moby->position);
+        probe_a[2]+=0.75f;probe_b[2]+=0.75f;probe_c[2]+=0.75f;
+        offset[0]=math_fast_sin_or_cos_a(moby->angle)*0.8f;
+        offset[1]=math_fast_sin_or_cos_b(moby->angle)*0.8f;offset[2]=0;
+        offset[0]=math_fast_sin_or_cos_a(moby->angle+3.1415929794311523f)*0.8f;
+        offset[1]=math_fast_sin_or_cos_b(moby->angle+3.1415929794311523f)*0.8f;offset[2]=0;
+        FastVecAdd(probe_b,probe_b,step_b);FastVecAdd(probe_c,probe_c,step_c);
+        if(coll_test_point(probe_a,0.6f,0,moby) || coll_test_point(probe_b,0.68f,0,moby) || coll_test_point(probe_c,0.68f,0,moby)) {
+            PlayMobySound(2,0,moby);
+            SpawnExplosionEffects(moby,g_default_vector,probe_a,0,0,10,3,16,4,2,9,1,-1,15,0,9,-1,0,0x810001);
             {
-    moby_mark_spawned(m);return;
+    moby_mark_spawned(moby);return;
 }
         }
     }
     goto closing;
-    m->state=12;
-    qcopy(v,m->position);v[2]+=1.0f;
-    PlayMobySound(2,0,m);
-    a[0]=math_fast_sin_or_cos_a(m->angle-1.5707964897155762f)*0.36f;
-    a[1]=math_fast_sin_or_cos_b(m->angle-1.5707964897155762f)*0.36f;a[2]=0;
-    SpawnExplosionEffects(m,g_default_vector,v,0,0,10,3,16,4,2,9,1,-1,15,0,9,-1,0,0x810001);
-    part_spawn_masked_debris(m,255,a,3,6,3,6,255);
-    moby_mark_spawned(m);return;
+    moby->state=12;
+    qcopy(offset,moby->position);offset[2]+=1.0f;
+    PlayMobySound(2,0,moby);
+    probe_a[0]=math_fast_sin_or_cos_a(moby->angle-1.5707964897155762f)*0.36f;
+    probe_a[1]=math_fast_sin_or_cos_b(moby->angle-1.5707964897155762f)*0.36f;probe_a[2]=0;
+    SpawnExplosionEffects(moby,g_default_vector,offset,0,0,10,3,16,4,2,9,1,-1,15,0,9,-1,0,0x810001);
+    part_spawn_masked_debris(moby,255,probe_a,3,6,3,6,255);
+    moby_mark_spawned(moby);return;
 closing:
-    if(m->state==3 && IsPointInCuboid(g_hero_position,d->close_volume)) {
-        m->state=4;
-        if(m->animation!=3)anim_start_blended(m,3,0,0);
+    if(moby->state==3 && IsPointInCuboid(g_hero_position,ctx->close_volume)) {
+        moby->state=4;
+        if(moby->animation!=3)anim_start_blended(moby,3,0,0);
     }
-    if(m->state==4 && (m->anim_flags&2)) {
-        m->state=5;m->collision=m->object_class->collision;
-        if(m->animation!=0)anim_start_blended(m,0,0,0);
+    if(moby->state==4 && (moby->anim_flags&2)) {
+        moby->state=5;moby->collision=moby->object_class->collision;
+        if(moby->animation!=0)anim_start_blended(moby,0,0,0);
     }
 }

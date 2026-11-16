@@ -3,7 +3,8 @@
 extern char *g_resident_data_base;
 extern int audio_menu_update(void *, int);
 
-int func_US2_0029D7C8(int value) {
+/* Passes a value to a menu panel and returns its answer; returns 0 if the menu system does not exist. */
+int audio_panel_update_us2(int value) {
     if (g_resident_data_base != 0)
         return audio_menu_update(g_resident_data_base + 0x3DA78, value);
     return 0;
@@ -11,7 +12,8 @@ int func_US2_0029D7C8(int value) {
 
 extern void audio_menu_draw(void *);
 
-void func_US2_0029D808(void) {
+/* Draws a menu panel, if the menu system exists. */
+void audio_panel_draw_us2(void) {
     if (g_resident_data_base != 0)
         audio_menu_draw(g_resident_data_base + 0x3DA78);
 }

@@ -3,8 +3,8 @@
  * names. */
 #include "common.h"
 typedef struct {
-    int tableIndex; u8 pad04[12]; float origin[4];
-    float angle, angularSpeed; int counter, timer; u8 pad30[16];
+    int table_index; u8 pad04[12]; float origin[4];
+    float angle, angular_speed; int counter, timer; u8 pad30[16];
     int flags, sound; float amount;
 } ObjectState;
 #define F(p,o) (*(float *)((u8 *)(p)+(o)))
@@ -41,7 +41,7 @@ extern void FastVecAdd(void *,void *,void *);
 extern int coll_sweep_from_object(u8 *,void *,int,int,int,int,float,float,float);
 extern int PlayMobySound(int,int,char *);
 extern void snd_stop_voice(s32);
-extern int func_US2_00289840(int,int);
+extern int subtitle_request_voice_line_us2(int,int);
 extern void gfx_add_draw_callback_first(void (*)(void *),void *);
 extern void DrawRotatingGroupInstances(void *);
 extern void *part_find_owned_effect_slot(void *,u32,s32);
@@ -59,7 +59,10 @@ extern void moby_mark_spawned(void *);
 extern float FastAddRotations(float,float);
 extern int PulseColor(int,int,float);
 
-void func_US2_L16_003C404C(u8 *object)
+/* Updates a rotating-group moby: state 1 follows a linked lever amount (pushing the moby
+ * along its axis with a sound, spinning the group) and at full amount moves to state 2, which
+ * blasts it, shows how many of its group remain and removes it (v2.00 text ids). */
+void rotating_group_update_us2(u8 *object)
 {
     float point[4],step[4],normal[4];
     char message[128];
@@ -67,7 +70,7 @@ void func_US2_L16_003C404C(u8 *object)
     float amount,rate;
     char *string;
     int count,i;
-    u32 timer,oldTimer;
+    u32 timer,old_timer;
     switch (object[0x20]) {
     case 0: {
         float speed;
@@ -79,13 +82,13 @@ void func_US2_L16_003C404C(u8 *object)
         speed=g_moby_pulse_speed_a*0.00029088825f;
         state->amount=0.0f;
         state->sound=-1;
-        state->angularSpeed=speed;
+        state->angular_speed=speed;
         moby_set_state(object,1,-1);
         break;
     }
     case 1:
         if (!g_hero_l16_block_flag) break;
-        amount=moby_get_linked_float(g_moby_instance_table+(state->tableIndex<<8));
+        amount=moby_get_linked_float(g_moby_instance_table+(state->table_index<<8));
         if (amount!=0.0f || state->amount!=0.0f) {
             part_spawn_spark_side(object);
             vec_scale_to_length(point,object+0xE0,g_moby_l16_push_scale*amount*(F(object,0x2C)/F(*(u8 **)(object+0x24),0x24)));
@@ -93,17 +96,17 @@ void func_US2_L16_003C404C(u8 *object)
             if (amount<state->amount) coll_sweep_from_object(object,object+0x10,0x10000,0,1,0,2.1f,3.0f,1.0f);
         }
         if (amount!=state->amount && amount!=1.0f && amount!=0.0f) {
-            u8 *playingSound=g_sound_state+state->sound*0x70;
-            if (*(u8 **)(playingSound+0x88)!=object || !playingSound[0x74]) state->sound=PlayMobySound(2,4,(char *)object);
+            u8 *playing_sound=g_sound_state+state->sound*0x70;
+            if (*(u8 **)(playing_sound+0x88)!=object || !playing_sound[0x74]) state->sound=PlayMobySound(2,4,(char *)object);
         } else {
             int sound=state->sound;
             if (sound!=-1) {
-                u8 *stoppingSound=g_sound_state+sound*0x70;
-                if (*(u8 **)(stoppingSound+0x88)==object && stoppingSound[0x74]) snd_stop_voice(sound);
+                u8 *stopping_sound=g_sound_state+sound*0x70;
+                if (*(u8 **)(stopping_sound+0x88)==object && stopping_sound[0x74]) snd_stop_voice(sound);
             }
             state->sound=-1;
         }
-        if (amount==1.0f && state->amount!=1.0f) func_US2_00289840(0x9EC,67);
+        if (amount==1.0f && state->amount!=1.0f) subtitle_request_voice_line_us2(0x9EC,67);
         state->amount=amount;
         if (g_last_frame_counter!=g_frame_l16_counter) {
             g_last_frame_counter=g_frame_l16_counter;
@@ -120,9 +123,9 @@ void func_US2_L16_003C404C(u8 *object)
         break;
     case 2:
         timer=*(u16 *)(object+0x96);
-        oldTimer=timer++;
+        old_timer=timer++;
         *(u16 *)(object+0x96)=timer;
-        if (oldTimer>=60) {
+        if (old_timer>=60) {
             vec_scale_to_length(point,object+0xE0,-2.0f);
             vec_scale_to_length(step,object+0xE0,5.0f);
             FastVecAdd(point,point,object+0x10);

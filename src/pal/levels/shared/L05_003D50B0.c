@@ -4,12 +4,12 @@
 #include "common.h"
 struct Sub_003D15E8 {
       char pad000[0x104];
-      int f104;
-      int f108;
+      int unk_104;
+      int unk_108;
       int pad10C;
       int mode;
       int pad114[2];
-      int targetMode;
+      int target_mode;
       char *target;
 };
 extern char *g_feltzin_target_mobys MACRO_ADDR;
@@ -21,7 +21,7 @@ extern void vec_clear_128(void *);
 extern void level_append_object(char *, void *, int, int);
 extern void moby_l00_update_empty_3(void);
 extern void AttachManipulator(char *, int, void *);
-extern void func_PAL_L05_0037E8E0(char *);
+extern void follower_l05_update_pal(char *);
 extern int moby_process_collision_hit(char *, int, int, int);
 extern void moby_check_player_in_view_and_range(char *, int, float);
 extern float fast_vec_dist(void *, void *);
@@ -34,18 +34,18 @@ extern void moby_spawn_effect_after_guards_pal(char *);
 extern int moby_can_take_next_step(char *);
 extern int list_count_objects_matching_value(char *, int);
 extern void moby_l05_set_state_value(char *, int);
-extern void func_PAL_L05_0037DE20(char *);
+extern void follower_start_wander_pal(char *);
 extern int math_fast_float_d(void *);
-extern void func_PAL_L05_003D5800(char *);
+extern void feltzin_enemy_spawn_exhaust_pal(char *);
 
 /* The object's update: on its first frame it sets itself up; afterwards, while its record is
    active, it aims at the object its state names (with a chance of a sound when close), turns
    its two vectors, may take its next step, and keeps its looping sound playing. */
-void func_PAL_L05_003D5330(char *obj)
+void feltzin_enemy_update_pal(char *obj)
 {
     char *state = *(char **)(obj + 0x68);
     struct Sub_003D15E8 *sub;
-    float tmp[4];
+    float scratch_vec[4];
     int one, mode;
 
     if (!*(unsigned char *)(obj + 0x20)) {
@@ -53,7 +53,7 @@ void func_PAL_L05_003D5330(char *obj)
         if (!state_get_stored_pointer_value(obj))
             return;
         moby_init_state_and_position_pal(obj);
-        vec_clear_128(tmp);
+        vec_clear_128(scratch_vec);
         if (*(int *)(state + 0x264))
             level_append_object(obj, moby_l00_update_empty_3, 0, 0);
         AttachManipulator(obj, 2, state + 0x270);
@@ -64,13 +64,13 @@ void func_PAL_L05_003D5330(char *obj)
     if (!sub->mode)
         return;
     one = 1;
-    func_PAL_L05_0037E8E0(obj);
+    follower_l05_update_pal(obj);
     moby_process_collision_hit(obj, 0, 0, 0);
     moby_check_player_in_view_and_range(obj, 1, 32.0f);
     mode = sub->mode;
     if (mode == one) {
         if (*(int *)(state + 0x260) != -1) {
-            sub->targetMode = mode;
+            sub->target_mode = mode;
             sub->target = g_feltzin_target_mobys + (*(int *)(state + 0x260) << 8);
             if (fast_vec_dist(sub->target + 0x10, obj + 0x10) < 10.0f) {
                 char *sound1 = g_sound_state + *(int *)(state + 0x2f4) * 0x70;
@@ -87,11 +87,11 @@ void func_PAL_L05_003D5330(char *obj)
             *(float *)(state + 0x28c) = math_fast_sin_or_cos_a(0.78539824f);
             *(float *)(state + 0x2c4) = math_fast_sin_or_cos_b(0.78539824f);
             *(float *)(state + 0x2cc) = math_fast_sin_or_cos_a(0.78539824f);
-            if (sub->f108)
+            if (sub->unk_108)
                 moby_spawn_effect_after_guards_pal(obj);
         } else {
             *(float *)(state + 0x2cc) = *(float *)(state + 0x28c) = 1.0f;
-            if (sub->f108 && sub->f104)
+            if (sub->unk_108 && sub->unk_104)
                 moby_spawn_effect_after_guards_pal(obj);
         }
         if (moby_can_take_next_step(obj)) {
@@ -99,10 +99,10 @@ void func_PAL_L05_003D5330(char *obj)
                 moby_l05_set_state_value(obj, 5);
             else
                 moby_l05_set_state_value(obj, 1);
-            func_PAL_L05_0037DE20(obj);
+            follower_start_wander_pal(obj);
         }
         math_fast_float_d(state + 0x268);
-        func_PAL_L05_003D5800(obj);
+        feltzin_enemy_spawn_exhaust_pal(obj);
     }
     {
         char *sound2 = g_sound_state + *(int *)(state + 0x2f0) * 0x70;

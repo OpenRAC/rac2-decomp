@@ -29,13 +29,13 @@ extern void matrix_mul_vec3(void *, void *, void *);
 extern void draw_world_quad(void *, void *, int);
 
 /* Rotate alternating packet edges and submit the pair sixteen times. */
-void func_PAL_L11_004613D0(char *p)
+void gfx_draw_spinning_glow_sprites_pal(char *moby)
 {
     float matrix[16], rotation[16], spin[12];
     float vector[4];
     L11Packet packets[2];
     float angles[4], temp[4], transform[12];
-    char *q = *(char **)(p + 0x68);
+    char *vars = *(char **)(moby + 0x68);
     int i, j, k, side;
 
     *(L11RenderQuad *)vector = 0;
@@ -46,8 +46,8 @@ void func_PAL_L11_004613D0(char *p)
         (1.0f / 600.0f) * 2.0f * 3.14159274f - 3.14159274f;
     *(L11RenderQuad *)angles = *(L11RenderQuad *)temp;
     euler_to_matrix(rotation, angles);
-    euler_to_matrix(matrix, p + 0xF0);
-    qcopy(matrix + 12, p + 0x10);
+    euler_to_matrix(matrix, moby + 0xF0);
+    qcopy(matrix + 12, moby + 0x10);
     matrix[15] = 1.0f;
     transform_vector(temp, vector, matrix);
     temp[3] = 30.0f;
@@ -58,8 +58,8 @@ void func_PAL_L11_004613D0(char *p)
     FillQuadPacket(&packets[1], g_glow_quad_params_b[0], g_glow_quad_params_d[0],
                       g_glow_l11_quad_uvs, g_glow_render_quads_b, 1);
     for (i = 0; i < 4; i++) {
-        packets[0].color[i] += *(int *)q;
-        packets[1].color[i] += *(int *)q;
+        packets[0].color[i] += *(int *)vars;
+        packets[1].color[i] += *(int *)vars;
     }
     vec_clear_128(angles);
     angles[0] = 0.52359879f;

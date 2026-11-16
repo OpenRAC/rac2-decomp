@@ -49,7 +49,8 @@ extern void ref_L00_003DD6A8_37(char *, char *);
 extern int ref_L00_003DD6A8_38(char *, char *, char *, char *, char *, char *);
 extern void ref_L00_003DD6A8_39(char *, char *), ref_L00_003DD6A8_40(char *, float);
 
-void func_PAL_003278FC(char *object)
+/* Per-frame update of the thrown Spider Bot. It flies out, lands, walks around and then explodes (PAL: 50 Hz timings). */
+void thrown_object_update_pal(char *object)
 {
     char oldpos[16], ahead[16], behind[16];
     char *data = *(char **)(object + 0x68);

@@ -177,7 +177,8 @@ extern char g_impact_effect_data[] MACRO_ADDR;
 extern void moby_raise_state_to_eight();
 extern void moby_raise_state_to_eight_copy();
 
-void func_US2_L00_002BA8E0(void) {
+/* Per-frame hero movement: for the current move state, applies stick steering, gravity, jump and push motion, aim targeting and the matching animation. */
+void hero_update_move_physics_us2(void) {
     Hero *hp71;
     s32 idx71;
     s32 cnt71;

@@ -22,22 +22,23 @@ extern int FastTweenColor(int,int,float);
 extern unsigned char *part_spawn_fading(void *,int,int,int,int,int,int,float);
 extern void func_00282E70(void *,void *,void *);
 
-void func_PAL_L12_004075B8(u8 *o) {
-    float pos[4], v[4], delta[4], toward[4], step[4];
+/* Spawns the sparkle trail of a collectible: occasional random sparks at its tip and four fading glows stepping toward the hero (PAL: 50 Hz). */
+void gfx_draw_sparkle_trail_to_hero_pal(u8 *moby) {
+    float pos[4], velocity[4], delta[4], toward[4], step[4];
     int i, j;
 
-    func_00282E70(pos, g_sparkle_trail_local_offset, o + 0xC0);
-    FastVecAdd(pos, pos, o + 0x10);
+    func_00282E70(pos, g_sparkle_trail_local_offset, moby + 0xC0);
+    FastVecAdd(pos, pos, moby + 0x10);
     if (!math_random_int_below(4)) {
-        vec_random_direction(v, g_sparkle_trail_velocity_a * 0.020000001f,
+        vec_random_direction(velocity, g_sparkle_trail_velocity_a * 0.020000001f,
                      g_sparkle_trail_velocity_b * 0.020000001f);
-        part_spawn_hero_relative(pos, v, g_sparkle_trail_part_type_a, g_sparkle_trail_spawn_flag,
+        part_spawn_hero_relative(pos, velocity, g_sparkle_trail_part_type_a, g_sparkle_trail_spawn_flag,
                      (u8)math_random_int_below(255), 0, g_sparkle_trail_scale_a);
         for (j = 2; j >= 0; j--) {
             vec_random_direction(delta, g_sparkle_trail_delta_a * 0.020000001f,
                          g_sparkle_trail_delta_b * 0.020000001f);
-            FastVecAdd(v, v, delta);
-            part_spawn_hero_relative(pos, v, g_sparkle_trail_part_type_b, g_sparkle_trail_spawn_flag,
+            FastVecAdd(velocity, velocity, delta);
+            part_spawn_hero_relative(pos, velocity, g_sparkle_trail_part_type_b, g_sparkle_trail_spawn_flag,
                          (u8)math_random_int_below(255), 0, g_sparkle_trail_scale_b);
         }
     }
@@ -57,8 +58,8 @@ void func_PAL_L12_004075B8(u8 *o) {
         part_spawn_fading(toward, color, (u8)alpha, g_sparkle_trail_fade_param_b,
                      g_sparkle_trail_fade_param_a, 2, 0,
                      (g_sparkle_trail_base_offset + IntToFloat(i) * g_sparkle_trail_step) *
-                     (*(float *)(o + 0x2C) /
-                      *(float *)(*(u8 **)(o + 0x24) + 0x24)));
+                     (*(float *)(moby + 0x2C) /
+                      *(float *)(*(u8 **)(moby + 0x24) + 0x24)));
         FastVecAdd(toward, toward, step);
     }
 }

@@ -12,6 +12,7 @@ extern int g_menu_input_flags;
 extern void weapon_menu_sync_slots(void);
 extern int func_0029CBE0(int);
 
+/* Menu input handler: confirm keeps the current selection, back or cancel closes the menu, anything else is passed to the menu helper. */
 int menu_handle_input_with_fallback_us2(void) {
     int result = 0;
     int flags = g_menu_input_flags;

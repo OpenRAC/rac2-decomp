@@ -25,7 +25,7 @@ extern float vec_distance_xy(void *, void *);
 extern int math_fast_float_d(void *);
 extern float mat_fast_helper_a(float, float);
 extern float FastDiffRots(float, float);
-extern void func_US2_002A7AA8(void *, int, int);
+extern void SetDeathBits_us2(void *, int, int);
 extern void anim_start_blended(void *, int, int, int);
 extern void moby_set_state(void *, int, int);
 extern int math_random_int_below(int);
@@ -53,96 +53,96 @@ extern u8 *SpawnEA7Moby(void *, void *, void *, int, float);
 
 /* The per-frame update of the level-13 guard: the action states (+0x95) first, then the
    animation states (+0x20), then the shared timer update. */
-void guard_l13_update_us2(u8 *a0)
+void guard_l13_update_us2(u8 *moby)
 {
     float m[16] __attribute__((aligned(16)));
     float v[4];
     u8 *st;
 
-    st = *(u8 **)(a0 + 0x68);
-    if (guard_init_check(a0) != 0) {
-        part_queue_moby_for_glow(a0, 0, 0);
+    st = *(u8 **)(moby + 0x68);
+    if (guard_init_check(moby) != 0) {
+        part_queue_moby_for_glow(moby, 0, 0);
     }
-    switch (a0[0x95]) {
+    switch (moby[0x95]) {
     case 0: {
         s32 r;
         r = *(s32 *)(st + 0x250);
         if (r == 1 && math_fast_float_d(st + 0x248) != 0) {
             if (*(s32 *)(st + 0x2A8) == 0 || ((Hero *)g_hero_state)->h[0x348 / 2] == r) {
                 *(s32 *)(st + 0x26C) = r;
-                moby_set_state(a0, 0x18, 2);
-                if (a0[0x43] != 6) {
-                    anim_start_blended(a0, 6, 0, 0xA);
+                moby_set_state(moby, 0x18, 2);
+                if (moby[0x43] != 6) {
+                    anim_start_blended(moby, 6, 0, 0xA);
                 }
                 if (*(s32 *)(st + 0x25C) != -1) {
-                    moby_set_state(a0, 0xF, 2);
-                    if (a0[0x43] != 0xD) {
-                        anim_start_blended(a0, 0xD, 0, 0xF);
+                    moby_set_state(moby, 0xF, 2);
+                    if (moby[0x43] != 0xD) {
+                        anim_start_blended(moby, 0xD, 0, 0xF);
                     }
                 }
                 if (*(s32 *)(st + 0x290) != -1) {
-                    moby_set_state(a0, 0xE, 2);
-                    if (a0[0x43] != 0xD) {
-                        anim_start_blended(a0, 0xD, 0, 0xF);
+                    moby_set_state(moby, 0xE, 2);
+                    if (moby[0x43] != 0xD) {
+                        anim_start_blended(moby, 0xD, 0, 0xF);
                     }
                 }
                 if (*(s32 *)(st + 0x2A8) != 0) {
                     u8 *e = g_object_table_base + (*(s32 *)(st + 0x2AC) << 8);
                     e[0x20] = 3;
-                    *(u8 **)(*(u8 **)(e + 0x68) + 0xC) = a0;
+                    *(u8 **)(*(u8 **)(e + 0x68) + 0xC) = moby;
                 }
                 if (*(s32 *)(st + 0x2BC) != 0) {
-                    moby_set_state(a0, 0xA, 7);
-                    if (a0[0x43] != 3) {
-                        anim_start_blended(a0, 3, 0, 0xF);
+                    moby_set_state(moby, 0xA, 7);
+                    if (moby[0x43] != 3) {
+                        anim_start_blended(moby, 3, 0, 0xF);
                     }
-                    moby_set_controller_speed_limits(a0, 0.0022222223f, 0.06666667f, 0.006981318f, 0.8377582f);
+                    moby_set_controller_speed_limits(moby, 0.0022222223f, 0.06666667f, 0.006981318f, 0.8377582f);
                 }
             }
         } else if (*(s64 *)(st + 0x278) == 1) {
             if (*(s32 *)(st + 0x270) != -1) {
-                moby_set_state(a0, 0x10, -1);
-                if (a0[0x43] != 0xD) {
-                    anim_start_blended(a0, 0xD, 0, 0xA);
+                moby_set_state(moby, 0x10, -1);
+                if (moby[0x43] != 0xD) {
+                    anim_start_blended(moby, 0xD, 0, 0xA);
                 }
                 *(s32 *)(st + 0x27C) = 1;
             }
         } else if (*(s32 *)(st + 0x24C) != 0) {
             if (*(s32 *)(st + 0x250) == 1 || *(s32 *)(st + 0x254) == 1) {
                 *(s32 *)(st + 0x26C) = 1;
-                if (a0[0x43] != 5) {
-                    anim_start_blended(a0, 5, 0, 0xA);
+                if (moby[0x43] != 5) {
+                    anim_start_blended(moby, 5, 0, 0xA);
                 }
-                moby_set_state(a0, 0x16, 2);
+                moby_set_state(moby, 0x16, 2);
                 if (*(s32 *)(st + 0x280) == 1) {
-                    if (a0[0x43] != 0x13) {
-                        anim_start_blended(a0, 0x13, 0, 0xA);
+                    if (moby[0x43] != 0x13) {
+                        anim_start_blended(moby, 0x13, 0, 0xA);
                     }
-                    moby_set_state(a0, 0x14, 2);
+                    moby_set_state(moby, 0x14, 2);
                 }
                 if (*(s32 *)(st + 0x25C) != -1) {
-                    moby_set_state(a0, 0xF, 2);
-                    if (a0[0x43] != 0xD) {
-                        anim_start_blended(a0, 0xD, 0, 0xF);
+                    moby_set_state(moby, 0xF, 2);
+                    if (moby[0x43] != 0xD) {
+                        anim_start_blended(moby, 0xD, 0, 0xF);
                     }
                 }
                 if (*(s32 *)(st + 0x290) != -1) {
-                    moby_set_state(a0, 0xE, 2);
-                    if (a0[0x43] != 0xD) {
-                        anim_start_blended(a0, 0xD, 0, 0xF);
+                    moby_set_state(moby, 0xE, 2);
+                    if (moby[0x43] != 0xD) {
+                        anim_start_blended(moby, 0xD, 0, 0xF);
                     }
                 }
                 if (*(s32 *)(st + 0x2A8) != 0) {
                     u8 *e = g_object_table_base + (*(s32 *)(st + 0x2AC) << 8);
                     e[0x20] = 3;
-                    *(u8 **)(*(u8 **)(e + 0x68) + 0xC) = a0;
+                    *(u8 **)(*(u8 **)(e + 0x68) + 0xC) = moby;
                 }
                 if (*(s32 *)(st + 0x2BC) != 0) {
-                    moby_set_state(a0, 0xA, 7);
-                    if (a0[0x43] != 3) {
-                        anim_start_blended(a0, 3, 0, 0xF);
+                    moby_set_state(moby, 0xA, 7);
+                    if (moby[0x43] != 3) {
+                        anim_start_blended(moby, 3, 0, 0xF);
                     }
-                    moby_set_controller_speed_limits(a0, 0.0022222223f, 0.06666667f, 0.006981318f, 0.8377582f);
+                    moby_set_controller_speed_limits(moby, 0.0022222223f, 0.06666667f, 0.006981318f, 0.8377582f);
                 }
             }
             *(s32 *)(st + 0x24C) = 0;
@@ -159,25 +159,25 @@ void guard_l13_update_us2(u8 *a0)
         if (*(s32 *)(st + 0x294) != 0 && (i = *(s32 *)(st + 0x298)) != -1) {
             e = g_object_table_base + (i << 8);
             if (e == 0 || e[0x20] == 0xFE || e[0x20] == 0xFD) {
-                *(u16 *)(a0 + 0x34) = (*(u16 *)(a0 + 0x34) & 0xFFBE) | 0x1000;
-                *(s32 *)(a0 + 0x98) = *(s32 *)(*(u8 **)(a0 + 0x24) + 0x10);
-                moby_fuse_linked_objects(a0, a0 + 0x10, a0 + 0xF0, 0, 0);
+                *(u16 *)(moby + 0x34) = (*(u16 *)(moby + 0x34) & 0xFFBE) | 0x1000;
+                *(s32 *)(moby + 0x98) = *(s32 *)(*(u8 **)(moby + 0x24) + 0x10);
+                moby_fuse_linked_objects(moby, moby + 0x10, moby + 0xF0, 0, 0);
                 *(s32 *)(st + 0x294) = 0;
                 if (*(s32 *)(st + 0x29C) != -1) {
-                    moby_set_state(a0, 0x1C, 6);
-                    if (a0[0x43] != 0xD) {
-                        anim_start_blended(a0, 0xD, 0, 0xF);
+                    moby_set_state(moby, 0x1C, 6);
+                    if (moby[0x43] != 0xD) {
+                        anim_start_blended(moby, 0xD, 0, 0xF);
                     }
                 } else {
-                    if (a0[0x43] != 5) {
-                        anim_start_blended(a0, 5, 0, 0xA);
+                    if (moby[0x43] != 5) {
+                        anim_start_blended(moby, 5, 0, 0xA);
                     }
-                    moby_set_state(a0, 0x16, 2);
+                    moby_set_state(moby, 0x16, 2);
                     if (*(s32 *)(st + 0x280) == 1) {
-                        if (a0[0x43] != 0x13) {
-                            anim_start_blended(a0, 0x13, 0, 0xA);
+                        if (moby[0x43] != 0x13) {
+                            anim_start_blended(moby, 0x13, 0, 0xA);
                         }
-                        moby_set_state(a0, 0x14, 2);
+                        moby_set_state(moby, 0x14, 2);
                     }
                 }
             }
@@ -185,36 +185,36 @@ void guard_l13_update_us2(u8 *a0)
             r = *(s32 *)(st + 0x250);
             if (r == 1 && math_fast_float_d(st + 0x248) != 0) {
                 *(s32 *)(st + 0x26C) = r;
-                if (a0[0x43] != 5) {
-                    anim_start_blended(a0, 5, 0, 0xA);
+                if (moby[0x43] != 5) {
+                    anim_start_blended(moby, 5, 0, 0xA);
                 }
-                moby_set_state(a0, 0x16, 2);
+                moby_set_state(moby, 0x16, 2);
                 if (*(s32 *)(st + 0x280) == r) {
-                    if (a0[0x43] != 0x13) {
-                        anim_start_blended(a0, 0x13, 0, 0xA);
+                    if (moby[0x43] != 0x13) {
+                        anim_start_blended(moby, 0x13, 0, 0xA);
                     }
-                    moby_set_state(a0, 0x14, 2);
+                    moby_set_state(moby, 0x14, 2);
                 }
-                *(u16 *)(a0 + 0x34) = (*(u16 *)(a0 + 0x34) & 0xFFBE) | 0x1000;
-                *(s32 *)(a0 + 0x98) = *(s32 *)(*(u8 **)(a0 + 0x24) + 0x10);
-                moby_fuse_linked_objects(a0, a0 + 0x10, a0 + 0xF0, 0, 0);
+                *(u16 *)(moby + 0x34) = (*(u16 *)(moby + 0x34) & 0xFFBE) | 0x1000;
+                *(s32 *)(moby + 0x98) = *(s32 *)(*(u8 **)(moby + 0x24) + 0x10);
+                moby_fuse_linked_objects(moby, moby + 0x10, moby + 0xF0, 0, 0);
             } else {
-                r = a0[0xBC];
+                r = moby[0xBC];
                 if (r == 1) {
                     *(s32 *)(st + 0x26C) = r;
-                    if (a0[0x43] != 5) {
-                        anim_start_blended(a0, 5, 0, 0xA);
+                    if (moby[0x43] != 5) {
+                        anim_start_blended(moby, 5, 0, 0xA);
                     }
-                    moby_set_state(a0, 0x16, 2);
+                    moby_set_state(moby, 0x16, 2);
                     if (*(s32 *)(st + 0x280) == r) {
-                        if (a0[0x43] != 0x13) {
-                            anim_start_blended(a0, 0x13, 0, 0xA);
+                        if (moby[0x43] != 0x13) {
+                            anim_start_blended(moby, 0x13, 0, 0xA);
                         }
-                        moby_set_state(a0, 0x14, 2);
+                        moby_set_state(moby, 0x14, 2);
                     }
-                    *(u16 *)(a0 + 0x34) = (*(u16 *)(a0 + 0x34) & 0xFFBE) | 0x1000;
-                    *(s32 *)(a0 + 0x98) = *(s32 *)(*(u8 **)(a0 + 0x24) + 0x10);
-                    moby_fuse_linked_objects(a0, a0 + 0x10, a0 + 0xF0, 0, 0);
+                    *(u16 *)(moby + 0x34) = (*(u16 *)(moby + 0x34) & 0xFFBE) | 0x1000;
+                    *(s32 *)(moby + 0x98) = *(s32 *)(*(u8 **)(moby + 0x24) + 0x10);
+                    moby_fuse_linked_objects(moby, moby + 0x10, moby + 0xF0, 0, 0);
                 }
             }
         }
@@ -223,41 +223,41 @@ void guard_l13_update_us2(u8 *a0)
     case 1:
         if (*(s32 *)(st + 0x250) == 1 || *(s32 *)(st + 0x254) == 1) {
             *(s32 *)(st + 0x26C) = 1;
-            if (a0[0x43] != 5) {
-                anim_start_blended(a0, 5, 0, 0xA);
+            if (moby[0x43] != 5) {
+                anim_start_blended(moby, 5, 0, 0xA);
             }
-            moby_set_state(a0, 0x16, 2);
+            moby_set_state(moby, 0x16, 2);
             if (*(s32 *)(st + 0x280) == 1) {
-                if (a0[0x43] != 0x13) {
-                    anim_start_blended(a0, 0x13, 0, 0xA);
+                if (moby[0x43] != 0x13) {
+                    anim_start_blended(moby, 0x13, 0, 0xA);
                 }
-                moby_set_state(a0, 0x14, 2);
+                moby_set_state(moby, 0x14, 2);
             }
             if (*(s32 *)(st + 0x25C) != -1) {
-                moby_set_state(a0, 0xF, 2);
-                if (a0[0x43] != 0xD) {
-                    anim_start_blended(a0, 0xD, 0, 0xF);
+                moby_set_state(moby, 0xF, 2);
+                if (moby[0x43] != 0xD) {
+                    anim_start_blended(moby, 0xD, 0, 0xF);
                 }
             }
             if (*(s32 *)(st + 0x290) != -1) {
-                moby_set_state(a0, 0xE, 2);
-                if (a0[0x43] != 0xD) {
-                    anim_start_blended(a0, 0xD, 0, 0xF);
+                moby_set_state(moby, 0xE, 2);
+                if (moby[0x43] != 0xD) {
+                    anim_start_blended(moby, 0xD, 0, 0xF);
                 }
             }
             if (*(s32 *)(st + 0x2A8) != 0) {
                 u8 *e = g_object_table_base + (*(s32 *)(st + 0x2AC) << 8);
                 e[0x20] = 3;
-                *(u8 **)(*(u8 **)(e + 0x68) + 0xC) = a0;
+                *(u8 **)(*(u8 **)(e + 0x68) + 0xC) = moby;
             }
         }
         break;
     case 2: {
         s32 r;
-        if (*(s32 *)(st + 0x250) != 1 && *(s32 *)(st + 0x254) != 1 && a0[0x20] != 0xF) {
-            moby_set_state(a0, 9, 1);
-            if (a0[0x43] != 0x15) {
-                anim_start_blended(a0, 0x15, 0, 0x1E);
+        if (*(s32 *)(st + 0x250) != 1 && *(s32 *)(st + 0x254) != 1 && moby[0x20] != 0xF) {
+            moby_set_state(moby, 9, 1);
+            if (moby[0x43] != 0x15) {
+                anim_start_blended(moby, 0x15, 0, 0x1E);
             }
             *(s32 *)(st + 0x240) = math_random_int_range(0x244, 0x258);
             r = math_random_int_below(2);
@@ -265,9 +265,9 @@ void guard_l13_update_us2(u8 *a0)
             *(s32 *)(st + 0x288) = *(s32 *)(st + 0x284) + r;
         }
         if (*(s32 *)(st + 0x264) == 1 && *(s32 *)(st + 0x26C) == 0) {
-            moby_set_state(a0, 0x17, 3);
-            if (a0[0x43] != 0xD) {
-                anim_start_blended(a0, 0xD, 0, 0x14);
+            moby_set_state(moby, 0x17, 3);
+            if (moby[0x43] != 0xD) {
+                anim_start_blended(moby, 0xD, 0, 0x14);
             }
             r = math_random_int_below(2);
             *(s32 *)(st + 0x28C) = 0;
@@ -281,20 +281,20 @@ void guard_l13_update_us2(u8 *a0)
         if (e == 0 || e[0x20] == 0xFE || e[0x20] == 0xFD || *(s32 *)(st + 0x2B8) == 1) {
             *(s32 *)(st + 0x294) = 0;
             if (*(s32 *)(st + 0x29C) != -1) {
-                moby_set_state(a0, 0x1C, 6);
-                if (a0[0x43] != 0xD) {
-                    anim_start_blended(a0, 0xD, 0, 0xF);
+                moby_set_state(moby, 0x1C, 6);
+                if (moby[0x43] != 0xD) {
+                    anim_start_blended(moby, 0xD, 0, 0xF);
                 }
             } else {
-                if (a0[0x43] != 5) {
-                    anim_start_blended(a0, 5, 0, 0xA);
+                if (moby[0x43] != 5) {
+                    anim_start_blended(moby, 5, 0, 0xA);
                 }
-                moby_set_state(a0, 0x16, 2);
+                moby_set_state(moby, 0x16, 2);
                 if (*(s32 *)(st + 0x280) == 1) {
-                    if (a0[0x43] != 0x13) {
-                        anim_start_blended(a0, 0x13, 0, 0xA);
+                    if (moby[0x43] != 0x13) {
+                        anim_start_blended(moby, 0x13, 0, 0xA);
                     }
-                    moby_set_state(a0, 0x14, 2);
+                    moby_set_state(moby, 0x14, 2);
                 }
             }
         }
@@ -303,79 +303,79 @@ void guard_l13_update_us2(u8 *a0)
     case 4: {
         s32 r;
         u8 *e;
-        r = moby_dispatch_action_by_kind(a0, st + 0x140);
+        r = moby_dispatch_action_by_kind(moby, st + 0x140);
         if (r & 1) {
-            func_US2_002A7AA8(a0, 0, 3);
-            part_queue_moby_for_glow(a0, 0, 0);
+            SetDeathBits_us2(moby, 0, 3);
+            part_queue_moby_for_glow(moby, 0, 0);
             return;
         }
         if (r & 2) {
             if (*(s32 *)(st + 0x250) == 1 || *(s32 *)(st + 0x254) == 1) {
-                if (a0[0x43] != 0x13) {
-                    anim_start_blended(a0, 0x13, 0, 0xA);
+                if (moby[0x43] != 0x13) {
+                    anim_start_blended(moby, 0x13, 0, 0xA);
                 }
-                moby_set_state(a0, 0x14, 2);
+                moby_set_state(moby, 0x14, 2);
             } else {
                 if (math_random_int_below(2) == 1) {
-                    if (a0[0x43] != 1) {
-                        anim_start_blended(a0, 1, 0, 0x14);
+                    if (moby[0x43] != 1) {
+                        anim_start_blended(moby, 1, 0, 0x14);
                     }
                 } else {
-                    if (a0[0x43] != 4) {
-                        anim_start_blended(a0, 4, 0, 0xA);
+                    if (moby[0x43] != 4) {
+                        anim_start_blended(moby, 4, 0, 0xA);
                     }
                 }
-                moby_set_state(a0, 9, 1);
+                moby_set_state(moby, 9, 1);
                 *(s32 *)(st + 0x240) = math_random_int_range(0x244, 0x258);
             }
             if (*(s32 *)(st + 0x290) != -1) {
-                moby_set_state(a0, 0xE, 2);
-                if (a0[0x43] != 0xD) {
-                    anim_start_blended(a0, 0xD, 0, 0xF);
+                moby_set_state(moby, 0xE, 2);
+                if (moby[0x43] != 0xD) {
+                    anim_start_blended(moby, 0xD, 0, 0xF);
                 }
             }
             if (*(s32 *)(st + 0x270) != -1 && *(s32 *)(st + 0x26C) == 0) {
-                moby_set_state(a0, 0x10, -1);
-                if (a0[0x43] != 0xD) {
-                    anim_start_blended(a0, 0xD, 0, 0xA);
+                moby_set_state(moby, 0x10, -1);
+                if (moby[0x43] != 0xD) {
+                    anim_start_blended(moby, 0xD, 0, 0xA);
                 }
             }
             if (*(s32 *)(st + 0x294) != 0) {
-                if (a0[0x43] != 0x15) {
-                    anim_start_blended(a0, 0x15, 0, 0xA);
+                if (moby[0x43] != 0x15) {
+                    anim_start_blended(moby, 0x15, 0, 0xA);
                 }
-                moby_set_state(a0, 0x1B, 5);
+                moby_set_state(moby, 0x1B, 5);
             }
             e = g_object_table_base + (*(s32 *)(st + 0x2D4) << 8);
             if (*(s32 *)(st + 0x2BC) != 0 && e != 0 && e[0x20] != 0xFE && e[0x20] != 0xFD) {
-                moby_set_state(a0, 0xA, 7);
-                if (a0[0x43] != 3) {
-                    anim_start_blended(a0, 3, 0, 0xF);
+                moby_set_state(moby, 0xA, 7);
+                if (moby[0x43] != 3) {
+                    anim_start_blended(moby, 3, 0, 0xF);
                 }
-                moby_set_controller_speed_limits(a0, 0.0022222223f, 0.06666667f, 0.006981318f, 0.8377582f);
+                moby_set_controller_speed_limits(moby, 0.0022222223f, 0.06666667f, 0.006981318f, 0.8377582f);
             }
         }
-        if (*(float *)(st + 0x20) <= 0.0f && *(u16 *)(a0 + 0x96) == 0x28) {
+        if (*(float *)(st + 0x20) <= 0.0f && *(u16 *)(moby + 0x96) == 0x28) {
             STUB_printf(g_str_guard_msg_a);
-            moby_transform_joint_point(a0, 0, m);
+            moby_transform_joint_point(moby, 0, m);
             vec_scale_to_length(v, &m[4], -0.8333334f);
-            SpawnEA7Moby(a0, v, &m[12], 0, st[0x34]);
+            SpawnEA7Moby(moby, v, &m[12], 0, st[0x34]);
         }
         break;
     }
     }
 
-    switch (a0[0x20]) {
+    switch (moby[0x20]) {
     case 5:
-        if (*(u16 *)(a0 + 0x96) >= 0x38) {
-            moby_set_state(a0, 6, -1);
-            if (a0[0x43] != math_random_int_below(3) + 0x19) {
-                anim_start_blended(a0, math_random_int_below(3) + 0x19, 0, 3);
+        if (*(u16 *)(moby + 0x96) >= 0x38) {
+            moby_set_state(moby, 6, -1);
+            if (moby[0x43] != math_random_int_below(3) + 0x19) {
+                anim_start_blended(moby, math_random_int_below(3) + 0x19, 0, 3);
             }
-            if (a0[0x43] == 0x19) {
+            if (moby[0x43] == 0x19) {
                 *(s32 *)(st + 0x2CC) = 0;
                 STUB_printf(g_str_guard_msg_b);
-            } else if (a0[0x43] == 0x1B) {
+            } else if (moby[0x43] == 0x1B) {
                 *(s32 *)(st + 0x2CC) = 1;
                 STUB_printf(g_str_guard_msg_c);
             } else {
@@ -385,15 +385,15 @@ void guard_l13_update_us2(u8 *a0)
         }
         break;
     case 8:
-        if (*(u16 *)(a0 + 0x96) >= 0x47) {
-            moby_set_state(a0, 6, -1);
-            if (a0[0x43] != math_random_int_below(3) + 0x19) {
-                anim_start_blended(a0, math_random_int_below(3) + 0x19, 0, 3);
+        if (*(u16 *)(moby + 0x96) >= 0x47) {
+            moby_set_state(moby, 6, -1);
+            if (moby[0x43] != math_random_int_below(3) + 0x19) {
+                anim_start_blended(moby, math_random_int_below(3) + 0x19, 0, 3);
             }
-            if (a0[0x43] == 0x19) {
+            if (moby[0x43] == 0x19) {
                 *(s32 *)(st + 0x2CC) = 0;
                 STUB_printf(g_str_guard_msg_b);
-            } else if (a0[0x43] == 0x1B) {
+            } else if (moby[0x43] == 0x1B) {
                 *(s32 *)(st + 0x2CC) = 1;
                 STUB_printf(g_str_guard_msg_c);
             } else {
@@ -404,69 +404,69 @@ void guard_l13_update_us2(u8 *a0)
         break;
     case 6: {
         s32 r;
-        if (*(u16 *)(a0 + 0x96) >= 0x3D) {
-            r = rps_judge(a0);
+        if (*(u16 *)(moby + 0x96) >= 0x3D) {
+            r = rps_judge(moby);
             if (r == 2) {
-                moby_set_state(a0, 5, -1);
-                if (a0[0x43] != 0x18) {
-                    anim_start_blended(a0, 0x18, 0, 3);
+                moby_set_state(moby, 5, -1);
+                if (moby[0x43] != 0x18) {
+                    anim_start_blended(moby, 0x18, 0, 3);
                 }
             } else if (r == 0) {
-                moby_set_state(a0, 7, -1);
-                if (a0[0x43] != 7) {
-                    anim_start_blended(a0, 7, 2, 0x1B);
+                moby_set_state(moby, 7, -1);
+                if (moby[0x43] != 7) {
+                    anim_start_blended(moby, 7, 2, 0x1B);
                 }
             } else {
-                moby_set_state(a0, 7, -1);
-                if (a0[0x43] != 0x1C) {
-                    anim_start_blended(a0, 0x1C, 0, 0xA);
+                moby_set_state(moby, 7, -1);
+                if (moby[0x43] != 0x1C) {
+                    anim_start_blended(moby, 0x1C, 0, 0xA);
                 }
             }
         }
         break;
     }
     case 7:
-        if (*(u16 *)(a0 + 0x96) >= 0x49) {
-            moby_set_state(a0, 8, -1);
-            if (a0[0x43] != 0x18) {
-                anim_start_blended(a0, 0x18, 0, 0x12);
+        if (*(u16 *)(moby + 0x96) >= 0x49) {
+            moby_set_state(moby, 8, -1);
+            if (moby[0x43] != 0x18) {
+                anim_start_blended(moby, 0x18, 0, 0x12);
             }
         }
         break;
     case 3:
         if (*(s32 *)(st + 0x2A0) != 0) {
-            if (AdvancePathWaypoint(a0, g_guard_path_table[*(s32 *)(st + 0x2B0)]) != 0) {
-                moby_set_state(a0, 4, -1);
+            if (AdvancePathWaypoint(moby, g_guard_path_table[*(s32 *)(st + 0x2B0)]) != 0) {
+                moby_set_state(moby, 4, -1);
                 if (math_random_int_below(2) == 1) {
-                    if (a0[0x43] != 1) {
-                        anim_start_blended(a0, 1, 0, 0x14);
+                    if (moby[0x43] != 1) {
+                        anim_start_blended(moby, 1, 0, 0x14);
                     }
                 } else {
-                    if (a0[0x43] != 0x16) {
-                        anim_start_blended(a0, 0x16, 0, 0xA);
+                    if (moby[0x43] != 0x16) {
+                        anim_start_blended(moby, 0x16, 0, 0xA);
                     }
                 }
                 if (math_random_int_below(3) == 1) {
-                    if (a0[0x43] != 4) {
-                        anim_start_blended(a0, 4, 0, 0xA);
+                    if (moby[0x43] != 4) {
+                        anim_start_blended(moby, 4, 0, 0xA);
                     }
                 }
             }
         } else {
-            if (path_follow_nodes(a0, g_guard_path_table[*(s32 *)(st + 0x2B0)]) != 0) {
-                moby_set_state(a0, 4, -1);
+            if (path_follow_nodes(moby, g_guard_path_table[*(s32 *)(st + 0x2B0)]) != 0) {
+                moby_set_state(moby, 4, -1);
                 if (math_random_int_below(2) == 1) {
-                    if (a0[0x43] != 1) {
-                        anim_start_blended(a0, 1, 0, 0x14);
+                    if (moby[0x43] != 1) {
+                        anim_start_blended(moby, 1, 0, 0x14);
                     }
                 } else {
-                    if (a0[0x43] != 0x16) {
-                        anim_start_blended(a0, 0x16, 0, 0xA);
+                    if (moby[0x43] != 0x16) {
+                        anim_start_blended(moby, 0x16, 0, 0xA);
                     }
                 }
                 if (math_random_int_below(3) == 1) {
-                    if (a0[0x43] != 4) {
-                        anim_start_blended(a0, 4, 0, 0xA);
+                    if (moby[0x43] != 4) {
+                        anim_start_blended(moby, 4, 0, 0xA);
                     }
                 }
             }
@@ -475,88 +475,88 @@ void guard_l13_update_us2(u8 *a0)
     case 4: {
         s32 *path;
         float d;
-        if (a0[0x60] & 2) {
+        if (moby[0x60] & 2) {
             path = g_guard_path_table[*(s32 *)(st + 0x2B0)];
-            d = vec_distance_xy(a0 + 0x10, path + 4);
-            if (vec_distance_xy(a0 + 0x10, path + *path * 4) < d) {
-                path_set_follower_nodes(a0, g_guard_path_table[*(s32 *)(st + 0x2B0)], 0, *path - 1);
+            d = vec_distance_xy(moby + 0x10, path + 4);
+            if (vec_distance_xy(moby + 0x10, path + *path * 4) < d) {
+                path_set_follower_nodes(moby, g_guard_path_table[*(s32 *)(st + 0x2B0)], 0, *path - 1);
             } else {
-                path_set_follower_nodes(a0, g_guard_path_table[*(s32 *)(st + 0x2B0)], *path - 1, 0);
+                path_set_follower_nodes(moby, g_guard_path_table[*(s32 *)(st + 0x2B0)], *path - 1, 0);
             }
-            moby_set_state(a0, 3, -1);
-            if (a0[0x43] != 3) {
-                anim_start_blended(a0, 3, 0, 0x14);
+            moby_set_state(moby, 3, -1);
+            if (moby[0x43] != 3) {
+                anim_start_blended(moby, 3, 0, 0x14);
             }
         }
         break;
     }
     case 16:
-        if (path_follow_nodes(a0, g_guard_path_table[*(s32 *)(st + 0x270)]) != 0) {
+        if (path_follow_nodes(moby, g_guard_path_table[*(s32 *)(st + 0x270)]) != 0) {
             *(s32 *)(st + 0x26C) = 1;
-            moby_set_state(a0, 2, -1);
-            if (a0[0x43] != 0x15) {
-                anim_start_blended(a0, 0x15, 0, 0xA);
+            moby_set_state(moby, 2, -1);
+            if (moby[0x43] != 0x15) {
+                anim_start_blended(moby, 0x15, 0, 0xA);
             }
         }
         break;
     case 2:
         STUB_printf(g_str_guard_msg_e);
-        moby_set_state(a0, 1, -1);
+        moby_set_state(moby, 1, -1);
         break;
     case 9:
-        if (a0[0x60] & 2) {
-            if (a0[0x43] != 0x15) {
-                anim_start_blended(a0, 0x15, 0, 0xA);
+        if (moby[0x60] & 2) {
+            if (moby[0x43] != 0x15) {
+                anim_start_blended(moby, 0x15, 0, 0xA);
             }
-            moby_set_state(a0, 1, -1);
+            moby_set_state(moby, 1, -1);
         }
         break;
     case 10: {
         u8 *e;
-        if (path_check_entry_for_moby(a0, *(s32 *)(st + 0x2C0)) != 0) {
-            if (a0[0x43] != 0x15) {
-                anim_start_blended(a0, 0x15, 0, 0xA);
+        if (path_check_entry_for_moby(moby, *(s32 *)(st + 0x2C0)) != 0) {
+            if (moby[0x43] != 0x15) {
+                anim_start_blended(moby, 0x15, 0, 0xA);
             }
-            moby_set_state(a0, 0xD, -1);
+            moby_set_state(moby, 0xD, -1);
         }
         e = g_object_table_base + (*(s32 *)(st + 0x2D4) << 8);
         if (e == 0 || e[0x20] == 0xFE || e[0x20] == 0xFD
-            || FastDiffRots(*(float *)(a0 + 0xF8),
-                             mat_fast_helper_a(*(float *)(st + 0x1F0) - *(float *)(a0 + 0x10),
-                                           *(float *)(st + 0x1F4) - *(float *)(a0 + 0x14))) > 1.7453294f) {
-            if (a0[0x43] != 5) {
-                anim_start_blended(a0, 5, 0, 0xA);
+            || FastDiffRots(*(float *)(moby + 0xF8),
+                             mat_fast_helper_a(*(float *)(st + 0x1F0) - *(float *)(moby + 0x10),
+                                           *(float *)(st + 0x1F4) - *(float *)(moby + 0x14))) > 1.7453294f) {
+            if (moby[0x43] != 5) {
+                anim_start_blended(moby, 5, 0, 0xA);
             }
-            moby_set_state(a0, 0x16, 2);
+            moby_set_state(moby, 0x16, 2);
             if (*(s32 *)(st + 0x280) == 1) {
-                if (a0[0x43] != 0x13) {
-                    anim_start_blended(a0, 0x13, 0, 0xA);
+                if (moby[0x43] != 0x13) {
+                    anim_start_blended(moby, 0x13, 0, 0xA);
                 }
-                moby_set_state(a0, 0x14, 2);
+                moby_set_state(moby, 0x14, 2);
             }
             if (*(s32 *)(st + 0x2D8) != 0) {
-                moby_set_state(a0, 0xB, 2);
-                if (a0[0x43] != 0xD) {
-                    anim_start_blended(a0, 0xD, 0, 0xA);
+                moby_set_state(moby, 0xB, 2);
+                if (moby[0x43] != 0xD) {
+                    anim_start_blended(moby, 0xD, 0, 0xA);
                 }
-                moby_set_controller_speed_limits(a0, 0.0033333334f, 0.10000001f, 0.006981318f, 0.8377582f);
+                moby_set_controller_speed_limits(moby, 0.0033333334f, 0.10000001f, 0.006981318f, 0.8377582f);
             }
         }
         break;
     }
     case 11:
-        moby_turn_toward_target_and_step(a0, st + 0x1F0, *(float *)(st + 0x2DC) * 0.017453294f);
-        if (*(u16 *)(a0 + 0x96) >= 0x65) {
+        moby_turn_toward_target_and_step(moby, st + 0x1F0, *(float *)(st + 0x2DC) * 0.017453294f);
+        if (*(u16 *)(moby + 0x96) >= 0x65) {
             if (math_random_int_below(0xA) == 1) {
-                if (a0[0x43] != 5) {
-                    anim_start_blended(a0, 5, 0, 0xA);
+                if (moby[0x43] != 5) {
+                    anim_start_blended(moby, 5, 0, 0xA);
                 }
-                moby_set_state(a0, 0x16, 2);
+                moby_set_state(moby, 0x16, 2);
                 if (*(s32 *)(st + 0x280) == 1) {
-                    if (a0[0x43] != 0x13) {
-                        anim_start_blended(a0, 0x13, 0, 0xA);
+                    if (moby[0x43] != 0x13) {
+                        anim_start_blended(moby, 0x13, 0, 0xA);
                     }
-                    moby_set_state(a0, 0x14, 2);
+                    moby_set_state(moby, 0x14, 2);
                 }
             }
         }
@@ -564,20 +564,20 @@ void guard_l13_update_us2(u8 *a0)
     case 28: {
         s32 r;
         if (*(s32 *)(st + 0x2A0) != 0) {
-            r = AdvancePathWaypoint(a0, g_guard_path_table[*(s32 *)(st + 0x29C)]);
+            r = AdvancePathWaypoint(moby, g_guard_path_table[*(s32 *)(st + 0x29C)]);
         } else {
-            r = path_follow_nodes(a0, g_guard_path_table[*(s32 *)(st + 0x29C)]);
+            r = path_follow_nodes(moby, g_guard_path_table[*(s32 *)(st + 0x29C)]);
         }
-        if (r != 0 || vec_distance_xy(a0 + 0x10, *(u8 **)(st + 0x200) + 0x10) < 8.0f) {
-            if (a0[0x43] != 5) {
-                anim_start_blended(a0, 5, 0, 0xA);
+        if (r != 0 || vec_distance_xy(moby + 0x10, *(u8 **)(st + 0x200) + 0x10) < 8.0f) {
+            if (moby[0x43] != 5) {
+                anim_start_blended(moby, 5, 0, 0xA);
             }
-            moby_set_state(a0, 0x16, 2);
+            moby_set_state(moby, 0x16, 2);
             if (*(s32 *)(st + 0x280) == 1) {
-                if (a0[0x43] != 0x13) {
-                    anim_start_blended(a0, 0x13, 0, 0xA);
+                if (moby[0x43] != 0x13) {
+                    anim_start_blended(moby, 0x13, 0, 0xA);
                 }
-                moby_set_state(a0, 0x14, 2);
+                moby_set_state(moby, 0x14, 2);
             }
         }
         break;
@@ -585,7 +585,7 @@ void guard_l13_update_us2(u8 *a0)
     case 15: {
         s32 i;
         s32 j;
-        if (flag_set_first_pending(a0) != 0 && *(s32 *)(st + 0x2A8) != 0) {
+        if (flag_set_first_pending(moby) != 0 && *(s32 *)(st + 0x2A8) != 0) {
             i = *(s32 *)(st + 0x360);
             if (i != -1) {
                 j = *(s32 *)(st + 0x364);
@@ -600,26 +600,26 @@ void guard_l13_update_us2(u8 *a0)
         }
         *(TI128 *)m = ((L13Cam *)g_moby_slot_table)[*(s32 *)(st + 0x25C)].v;
         if (*(s32 *)(st + 0x2A0) != 0) {
-            creature_move_along_ground(a0, m);
+            creature_move_along_ground(moby, m);
         } else {
-            moby_l01_turn_toward_target(a0, m);
+            moby_l01_turn_toward_target(moby, m);
         }
         if (*(s32 *)(st + 0x2A0) != 0) {
-            if (vec_distance_xy(a0 + 0x10, m) < 0.9f) {
-                moby_set_state(a0, 0x14, -1);
-                if (a0[0x43] != 0x13) {
-                    anim_start_blended(a0, 0x13, 0, 0xF);
+            if (vec_distance_xy(moby + 0x10, m) < 0.9f) {
+                moby_set_state(moby, 0x14, -1);
+                if (moby[0x43] != 0x13) {
+                    anim_start_blended(moby, 0x13, 0, 0xF);
                 }
             }
-        } else if (vec_distance_xy(a0 + 0x10, m) < 0.5f) {
-            moby_set_state(a0, 0x14, -1);
-            if (a0[0x43] != 0x13) {
-                anim_start_blended(a0, 0x13, 0, 0xF);
+        } else if (vec_distance_xy(moby + 0x10, m) < 0.5f) {
+            moby_set_state(moby, 0x14, -1);
+            if (moby[0x43] != 0x13) {
+                anim_start_blended(moby, 0x13, 0, 0xF);
             }
             if (*(s32 *)(st + 0x2A8) != 0) {
-                moby_set_state(a0, 0x19, -1);
-                if (a0[0x43] != 0x11) {
-                    anim_start_blended(a0, 0x11, 0, 0x14);
+                moby_set_state(moby, 0x19, -1);
+                if (moby[0x43] != 0x11) {
+                    anim_start_blended(moby, 0x11, 0, 0x14);
                 }
             }
         }
@@ -628,26 +628,26 @@ void guard_l13_update_us2(u8 *a0)
     case 29:
         *(TI128 *)m = *(TI128 *)(st + 0x370);
         if (*(s32 *)(st + 0x2A0) != 0) {
-            creature_move_along_ground(a0, m);
+            creature_move_along_ground(moby, m);
         } else {
-            moby_l01_turn_toward_target(a0, m);
+            moby_l01_turn_toward_target(moby, m);
         }
         if (*(s32 *)(st + 0x2A0) != 0) {
-            if (vec_distance_xy(a0 + 0x10, m) < 0.9f) {
-                moby_set_state(a0, 0x14, -1);
-                if (a0[0x43] != 0x13) {
-                    anim_start_blended(a0, 0x13, 0, 0xF);
+            if (vec_distance_xy(moby + 0x10, m) < 0.9f) {
+                moby_set_state(moby, 0x14, -1);
+                if (moby[0x43] != 0x13) {
+                    anim_start_blended(moby, 0x13, 0, 0xF);
                 }
             }
-        } else if (vec_distance_xy(a0 + 0x10, m) < 0.5f) {
-            moby_set_state(a0, 0x14, -1);
-            if (a0[0x43] != 0x13) {
-                anim_start_blended(a0, 0x13, 0, 0xF);
+        } else if (vec_distance_xy(moby + 0x10, m) < 0.5f) {
+            moby_set_state(moby, 0x14, -1);
+            if (moby[0x43] != 0x13) {
+                anim_start_blended(moby, 0x13, 0, 0xF);
             }
             if (*(s32 *)(st + 0x2A8) != 0) {
-                moby_set_state(a0, 0x19, -1);
-                if (a0[0x43] != 0x11) {
-                    anim_start_blended(a0, 0x11, 0, 0x14);
+                moby_set_state(moby, 0x19, -1);
+                if (moby[0x43] != 0x11) {
+                    anim_start_blended(moby, 0x11, 0, 0x14);
                 }
             }
         }
@@ -657,49 +657,49 @@ void guard_l13_update_us2(u8 *a0)
         u8 *hit;
         e = g_object_table_base + (*(s32 *)(st + 0x2D4) << 8);
         if (e == 0 || e[0x20] == 0xFE || e[0x20] == 0xFD) {
-            if (a0[0x43] != 5) {
-                anim_start_blended(a0, 5, 0, 0xA);
+            if (moby[0x43] != 5) {
+                anim_start_blended(moby, 5, 0, 0xA);
             }
-            moby_set_state(a0, 0x16, 2);
+            moby_set_state(moby, 0x16, 2);
             if (*(s32 *)(st + 0x280) == 1) {
-                if (a0[0x43] != 0x13) {
-                    anim_start_blended(a0, 0x13, 0, 0xA);
+                if (moby[0x43] != 0x13) {
+                    anim_start_blended(moby, 0x13, 0, 0xA);
                 }
-                moby_set_state(a0, 0x14, 2);
+                moby_set_state(moby, 0x14, 2);
             }
             if (*(s32 *)(st + 0x2D8) != 0) {
-                moby_set_state(a0, 0xB, 2);
-                if (a0[0x43] != 0xD) {
-                    anim_start_blended(a0, 0xD, 0, 0xA);
+                moby_set_state(moby, 0xB, 2);
+                if (moby[0x43] != 0xD) {
+                    anim_start_blended(moby, 0xD, 0, 0xA);
                 }
-                moby_set_controller_speed_limits(a0, 0.0033333334f, 0.10000001f, 0.006981318f, 0.8377582f);
+                moby_set_controller_speed_limits(moby, 0.0033333334f, 0.10000001f, 0.006981318f, 0.8377582f);
             }
         } else {
-            moby_transform_joint_to_world(a0, 0, m);
-            if (CollLine(m, st + 0x1F0, 0, a0, 0) == 0) {
-                if (a0[0x43] != 5) {
-                    anim_start_blended(a0, 5, 0, 0xA);
+            moby_transform_joint_to_world(moby, 0, m);
+            if (CollLine(m, st + 0x1F0, 0, moby, 0) == 0) {
+                if (moby[0x43] != 5) {
+                    anim_start_blended(moby, 5, 0, 0xA);
                 }
-                moby_set_state(a0, 0x16, 2);
+                moby_set_state(moby, 0x16, 2);
                 if (*(s32 *)(st + 0x280) == 1) {
-                    if (a0[0x43] != 0x13) {
-                        anim_start_blended(a0, 0x13, 0, 0xA);
+                    if (moby[0x43] != 0x13) {
+                        anim_start_blended(moby, 0x13, 0, 0xA);
                     }
-                    moby_set_state(a0, 0x14, 2);
+                    moby_set_state(moby, 0x14, 2);
                 }
             } else {
                 hit = *(u8 **)(g_collision_l13_result + 0x18);
                 if (hit != 0 && (hit == g_hero_moby || *(s16 *)(hit + 0xAA) == 0xC87
                                  || hit == *(u8 **)(st + 0x200))) {
-                    if (a0[0x43] != 5) {
-                        anim_start_blended(a0, 5, 0, 0xA);
+                    if (moby[0x43] != 5) {
+                        anim_start_blended(moby, 5, 0, 0xA);
                     }
-                    moby_set_state(a0, 0x16, 2);
+                    moby_set_state(moby, 0x16, 2);
                     if (*(s32 *)(st + 0x280) == 1) {
-                        if (a0[0x43] != 0x13) {
-                            anim_start_blended(a0, 0x13, 0, 0xA);
+                        if (moby[0x43] != 0x13) {
+                            anim_start_blended(moby, 0x13, 0, 0xA);
                         }
-                        moby_set_state(a0, 0x14, 2);
+                        moby_set_state(moby, 0x14, 2);
                     }
                 }
             }
@@ -707,52 +707,52 @@ void guard_l13_update_us2(u8 *a0)
         break;
     }
     case 18:
-        if (a0[0x60] & 2) {
-            if (a0[0x43] != 0x13) {
-                anim_start_blended(a0, 0x13, 0, 0xA);
+        if (moby[0x60] & 2) {
+            if (moby[0x43] != 0x13) {
+                anim_start_blended(moby, 0x13, 0, 0xA);
             }
-            moby_set_state(a0, 0x14, -1);
+            moby_set_state(moby, 0x14, -1);
         }
         break;
     case 14:
         if (*(s32 *)(st + 0x2A0) != 0) {
-            if (AdvancePathWaypoint(a0, g_guard_path_table[*(s32 *)(st + 0x290)]) != 0) {
-                if (a0[0x43] != 5) {
-                    anim_start_blended(a0, 5, 0, 0xA);
+            if (AdvancePathWaypoint(moby, g_guard_path_table[*(s32 *)(st + 0x290)]) != 0) {
+                if (moby[0x43] != 5) {
+                    anim_start_blended(moby, 5, 0, 0xA);
                 }
-                moby_set_state(a0, 0x16, 2);
+                moby_set_state(moby, 0x16, 2);
                 if (*(s32 *)(st + 0x280) == 1) {
-                    if (a0[0x43] != 0x13) {
-                        anim_start_blended(a0, 0x13, 0, 0xA);
+                    if (moby[0x43] != 0x13) {
+                        anim_start_blended(moby, 0x13, 0, 0xA);
                     }
-                    moby_set_state(a0, 0x14, 2);
+                    moby_set_state(moby, 0x14, 2);
                 }
                 *(s32 *)(st + 0x290) = -1;
             }
-        } else if (path_follow_nodes(a0, g_guard_path_table[*(s32 *)(st + 0x290)]) != 0
-                   || vec_distance_xy(a0 + 0x10, *(u8 **)(st + 0x200) + 0x10) < 8.0f) {
-            moby_set_state(a0, 0x18, 2);
-            if (a0[0x43] != 6) {
-                anim_start_blended(a0, 6, 0, 0xA);
+        } else if (path_follow_nodes(moby, g_guard_path_table[*(s32 *)(st + 0x290)]) != 0
+                   || vec_distance_xy(moby + 0x10, *(u8 **)(st + 0x200) + 0x10) < 8.0f) {
+            moby_set_state(moby, 0x18, 2);
+            if (moby[0x43] != 6) {
+                anim_start_blended(moby, 6, 0, 0xA);
             }
             *(s32 *)(st + 0x290) = -1;
         }
         break;
     case 19: {
         u8 *hit;
-        moby_transform_joint_to_world(a0, 0, m);
+        moby_transform_joint_to_world(moby, 0, m);
         FastVecSub(&m[4], st + 0x1F0, m);
         vec_scale_to_length(&m[4], &m[4], 0.6666667f);
-        if (CollLine(m, st + 0x1F0, 0, a0, 0) == 0) {
-            if (a0[0x43] != 5) {
-                anim_start_blended(a0, 5, 0, 1);
+        if (CollLine(m, st + 0x1F0, 0, moby, 0) == 0) {
+            if (moby[0x43] != 5) {
+                anim_start_blended(moby, 5, 0, 1);
             }
-            moby_set_state(a0, 0x16, -1);
+            moby_set_state(moby, 0x16, -1);
             if (*(s32 *)(st + 0x280) == 1) {
-                if (a0[0x43] != 0x13) {
-                    anim_start_blended(a0, 0x13, 0, 0xA);
+                if (moby[0x43] != 0x13) {
+                    anim_start_blended(moby, 0x13, 0, 0xA);
                 }
-                moby_set_state(a0, 0x14, 2);
+                moby_set_state(moby, 0x14, 2);
             }
         } else {
             hit = *(u8 **)(g_collision_l13_result + 0x18);
@@ -760,89 +760,89 @@ void guard_l13_update_us2(u8 *a0)
                              || *(s16 *)(hit + 0xAA) == 0xC87 || *(s16 *)(hit + 0xAA) == 0xC86
                              || *(s16 *)(hit + 0xAA) == 0x1F4 || *(s16 *)(hit + 0xAA) == 0x10CE
                              || *(s16 *)(hit + 0xAA) == 0x200 || *(s16 *)(hit + 0xAA) == 0x1FF)) {
-                if (a0[0x43] != 5) {
-                    anim_start_blended(a0, 5, 0, math_random_int_below(0xF));
+                if (moby[0x43] != 5) {
+                    anim_start_blended(moby, 5, 0, math_random_int_below(0xF));
                 }
-                moby_set_state(a0, 0x16, -1);
+                moby_set_state(moby, 0x16, -1);
                 if (*(s32 *)(st + 0x280) == 1) {
-                    if (a0[0x43] != 0x13) {
-                        anim_start_blended(a0, 0x13, 0, 0xA);
+                    if (moby[0x43] != 0x13) {
+                        anim_start_blended(moby, 0x13, 0, 0xA);
                     }
-                    moby_set_state(a0, 0x14, 2);
+                    moby_set_state(moby, 0x14, 2);
                 }
             }
         }
-        if (a0[0x60] & 2) {
-            if (a0[0x42] == 0xE) {
+        if (moby[0x60] & 2) {
+            if (moby[0x42] == 0xE) {
                 if (math_random_int_below(2) == 1) {
-                    if (a0[0x43] != 1) {
-                        anim_start_blended(a0, 1, 0, 0x14);
+                    if (moby[0x43] != 1) {
+                        anim_start_blended(moby, 1, 0, 0x14);
                     }
                 } else {
-                    if (a0[0x43] != 0x16) {
-                        anim_start_blended(a0, 0x16, 0, 0xA);
+                    if (moby[0x43] != 0x16) {
+                        anim_start_blended(moby, 0x16, 0, 0xA);
                     }
                 }
                 if (math_random_int_below(3) == 1) {
-                    if (a0[0x43] != 4) {
-                        anim_start_blended(a0, 4, 0, 0xA);
+                    if (moby[0x43] != 4) {
+                        anim_start_blended(moby, 4, 0, 0xA);
                     }
                 }
             } else {
-                if (a0[0x43] != 0xE) {
-                    anim_start_blended(a0, 0xE, 0, 0x14);
+                if (moby[0x43] != 0xE) {
+                    anim_start_blended(moby, 0xE, 0, 0x14);
                 }
             }
         }
         break;
     }
     case 20:
-        moby_start_effect_from_entry(a0, mat_fast_helper_a(*(float *)(*(u8 **)(st + 0x200) + 0x10) - *(float *)(a0 + 0x10),
-                                             *(float *)(*(u8 **)(st + 0x200) + 0x14) - *(float *)(a0 + 0x14)));
+        moby_start_effect_from_entry(moby, mat_fast_helper_a(*(float *)(*(u8 **)(st + 0x200) + 0x10) - *(float *)(moby + 0x10),
+                                             *(float *)(*(u8 **)(st + 0x200) + 0x14) - *(float *)(moby + 0x14)));
         if (*(s32 *)(st + 0x2A0) != 0) {
-            moby_turn_toward_hero(a0);
+            moby_turn_toward_hero(moby);
         }
-        if (math_is_value_within_step_us2(a0, 1.0f) != 0) {
-            moby_transform_joint_to_world(a0, 0, m);
+        if (math_is_value_within_step_us2(moby, 1.0f) != 0) {
+            moby_transform_joint_to_world(moby, 0, m);
             FastVecSub(&m[4], st + 0x1F0, m);
             vec_scale_to_length(&m[4], &m[4], 0.6666667f);
-            SpawnEA7Moby(a0, &m[4], m, 0, st[0x34]);
+            SpawnEA7Moby(moby, &m[4], m, 0, st[0x34]);
             (*(s32 *)(st + 0x28C))++;
         }
-        if (a0[0x60] & 2) {
+        if (moby[0x60] & 2) {
             if (*(s32 *)(st + 0x288) == *(s32 *)(st + 0x28C)) {
                 s32 r;
-                moby_set_state(a0, 0x18, -1);
-                if (a0[0x43] != 6) {
-                    anim_start_blended(a0, 6, 0, 0xA);
+                moby_set_state(moby, 0x18, -1);
+                if (moby[0x43] != 6) {
+                    anim_start_blended(moby, 6, 0, 0xA);
                 }
                 r = math_random_int_below(4);
                 *(s32 *)(st + 0x28C) = 0;
                 *(s32 *)(st + 0x288) = *(s32 *)(st + 0x284) + r;
             } else {
-                if (a0[0x43] != 0xE) {
-                    anim_start_blended(a0, 0xE, 0, math_random_int_below(5) + 0xA);
+                if (moby[0x43] != 0xE) {
+                    anim_start_blended(moby, 0xE, 0, math_random_int_below(5) + 0xA);
                 }
-                moby_set_state(a0, 0x13, -1);
+                moby_set_state(moby, 0x13, -1);
             }
         }
         break;
     case 21: {
         u8 *hit;
-        if (*(u16 *)(a0 + 0x96) >= 0x79) {
-            moby_transform_joint_to_world(a0, 0, m);
+        if (*(u16 *)(moby + 0x96) >= 0x79) {
+            moby_transform_joint_to_world(moby, 0, m);
             FastVecSub(&m[4], st + 0x1F0, m);
             vec_scale_to_length(&m[4], &m[4], 0.6666667f);
-            if (CollLine(m, st + 0x1F0, 0, a0, 0) == 0) {
-                if (a0[0x43] != 5) {
-                    anim_start_blended(a0, 5, 0, 1);
+            if (CollLine(m, st + 0x1F0, 0, moby, 0) == 0) {
+                if (moby[0x43] != 5) {
+                    anim_start_blended(moby, 5, 0, 1);
                 }
-                moby_set_state(a0, 0x16, -1);
+                moby_set_state(moby, 0x16, -1);
                 if (*(s32 *)(st + 0x280) == 1) {
-                    if (a0[0x43] != 0x13) {
-                        anim_start_blended(a0, 0x13, 0, 0xA);
+                    if (moby[0x43] != 0x13) {
+                        anim_start_blended(moby, 0x13, 0, 0xA);
                     }
-                    moby_set_state(a0, 0x14, 2);
+                    moby_set_state(moby, 0x14, 2);
                 }
             } else {
                 hit = *(u8 **)(g_collision_l13_result + 0x18);
@@ -850,15 +850,15 @@ void guard_l13_update_us2(u8 *a0)
                                  || *(s16 *)(hit + 0xAA) == 0xC87 || *(s16 *)(hit + 0xAA) == 0xC86
                                  || *(s16 *)(hit + 0xAA) == 0x1F4 || *(s16 *)(hit + 0xAA) == 0x10CE
                                  || *(s16 *)(hit + 0xAA) == 0x200 || *(s16 *)(hit + 0xAA) == 0x1FF)) {
-                    if (a0[0x43] != 5) {
-                        anim_start_blended(a0, 5, 0, math_random_int_below(0xF));
+                    if (moby[0x43] != 5) {
+                        anim_start_blended(moby, 5, 0, math_random_int_below(0xF));
                     }
-                    moby_set_state(a0, 0x16, -1);
+                    moby_set_state(moby, 0x16, -1);
                     if (*(s32 *)(st + 0x280) == 1) {
-                        if (a0[0x43] != 0x13) {
-                            anim_start_blended(a0, 0x13, 0, 0xA);
+                        if (moby[0x43] != 0x13) {
+                            anim_start_blended(moby, 0x13, 0, 0xA);
                         }
-                        moby_set_state(a0, 0x14, 2);
+                        moby_set_state(moby, 0x14, 2);
                     }
                 }
             }
@@ -866,53 +866,53 @@ void guard_l13_update_us2(u8 *a0)
         break;
     }
     case 22:
-        moby_start_effect_from_entry(a0, mat_fast_helper_a(*(float *)(*(u8 **)(st + 0x200) + 0x10) - *(float *)(a0 + 0x10),
-                                             *(float *)(*(u8 **)(st + 0x200) + 0x14) - *(float *)(a0 + 0x14)));
+        moby_start_effect_from_entry(moby, mat_fast_helper_a(*(float *)(*(u8 **)(st + 0x200) + 0x10) - *(float *)(moby + 0x10),
+                                             *(float *)(*(u8 **)(st + 0x200) + 0x14) - *(float *)(moby + 0x14)));
         if (*(s32 *)(st + 0x2A0) != 0) {
-            moby_turn_toward_hero(a0);
+            moby_turn_toward_hero(moby);
         }
-        if (math_is_value_within_step_us2(a0, 3.0f) != 0) {
-            moby_transform_joint_to_world(a0, 0, m);
+        if (math_is_value_within_step_us2(moby, 3.0f) != 0) {
+            moby_transform_joint_to_world(moby, 0, m);
             FastVecSub(&m[4], st + 0x1F0, m);
             vec_scale_to_length(&m[4], &m[4], 0.6666667f);
-            SpawnEA7Moby(a0, &m[4], m, 0, st[0x34]);
+            SpawnEA7Moby(moby, &m[4], m, 0, st[0x34]);
             (*(s32 *)(st + 0x28C))++;
         }
-        if (a0[0x60] & 2) {
+        if (moby[0x60] & 2) {
             if (*(s32 *)(st + 0x288) == *(s32 *)(st + 0x28C)) {
-                moby_set_state(a0, 0x18, -1);
-                if (a0[0x43] != 6) {
-                    anim_start_blended(a0, 6, 0, 0xA);
+                moby_set_state(moby, 0x18, -1);
+                if (moby[0x43] != 6) {
+                    anim_start_blended(moby, 6, 0, 0xA);
                 }
                 if (math_random_int_below(2) == 1) {
                     *(s32 *)(st + 0x288) = *(s32 *)(st + 0x284) + math_random_int_below(4);
                 }
                 *(s32 *)(st + 0x28C) = 0;
             } else {
-                if (a0[0x43] != 0xE) {
-                    anim_start_blended(a0, 0xE, 0, math_random_int_below(5) + 0xA);
+                if (moby[0x43] != 0xE) {
+                    anim_start_blended(moby, 0xE, 0, math_random_int_below(5) + 0xA);
                 }
-                moby_set_state(a0, 0x15, -1);
+                moby_set_state(moby, 0x15, -1);
             }
         }
         break;
     case 25:
-        moby_start_effect_from_entry(a0, mat_fast_helper_a(*(float *)(*(u8 **)(st + 0x200) + 0x10) - *(float *)(a0 + 0x10),
-                                             *(float *)(*(u8 **)(st + 0x200) + 0x14) - *(float *)(a0 + 0x14)));
+        moby_start_effect_from_entry(moby, mat_fast_helper_a(*(float *)(*(u8 **)(st + 0x200) + 0x10) - *(float *)(moby + 0x10),
+                                             *(float *)(*(u8 **)(st + 0x200) + 0x14) - *(float *)(moby + 0x14)));
         if (*(s32 *)(st + 0x2A0) != 0) {
-            moby_turn_toward_hero(a0);
+            moby_turn_toward_hero(moby);
         }
-        if (math_is_value_within_step_us2(a0, 3.0f) != 0) {
-            moby_transform_joint_to_world(a0, 0, m);
+        if (math_is_value_within_step_us2(moby, 3.0f) != 0) {
+            moby_transform_joint_to_world(moby, 0, m);
             FastVecSub(&m[4], st + 0x1F0, m);
             vec_scale_to_length(&m[4], &m[4], 0.6666667f);
-            SpawnEA7Moby(a0, &m[4], m, 0, st[0x34]);
+            SpawnEA7Moby(moby, &m[4], m, 0, st[0x34]);
             (*(s32 *)(st + 0x28C))++;
         }
-        if ((a0[0x60] & 2) && *(s32 *)(st + 0x288) == *(s32 *)(st + 0x28C)) {
-            moby_set_state(a0, 0x18, -1);
-            if (a0[0x43] != 6) {
-                anim_start_blended(a0, 6, 0, 0x14);
+        if ((moby[0x60] & 2) && *(s32 *)(st + 0x288) == *(s32 *)(st + 0x28C)) {
+            moby_set_state(moby, 0x18, -1);
+            if (moby[0x43] != 6) {
+                anim_start_blended(moby, 6, 0, 0x14);
             }
             if (math_random_int_below(2) == 1) {
                 *(s32 *)(st + 0x288) = *(s32 *)(st + 0x284) + math_random_int_below(4);
@@ -922,37 +922,37 @@ void guard_l13_update_us2(u8 *a0)
         break;
     case 23:
         *(TI128 *)m = ((L13Cam *)g_moby_slot_table)[*(s32 *)(st + 0x268)].v;
-        moby_l01_turn_toward_target(a0, m);
-        if (vec_distance_xy(a0 + 0x10, m) < 0.5f) {
+        moby_l01_turn_toward_target(moby, m);
+        if (vec_distance_xy(moby + 0x10, m) < 0.5f) {
             *(s32 *)(st + 0x26C) = 1;
-            moby_set_state(a0, 0x14, 2);
-            if (a0[0x43] != 0x13) {
-                anim_start_blended(a0, 0x13, 0, 0xF);
+            moby_set_state(moby, 0x14, 2);
+            if (moby[0x43] != 0x13) {
+                anim_start_blended(moby, 0x13, 0, 0xF);
             }
         }
         break;
     case 24:
-        if (a0[0x60] & 2) {
-            if (a0[0x43] != 0xE) {
-                anim_start_blended(a0, 0xE, 0, 0xA);
+        if (moby[0x60] & 2) {
+            if (moby[0x43] != 0xE) {
+                anim_start_blended(moby, 0xE, 0, 0xA);
             }
-            moby_set_state(a0, 0x15, 2);
+            moby_set_state(moby, 0x15, 2);
             if (*(s32 *)(st + 0x280) == 1) {
-                if (a0[0x43] != 0xE) {
-                    anim_start_blended(a0, 0xE, 0, 0xA);
+                if (moby[0x43] != 0xE) {
+                    anim_start_blended(moby, 0xE, 0, 0xA);
                 }
-                moby_set_state(a0, 0x13, 2);
+                moby_set_state(moby, 0x13, 2);
             }
-            if (*(s32 *)(st + 0x2A8) != 0 && g_hero_position[2] - *(float *)(a0 + 0x18) > 6.0f) {
-                moby_set_state(a0, 0x19, -1);
-                if (a0[0x43] != 0x11) {
-                    anim_start_blended(a0, 0x11, 0, 0x14);
+            if (*(s32 *)(st + 0x2A8) != 0 && g_hero_position[2] - *(float *)(moby + 0x18) > 6.0f) {
+                moby_set_state(moby, 0x19, -1);
+                if (moby[0x43] != 0x11) {
+                    anim_start_blended(moby, 0x11, 0, 0x14);
                 }
             }
-            if (*(s32 *)(st + 0x368) != 0 && vec_distance_xy(a0 + 0x10, st + 0x370) > 4.0f) {
-                moby_set_state(a0, 0x1D, -1);
-                if (a0[0x43] != 0xD) {
-                    anim_start_blended(a0, 0xD, 0, 0xA);
+            if (*(s32 *)(st + 0x368) != 0 && vec_distance_xy(moby + 0x10, st + 0x370) > 4.0f) {
+                moby_set_state(moby, 0x1D, -1);
+                if (moby[0x43] != 0xD) {
+                    anim_start_blended(moby, 0xD, 0, 0xA);
                 }
             }
         }
@@ -961,5 +961,5 @@ void guard_l13_update_us2(u8 *a0)
     default:
         break;
     }
-    guard_update_hit_timer(a0);
+    guard_update_hit_timer(moby);
 }

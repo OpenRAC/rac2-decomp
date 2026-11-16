@@ -27,7 +27,8 @@ extern float g_texture_scroll_step;
 extern int g_ripple_grid_duration,g_ripple_grid_fade_start;
 typedef unsigned int Quad57 __attribute__((mode(TI)));
 
-void func_PAL_L06_003E8E68(u8 *moby) {
+/* Draws the flowing ribbon of glowing strips for a ribbon moby. It fades the ribbon out when the player is far away (PAL). */
+void gfx_l06_draw_ribbon_effect_pal(u8 *moby) {
     char *data = (*(char **)(moby + 0x68));
     char *base = *(char **)((*(int *)(data + 0xc) << 8) + (int)g_moby_l06_table + 0x68);
     char scratch[(unsigned int)*(int *)(data + 4) * 0x40];

@@ -44,7 +44,7 @@ static __inline__ int footer_y(float value, float scale, float half, int active)
     return (int)scaled;
 }
 
-void func_PAL_L02_003C80F8(char *obj) {
+void menu_draw_challenge_pal(char *obj) {
     char *text;
     int state;
     char *id;

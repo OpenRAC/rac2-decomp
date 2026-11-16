@@ -30,7 +30,7 @@ extern float coll_probe_ground_height_below(void *, int, float);
 extern void moby_transform_joint_to_world(void *, int, void *);
 extern void vec_add_random_offset(float *, float);
 extern float weapon_compute_shot_launch_speed(void *, void *, int, float, float);
-extern char *func_PAL_L06_003F77D8(void *, void *, void *, int, int);
+extern char *flock_create_member_pal(void *, void *, void *, int, int);
 extern int PlayMobySound(int, int, void *);
 extern void SpawnExplosionEffects(void *, void *, void *, float, float, int, int, int, float, float, float, float,
                          int, float, int, int, int, int, int);
@@ -49,12 +49,12 @@ typedef struct {
 } SpawnerSlots;
 
 /* Select a spawn point, launch a child and retire the spawner when destroyed. */
-void func_PAL_L06_003F70C8(char *moby)
+void spawner_moby_update_pal(char *moby)
 {
     Vector point, delta, origin, step;
     char *region;
     void *anchor;
-    int hasAnchor;
+    int has_anchor;
     char *path_points;
     int path_count;
     char *path;
@@ -80,19 +80,19 @@ void func_PAL_L06_003F70C8(char *moby)
             break;
         if (!math_random_int_below(7)) {
             anchor = 0;
-            hasAnchor = 0;
+            has_anchor = 0;
             path_points = 0;
             path_count = 0;
             if (*(int *)(state + 0x74) != -1) {
                 anchor = state + 0x74;
-                hasAnchor = 1;
+                has_anchor = 1;
             }
             if (*(int *)(state + 0x78) != -1) {
                 path = g_path_list[*(int *)(state + 0x78)];
                 path_points = path + 0x10;
                 path_count = *(int *)path;
             }
-            FindHeroOrMobyTarget(moby, state + 0xF0, anchor, hasAnchor,
+            FindHeroOrMobyTarget(moby, state + 0xF0, anchor, has_anchor,
                              path_points, path_count,
                              *(float *)(state + 0x70));
         } else {
@@ -181,7 +181,7 @@ void func_PAL_L06_003F70C8(char *moby)
                 FastVecAdd(origin, origin, step);
                 delta[2] = weapon_compute_shot_launch_speed(origin, point, 0, distance, -0.00392f);
             }
-            ((SpawnerSlots *)state)->children[slot] = func_PAL_L06_003F77D8(moby, origin, delta,
+            ((SpawnerSlots *)state)->children[slot] = flock_create_member_pal(moby, origin, delta,
                                                *(unsigned char *)(state + 0x83), (unsigned char)slot);
             PlayMobySound(0, 0, moby);
             *(short *)(state + 0x7E) = ((s32)(*(short *)(state + 0x7C)) * 5 + 2) / 6;

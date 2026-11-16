@@ -1,12 +1,12 @@
 #include "names.h"
 /* func_PAL_003402F0, the PAL copy of func_0033E348: the same C, where rename func_00348128 becomes func_PAL_0034A2F0. */
 
-extern int func_PAL_003402F0(int);
+extern int list_menu_get_selected_index_pal(int);
 
 extern int menu_get_selected_index_pal(unsigned char *);
 
 /* Qwen draft (branch qwen/autonomy, 4419d477), checked by tools/check.py */
-int func_PAL_003402F0(int owner)
+int list_menu_get_selected_index_pal(int owner)
 {
     return menu_get_selected_index_pal((unsigned char *)(owner + 0x2e0));
 }

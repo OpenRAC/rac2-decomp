@@ -102,7 +102,7 @@ extern int g_beam_color_green[] __attribute__((sda));
 extern int g_beam_color_blue[] __attribute__((sda));
 
 /* func_US2_L30_00413C18, the v2.00 copy of func_L30_004135A0: the same C, where the title string becomes a text lookup. */
-void func_US2_L30_00413C18(char *obj) {
+void museum_tweak_menu_draw_us2(char *obj) {
     char text[256];
     int i = 0, count = 0;
     int *st = *(int **)(obj + 0x68);
@@ -141,6 +141,7 @@ void func_US2_L30_00413C18(char *obj) {
     }
 }
 
+/* Updates the projectile tester: opens one of two tuning menus on a button press, then fires a test projectile when the camera check passes. */
 void museum_projectile_tester_update_us2(char *obj) {
     float matrix[16];
     float velocity[4];

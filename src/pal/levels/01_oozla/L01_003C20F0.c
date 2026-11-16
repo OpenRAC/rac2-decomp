@@ -28,35 +28,36 @@ extern void get_moby_color(void *, int *, int *, int *);
 extern void set_moby_color(void *, int, int, int);
 extern int FastTweenColor(unsigned int, unsigned int, float);
 
-void func_PAL_L01_003C20F0(L01_003BE4D0_OBJ *obj)
+/* Counts down the moby's timers and fades its colour towards the glow colour or back to dark (PAL: 50 Hz timings). */
+void firefly_update_timers_and_color_pal(L01_003BE4D0_OBJ *moby)
 {
-    L01_003BE4D0_STATE *s = obj->f68;
+    L01_003BE4D0_STATE *state = moby->f68;
     int red, green, blue;
     unsigned int target;
     int color;
 
-    if (obj->fBC != 0) {
-        obj->fBC = 0;
-        if (s->timer238 < 167) {
-            s->timer238 = ((s32)(math_random_int_range(300, 360)) * 5 + 2) / 6;
+    if (moby->fBC != 0) {
+        moby->fBC = 0;
+        if (state->timer238 < 167) {
+            state->timer238 = ((s32)(math_random_int_range(300, 360)) * 5 + 2) / 6;
         }
     }
-    if (s->f114 != 1) {
-        math_fast_float_d(&s->timer238);
+    if (state->f114 != 1) {
+        math_fast_float_d(&state->timer238);
     }
-    if (obj->f96 <= 0xFFFD) {
-        obj->f96 = obj->f96 + 1;
+    if (moby->f96 <= 0xFFFD) {
+        moby->f96 = moby->f96 + 1;
     }
-    math_fast_float_d(&s->timer230);
-    math_fast_float_d(&s->timer23C);
+    math_fast_float_d(&state->timer230);
+    math_fast_float_d(&state->timer23C);
     /* Pack the current colour as 0x80BBGGRR, then blend it towards the target. */
-    get_moby_color(obj, &red, &green, &blue);
+    get_moby_color(moby, &red, &green, &blue);
     {
         unsigned int alpha_green = (green << 8) | 0x80000000u;
         unsigned int alpha_blue_green = (blue << 16) | alpha_green;
         color = alpha_blue_green | red;
     }
-    if (s->f290 != 0 && obj->f20 < 9) {
+    if (state->f290 != 0 && moby->f20 < 9) {
         target = 0x8040E0F0;
         color = FastTweenColor(color, target, 0.060000002f);
     } else {
@@ -66,6 +67,6 @@ void func_PAL_L01_003C20F0(L01_003BE4D0_OBJ *obj)
     red = color & 0xFF;
     green = (color >> 8) & 0xFF;
     blue = (color >> 16) & 0xFF;
-    set_moby_color(obj, red, green, blue);
+    set_moby_color(moby, red, green, blue);
 }
 

@@ -6,10 +6,10 @@ extern float mat_fast_helper_a(float a, float b);
 extern float FastAddRotations(float a, float b);
 extern int FastDecTimer(short *p);
 extern int math_random_int_range(int a0, int a1);
-extern int moby_move_to_target_temp_limits(char *a0, char *a1, float f12, char *a2, float f13, float f14);
+extern int moby_move_to_target_temp_limits(char *a0, char *a1, float f12, char *a2, float turn_arg_a, float turn_arg_b);
 
 /* Aim the record at the shape the caller found. */
-int enemy_aim_toward_target_pal(char *self, float *target, char *third, float amount, float f13, float f14)
+int enemy_aim_toward_target_pal(char *self, float *target, char *third, float amount, float turn_arg_a, float turn_arg_b)
 {
     char *data = (char *)moby_get_vars_word_18(self);
     float angle;
@@ -26,6 +26,6 @@ int enemy_aim_toward_target_pal(char *self, float *target, char *third, float am
             *(short *)(data + 0xE0) = math_random_int_range(*(short *)(data + 0xE2), *(short *)(data + 0xE4));
         }
     }
-    return moby_move_to_target_temp_limits(self, target, angle, third, f13, f14);
+    return moby_move_to_target_temp_limits(self, target, angle, third, turn_arg_a, turn_arg_b);
 }
 

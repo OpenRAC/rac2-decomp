@@ -23,42 +23,42 @@ extern float func_002E35D0(char *);
 extern float func_002E35A0(float *);
 
 extern float swing_vector __asm__("D_L01_001B2EF0") MACRO_ADDR;
-void func_PAL_L01_0039C7E8(int a0)
+void part_pick_random_wind_and_count_pal(int weather_type)
 {
-    float s, x, y, lo, hi;
+    float wind_speed, change_delay_min, change_delay_max, min_count, max_count;
 
-    if (a0 == 0) {
-        s = 5.0f;
-        y = 10.0f;
-        x = 2.0f;
-        hi = 8.0f;
-        lo = 4.0f;
+    if (weather_type == 0) {
+        wind_speed = 5.0f;
+        change_delay_max = 10.0f;
+        change_delay_min = 2.0f;
+        max_count = 8.0f;
+        min_count = 4.0f;
     } else {
-        s = 2.5f;
-        y = 10.0f;
-        x = 20.0f;
-        hi = 3.0f;
-        lo = 2.0f;
+        wind_speed = 2.5f;
+        change_delay_max = 10.0f;
+        change_delay_min = 20.0f;
+        max_count = 3.0f;
+        min_count = 2.0f;
     }
 
     if (g_wind_min_count >= 0.0f)
-        lo = g_wind_min_count;
+        min_count = g_wind_min_count;
     if (g_wind_max_count >= 0.0f)
-        hi = g_wind_max_count;
+        max_count = g_wind_max_count;
 
     {
-        float k = s * 0.020000001f;
+        float step = wind_speed * 0.020000001f;
         float v[4];
 
-        g_wind_x = func_00310580(-k, k);
-        g_wind_y[0] = func_00310580(-k, k);
-        g_wind_change_delay = func_00310580((x * 5.0f + 2.0f) * 0.16666667f,
-                                       (y * 5.0f + 2.0f) * 0.16666667f);
-        v[0] = k;
-        v[1] = k;
+        g_wind_x = func_00310580(-step, step);
+        g_wind_y[0] = func_00310580(-step, step);
+        g_wind_change_delay = func_00310580((change_delay_min * 5.0f + 2.0f) * 0.16666667f,
+                                       (change_delay_max * 5.0f + 2.0f) * 0.16666667f);
+        v[0] = step;
+        v[1] = step;
         g_wind_particle_count = (int)((func_002E35D0((char *)&swing_vector) /
                             func_002E35A0(v)) *
-                               (hi - lo) +
-                           lo);
+                               (max_count - min_count) +
+                           min_count);
     }
 }

@@ -42,16 +42,16 @@ extern void hrugis_reset_mission_state(void *);
 extern void *g_gate_first __attribute__((sda)), *g_gate_second __attribute__((sda));
 extern void moby_mark_spawned(void *);
 
-void func_US2_L10_00425CD8(char *object)
+void mission_first_update_us2(char *object)
 {
-    char **all;
-    int result;
-    char *st = *(char **)(object + 0x68);
-    char *p;
+    char **objects;
+    int count;
+    char *vars = *(char **)(object + 0x68);
+    char *group;
     int i;
     if (!g_mission_initialized) {
         typedef int Quad __attribute__((mode(TI)));
-        union { Quad q; float f[4]; } av, bv;
+        union { Quad q; float f[4]; } start_point, end_point;
         g_mission_progress_flag = 0;
         g_mission_initialized = 1;
         g_hud_blink_timer_first = 0;
@@ -59,17 +59,17 @@ void func_US2_L10_00425CD8(char *object)
         music_Unpause();
         entry_init_all_registered();
         hero_set_state_value_a(0);
-        all = level_get_object_list();
-        result = level_get_saved_value();
-        for (i = 0; i < result; i++) {
-            if (*(short *)(all[i] + 0xAA) == 0xF85) entry_spawn_list_objects_with_flag(all[i], 1);
+        objects = level_get_object_list();
+        count = level_get_saved_value();
+        for (i = 0; i < count; i++) {
+            if (*(short *)(objects[i] + 0xAA) == 0xF85) entry_spawn_list_objects_with_flag(objects[i], 1);
         }
         cloud_destroy_leftover_objects();
         cloud_spawn_objects(75,16);
-        av.q = 0; bv.q = 0;
-        av.f[0] = 469.63f; av.f[1] = 407.93f; av.f[2] = 502.79f;
-        bv.f[0] = 476.13f; bv.f[1] = 415.41f; bv.f[2] = 502.79f;
-        CreateEnergyStrip(&av,&bv,1,2000000,0x7F7F7F,0xFF1010,70,70,0.5f,0.2f,0.402f,1.12225f);
+        start_point.q = 0; end_point.q = 0;
+        start_point.f[0] = 469.63f; start_point.f[1] = 407.93f; start_point.f[2] = 502.79f;
+        end_point.f[0] = 476.13f; end_point.f[1] = 415.41f; end_point.f[2] = 502.79f;
+        CreateEnergyStrip(&start_point,&end_point,1,2000000,0x7F7F7F,0xFF1010,70,70,0.5f,0.2f,0.402f,1.12225f);
         if (g_gate_first) {
             moby_mark_spawned(g_gate_first);
             g_gate_first = 0;
@@ -79,20 +79,20 @@ void func_US2_L10_00425CD8(char *object)
             g_gate_second = 0;
         }
     }
-    p = level_find_object_by_class_id(0xF85);
-    result = p ? group_count_alive(p) : 0;
-    if (!result) {
+    group = level_find_object_by_class_id(0xF85);
+    count = group ? group_count_alive(group) : 0;
+    if (!count) {
         entry_init_all_registered();
         if (g_no_first_completion_flag) {
-            if (math_fast_float_d(st + 0x58)) {
-                *(int *)(st + 0x58) = 10;
+            if (math_fast_float_d(vars + 0x58)) {
+                *(int *)(vars + 0x58) = 10;
                 moby_mark_flag_and_append_to_list(12);
-                moby_set_flag_bit(g_moby_base_table + *(int *)(st + 0x2C) * 256,1);
+                moby_set_flag_bit(g_moby_base_table + *(int *)(vars + 0x2C) * 256,1);
                 g_state_frame_count = 0;
                 g_no_first_completion_flag = 0;
                 hero_set_state_value_c(1);
             }
-        } else if (math_fast_float_d(st + 0x58)) {
+        } else if (math_fast_float_d(vars + 0x58)) {
             hrugis_finish_mission_reward_us2(object,0);
             g_hud_blink_timer_first = 0;
             g_hud_blink_timer_second = 0;
@@ -100,13 +100,13 @@ void func_US2_L10_00425CD8(char *object)
     }
 }
 
-void func_US2_L10_00425F48(u8 *a0) {
-    u8 **p;
-    int n;
+void mission_second_update_us2(u8 *moby) {
+    u8 **objects;
+    int count;
     int i;
-    u8 *o;
-    void *v;
-    int r;
+    u8 *object;
+    void *group;
+    int alive;
 
     if (g_mission_initialized == 0) {
         g_mission_initialized = 1;
@@ -114,19 +114,19 @@ void func_US2_L10_00425F48(u8 *a0) {
         music_Unpause();
         entry_init_all_registered();
         hero_set_state_value_a(0);
-        p = level_get_object_list();
-        n = level_get_saved_value();
-        for (i = 0; i < n; i++) {
-            o = p[i];
-            switch (*(short *)(o + 0xAA)) {
+        objects = level_get_object_list();
+        count = level_get_saved_value();
+        for (i = 0; i < count; i++) {
+            object = objects[i];
+            switch (*(short *)(object + 0xAA)) {
             case 0xCBE:
-                entry_spawn_list_objects_with_flag(o, 1);
+                entry_spawn_list_objects_with_flag(object, 1);
                 break;
             case 0xF93:
-                entry_spawn_list_objects_with_flag(o, 1);
-                func_L05_0037CEE0(p[i], g_spot_record_table + g_mission_state.idx * 128 + 0x30, 64.0f);
-                func_L05_0037D608(p[i], g_spot_record_table + g_mission_state.idx * 128 + 0x30, 64.0f);
-                hrugis_set_group_states(p[i]);
+                entry_spawn_list_objects_with_flag(object, 1);
+                func_L05_0037CEE0(objects[i], g_spot_record_table + g_mission_state.idx * 128 + 0x30, 64.0f);
+                func_L05_0037D608(objects[i], g_spot_record_table + g_mission_state.idx * 128 + 0x30, 64.0f);
+                hrugis_set_group_states(objects[i]);
                 break;
             }
         }
@@ -141,14 +141,14 @@ void func_US2_L10_00425F48(u8 *a0) {
             g_gate_second = 0;
         }
     }
-    v = level_find_object_by_class_id(0xF93);
-    r = v ? group_count_alive(v) : 0;
-    if (r == 0) {
-        hrugis_finish_mission_reward_us2(a0, 1);
+    group = level_find_object_by_class_id(0xF93);
+    alive = group ? group_count_alive(group) : 0;
+    if (alive == 0) {
+        hrugis_finish_mission_reward_us2(moby, 1);
     }
     if (list_count_ready_objects(level_find_object_by_class_id(0xCBE)) == 0) {
         FadeToBlack(0x1E);
         hero_set_state_value_c(0);
-        hrugis_reset_mission_state(a0);
+        hrugis_reset_mission_state(moby);
     }
 }

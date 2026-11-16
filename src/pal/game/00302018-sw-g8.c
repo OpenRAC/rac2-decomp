@@ -22,14 +22,14 @@ extern void *part_spawn_ground_effect(void *, u32, u32, u32, s32, s32, s32, f32,
    0xD..0x13, 1 for any other) to the running total, and to the player's row of the table when
    the owner's flag is set or a counted owner is below the limit pointer, then plays the sound
    and throws two bursts of sparks from the object. */
-void func_PAL_00302E18(u8 *obj) {
-    f32 buf[4];
+void CollectBolts_pal(u8 *bolt) {
+    f32 direction[4];
     f32 pos[4];
     s32 score;
     s32 sign;
-    f32 f20;
+    f32 rand_scale;
 
-    switch ((short)(*(unsigned short *)(obj + 0xAA) - 0xD)) {
+    switch ((short)(*(unsigned short *)(bolt + 0xAA) - 0xD)) {
     default:
     case 0:
         score = 1;
@@ -54,16 +54,16 @@ void func_PAL_00302E18(u8 *obj) {
         break;
     }
     g_player_bolts = g_player_bolts + score;
-    if (*(u8 *)(*(u8 **)(obj + 0x68) + 0x40) != 0 || (g_bolt_pickup_enabled != 0 && (u32)obj < g_moby_pool_end))
+    if (*(u8 *)(*(u8 **)(bolt + 0x68) + 0x40) != 0 || (g_bolt_pickup_enabled != 0 && (u32)bolt < g_moby_pool_end))
         g_level_bolt_scores[g_current_map_index] += score;
     level_forward_value(0x96);
-    vec_random_direction(buf, 0.014f, 0.020000001f);
-    FastVecScale(pos, buf, 10.0f);
-    FastVecAdd(pos, pos, obj + 0x10);
+    vec_random_direction(direction, 0.014f, 0.020000001f);
+    FastVecScale(pos, direction, 10.0f);
+    FastVecAdd(pos, pos, bolt + 0x10);
     sign = math_random_int_below(2);
     if (sign == 0)
         sign = sign - 1;
-    f20 = math_random_float_range(0.4f, 0.5f);
-    part_spawn_ground_effect(pos, 0x15, 0x7F207F7F, 0, sign, (s32)buf, 0, f20 * 0.2f, f20, 0.0f);
-    part_spawn_ground_effect(pos, 0x15, 0x7F7F7F7F, 1, -sign, (s32)buf, 0, f20 * 0.14f, f20 * 0.7f, 0.0f);
+    rand_scale = math_random_float_range(0.4f, 0.5f);
+    part_spawn_ground_effect(pos, 0x15, 0x7F207F7F, 0, sign, (s32)direction, 0, rand_scale * 0.2f, rand_scale, 0.0f);
+    part_spawn_ground_effect(pos, 0x15, 0x7F7F7F7F, 1, -sign, (s32)direction, 0, rand_scale * 0.14f, rand_scale * 0.7f, 0.0f);
 }

@@ -10,28 +10,29 @@ extern void Fe617c30b_FUN_002B9180(char *p);
 
 /* func_002BAE50 is matched in its own unit, src/game/002BAE50.c (default flags). */
 
-void part_update_scaling_pal(char *a0)
+/* Scales a particle over its lifetime, moves it with a slowing velocity, steps its color and removes it when its time is up (PAL). */
+void part_update_scaling_pal(char *part)
 {
-    char *s0 = a0 + 32;
-    int x;
-    int u;
-    int t;
+    char *data = part + 32;
+    int lifetime;
+    int scaled;
+    int time_left;
     float f;
 
-    x = *(int *)(s0 + 28);
-    t = *(short *)(a0 + 10);
-    u = *(short *)(s0 + 24) * (x - t) / x + *(short *)(s0 + 26);
+    lifetime = *(int *)(data + 28);
+    time_left = *(short *)(part + 10);
+    scaled = *(short *)(data + 24) * (lifetime - time_left) / lifetime + *(short *)(data + 26);
 
-    f = Fe617c30b_FUN_00283CE0(u) * 1000.0f;
-    *(float *)(a0 + 12) = f;
-    Fe617c30b_FUN_00282D30(s0, s0, 0.976f);
-    Fe617c30b_FUN_00282CC0(a0 + 16, a0 + 16, s0);
-    *(unsigned char *)(a0 + 8) = *(unsigned char *)(a0 + 8) + 1;
-    f = Fe617c30b_FUN_00283CE0(*(int *)(s0 + 28));
-    *(int *)(a0 + 4) = Fe617c30b_FUN_002A9568(*(int *)(s0 + 20), *(int *)(s0 + 16),
-                               (float)*(short *)(a0 + 10) / f);
-    if (Fe617c30b_FUN_00282978(a0 + 10) != 0)
-        Fe617c30b_FUN_002B9180(a0);
+    f = Fe617c30b_FUN_00283CE0(scaled) * 1000.0f;
+    *(float *)(part + 12) = f;
+    Fe617c30b_FUN_00282D30(data, data, 0.976f);
+    Fe617c30b_FUN_00282CC0(part + 16, part + 16, data);
+    *(unsigned char *)(part + 8) = *(unsigned char *)(part + 8) + 1;
+    f = Fe617c30b_FUN_00283CE0(*(int *)(data + 28));
+    *(int *)(part + 4) = Fe617c30b_FUN_002A9568(*(int *)(data + 20), *(int *)(data + 16),
+                               (float)*(short *)(part + 10) / f);
+    if (Fe617c30b_FUN_00282978(part + 10) != 0)
+        Fe617c30b_FUN_002B9180(part);
 }
 
 
@@ -39,24 +40,25 @@ extern void part_kill(char *);
 extern s32 math_fast_float_d(void *);
 extern void vec_transform_or_copy(char *, char *);
 
-void func_PAL_002BBC10(u8 *a0)
+/* Moves a particle with a transform, grows it with a step value and fades its alpha out over the last 5 frames, removing it when its timer runs out. */
+void part_update_moving_fade_out_pal(u8 *part)
 {
-    u8 *s0 = a0;
-    u8 *s1 = a0 + 0x20;
+    u8 *part_ptr = part;
+    u8 *data = part + 0x20;
 
-    if (math_fast_float_d((char *)s1) != 0) {
-        part_kill((char *)s0);
+    if (math_fast_float_d((char *)data) != 0) {
+        part_kill((char *)part_ptr);
         return;
     }
     {
-        u8 *p = s0 + 0x10;
+        u8 *pos = part_ptr + 0x10;
 
-        vec_transform_or_copy((char *)p, (char *)p);
+        vec_transform_or_copy((char *)pos, (char *)pos);
     }
-    *(f32 *)(s0 + 0xC) = *(f32 *)(s0 + 0xC) + *(f32 *)(s1 + 4);
-    if (*(s32 *)(s1) < 5) {
-        *(unsigned int *)(s0 + 4) = (*(unsigned int *)(s0 + 4) & 0xFFFFFF)
-            | ((unsigned int)(*(s32 *)(s1) * 127 / 5) << 24);
+    *(f32 *)(part_ptr + 0xC) = *(f32 *)(part_ptr + 0xC) + *(f32 *)(data + 4);
+    if (*(s32 *)(data) < 5) {
+        *(unsigned int *)(part_ptr + 4) = (*(unsigned int *)(part_ptr + 4) & 0xFFFFFF)
+            | ((unsigned int)(*(s32 *)(data) * 127 / 5) << 24);
     }
 }
 
@@ -66,17 +68,18 @@ void func_PAL_002BBC10(u8 *a0)
 extern int Fb77d67f1_FUN_00282948(char *p);
 extern void Fb77d67f1_FUN_002B9180(char *p);
 
-void func_PAL_002BC400(char *a0)
+/* Grows a particle with a step value and fades its alpha out over the last 5 frames, removing it when its timer runs out. */
+void part_update_growing_fade_out_pal(char *part)
 {
-    char *p = a0 + 32;
+    char *data = part + 32;
 
-    if (Fb77d67f1_FUN_00282948(p) != 0) {
-        Fb77d67f1_FUN_002B9180(a0);
+    if (Fb77d67f1_FUN_00282948(data) != 0) {
+        Fb77d67f1_FUN_002B9180(part);
         return;
     }
-    *(float *)(a0 + 12) = *(float *)(a0 + 12) + *(float *)(p + 4);
-    if (*(int *)(a0 + 32) < 5)
-        *(int *)(a0 + 4) = (*(int *)(a0 + 4) & 0xFFFFFF)
-                         | ((*(int *)(a0 + 32) * 127 / 5) << 24);
+    *(float *)(part + 12) = *(float *)(part + 12) + *(float *)(data + 4);
+    if (*(int *)(part + 32) < 5)
+        *(int *)(part + 4) = (*(int *)(part + 4) & 0xFFFFFF)
+                         | ((*(int *)(part + 32) * 127 / 5) << 24);
 }
 

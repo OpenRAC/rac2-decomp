@@ -10,12 +10,12 @@ extern int IsPointInCuboid(void *, int);
 extern int flag_set_first_pending(char *);
 extern void cam_lock_entry(int);
 extern int ForceClaimNotice(int, int, int);
-extern int func_PAL_L11_002D9038(int, int);
+extern int hero_l11_enter_state_pal(int, int);
 extern float FastAddRotations(float, float);
 
 /* State 0 opens the trigger; state 1 reacts to the hero being on the object, or being in state
  * 0x82 inside its cuboid. Then pulses the object's colour, in the channel the flag selects. */
-void func_PAL_L11_003D2E78(char *obj)
+void levitator_l11_pad_update_pal(char *obj)
 {
     char *rig = *(char **)(obj + 0x68);
     char *hero, *other;
@@ -49,7 +49,7 @@ void func_PAL_L11_003D2E78(char *obj)
             if (*(int *)(other + 0x2294) == 0x82) {
                 level = *(int *)(rig + 8);
                 if (level >= 0 && IsPointInCuboid(other + 0x80, level) != 0)
-                    func_PAL_L11_002D9038(6, 1);
+                    hero_l11_enter_state_pal(6, 1);
             }
         }
         break;

@@ -53,13 +53,13 @@ extern SceneCamera g_hero_l18_state_extra;
 extern ExplosionSpot g_explosion_spots[];
 
 extern void anim_start_startup_animations(void);
-extern void func_PAL_002E7270(void *);
+extern void update_equipment_pieces_pal(void *);
 extern void math_store_angle_update_result(void *, void *, unsigned int, unsigned int, float);
 extern void matrix_mul_vec3(void *, void *, void *);
 extern void FastVecAdd(void *, void *, void *);
 extern void *SpawnExplosion_pal(void *, int, int, int, int, int, int, int, float, float, int, int, int, int);
 
-void func_PAL_L18_00318BE0(void)
+void damosel_update_timed_explosions_pal(void)
 {
     float position[4] __attribute__((aligned(16)));
     int i, j, k;
@@ -75,10 +75,10 @@ void func_PAL_L18_00318BE0(void)
             *(unsigned short *)(object + 0x34) |= 0x800;
         }
         if (*(short *)(object + 0xAA) == 0xD54) {
-            func_PAL_002E7270(object);
+            update_equipment_pieces_pal(object);
         }
         if (object) {
-            int type = 0xFA0;
+            int type = MOBY_CLASS_TV_SCREENS;
 
             if (*(short *)(object + 0xAA) == type && g_current_map_index != 51) {
                 state = *(unsigned char **)(object + 0x68);

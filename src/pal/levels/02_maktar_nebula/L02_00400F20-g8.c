@@ -1,5 +1,6 @@
 #include "include_asm.h"
 #include "names.h"
+#include "moby_classes.h"
 
 typedef unsigned char u8;
 typedef short s16;
@@ -49,41 +50,41 @@ typedef struct {
 } L02_003FC9C0_Vec3;
 
 /* In state 8 the actor's 0xC0 object is created through func_PAL_L00_002D7850(5) when missing,
-   otherwise it gets one of three float triples: by the class (+0xAA, 0x9F8 or 0xA44) of the
+   otherwise it gets one of three float triples: by the class (+0xAA, MOBY_CLASS_CHAINBLADE or MOBY_CLASS_B2_BRAWLER_LEGS) of the
    0xD0 object, or the default one when there is none. In any other state the object is
    released through func_L00_002D7140 and the slot cleared.
    Each branch writes its own triple; the y and z stores (re-reading 0xC0) come out as one tail
    through cross-jumping after reload, which is why z keeps its own register ($f2). The stores
    are struct fields so the sda loads are not ordered behind them. */
-void actor_update_helper_offsets_pal(u8 *a0) {
-    u8 *s0 = *(u8 **)(a0 + 0x68);
+void actor_update_helper_offsets_pal(u8 *moby) {
+    u8 *vars = *(u8 **)(moby + 0x68);
 
-    if (*(u8 *)(a0 + 0x20) == 8) {
-        L02_003FC9C0_Vec3 *obj = *(L02_003FC9C0_Vec3 **)(s0 + 0xC0);
+    if (*(u8 *)(moby + 0x20) == 8) {
+        L02_003FC9C0_Vec3 *cam_slot = *(L02_003FC9C0_Vec3 **)(vars + 0xC0);
 
-        if (obj == 0) {
-            *(L02_003FC9C0_Vec3 **)(s0 + 0xC0) = cam_alloc_override_slot_pal(5);
+        if (cam_slot == 0) {
+            *(L02_003FC9C0_Vec3 **)(vars + 0xC0) = cam_alloc_override_slot_pal(5);
         } else {
-            u8 *src = *(u8 **)(s0 + 0xD0);
+            u8 *target_moby = *(u8 **)(vars + 0xD0);
 
-            if (src != 0) {
-                if (*(s16 *)(src + 0xAA) == 0x9F8) {
-                    obj->x = g_helper_offset_b_x;
-                    (*(L02_003FC9C0_Vec3 **)(s0 + 0xC0))->y = g_helper_offset_b_y;
-                    (*(L02_003FC9C0_Vec3 **)(s0 + 0xC0))->z = g_helper_offset_b_z;
-                } else if (*(s16 *)(src + 0xAA) == 0xA44) {
-                    obj->x = g_helper_offset_c_x;
-                    (*(L02_003FC9C0_Vec3 **)(s0 + 0xC0))->y = g_helper_offset_c_y;
-                    (*(L02_003FC9C0_Vec3 **)(s0 + 0xC0))->z = g_helper_offset_c_z;
+            if (target_moby != 0) {
+                if (*(s16 *)(target_moby + 0xAA) == MOBY_CLASS_CHAINBLADE) {
+                    cam_slot->x = g_helper_offset_b_x;
+                    (*(L02_003FC9C0_Vec3 **)(vars + 0xC0))->y = g_helper_offset_b_y;
+                    (*(L02_003FC9C0_Vec3 **)(vars + 0xC0))->z = g_helper_offset_b_z;
+                } else if (*(s16 *)(target_moby + 0xAA) == MOBY_CLASS_B2_BRAWLER_LEGS) {
+                    cam_slot->x = g_helper_offset_c_x;
+                    (*(L02_003FC9C0_Vec3 **)(vars + 0xC0))->y = g_helper_offset_c_y;
+                    (*(L02_003FC9C0_Vec3 **)(vars + 0xC0))->z = g_helper_offset_c_z;
                 }
             } else {
-                obj->x = g_helper_offset_a_x;
-                (*(L02_003FC9C0_Vec3 **)(s0 + 0xC0))->y = g_helper_offset_a_y;
-                (*(L02_003FC9C0_Vec3 **)(s0 + 0xC0))->z = g_helper_offset_a_z;
+                cam_slot->x = g_helper_offset_a_x;
+                (*(L02_003FC9C0_Vec3 **)(vars + 0xC0))->y = g_helper_offset_a_y;
+                (*(L02_003FC9C0_Vec3 **)(vars + 0xC0))->z = g_helper_offset_a_z;
             }
         }
     } else {
-        cam_end_override(*(L02_003FC9C0_Vec3 **)(s0 + 0xC0));
-        *(L02_003FC9C0_Vec3 **)(s0 + 0xC0) = 0;
+        cam_end_override(*(L02_003FC9C0_Vec3 **)(vars + 0xC0));
+        *(L02_003FC9C0_Vec3 **)(vars + 0xC0) = 0;
     }
 }

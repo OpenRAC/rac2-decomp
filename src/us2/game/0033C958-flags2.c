@@ -9,6 +9,7 @@ extern char *GetLocalizedString(int);
 extern int sprintf(char *, const char *, ...);
 extern int text_draw_centered_small(int, int, unsigned long, char *, int);
 
+/* Draws the on/off option menu: the prompt bar and the current setting. */
 void onoff_menu_draw_us2(char *object)
 {
     char buffer[128];
@@ -25,7 +26,8 @@ void onoff_menu_draw_us2(char *object)
     text_draw_centered_small(0x100, 0xAA, 0x80F0F0F0UL, buffer, -1);
 }
 
-void func_US2_0033ED18(char *object)
+/* Draws a one-option menu: the prompt bar and the current setting. */
+void single_toggle_c_draw_us2(char *object)
 {
     char buffer[128];
     SolTextPair pair;
@@ -44,7 +46,8 @@ void func_US2_0033ED18(char *object)
 extern void *prompt_bar_destroy_us2(void *);
 extern unsigned long long menu_pass_through_handle(void *);
 
-void *func_US2_0033F1C0(char *object) {
+/* Destroys a list page: its prompt bar and list widgets. */
+void *list_page_destroy_us2(char *object) {
     prompt_bar_destroy_us2(object + 0x8);
     menu_pass_through_handle(object + 0x2E0);
     return object;
@@ -52,7 +55,8 @@ void *func_US2_0033F1C0(char *object) {
 
 extern void *hud_construct_widget_base(void *);
 
-void *func_US2_0033F4D0(char *object) {
+/* Destroys a simple list page: its prompt bar and list widget. */
+void *simple_list_page_destroy_us2(char *object) {
     prompt_bar_destroy_us2(object + 0x8);
     hud_construct_widget_base(object + 0x2E0);
     return object;
@@ -67,7 +71,7 @@ typedef struct {
     float scale;
 } Row_0033B910;
 extern void gfx_draw_screen_element_stored(char *);
-extern void func_US2_003378A0(char *);
+extern void text_label_draw_us2(char *);
 extern void hud_draw_colored_quad_widget(char *);
 extern void object_set_first_float4(void *, float, float, float, float);
 extern void hud_set_widget_value_pair(char *, int, int);
@@ -84,6 +88,7 @@ static __inline__ void SetColor_0033B910(char *w, int c)
     *object_get_fourth_field(w) = c;
 }
 
+/* Draws the map screen: its sprites, the level spots and the cursor lines. */
 void map_screen_draw_us2(char *obj)
 {
     int i;
@@ -92,9 +97,9 @@ void map_screen_draw_us2(char *obj)
     gfx_draw_screen_element_stored(obj);
     gfx_draw_screen_element_stored(obj + 0x4C);
     gfx_draw_screen_element_stored(obj + 0x98);
-    func_US2_003378A0(obj + 0x1D8);
-    func_US2_003378A0(obj + 0x230);
-    func_US2_003378A0(obj + 0x288);
+    text_label_draw_us2(obj + 0x1D8);
+    text_label_draw_us2(obj + 0x230);
+    text_label_draw_us2(obj + 0x288);
     hud_draw_colored_quad_widget(obj + 0x2E0);
     for (i = 0; i < 21; i++) {
         object_set_first_float4(obj + 0x31C, (float)g_map_spot_table[i].x + (*(float **)(obj + 0x1C8))[0],

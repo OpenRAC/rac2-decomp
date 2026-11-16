@@ -51,7 +51,7 @@ extern int g_item_ammo_counts[];
 extern int g_selected_item_material __attribute__((sda));
 extern int g_selection_grid_cursor[];
 
-int func_US2_00347B88(ItemMenu *menu, int buttons)
+int UpdateItemGridMenu_us2(ItemMenu *menu, int buttons)
 {
     float pos0[2] __attribute__((aligned(16)));
     float pos4C[2] __attribute__((aligned(16)));

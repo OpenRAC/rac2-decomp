@@ -30,12 +30,13 @@ extern float vec_distance_xy(void *a, void *b);
 
 void DrawScrollingTwoPassQuadMesh(u8 *object);
 
-void func_PAL_L12_00425F20(u8 *object)
+/* Makes the mesh ripple in waves while the hero is close enough to see it (PAL: 50 Hz timings). */
+void UpdateWaveMesh_pal(u8 *object)
 {
     float *data = *(float **)(object + 0x68);
     int i;
     float angle;
-    float a, b, c, d, e, f, g, h;
+    float wave0, wave1, wave2, wave3, wave4, wave5, wave6, wave7;
 
     switch (object[0x20]) {
     case 0:
@@ -70,53 +71,53 @@ void func_PAL_L12_00425F20(u8 *object)
         data[4] += ((data[5]) * 1.2f);
         if (data[4] >= 8.0f)
             data[4] -= 8.0f;
-        a = math_fast_sin_or_cos_b(data[0] * 3.141590118408203f) * 0.001f;
-        b = math_fast_sin_or_cos_b(data[1] * 3.141590118408203f) * 0.001f;
-        c = math_fast_sin_or_cos_b(data[2] * 3.141590118408203f) * 0.001f;
-        d = math_fast_sin_or_cos_b(data[3] * 3.141590118408203f) * 0.001f;
-        e = math_fast_sin_or_cos_b(data[0] * 3.141590118408203f) * 0.001f;
-        f = math_fast_sin_or_cos_b(data[1] * 3.141590118408203f) * 0.001f;
-        g = math_fast_sin_or_cos_b(data[2] * 3.141590118408203f) * 0.001f;
-        h = math_fast_sin_or_cos_b(data[3] * 3.141590118408203f) * 0.001f;
+        wave0 = math_fast_sin_or_cos_b(data[0] * 3.141590118408203f) * 0.001f;
+        wave1 = math_fast_sin_or_cos_b(data[1] * 3.141590118408203f) * 0.001f;
+        wave2 = math_fast_sin_or_cos_b(data[2] * 3.141590118408203f) * 0.001f;
+        wave3 = math_fast_sin_or_cos_b(data[3] * 3.141590118408203f) * 0.001f;
+        wave4 = math_fast_sin_or_cos_b(data[0] * 3.141590118408203f) * 0.001f;
+        wave5 = math_fast_sin_or_cos_b(data[1] * 3.141590118408203f) * 0.001f;
+        wave6 = math_fast_sin_or_cos_b(data[2] * 3.141590118408203f) * 0.001f;
+        wave7 = math_fast_sin_or_cos_b(data[3] * 3.141590118408203f) * 0.001f;
         for (i = 0; i < 21; i++) {
-            float *p = g_barrier_vertex_table[i];
+            float *vertex = g_barrier_vertex_table[i];
 
-            p[2] += a;
+            vertex[2] += wave0;
         }
         for (i = 21; i < 42; i++) {
-            float *p = g_barrier_vertex_table[i];
+            float *vertex = g_barrier_vertex_table[i];
 
-            p[2] += b;
+            vertex[2] += wave1;
         }
         for (i = 42; i < 63; i++) {
-            float *p = g_barrier_vertex_table[i];
+            float *vertex = g_barrier_vertex_table[i];
 
-            p[2] += c;
+            vertex[2] += wave2;
         }
         for (i = 63; i < 84; i++) {
-            float *p = g_barrier_vertex_table[i];
+            float *vertex = g_barrier_vertex_table[i];
 
-            p[2] += d;
+            vertex[2] += wave3;
         }
         for (i = 84; i < 105; i++) {
-            float *p = g_barrier_vertex_table[i];
+            float *vertex = g_barrier_vertex_table[i];
 
-            p[2] += e;
+            vertex[2] += wave4;
         }
         for (i = 105; i < 126; i++) {
-            float *p = g_barrier_vertex_table[i];
+            float *vertex = g_barrier_vertex_table[i];
 
-            p[2] += f;
+            vertex[2] += wave5;
         }
         for (i = 126; i < 147; i++) {
-            float *p = g_barrier_vertex_table[i];
+            float *vertex = g_barrier_vertex_table[i];
 
-            p[2] += g;
+            vertex[2] += wave6;
         }
         for (i = 147; i < 168; i++) {
-            float *p = g_barrier_vertex_table[i];
+            float *vertex = g_barrier_vertex_table[i];
 
-            p[2] += h;
+            vertex[2] += wave7;
         }
         data[0] += 0.01f;
         data[1] += 0.01f;

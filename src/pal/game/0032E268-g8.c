@@ -50,7 +50,7 @@ typedef unsigned int EffectQuad __attribute__((mode(TI)));
 typedef struct { float x, y, z, w; } EffectVec __attribute__((aligned(16)));
 
 /* Emits the explosion layers, debris and spinning sparks configured by the object. */
-void func_PAL_0032E268(char *object, void *radial, void *attachment, float distance)
+void EmitExplosionParticles_pal(char *object, void *radial, void *attachment, float distance)
 {
     EffectVec pos, velocity, rotated;
     char *state = *(char **)(object + 0x68), *particle;

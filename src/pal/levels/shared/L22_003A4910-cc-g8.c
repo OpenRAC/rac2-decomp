@@ -188,62 +188,62 @@ extern int DrawSpaceCombatHud(void);
 extern float fast_vec_dist(void *,void *);
 extern void moby_update_ground_check(void *),func_002A0F48(void *);
 extern void cam_compute_view_direction(void *,void *,int), vec_negate_and_forward(void *,void *,int);
-extern int func_PAL_002B1A50(void *,void *,int);
+extern int moby_apply_damage_to_object_pal(void *,void *,int);
 extern void moby_set_state(void *,int,int), cancel_hero_item_animation_pal(void), release_moby_animation_slot(void *,void *);
-extern s32 func_PAL_L22_002C99C8(int,int);
+extern s32 hero_l22_set_action_pal(int,int);
 
-/* Sets the record up on the first update (health scaled by difficulty, the object table
+/* Space ship setup and upkeep (PAL: 50 Hz tuning). Sets the record up on the first update (health scaled by difficulty, the object table
    scan, then the tuning block) and keeps the three child objects in step. The tuning
    block's order matters to the scheduler: f11C is the 34th memory reference after the
    call, so it flushes the pending list, and f1F8 and f1F9 precede the second health read. */
-void func_PAL_L22_003A4910(Obj_15D0 *obj) {
-    Vars_15D0 *p = obj->f68;
+void space_ship_init_and_update_pal(Obj_15D0 *obj) {
+    Vars_15D0 *vars = obj->f68;
     Obj_15D0 *found = 0;
-    Obj_15D0 *it;
+    Obj_15D0 *child;
     int i;
     char *base;
     typedef int Quad __attribute__((mode(TI)));
     union { Quad q; float f[4]; } vec;
     anim_choose_next_pal(obj);
     if (obj->f20 == 0) {
-        float factor, health, damageScale, rangeScale;
-        short x380;
+        float factor, health, damage_scale, range_scale;
+        short random_roll;
         int eight, alpha;
         int difficulty=g_space_ship_difficulty;
         if (g_space_ship_difficulty_threshold_b < difficulty) factor = 0.6f;
         else if (g_space_ship_difficulty_threshold_a < difficulty) factor = 0.9f;
         else goto full_health;
-        g_space_ship_max_health = (int)(p->f326*factor);
+        g_space_ship_max_health = (int)(vars->f326*factor);
         goto health_done;
 full_health:
-        g_space_ship_max_health = p->f326;
+        g_space_ship_max_health = vars->f326;
 health_done:
-        cam_reset_entry(p->f46C);
+        cam_reset_entry(vars->f46C);
         g_space_ship_timer = 1;
         func_001163A0(T1_COUNT);
-        p->f4EC=1;
+        vars->f4EC=1;
         g_flying_enemy_spawn_count=0; g_space_ship_pickup_slots=g_ship_pickup_table;
         g_flying_enemy_spawn_blocked=0;
-        p->f460=0; p->f41E=0;
+        vars->f460=0; vars->f41E=0;
         g_space_ship_active_flag=1; g_space_ship_mode=0;
-        p->f46A=0; p->f468=0;
-        p->f464=0; p->f344=0;
+        vars->f46A=0; vars->f468=0;
+        vars->f464=0; vars->f344=0;
         g_space_ship_lane_count=5;
-        { int *d=g_lane_slot_list; int *s=(int *)g_ship_init_params_template; int n; for(n=5;n!=0;n--) *d++=*s++; }
+        { int *dst=g_lane_slot_list; int *src=(int *)g_ship_init_params_template; int count; for(count=5;count!=0;count--) *dst++=*src++; }
         g_pickup_message_kind=-1; g_lane_check_index=0; g_pickup_message_timer=0;
-        p->f34E=0; p->f34C=0;
+        vars->f34E=0; vars->f34C=0;
         i=0; base=g_ship_slot_array_start;
         if(base<g_ship_slot_array_end) do {
-            int id;
-            Obj_15D0 *it;
-            it=(Obj_15D0 *)(base+i*256);
-            id=it->fAA;
-            if(id==0x27D) found=it;
-            if(id==0xE0B) ref_L22_003A15D0_00=it;
-            if(id==0x133A) it->f34|=0x41;
-            if(it->fAA==0xF6E) {
+            int class_id;
+            Obj_15D0 *child;
+            child=(Obj_15D0 *)(base+i*256);
+            class_id=child->fAA;
+            if(class_id==0x27D) found=child;
+            if(class_id==0xE0B) ref_L22_003A15D0_00=child;
+            if(class_id==0x133A) child->f34|=0x41;
+            if(child->fAA==0xF6E) {
                 Sub_15D0 *sub;
-                g_space_ship_target_moby=it; it->f30=255;
+                g_space_ship_target_moby=child; child->f30=255;
                 sub=(Sub_15D0 *)g_space_ship_target_moby->f68;
                 sub->f8=0; sub->fA=0; sub->fC=-1;
             }
@@ -252,89 +252,89 @@ health_done:
         } while(base+i*256<g_ship_slot_array_end);
         vec.q=0; vec.f[0]=0.00161f; vec.f[1]=0.29459f; vec.f[2]=1.57105f;
         qcopy(&g_hero_state.rotation,&vec); qcopy(&g_hero_state.position,(char *)found+0x10);
-        g_hero_state.health=p->f324;
+        g_hero_state.health=vars->f324;
         FastVecSub(&vec,(char *)obj+0x10,(char *)&g_hero_state.rotation+0x20);
         g_planet_radius=FastVecLength(&vec);
         obj->f34|=0x100;
-        x380=math_random_int_below(25);
+        random_roll=math_random_int_below(25);
         eight=8;
-        p->fD7=1; p->f70=37; p->f71=4;
-        p->f77=eight; p->f72=eight; p->f76=eight;
-        p->fCC=9; p->fCD=18; p->fCE=9; p->fCF=18; p->fD2=-1; p->fD3=-1;
+        vars->fD7=1; vars->f70=37; vars->f71=4;
+        vars->f77=eight; vars->f72=eight; vars->f76=eight;
+        vars->fCC=9; vars->fCD=18; vars->fCE=9; vars->fCF=18; vars->fD2=-1; vars->fD3=-1;
         health=(float)g_space_ship_max_health;
-        rangeScale=900.0f/health; damageScale=9.0f/health;
-        p->f7C=0.70000005f; p->f80=0.080000006f;
-        p->f84=0.060000002f; p->f88=0.120000005f;
-        p->f8C=0.024f; p->f90=3; p->f94=4;
-        p->f9C=0.4f; p->fA8=eight;
-        p->fBC=rangeScale; p->fB8=damageScale;
-        p->f130=0.0064000003f; p->f134=0.0064000003f;
-        p->f138=0.24000001f; p->f110=2.5f; p->f114=0.75f;
-        p->f120=2; p->f118=2.75f; p->f144=0; p->f380=x380;
-        p->f11C=2.75f; p->f1F8=12; p->f1F9=11;
+        range_scale=900.0f/health; damage_scale=9.0f/health;
+        vars->f7C=0.70000005f; vars->f80=0.080000006f;
+        vars->f84=0.060000002f; vars->f88=0.120000005f;
+        vars->f8C=0.024f; vars->f90=3; vars->f94=4;
+        vars->f9C=0.4f; vars->fA8=eight;
+        vars->fBC=range_scale; vars->fB8=damage_scale;
+        vars->f130=0.0064000003f; vars->f134=0.0064000003f;
+        vars->f138=0.24000001f; vars->f110=2.5f; vars->f114=0.75f;
+        vars->f120=2; vars->f118=2.75f; vars->f144=0; vars->f380=random_roll;
+        vars->f11C=2.75f; vars->f1F8=12; vars->f1F9=11;
         { float health=(float)g_space_ship_max_health;
-        p->f148|=1; p->f140=0.7853982448577881f;
-        p->f28=3; p->f26=50;
-        p->f20=health;
-        p->f24=(int)health; }
+        vars->f148|=1; vars->f140=0.7853982448577881f;
+        vars->f28=3; vars->f26=50;
+        vars->f20=health;
+        vars->f24=(int)health; }
         alpha=255; obj->f32=alpha; obj->f30=alpha; obj->f48=1.0f;
-        p->f374=-1; p->f382=-1; p->f35C=-1; p->f35A=-1; p->f358=-1;
-        p->f3EC=-1; p->f4E4=250;
-        p->f3E4=p->f3E8=0.0f; p->f388=0;
-        p->f378=0; p->f37C=0; p->f37A=0;
-        p->f35E=0; p->f350=0;
+        vars->f374=-1; vars->f382=-1; vars->f35C=-1; vars->f35A=-1; vars->f358=-1;
+        vars->f3EC=-1; vars->f4E4=250;
+        vars->f3E4=vars->f3E8=0.0f; vars->f388=0;
+        vars->f378=0; vars->f37C=0; vars->f37A=0;
+        vars->f35E=0; vars->f350=0;
         obj->f34|=0x4000;
         obj->f2C=obj->f24->f24*g_space_ship_part_scale_b;
         lane_build_connection_masks(obj); pickup_spawn_initial((char *)obj);
-        p->f440=CreateMoby(0xE0A); set_identity_rotation_rows((char *)p->f440+0xC0);
-        p->f444=CreateMoby(0xE0C); p->f448=CreateMoby(0xF8F);
-        p->f384=25; p->f43A=0;
+        vars->f440=CreateMoby(0xE0A); set_identity_rotation_rows((char *)vars->f440+0xC0);
+        vars->f444=CreateMoby(0xE0C); vars->f448=CreateMoby(0xF8F);
+        vars->f384=25; vars->f43A=0;
     }
     level_store_value_pair_pal(level_call_helper_return_true,DrawSpaceCombatHud);
-    if(p->f440) {
-        p->f440->f32=obj->f32; p->f440->f30=obj->f30;
-        p->f440->f38=obj->f38;
-        p->f440->f78=obj->f78;
-        p->f440->f31=1;
-        it=p->f440; it->f2C=it->f24->f24*g_space_ship_part_scale_b;
-        it=p->f440;
-        if(it->f31 && fast_vec_dist((char *)it+0x10,g_tether_origin)<24.0f) {
-            moby_update_ground_check(p->f440); p->f440->f6F=22;
+    if(vars->f440) {
+        vars->f440->f32=obj->f32; vars->f440->f30=obj->f30;
+        vars->f440->f38=obj->f38;
+        vars->f440->f78=obj->f78;
+        vars->f440->f31=1;
+        child=vars->f440; child->f2C=child->f24->f24*g_space_ship_part_scale_b;
+        child=vars->f440;
+        if(child->f31 && fast_vec_dist((char *)child+0x10,g_tether_origin)<24.0f) {
+            moby_update_ground_check(vars->f440); vars->f440->f6F=22;
         }
     }
-    if(p->f444) {
-        p->f444->f32=80; p->f444->f30=obj->f30;
-        p->f444->f38=obj->f38;
-        p->f444->f78=obj->f78;
-        p->f444->f31=1;
-        it=p->f444; it->f2C=it->f24->f24*g_space_ship_part_scale_b;
+    if(vars->f444) {
+        vars->f444->f32=80; vars->f444->f30=obj->f30;
+        vars->f444->f38=obj->f38;
+        vars->f444->f78=obj->f78;
+        vars->f444->f31=1;
+        child=vars->f444; child->f2C=child->f24->f24*g_space_ship_part_scale_b;
     }
-    if(p->f448) {
-        p->f448->f32=80; p->f448->f30=obj->f30;
-        p->f448->f38=obj->f38;
-        p->f448->f78=obj->f78;
-        p->f448->f31=1;
-        it=p->f448; it->f2C=it->f24->f24*g_space_ship_part_scale_a;
-        func_002A0F48(p->f448);
+    if(vars->f448) {
+        vars->f448->f32=80; vars->f448->f30=obj->f30;
+        vars->f448->f38=obj->f38;
+        vars->f448->f78=obj->f78;
+        vars->f448->f31=1;
+        child=vars->f448; child->f2C=child->f24->f24*g_space_ship_part_scale_a;
+        func_002A0F48(vars->f448);
     }
-    cam_compute_view_direction((char *)obj+0x10,(char *)p+0x200,0); vec_negate_and_forward((char *)obj+0xC0,(char *)p+0x200,0); func_PAL_002B1A50(obj,(char *)p+0x60,0);
+    cam_compute_view_direction((char *)obj+0x10,(char *)vars+0x200,0); vec_negate_and_forward((char *)obj+0xC0,(char *)vars+0x200,0); moby_apply_damage_to_object_pal(obj,(char *)vars+0x60,0);
     obj->f2C=obj->f24->f24*g_space_ship_part_scale_b;
     if(g_space_ship_timer) {
         if(++g_space_ship_timer>32000) g_space_ship_timer=1;
         g_hero_state.mode=8;
         if(obj->f95!=1) {
-            p->f350=0; p->f3E4=p->f3E8=0.0f; moby_set_state(obj,1,1);
+            vars->f350=0; vars->f3E4=vars->f3E8=0.0f; moby_set_state(obj,1,1);
         }
         if(g_pad_state.buttons&0x50) {
             g_space_ship_timer=0; moby_set_state(obj,5,0); g_pad_state.buttons=0; g_hero_state.mode=17;
         } else if(g_space_ship_timer<30) {
             g_hero_state.field2294=0; cancel_hero_item_animation_pal();
             release_moby_animation_slot(g_hero_state.field2290,&g_hero_state.field1870);
-            g_hero_state.field187C=0; func_PAL_L22_002C99C8(0,1);
+            g_hero_state.field187C=0; hero_l22_set_action_pal(0,1);
         }
     } else if(g_hero_state.health<=0 && obj->f95!=1) {
-        p->f350=0; p->f3E4=p->f3E8=0.0f;
-        moby_set_state(obj,2,1); p->f384=25;
+        vars->f350=0; vars->f3E4=vars->f3E8=0.0f;
+        moby_set_state(obj,2,1); vars->f384=25;
     }
     if(obj->f31 && fast_vec_dist((char *)obj+0x10,g_tether_origin)<24.0f) {
         moby_update_ground_check(obj); obj->f6F=22;

@@ -12,7 +12,7 @@ extern float g_lift_wobble_y_rate __attribute__((sda));
 extern float g_lift_wobble_height_scale __attribute__((sda));
 
 /* Restore the base pose, then advance its three independent oscillations. */
-void func_PAL_L02_00418428(u8 *object)
+void lift_apply_wobble_pal(u8 *object)
 {
     u8 *state = *(u8 **)(object + 0x68);
     float step;

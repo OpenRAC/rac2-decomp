@@ -10,50 +10,51 @@ extern void F70997ba9_FUN_0027F5B8(int a, int b, long c, void *d, int e);
 extern void F70997ba9_FUN_0027F110(void);
 extern void F70997ba9_FUN_0027C660(void);
 
-int menu_label_column_draw_pal(int *arg0)
+/* Draws five text labels in a column, sized to the widest one. */
+int menu_label_column_draw_pal(int *menu)
 {
-    int min;
-    int v;
-    int slot;
-    int count;
-    int off;
+    int max_width;
+    int width;
+    int label_x;
+    int row_height;
+    int row_y;
 
     F70997ba9_FUN_002FC560(66, 68);
     F70997ba9_FUN_002FC560(71, 11);
     F70997ba9_FUN_0027C540(0);
-    min = F70997ba9_FUN_0027F198(F70997ba9_FUN_00288FB8(2926), -1);
-    v = F70997ba9_FUN_0027F198(F70997ba9_FUN_00288FB8(2938), -1);
-    if (v >= min)
-        min = v;
+    max_width = F70997ba9_FUN_0027F198(F70997ba9_FUN_00288FB8(2926), -1);
+    width = F70997ba9_FUN_0027F198(F70997ba9_FUN_00288FB8(2938), -1);
+    if (width >= max_width)
+        max_width = width;
     if (*(int *)0x1A7A78 != 0) {
-        v = F70997ba9_FUN_0027F198(F70997ba9_FUN_00288FB8(2927), -1);
-        if (v >= min)
-            min = v;
+        width = F70997ba9_FUN_0027F198(F70997ba9_FUN_00288FB8(2927), -1);
+        if (width >= max_width)
+            max_width = width;
     }
-    v = F70997ba9_FUN_0027F198(F70997ba9_FUN_00288FB8(2939), -1);
-    if (v >= min)
-        min = v;
-    v = F70997ba9_FUN_0027F198(F70997ba9_FUN_00288FB8(2940), -1);
-    if (v >= min)
-        min = v;
-    v = F70997ba9_FUN_0027F198(F70997ba9_FUN_00288FB8(2912), -1);
-    if (v >= min)
-        min = v;
-    slot = (arg0[8] - min) >> 1;
-    if (slot <= 1)
-        slot = 2;
-    count = arg0[9] / (*(int *)0x1A7A78 != 0 ? 7 : 6);
+    width = F70997ba9_FUN_0027F198(F70997ba9_FUN_00288FB8(2939), -1);
+    if (width >= max_width)
+        max_width = width;
+    width = F70997ba9_FUN_0027F198(F70997ba9_FUN_00288FB8(2940), -1);
+    if (width >= max_width)
+        max_width = width;
+    width = F70997ba9_FUN_0027F198(F70997ba9_FUN_00288FB8(2912), -1);
+    if (width >= max_width)
+        max_width = width;
+    label_x = (menu[8] - max_width) >> 1;
+    if (label_x <= 1)
+        label_x = 2;
+    row_height = menu[9] / (*(int *)0x1A7A78 != 0 ? 7 : 6);
     F70997ba9_FUN_0027F120();
-    off = count - 6;
-    F70997ba9_FUN_0027F5B8(slot, off, 0x80FFA888L, F70997ba9_FUN_00288FB8(2926), -1);
-    off += count;
-    F70997ba9_FUN_0027F5B8(slot, off, 0x80FFA888L, F70997ba9_FUN_00288FB8(2938), -1);
-    off += count;
-    F70997ba9_FUN_0027F5B8(slot, off, 0x80FFA888L, F70997ba9_FUN_00288FB8(2939), -1);
-    off += count;
-    F70997ba9_FUN_0027F5B8(slot, off, 0x80FFA888L, F70997ba9_FUN_00288FB8(2940), -1);
-    off += count;
-    F70997ba9_FUN_0027F5B8(slot, off, 0x80FFA888L, F70997ba9_FUN_00288FB8(2912), -1);
+    row_y = row_height - 6;
+    F70997ba9_FUN_0027F5B8(label_x, row_y, 0x80FFA888L, F70997ba9_FUN_00288FB8(2926), -1);
+    row_y += row_height;
+    F70997ba9_FUN_0027F5B8(label_x, row_y, 0x80FFA888L, F70997ba9_FUN_00288FB8(2938), -1);
+    row_y += row_height;
+    F70997ba9_FUN_0027F5B8(label_x, row_y, 0x80FFA888L, F70997ba9_FUN_00288FB8(2939), -1);
+    row_y += row_height;
+    F70997ba9_FUN_0027F5B8(label_x, row_y, 0x80FFA888L, F70997ba9_FUN_00288FB8(2940), -1);
+    row_y += row_height;
+    F70997ba9_FUN_0027F5B8(label_x, row_y, 0x80FFA888L, F70997ba9_FUN_00288FB8(2912), -1);
     F70997ba9_FUN_0027F110();
     F70997ba9_FUN_0027C660();
     return 2;

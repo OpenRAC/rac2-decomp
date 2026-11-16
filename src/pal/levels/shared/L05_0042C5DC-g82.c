@@ -20,6 +20,7 @@ extern void *part_spawn_limited_blast_pal(void *, void *, int, int, int, int, in
                             int, int, int, int, int, float);
 extern int coll_process_hit(void *, int, int, void *, float);
 
+/* Makes an explosion: hurts every living object in the level except a few excluded ones, then plays the blast effect (PAL). */
 void moby_explode_damage_nearby_pal(unsigned char *object)
 {
     unsigned char *state = *(unsigned char **)(object + 0x68);

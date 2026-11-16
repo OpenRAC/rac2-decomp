@@ -16,6 +16,7 @@ extern void FastVecCross(void *, const void *, const void *);
 extern void vec_set_direction_with_complement(float *, float *, float);
 extern void cam_moby_init_tracking_pal(void *, int, int, const void *, const void *, unsigned char, float);
 
+/* Finds the first unused object in a group, puts it at the given position and launches it with the given velocity. Returns that object, or 0 if none is free. (PAL version) */
 u8 *ActivateGroupMemberAt_pal(int group, const float position[4], const float velocity[4], float lifetime)
 {
     float delta[4] __attribute__((aligned(16)));

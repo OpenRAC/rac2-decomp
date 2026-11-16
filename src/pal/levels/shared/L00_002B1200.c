@@ -34,7 +34,7 @@ extern void *D_L00_002A00A0[31];
 /* Dispatches on the argument through the level's table: the five listed cases write
  * 0x46 at +0x1FC and 3 at +0x24F4 of the resident block, the other twenty-six and every
  * argument out of the range only return. */
-void hero_start_timed_state_for_mode_pal(int a0)
+void hero_start_timed_state_for_mode_pal(int mode)
 {
     /* Keeps the two arms alive: the addresses land in the discarded .data. */
     static void *cases[31] = {
@@ -44,8 +44,8 @@ void hero_start_timed_state_for_mode_pal(int a0)
         &&ret, &&ret, &&ret, &&ret, &&ret, &&arm, &&arm
     };
 
-    if ((unsigned int)(a0 - 14) < 31) {
-        goto *D_L00_002A00A0[a0 - 14];
+    if ((unsigned int)(mode - 14) < 31) {
+        goto *D_L00_002A00A0[mode - 14];
     } else {
         goto ret;
     }
@@ -57,7 +57,7 @@ ret:
 }
 
 extern void UpdateHeroSlotCallbacks(void);
-extern void func_PAL_002A7E68(void *, int, int, int);
+extern void anim_start_blended_pal(void *, int, int, int);
 extern int g_ring_animation_counter[] __attribute__((sda)), g_frame_l00_counter[] __attribute__((sda));
 extern void ApplyHeroEquipmentRequest_pal(int);
 extern int g_ring_animation_counter[] __attribute__((sda));
@@ -85,7 +85,7 @@ void UpdateHeroSlotCallbacks_pal(void)
                 ApplyHeroEquipmentRequest_pal(i);
                 if ((entry[0x60] & 2) && entry[0x43] == 0
                     && (*(u8 **)(entry + 0x24))[0xC] >= 2)
-                    func_PAL_002A7E68(entry, 1, 0, 2);
+                    anim_start_blended_pal(entry, 1, 0, 2);
                 break;
             case 3:
                 ++slot[0x123B];
@@ -118,10 +118,10 @@ extern void level_release_slot_list(char *);
 extern void hero_set_objects_flag_bit(void);
 extern void hero_clear_tracked_slots(void);
 extern void attachment_reset_all(void);
-extern void func_PAL_L00_002B3210(void);
+extern void hero_update_collision_capsule_pal(void);
 extern void hero_clear_queued_anim(void);
 extern void func_002A677C(char *);
-extern int func_PAL_L00_002C4480(int, int);
+extern int hero_l00_set_action_pal(int, int);
 extern int level_run_slot_callback(int);
 extern int g_pad_pressed_flags[];
 extern char g_str_timed_state_text_a[];
@@ -163,7 +163,7 @@ void SetHeroMode_pal(int mode, int value, char *object)
         {
             char *r = (char *)D_00189E20_1;
 
-            func_PAL_L00_002B3210();
+            hero_update_collision_capsule_pal();
             *(float *)(r + 0x250) = *(float *)(r + 0x258);
             *(float *)(r + 0x254) = *(float *)(r + 0x25C);
             *(unsigned short *)(*(char **)(r + 0x2290) + 0x34) |= 6;
@@ -178,7 +178,7 @@ void SetHeroMode_pal(int mode, int value, char *object)
                 if (count >= 5)
                     *(int *)(r + 0x24CC) = 4;
             }
-            func_PAL_L00_002C4480(value, 2);
+            hero_l00_set_action_pal(value, 2);
         }
     }
 }

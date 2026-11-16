@@ -12,24 +12,24 @@ typedef struct VehicleMoby {
     float pos[4];             /* 0x10 */
     u8 state;                 /* 0x20 */
     u8 pad21[3];
-    u8 *pClass;               /* 0x24 */
+    u8 *class_ptr;               /* 0x24 */
     u8 pad28[4];
     float f2c;                /* 0x2c */
     u8 pad30;
     u8 drawn;                 /* 0x31 */
     u8 pad32[2];
-    u16 modeBits;             /* 0x34 */
+    u16 mode_bits;             /* 0x34 */
     u8 pad36[0x0c];
-    u8 seqA;                  /* 0x42 */
-    u8 seqB;                  /* 0x43 */
+    u8 seq_a;                  /* 0x42 */
+    u8 seq_b;                  /* 0x43 */
     u8 pad44[0x1c];
     u8 f60;                   /* 0x60 */
     u8 pad61[7];
-    VehicleVars *pVars;       /* 0x68 */
+    VehicleVars *vars_ptr;       /* 0x68 */
     u8 pad6c[3];
     u8 f6f;                   /* 0x6f */
     u8 pad70[0x28];
-    s32 collData;             /* 0x98 */
+    s32 coll_data;             /* 0x98 */
     s32 f9c;                  /* 0x9c */
     u8 padA0[8];
     u8 impact;                /* 0xa8 */
@@ -48,10 +48,10 @@ struct VehicleVars {
     u8 pad2c[4];
     float home[4];            /* 0x30 */
     u8 pad40[8];
-    float bobPhase;           /* 0x48 */
-    float bobOffset;          /* 0x4c */
+    float bob_phase;           /* 0x48 */
+    float bob_offset;          /* 0x4c */
     float sway[2];            /* 0x50 */
-    float lastZ;              /* 0x58 */
+    float last_z;              /* 0x58 */
     float throttle;           /* 0x5c */
     float health;             /* 0x60 */
     u8 pad64[4];
@@ -64,13 +64,13 @@ struct VehicleVars {
     u8 pad7e[0x0a];
     s16 timer88;              /* 0x88 */
     u8 mode8a;                /* 0x8a */
-    u8 hitCooldown;           /* 0x8b */
+    u8 hit_cooldown;           /* 0x8b */
     s16 f8c;                  /* 0x8c */
     u8 pad8e[2];
     u8 flash[7];              /* 0x90 */
-    u8 flashRGB[3];           /* 0x97 */
+    u8 flash_rgb[3];           /* 0x97 */
     u8 pad9a[6];
-    u8 *lastHit;              /* 0xa0 */
+    u8 *last_hit;              /* 0xa0 */
     s32 fa4;                  /* 0xa4 */
     s32 fa8;                  /* 0xa8 */
     u8 padac[4];
@@ -101,7 +101,7 @@ typedef struct {
     float position[4];
     float rotation[4];
     u8 padA0[0x2d0 - 0xa0];
-    float cameraPosition[4];
+    float camera_position[4];
     u8 pad2E0[0x33c - 0x2e0];
     u8 *attachment;
     s32 available;
@@ -109,18 +109,18 @@ typedef struct {
     VehicleMoby *vehicle;
     u8 pad1834[8];
     float health;
-    float maxHealth;
+    float max_health;
     u8 pad1844[4];
-    s32 healthBar;
+    s32 health_bar;
     u8 pad184C[0x2290 - 0x184c];
     VehicleMoby *moby;
-    s32 animationState;
+    s32 animation_state;
     u8 pad2298[4];
-    s32 movementState;
+    s32 movement_state;
     u8 pad22A0[0x22b5 - 0x22a0];
-    u8 vehicleControl;
+    u8 vehicle_control;
     u8 pad22B6[0x24cc - 0x22b6];
-    s32 healthAvailable;
+    s32 health_available;
 } VehiclePlayerState;
 extern VehiclePlayerState D_00189E20_14;
 extern s32 g_cutscene_l08_active_flag;
@@ -128,8 +128,8 @@ extern float g_mining_vehicle_class_scale __attribute__((sda));
 extern s32 g_mining_hit_cooldown __attribute__((sda));
 extern s32 vec_fast_helper_a(u8 *);
 extern u8 *part_find_owned_effect_slot(u8 *, s32, s32);
-extern void func_PAL_002AC290(u8 *, u8 *);
-extern void func_PAL_002AC3C0(u8 *, u8 *);
+extern void gfx_start_color_fade_pal(u8 *, u8 *);
+extern void gfx_update_color_fade_pal(u8 *, u8 *);
 extern void moby_set_group_flags(s32, s32, s32, s32);
 
 extern float g_mining_vehicle_spin_rate __attribute__((sda));
@@ -233,13 +233,13 @@ extern ShakeState g_hero_l08_extra_state;
 extern u8 g_hero_position_vec[];
 extern float g_hud_l08_bar_threshold[] __attribute__((sda));
 extern void ref_L08_0041EBF8_00(void);
-extern void func_PAL_002A7E68(void *, s32, s32, s32);
+extern void anim_start_blended_pal(void *, s32, s32, s32);
 extern void AttachManipulator(void *, s32, void *);
 extern float func_002A0558(void *, void *);
 extern s32 TryClaimNotice(s32, s32, s32);
 extern s32 level_set_game_state_pair_pal(s32, void *, s32);
 extern void script_queue_keyed_request(s32, s32);
-extern s32 func_PAL_L08_002D3078(s32, s32);
+extern s32 hero_l08_enter_state_pal(s32, s32);
 extern void set_hero_animation_pal(s32, s32, float);
 extern void snd_stop_voice(s32);
 extern s32 snd_play_from_class_bank(s32, s32, void *, s32);
@@ -270,10 +270,10 @@ extern void moby_transform_joint_to_world(void *, s32, void *);
 extern s32 coll_process_triangles(void *, float);
 extern s32 coll_test_point(void *, s32, void *, float);
 extern float FastVecDot(void *, void *);
-extern void func_PAL_L08_004239F0(void *, void *, s32, float, float, float, float, float, float);
+extern void part_spawn_ring_pal(void *, void *, s32, float, float, float, float, float, float);
 extern void make_hit_descriptor(void *, void *, s32, void *, float);
 extern int coll_process_hit(void *, s32, void *, void *, float);
-extern void func_PAL_L08_00423D30(void *);
+extern void vehicle_end_ride_pal(void *);
 extern void SpawnExplosionEffects_pal(void *, void *, void *, float, float, s32, s32, s32, float, float, float, float,
                           s32, float, s32, s32, s32, s32, s32);
 extern void moby_scale_owner_words_by_angles(void *, void *, void *, float, float, float);
@@ -292,258 +292,259 @@ extern int math_fast_float_d(void *);
 #define EFFECT_LIVE(i) (EFFECT(i)->owner == moby && EFFECT(i)->active)
 
 /* Update the rideable hovering vehicle and its player-control state. */
-void func_PAL_L08_00423EA0(VehicleMoby *moby)
+/* Updates the Mining Vehicle (moby class 3823): it lets the hero board and drive it, handles steering, boost, effects and sounds, and drops the hero off when the ride ends (PAL: 50 Hz timings). */
+void mining_vehicle_update_pal(VehicleMoby *moby)
 {
-    VehicleVars *p = moby->pVars;
+    VehicleVars *vars = moby->vars_ptr;
     s32 fresh;
-    float inputTurn, inputThrottle, inputPitch, inputBrake, inputStrafe;
+    float input_turn, input_throttle, input_pitch, input_brake, input_strafe;
     /* basis: the ground-aligned matrix (rows x, y, normal, zero translation); its rows
      * are reused below as the probe point, its offset and the contact normal. */
-    float forward[4], thrust[4], nextPos[4], basis[4][4], angles[4], scratch[16];
+    float forward[4], thrust[4], next_pos[4], basis[4][4], angles[4], scratch[16];
 
-    if (g_cutscene_l08_active_flag == 2 || D_00189E20_14.animationState == 97) {
+    if (g_cutscene_l08_active_flag == 2 || D_00189E20_14.animation_state == 97) {
         moby->drawn = 0;
-        moby->modeBits |= 1;
+        moby->mode_bits |= 1;
         return;
     }
     moby->drawn = 1;
-    moby->modeBits &= 0xfffe;
-    if (vec_fast_helper_a(&p->hitCooldown))
-        p->lastHit = 0;
+    moby->mode_bits &= 0xfffe;
+    if (vec_fast_helper_a(&vars->hit_cooldown))
+        vars->last_hit = 0;
     if (moby->state) {
         u8 *hit, *target;
-        moby->pos[2] = p->lastZ;
+        moby->pos[2] = vars->last_z;
         hit = part_find_owned_effect_slot(moby, 1, 0);
         if (hit && (target = *(u8 **)(hit + 0x20))) {
             s32 kind = *(s16 *)(target + 0xaa);
-            if (kind != 0xeef && kind != 0x942 && kind != 0xfff &&
-                (target != p->lastHit || !p->hitCooldown)) {
-                p->flashRGB[0] = 0xd2;
-                p->flashRGB[1] = 0xd2;
-                p->flashRGB[2] = 0xd2;
-                func_PAL_002AC290(moby, p->flash);
-                p->health -= *(float *)(hit + 0x2c);
-                D_00189E20_14.health = p->health;
-                if (p->health <= 0.0f)
+            if (kind != MOBY_CLASS_MINING_VEHICLE && kind != 0x942 && kind != MOBY_CLASS_MUTANT_SANDFLY &&
+                (target != vars->last_hit || !vars->hit_cooldown)) {
+                vars->flash_rgb[0] = 0xd2;
+                vars->flash_rgb[1] = 0xd2;
+                vars->flash_rgb[2] = 0xd2;
+                gfx_start_color_fade_pal(moby, vars->flash);
+                vars->health -= *(float *)(hit + 0x2c);
+                D_00189E20_14.health = vars->health;
+                if (vars->health <= 0.0f)
                     moby->state = 5;
-                p->lastHit = *(u8 **)(hit + 0x20);
-                p->hitCooldown = (g_mining_hit_cooldown * 5 + 2) / 6;
+                vars->last_hit = *(u8 **)(hit + 0x20);
+                vars->hit_cooldown = (g_mining_hit_cooldown * 5 + 2) / 6;
             }
         }
         moby->impact = 0xff;
     } else {
-        p->lastZ = moby->pos[2];
+        vars->last_z = moby->pos[2];
     }
-    func_PAL_002AC3C0(moby, p->flash);
-    moby->f2c = *(float *)(moby->pClass + 0x24) * g_mining_vehicle_class_scale;
+    gfx_update_color_fade_pal(moby, vars->flash);
+    moby->f2c = *(float *)(moby->class_ptr + 0x24) * g_mining_vehicle_class_scale;
     if (D_00189E20_14.vehicle == moby && moby->state)
-        D_00189E20_14.healthBar = (s32)(D_00189E20_14.health / D_00189E20_14.maxHealth * 200.0f);
+        D_00189E20_14.health_bar = (s32)(D_00189E20_14.health / D_00189E20_14.max_health * 200.0f);
     else
-        D_00189E20_14.healthBar = 200;
+        D_00189E20_14.health_bar = 200;
     fresh = 0;
-    if (p->sound != -1)
-        moby_set_group_flags(p->sound, -1, -1, 1);
+    if (vars->sound != -1)
+        moby_set_group_flags(vars->sound, -1, -1, 1);
     switch (moby->state) {
     case 0:
-        if (moby->seqB)
-            func_PAL_002A7E68(moby, 0, 0, 10);
-        if (!p->rotor[0].hdr[1]) {
+        if (moby->seq_b)
+            anim_start_blended_pal(moby, 0, 0, 10);
+        if (!vars->rotor[0].hdr[1]) {
             s32 j;
             for (j = 0; j < 3; j++)
-                AttachManipulator(moby, j + 2, &p->rotor[j]);
+                AttachManipulator(moby, j + 2, &vars->rotor[j]);
         }
-        p->fa4 = 0;
-        p->fa8 = 255;
-        qcopy(p->home, moby->pos);
-        qzero(p->vel);
+        vars->fa4 = 0;
+        vars->fa8 = 255;
+        qcopy(vars->home, moby->pos);
+        qzero(vars->vel);
         switch (g_current_map_index) {
         case 8:
-            D_00189E20_14.maxHealth = g_mining_vehicle_max_health_b;
+            D_00189E20_14.max_health = g_mining_vehicle_max_health_b;
             break;
         case 19:
-            D_00189E20_14.maxHealth = g_mining_vehicle_max_health_c;
+            D_00189E20_14.max_health = g_mining_vehicle_max_health_c;
             break;
         default:
-            D_00189E20_14.maxHealth = g_mining_vehicle_max_health_a;
+            D_00189E20_14.max_health = g_mining_vehicle_max_health_a;
             break;
         }
-        p->health = D_00189E20_14.maxHealth;
-        D_00189E20_14.health = p->health;
-        p->f74 = 0;
+        vars->health = D_00189E20_14.max_health;
+        D_00189E20_14.health = vars->health;
+        vars->f74 = 0;
         moby->state = 1;
-        p->fx1a4 = -1;
-        p->power = 0.0f;
-        p->fx1ac = 0;
-        p->fx1b0 = 0;
+        vars->fx1a4 = -1;
+        vars->power = 0.0f;
+        vars->fx1ac = 0;
+        vars->fx1b0 = 0;
         break;
     case 1:
-        if (D_00189E20_14.animationState != 28 && D_00189E20_14.animationState != 22 &&
-            D_00189E20_14.animationState != 57 && D_00189E20_14.animationState != 111 &&
-            D_00189E20_14.movementState != 2 && D_00189E20_14.movementState != 4 &&
-            D_00189E20_14.movementState != 3 && D_00189E20_14.movementState < 13 &&
-            D_00189E20_14.movementState != 7 && D_00189E20_14.movementState != 10 &&
-            D_00189E20_14.movementState != 16 && D_00189E20_14.movementState != 5 &&
-            D_00189E20_14.animationState != 98 && D_00189E20_14.healthAvailable > 0 &&
+        if (D_00189E20_14.animation_state != 28 && D_00189E20_14.animation_state != 22 &&
+            D_00189E20_14.animation_state != 57 && D_00189E20_14.animation_state != 111 &&
+            D_00189E20_14.movement_state != 2 && D_00189E20_14.movement_state != 4 &&
+            D_00189E20_14.movement_state != 3 && D_00189E20_14.movement_state < 13 &&
+            D_00189E20_14.movement_state != 7 && D_00189E20_14.movement_state != 10 &&
+            D_00189E20_14.movement_state != 16 && D_00189E20_14.movement_state != 5 &&
+            D_00189E20_14.animation_state != 98 && D_00189E20_14.health_available > 0 &&
             g_cutscene_l08_active_flag == 0 && D_00189E20_14.available &&
             (!D_00189E20_14.attachment || (*(s16 *)(D_00189E20_14.attachment + 0xaa) != 0x13e &&
                                     *(s16 *)(D_00189E20_14.attachment + 0xaa) != 0x46f)) &&
             func_002A0558(moby, D_00189E20_14.moby) < g_mining_vehicle_player_range &&
-            D_00189E20_14.animationState != 49) {
+            D_00189E20_14.animation_state != 49) {
             s32 ready = TryClaimNotice(7, 0x12ea, 1) != 0;
             if ((g_pad_state[0x69] & 16) && ready) {
-                p->f190 = 0;
+                vars->f190 = 0;
                 fresh = 1;
                 level_set_game_state_pair_pal(0, ref_L08_0041EBF8_00, 1);
-                script_queue_keyed_request(p->f194, p->f19c);
-                func_PAL_L08_002D3078(49, 0);
+                script_queue_keyed_request(vars->f194, vars->f19c);
+                hero_l08_enter_state_pal(49, 0);
                 set_hero_animation_pal(g_mining_vehicle_hero_animation, 0, 15.0f);
                 qcopy(D_00189E20_14.rotation, moby->rot);
                 qcopy(D_00189E20_14.position, moby->pos);
                 D_00189E20_14.vehicle = moby;
                 moby->state = 3;
-                if (p->fx1b4 != -1 && EFFECT_LIVE(p->fx1b4))
-                    snd_stop_voice(p->fx1b4);
-                p->fx1b4 = -1;
+                if (vars->fx1b4 != -1 && EFFECT_LIVE(vars->fx1b4))
+                    snd_stop_voice(vars->fx1b4);
+                vars->fx1b4 = -1;
                 D_00189E20_14.moby->f9c = -1;
-                D_00189E20_14.vehicleControl = 1;
+                D_00189E20_14.vehicle_control = 1;
             }
         }
-        if (!EFFECT_LIVE(p->fx1b4))
-            p->fx1b4 = snd_play_from_class_bank(9, 4, moby, 0x85c);
+        if (!EFFECT_LIVE(vars->fx1b4))
+            vars->fx1b4 = snd_play_from_class_bank(9, 4, moby, 0x85c);
         /* Activation continues through the control/movement path this frame. */
     case 3:
-        moby->collData = 0;
-        FastDecTimer(&p->timer7c);
-        inputStrafe = inputBrake = inputPitch = inputThrottle = inputTurn = 0.0f;
+        moby->coll_data = 0;
+        FastDecTimer(&vars->timer7c);
+        input_strafe = input_brake = input_pitch = input_throttle = input_turn = 0.0f;
         if (moby->state == 3) {
-            D_00189E20_14.vehicleControl = 1;
+            D_00189E20_14.vehicle_control = 1;
             if (g_pad_state[0x68] & 0x80) {
-                if ((moby->seqA < 1 || moby->seqA > 3) && moby->seqB != 1 && moby->seqB != 2 &&
-                    moby->seqB != 3) {
-                    if (moby->seqB != 1)
-                        func_PAL_002A7E68(moby, 1, 0, 10);
+                if ((moby->seq_a < 1 || moby->seq_a > 3) && moby->seq_b != 1 && moby->seq_b != 2 &&
+                    moby->seq_b != 3) {
+                    if (moby->seq_b != 1)
+                        anim_start_blended_pal(moby, 1, 0, 10);
                 } else if (moby->f60 & 2) {
-                    if (moby->seqA == 1) {
-                        if (moby->seqB != 2)
-                            func_PAL_002A7E68(moby, 2, 0, 10);
-                    } else if (moby->seqB == 3 || moby->seqB == 0) {
-                        if (moby->seqB != 1)
-                            func_PAL_002A7E68(moby, 1, 0, 10);
+                    if (moby->seq_a == 1) {
+                        if (moby->seq_b != 2)
+                            anim_start_blended_pal(moby, 2, 0, 10);
+                    } else if (moby->seq_b == 3 || moby->seq_b == 0) {
+                        if (moby->seq_b != 1)
+                            anim_start_blended_pal(moby, 1, 0, 10);
                     }
                 }
-                p->power -= g_mining_vehicle_power_decrease * 1.2f;
+                vars->power -= g_mining_vehicle_power_decrease * 1.2f;
                 if (!math_random_int_below(9) || (g_pad_state[0x69] & 0x80))
                     moby_mark_in_range(moby);
             } else {
                 if (moby->f60 & 2) {
-                    if ((moby->seqA >= 1 && moby->seqA <= 2) ||
-                        moby->seqB == 1 || moby->seqB == 2) {
-                        if (moby->seqB != 3)
-                            func_PAL_002A7E68(moby, 3, 0, 10);
-                    } else if (moby->seqB) {
-                        func_PAL_002A7E68(moby, 0, 0, 10);
+                    if ((moby->seq_a >= 1 && moby->seq_a <= 2) ||
+                        moby->seq_b == 1 || moby->seq_b == 2) {
+                        if (moby->seq_b != 3)
+                            anim_start_blended_pal(moby, 3, 0, 10);
+                    } else if (moby->seq_b) {
+                        anim_start_blended_pal(moby, 0, 0, 10);
                     }
                 }
-                p->power += g_mining_vehicle_power_increase * 1.2f;
+                vars->power += g_mining_vehicle_power_increase * 1.2f;
             }
             if (g_mining_vehicle_current_animation != g_mining_vehicle_hero_animation && g_mining_vehicle_hero_animation != -1)
                 set_hero_animation_pal(g_mining_vehicle_hero_animation, 0, 15.0f);
-            vehicle_read_controls(&inputTurn, &inputThrottle, &inputPitch, &inputBrake, &inputStrafe);
-            inputTurn *= p->power;
+            vehicle_read_controls(&input_turn, &input_throttle, &input_pitch, &input_brake, &input_strafe);
+            input_turn *= vars->power;
         } else {
-            p->power -= g_mining_vehicle_power_decrease * 1.2f;
+            vars->power -= g_mining_vehicle_power_decrease * 1.2f;
             if (moby->f60 & 2) {
-                if ((moby->seqA >= 1 && moby->seqA <= 2) ||
-                    moby->seqB == 1 || moby->seqB == 2) {
-                    if (moby->seqB != 3)
-                        func_PAL_002A7E68(moby, 3, 0, 2);
-                } else if (moby->seqB) {
-                    func_PAL_002A7E68(moby, 0, 0, 2);
+                if ((moby->seq_a >= 1 && moby->seq_a <= 2) ||
+                    moby->seq_b == 1 || moby->seq_b == 2) {
+                    if (moby->seq_b != 3)
+                        anim_start_blended_pal(moby, 3, 0, 2);
+                } else if (moby->seq_b) {
+                    anim_start_blended_pal(moby, 0, 0, 2);
                 }
             }
         }
-        if (p->power > 1.0f)
-            p->power = 1.0f;
-        else if (p->power < 0.0f)
-            p->power = 0.0f;
+        if (vars->power > 1.0f)
+            vars->power = 1.0f;
+        else if (vars->power < 0.0f)
+            vars->power = 0.0f;
         {
             float sign = 1.0f;
-            float hoverHeight, rate, speed, speedMax, steer, turn, turnRad, bank;
-            float turnFactor, damping, push, acceleration, spin, strength, height;
+            float hover_height, rate, speed, speed_max, steer, turn, turn_rad, bank;
+            float turn_factor, damping, push, acceleration, spin, strength, height;
             float *angle, *rates;
             s32 special, grounded, collision;
 
-            inputThrottle *= p->power;
-            inputBrake += 1.0f - p->power;
-            inputStrafe *= p->power;
-            hoverHeight = g_mining_vehicle_hover_height_high * p->power + g_mining_vehicle_hover_height_low * (1.0f - p->power);
+            input_throttle *= vars->power;
+            input_brake += 1.0f - vars->power;
+            input_strafe *= vars->power;
+            hover_height = g_mining_vehicle_hover_height_high * vars->power + g_mining_vehicle_hover_height_low * (1.0f - vars->power);
             if (moby->state == 3)
-                hoverHeight = g_mining_vehicle_hover_height_high * p->power + g_mining_vehicle_hover_height_mid * (1.0f - p->power);
-            p->throttle = inputThrottle;
-            inputPitch *= 0.017453294f;
-            inputPitch *= g_mining_vehicle_input_pitch_scale;
-            speed = FastVecLength(p) * p->power;
-            speedMax = g_mining_vehicle_max_speed * 0.020000001f;
+                hover_height = g_mining_vehicle_hover_height_high * vars->power + g_mining_vehicle_hover_height_mid * (1.0f - vars->power);
+            vars->throttle = input_throttle;
+            input_pitch *= 0.017453294f;
+            input_pitch *= g_mining_vehicle_input_pitch_scale;
+            speed = FastVecLength(vars) * vars->power;
+            speed_max = g_mining_vehicle_max_speed * 0.020000001f;
             rate = g_mining_vehicle_accel_rate * 0.020000001f;
             steer = (speed < rate ? speed : rate) / rate * g_mining_vehicle_steer_blend + (1.0f - g_mining_vehicle_steer_blend) +
-                    g_mining_vehicle_hover_extra * (1.0f - p->power);
-            turn = inputTurn * steer * 0.0003490659f;
-            p->yaw = FastAddRotations(p->yaw, g_mining_vehicle_turn_rate * turn);
-            turnRad = inputTurn * 0.017453294f;
-            bank = g_mining_vehicle_bank_scale * turnRad;
-            bank *= p->power;
-            bank *= g_mining_vehicle_bank_throttle_mix * inputThrottle + (1.0f - g_mining_vehicle_bank_throttle_mix);
+                    g_mining_vehicle_hover_extra * (1.0f - vars->power);
+            turn = input_turn * steer * 0.0003490659f;
+            vars->yaw = FastAddRotations(vars->yaw, g_mining_vehicle_turn_rate * turn);
+            turn_rad = input_turn * 0.017453294f;
+            bank = g_mining_vehicle_bank_scale * turn_rad;
+            bank *= vars->power;
+            bank *= g_mining_vehicle_bank_throttle_mix * input_throttle + (1.0f - g_mining_vehicle_bank_throttle_mix);
             bank -= moby->rot[0];
             bank *= g_mining_vehicle_bank_damping;
-            p->roll += bank;
-            forward[0] = math_fast_sin_or_cos_a(p->yaw);
-            forward[1] = math_fast_sin_or_cos_b(p->yaw);
+            vars->roll += bank;
+            forward[0] = math_fast_sin_or_cos_a(vars->yaw);
+            forward[1] = math_fast_sin_or_cos_b(vars->yaw);
             forward[2] = 0.0f;
-            if (inputThrottle < 0.0f)
-                inputThrottle *= g_mining_vehicle_throttle_scale;
-            if (inputThrottle < 0.0f)
+            if (input_throttle < 0.0f)
+                input_throttle *= g_mining_vehicle_throttle_scale;
+            if (input_throttle < 0.0f)
                 sign = -1.0f;
-            turnFactor = math_fabs(inputTurn), damping = IntegerPower(2, (speedMax - speed) / speedMax);
-            push = inputThrottle + g_mining_vehicle_turn_push * turnFactor * sign;
+            turn_factor = math_fabs(input_turn), damping = IntegerPower(2, (speed_max - speed) / speed_max);
+            push = input_throttle + g_mining_vehicle_turn_push * turn_factor * sign;
             push *= 0.00040000002f;
             push *= g_mining_vehicle_push_scale;
             acceleration = push * damping;
-            spin = p->power * 0.0003490659f;
-            p->rate[0] = spin * g_mining_vehicle_spin_rate;
+            spin = vars->power * 0.0003490659f;
+            vars->rate[0] = spin * g_mining_vehicle_spin_rate;
             strength = g_mining_vehicle_sway_strength * 0.0003490659f;
-            rates = p->rate;
-            angle = p->angle;
+            rates = vars->rate;
+            angle = vars->angle;
             {
                 s32 k;
                 for (k = 1; k < 3; k++) {
-                    float t = speed / speedMax + inputThrottle;
+                    float t = speed / speed_max + input_throttle;
                     float x;
                     if (!(k & 1))
-                        x = t - inputTurn;
+                        x = t - input_turn;
                     else
-                        x = t + inputTurn;
+                        x = t + input_turn;
                     x = x * strength * 0.5f;
                     if (k & 1)
                         x = -x;
-                    p->rate[k] = x;
+                    vars->rate[k] = x;
                 }
             }
             {
                 s32 k;
                 for (k = 0; k < 3; k++) {
                     angle[k] = FastAddRotations(angle[k], rates[k]);
-                    build_axis_rotation_quaternion(p->rotor[k].mtx, k == 0 ? 2 : 0, angle[k]);
+                    build_axis_rotation_quaternion(vars->rotor[k].mtx, k == 0 ? 2 : 0, angle[k]);
                 }
             }
-            FastVecAdd(nextPos, moby->pos, p->vel);
-            height = coll_probe_ground_height_below(nextPos, 0, 0.5f);
+            FastVecAdd(next_pos, moby->pos, vars->vel);
+            height = coll_probe_ground_height_below(next_pos, 0, 0.5f);
             special = 0;
             if (GetCollHitMaterial() == 1 || GetCollHitMaterial() == 11)
                 special = 1;
-            if (moby->pos[2] < height + hoverHeight + 0.3f && special)
+            if (moby->pos[2] < height + hover_height + 0.3f && special)
                 moby->state = 5;
             grounded = 1;
-            p->vel[2] -= g_mining_vehicle_gravity * 0.00040000002f;
+            vars->vel[2] -= g_mining_vehicle_gravity * 0.00040000002f;
             if (height != 0.0f) {
                 vec_scale_to_length(basis[2], g_collision_l08_result.normal, 1.0f);
                 FastVecCross(basis[1], moby->mtx, basis[2]);
@@ -551,32 +552,32 @@ void func_PAL_L08_00423EA0(VehicleMoby *moby)
                 qzero_nc(basis[3]);
                 mat_get_euler_angles(basis, angles);
                 {
-                    float tilt = inputPitch * 0.5f;
-                    p->pitch = FastAddRotations(p->pitch,
-                        fast_subtract_rotations(FastAddRotations(-angles[1], tilt * (g_mining_vehicle_tilt_scale * (p->power + 1.0f))),
-                                      p->pitch) * g_mining_vehicle_pitch_scale);
+                    float tilt = input_pitch * 0.5f;
+                    vars->pitch = FastAddRotations(vars->pitch,
+                        fast_subtract_rotations(FastAddRotations(-angles[1], tilt * (g_mining_vehicle_tilt_scale * (vars->power + 1.0f))),
+                                      vars->pitch) * g_mining_vehicle_pitch_scale);
                 }
-                if (nextPos[2] < height + hoverHeight + 0.2f) {
+                if (next_pos[2] < height + hover_height + 0.2f) {
                     grounded = 0;
-                    if (nextPos[2] + 0.1f < height || special) {
-                        nextPos[2] = height;
-                        FastVecScale(p, p, g_mining_vehicle_drag_c);
+                    if (next_pos[2] + 0.1f < height || special) {
+                        next_pos[2] = height;
+                        FastVecScale(vars, vars, g_mining_vehicle_drag_c);
                     }
-                    p->vel[2] += ((height + hoverHeight - nextPos[2]) * g_mining_vehicle_hover_spring - p->vel[2]) *
+                    vars->vel[2] += ((height + hover_height - next_pos[2]) * g_mining_vehicle_hover_spring - vars->vel[2]) *
                                  g_mining_vehicle_hover_spring;
-                    if (inputBrake > 0.0f) {
-                        float brake = 1.0f - g_mining_vehicle_brake_strength * inputBrake;
-                        p->vel[0] *= brake;
-                        p->vel[1] *= brake;
+                    if (input_brake > 0.0f) {
+                        float brake = 1.0f - g_mining_vehicle_brake_strength * input_brake;
+                        vars->vel[0] *= brake;
+                        vars->vel[1] *= brake;
                     }
-                    FastVecScale(p, p, g_mining_vehicle_drag_a);
+                    FastVecScale(vars, vars, g_mining_vehicle_drag_a);
                     matrix_from_basis_rows(scratch, moby->mtx);
-                    transform_vector(p, p, scratch);
-                    p->vel[1] *= g_mining_vehicle_vertical_damping;
-                    matrix_mul_vec3(p, p, moby->mtx);
+                    transform_vector(vars, vars, scratch);
+                    vars->vel[1] *= g_mining_vehicle_vertical_damping;
+                    matrix_mul_vec3(vars, vars, moby->mtx);
                 }
                 vec_scale_to_length(thrust, moby->mtx, acceleration);
-                if (p->pitch < -0.78539824f) {
+                if (vars->pitch < -0.78539824f) {
                     if (thrust[2] > 0.0f)
                         thrust[2] = 0.0f;
                     vec_scale_to_length(thrust, thrust, acceleration);
@@ -587,29 +588,29 @@ void func_PAL_L08_00423EA0(VehicleMoby *moby)
                     vec_scale_to_length(thrust, thrust, acceleration);
                 }
                 {
-                    float side = inputStrafe * 0.00040000002f;
-                    vec_scale_to_length(scratch, moby->mtx[1], g_mining_vehicle_side_scale * side * p->power);
+                    float side = input_strafe * 0.00040000002f;
+                    vec_scale_to_length(scratch, moby->mtx[1], g_mining_vehicle_side_scale * side * vars->power);
                 }
                 FastVecAdd(thrust, thrust, scratch);
-                FastVecAdd(p, p, thrust);
+                FastVecAdd(vars, vars, thrust);
             }
-            qcopy(moby->pos, nextPos);
+            qcopy(moby->pos, next_pos);
             moby_transform_joint_to_world(moby, 0, basis[0]);
             basis[0][2] += g_mining_vehicle_collision_radius - g_mining_vehicle_hover_height_low;
             FastVecSub(basis[1], moby->pos, basis[0]);
-            moby->collData = 0;
+            moby->coll_data = 0;
             collision = coll_process_triangles(basis[0], g_mining_vehicle_collision_radius);
             if (!collision) {
                 if (g_current_map_index == 19) {
-                    s32 saved = D_00189E20_14.moby->collData;
-                    D_00189E20_14.moby->collData = 0;
+                    s32 saved = D_00189E20_14.moby->coll_data;
+                    D_00189E20_14.moby->coll_data = 0;
                     collision = coll_test_point(basis[0], 0, moby, g_mining_vehicle_collision_radius);
-                    D_00189E20_14.moby->collData = saved;
+                    D_00189E20_14.moby->coll_data = saved;
                 } else {
                     collision = coll_test_point(basis[0], 2, moby, g_mining_vehicle_collision_radius);
                 }
             }
-            moby->collData = *(s32 *)(moby->pClass + 0x10);
+            moby->coll_data = *(s32 *)(moby->class_ptr + 0x10);
             if (collision) {
                 if (GetCollHitMaterial() == 1 || GetCollHitMaterial() == 11)
                     moby->state = 5;
@@ -619,21 +620,21 @@ void func_PAL_L08_00423EA0(VehicleMoby *moby)
                         g_collision_l08_result.point[0] -= basis[0][0];
                         g_collision_l08_result.point[1] -= basis[0][1];
                         if (g_collision_l08_result.point[0] < 0.060000002f)
-                            g_collision_l08_result.point[0] *= p->power;
+                            g_collision_l08_result.point[0] *= vars->power;
                         if (g_collision_l08_result.point[1] < 0.060000002f)
-                            g_collision_l08_result.point[1] *= p->power;
+                            g_collision_l08_result.point[1] *= vars->power;
                         g_collision_l08_result.point[0] += basis[0][0];
                         g_collision_l08_result.point[1] += basis[0][1];
                     } else {
-                        give = p->power;
+                        give = vars->power;
                     }
                     FastVecAdd(moby->pos, g_collision_l08_result.point, basis[1]);
-                    FastVecCross(basis[3], g_collision_l08_result.normal, p);
+                    FastVecCross(basis[3], g_collision_l08_result.normal, vars);
                     FastVecCross(basis[2], basis[3], g_collision_l08_result.normal);
                     vec_scale_to_length(basis[2], basis[2], 1.0f);
-                    vec_scale_to_length(p, basis[2], FastVecDot(p, basis[2]) * give);
-                    FastVecScale(p, p, g_mining_vehicle_drag_b);
-                    if (moby->pos[2] < p->f17c)
+                    vec_scale_to_length(vars, basis[2], FastVecDot(vars, basis[2]) * give);
+                    FastVecScale(vars, vars, g_mining_vehicle_drag_b);
+                    if (moby->pos[2] < vars->f17c)
                         moby->state = 5;
                 }
             }
@@ -641,49 +642,49 @@ void func_PAL_L08_00423EA0(VehicleMoby *moby)
         if (moby->state == 3) {
             if (moby->pos[2] < g_collision_l08_result.lowest[2])
                 g_collision_l08_result.lowest[2] = moby->pos[2];
-            if (p->power < 0.98f && (g_pad_state[0x68] & 0x80)) {
-                if (p->fx1a8 == 0) {
-                    if (!p->fx1ac)
+            if (vars->power < 0.98f && (g_pad_state[0x68] & 0x80)) {
+                if (vars->fx1a8 == 0) {
+                    if (!vars->fx1ac)
                         snd_play_from_class_bank(1, 0, moby, 0x85c);
-                    p->fx1a8 = 2;
-                    p->fx1ac = 12;
-                } else if (p->fx1a8 == 2) {
-                    if (!EFFECT_LIVE(p->fx1a4)) {
-                        p->fx1a4 = snd_play_from_class_bank(2, 4, moby, 0x85c);
-                        if (p->fx1b4 != -1 && EFFECT_LIVE(p->fx1b4))
-                            snd_stop_voice(p->fx1b4);
-                        p->fx1b4 = -1;
+                    vars->fx1a8 = 2;
+                    vars->fx1ac = 12;
+                } else if (vars->fx1a8 == 2) {
+                    if (!EFFECT_LIVE(vars->fx1a4)) {
+                        vars->fx1a4 = snd_play_from_class_bank(2, 4, moby, 0x85c);
+                        if (vars->fx1b4 != -1 && EFFECT_LIVE(vars->fx1b4))
+                            snd_stop_voice(vars->fx1b4);
+                        vars->fx1b4 = -1;
                     }
                 }
-                if (p->f68 < g_hud_l08_bar_threshold[0]) {
-                    func_PAL_L08_004239F0(moby, g_collision_l08_result.lowest, g_mining_hit_ring_param_a,
+                if (vars->f68 < g_hud_l08_bar_threshold[0]) {
+                    part_spawn_ring_pal(moby, g_collision_l08_result.lowest, g_mining_hit_ring_param_a,
                         g_mining_vehicle_dust_param_a, g_mining_vehicle_dust_param_b, g_mining_vehicle_dust_param_c,
                         g_mining_vehicle_dust_param_c, g_mining_hit_vec_y, g_mining_hit_vec_z);
                     if (!math_random_int_below(11)) {
-                        g_hero_l08_extra_state.amount = (1.0f - p->power) * 0.05f;
+                        g_hero_l08_extra_state.amount = (1.0f - vars->power) * 0.05f;
                         g_hero_l08_extra_state.timer = 12;
                         g_hero_l08_extra_state.phase = 0;
                     }
                 } else {
-                    func_PAL_L08_004239F0(moby, g_collision_l08_result.lowest, g_mining_hit_ring_param_b,
+                    part_spawn_ring_pal(moby, g_collision_l08_result.lowest, g_mining_hit_ring_param_b,
                         g_mining_hit_float_d, g_mining_hit_float_e, g_mining_hit_float_c,
                         g_mining_hit_float_c, g_mining_hit_float_f, g_mining_hit_float_g);
                 }
-                if (p->fx1b4 != -1 && EFFECT_LIVE(p->fx1b4))
-                    snd_stop_voice(p->fx1b4);
-                p->fx1b4 = -1;
-            } else if (p->fx1a8 == 2) {
-                if (p->fx1a4 != -1 && EFFECT_LIVE(p->fx1a4))
-                    snd_stop_voice(p->fx1a4);
-                p->fx1a4 = -1;
-                if (p->fx1ac == 0)
+                if (vars->fx1b4 != -1 && EFFECT_LIVE(vars->fx1b4))
+                    snd_stop_voice(vars->fx1b4);
+                vars->fx1b4 = -1;
+            } else if (vars->fx1a8 == 2) {
+                if (vars->fx1a4 != -1 && EFFECT_LIVE(vars->fx1a4))
+                    snd_stop_voice(vars->fx1a4);
+                vars->fx1a4 = -1;
+                if (vars->fx1ac == 0)
                     snd_play_from_class_bank(4, 0, moby, 0x85c);
-                p->fx1a8 = 0;
-                p->fx1ac = 12;
-            } else if (!EFFECT_LIVE(p->fx1b4)) {
-                p->fx1b4 = snd_play_from_class_bank(9, 4, moby, 0x85c);
+                vars->fx1a8 = 0;
+                vars->fx1ac = 12;
+            } else if (!EFFECT_LIVE(vars->fx1b4)) {
+                vars->fx1b4 = snd_play_from_class_bank(9, 4, moby, 0x85c);
             }
-            func_PAL_L08_004239F0(moby, g_collision_l08_result.lowest, g_mining_vehicle_ring_color,
+            part_spawn_ring_pal(moby, g_collision_l08_result.lowest, g_mining_vehicle_ring_color,
                 g_mining_vehicle_ring_param_a, g_mining_vehicle_ring_param_b, g_mining_vehicle_ring_param_c,
                 g_mining_vehicle_ring_speed, g_mining_vehicle_ring_rise, 1.0f);
         }
@@ -699,18 +700,18 @@ void func_PAL_L08_00423EA0(VehicleMoby *moby)
                 reach = g_mining_vehicle_reach_c;
                 break;
             }
-            make_hit_descriptor(basis[2], moby, 0x10000, p, reach);
+            make_hit_descriptor(basis[2], moby, 0x10000, vars, reach);
         }
         coll_process_hit(basis[0], 0, moby, basis[2], g_mining_vehicle_hit_radius_a);
-        if (FastVecLength(p) > g_mining_vehicle_speed_limit * 0.020000001f) {
+        if (FastVecLength(vars) > g_mining_vehicle_speed_limit * 0.020000001f) {
             moby_transform_joint_to_world(moby, 1, scratch);
             coll_process_hit(scratch, 0, moby, basis[2], g_mining_vehicle_hit_radius_b);
         }
         if (!fresh && D_00189E20_14.vehicle == moby && (g_pad_state[0x69] & 16)) {
-            func_PAL_L08_00423D30(moby);
+            vehicle_end_ride_pal(moby);
             moby->state = 1;
-            if (!EFFECT_LIVE(p->fx1b4))
-                p->fx1b4 = snd_play_from_class_bank(9, 4, moby, 0x85c);
+            if (!EFFECT_LIVE(vars->fx1b4))
+                vars->fx1b4 = snd_play_from_class_bank(9, 4, moby, 0x85c);
         }
         break;
     case 2:
@@ -718,75 +719,75 @@ void func_PAL_L08_00423EA0(VehicleMoby *moby)
     case 6:
         break;
     case 5:
-        func_PAL_L08_00423D30(moby);
+        vehicle_end_ride_pal(moby);
         moby_transform_joint_to_world(moby, 0, forward);
-        SpawnExplosionEffects_pal(moby, p, forward, 0.0f, 0.0f, 10, 3, 16, 4.0f, 2.0f, 9.0f, 1.0f, -1, 15.0f,
+        SpawnExplosionEffects_pal(moby, vars, forward, 0.0f, 0.0f, 10, 3, 16, 4.0f, 2.0f, 9.0f, 1.0f, -1, 15.0f,
                       1, 1, -1, 0, 0x810001);
-        qcopy(moby->pos, p->home);
+        qcopy(moby->pos, vars->home);
         moby->state = 0;
         break;
     }
-    p->lastZ = moby->pos[2];
+    vars->last_z = moby->pos[2];
     {
-        float step = p->power * 0.0003490659f;
-        p->bobPhase = FastAddRotations(p->bobPhase, g_mining_vehicle_bob_speed * step);
+        float step = vars->power * 0.0003490659f;
+        vars->bob_phase = FastAddRotations(vars->bob_phase, g_mining_vehicle_bob_speed * step);
     }
-    p->bobOffset = math_fast_sin_or_cos_b(p->bobPhase) * g_mining_vehicle_bob_amplitude * p->power;
-    moby->pos[2] += p->bobOffset * p->power;
+    vars->bob_offset = math_fast_sin_or_cos_b(vars->bob_phase) * g_mining_vehicle_bob_amplitude * vars->power;
+    moby->pos[2] += vars->bob_offset * vars->power;
     {
-        float k = p->power * 0.0003490659f;
-        moby_scale_owner_words_by_angles(moby, &p->sway[0], &p->sway[1], g_mining_vehicle_sway_angle * 0.017453294f,
+        float k = vars->power * 0.0003490659f;
+        moby_scale_owner_words_by_angles(moby, &vars->sway[0], &vars->sway[1], g_mining_vehicle_sway_angle * 0.017453294f,
                       g_mining_vehicle_sway_scale_x * k, g_mining_vehicle_sway_scale_y * k);
     }
-    moby->rot[2] = p->yaw;
-    moby->rot[0] = FastAddRotations(moby->rot[0], p->roll);
-    moby->rot[1] = FastAddRotations(moby->rot[1], p->pitch);
+    moby->rot[2] = vars->yaw;
+    moby->rot[0] = FastAddRotations(moby->rot[0], vars->roll);
+    moby->rot[1] = FastAddRotations(moby->rot[1], vars->pitch);
     if (moby->state == 3) {
         if (g_current_map_index == 8 || g_current_map_index == 19) {
-            switch (p->mode8a) {
+            switch (vars->mode8a) {
             case 0:
-                if (p->f68 < g_hud_l08_bar_threshold[0]) {
-                    p->mode8a = 1;
-                    p->timer88 = 0;
+                if (vars->f68 < g_hud_l08_bar_threshold[0]) {
+                    vars->mode8a = 1;
+                    vars->timer88 = 0;
                 }
                 break;
             case 1:
-                (p->timer88)++;
-                if (p->timer88 > (g_mining_vehicle_timer_max * 5 + 2) / 6)
-                    p->timer88 = (g_mining_vehicle_timer_max * 5 + 2) / 6;
-                if (p->f68 > g_hud_l08_bar_threshold[0])
-                    p->mode8a = 3;
-                else if (p->timer88 >= (g_mining_vehicle_timer_max * 5 + 2) / 6)
-                    p->mode8a = 2;
+                (vars->timer88)++;
+                if (vars->timer88 > (g_mining_vehicle_timer_max * 5 + 2) / 6)
+                    vars->timer88 = (g_mining_vehicle_timer_max * 5 + 2) / 6;
+                if (vars->f68 > g_hud_l08_bar_threshold[0])
+                    vars->mode8a = 3;
+                else if (vars->timer88 >= (g_mining_vehicle_timer_max * 5 + 2) / 6)
+                    vars->mode8a = 2;
                 break;
             case 2:
-                if (p->f68 > g_hud_l08_bar_threshold[0])
-                    p->mode8a = 3;
+                if (vars->f68 > g_hud_l08_bar_threshold[0])
+                    vars->mode8a = 3;
                 break;
             case 3:
-                FastDecTimer(&p->timer88);
-                if (p->f68 < g_hud_l08_bar_threshold[0])
-                    p->mode8a = 1;
-                else if (p->timer88 == 0)
-                    p->mode8a = 0;
+                FastDecTimer(&vars->timer88);
+                if (vars->f68 < g_hud_l08_bar_threshold[0])
+                    vars->mode8a = 1;
+                else if (vars->timer88 == 0)
+                    vars->mode8a = 0;
                 break;
             }
-            if (p->mode8a && p->f6c) {
-                u8 *other = *(u8 **)(p->f6c + 0x68);
+            if (vars->mode8a && vars->f6c) {
+                u8 *other = *(u8 **)(vars->f6c + 0x68);
                 float num = IntToFloat(*(s32 *)(other + 4));
-                p->f8c =
+                vars->f8c =
                     FloatToInt(g_mining_vehicle_time_scale * num / ((IntToFloat(*(s32 *)other) * 60.0f * 5 + 2) / 6));
             } else {
-                p->f8c = 0x200;
+                vars->f8c = 0x200;
             }
-            if (p->f6c) {
-                if (!p->f74)
-                    p->f74 = part_spawn_attached_effect(moby, p->f6c + 0x10);
+            if (vars->f6c) {
+                if (!vars->f74)
+                    vars->f74 = part_spawn_attached_effect(moby, vars->f6c + 0x10);
                 else
-                    moby_store_position_private(p->f74, p->f6c + 0x10);
-            } else if (p->f74) {
-                moby_mark_spawned(p->f74);
-                p->f74 = 0;
+                    moby_store_position_private(vars->f74, vars->f6c + 0x10);
+            } else if (vars->f74) {
+                moby_mark_spawned(vars->f74);
+                vars->f74 = 0;
             }
         }
         vec_scale_to_length(forward, moby->mtx, -0.5f);
@@ -794,33 +795,33 @@ void func_PAL_L08_00423EA0(VehicleMoby *moby)
             forward[2] = 0.0f;
         forward[2] += 1.5f;
         FastVecAdd(D_00189E20_14.position, forward, moby->pos);
-        qcopy(D_00189E20_14.cameraPosition, D_00189E20_14.position);
-        D_00189E20_14.cameraPosition[2] = moby->pos[2];
+        qcopy(D_00189E20_14.camera_position, D_00189E20_14.position);
+        D_00189E20_14.camera_position[2] = moby->pos[2];
         qcopy(D_00189E20_14.rotation, moby->rot);
     }
-    moby->collData = *(s32 *)(moby->pClass + 0x10);
+    moby->coll_data = *(s32 *)(moby->class_ptr + 0x10);
     if (moby->drawn && fast_vec_dist(moby->pos, g_hero_position_vec) < 64.0f) {
         moby_update_ground_check(moby);
         moby->f6f = 60;
     }
-    if (p->sound != -1)
-        moby_set_group_flags(p->sound, -1, 0, 0);
-    if (p->throttle != 0.0f) {
-        if (!EFFECT_LIVE(p->fx1a4)) {
-            p->fx1a4 = snd_play_from_class_bank(0, 4, moby, 0x85c);
-            part_fill_effect_record_pal(moby, p->fx1a4, 0, p->trail, g_mining_trail_param_a, g_mining_trail_param_b);
+    if (vars->sound != -1)
+        moby_set_group_flags(vars->sound, -1, 0, 0);
+    if (vars->throttle != 0.0f) {
+        if (!EFFECT_LIVE(vars->fx1a4)) {
+            vars->fx1a4 = snd_play_from_class_bank(0, 4, moby, 0x85c);
+            part_fill_effect_record_pal(moby, vars->fx1a4, 0, vars->trail, g_mining_trail_param_a, g_mining_trail_param_b);
         } else {
-            FastVecSub(forward, moby->pos, p->trail);
+            FastVecSub(forward, moby->pos, vars->trail);
             forward[2] = 0.0f;
-            snd_fade_looping_by_distance(moby, p->trail, g_mining_vehicle_trail_fade_near, g_mining_vehicle_trail_fade_far, FastVecLength(forward));
-            if (p->fx1b4 != -1 && EFFECT_LIVE(p->fx1b4))
-                snd_stop_voice(p->fx1b4);
-            p->fx1b4 = -1;
+            snd_fade_looping_by_distance(moby, vars->trail, g_mining_vehicle_trail_fade_near, g_mining_vehicle_trail_fade_far, FastVecLength(forward));
+            if (vars->fx1b4 != -1 && EFFECT_LIVE(vars->fx1b4))
+                snd_stop_voice(vars->fx1b4);
+            vars->fx1b4 = -1;
         }
-    } else if (p->fx1a8 != 2) {
-        if (p->fx1a4 != -1 && EFFECT_LIVE(p->fx1a4))
-            snd_stop_voice(p->fx1a4);
-        p->fx1a4 = -1;
+    } else if (vars->fx1a8 != 2) {
+        if (vars->fx1a4 != -1 && EFFECT_LIVE(vars->fx1a4))
+            snd_stop_voice(vars->fx1a4);
+        vars->fx1a4 = -1;
     }
-    math_fast_float_d(&p->fx1ac);
+    math_fast_float_d(&vars->fx1ac);
 }

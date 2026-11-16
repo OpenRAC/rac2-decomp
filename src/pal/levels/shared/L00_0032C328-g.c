@@ -17,7 +17,7 @@ extern void transform_vector(void *, void *, void *);
 extern void func_L00_002EE078(void *, void *, void *);
 extern void func_L00_002EE058(void *, void *, void *);
 
-/* Transform and scatter the pieces of an object, remapping their positions into a box. */
+/* Transforms and scatters the pieces of an object, remapping their positions into a box (PAL). */
 void ScatterObjectPieces_pal(char *object, float *box, float *speed, float *spread,
                        int types, int event, int skip, int flags, int mask,
                        unsigned char selector, void *owner)

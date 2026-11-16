@@ -55,7 +55,7 @@ extern void gfx_draw_scaled_object_two_axes(int, float, float, unsigned int, flo
 void text_box_draw_frame_pal(char *obj, unsigned int alpha, unsigned int color, float top, float bottom, float left, float right)
 {
     ViewState *view;
-    float saved, scale, uv, insetRight, insetLeft, border;
+    float saved, scale, uv, inset_right, inset_left, border;
 
     if (g_resident_data_base[0]) {
         view = &g_view_params;
@@ -73,13 +73,13 @@ void text_box_draw_frame_pal(char *obj, unsigned int alpha, unsigned int color, 
         border = 16.0f;
         gfx_draw_scaled_object_two_axes(*(int *)(obj + 0x222c), right, top, alpha, 1.0f, scale, uv);
         uv = ((right - left) - 150.0f) * 0.003267973894253373f;
-        insetLeft = left + border;
-        insetRight = right - border;
+        inset_left = left + border;
+        inset_right = right - border;
         uv = uv * 0.43300002813339233f + 0.10199999809265137f;
-        gfx_draw_scaled_object_two_axes(*(int *)(obj + 0x2230), insetLeft, top, alpha, -1.0f, 1.0f, uv);
-        gfx_draw_scaled_object_two_axes(*(int *)(obj + 0x2230), insetRight, top, alpha, 1.0f, 1.0f, uv);
-        gfx_draw_scaled_object_two_axes(*(int *)(obj + 0x2230), insetLeft, bottom, alpha, -1.0f, -1.0f, uv);
-        gfx_draw_scaled_object_two_axes(*(int *)(obj + 0x2230), insetRight, bottom, alpha, 1.0f, -1.0f, uv);
+        gfx_draw_scaled_object_two_axes(*(int *)(obj + 0x2230), inset_left, top, alpha, -1.0f, 1.0f, uv);
+        gfx_draw_scaled_object_two_axes(*(int *)(obj + 0x2230), inset_right, top, alpha, 1.0f, 1.0f, uv);
+        gfx_draw_scaled_object_two_axes(*(int *)(obj + 0x2230), inset_left, bottom, alpha, -1.0f, -1.0f, uv);
+        gfx_draw_scaled_object_two_axes(*(int *)(obj + 0x2230), inset_right, bottom, alpha, 1.0f, -1.0f, uv);
         view->fB0 = saved;
         UpdateViewContext();
     }

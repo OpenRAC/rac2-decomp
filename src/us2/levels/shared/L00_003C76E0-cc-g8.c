@@ -59,7 +59,7 @@ extern void anim_start_blended(void *, int, int, int);
 extern void start_equipped_item_animation(void);
 extern void cancel_hero_item_animation(void);
 extern void moby_transform_joint_to_world(void *, int, void *);
-extern s32 func_US2_L00_002C4560(int, int);
+extern s32 hero_l00_change_action_us2(int, int);
 extern void copy_matrix3x4(void *, void *);
 extern void matrix_from_basis_rows(void *, void *);
 extern void transform_vector(void *, void *, void *);
@@ -76,7 +76,7 @@ extern void gauge_popup_show(int, int, int, float);
 extern int snd_play_from_global_bank(int, int, void *);
 extern void value_set_entry_by_index_us2(int, int);
 extern int PlayMobySound(int, int, void *);
-extern void *func_US2_L00_00404C18(void *);
+extern void *sheep_spawn_from_object_us2(void *);
 extern void lightning_l00_beam_update(void *);
 extern int gfx_add_point_light(float, void *, int, float);
 extern void vec_scale_to_length(void *, void *, float);
@@ -86,14 +86,15 @@ extern void gfx_free_point_light(int);
 extern void snd_stop_voice(int);
 extern void anim_start_blended_with_flags(void *, int, int, int, int);
 
-void sheepinator_update_us2(char *owner)
+/* Updates the Sheepinator: while fired it finds a target in the beam, drains its charge, turns it into a sheep when empty, and runs the beam light and sound (US2 copy of sheepinator_update). */
+void sheepinator_update_us2(char *gun)
 {
     Vec direction;
     union {
         struct { Vec matrix[3], inverse[4]; } aim;
         struct { Vec offset, point; } light;
     } work;
-    BeamContext *context = FIELD(owner, BeamContext *, 0x68);
+    BeamContext *context = FIELD(gun, BeamContext *, 0x68);
     int special;
     int allowed;
     char *target, *definition;
@@ -103,8 +104,8 @@ void sheepinator_update_us2(char *owner)
 
     special = 0;
     if (g_hero_state.weapon == 3) special = 1;
-    if (!FIELD(owner, unsigned char, 0x20)) {
-        FIELD(owner, unsigned char, 0x20) = 1;
+    if (!FIELD(gun, unsigned char, 0x20)) {
+        FIELD(gun, unsigned char, 0x20) = 1;
         g_sheepinator_l00_light = -1;
         g_sheepinator_l00_sound = -1;
         g_sheepinator_l00_light_timer = 0;
@@ -117,8 +118,8 @@ void sheepinator_update_us2(char *owner)
 
     if ((unsigned int)g_hero_state.mode < 2 &&
         (g_pad_pressed_flags & g_hero_state.input) && allowed) {
-        if (FIELD(owner, unsigned char, 0x43) != 2)
-            anim_start_blended(owner, 2, 0, 0);
+        if (FIELD(gun, unsigned char, 0x43) != 2)
+            anim_start_blended(gun, 2, 0, 0);
         if (!g_hero_state.flag) start_equipped_item_animation();
         if (!context->active) {
             context->active = 1;
@@ -127,8 +128,8 @@ void sheepinator_update_us2(char *owner)
             g_statistics_table[16].levels = (g_statistics_table[16].levels | (1u << g_current_map_index)) | 0x80000000u;
         }
         if (!context->timer) context->timer = 15;
-        moby_transform_joint_to_world(owner, 0, context);
-        if (g_hero_state.state == 1) func_US2_L00_002C4560(29, 1);
+        moby_transform_joint_to_world(gun, 0, context);
+        if (g_hero_state.state == 1) hero_l00_change_action_us2(29, 1);
         direction.q = 0;
         if (g_hero_state.state == 29 &&
             (FIELD(g_hero_state.object, unsigned short, 0x34) & 1)) {
@@ -137,7 +138,7 @@ void sheepinator_update_us2(char *owner)
             direction.f[2] = 1.0f;
             transform_vector(&direction, &direction, work.aim.inverse);
         } else if (g_hero_state.aiming == 1) {
-            FastVecScale(&direction, owner + 0xD0, -1.0f);
+            FastVecScale(&direction, gun + 0xD0, -1.0f);
         } else {
             direction.f[0] = 1.0f;
             matrix_mul_vec3(&direction, &direction, g_hero_state.matrix);
@@ -145,7 +146,7 @@ void sheepinator_update_us2(char *owner)
         context->yaw = mat_fast_helper_a(direction.f[0], direction.f[1]);
         context->pitch = mat_fast_helper_a(vec_length_xy(&direction), direction.f[2]);
         work.aim.matrix[0].q = context->position.q;
-        target = ref_L00_003C6298_00(owner, work.aim.matrix, &context->yaw, &context->pitch);
+        target = ref_L00_003C6298_00(gun, work.aim.matrix, &context->yaw, &context->pitch);
         math_fast_float_d(&context->cooldown);
         if (context->target) {
             unsigned char state = FIELD(context->target, unsigned char, 0x20);
@@ -188,7 +189,7 @@ have_target:
         gauge_popup_show(1, math_update_angle_and_blend(context->beam, D_L00_001AFFB0_sda, g_sheepinator_beam_angles[1], rate * 0.0002908882452175021f), 0, g_sheepinator_charge_ratio);
         if (context->target && context->remaining <= 0.0f) {
             int target_class = FIELD(context->target, short, 0xAA);
-            if (g_current_map_index == 12 && target_class == 0xFB4) {
+            if (g_current_map_index == 12 && target_class == MOBY_CLASS_MUTANT_TEST_SQUIRREL) {
                 g_sheepinator_shot_counter[0] = g_sheepinator_shot_counter[0] + 1;
                 if (g_sheepinator_shot_counter[0] >= 16 && !g_item_enabled_flags[22]) {
                     g_item_enabled_flags[22] = 1;
@@ -197,19 +198,19 @@ have_target:
                     g_collection_progress_flag[0] = 1;
                 }
             }
-            PlayMobySound(3, 0, owner);
-            func_US2_L00_00404C18(context->target);
+            PlayMobySound(3, 0, gun);
+            sheep_spawn_from_object_us2(context->target);
             g_sheepinator_frame_counter++;
             context->target = 0;
         }
-        lightning_l00_beam_update(owner);
+        lightning_l00_beam_update(gun);
         if (g_sheepinator_l00_light == -1)
-            g_sheepinator_l00_light = gfx_add_point_light(7.5f, owner + 0x10, 0x207F7F, 0.0f);
+            g_sheepinator_l00_light = gfx_add_point_light(7.5f, gun + 0x10, 0x207F7F, 0.0f);
         if (g_sheepinator_l00_light >= 0) {
             float light_x, light_y, light_z;
             Light *light;
             g_sheepinator_l00_light_timer = 20;
-            vec_scale_to_length(&work.light.offset, owner + 0xD0, -0.5f);
+            vec_scale_to_length(&work.light.offset, gun + 0xD0, -0.5f);
             FastVecAdd(&work.light.point, context, &work.light.offset);
             light_x = work.light.point.f[0];
             light_y = work.light.point.f[1];
@@ -220,8 +221,8 @@ have_target:
             light->position.f[2] = light_z;
             light->position.f[0] = light_x;
         }
-        if (!snd_is_voice_playing_for_owner(owner, g_sheepinator_l00_sound))
-            D_L00_001B2A0C_sda = PlayMobySound(1, 4, owner);
+        if (!snd_is_voice_playing_for_owner(gun, g_sheepinator_l00_sound))
+            D_L00_001B2A0C_sda = PlayMobySound(1, 4, gun);
     } else {
         context->target = 0;
         context->active = 0;
@@ -230,7 +231,7 @@ have_target:
         if (g_sheepinator_l00_light >= 0) {
             float light_x2, light_y2, light_z2;
             Light *light;
-            vec_scale_to_length(&direction, owner + 0xD0, -0.5f);
+            vec_scale_to_length(&direction, gun + 0xD0, -0.5f);
             FastVecAdd(&work.light.offset, context, &direction);
             light_x2 = work.light.offset.f[0];
             light_y2 = work.light.offset.f[1];
@@ -262,11 +263,11 @@ sound_cleanup:
             int sound = g_sheepinator_l00_sound;
             if (sound != -1) {
                 SoundView *entry = (SoundView *)(g_sound_state + sound * 0x70);
-                if (entry->owner == owner && entry->active) snd_stop_voice(sound);
+                if (entry->owner == gun && entry->active) snd_stop_voice(sound);
             }
             g_sheepinator_l00_sound = -1;
         }
-        if (FIELD(owner, unsigned char, 0x60) & 2) anim_start_blended_with_flags(owner, 1, 0, 1, 0);
+        if (FIELD(gun, unsigned char, 0x60) & 2) anim_start_blended_with_flags(gun, 1, 0, 1, 0);
         cancel_hero_item_animation();
     }
     if (special && g_sheepinator_l00_light >= 0) {

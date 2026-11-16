@@ -29,21 +29,21 @@ extern int g_menu_title_y_c __attribute__((sda));
 extern unsigned char g_item_enabled_flags[] MACRO_ADDR;
 extern short g_skill_text_entries[][3];
 
-int func_US2_002D0D04(void) {
+int menu_draw_five_row_progress_us2(void) {
     char buf[64];
-    int r, i, y, k, color;
+    int sprite, i, y, index, color;
     char *text;
-    float z;
+    float depth;
     SetupGifPaging(0);
-    z = 0.0f;
-    r = table_find_by_id(g_resident_data_base + 0x8710, 0xD7);
-    gfx_draw_scaled_object_two_axes(r, 0x60442D00, (float)(g_screen_width / 2), (float)g_menu_title_y_c, 1.0f, g_menu_alpha_scale, z);
-    r = table_find_by_id(g_resident_data_base + 0x8710, 0xD8);
-    gfx_draw_scaled_object_two_axes(r, 0x60241700, (float)(g_screen_width / 2), (float)g_menu_title_y_c, 1.0f, g_menu_alpha_scale, z);
-    r = table_find_by_id(g_resident_data_base + 0x8710, 0xD9);
-    gfx_draw_scaled_object_two_axes(r, 0x55F0C070, (float)(g_screen_width / 2), (float)g_menu_title_y_c, 1.0f, g_menu_alpha_scale, z);
-    r = table_find_by_id(g_resident_data_base + 0x8710, 0xDA);
-    gfx_draw_scaled_object_two_axes(r, 0x55F0C070, (float)(g_screen_width / 2), (float)g_menu_title_y_c, 1.0f, g_menu_alpha_scale, z);
+    depth = 0.0f;
+    sprite = table_find_by_id(g_resident_data_base + 0x8710, 0xD7);
+    gfx_draw_scaled_object_two_axes(sprite, 0x60442D00, (float)(g_screen_width / 2), (float)g_menu_title_y_c, 1.0f, g_menu_alpha_scale, depth);
+    sprite = table_find_by_id(g_resident_data_base + 0x8710, 0xD8);
+    gfx_draw_scaled_object_two_axes(sprite, 0x60241700, (float)(g_screen_width / 2), (float)g_menu_title_y_c, 1.0f, g_menu_alpha_scale, depth);
+    sprite = table_find_by_id(g_resident_data_base + 0x8710, 0xD9);
+    gfx_draw_scaled_object_two_axes(sprite, 0x55F0C070, (float)(g_screen_width / 2), (float)g_menu_title_y_c, 1.0f, g_menu_alpha_scale, depth);
+    sprite = table_find_by_id(g_resident_data_base + 0x8710, 0xDA);
+    gfx_draw_scaled_object_two_axes(sprite, 0x55F0C070, (float)(g_screen_width / 2), (float)g_menu_title_y_c, 1.0f, g_menu_alpha_scale, depth);
     gfx_disable_screen_flag();
     text_draw_centered_small(0xB9, 0x1B, 0x80F0F0F0ULL, GetLocalizedString(0x2CA6), -1);
     text = GetLocalizedString(0x2DC5);
@@ -60,12 +60,12 @@ int func_US2_002D0D04(void) {
     menu_draw_scroll_arrows_and_frame();
     for (y = 0x112, i = 0; i < 5; i++, y += 20) {
         char *label;
-        k = i + g_skill_points_cursor - 2;
-        if (k < 0) k += 30;
-        if (k >= 30) k -= 30;
+        index = i + g_skill_points_cursor - 2;
+        if (index < 0) index += 30;
+        if (index >= 30) index -= 30;
         color = 0x80F0F0F0;
-        label = GetLocalizedString(g_skill_text_entries[k][0]);
-        if (g_item_enabled_flags[k]) color = 0x7029A1FF;
+        label = GetLocalizedString(g_skill_text_entries[index][0]);
+        if (g_item_enabled_flags[index]) color = 0x7029A1FF;
         color &= 0xFFFFFF;
         if (i == 0 || i == 4) color |= 0x10000000;
         else if (i == 1 || i == 3) color |= 0x50000000;

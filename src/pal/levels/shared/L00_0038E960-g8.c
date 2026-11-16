@@ -21,14 +21,15 @@ typedef struct { char pad[0x20]; Vector4 position; } CollisionResult;
 extern CollisionResult g_collision_result;
 extern Vector4 g_camera_l00_position;
 
+/* Throws a burst of sparks and puffs from the spot where the weapon hit something (PAL). */
 void part_spawn_weapon_impact_sparks_pal(char *owner)
 {
     Vector4 velocity,position;
-    float tilt,unusedHeading,angle;
+    float tilt,unused_heading,angle;
     int i;
     FastVecSub(&velocity,&g_camera_l00_position,&g_collision_result.position);
     tilt=-mat_fast_helper_a(vec_length_xy(&velocity),velocity.f[2]);
-    unusedHeading=mat_fast_helper_a(velocity.f[0],velocity.f[1]);
+    unused_heading=mat_fast_helper_a(velocity.f[0],velocity.f[1]);
     for(i=19;i>=0;--i) {
         angle=FastAddRotations(math_random_signed_float_range(0,3.1415927f),tilt);
         vec_build_spherical_offset(velocity.f,0.2f,FastAddRotations(math_random_signed_float_range(0,3.1415927f),tilt),angle);

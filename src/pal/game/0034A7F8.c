@@ -10,13 +10,13 @@ extern char *func_00288FB8_2(int a);
 extern void func_L00_0042C360_1(char *a, int b);
 
 /* stores the count in a field, then loops count times calling one helper on each successive 72-byte slot and passing the result to a second helper. */
-void menu_set_icon_count_and_icons_pal(char *a0, int a1, int *a2)
+void menu_set_icon_count_and_icons_pal(char *menu, int count, int *icon_ids)
 {
     int i;
 
-    *(int *)(a0 + 1204) = a1;
-    for (i = 0; i < a1; i++)
-        func_L00_0042C360_1(a0 + 536 + i * 88, func_00288FB8_2(a2[i]));
+    *(int *)(menu + 1204) = count;
+    for (i = 0; i < count; i++)
+        func_L00_0042C360_1(menu + 536 + i * 88, func_00288FB8_2(icon_ids[i]));
 }
 
 

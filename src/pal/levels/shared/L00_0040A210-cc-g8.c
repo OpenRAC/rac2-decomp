@@ -47,10 +47,10 @@ extern int g_collection_progress_flag;
 extern float moby_get_anim_value(void *);
 extern int math_fast_float_d(void *);
 extern int FastDecTimer(void *);
-extern void func_PAL_002A7E68(void *,int,int,int);
+extern void anim_start_blended_pal(void *,int,int,int);
 extern void matrix_mul_vec3(void *,void *,void *);
 extern void FastVecAdd(void *,void *,void *);
-extern s32 func_PAL_L00_002C4480(int,int);
+extern s32 hero_l00_set_action_pal(int,int);
 extern void copy_matrix3x4(void *,void *);
 extern void matrix_from_basis_rows(void *,void *);
 extern void transform_vector(void *,void *,void *);
@@ -64,8 +64,8 @@ extern void gauge_popup_show(int,int,int,float);
 extern int snd_play_from_global_bank(int,int,void *);
 extern void value_set_entry_by_index_pal(int,int);
 extern int PlayMobySound(int,int,void *);
-extern void *func_PAL_L00_0040D328(void *);
-extern void func_PAL_L00_0040AB80(void *);
+extern void *dark_sheep_spawn_from_object_pal(void *);
+extern void sheepinator_update_beam_shape_pal(void *);
 extern int gfx_add_point_light(void *,float,float,unsigned int);
 extern void vec_scale_to_length(void *,void *,float);
 extern int snd_is_voice_playing_for_owner(void *,int);
@@ -73,7 +73,8 @@ extern void gfx_free_point_light(int);
 extern void snd_stop_voice(int);
 extern void anim_start_blended_with_flags(void *,int,int,int,int);
 
-void func_PAL_L00_0040A210(char *object)
+/* Updates the Black Sheepinator (moby class 3757): while the button is held, it fires the beam, locks onto a target and turns it into a sheep when the charge runs out. (PAL: 50 Hz timings) */
+void morphoray_update_pal(char *object)
 {
     Vec offset;
     Vec direction;
@@ -103,7 +104,7 @@ void func_PAL_L00_0040A210(char *object)
     else g_hero_state.timer=33;
     FastDecTimer(&state->timer);
     if ((unsigned int)g_hero_state.control<2 && (g_pad_pressed_flags&g_hero_state.buttons) && permitted) {
-        if (B(object,0x43)!=2) func_PAL_002A7E68(object,2,0,0);
+        if (B(object,0x43)!=2) anim_start_blended_pal(object,2,0,0);
         if (!state->seen) {
             state->seen=1;
             if (g_statistics_table.kills<65535) g_statistics_table.kills++;
@@ -115,7 +116,7 @@ void func_PAL_L00_0040A210(char *object)
         offset.x=0.15f; offset.y=-1.0f; offset.z=0.06f; offset.w=1.0f;
         matrix_mul_vec3(&offset,&offset,object+0xc0);
         FastVecAdd(state,object+0x10,&offset);
-        if (g_hero_state.current==1) func_PAL_L00_002C4480(29,1);
+        if (g_hero_state.current==1) hero_l00_set_action_pal(29,1);
         *(Quad *)&direction=0;
         if (g_hero_state.current==29 && (U(g_hero_state.object,0x34)&1)) {
             copy_matrix3x4(matrix,g_scalar_transition_state);
@@ -172,9 +173,9 @@ clear_target:
                 }
             }
             PlayMobySound(3,0,object);
-            func_PAL_L00_0040D328(state->target); state->target=0;
+            dark_sheep_spawn_from_object_pal(state->target); state->target=0;
         }
-        func_PAL_L00_0040AB80(object);
+        sheepinator_update_beam_shape_pal(object);
         if (g_sheepinator_l00_light_2==-1) g_sheepinator_l00_light_2=gfx_add_point_light(object+0x10,7.5f,0.0f,0x207f7f);
         if (g_sheepinator_l00_light_2>=0) {
             g_sheepinator_l00_light_timer_2=17;

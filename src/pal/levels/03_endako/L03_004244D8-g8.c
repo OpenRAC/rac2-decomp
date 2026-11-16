@@ -23,30 +23,30 @@ extern s32 func_3240F0(u8 *a0);
 
 /* Sets the entity up for a shot: the state's own counter, its two blend rates and the
  * frame the shot was prepared on. */
-s32 entity_prepare_shot_pal(u8 *entity) {
-    u8 *state = *(u8 **)(entity + 0x68);
-    f32 f0;
-    f32 f1;
-    s32 v0;
+s32 entity_prepare_shot_pal(u8 *moby) {
+    u8 *state = *(u8 **)(moby + 0x68);
+    f32 turn_scale;
+    f32 speed_scale;
+    s32 frame;
 
     if (*(s32 *)(state + 0x284) == -1) return 0;
-    if (entity[0x20] != 9) return 0;
+    if (moby[0x20] != 9) return 0;
 
     if (flag_is_third_pending_set() == 0) {
-        entity[0xA8] = 0xFF;
-        f1 = g_robot_speed_scale * 0.00040000002f;
-        f0 = g_robot_turn_scale * 0.020000001f;
-        v0 = *(s16 *)(state + 0x24);
+        moby[0xA8] = 0xFF;
+        speed_scale = g_robot_speed_scale * 0.00040000002f;
+        turn_scale = g_robot_turn_scale * 0.020000001f;
+        frame = *(s16 *)(state + 0x24);
         *(u16 *)(state + 0x98) = 0;
-        *(f32 *)(state + 0x138) = f0;
+        *(f32 *)(state + 0x138) = turn_scale;
         *(f32 *)(state + 0x33C) = 6.0f;
-        *(f32 *)(state + 0x134) = f1;
-        *(f32 *)(state + 0x130) = f1;
-        *(f32 *)(state + 0x20) = (f32)v0;
-        entity[0xA8] = 0xFF;
-        *(u32 *)(entity + 0x98) = *(u32 *)(*(u8 **)(entity + 0x24) + 0x10);
-        hero_copy_field_to_moby(entity);
-        moby_set_flag_bit(entity, 1);
+        *(f32 *)(state + 0x134) = speed_scale;
+        *(f32 *)(state + 0x130) = speed_scale;
+        *(f32 *)(state + 0x20) = (f32)frame;
+        moby[0xA8] = 0xFF;
+        *(u32 *)(moby + 0x98) = *(u32 *)(*(u8 **)(moby + 0x24) + 0x10);
+        hero_copy_field_to_moby(moby);
+        moby_set_flag_bit(moby, 1);
         return 1;
     }
     return 0;

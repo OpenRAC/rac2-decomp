@@ -13,6 +13,7 @@ extern void anim_update_foot_tilt_angles(void *, void *, float);
 extern void thread_accumulate_timer_ticks(void);
 typedef int PoseVector128 __attribute__((mode(TI)));
 
+/* Runs one step of the moby controller: finds the ground, updates velocity, resolves collisions and updates ground contact and foot tilt (PAL). */
 int moby_step_controller_pal(void *self, void *target, float amount)
 {
     char *data = moby_get_controller(self);

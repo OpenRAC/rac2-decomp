@@ -21,15 +21,17 @@ extern int PlayMobySound(int, int, void *);
 extern void FastVecSub(void *, void *, void *);
 extern void mat_combine_and_store(void *, void *, void *, void *);
 
-void func_PAL_L17_003CB334(char *self) {
-    UpdateVec oldpos, delta;
+/* Falling object (PAL): drops to the ground while the player is under it and hurts the player if
+   it lands on them, then breaks apart with a burst of effects and a sound. */
+void falling_l17_object_update_pal(char *self) {
+    UpdateVec old_position, delta;
     char collision[0x30];
     char *position;
     char *data = *(char **)(self + 0x68);
     float ground;
     if (*(int *)(data + 0xAC) == 1) return;
     position = self + 0x10;
-    oldpos.q = *(UpdateQuad *)(self + 0x10);
+    old_position.q = *(UpdateQuad *)(self + 0x10);
     if (*(unsigned char *)(self + 0x20) == 0) {
         if (*(int *)(data + 0x90) != -1) {
             ground = coll_probe_ground_height_below(position, 0, 0.5f);
@@ -64,6 +66,6 @@ void func_PAL_L17_003CB334(char *self) {
             *(int *)(data + 0xA8) += 1;
         }
     }
-    FastVecSub(&delta, position, &oldpos);
+    FastVecSub(&delta, position, &old_position);
     mat_combine_and_store(data + 0x50, &delta, self + 0xF0, self + 0xF0);
 }

@@ -26,102 +26,102 @@ extern int PlayMobySound(int,int,void *);
 extern float math_step_value_toward_target(float *,float *,float,float,float,float);
 extern void FastVecSub(void *,void *,void *);
 extern void mat_combine_and_store(void *,void *,void *,void *);
-void func_PAL_L13_004280E8(u8 *m) {
-    u8 *d=P(m,0x68);
-    u8 oldpos[16] __attribute__((aligned(16)));
-    u8 oldrot[16] __attribute__((aligned(16)));
+void UpdateBoldanVerticalPlatform_pal(u8 *moby) {
+    u8 *vars=P(moby,0x68);
+    u8 old_pos[16] __attribute__((aligned(16)));
+    u8 old_rot[16] __attribute__((aligned(16)));
     u8 delta[16] __attribute__((aligned(16)));
-    int n;
-    unsigned int c, color;
-    int tickPhase;
-    float f;
+    int voice_index;
+    unsigned int fade, color;
+    int tick_phase;
+    float phase;
     if(g_hero_state.mode==0x82) return;
-    qcopy_nc(oldpos,m+0x10);
-    qcopy_nc(oldrot,m+0xF0);
-    switch(m[0x20]) {
+    qcopy_nc(old_pos,moby+0x10);
+    qcopy_nc(old_rot,moby+0xF0);
+    switch(moby[0x20]) {
     case 0:
-        m[0x30]=255;
-        I(d,0x7C)=I(d,0x78);
-        I(d,0x5C)|=1;
-        qcopy_nc(d+0x90,m+0x10);
-        qcopy_nc(d+0x80,d+0x90);
-        F(d,0x88)=F(d,0x98)-F(d,0x68);
-        I(d,0x60)=(((int)(I(d,0x74)) * 5 + 2) / 6);
-        m[0x20]=1;
-        I(d,0xB0)=-1;
-        I(d,0x64)=0;
+        moby[0x30]=255;
+        I(vars,0x7C)=I(vars,0x78);
+        I(vars,0x5C)|=1;
+        qcopy_nc(vars+0x90,moby+0x10);
+        qcopy_nc(vars+0x80,vars+0x90);
+        F(vars,0x88)=F(vars,0x98)-F(vars,0x68);
+        I(vars,0x60)=(((int)(I(vars,0x74)) * 5 + 2) / 6);
+        moby[0x20]=1;
+        I(vars,0xB0)=-1;
+        I(vars,0x64)=0;
         break;
     case 1:
-        n=I(d,0xB0);
-        if(n!=-1) {
-            u8 *sound=g_sound_state+n*0x70; if(P(sound,0x88)==m && sound[0x74]) snd_stop_voice(n);
+        voice_index=I(vars,0xB0);
+        if(voice_index!=-1) {
+            u8 *sound=g_sound_state+voice_index*0x70; if(P(sound,0x88)==moby && sound[0x74]) snd_stop_voice(voice_index);
         }
-        I(d,0xB0)=-1;
-        if(hero_is_current_selected_id(m)) {
-            if(F(m,0x18)==F(d,0x98)) {
-                if(I(d,0xB4)) {
-                    P(d,0xB8)=cam_alloc_override_slot_pal(5);
-                    F(P(d,0xB8),0)=1.0f;
-                    F(P(d,0xB8),4)=4.5f;
-                    I(d,0xBC)=1;
+        I(vars,0xB0)=-1;
+        if(hero_is_current_selected_id(moby)) {
+            if(F(moby,0x18)==F(vars,0x98)) {
+                if(I(vars,0xB4)) {
+                    P(vars,0xB8)=cam_alloc_override_slot_pal(5);
+                    F(P(vars,0xB8),0)=1.0f;
+                    F(P(vars,0xB8),4)=4.5f;
+                    I(vars,0xBC)=1;
                 }
-                moby_set_state(m,2,-1);
+                moby_set_state(moby,2,-1);
             } else {
-                if(I(d,0xB4)) {
-                    P(d,0xB8)=cam_alloc_override_slot_pal(5);
-                    F(P(d,0xB8),0)=1.0f;
-                    F(P(d,0xB8),4)=4.5f;
-                    I(d,0xBC)=1;
+                if(I(vars,0xB4)) {
+                    P(vars,0xB8)=cam_alloc_override_slot_pal(5);
+                    F(P(vars,0xB8),0)=1.0f;
+                    F(P(vars,0xB8),4)=4.5f;
+                    I(vars,0xBC)=1;
                 }
-                moby_set_state(m,3,-1);
+                moby_set_state(moby,3,-1);
             }
         }
         {
-            if(F(m,0x18)-g_hero_state.height>F(d,0x68)*0.5f && F(m,0x18)==F(d,0x98)) moby_set_state(m,2,-1);
-            else if(F(m,0x18)-g_hero_state.height<-F(d,0x68)*0.5f && F(m,0x18)==F(d,0x88) && g_hero_state.mode!=0x82) moby_set_state(m,3,-1);
+            if(F(moby,0x18)-g_hero_state.height>F(vars,0x68)*0.5f && F(moby,0x18)==F(vars,0x98)) moby_set_state(moby,2,-1);
+            else if(F(moby,0x18)-g_hero_state.height<-F(vars,0x68)*0.5f && F(moby,0x18)==F(vars,0x88) && g_hero_state.mode!=0x82) moby_set_state(moby,3,-1);
         }
         break;
     case 2:
-        if(F(m,0x18)<=F(d,0x88)) {
-            if(I(d,0xBC)) { cam_end_override(P(d,0xB8)); I(d,0xBC)=0; }
-            n=I(d,0xB0);
-            if(n!=-1) { u8 *sound=g_sound_state+n*0x70; if(P(sound,0x88)==m && sound[0x74]) snd_stop_voice(n); }
-            I(d,0xB0)=-1;
-            if(!hero_is_current_selected_id(m)) m[0x20]=1;
-        } else if(!coll_test_point(m+0x10,1,m,2.8f) ||
-            (F(m,0x18)<=g_hero_state.height || (g_hero_state.platform!=0 && g_hero_state.platform==m) || (g_hit_l13_result && *(short *)(g_hit_l13_result+0xAA)==0xEA3))) {
-            { u8 *sound=g_sound_state+I(d,0xB0)*0x70; if(P(sound,0x88)!=m || !sound[0x74]) I(d,0xB0)=PlayMobySound(0,4,m); }
-            math_step_value_toward_target((float *)(m+0x18),(float *)(d+0x64),F(d,0x88),0.0028000001f,0.0024f,0.120000005f);
+        if(F(moby,0x18)<=F(vars,0x88)) {
+            if(I(vars,0xBC)) { cam_end_override(P(vars,0xB8)); I(vars,0xBC)=0; }
+            voice_index=I(vars,0xB0);
+            if(voice_index!=-1) { u8 *sound=g_sound_state+voice_index*0x70; if(P(sound,0x88)==moby && sound[0x74]) snd_stop_voice(voice_index); }
+            I(vars,0xB0)=-1;
+            if(!hero_is_current_selected_id(moby)) moby[0x20]=1;
+        } else if(!coll_test_point(moby+0x10,1,moby,2.8f) ||
+            (F(moby,0x18)<=g_hero_state.height || (g_hero_state.platform!=0 && g_hero_state.platform==moby) || (g_hit_l13_result && *(short *)(g_hit_l13_result+0xAA)==0xEA3))) {
+            { u8 *sound=g_sound_state+I(vars,0xB0)*0x70; if(P(sound,0x88)!=moby || !sound[0x74]) I(vars,0xB0)=PlayMobySound(0,4,moby); }
+            math_step_value_toward_target((float *)(moby+0x18),(float *)(vars+0x64),F(vars,0x88),0.0028000001f,0.0024f,0.120000005f);
         } else {
-            n=I(d,0xB0);
-            if(n!=-1) { u8 *sound=g_sound_state+n*0x70; if(P(sound,0x88)==m && sound[0x74]) snd_stop_voice(n); }
-            I(d,0xB0)=-1;
+            voice_index=I(vars,0xB0);
+            if(voice_index!=-1) { u8 *sound=g_sound_state+voice_index*0x70; if(P(sound,0x88)==moby && sound[0x74]) snd_stop_voice(voice_index); }
+            I(vars,0xB0)=-1;
         }
         break;
     case 3:
-        math_step_value_toward_target((float *)(m+0x18),(float *)(d+0x64),F(d,0x98),0.0028000001f,0.0024f,0.120000005f);
-        if(F(m,0x18)>=F(d,0x98)) {
-            if(I(d,0xBC)) { cam_end_override(P(d,0xB8)); I(d,0xBC)=0; }
-            n=I(d,0xB0);
-            if(n!=-1) { u8 *sound=g_sound_state+n*0x70; if(P(sound,0x88)==m && sound[0x74]) snd_stop_voice(n); }
-            I(d,0xB0)=-1;
-            if(!hero_is_current_selected_id(m)) { I(d,0x60)=(((int)(I(d,0x74)) * 5 + 2) / 6); --I(d,0x78); m[0x20]=1; }
+        math_step_value_toward_target((float *)(moby+0x18),(float *)(vars+0x64),F(vars,0x98),0.0028000001f,0.0024f,0.120000005f);
+        if(F(moby,0x18)>=F(vars,0x98)) {
+            if(I(vars,0xBC)) { cam_end_override(P(vars,0xB8)); I(vars,0xBC)=0; }
+            voice_index=I(vars,0xB0);
+            if(voice_index!=-1) { u8 *sound=g_sound_state+voice_index*0x70; if(P(sound,0x88)==moby && sound[0x74]) snd_stop_voice(voice_index); }
+            I(vars,0xB0)=-1;
+            if(!hero_is_current_selected_id(moby)) { I(vars,0x60)=(((int)(I(vars,0x74)) * 5 + 2) / 6); --I(vars,0x78); moby[0x20]=1; }
         } else {
-            { u8 *sound=g_sound_state+I(d,0xB0)*0x70; if(P(sound,0x88)!=m || !sound[0x74]) I(d,0xB0)=PlayMobySound(0,4,m); }
+            { u8 *sound=g_sound_state+I(vars,0xB0)*0x70; if(P(sound,0x88)!=moby || !sound[0x74]) I(vars,0xB0)=PlayMobySound(0,4,moby); }
         }
         break;
     case 4:
-        n=I(d,0xB0);
-        if(n!=-1) { u8 *sound=g_sound_state+n*0x70; if(P(sound,0x88)==m && sound[0x74]) snd_stop_voice(n); }
-        I(d,0xB0)=-1; break;
+        voice_index=I(vars,0xB0);
+        if(voice_index!=-1) { u8 *sound=g_sound_state+voice_index*0x70; if(P(sound,0x88)==moby && sound[0x74]) snd_stop_voice(voice_index); }
+        I(vars,0xB0)=-1; break;
     }
-    f=(float)g_game_l13_frame_counter*(0.02f);
-    tickPhase=(int)f;
-    f-=(float)tickPhase;
-    if(!(tickPhase&1)) f=1.0f-f;
-    c=(int)(f*255.0f);
-    color=(c<<8)|0x7F000000;
-    I(m,0x78)=(c<<16)|color|c;
-    FastVecSub(delta,m+0x10,oldpos);
-    mat_combine_and_store(d+0x20,delta,oldrot,m+0xF0);
+    phase=(float)g_game_l13_frame_counter*(0.02f);
+    tick_phase=(int)phase;
+    phase-=(float)tick_phase;
+    if(!(tick_phase&1)) phase=1.0f-phase;
+    fade=(int)(phase*255.0f);
+    color=(fade<<8)|0x7F000000;
+    I(moby,0x78)=(fade<<16)|color|fade;
+    FastVecSub(delta,moby+0x10,old_pos);
+    mat_combine_and_store(vars+0x20,delta,old_rot,moby+0xF0);
 }

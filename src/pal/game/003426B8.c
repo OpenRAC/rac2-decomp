@@ -16,41 +16,42 @@ extern void DrawItemGrid(int *);
 
 static __inline__ void initDescriptor_340498(int *f) { f[20] = 0; f[21] = 1; }
 
-void radial_menu_draw_info_second_pal(char *o)
+/* Draws the second item grid of the radial menu by filling in a descriptor for DrawItemGrid (PAL). */
+void radial_menu_draw_info_second_pal(char *self)
 {
-    Word2_340498 q0 = g_radial_info_second_word_pair_a;
-    Word2_340498 q1 = g_radial_info_second_word_pair_b;
-    Word2_340498 q2 = g_radial_info_second_word_pair_a;
-    Word2_340498 q3 = g_radial_info_second_word_pair_c;
-    Word2_340498 q4 = g_radial_info_shared_word_pair;
-    Word2_340498 q5 = g_info_word_pair_page;
-    int f[23];
+    Word2_340498 pair_a = g_radial_info_second_word_pair_a;
+    Word2_340498 pair_b = g_radial_info_second_word_pair_b;
+    Word2_340498 pair_c = g_radial_info_second_word_pair_a;
+    Word2_340498 pair_d = g_radial_info_second_word_pair_c;
+    Word2_340498 pair_shared = g_radial_info_shared_word_pair;
+    Word2_340498 pair_page = g_info_word_pair_page;
+    int desc[23];
     char *child;
-    initDescriptor_340498(f);
-    f[19] = *(int *)(o + 0x820);
-    f[21] = *(int *)(o + 0x81C) == 1;
-    f[16] = (int)(o + 0xA78);
-    f[3] = *(int *)(o + 0x814);
-    f[4] = *(int *)(o + 0x818);
-    child = o + 0x17C;
-    f[9] = (int)&q4;
-    f[14] = 1;
-    f[13] = 0;
-    f[1] = 3;
-    f[2] = 2;
-    f[0] = (int)g_menu_item_table_second;
-    f[17] = (int)(o + 0x880);
+    initDescriptor_340498(desc);
+    desc[19] = *(int *)(self + 0x820);
+    desc[21] = *(int *)(self + 0x81C) == 1;
+    desc[16] = (int)(self + 0xA78);
+    desc[3] = *(int *)(self + 0x814);
+    desc[4] = *(int *)(self + 0x818);
+    child = self + 0x17C;
+    desc[9] = (int)&pair_shared;
+    desc[14] = 1;
+    desc[13] = 0;
+    desc[1] = 3;
+    desc[2] = 2;
+    desc[0] = (int)g_menu_item_table_second;
+    desc[17] = (int)(self + 0x880);
     object_set_helper_result(child, g_resident_data_base + 0x8710, 0x5D);
-    f[10] = (int)child;
-    f[12] = (int)(o + 0x214);
-    f[15] = (int)(o + 0x7D0);
-    f[8] = (int)&q3;
-    f[7] = (int)&q2;
-    f[11] = 0;
-    f[18] = *(int *)(o + 0x80C);
-    f[6] = (int)&q1;
-    f[5] = (int)&q0;
-    f[20] = (int)&q5;
-    f[22] = 0;
-    DrawItemGrid(f);
+    desc[10] = (int)child;
+    desc[12] = (int)(self + 0x214);
+    desc[15] = (int)(self + 0x7D0);
+    desc[8] = (int)&pair_d;
+    desc[7] = (int)&pair_c;
+    desc[11] = 0;
+    desc[18] = *(int *)(self + 0x80C);
+    desc[6] = (int)&pair_b;
+    desc[5] = (int)&pair_a;
+    desc[20] = (int)&pair_page;
+    desc[22] = 0;
+    DrawItemGrid(desc);
 }

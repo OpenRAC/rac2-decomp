@@ -4,7 +4,7 @@
 extern unsigned int g_path_l09_table[];
 extern float vec_distance_xy(char *a, int b);
 
-/* reports whether the index still names a reachable entry, or whether the frame moved close enough */
+/* Reports whether the index still names a reachable entry, or whether the frame moved close enough */
 int path_is_entry_reachable_pal(char *object, int index) {
     char *frame = *(char **)(object + 0x68);
     int entry = path_check_entry_for_moby(object, index);

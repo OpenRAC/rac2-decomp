@@ -42,15 +42,15 @@ extern void cam_set_tuning_value(float);
 extern void set_follow_camera_orbit_clamp_mode(int);
 extern void cam_set_turn_limits(float, float, float);
 
-/* Initializes and updates the aim - camera volume, including follow - camera offsets. */
-void func_US2_L00_0042B428(char *camera)
+/* Initializes and updates the aim camera volume (US2 copy of the volume aim camera update), including the follow_block camera offsets. */
+void cam_volume_aim_update_us2(char *camera)
 {
     float position[4] __attribute__((aligned(16)));
     char to_position[16] __attribute__((aligned(16)));
     char gravity_offset[16] __attribute__((aligned(16)));
     char horizontal[16] __attribute__((aligned(16)));
     char *params = *(char **)(g_camera_def_table + *(short *)(camera + 0x84)*32 + 0x1C);
-    char *camera_position, *state, *reset, *tail, *follow, *snap, *rig;
+    char *camera_position, *rig_state, *reset_block, *tail_block, *follow_block, *snap_block, *camera_rig;
     float yaw, height, tangent, pitch;
     if (g_frame_l00_counter>=4 && cam_test_trigger_volumes(camera)) {
         if (cam_claim_request_slot(camera)<=0) {
@@ -94,40 +94,40 @@ run:
             *(float *)(params + 0x40) = *(float *)(params + 0x3C) - *(float *)(params + 0x38)*tangent;
         }
         camera_position = g_follow_camera_object;
-        rig = *(char **)(camera_position + 0x70);
+        camera_rig = *(char **)(camera_position + 0x70);
         camera_position+=0x30;
-        follow = rig + 0x60;
-        tail = rig + 0x160;
-        snap = rig + 0x1F0;
-        state = rig;
-        reset = state + 0x20;
+        follow_block = camera_rig + 0x60;
+        tail_block = camera_rig + 0x160;
+        snap_block = camera_rig + 0x1F0;
+        rig_state = camera_rig;
+        reset_block = rig_state + 0x20;
         qcopy(camera_position, position);
-        *(float *)(tail + 0x2C) = *(float *)(params + 0x38);
-        *(float *)(tail + 0x30) = *(float *)(params + 0x3C);
-        *(float *)(reset + 0x28) = *(float *)(params + 0x44);
-        *(float *)(follow + 0xB0) = *(float *)(params + 0x40);
-        FastVecScale(gravity_offset, (char *)D_00189E20_6.axis,  - *(float *)(tail + 0x30));
-        func_00282CC0_4(state + 0xB0, (char *)D_00189E20_6.position, gravity_offset);
-        FastVecSub(tail, (char *)position, state + 0xB0);
-        qcopy(state + 0x170, tail);
-        FastVecScale(gravity_offset, (char *)D_00189E20_6.axis,  - *(float *)(follow + 0xB0));
-        func_00282CC0_4(state + 0xA0, (char *)D_00189E20_6.position, gravity_offset);
-        qcopy(state + 0xF0, state + 0xA0);
-        qcopy(follow, (char *)D_00189E20_6.position);
-        qcopy(state + 0xC0, follow);
-        qcopy(state, camera_position);
-        qcopy(state + 0x210, camera_position);
-        *(int *)(snap + 0x30) = 0;
-        *(int *)(reset + 0x14) = 0;
-        *(float *)(reset + 4) = *(float *)(follow + 0xB0);
+        *(float *)(tail_block + 0x2C) = *(float *)(params + 0x38);
+        *(float *)(tail_block + 0x30) = *(float *)(params + 0x3C);
+        *(float *)(reset_block + 0x28) = *(float *)(params + 0x44);
+        *(float *)(follow_block + 0xB0) = *(float *)(params + 0x40);
+        FastVecScale(gravity_offset, (char *)D_00189E20_6.axis,  - *(float *)(tail_block + 0x30));
+        func_00282CC0_4(rig_state + 0xB0, (char *)D_00189E20_6.position, gravity_offset);
+        FastVecSub(tail_block, (char *)position, rig_state + 0xB0);
+        qcopy(rig_state + 0x170, tail_block);
+        FastVecScale(gravity_offset, (char *)D_00189E20_6.axis,  - *(float *)(follow_block + 0xB0));
+        func_00282CC0_4(rig_state + 0xA0, (char *)D_00189E20_6.position, gravity_offset);
+        qcopy(rig_state + 0xF0, rig_state + 0xA0);
+        qcopy(follow_block, (char *)D_00189E20_6.position);
+        qcopy(rig_state + 0xC0, follow_block);
+        qcopy(rig_state, camera_position);
+        qcopy(rig_state + 0x210, camera_position);
+        *(int *)(snap_block + 0x30) = 0;
+        *(int *)(reset_block + 0x14) = 0;
+        *(float *)(reset_block + 4) = *(float *)(follow_block + 0xB0);
         {
-            float zero = *(float *)(reset + 0x14);
-            float distance = *(float *)(tail + 0x30);
-            *(float *)(reset + 8) = distance;
-            *(short *)(reset + 2) = 0;
-            *(float *)(reset + 0x18) = zero;
-            *(float *)(reset + 0x10) = zero;
-            *(float *)(reset + 0xC) = zero;
+            float zero = *(float *)(reset_block + 0x14);
+            float distance = *(float *)(tail_block + 0x30);
+            *(float *)(reset_block + 8) = distance;
+            *(short *)(reset_block + 2) = 0;
+            *(float *)(reset_block + 0x18) = zero;
+            *(float *)(reset_block + 0x10) = zero;
+            *(float *)(reset_block + 0xC) = zero;
         }
     }
     ++*(int *)(params + 0x20);

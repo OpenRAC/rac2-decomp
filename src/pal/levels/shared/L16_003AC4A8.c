@@ -29,9 +29,9 @@ typedef struct {
 
 /* Moves the projectile, then explodes it on a hit or when its timer runs out, and destroys
    it then or once it leaves the 2..1021 world box; otherwise refreshes its orientation. */
-void func_PAL_L16_003AC4A8(char *object)
+void projectile_l16_update_pal(char *object)
 {
-    char *data = *(char **)(object + 0x68);
+    char *vars = *(char **)(object + 0x68);
     float old[4] __attribute__((aligned(16)));
     float scratch[4] __attribute__((aligned(16)));
     float start[4] __attribute__((aligned(16)));
@@ -41,39 +41,39 @@ void func_PAL_L16_003AC4A8(char *object)
     cam_compute_view_direction(object + 0x10, scratch, 1);
     qcopy(start, object + 0x10);
     if (B(object, 0x20) == 0) {
-        FastVecAdd(object + 0x10, object + 0x10, data + 0x30);
+        FastVecAdd(object + 0x10, object + 0x10, vars + 0x30);
         hit.object = object;
         hit.flags = 0x10001;
-        hit.radius = F(data, 0x54);
+        hit.radius = F(vars, 0x54);
         hit.mode = 1;
-        qcopy(hit.v, data + 0x30);
-        vec_scale_to_length(hit.v, hit.v, F(data, 0x60));
+        qcopy(hit.v, vars + 0x30);
+        vec_scale_to_length(hit.v, hit.v, F(vars, 0x60));
         hit.v[3] = 5627.925f;
-        hit.a = B(data, 0x64);
-        hit.b = B(data, 0x68);
+        hit.a = B(vars, 0x64);
+        hit.b = B(vars, 0x68);
         hit.id = *(u16 *)(object + 0xAA);
-        if (CollLine(start, object + 0x10, 0, I(data, 0x40), &hit)
-            || coll_test_point(0.2f, object + 0x10, 0, I(data, 0x40))) {
+        if (CollLine(start, object + 0x10, 0, I(vars, 0x40), &hit)
+            || coll_test_point(0.2f, object + 0x10, 0, I(vars, 0x40))) {
             int r, g, b;
 
             PlayMobySound(0, 0, object);
-            r = FloatToInt(F(data, 0x50) * 5.0f);
-            g = FloatToInt(F(data, 0x50) * 4.0f);
-            b = FloatToInt(F(data, 0x50) * 10.0f);
-            SpawnExplosionEffects_pal(object, data + 0x30, 0, 0.0f, 0.0f, r, g, b, 0.0f, 0.0f, 9.0f, F(data, 0x50),
+            r = FloatToInt(F(vars, 0x50) * 5.0f);
+            g = FloatToInt(F(vars, 0x50) * 4.0f);
+            b = FloatToInt(F(vars, 0x50) * 10.0f);
+            SpawnExplosionEffects_pal(object, vars + 0x30, 0, 0.0f, 0.0f, r, g, b, 0.0f, 0.0f, 9.0f, F(vars, 0x50),
                           -1, 0.0f, 0, 1, -1, 0, 0x810001);
-            coll_process_hit(object + 0x10, 16, I(data, 0x40), &hit, 1.0f);
+            coll_process_hit(object + 0x10, 16, I(vars, 0x40), &hit, 1.0f);
             moby_mark_spawned(object);
             return;
         }
     }
-    if (math_fast_float_d(data + 0x48)) {
+    if (math_fast_float_d(vars + 0x48)) {
         int r, g, b;
 
-        r = FloatToInt(F(data, 0x50) * 5.0f);
-        g = FloatToInt(F(data, 0x50) * 4.0f);
-        b = FloatToInt(F(data, 0x50) * 10.0f);
-        SpawnExplosionEffects_pal(object, data + 0x30, 0, 2.0f, F(data, 0x54), r, g, b, 0.0f, 0.0f, 9.0f, F(data, 0x50),
+        r = FloatToInt(F(vars, 0x50) * 5.0f);
+        g = FloatToInt(F(vars, 0x50) * 4.0f);
+        b = FloatToInt(F(vars, 0x50) * 10.0f);
+        SpawnExplosionEffects_pal(object, vars + 0x30, 0, 2.0f, F(vars, 0x54), r, g, b, 0.0f, 0.0f, 9.0f, F(vars, 0x50),
                       -1, 0.0f, 0, 1, -1, 0, 0x810001);
         moby_mark_spawned(object);
         return;

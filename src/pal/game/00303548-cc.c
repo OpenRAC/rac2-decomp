@@ -88,6 +88,7 @@ NativeCompactHeader *func_00300618(NativeCompactHeader *header);
 
 int pickup_start_fly_to_target_pal(char *obj, char *obj2, float x, float y);
 
+/* Starts the pickup flying toward its target, but only if it is in the idle state. */
 int pickup_start_fly_if_idle_pal(char *obj, char *obj2)
 {
     if (*(u8 *)(obj + 32) != 3)

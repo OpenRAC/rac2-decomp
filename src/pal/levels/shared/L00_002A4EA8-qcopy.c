@@ -15,7 +15,7 @@ extern void mat_build_rotation_from_angles(void *, float *);
 extern void vec_clear_128(Quad *);
 
 /* Update an active attachment's orientation/position and link or retire its record. */
-void func_PAL_L00_002A4EA8(u8 *node)
+void attachment_update_record_pal(u8 *node)
 {
     u8 *owner = attachment_get_owner_by_kind(*(short *)(node + 0xA2));
     float *angles;

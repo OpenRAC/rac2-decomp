@@ -41,11 +41,11 @@ extern InputState g_pad_state;
 extern int FastDecTimer(void *);
 extern int hero_get_movement_mode_pal(void);
 extern float vec_length_xy(void *);
-extern void func_PAL_L00_002BA750(void);
+extern void hero_l00_update_state_machine_pal(void);
 extern void euler_to_matrix(void *, void *);
 extern void set_identity_matrix(void *);
 extern void matrix_from_basis_rows(void *, void *);
-extern void func_PAL_L00_002B3210(void);
+extern void hero_update_collision_capsule_pal(void);
 extern void hero_probe_ground_and_ledge_pal(void);
 extern void hero_l00_update_timers_pal(void);
 extern float hero_get_stick_magnitude(void);
@@ -88,7 +88,7 @@ void UpdateHeroInputAndHistory_pal(void)
         }
     }
     p->speed = hero_get_stick_magnitude();
-    func_PAL_L00_002BA750();
+    hero_l00_update_state_machine_pal();
     p->yaws[p->yaw_index] = p->yaw;
     p->yaw_index = (p->yaw_index + 1) % 32;
     if (++p->yaw_count > 32)
@@ -104,7 +104,7 @@ void UpdateHeroInputAndHistory_pal(void)
     euler_to_matrix(p, (char *)p + 0x90);
     set_identity_matrix((char *)p + 0x40);
     matrix_from_basis_rows((char *)p + 0x40, p);
-    func_PAL_L00_002B3210();
+    hero_update_collision_capsule_pal();
     hero_probe_ground_and_ledge_pal();
     hero_l00_update_timers_pal();
 }

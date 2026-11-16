@@ -30,22 +30,23 @@ typedef struct {
 } MenuOption;
 extern MenuOption g_unlockable_shop_table[] MACRO_ADDR;
 
+/* Draws the unlockable options list: each option with its on or off state, or the count needed to unlock it. */
 int DrawUnlockableOptionsMenu_us2(void)
 {
-    char buf[64];
-    int r, i, y, color, limit, available;
+    char text[64];
+    int sprite, i, y, color, limit, available;
     u64 style;
-    float z;
+    float depth;
 
     available = save_count_nonzero_flags();
-    z = 0.84f;
+    depth = 0.84f;
     SetupGifPaging(0);
-    r = table_find_by_id(g_resident_data_base + 0x8710, 0x8B);
-    gfx_draw_scaled_object_two_axes((char *)r, 0x60442D00, (float)(g_screen_width / 2), (float)g_menu_title_y_b, 1.0f, g_menu_alpha_scale, z);
-    r = table_find_by_id(g_resident_data_base + 0x8710, 0x8C);
-    gfx_draw_scaled_object_two_axes((char *)r, 0x55F0C070, (float)(g_screen_width / 2), (float)g_menu_title_y_b, 1.0f, g_menu_alpha_scale, z);
-    r = table_find_by_id(g_resident_data_base + 0x8710, 0x8D);
-    gfx_draw_scaled_object_two_axes((char *)r, 0x55F0C070, (float)(g_screen_width / 2), (float)g_menu_title_y_b, 1.0f, g_menu_alpha_scale, z);
+    sprite = table_find_by_id(g_resident_data_base + 0x8710, 0x8B);
+    gfx_draw_scaled_object_two_axes((char *)sprite, 0x60442D00, (float)(g_screen_width / 2), (float)g_menu_title_y_b, 1.0f, g_menu_alpha_scale, depth);
+    sprite = table_find_by_id(g_resident_data_base + 0x8710, 0x8C);
+    gfx_draw_scaled_object_two_axes((char *)sprite, 0x55F0C070, (float)(g_screen_width / 2), (float)g_menu_title_y_b, 1.0f, g_menu_alpha_scale, depth);
+    sprite = table_find_by_id(g_resident_data_base + 0x8710, 0x8D);
+    gfx_draw_scaled_object_two_axes((char *)sprite, 0x55F0C070, (float)(g_screen_width / 2), (float)g_menu_title_y_b, 1.0f, g_menu_alpha_scale, depth);
     text_draw_centered_small(g_screen_width / 2, 0x41, 0x80F0F0F0ULL, GetLocalizedString(0x2CA8), -1);
     text_draw_centered_small(g_screen_width / 2, 0x141, 0x80F0F0F0ULL, GetLocalizedString(0x2BE4), -1);
     text_draw_centered_small(g_screen_width / 2, 0x15A, 0x80F0F0F0ULL, GetLocalizedString(0x2BE5), -1);
@@ -63,13 +64,13 @@ locked:
             if (i == g_unlockable_options_cursor) color = 0x7029A1FF;
             text_draw_medium(0x2B, y, color, GetLocalizedString(0x2C56), -1);
             if (limit == 90)
-                sprintf(buf, g_str_localized_text_fmt, GetLocalizedString(0x2CBE));
+                sprintf(text, g_str_localized_text_fmt, GetLocalizedString(0x2CBE));
             else
-                sprintf(buf, g_str_count_fmt, limit, GetLocalizedString(0x2CA6));
+                sprintf(text, g_str_count_fmt, limit, GetLocalizedString(0x2CA6));
             style = color;
             gfx_disable_screen_flag();
-            r = func_001157AC(buf);
-            text_draw_centered_medium(0x195, y, style, buf, r);
+            sprite = func_001157AC(text);
+            text_draw_centered_medium(0x195, y, style, text, sprite);
             gfx_enable_screen_flag();
         }
         goto next;

@@ -94,7 +94,7 @@ extern int D_L18_001A8F00_abs __asm__("D_L18_001A8F00");
 extern float g_hero_l18_reach_timer_b, g_hero_l18_reach_timer_a;
 extern unsigned char g_hero_event_flags[] __attribute__((sda));
 extern void hero_ease_lean_to_upright_pal(void), hero_queue_glow_draw_routine(void), hero_update_landing_slide_pal(void), hero_record_play_counters_pal(void);
-extern s32 func_PAL_L18_002E01E0(int, int);
+extern s32 hero_l18_set_action_pal(int, int);
 extern int FastDecTimer(void *), math_fast_float_d(void *);
 extern void vec_clear_128(void *);
 extern int moby_is_in_special_class_range(void *), math_random_int_below(int);
@@ -107,8 +107,9 @@ extern void hero_build_relative_point(void *, int, float, float, float), hero_ap
 
 /* Corresponds to RAC1 update_hero_timers_and_reach_state in
  * src/overlays/shared/hero_vehicle_and_collision.c. */
+/* Counts the player's timers up each frame, keeps the movement history and sets how far the player can reach (PAL: 50 Hz timings). */
 void hero_update_timers_reach_pal(void) {
-    unsigned char *m, *pos, *hero;
+    unsigned char *moby, *moby_position, *hero_position;
     float sum[4], delta[4];
     int i, count, history_index, first_index, second_index;
     if (!g_hero_state.tilt_disabled) hero_ease_lean_to_upright_pal();
@@ -175,7 +176,7 @@ void hero_update_timers_reach_pal(void) {
     if (g_hero_state.field_24CC && !D_L18_001A8F00_abs && g_hero_state.mode == 4 && g_hero_state.field_2294 != 0x6F && (g_pad_state.pressed&0x10)) {
         g_hero_state.field_1E0 = 0;
         g_hero_state.field_24CC = 0;
-        func_PAL_L18_002E01E0(0x91, 1);
+        hero_l18_set_action_pal(0x91, 1);
     }
     if (!D_L18_001A8F00_abs) {
         if (g_hero_l18_reach_timer_b>0) g_hero_state.field_22A++;
@@ -192,15 +193,15 @@ void hero_update_timers_reach_pal(void) {
         }
     }
     if (g_hero_state.field_224) {
-        for (i = 0;(m = g_active_target_mobys[i]) != 0;i++) {
-            if (moby_is_in_special_class_range(m) || (m && BP(m, 0x24) && BS(BP(m, 0x24), 0x46) == 22)) {
-                if ((g_frame_l18_counter&7) == (((int)m>>8)&7) || !math_random_int_below(4)) {
-                    hero = (unsigned char *)&g_hero_state+0x80;
-                    pos = m+0x10;
-                    if (fast_vec_dist(hero, pos)<15.37f) {
-                        FastVecSub(sum, pos, hero);
+        for (i = 0;(moby = g_active_target_mobys[i]) != 0;i++) {
+            if (moby_is_in_special_class_range(moby) || (moby && BP(moby, 0x24) && BS(BP(moby, 0x24), 0x46) == 22)) {
+                if ((g_frame_l18_counter&7) == (((int)moby>>8)&7) || !math_random_int_below(4)) {
+                    hero_position = (unsigned char *)&g_hero_state+0x80;
+                    moby_position = moby+0x10;
+                    if (fast_vec_dist(hero_position, moby_position)<15.37f) {
+                        FastVecSub(sum, moby_position, hero_position);
                         vec_scale_to_length(sum, sum, 1.7f);
-                        part_queue_impact_effect(m, g_hero_state.field_2290, 0x4000000, hero, sum, 1.0f);
+                        part_queue_impact_effect(moby, g_hero_state.field_2290, 0x4000000, hero_position, sum, 1.0f);
                     }
                 }
             }

@@ -2,7 +2,7 @@
 /* func_PAL_L23_0041F458, the PAL copy of func_L23_0041A3B8: the same C, where rename func_L23_00422540 becomes func_PAL_L23_00427920; rename func_L23_0041BF18 becomes func_PAL_L23_00420FF8; rename func_L23_004280D8 becomes func_PAL_L23_0042D620; rename func_0032C700 becomes func_PAL_L00_003FB330. */
 /* func_PAL_L23_0041F458: Damosel effect trigger. Kind 0xF objects spawn the burst at
    D_L23_001B3850 along the object's state direction and play sound 0x21; kinds 0x10 and
-   0xC, once the timer threshold is reached and the blink mask is full, aim it at arg1 and
+   0xC, once the timer threshold is reached and the blink mask is full, aim it at target_pos and
    play sound 0x1A (with the explosion) or 0x21. Returns 1 when the object was handled.
 
    The kind 0xF arm groups its effect in a nonempty one-pass statement, as current RAC1 game
@@ -37,11 +37,11 @@ extern char *SpawnExplosion_pal(char *, int, int, int, int, int, int, int, float
 
 extern void mothership_turn_joints_pal(char *, float, float);
 
-int func_PAL_L23_0041F458(char *arg0, char *arg1) {
-    char *state = *(char **)(arg0 + 0x68);
-    float tmp;
-    float vec[4];
-    int kind = *(unsigned char *)(arg0 + 0x20);
+int mothership_fire_weapon_pal(char *boss, char *target_pos) {
+    char *state = *(char **)(boss + 0x68);
+    float shot_scale;
+    float shot_vel[4];
+    int kind = *(unsigned char *)(boss + 0x20);
 
     if (kind != 0xF) {
         if (kind == 0x10 || kind == 0xC) {
@@ -50,35 +50,35 @@ int func_PAL_L23_0041F458(char *arg0, char *arg1) {
         } else
             return 0;
     } else {
-        if ((*(unsigned short *)(arg0 + 0x96) & 3) != 2)
+        if ((*(unsigned short *)(boss + 0x96) & 3) != 2)
             return 1;
         do {
-            vec_scale_to_length((char *)vec, g_mothership_aim_direction, *(short *)(state + 0x33A) * 0.020000001f);
-            tmp = *(float *)(state + 0x300) * 1.5f;
-            directed_shot_create_pal(g_mothership_shot_origin, (char *)vec, &tmp);
+            vec_scale_to_length((char *)shot_vel, g_mothership_aim_direction, *(short *)(state + 0x33A) * 0.020000001f);
+            shot_scale = *(float *)(state + 0x300) * 1.5f;
+            directed_shot_create_pal(g_mothership_shot_origin, (char *)shot_vel, &shot_scale);
         } while (0);
         snd_start_in_slot(0x21, 0, 0);
         return 1;
     }
     if (!(g_mothership_aim_dot >= g_mothership_fire_threshold))
         return 1;
-    mothership_turn_joints_pal(arg0, 2.0f, 2.0f);
-    if (*(unsigned char *)(arg0 + 0x20) == 0x10) {
-        int m = *(short *)(state + 0x336);
-        if ((*(unsigned short *)(arg0 + 0x96) & ((1 << (9 - m)) - 1)) != ((1 << (9 - m)) - 1))
+    mothership_turn_joints_pal(boss, 2.0f, 2.0f);
+    if (*(unsigned char *)(boss + 0x20) == 0x10) {
+        int blink_level = *(short *)(state + 0x336);
+        if ((*(unsigned short *)(boss + 0x96) & ((1 << (9 - blink_level)) - 1)) != ((1 << (9 - blink_level)) - 1))
             return 1;
-        FastVecSub((char *)vec, arg1, g_mothership_shot_origin);
-        vec_scale_to_length((char *)vec, (char *)vec, *(short *)(state + 0x33C) * 0.020000001f);
-        flying_shot_create_child_pal(arg0, (char *)vec, g_mothership_shot_origin, 0, *(float *)(state + 0x304));
+        FastVecSub((char *)shot_vel, target_pos, g_mothership_shot_origin);
+        vec_scale_to_length((char *)shot_vel, (char *)shot_vel, *(short *)(state + 0x33C) * 0.020000001f);
+        flying_shot_create_child_pal(boss, (char *)shot_vel, g_mothership_shot_origin, 0, *(float *)(state + 0x304));
         SpawnExplosion_pal(g_mothership_shot_origin, 0, 2, 3, 2, 2, 0xA, 0, 0.5f, 20.0f, 1, 1, 0, 0);
         snd_start_in_slot(0x1A, 0, 0);
     } else {
-        int m = *(short *)(state + 0x334);
-        if ((*(unsigned short *)(arg0 + 0x96) & ((1 << (9 - m)) - 1)) != ((1 << (9 - m)) - 1))
+        int blink_level = *(short *)(state + 0x334);
+        if ((*(unsigned short *)(boss + 0x96) & ((1 << (9 - blink_level)) - 1)) != ((1 << (9 - blink_level)) - 1))
             return 1;
-        FastVecSub((char *)vec, arg1, g_mothership_aim_direction);
-        vec_scale_to_length((char *)vec, (char *)vec, *(short *)(state + 0x33A) * 0.020000001f);
-        directed_shot_create_pal(g_mothership_shot_origin, (char *)vec, (float *)(state + 0x300));
+        FastVecSub((char *)shot_vel, target_pos, g_mothership_aim_direction);
+        vec_scale_to_length((char *)shot_vel, (char *)shot_vel, *(short *)(state + 0x33A) * 0.020000001f);
+        directed_shot_create_pal(g_mothership_shot_origin, (char *)shot_vel, (float *)(state + 0x300));
         snd_start_in_slot(0x21, 0, 0);
     }
     return 1;

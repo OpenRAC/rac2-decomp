@@ -13,32 +13,33 @@ extern int snd_play_from_class_bank(int index, int value, char *object, int kind
 extern void part_spawn_explosion_with_sparks_pal(void *a0, void *a1, int a2, float f12, float f13);
 extern int PlayMobySound(int index, int a1, char *a2);
 extern void vec_scale_to_length(float *a0, void *a1, float f12);
-extern void func_PAL_002B15D8(void *a0, int a1, void *a2, unsigned char a3,
+extern void part_spawn_masked_debris_pal(void *a0, int a1, void *a2, unsigned char a3,
                            float f12, float f13, float f14, float f15);
 extern void moby_mark_spawned(void *object);
 extern void moby_explode(u8 *a0, int a1, int a2);
 
-void moby_explode_pal(u8 *a0, int a1, int a2) {
-    u8 *s0 = a0;
-    void *s3;
-    int s2;
-    int s1;
-    float buf[4];
+/* Blows the object up: plays a random sound, adds an effect and a burst of sparks, then removes it. (PAL copy) */
+void moby_explode_pal(u8 *moby, int arg1, int arg2) {
+    u8 *obj = moby;
+    void *owned_slot;
+    int sound_base;
+    int sound_bank;
+    float velocity[4];
 
-    s3 = part_find_owned_effect_slot(a0, -1, 0);
-    if (s3 == 0)
+    owned_slot = part_find_owned_effect_slot(moby, -1, 0);
+    if (owned_slot == 0)
         return;
-    if (*(short *)(s0 + 0xAA) == 0x1213) {
-        s2 = 0xB;
-        s1 = 0xF7F;
+    if (*(short *)(obj + 0xAA) == 0x1213) {
+        sound_base = 0xB;
+        sound_bank = 0xF7F;
     } else {
-        s2 = 0xC;
-        s1 = 0xE0B;
+        sound_base = 0xC;
+        sound_bank = 0xE0B;
     }
-    snd_play_from_class_bank(s2 + math_random_int_below(3), 0, s0, s1);
-    part_spawn_explosion_with_sparks_pal(s0, s0 + 0x10, -1, 2.0f, 13.0f);
-    PlayMobySound(0, 0, s0);
-    vec_scale_to_length(buf, s3 + 0x10, 0.28000003f);
-    func_PAL_002B15D8(s0, 3, buf, 0xFF, 3.0f, 6.0f, 3.0f, 6.0f);
-    moby_mark_spawned(s0);
+    snd_play_from_class_bank(sound_base + math_random_int_below(3), 0, obj, sound_bank);
+    part_spawn_explosion_with_sparks_pal(obj, obj + 0x10, -1, 2.0f, 13.0f);
+    PlayMobySound(0, 0, obj);
+    vec_scale_to_length(velocity, owned_slot + 0x10, 0.28000003f);
+    part_spawn_masked_debris_pal(obj, 3, velocity, 0xFF, 3.0f, 6.0f, 3.0f, 6.0f);
+    moby_mark_spawned(obj);
 }

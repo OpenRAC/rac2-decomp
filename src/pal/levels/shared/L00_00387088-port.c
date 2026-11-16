@@ -122,7 +122,7 @@ static inline int pad_buttons(int i)
    true, its alpha is 128 and a button in 0xE0 is down, sets that counter to 45 and
    calls func_L00_00384CA8 with a position and velocity taken from the object. The copy source is set before the loop: it gets no
    register and reload rematerializes it at the copy. */
-void func_PAL_L00_00387088(char *owner)
+void twin_guns_update_and_fire_pal(char *owner)
 {
     AttachmentWork *work = FIELD(AttachmentWork *, owner, 0x68);
     Vector4 position, velocity;

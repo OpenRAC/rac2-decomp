@@ -10,8 +10,9 @@ extern void gfx_update_all_view_transforms(void);
 extern void gfx_link_packet_chain(void);
 extern void VU1_addGSregister(unsigned int, unsigned long);
 
-void func_PAL_L03_002FF6E0(void) {
-    float *p;
+/* Sets up the Endako sky each frame: resets the tables, links the view transforms and packets, and scrolls the sky. (PAL: 50 Hz scroll speed) */
+void sky_update_scroll_pal(void) {
+    float *scroll;
 
     gfx_resident_table_reset();
     g_sky_scroll_value = (int)g_str_sky_scroll_data;
@@ -19,8 +20,8 @@ void func_PAL_L03_002FF6E0(void) {
     gfx_link_packet_chain();
     VU1_addGSregister(0x47, 0x5360B);
     VU1_addGSregister(0x4E, 0x1000000 | (g_vram_zbuffer_address >> 13));
-    p = (float *)(g_sky_scroll_base + 0x74);
-    *p += 0.013320001f;
-    if (*p > 1.0f)
-        *p -= 1.0f;
+    scroll = (float *)(g_sky_scroll_base + 0x74);
+    *scroll += 0.013320001f;
+    if (*scroll > 1.0f)
+        *scroll -= 1.0f;
 }

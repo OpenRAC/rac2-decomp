@@ -5,13 +5,13 @@
 
 extern void gfx_draw_screen_element_stored(void *);
 extern void hud_draw_colored_quad_widget(void *);
-extern void func_US2_003378A0(void *);
+extern void text_label_draw_us2(void *);
 extern float *object_get_second_field(void *);
 extern float *object_get_first_field(void *);
 extern unsigned int *object_get_fourth_field(void *);
 extern void DrawSegmentedRingMeter(void *);
-extern unsigned long func_US2_0027CED8(int);
-extern void func_US2_0027FCB0(float, float, unsigned long, char *, int, float, unsigned long, unsigned char *);
+extern unsigned long tex_get_effect_descriptor_us2(int);
+extern void text_draw_scaled_us2(float, float, unsigned long, char *, int, float, unsigned long, unsigned char *);
 extern int text_draw_centered_large(int, int, unsigned long, char *, int);
 extern int sprintf(char *, char *, ...);
 extern int g_notice_owner[] __attribute__((sda));
@@ -70,7 +70,7 @@ typedef struct HudOwner {
  * bolt counter) and the "x%d" multiplier. The vtable pointers are read through
  * &a[i] + 0x30 so that every induction value is object-relative, and each
  * loop keeps its own vtable local, as in RAC2's DRAW idiom (00337210.c). */
-void func_US2_0034E8D8(void *arg)
+void hud_bolt_counter_panel_draw_us2(void *arg)
 {
     HudOwner *object = arg;
     char separator[32];
@@ -85,7 +85,7 @@ void func_US2_0034E8D8(void *arg)
     gfx_draw_screen_element_stored(&object->top[1]);
     gfx_draw_screen_element_stored(&object->top[2]);
     hud_draw_colored_quad_widget(object->panel148);
-    func_US2_003378A0(object->panel100);
+    text_label_draw_us2(object->panel100);
     if (!g_notice_owner[0]) {
         HudElem4C *left = &object->side[0];
         HudElem4C *right = &object->side[1];
@@ -110,7 +110,7 @@ void func_US2_0034E8D8(void *arg)
     }
     gfx_draw_screen_element_stored(&object->mid[0]);
     gfx_draw_screen_element_stored(&object->mid[1]);
-    func_US2_003378A0(&object->text);
+    text_label_draw_us2(&object->text);
     hud_draw_colored_quad_widget(object->panel280);
     x = object_get_first_field(&object->text)[0];
     y = object_get_first_field(&object->text)[1];
@@ -135,8 +135,8 @@ void func_US2_0034E8D8(void *arg)
             step += 3.0f;
             scale = object_get_second_field(t);
             style = t->style;
-            texture = func_US2_0027CED8((int)style);
-            func_US2_0027FCB0(drawX, y + (float)yoffset, color, separator, -1, *scale, texture, t->metrics);
+            texture = tex_get_effect_descriptor_us2((int)style);
+            text_draw_scaled_us2(drawX, y + (float)yoffset, color, separator, -1, *scale, texture, t->metrics);
         } while (step < (float)digits);
     }
     if (g_bolt_multiplier[0] >= 2) {

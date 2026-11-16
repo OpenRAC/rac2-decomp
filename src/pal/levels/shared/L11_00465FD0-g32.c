@@ -26,6 +26,7 @@ extern void *enemy_spawn_record(void *, void *, void *, void *, int);
 extern void *part_spawn_gravity_fade(void *, void *, int, u32, int, int, int, float, float, float, int);
 extern float FastAddRotations(float, float);
 
+/* Spawns a ring of sparks and puffs around a position, spread evenly in angle with random speeds (PAL: 50 Hz speeds). */
 void part_l11_spawn_spark_ring_pal(void *position, int count) {
     float velocity[4];
     float step = 6.2831854820251465f / IntToFloat(count);

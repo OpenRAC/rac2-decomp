@@ -14,7 +14,8 @@ extern char g_particle_params_a __attribute__((sda));
 extern char g_particle_params_b __attribute__((sda));
 extern char g_particle_params_c __attribute__((sda));
 
-void func_PAL_L00_003F0390(char *object)
+/* Shoots out three small downward puffs from the object when it is visible (PAL: 50 Hz speed). */
+void synthenoid_emit_exhaust_pal(char *object)
 {
     Vector position, velocity, temporary;
     if (*(unsigned char *)(object + 0x31) != 0) {

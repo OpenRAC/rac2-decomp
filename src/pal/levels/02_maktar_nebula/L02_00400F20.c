@@ -1,5 +1,6 @@
 #include "include_asm.h"
 #include "names.h"
+#include "moby_classes.h"
 
 typedef unsigned char u8;
 typedef unsigned short u16;
@@ -27,11 +28,11 @@ extern char *g_moby_l02_pool __attribute__((section(".sdata")));
 extern s32 g_group_max_index[] __attribute__((sda));
 extern s16 moby_get_vars_counter(char *);
 #define GROUP(off) (*(s32 *)(state + (off)))
-#define FOR_EACH_ID(p, off) \
-    for (p = (u16 *)D_L02_001FC060[GROUP(off)]; \
-         (GROUP(off) & 0xFF) != 0xFF && GROUP(off) <= D_L02_001B35B8[0] && p != 0 && \
-         ((p != 0 && (s16)p[-1] >= 0) || p == (u16 *)D_L02_001FC060[GROUP(off)]); \
-         p++)
+#define FOR_EACH_ID(entry_ptr, off) \
+    for (entry_ptr = (u16 *)D_L02_001FC060[GROUP(off)]; \
+         (GROUP(off) & 0xFF) != 0xFF && GROUP(off) <= D_L02_001B35B8[0] && entry_ptr != 0 && \
+         ((entry_ptr != 0 && (s16)entry_ptr[-1] >= 0) || entry_ptr == (u16 *)D_L02_001FC060[GROUP(off)]); \
+         entry_ptr++)
 extern s32 moby_get_busy_flag(char *);
 extern void armed_enemy_drop_held_and_reset(char *, int, int);
 extern void moby_set_anim_type_three(char *, int, int);
@@ -43,43 +44,43 @@ extern u8 g_game_flag_table[];
    test: the handlers may change it).  Each live, unflagged one that passes the screen
    against the two bounds is handed to the handler of its type.  Afterwards the follow-up is
    called unless the resident record passes the screen. */
-void arena_update_group_enemies_pal(char *a0) {
-    char *state = *(char **)(a0 + 0x68);
-    u16 *p;
-    char *e;
-    u8 c;
+void arena_update_group_enemies_pal(char *moby) {
+    char *state = *(char **)(moby + 0x68);
+    u16 *entry_ptr;
+    char *member;
+    u8 state_byte;
 
-    FOR_EACH_ID(p, 0x40) {
-        e = g_moby_l02_pool + ((*p & 0x7FFF) << 8);
-        if (e == 0)
+    FOR_EACH_ID(entry_ptr, 0x40) {
+        member = g_moby_l02_pool + ((*entry_ptr & 0x7FFF) << 8);
+        if (member == 0)
             break;
-        c = *(u8 *)(e + 0x20);
-        if (c == 0xFE)
+        state_byte = *(u8 *)(member + 0x20);
+        if (state_byte == 0xFE)
             continue;
-        if (c == 0xFD)
+        if (state_byte == 0xFD)
             continue;
-        if (c < 3)
+        if (state_byte < 3)
             continue;
-        if (*(u16 *)(e + 0x34) & 2)
+        if (*(u16 *)(member + 0x34) & 2)
             continue;
-        if (coll_point_inside_record_volume(e + 0x10, *(s32 *)(state + 0x80)) == 0 &&
-            coll_point_inside_record_volume(e + 0x10, *(s32 *)(state + 0x7C)) != 0)
+        if (coll_point_inside_record_volume(member + 0x10, *(s32 *)(state + 0x80)) == 0 &&
+            coll_point_inside_record_volume(member + 0x10, *(s32 *)(state + 0x7C)) != 0)
             continue;
-        switch (*(s16 *)(e + 0xAA)) {
+        switch (*(s16 *)(member + 0xAA)) {
         case 0x9CA:
-            armed_enemy_drop_held_and_reset(e, 0, 0);
+            armed_enemy_drop_held_and_reset(member, 0, 0);
             break;
         case 0xB22:
-            moby_set_anim_type_three(e, 0, -1);
-            actor_tear_down(e);
+            moby_set_anim_type_three(member, 0, -1);
+            actor_tear_down(member);
             break;
-        case 0xC3B:
-            moby_set_anim_type_three(e, 0, -1);
-            flamethrower_robot_knock_out(e);
+        case MOBY_CLASS_MEGACORP_SECURITY_ROBOT_FLAMETHROWER:
+            moby_set_anim_type_three(member, 0, -1);
+            flamethrower_robot_knock_out(member);
             break;
-        case 0xC3E:
-            moby_set_anim_type_three(e, 0, -1);
-            blade_ball_explode(e);
+        case MOBY_CLASS_PX6_BLADEBALL:
+            moby_set_anim_type_three(member, 0, -1);
+            blade_ball_explode(member);
             break;
         }
     }
@@ -106,31 +107,31 @@ extern int g_arena_challenge_index __attribute__((sda));
    releases the object held at +0xC0 and, by a per-slot flag, hands a vector whose third float
    is -1.59 or 2.16, with the matching 128-byte record, to func_L00_002B9D60; ends by setting
    D_L02_001AA1B0 to -1. */
-void arena_cancel_challenge_menu_pal(char *a0) {
-    char *s1 = *(char **)(a0 + 0x68);
-    float v[4];
+void arena_cancel_challenge_menu_pal(char *moby) {
+    char *vars = *(char **)(moby + 0x68);
+    float facing[4];
 
-    arena_start_announcer_message(a0, math_random_int_below(2) + 0x25);
-    moby_set_state(a0, 1, -1);
-    if (*(char **)(s1 + 0xC0) != 0) {
-        cam_end_override(*(char **)(s1 + 0xC0));
-        *(s32 *)(s1 + 0xC0) = 0;
+    arena_start_announcer_message(moby, math_random_int_below(2) + 0x25);
+    moby_set_state(moby, 1, -1);
+    if (*(char **)(vars + 0xC0) != 0) {
+        cam_end_override(*(char **)(vars + 0xC0));
+        *(s32 *)(vars + 0xC0) = 0;
     }
     if (g_arena_l02_active_flag != 0)
-        load_scene_chunk(0, *(s32 *)(s1 + 0x224));
-    vec_clear_128(v);
+        load_scene_chunk(0, *(s32 *)(vars + 0x224));
+    vec_clear_128(facing);
     if (g_game_flag_table[arena_get_challenge_save_index(0)] != 0) {
-        v[2] = -1.59f;
-        hero_reset_position_and_direction(g_hero_position_records + *(s32 *)(s1 + 0x74) * 128 + 0x30, v, 0, 1);
+        facing[2] = -1.59f;
+        hero_reset_position_and_direction(g_hero_position_records + *(s32 *)(vars + 0x74) * 128 + 0x30, facing, 0, 1);
     } else {
-        v[2] = 2.16f;
-        hero_reset_position_and_direction(g_matrix_l02_record_table + *(s32 *)(s1 + 0x78) * 128 + 0x30, v, 0, 1);
+        facing[2] = 2.16f;
+        hero_reset_position_and_direction(g_matrix_l02_record_table + *(s32 *)(vars + 0x78) * 128 + 0x30, facing, 0, 1);
     }
     level_capture_checkpoint_state(g_hero_position, g_hero_position + 0x10);
-    arena_reset_group_enemies(a0);
-    arena_match_active_count_a(a0, 0);
-    arena_match_active_count_b(a0, 0);
-    script_queue_keyed_request(*(s32 *)(s1 + 0x224), *(s32 *)(s1 + 0x22C));
+    arena_reset_group_enemies(moby);
+    arena_match_active_count_a(moby, 0);
+    arena_match_active_count_b(moby, 0);
+    script_queue_keyed_request(*(s32 *)(vars + 0x224), *(s32 *)(vars + 0x22C));
     g_arena_challenge_index = -1;
 }
 

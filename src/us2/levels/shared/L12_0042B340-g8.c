@@ -67,12 +67,13 @@ typedef struct {
     float scroll;
 } BeamState;
 
+/* Draws a laser beam as a textured quad from the previous hero position to the moby (v2.00 copy). */
 void gfx_draw_laser_beam_us2(int unused0, int unused1, int unused2, int unused3,
-                      int unused4, char *obj)
+                      int unused4, char *moby)
 {
     RenderQuad quad;
     float delta[4], offset[4], center[4], width[4], base[4], temp[4];
-    BeamState *state = *(BeamState **)(obj + 0x68);
+    BeamState *state = *(BeamState **)(moby + 0x68);
     float *vertices;
     float *u;
     float *v;
@@ -113,13 +114,13 @@ void gfx_draw_laser_beam_us2(int unused0, int unused1, int unused2, int unused3,
     state->scroll += 0.1f;
     if (state->scroll >= 4.0f)
         state->scroll -= 4.0f;
-    FastVecSub(delta, obj + 0x10, g_hero_prev_position);
+    FastVecSub(delta, moby + 0x10, g_hero_prev_position);
     vec_scale_to_length(offset, state, -g_laser_offset_a);
-    FastVecAdd(center, obj + 0x10, offset);
+    FastVecAdd(center, moby + 0x10, offset);
     FastVecCross(width, delta, offset);
     vec_scale_to_length(width, width, g_laser_beam_width_d);
     vec_scale_to_length(base, state, g_laser_base_length_c[0]);
-    FastVecAdd(base, obj + 0x10, base);
+    FastVecAdd(base, moby + 0x10, base);
     FastVecAdd(quad.vertices[0], base, width);
     FastVecSub(vertices, base, width);
     FastVecAdd(quad.vertices[2], center, width);
@@ -173,7 +174,7 @@ void gfx_draw_laser_beam_us2(int unused0, int unused1, int unused2, int unused3,
     quad.colors[2] = quad.colors[3];
     vec_scale_to_length(width, width, g_laser_beam_width_a);
     vec_scale_to_length(base, state, g_laser_base_length_c[0]);
-    FastVecAdd(base, obj + 0x10, base);
+    FastVecAdd(base, moby + 0x10, base);
     FastVecAdd(quad.vertices[0], base, width);
     FastVecSub(vertices, base, width);
     FastVecAdd(center, base, offset);
@@ -192,7 +193,7 @@ void gfx_draw_laser_beam_us2(int unused0, int unused1, int unused2, int unused3,
     quad.colors[2] = quad.colors[3];
     vec_scale_to_length(width, width, g_laser_beam_width_b);
     vec_scale_to_length(base, state, g_laser_base_length_a);
-    FastVecAdd(base, obj + 0x10, base);
+    FastVecAdd(base, moby + 0x10, base);
     FastVecAdd(quad.vertices[0], base, width);
     FastVecSub(vertices, base, width);
     FastVecAdd(center, base, offset);
@@ -211,7 +212,7 @@ void gfx_draw_laser_beam_us2(int unused0, int unused1, int unused2, int unused3,
     quad.colors[2] = quad.colors[3];
     vec_scale_to_length(width, width, g_laser_beam_width_c);
     vec_scale_to_length(base, state, g_laser_base_length_a);
-    FastVecAdd(base, obj + 0x10, base);
+    FastVecAdd(base, moby + 0x10, base);
     FastVecAdd(quad.vertices[0], base, width);
     FastVecSub(vertices, base, width);
     FastVecAdd(center, base, offset);
@@ -230,7 +231,7 @@ void gfx_draw_laser_beam_us2(int unused0, int unused1, int unused2, int unused3,
     quad.colors[2] = quad.colors[3];
     vec_scale_to_length(width, width, g_laser_beam_width_a);
     vec_scale_to_length(base, state, g_laser_base_length_b);
-    FastVecAdd(base, obj + 0x10, base);
+    FastVecAdd(base, moby + 0x10, base);
     FastVecAdd(quad.vertices[0], base, width);
     FastVecSub(vertices, base, width);
     vec_scale_to_length(offset, state, -0.6f);
@@ -239,10 +240,10 @@ void gfx_draw_laser_beam_us2(int unused0, int unused1, int unused2, int unused3,
     FastVecAdd(quad.vertices[2], center, width);
     FastVecSub(quad.vertices[3], center, width);
     draw_world_quad(&quad, 0, 0);
-    gfx_draw_billboard_quad(obj + 0x10, g_laser_billboard_texture, g_laser_billboard_color, 1,
+    gfx_draw_billboard_quad(moby + 0x10, g_laser_billboard_texture, g_laser_billboard_color, 1,
                    g_laser_glow_size, 0.08f, math_random_angle());
     glow = g_laser_glow_size;
     glow *= 0.4f;
-    gfx_draw_billboard_quad(obj + 0x10, g_laser_billboard_texture, 0x80808080, 1,
+    gfx_draw_billboard_quad(moby + 0x10, g_laser_billboard_texture, 0x80808080, 1,
                    glow, 0.08f, math_random_angle());
 }

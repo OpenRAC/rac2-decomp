@@ -101,8 +101,8 @@ extern void FlushCache(int);
 extern int sceGsSyncV(int);
 extern int snd_Pump(void);
 extern void snd_set_current_buffer_flag(void);
-extern void func_PAL_0026E838(int);
-extern void func_PAL_0026E928(int);
+extern void ShowSplashImage_pal(int);
+extern void gfx_draw_splash_screen_frame_pal(int);
 extern void menu_fill_shuffled_tile_table(unsigned short *);
 extern void ResetGsRegistersPr(void), gfx_render_frame_extra_layers_pal(void), gfx_call_frame_helper_zero_pal(void);
 extern void FadeToBlack(int);
@@ -110,11 +110,11 @@ extern void gfx_process_screen_copy_regions(void);
 extern void math_trap_always(void);
 extern float IntToFloat(int);
 extern int gfx_query_display_buffer(void);
-extern void func_PAL_0026E780(void), gfx_append_draw_list_header(void), PutDrawBufferSmall(void), gfx_queue_second_strip_packet(void), func_PAL_00287018(void);
+extern void gfx_append_splash_packet_pal(void), gfx_append_draw_list_header(void), PutDrawBufferSmall(void), gfx_queue_second_strip_packet(void), UpdateModalState_pal(void);
 extern int req_push_queue(unsigned char *, int);
 extern int req_launch_queued(void *);
 extern void InitializeHudSlotsAndBuffers(void);
-extern void level_init_systems(void), func_PAL_002914E0(void);
+extern void level_init_systems(void), InitOnce_pal(void);
 extern void func_00291DE0(int *, int);
 extern void tex_load_pack_to_vram_pal(int), LoadPackSingleTexture_pal(int), load_disc_table_entry_for_draw_pal(int), LoadDiscTableTexture_pal(int);
 extern void hud_load_banks(void);
@@ -123,18 +123,18 @@ extern void map_update_state_machine(void), mc_update_state_pal(void);
 extern void level_init_callbacks_pal(void);
 extern int fast_decompress_pal(int, int);
 extern int request_begin_slot(int, int, int, int, unsigned char *);
-extern void func_PAL_002B57D0(void);
+extern void mode_apply_pending_change_pal(void);
 extern void snd_start_bank_load(int, int);
 extern int load_start_disc_read(int, int, int);
 extern short snd_pump_music_and_disc_read_pal(int);
 extern void pad_poll_ports_pal(void);
 extern void menu_reset_slots(void);
-extern void func_PAL_002CB710(void);
-extern int func_PAL_002EA0B0(void);
+extern void menu_update_pause_pal(void);
+extern int update_playback_scene_pal(void);
 extern void transition_draw_background_pal(void);
 extern void RunLevelTransition_pal(void);
 extern void gfx_reset_buffer_slot_table(void);
-extern void func_PAL_002F6F08(void);
+extern void mpeg_play_movie_pal(void);
 extern void gfx_swap_packet_buffer(void), SubmitBufferedDmaChain(void);
 extern void gfx_wait_for_dma_status_bits(unsigned long long);
 extern long long tex_upload_blocks_return_setup(int, int, int, int);
@@ -156,7 +156,7 @@ void RunBootTitleLoop_pal(void)
     float time;
 
     g_menu_panel_active[0] = 1;
-    func_PAL_002914E0();
+    InitOnce_pal();
     {
         LoaderMemory *memory = &g_loader_memory;
         LoaderDisc *disc = &g_copy_setup_data;
@@ -179,9 +179,9 @@ void RunBootTitleLoop_pal(void)
         loaded = 1;
         if (g_memcard_state->state < 3 && g_memcard_state->next_state < 0) {
             if (g_memcard_state->card[0].type != 2)
-                func_PAL_0026E928((int)g_loader_name_table_a[g_language_settings[4]]);
+                gfx_draw_splash_screen_frame_pal((int)g_loader_name_table_a[g_language_settings[4]]);
             else if (g_memcard_state->card[0].status != -4)
-                func_PAL_0026E928((int)g_loader_name_table_b[g_language_settings[4]]);
+                gfx_draw_splash_screen_frame_pal((int)g_loader_name_table_b[g_language_settings[4]]);
             if (g_memcard_state->next_state < 0) {
                 g_memcard_state->next_state = 7;
                 g_memcard_state->next_card = 0;
@@ -213,7 +213,7 @@ void RunBootTitleLoop_pal(void)
         FlushCache(0);
         gfx_reset_buffer_slot_table();
         archive = memory->archive;
-        func_PAL_0026E838(archive->offsets[0x50 / 4] + (int)archive);
+        ShowSplashImage_pal(archive->offsets[0x50 / 4] + (int)archive);
         g_loader_archives[2] = memory->archive;
         hud_load_banks();
         snd_start_bank_load(archive->offsets[8 / 4] + (int)archive, 0);
@@ -256,7 +256,7 @@ void RunBootTitleLoop_pal(void)
         for (i = 24; i >= 0; i--)
             sceGsSyncV(0);
     }
-    func_PAL_0026E838(archive->offsets[0x58 / 4] + (int)archive);
+    ShowSplashImage_pal(archive->offsets[0x58 / 4] + (int)archive);
     {
         LoaderSound *sound;
         g_hero_state.enabled = 1;
@@ -288,7 +288,7 @@ void RunBootTitleLoop_pal(void)
     g_loader_state_word = 3;
     req_push_queue((unsigned char *)&g_loader_movie, 0xB2);
     req_launch_queued(&g_loader_movie);
-    func_PAL_002B57D0();
+    mode_apply_pending_change_pal();
     while (!g_frontend_done_flag[0]) {
         g_subtitle_entries = tables[g_language_settings[4]];
         g_subtitle_state.count = counts[g_language_settings[4]];
@@ -300,7 +300,7 @@ void RunBootTitleLoop_pal(void)
         gfx_swap_packet_buffer();
         PutDrawBufferSmall();
         gfx_queue_second_strip_packet();
-        func_PAL_0026E780();
+        gfx_append_splash_packet_pal();
         gfx_append_draw_list_header();
         snd_Pump();
         state = g_current_game_mode[0];
@@ -321,10 +321,10 @@ void RunBootTitleLoop_pal(void)
             }
             break;
         case 1:
-            func_PAL_002F6F08();
+            mpeg_play_movie_pal();
             if (extra) {
                 int i;
-                func_PAL_0026E838((int)extra);
+                ShowSplashImage_pal((int)extra);
                 for (i = 24; i >= 0; i--)
                     sceGsSyncV(0);
                 FadeToBlack(30);
@@ -336,17 +336,17 @@ void RunBootTitleLoop_pal(void)
             pad_poll_ports_pal();
             if (g_pad_pressed_flags[0])
                 idle = 0;
-            func_PAL_002CB710();
+            menu_update_pause_pal();
             gfx_call_frame_helper_zero_pal();
             break;
         case 4:
             pad_poll_ports_pal();
-            func_PAL_00287018();
+            UpdateModalState_pal();
             gfx_render_frame_extra_layers_pal();
             break;
         case 6:
             pad_poll_ports_pal();
-            func_PAL_002EA0B0();
+            update_playback_scene_pal();
             transition_draw_background_pal();
             break;
         default:
@@ -363,7 +363,7 @@ void RunBootTitleLoop_pal(void)
         time = IntToFloat(T1_COUNT);
         g_frame_time_scale = time * (g_is_pal_video[0] ? 0.0000868055578f : 0.000104166669f);
         ResetGsRegistersPr();
-        func_PAL_002B57D0();
+        mode_apply_pending_change_pal();
         g_frame_counter_3[0]++;
         sceGsSyncV(0);
     }

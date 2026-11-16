@@ -2,16 +2,17 @@
 
 #include "common.h"
 extern int math_fast_float_d(void *);
-extern void func_PAL_002AC3C0(void *, unsigned char *);
+extern void gfx_update_color_fade_pal(void *, unsigned char *);
 extern void moby_pulse_tint_pal(unsigned char *);
 extern void moby_update_eased_node(void *, void *, int, float, float);
 extern int route_get_node_value(unsigned int, int);
 extern unsigned char g_state_flag_b;
 
+/* Per-frame update for a bot: ticks its timers, refreshes its path and aim, and picks its next waypoint. (PAL: 50 Hz easing rates) */
 void bot_update_timers_and_path_pal(unsigned char *object)
 {
     unsigned char *state = *(unsigned char **)(object + 0x68);
-    func_PAL_002AC3C0(object, state + 0x50);
+    gfx_update_color_fade_pal(object, state + 0x50);
     if (*(unsigned short *)(object + 0x96) < 0xFFFF)
         ++*(unsigned short *)(object + 0x96);
     math_fast_float_d(state + 0x364);

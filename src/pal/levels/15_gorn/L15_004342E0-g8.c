@@ -121,12 +121,12 @@ static __inline__ s32 sprite_y(void *handle, f32 y, f32 adjustment)
     return result;
 }
 
-s32 func_PAL_L15_004342E0(void) {
+s32 gorn_challenge_menu_draw_pal(void) {
     char buf[128];
     f32 center, fade, image_y;
     void *sprite;
     char *text;
-    s32 x, y, t, hx;
+    s32 x, y, pulse_phase, header_x;
     
     u32 blend, color;
 
@@ -139,11 +139,11 @@ s32 func_PAL_L15_004342E0(void) {
         gfx_draw_scaled_object(sprite, center, (f32)label_y(sprite, 200.0f, g_screen_l15_scale, 0.5f, 1), 0x60442D00, 1.0f, 0.0f);
         sprite = table_find_by_id(g_challenge_menu_data + 0x8710, 0x44);
         gfx_draw_scaled_object(sprite, center, (f32)label_y(sprite, 200.0f, g_screen_l15_scale, 0.5f, 1), 0x55F0C070, 1.0f, 0.0f);
-        t = g_gorn_challenge_count % 50;
-        if (t >= 25)
-            fade = 1.0f - (f32)(t - 25) * 0.04f;
+        pulse_phase = g_gorn_challenge_count % 50;
+        if (pulse_phase >= 25)
+            fade = 1.0f - (f32)(pulse_phase - 25) * 0.04f;
         else
-            fade = (f32)t * 0.04f;
+            fade = (f32)pulse_phase * 0.04f;
         blend = FastTweenColor(0x80FFDE8D, 0x60442D00, fade);
         color = (g_pad_state[0x68] & 0x2000) ? 0x80007FFF : blend;
         sprite = table_find_by_id(g_challenge_menu_data + 0x8710, 0x4A);
@@ -157,9 +157,9 @@ s32 func_PAL_L15_004342E0(void) {
         {
             s32 len;
 
-            hx = FloatToInt(center);
+            header_x = FloatToInt(center);
             len = func_001157AC(buf);
-            text_draw_centered_large(hx, 46, 0x80F0F0F0, buf, len);
+            text_draw_centered_large(header_x, 46, 0x80F0F0F0, buf, len);
         }
         x = FloatToInt(center);
         switch (g_gorn_selected_challenge) {

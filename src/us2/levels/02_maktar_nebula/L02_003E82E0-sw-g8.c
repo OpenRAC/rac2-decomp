@@ -35,8 +35,8 @@ extern float mat_fast_helper_a(float, float);
 extern void moby_mark_spawned(void *);
 extern char *part_find_owned_effect_slot(void *, int, int);
 extern void slot_machine_roll_result(void *);
-typedef struct { char pad[0x18]; u8 kind; u8 flags; short sourceClass; char tail[0x14]; } Hit003E6D70;
-typedef struct { char pad[0xAA]; short classId; } SlotActor003E6D70;
+typedef struct { char pad[0x18]; u8 kind; u8 flags; short source_class; char tail[0x14]; } Hit003E6D70;
+typedef struct { char pad[0xAA]; short class_id; } SlotActor003E6D70;
 typedef struct {
     char pad0[0x20]; float health; short count; char pad26[10];
     float multiplier; char pad34[0x2C]; float reel[3];
@@ -52,7 +52,7 @@ void UpdateSlotMachine_us2(char *actor) {
     char *state = *(char **)(actor + 0x68);
     float point[4];
     Hit003E6D70 hit;
-    float prizePoint[4];
+    float prize_point[4];
     char *contact, *other;
     int i, index;
     float *rate;
@@ -135,15 +135,15 @@ void UpdateSlotMachine_us2(char *actor) {
         part_init_effect_record(&hit, actor, 0x810001, 2.0f);
         hit.kind = 2;
         hit.flags = 1;
-        hit.sourceClass = ((SlotActor003E6D70 *)actor)->classId;
+        hit.source_class = ((SlotActor003E6D70 *)actor)->class_id;
         coll_process_hit(point, 16, actor, &hit, 4.0f);
         SpawnExplosion(actor + 0x10, 1, 25, 20, 20, 20, 45, 0, 1, 1, 0, 0, 1.5f, 20.0f);
         if (*(int *)(state + 0x58)) {
             for (i = 0; i < 2; i++) {
                 char *prize = moby_find_group_in_state_13(*(int *)(state + 0x58));
                 if (prize) {
-                    moby_compute_local_point(actor, prizePoint, 0.5f, (float)i * 0.9f - 0.45f, 0.0f);
-                    moby_teleport_to_new_pose(prize, prizePoint, g_zero_l02_vector);
+                    moby_compute_local_point(actor, prize_point, 0.5f, (float)i * 0.9f - 0.45f, 0.0f);
+                    moby_teleport_to_new_pose(prize, prize_point, g_zero_l02_vector);
                     *(float *)(prize + 0xF8) = mat_fast_helper_a(((Hero *)g_hero_state)->f[0x80 / 4] - *(float *)(prize + 0x10), ((Hero *)g_hero_state)->f[0x84 / 4] - *(float *)(prize + 0x14));
                 }
             }

@@ -4,13 +4,13 @@
 extern void *pool_alloc_cell(void *);
 extern float *ui_return_second_arg(int, int);
 extern void object_init_derived_arrays(void *, void *, void *);
-extern void func_PAL_00338688(void *, void *, void *);
+extern void hud_init_widget_defaults_pal(void *, void *, void *);
 extern void hud_set_widget_field_a(void *, int);
 extern unsigned int *object_get_fourth_field(void *);
 extern void object_set_helper_result(void *, void *, int);
 extern void hud_set_widget_field_b(void *, void *);
 extern char *GetLocalizedString(int);
-extern int func_PAL_0033B218(void *, int);
+extern int mission_screen_place_parts_pal(void *, int);
 extern char *ref_L00_0042E9A8_00;
 extern char ref_L00_0042E9A8_01[];
 extern char ref_L00_0042E9A8_02[];
@@ -22,7 +22,7 @@ extern char ref_L00_0042E9A8_07[];
 extern char ref_L00_0042E9A8_08[];
 
 /* Creates the mission screen's panels and labels, then applies its layout. */
-void func_PAL_0033AF68(char *object, void *parent)
+void mission_screen_init_pal(char *object, void *parent)
 {
     char *title;
     char *city;
@@ -55,10 +55,10 @@ void func_PAL_0033AF68(char *object, void *parent)
     object_init_derived_arrays(city, ref_L00_0042E9A8_02, parent);
     object_init_derived_arrays(planet, ref_L00_0042E9A8_03, parent);
     object_init_derived_arrays(mission, ref_L00_0042E9A8_04, parent);
-    func_PAL_00338688(name, ref_L00_0042E9A8_05, parent);
-    func_PAL_00338688(description, ref_L00_0042E9A8_06, parent);
-    func_PAL_00338688(details, ref_L00_0042E9A8_07, parent);
-    func_PAL_00338688(object + 0x240, ref_L00_0042E9A8_08, parent);
+    hud_init_widget_defaults_pal(name, ref_L00_0042E9A8_05, parent);
+    hud_init_widget_defaults_pal(description, ref_L00_0042E9A8_06, parent);
+    hud_init_widget_defaults_pal(details, ref_L00_0042E9A8_07, parent);
+    hud_init_widget_defaults_pal(object + 0x240, ref_L00_0042E9A8_08, parent);
     hud_set_widget_field_a(details, 1);
     *object_get_fourth_field(title) = 0x60442d00;
     *object_get_fourth_field(city) = 0x60241700;
@@ -74,5 +74,5 @@ void func_PAL_0033AF68(char *object, void *parent)
     hud_set_widget_field_b(name, GetLocalizedString(0xbd6));
     hud_set_widget_field_b(description, GetLocalizedString(0xb60));
     hud_set_widget_field_b(details, object + 0x298);
-    func_PAL_0033B218(object, 0);
+    mission_screen_place_parts_pal(object, 0);
 }

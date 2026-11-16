@@ -9,7 +9,8 @@ typedef struct { u8 pad[0x158]; float value; u8 gap[0x370-0x15c]; AnimQuad vecto
 extern AnimBase g_scalar_transition_state;
 extern void hero_steer_heading(int, float, float, float);
 
-void func_PAL_L00_002B34C0(void)
+/* Copies the hero turning values from the animation data and slows the turn depending on which way the hero is leaning. */
+void hero_update_turn_from_anim_pal(void)
 {
     u8 *p=D_00189E20_1;
     float f;

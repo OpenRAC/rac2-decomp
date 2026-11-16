@@ -29,6 +29,7 @@ typedef struct {
 } MapToc;
 extern MapToc g_copy_setup_data;
 
+/* Resets the map picture cache and reloads the map files of the current level. */
 void map_reset_cache_and_reload_us2(void)
 {
     int *arena;

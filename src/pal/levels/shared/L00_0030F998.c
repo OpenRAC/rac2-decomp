@@ -6,7 +6,8 @@ extern int list_menu_update_pal(char *, int);
 
 /* func_PAL_L00_0030F998, the PAL copy of func_L00_0030DB48: the same C, where the base offset
  * 0x3E1D8 becomes 0x3E810 and func_003424C0 becomes func_PAL_00344528. */
-int func_PAL_L00_0030F998(int argument)
+/* Passes the bound module (plus a PAL offset) and an argument to the list menu update; returns 0 when none is bound. */
+int level_l00_call_module_handler_with_arg_5_pal(int argument)
 {
     int value = D_L00_001A904C_2;
 
@@ -15,6 +16,7 @@ int func_PAL_L00_0030F998(int argument)
     return 0;
 }
 
+/* Draws the bound module's menu if it is active. */
 void level_l00_call_module_handler_6_pal(void)
 {
     int value = D_L00_001A904C_2;

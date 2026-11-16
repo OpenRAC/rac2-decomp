@@ -3,19 +3,19 @@
 #include "common.h"
 extern int math_random_int_below(int);
 extern int g_nanotech_cooldown __attribute__((sda));
-extern void func_US2_002A7AA8(void *, int, int);
+extern void SetDeathBits_us2(void *, int, int);
 extern int PickAmmoDropItem(void *, int *);
 extern char *SpawnWeaponAmmoPickup_us2(void *, int, int, int);
 
 /* Selects the object's drop kind, emits the requested count, and resets its
  * halfword at +0xB4 before handing it to the state helper. */
-void crate_drop_loot_us2(unsigned char *self)
+void crate_drop_loot_us2(unsigned char *moby)
 {
-    unsigned char *data = *(unsigned char **)(self + 0x68);
-    int item = *(short *)(data + 0xC6) == 0;
-    int n, i;
+    unsigned char *vars = *(unsigned char **)(moby + 0x68);
+    int item = *(short *)(vars + 0xC6) == 0;
+    int count, i;
 
-    if (*(short *)(self + 0xAA) == 0x1F5 || *(short *)(self + 0xAA) == 0x200)
+    if (*(short *)(moby + 0xAA) == MOBY_CLASS_NANOTECH_CRATE || *(short *)(moby + 0xAA) == MOBY_CLASS_PURPLE_NANOTECH_CRATE)
         item = 0;
     if (item) {
         if (g_nanotech_cooldown >= 21)
@@ -24,11 +24,11 @@ void crate_drop_loot_us2(unsigned char *self)
             i = 1;
         else
             i = 2;
-        func_US2_002A7AA8(self, 256, math_random_int_below(2) + i);
+        SetDeathBits_us2(moby, 256, math_random_int_below(2) + i);
     } else {
-        if (*(short *)(self + 0xAA) != 0x1F5 && *(short *)(self + 0xAA) != 0x200) {
+        if (*(short *)(moby + 0xAA) != MOBY_CLASS_NANOTECH_CRATE && *(short *)(moby + 0xAA) != MOBY_CLASS_PURPLE_NANOTECH_CRATE) {
             {
-                int kind = data[0xCB];
+                int kind = vars[0xCB];
                 if (kind == 4)
                     goto kind4;
                 if (kind < 5)
@@ -52,17 +52,17 @@ void crate_drop_loot_us2(unsigned char *self)
             selected:
                 ;
             }
-            n = PickAmmoDropItem(self, &item);
-            if (n > 0) {
-                i = n;
+            count = PickAmmoDropItem(moby, &item);
+            if (count > 0) {
+                i = count;
                 do {
-                    SpawnWeaponAmmoPickup_us2(self + 0x10, item, -1, 0);
+                    SpawnWeaponAmmoPickup_us2(moby + 0x10, item, -1, 0);
                     --i;
                 } while (i);
             }
         }
-        if (*(short *)(self + 0xB4))
-            *(short *)(self + 0xB4) = 0;
-        func_US2_002A7AA8(self, 256, 0);
+        if (*(short *)(moby + 0xB4))
+            *(short *)(moby + 0xB4) = 0;
+        SetDeathBits_us2(moby, 256, 0);
     }
 }

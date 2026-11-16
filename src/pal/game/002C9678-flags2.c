@@ -12,7 +12,9 @@ extern void FastVecAdd(void *, void *, void *);
 extern int FastDecTimer(void *);
 extern void part_kill(void *);
 
-void func_PAL_002C9678(char *self) {
+/* Drifting particle that tweens its colour and size over its life, then fades out in a
+   short final phase. */
+void part_update_drift_pal_2(char *self) {
     float a[4];
     float b[4];
     char *p = self + 0x20;

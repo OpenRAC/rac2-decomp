@@ -20,26 +20,26 @@ extern void entry_spawn_list_objects_with_flag_pal(char *, int);
 extern void func_L05_0037CEE0(char *, void *, float);
 extern void func_L05_0037D608(char *, void *, float);
 extern int math_fast_float_d(void *);
-extern void func_PAL_L05_00448A58(void *, void *, int);
+extern void ship_start_transition_pal(void *, void *, int);
 extern void ship_point_camera_at_target(void *, void *);
 extern void feltzin_mission_clamp_save_counts(void);
 extern int MemcardSave(int, int);
 extern void moby_set_flag_bit(char *, int);
 extern void hero_set_state_value_c(int);
 extern void moby_mark_flag_and_append_to_list(int);
-extern void func_PAL_L05_00425FB0(char *, int);
+extern void feltzin_mission_reward_update_pal(char *, int);
 
 /* func_PAL_L05_004262B0, the PAL copy of func_L05_00420A88: the same C, where the 25 frame timer
  * becomes 21 (25 at 50 Hz) and the timer arm also calls func_002AD7B8(6). */
-void func_PAL_L05_004262B0(char *actor)
+void feltzin_mission_one_update_pal(char *actor)
 {
-    Vector a;
-    Vector b;
-    Vector c;
+    Vector pos_a;
+    Vector pos_b;
+    Vector pos_c;
     char *state = *(char **)(actor + 0x68);
-    char **item;
+    char **object_list;
     int count;
-    int count2;
+    int saved_count2;
 
     if (g_feltzin_challenge_active == 0) {
         g_feltzin_challenge_state[11] = 0;
@@ -47,26 +47,26 @@ void func_PAL_L05_004262B0(char *actor)
         music_Unpause();
         entry_init_all_registered();
         hero_set_state_value_a(0);
-        item = level_get_object_list();
+        object_list = level_get_object_list();
         count = level_get_saved_value();
-        a.q = 0;
-        a.f[0] = 487.0f;
-        a.f[1] = 526.0f;
-        a.f[2] = 531.0f;
+        pos_a.q = 0;
+        pos_a.f[0] = 487.0f;
+        pos_a.f[1] = 526.0f;
+        pos_a.f[2] = 531.0f;
         if (count > 0) {
-            int n = count;
+            int i = count;
             do {
-                switch (*(short *)(*item + 0xAA)) {
+                switch (*(short *)(*object_list + 0xAA)) {
                 case 0x957:
                 case 0x97C:
                 case 0xF76:
-                    entry_spawn_list_objects_with_flag_pal(*item, 1);
-                    func_L05_0037CEE0(*item, &a, 64.0f);
-                    func_L05_0037D608(*item, &a, 64.0f);
+                    entry_spawn_list_objects_with_flag_pal(*object_list, 1);
+                    func_L05_0037CEE0(*object_list, &pos_a, 64.0f);
+                    func_L05_0037D608(*object_list, &pos_a, 64.0f);
                     break;
                 }
-                item++;
-            } while (--n != 0);
+                object_list++;
+            } while (--i != 0);
         }
     }
     if (g_feltzin_challenge_state[4] != 0 || g_feltzin_mission_index < 6)
@@ -75,37 +75,37 @@ void func_PAL_L05_004262B0(char *actor)
         if (math_fast_float_d(state + 0x58) == 0)
             return;
         *(int *)(state + 0x58) = 100;
-        func_PAL_L05_00448A58(g_str_feltzin_transition_src, g_str_feltzin_transition_dest, 200);
-        a.q = 0;
-        b.q = 0;
-        c.q = 0;
+        ship_start_transition_pal(g_str_feltzin_transition_src, g_str_feltzin_transition_dest, 200);
+        pos_a.q = 0;
+        pos_b.q = 0;
+        pos_c.q = 0;
         actor[0x20] = 3;
-        a.f[0] = 593.5f;
-        a.f[1] = 599.0f;
-        a.f[2] = 566.0f;
-        b.f[0] = 512.5f;
-        b.f[1] = 530.0f;
-        b.f[2] = 540.0f;
-        c.f[0] = 438.0f;
-        c.f[1] = 487.0f;
-        c.f[2] = 535.0f;
-        ship_point_camera_at_target(&a, &c);
-        item = level_get_object_list();
-        count2 = level_get_saved_value();
-        if (count2 > 0) {
-            int n = count2;
+        pos_a.f[0] = 593.5f;
+        pos_a.f[1] = 599.0f;
+        pos_a.f[2] = 566.0f;
+        pos_b.f[0] = 512.5f;
+        pos_b.f[1] = 530.0f;
+        pos_b.f[2] = 540.0f;
+        pos_c.f[0] = 438.0f;
+        pos_c.f[1] = 487.0f;
+        pos_c.f[2] = 535.0f;
+        ship_point_camera_at_target(&pos_a, &pos_c);
+        object_list = level_get_object_list();
+        saved_count2 = level_get_saved_value();
+        if (saved_count2 > 0) {
+            int i = saved_count2;
             do {
-                switch (*(short *)(*item + 0xAA)) {
+                switch (*(short *)(*object_list + 0xAA)) {
                 case 0x957:
                 case 0x97C:
                 case 0xF76:
-                    entry_spawn_list_objects_with_flag_pal(*item, 1);
-                    func_L05_0037CEE0(*item, &a, 10.0f);
-                    func_L05_0037D608(*item, &b, 20.0f);
+                    entry_spawn_list_objects_with_flag_pal(*object_list, 1);
+                    func_L05_0037CEE0(*object_list, &pos_a, 10.0f);
+                    func_L05_0037D608(*object_list, &pos_b, 20.0f);
                     break;
                 }
-                item++;
-            } while (--n != 0);
+                object_list++;
+            } while (--i != 0);
         }
     } else if (g_feltzin_no_challenge_flag != 0) {
         if (math_fast_float_d(state + 0x58) != 0) {
@@ -122,6 +122,6 @@ void func_PAL_L05_004262B0(char *actor)
             moby_mark_flag_and_append_to_list(6);
         }
     } else if (math_fast_float_d(state + 0x58) != 0) {
-        func_PAL_L05_00425FB0(actor, 0);
+        feltzin_mission_reward_update_pal(actor, 0);
     }
 }

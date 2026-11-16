@@ -16,7 +16,7 @@ extern void hero_process_action_command(void);
 extern int hero_find_ledge_grab(void *a0, void *a1, void *a2);
 extern void FindGrindRail(void);
 extern void hero_find_ledge_candidate(void);
-extern void func_US2_L00_002CB650(void);
+extern void hero_l00_update_move_decider_us2(void);
 extern void hero_set_objects_flag_bit(void);
 extern void hero_clear_objects_flag_bit(void);
 extern void RebuildRegionObjectMembership(void);
@@ -33,8 +33,8 @@ extern void attachment_update_all(void);
 extern void update_hero_moby(void);
 extern void part_spawn_effect_from_record(int a0);
 extern void hero_update_items_and_flags(void);
-extern void func_US2_L00_002B2408(void);
-extern void func_US2_L00_002B22D0(void);
+extern void hero_update_zapper_us2(void);
+extern void hero_play_collection_voice_line_us2(void);
 extern void hero_update_items_frame(void);
 extern int hero_is_action_allowed(void);
 extern void gfx_fade_screen_effect(void);
@@ -49,7 +49,8 @@ extern void func_002A677C(void *a0);
 extern void UpdateHeroBlinkAndItemTint(void);
 extern void UpdateHeroMobyProbedHeightBounds(void);
 
-void func_US2_L00_002A6DD0(void) {
+/* Per-frame hero update: advances the animation and input, runs the hero logic and every hero helper in order, and restores the pad state afterwards. */
+void hero_l00_update_frame_2_us2(void) {
     char *pad;
     char *player;
     char *p;
@@ -90,7 +91,7 @@ void func_US2_L00_002A6DD0(void) {
     hero_find_ledge_grab(p + 0x80, p + 0x90, p + 0x550);
     FindGrindRail();
     hero_find_ledge_candidate();
-    func_US2_L00_002CB650();
+    hero_l00_update_move_decider_us2();
     if (g_game_l00_mode == 2 || g_game_l00_mode == 6) {
         if (*(unsigned char *)(p + 0x22B5) != 0)
             hero_set_objects_flag_bit();
@@ -122,8 +123,8 @@ void func_US2_L00_002A6DD0(void) {
     update_hero_moby();
     part_spawn_effect_from_record(0);
     hero_update_items_and_flags();
-    func_US2_L00_002B2408();
-    func_US2_L00_002B22D0();
+    hero_update_zapper_us2();
+    hero_play_collection_voice_line_us2();
     hero_update_items_frame();
     {
         char *q = g_hero_state;

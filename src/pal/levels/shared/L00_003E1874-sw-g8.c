@@ -49,7 +49,8 @@ extern void ref_L00_003DD6A8_37(char *, char *);
 extern int ref_L00_003DD6A8_38(char *, char *, char *, char *, char *, char *);
 extern void ref_L00_003DD6A8_39(char *, char *), ref_L00_003DD6A8_40(char *, float);
 
-void func_PAL_L00_003E1874(char *object)
+/* Updates the spider bot: it is thrown, flies and bounces, walks on the ground it hits, and removes itself when its timer runs out (PAL: 50 Hz timings). */
+void spider_l00_bot_update_pal(char *object)
 {
     char oldpos[16], ahead[16], behind[16];
     char *data = *(char **)(object + 0x68);

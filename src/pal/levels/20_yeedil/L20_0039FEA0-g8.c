@@ -8,9 +8,9 @@ extern float g_trooper_spin_speed __attribute__((sda));
 extern void moby_set_controller_speed_limits(void *, float, float, float, float);
 extern void moby_change_class_from_tables(void *, int);
 extern void moby_set_state(void *, int, int);
-extern void func_PAL_002A7E68(void *, int, int, int);
+extern void anim_start_blended_pal(void *, int, int, int);
 extern void *part_find_owned_effect_slot(void *, u32, s32);
-extern int func_PAL_002B1A50(void *, void *, int);
+extern int moby_apply_damage_to_object_pal(void *, void *, int);
 extern void moby_mark_spawned(void *);
 extern int weapon_select_aim_target(void *, int, int, int, float, float);
 typedef struct {
@@ -69,6 +69,7 @@ typedef struct {
     unsigned char bA8;
 } Object0039D340;
 
+/* Sets up the trooper stats and hit settings on its first frame, then handles damage and picks where to aim. */
 void trooper_setup_stats_target_pal(Object0039D340 *object) {
     State0039D340 *st = object->state;
     unsigned char *event;
@@ -115,13 +116,13 @@ void trooper_setup_stats_target_pal(Object0039D340 *object) {
         }
         moby_change_class_from_tables(object, 0xD0F);
         moby_set_state(object, 6, 2);
-        if (object->b43) func_PAL_002A7E68(object, 0, 0, 0);
+        if (object->b43) anim_start_blended_pal(object, 0, 0, 0);
         object->h34 = (object->h34 | 0x4000) & 0xFFFB;
     }
     event = part_find_owned_effect_slot(object, 0x10000, 0);
     if (event && *(unsigned char **)(event + 0x20) && *(short *)(*(unsigned char **)(event + 0x20) + 0xAA) == 0xD0F)
         object->bA8 = 255;
-    func_PAL_002B1A50(object, &st->damage, 0);
+    moby_apply_damage_to_object_pal(object, &st->damage, 0);
     if (st->b2E == 2) {
         moby_set_state(object, 6, 2);
         object->i98 = 0;

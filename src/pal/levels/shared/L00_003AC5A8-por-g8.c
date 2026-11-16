@@ -39,7 +39,8 @@ extern void cam_compute_view_direction(void *, void *, int);
 extern void FastVecCross(void *, void *, void *);
 extern void FastVecAdd(void *, void *, void *);
 
-void func_PAL_L00_003AC5A8(Actor *self)
+/* Starts a new trail slot for a moby: builds its axes from the source direction and the camera (PAL: sample count at 50 Hz). */
+void trail_store_sample_pal(Actor *self)
 {
     Slot *slots;
     Source *source;

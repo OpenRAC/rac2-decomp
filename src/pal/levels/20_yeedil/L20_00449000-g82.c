@@ -16,36 +16,37 @@ extern float weapon_compute_shot_launch_speed(char *, char *, float *, float, fl
 extern int FloatToInt(float);
 extern void tumbling_debris_update(char *);
 
-char *yeedil_boss_spawn_lobbed_object_pal(char *arg0, int arg1, char *arg2) {
-    char *obj = (char *)CreateMoby(arg1);
+/* Creates an object of the given class at the owner and throws it in an arc toward the target. Returns the new object. (PAL) */
+char *yeedil_boss_spawn_lobbed_object_pal(char *owner, int class_id, char *aim_target) {
+    char *obj = (char *)CreateMoby(class_id);
     char *state;
-    char *p;
-    float f20;
-    float f21;
-    float local;
+    char *velocity;
+    float speed;
+    float accel;
+    float flight_time;
     unsigned short flags;
 
     if (obj != 0) {
-        moby_init_child_from_parent(obj, arg0);
-        qcopy(obj + 0xF0, arg0 + 0xF0);
+        moby_init_child_from_parent(obj, owner);
+        qcopy(obj + 0xF0, owner + 0xF0);
         euler_rotation_basis(obj + 0xC0, obj + 0xF0);
         flags = *(unsigned short *)(obj + 0x34);
         flags |= 0x100;
         flags &= 0xEFDF;
         state = *(char **)(obj + 0x68);
-        f20 = g_yeedil_lobbed_speed * 0.020000001f;
-        f21 = g_yeedil_lobbed_accel * 0.00040000002f;
-        p = state + 0x10;
+        speed = g_yeedil_lobbed_speed * 0.020000001f;
+        accel = g_yeedil_lobbed_accel * 0.00040000002f;
+        velocity = state + 0x10;
         *(unsigned short *)(obj + 0x34) = flags;
-        local = 0.0f;
-        FastVecSub(state, arg2, obj + 0x10);
+        flight_time = 0.0f;
+        FastVecSub(state, aim_target, obj + 0x10);
         *(float *)(state + 8) = 0.0f;
-        vec_scale_to_length(state, state, f20);
-        FastVecCross(p, state, obj + 0xE0);
-        vec_set_direction_with_complement((float *)p, (float *)p, math_fast_sin_or_cos_b(g_yeedil_lobbed_angle * 0.0003490659f));
-        *(float *)(state + 8) = weapon_compute_shot_launch_speed(obj + 0x10, arg2, &local, f20, -f21);
-        *(float *)(state + 0x20) = f21;
-        *(int *)(state + 0x24) = FloatToInt(local);
+        vec_scale_to_length(state, state, speed);
+        FastVecCross(velocity, state, obj + 0xE0);
+        vec_set_direction_with_complement((float *)velocity, (float *)velocity, math_fast_sin_or_cos_b(g_yeedil_lobbed_angle * 0.0003490659f));
+        *(float *)(state + 8) = weapon_compute_shot_launch_speed(obj + 0x10, aim_target, &flight_time, speed, -accel);
+        *(float *)(state + 0x20) = accel;
+        *(int *)(state + 0x24) = FloatToInt(flight_time);
         *(void (**)(char *))(obj + 0x64) = tumbling_debris_update;
     }
     return obj;

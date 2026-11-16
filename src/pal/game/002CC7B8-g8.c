@@ -21,10 +21,10 @@ extern char g_pause_page_third[];
 extern char g_pause_page_options[];
 extern volatile int g_pause_menu_busy_flag __attribute__((sda));
 extern int (*g_pad_poll_funcs[])(int);
-extern void func_PAL_0029D7D0(void);
-extern int func_PAL_0029CC28(int);
-extern int func_PAL_002D7B68(int);
-extern int func_PAL_0029CC98(int);
+extern void resident_notice_timers_update(void);
+extern int menu_update_mission_screen_pal(int);
+extern int DrawMapScreen_pal(int);
+extern int menu_update_list_screen_pal(int);
 
 int menu_update_page_input_pal(void)
 {
@@ -38,13 +38,13 @@ int menu_update_page_input_pal(void)
             result = 1;
         }
     } else if (g_pause_menu_state.source == g_pause_page_sixth) {
-        func_PAL_0029D7D0();
+        resident_notice_timers_update();
     } else if (g_pause_menu_state.source == g_pause_page_fifth && !g_pause_menu_busy_flag) {
-        func_PAL_0029CC28(0);
+        menu_update_mission_screen_pal(0);
     } else if (g_pause_menu_state.source == g_pause_page_fourth && !g_pause_menu_busy_flag) {
-        if (func_PAL_002D7B68(0))
+        if (DrawMapScreen_pal(0))
             g_pause_menu_state.state = g_pause_menu_state.value == 4 ? 2 : 1;
-        func_PAL_0029CC98(g_pause_pad_input.flags);
+        menu_update_list_screen_pal(g_pause_pad_input.flags);
         result = g_pause_menu_state.destination != g_pause_page_fifth;
     } else if ((g_pause_menu_state.source == g_pause_page_third && !g_pause_menu_busy_flag)
                || (g_pause_menu_state.source == g_pause_page_options && !g_pause_menu_busy_flag)) {

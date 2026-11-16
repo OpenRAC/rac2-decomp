@@ -12,7 +12,7 @@ extern int math_fast_helper_a(void *, float);
 extern float fast_vec_dist(void *, void *);
 extern float FastVecDot(void *, void *);
 extern float math_fast_angle_helper(float);
-extern void func_PAL_0032E268(char *, void *, void *, float);
+extern void EmitExplosionParticles_pal(char *, void *, void *, float);
 typedef struct {
     char prefix[0x140];
     EffectVector position;
@@ -100,7 +100,7 @@ char *SpawnExplosion_pal(EffectVector *position, int flash, int n0, int n1,
             state->visible=0;
             state->orient=0;
         }
-        func_PAL_0032E268(object,&radial,&attachment,distance);
+        EmitExplosionParticles_pal(object,&radial,&attachment,distance);
     }
     return object;
 }

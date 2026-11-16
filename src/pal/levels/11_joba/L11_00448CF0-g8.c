@@ -4,7 +4,7 @@
 extern int mode_get_stack_top(void);
 extern int flag_is_byte_set(void);
 extern int arena_get_challenge_flag_index(unsigned int);
-extern int func_PAL_L11_002D9038(int, int);
+extern int hero_l11_enter_state_pal(int, int);
 extern int snd_play_from_global_bank(int, int, void *);
 extern int FastDecTimer(short *);
 extern void moby_set_state(u8 *, int, int);
@@ -15,7 +15,7 @@ extern void arena_reset_encounter_pal(u8 *);
 extern void pad_clear_port_state(void);
 extern int PadPressedWithin(unsigned int, int, int *);
 extern void gfx_add_draw_callback_first(void (*)(void *), void *);
-extern void func_PAL_L11_004495E8(void *);
+extern void joba_menu_draw_selection_panel_pal(void *);
 extern int g_game_mode[3], g_hud_flag_triple[3];
 typedef struct {
     u8 pad[0x1a0];
@@ -36,13 +36,16 @@ extern int g_arena_challenge_table __attribute__((sda));
 #define TABLE ((int **)&D_L11_001B14F8)
 #define H(o) (*(short *)(state+(o)))
 
+/* Per-frame update of the Joba class selection menu: D-pad up/down moves the highlighted
+   challenge to the next unlocked one, X confirms it, triangle resets the encounter, and the
+   panel is drawn through a draw callback (PAL: 50 Hz timings). */
 void UpdateJobaClassSelectionMenu_pal(u8 *object)
 {
     u8 *state = *(u8 **)(object + 0x68);
     int i, found;
     InputView *input;
     if (mode_get_stack_top()==5) return;
-    if (g_game_mode[0]!=0x6f) func_PAL_L11_002D9038(0x6f,1);
+    if (g_game_mode[0]!=0x6f) hero_l11_enter_state_pal(0x6f,1);
     if (H(0x1ea)==0) {
         if ((((InputView *)g_pad_state)->field1c4&0x2000) && H(0x1e8)<12) {
             for (i=H(0x1e8)+1;i<13;i++) {
@@ -125,5 +128,5 @@ clear_buttons:
         moby_set_state(object,5,-1);
         return;
     }
-    gfx_add_draw_callback_first(func_PAL_L11_004495E8,object);
+    gfx_add_draw_callback_first(joba_menu_draw_selection_panel_pal,object);
 }

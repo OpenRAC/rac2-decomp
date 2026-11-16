@@ -29,7 +29,7 @@ typedef struct {
     RideVector direction;
     s32 owner, flags;
     u8 first, second;
-    u16 objectId;
+    u16 object_id;
     f32 distance;
     s32 enabled;
     f32 opaque;
@@ -105,11 +105,11 @@ typedef struct {
 
 extern s32 vec_fast_helper_a(void *);
 extern void *part_find_owned_effect_slot(void *, u32, s32);
-extern void func_PAL_002AC290(void *, void *);
-extern void func_PAL_002AC3C0(void *, void *);
+extern void gfx_start_color_fade_pal(void *, void *);
+extern void gfx_update_color_fade_pal(void *, void *);
 extern f32 func_002A0558(void *, void *);
 extern s32 TryClaimNotice(s32, s32, s32);
-extern s32 func_PAL_L08_002D3078(s32, s32);
+extern s32 hero_l08_enter_state_pal(s32, s32);
 extern void set_hero_animation_pal(int, int, f32);
 extern int FastDecTimer(void *);
 extern int math_fast_float_d(void *);
@@ -139,7 +139,7 @@ extern void FastVecSub(void *, void *, void *);
 extern s32 coll_process_triangles(void *, f32);
 extern s32 coll_test_point(void *, s32, void *, f32);
 extern f32 FastVecDot(void *, void *);
-extern void func_PAL_L08_003CA1C8(void *, void *, s32, f32, f32, f32, f32, f32, f32);
+extern void part_emit_disk_particles_pal(void *, void *, s32, f32, f32, f32, f32, f32, f32);
 extern s32 coll_process_hit(f32, void *, s32, void *, void *);
 extern void moby_mark_spawned(void *);
 extern void SpawnExplosionEffects_pal(void *, void *, void *, float, float, int, int, int, float, float, float, float, int, float, int, int, int, int, int);
@@ -242,16 +242,17 @@ extern u8 g_collision_aim_vector[];
 extern Block400 g_hud_gauge_values;
 extern void hud_draw_health_gauge(void);
 
-void func_PAL_L08_003CA508(RideMoby *moby)
+/* Updates the rideable hover vehicle: lets the hero board it, steers and moves it while ridden, handles hits and explosions (PAL: 50 Hz timings). */
+void rideable_moby_update_pal(RideMoby *moby)
 {
     f32 dir[4] __attribute__((aligned(16)));
-    f32 v30[4] __attribute__((aligned(16)));
-    f32 v40[4] __attribute__((aligned(16)));
+    f32 roll_offset[4] __attribute__((aligned(16)));
+    f32 probe_pos[4] __attribute__((aligned(16)));
     union {
         f32 basis[4][4];
         struct { RideQuery request; RideVector position; } query;
     } work;
-    f32 v90[4] __attribute__((aligned(16)));
+    f32 scratch_vec[4] __attribute__((aligned(16)));
     f32 turn;
     f32 speed;
     f32 pitch;
@@ -272,12 +273,12 @@ void func_PAL_L08_003CA508(RideMoby *moby)
         hit = part_find_owned_effect_slot(moby, 1, 0);
         if (hit != 0 && (other = *(u8 **)(hit + 0x20)) != 0) {
             s16 kind = *(s16 *)(other + 0xAA);
-            if (kind != 0x85C && kind != 0x942 && kind != 0xFFF) {
+            if (kind != 0x85C && kind != 0x942 && kind != MOBY_CLASS_MUTANT_SANDFLY) {
                 if (other != vars->xA0 || vars->x8B == 0) {
                     vars->x97 = 0xD2;
                     vars->x98 = 0xD2;
                     vars->x99 = 0xD2;
-                    func_PAL_002AC290(moby, (u8 *)vars + 0x90);
+                    gfx_start_color_fade_pal(moby, (u8 *)vars + 0x90);
                     vars->x60 -= *(f32 *)(hit + 0x2C);
                     ((Hero *)g_hero_state)->f[0x183C / 4] = vars->x60;
                     if (vars->x60 <= 0.0f) {
@@ -292,7 +293,7 @@ void func_PAL_L08_003CA508(RideMoby *moby)
     } else {
         vars->x58 = moby->pos.f[2];
     }
-    func_PAL_002AC3C0(moby, (u8 *)vars + 0x90);
+    gfx_update_color_fade_pal(moby, (u8 *)vars + 0x90);
     moby->x2C = *(f32 *)(moby->x24 + 0x24) * g_hover_height_scale;
     if (((Hero *)g_hero_state)->ptr[0x1830 / 4] == (u8 *)moby) {
         ((Hero *)g_hero_state)->i[0x1848 / 4] = ((Hero *)g_hero_state)->f[0x183C / 4] / g_hover_max_health * 200.0f;
@@ -348,7 +349,7 @@ void func_PAL_L08_003CA508(RideMoby *moby)
         }
         if (((Hero *)g_hero_state)->ptr[0x33C / 4] != 0) {
             s16 kind = *(s16 *)(((Hero *)g_hero_state)->ptr[0x33C / 4] + 0xAA);
-            if (kind == 0x13E || kind == 0x46F) {
+            if (kind == 0x13E || kind == MOBY_CLASS_TELEPORTER) {
                 break;
             }
         }
@@ -362,7 +363,7 @@ void func_PAL_L08_003CA508(RideMoby *moby)
             }
         }
         if (fire != 0) {
-            func_PAL_L08_002D3078(0x31, 0);
+            hero_l08_enter_state_pal(0x31, 0);
             set_hero_animation_pal(g_hover_anim_next, 0, 15.0f);
             *(TI128 *)(g_hero_state + 0x90) = moby->rot.q;
             *(TI128 *)(g_hero_state + 0x80) = moby->pos.q;
@@ -474,8 +475,8 @@ void func_PAL_L08_003CA508(RideMoby *moby)
                 }
             }
         }
-        FastVecAdd(v40, (u8 *)moby + 0x10, vars);
-        ground = coll_probe_ground_height_below(v40, 0, 0.5f);
+        FastVecAdd(probe_pos, (u8 *)moby + 0x10, vars);
+        ground = coll_probe_ground_height_below(probe_pos, 0, 0.5f);
         if (GetCollHitMaterial() == 1 || GetCollHitMaterial() == 0xB) {
             landed = 1;
         }
@@ -491,7 +492,7 @@ void func_PAL_L08_003CA508(RideMoby *moby)
         }
         if (ground != 0.0f) {
             steer = 1;
-            if (ground + blend < v40[2]) {
+            if (ground + blend < probe_pos[2]) {
                 vars->x24 = FastAddRotations(vars->x24,
                     fast_subtract_rotations(pitch, vars->x24) * g_hover_pitch_follow_b);
                 if (g_current_map_index == 8) {
@@ -501,11 +502,11 @@ void func_PAL_L08_003CA508(RideMoby *moby)
                 if (vars->xAC == 0 && thrust > 0.2f) {
                     vars->xAC = (g_hover_timer_limit * 5 + 2) / 6;
                 }
-                if (v40[2] + 0.1f < ground || landed) {
-                    v40[2] = ground;
+                if (probe_pos[2] + 0.1f < ground || landed) {
+                    probe_pos[2] = ground;
                     FastVecScale(vars, vars, g_hover_ground_damp);
                 }
-                vars->x8 += ((ground + blend - v40[2]) * g_hover_height_spring - vars->x8) * g_hover_height_spring;
+                vars->x8 += ((ground + blend - probe_pos[2]) * g_hover_height_spring - vars->x8) * g_hover_height_spring;
                 if (bank > 0.0f) {
                     f32 damp = 1.0f - g_hover_bank_damp * bank;
                     vars->x0 *= damp;
@@ -515,12 +516,12 @@ void func_PAL_L08_003CA508(RideMoby *moby)
                 FastVecCross(work.basis[1], (u8 *)moby + 0xC0, work.basis[2]);
                 FastVecCross(work.basis[0], work.basis[1], work.basis[2]);
                 qzero_nc(work.basis[3]);
-                mat_get_euler_angles(work.basis, v90);
+                mat_get_euler_angles(work.basis, scratch_vec);
                 {
                     f32 half = pitch * 0.5f;
                     f32 rise = g_hover_rise_scale * (vars->x78 + 1.0f);
                     vars->x24 = FastAddRotations(vars->x24,
-                        fast_subtract_rotations(FastAddRotations(-v90[1], half * rise),
+                        fast_subtract_rotations(FastAddRotations(-scratch_vec[1], half * rise),
                             vars->x24) * g_hover_pitch_follow_a);
                 }
                 FastVecScale(vars, vars, g_hover_velocity_damp);
@@ -534,20 +535,20 @@ void func_PAL_L08_003CA508(RideMoby *moby)
                 matrix_mul_vec3(vars, vars, (u8 *)moby + 0xC0);
             }
             if (steer) {
-                vec_scale_to_length(v30, (u8 *)moby + 0xC0, roll);
+                vec_scale_to_length(roll_offset, (u8 *)moby + 0xC0, roll);
                 {
                     f32 climb = lift * 0.00040000002f;
                     vec_scale_to_length(work.basis[0], (u8 *)moby + 0xD0, g_hover_climb_scale * climb * vars->x78);
                 }
-                FastVecAdd(v30, v30, work.basis[0]);
-                FastVecAdd(vars, vars, v30);
+                FastVecAdd(roll_offset, roll_offset, work.basis[0]);
+                FastVecAdd(vars, vars, roll_offset);
             }
         }
         make_hit_descriptor(g_hover_hit_damage, &work.query.request, moby, 0x10000, vars);
-        moby->pos.q = *(TI128 *)v40;
+        moby->pos.q = *(TI128 *)probe_pos;
         moby_transform_joint_to_world(moby, 0, work.query.position.f);
         work.query.position.f[2] += g_hover_probe_depth - g_hover_ground_height_low;
-        FastVecSub(v90, (u8 *)moby + 0x10, work.query.position.f);
+        FastVecSub(scratch_vec, (u8 *)moby + 0x10, work.query.position.f);
         moby->x98 = 0;
         {
             s32 found = coll_process_triangles(work.query.position.f, g_hover_probe_depth);
@@ -571,7 +572,7 @@ void func_PAL_L08_003CA508(RideMoby *moby)
                     *(f32 *)(col + 0x34) *= vars->x78;
                     *(f32 *)(col + 0x30) += work.query.position.f[0];
                     *(f32 *)(col + 0x34) += work.query.position.f[1];
-                    FastVecAdd((u8 *)moby + 0x10, col + 0x30, v90);
+                    FastVecAdd((u8 *)moby + 0x10, col + 0x30, scratch_vec);
                     FastVecCross(vB0, col + 0x40, vars);
                     FastVecCross(vA0, vB0, col + 0x40);
                     vec_scale_to_length(vA0, vA0, 1.0f);
@@ -583,7 +584,7 @@ void func_PAL_L08_003CA508(RideMoby *moby)
         if (moby->x20 == 3) {
             if (vars->x78 < 0.98f && (((Pad *)g_pad_state)->w[0x1A0 / 4] & 4)) {
                 if (vars->x68 < g_hud_l08_bar_threshold) {
-                    func_PAL_L08_003CA1C8(moby, g_collision_l08_hit_point, g_hover_emit_b_count, g_hover_emit_b_param_x, g_hover_emit_b_param_y,
+                    part_emit_disk_particles_pal(moby, g_collision_l08_hit_point, g_hover_emit_b_count, g_hover_emit_b_param_x, g_hover_emit_b_param_y,
                         g_hover_emit_b_color_rg, g_hover_emit_b_color_rg, g_hover_emit_b_color_b, g_hover_emit_b_color_a);
                     if (math_random_int_below(9) == 0) {
                         f32 amount = (1.0f - vars->x78) * 0.1f;
@@ -593,11 +594,11 @@ void func_PAL_L08_003CA508(RideMoby *moby)
                         *(f32 *)(shake + 0x160) = amount;
                     }
                 } else {
-                    func_PAL_L08_003CA1C8(moby, g_collision_l08_hit_point, g_hover_emit_c_count, g_hover_emit_c_param_x, g_hover_emit_c_param_y,
+                    part_emit_disk_particles_pal(moby, g_collision_l08_hit_point, g_hover_emit_c_count, g_hover_emit_c_param_x, g_hover_emit_c_param_y,
                         g_hover_emit_c_color_rg, g_hover_emit_c_color_rg, g_hover_emit_c_color_b, g_hover_emit_c_color_a);
                 }
             }
-            func_PAL_L08_003CA1C8(moby, g_collision_l08_hit_point, g_hover_emit_a_count, g_hover_emit_a_param_x, g_hover_emit_a_param_y,
+            part_emit_disk_particles_pal(moby, g_collision_l08_hit_point, g_hover_emit_a_count, g_hover_emit_a_param_x, g_hover_emit_a_param_y,
                 g_hover_emit_a_color_r, g_hover_emit_a_color_g, g_hover_emit_a_color_b, 1.0f);
         }
         moby_transform_joint_to_world(moby, 0, work.query.position.f);
@@ -617,7 +618,7 @@ void func_PAL_L08_003CA508(RideMoby *moby)
     case 4:
         moby->x98 = *(s32 *)(moby->x24 + 0x10);
         *(s32 *)(((Hero *)g_hero_state)->ptr[0x2290 / 4] + 0x9C) = 0;
-        func_PAL_L08_002D3078(0, 1);
+        hero_l08_enter_state_pal(0, 1);
         ((Hero *)g_hero_state)->h[0x1834 / 2] = -1;
         ((Hero *)g_hero_state)->f[0x108 / 4] = 0.20000002f;
         ((Hero *)g_hero_state)->ptr[0x1830 / 4] = 0;
@@ -633,7 +634,7 @@ void func_PAL_L08_003CA508(RideMoby *moby)
     case 5:
         moby->x98 = *(s32 *)(moby->x24 + 0x10);
         *(s32 *)(((Hero *)g_hero_state)->ptr[0x2290 / 4] + 0x9C) = 0;
-        func_PAL_L08_002D3078(0, 1);
+        hero_l08_enter_state_pal(0, 1);
         moby_transform_joint_to_world(moby, 0, dir);
         SpawnExplosionEffects_pal(moby, vars, dir, 0.0f, 0.0f, 10, 3, 16, 4.0f, 2.0f, 9.0f, 1.0f, -1, 15.0f, 1, 1, -1, 0, 0x810001);
         moby->pos.q = vars->x30;

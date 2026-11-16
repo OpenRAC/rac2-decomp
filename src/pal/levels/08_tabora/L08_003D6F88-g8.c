@@ -13,10 +13,10 @@ extern void moby_update_ground_check(void *), moby_mark_spawned(void *);
 extern int moby_is_in_selected_zone(void *),game_is_either_mode_two(void);
 extern float coll_probe_ground_height_below(void *,int,float),math_random_float_range(float,float),math_random_angle(void),IntToFloat(int);
 extern int FloatToInt(float),math_random_int_range(int,int);
-extern void moby_set_state(void *,int,int),func_PAL_L08_003D0280(void *);
+extern void moby_set_state(void *,int,int),gfx_draw_glowing_spark_rings_pal(void *);
 extern void *part_find_owned_effect_slot(void *,int,int);
 extern float moby_update_aim_target_strength_pal(void *,void *);
-extern void func_PAL_002AC290(void *,void *), func_PAL_002AC3C0(void *,void *), anim_start_immediate(void *,int,int);
+extern void gfx_start_color_fade_pal(void *,void *), gfx_update_color_fade_pal(void *,void *), anim_start_immediate(void *,int,int);
 extern void moby_transform_joint_to_world(void *,int,void *);
 extern void SpawnExplosionEffects_pal(void *,void *,void *,float,float,int,int,int,float,float,float,float,int,float,int,int,int,int,int);
 extern void part_spawn_effect_burst(void *,int,int,int,int,int,int,void *);
@@ -24,7 +24,7 @@ extern int PlayMobySound(int,int,void *);
 extern void *CreateMoby(int);
 extern void func_002A0F48(void *),hero_copy_field_to_moby(void *),vec_build_spherical_offset(void *,float,float,float);
 extern void FastVecAdd(void *,void *,void *);
-extern s32 func_PAL_L08_00414850(void *,void *,void *,float,float);
+extern s32 moby_spawn_spinning_object_pal(void *,void *,void *,float,float);
 
 /* Applies damage, updates hit effects, and spawns debris when health reaches zero. */
 void crystal_shell_update_damage_pal(char *o) {
@@ -55,14 +55,14 @@ void crystal_shell_update_damage_pal(char *o) {
         moby_set_state(o,1,-1);
     }
     if(!p)return;
-    if(F(o,u8,0x31))func_PAL_L08_003D0280(o);
+    if(F(o,u8,0x31))gfx_draw_glowing_spark_rings_pal(o);
     health=p+0x20;effect=p+0x50;
     hit=part_find_owned_effect_slot(o,0x230000,0);
     impact=moby_update_aim_target_strength_pal(o,hit);
     if(impact>0) {
         F(health,float,0)-=impact;
         F(effect,u8,7)=255;F(effect,u8,8)=255;F(effect,u8,9)=255;
-        func_PAL_002AC290(o,effect);
+        gfx_start_color_fade_pal(o,effect);
         moby_transform_joint_to_world(o,0,at);
         anim_start_immediate(o,3,FloatToInt(IntToFloat(F(p,s16,0x24))-F(health,float,0))<16 ? FloatToInt(IntToFloat(F(p,s16,0x24))-F(health,float,0)) : 15);
         F(o,int,0x48)=0;
@@ -73,7 +73,7 @@ void crystal_shell_update_damage_pal(char *o) {
         if(F(health,float,0)>z)PlayMobySound(sound,0,o);
     }
     F(o,u8,0xA8)=255;
-    func_PAL_002AC3C0(o,effect);
+    gfx_update_color_fade_pal(o,effect);
     if(F(health,float,0)<=0) {
         qzero(at);at[2]=0.20000002f;
         if(hit)qcopy(target,hit);
@@ -102,7 +102,7 @@ void crystal_shell_update_damage_pal(char *o) {
                 FastVecAdd(position,target,velocity);
                 t=math_random_float_range(1,10);
                 z=math_random_float_range(8,12);
-                func_PAL_L08_00414850(o,position,velocity,t,z);
+                moby_spawn_spinning_object_pal(o,position,velocity,t,z);
             }while(n>=0);
             moby_mark_spawned(o);
         }

@@ -2,7 +2,7 @@
 
 #include "common.h"
 extern void moby_mark_spawned(void *);
-extern void func_PAL_002A7E68(void *, int, int, int);
+extern void anim_start_blended_pal(void *, int, int, int);
 extern void vec_build_spherical_offset(void *, float, float, float);
 extern void moby_transform_joint_to_world(void *, int, void *);
 extern void *SpawnDirectedEffectObject_pal(void *, void *, void *, int);
@@ -20,33 +20,34 @@ extern u8 g_mystic_state[] __attribute__((sda));
 extern u8 g_game_flag_table[];
 extern u8 g_request_l08_queue[];
 
-void func_PAL_L08_003D8718(u8 *self)
+/* Updates an effect object (moby class 2465): when its target is hit it plays an animation, fires a bolt and throws a burst of sparks, and it removes itself when the target is gone. */
+void hit_effect_update_pal(u8 *moby)
 {
     float direction[4] __attribute__((aligned(16)));
     float position[4] __attribute__((aligned(16)));
     float velocity[4] __attribute__((aligned(16)));
-    float random[4] __attribute__((aligned(16)));
-    u8 *target = *(u8 **)*(u32 *)(self + 0x68);
+    float random_dir[4] __attribute__((aligned(16)));
+    u8 *target = *(u8 **)*(u32 *)(moby + 0x68);
     int i;
     if (!target || target[0x20] == 0xFE || target[0x20] == 0xFD) {
-        moby_mark_spawned(self);
+        moby_mark_spawned(moby);
         return;
     }
-    if ((self[0x60] & 2) && self[0x43])
-        func_PAL_002A7E68(self, 0, 0, 0);
-    if (self[0xBC]) {
-        self[0xBC] = 0;
-        if (self[0x43] != 1) func_PAL_002A7E68(self, 1, 0, 0);
-        vec_build_spherical_offset(direction, 1.2f, *(float *)(self+0xF8), -*(float *)(self+0xF4));
-        moby_transform_joint_to_world(self, 0, position);
-        SpawnDirectedEffectObject_pal(self, position, direction, 0x4B);
+    if ((moby[0x60] & 2) && moby[0x43])
+        anim_start_blended_pal(moby, 0, 0, 0);
+    if (moby[0xBC]) {
+        moby[0xBC] = 0;
+        if (moby[0x43] != 1) anim_start_blended_pal(moby, 1, 0, 0);
+        vec_build_spherical_offset(direction, 1.2f, *(float *)(moby+0xF8), -*(float *)(moby+0xF4));
+        moby_transform_joint_to_world(moby, 0, position);
+        SpawnDirectedEffectObject_pal(moby, position, direction, 0x4B);
         i = 4;
         do {
-            *(TI128 *)random = 0;
-            random[0] = math_random_float_range(-1.0f, 1.0f);
-            random[1] = math_random_float_range(-1.0f, 1.0f);
-            random[2] = math_random_float_range(-1.0f, 1.0f);
-            *(TI128 *)velocity = *(TI128 *)random;
+            *(TI128 *)random_dir = 0;
+            random_dir[0] = math_random_float_range(-1.0f, 1.0f);
+            random_dir[1] = math_random_float_range(-1.0f, 1.0f);
+            random_dir[2] = math_random_float_range(-1.0f, 1.0f);
+            *(TI128 *)velocity = *(TI128 *)random_dir;
             vec_scale_to_length(velocity, velocity, FastVecLength(direction)*0.5799999f);
             FastVecAdd(velocity, direction, velocity);
             vec_scale_to_length(velocity, velocity, math_random_float_range(0.060000002f, 0.120000005f));

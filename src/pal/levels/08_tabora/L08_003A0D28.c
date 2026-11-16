@@ -18,7 +18,7 @@ extern void part_steer_effect_direction(int, void *, int);
 extern void vec_transform_or_copy(void *, void *);
 extern void shop_trigger_current_state_effect(void *, void *);
 extern void vec_add_object_direction_scaled(void *, void *, float);
-extern void func_PAL_L00_00392250(void *);
+extern void part_emit_sparkle_pal(void *);
 extern void vec_fast_normalize_helper(void *, void *, float);
 extern int CollLine(void *, void *, int, void *, void *);
 extern int GetCollHitMaterial(void);
@@ -31,16 +31,17 @@ extern float math_fast_sin_or_cos_a(float);
 extern float math_fast_sin_or_cos_b(float);
 extern int math_random_int_range(int, int);
 extern int math_random_int_below(int);
-extern void *func_PAL_002C0838(void *, void *, int, int);
+extern void *part_spawn_spark_2_pal(void *, void *, int, int);
 extern void vec_fast_normalize(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
 extern int math_fast_float_d(void *);
 extern void table_clear_entry_flag(int);
-extern void func_PAL_L00_00390F48(void *, void *, void *);
+extern void part_spawn_big_explosion_pal(void *, void *, void *);
 extern void FastVecAdd(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
 
-void func_PAL_L08_003A0D28(unsigned char *obj) {
+/* Moves a falling spark one step, checks what it hits, and sprays small bits when it lands. */
+void falling_l08_spark_update_pal(unsigned char *obj) {
     struct {
         Vec old, velocity, normal;
         struct {
@@ -68,7 +69,7 @@ void func_PAL_L08_003A0D28(unsigned char *obj) {
     vec_transform_or_copy(position, position);
     shop_trigger_current_state_effect(ctx, ctx);
     vec_add_object_direction_scaled(position, ctx, 0.0044f);
-    func_PAL_L00_00392250(obj);
+    part_emit_sparkle_pal(obj);
     frame.packet.moby = obj;
     frame.packet.flags = 0x830000;
     if (*(int *)(ctx + 0x18) < 0xF2)
@@ -108,7 +109,7 @@ void func_PAL_L08_003A0D28(unsigned char *obj) {
                 frame.spread.f[1] = math_fast_sin_or_cos_b(angle) * speed;
                 frame.spread.f[2] = math_random_float_range(0.060000002f, 0.13000001f);
                 lifetime = math_random_int_range(90, 120);
-                func_PAL_002C0838(&frame.position, spread, math_random_int_below(2), lifetime);
+                part_spawn_spark_2_pal(&frame.position, spread, math_random_int_below(2), lifetime);
             } while (i >= 0);
         } else {
             /* The hit branch re-reads the collision record through its own pointer and has its
@@ -147,7 +148,7 @@ void func_PAL_L08_003A0D28(unsigned char *obj) {
 finish:
     if (obj[0xBC]) {
         table_clear_entry_flag(*(int *)(ctx + 0x1C));
-        func_PAL_L00_00390F48(obj, &frame.velocity, &frame.normal);
+        part_spawn_big_explosion_pal(obj, &frame.velocity, &frame.normal);
     }
 }
 
@@ -155,10 +156,11 @@ finish:
 extern unsigned char g_bouncing_weapon_index;
 extern void FastVecScale(void *, void *, float);
 extern void cam_compute_view_direction(void *, void *, int);
-extern void func_PAL_L00_00391958(void *, void *, void *);
-extern void func_PAL_L00_00392500(void *);
+extern void part_l00_spawn_impact_burst_pal(void *, void *, void *);
+extern void part_spawn_spark_puff_pal(void *);
 
-void func_PAL_L08_003A1140(char *obj) {
+/* Moves a thrown shard one step and blows it up or bounces it when it hits something. */
+void thrown_l08_shard_update_pal(char *obj) {
     struct {
         Vec velocity, normal, old, surface;
         struct {
@@ -184,7 +186,7 @@ void func_PAL_L08_003A1140(char *obj) {
     FastVecAdd(position, position, ctx);
     cam_compute_view_direction(position, &frame.surface, 0);
     FastVecScale(&frame.surface, &frame.surface, 0.00044f);
-    func_PAL_L00_00392500(obj);
+    part_spawn_spark_puff_pal(obj);
     frame.packet.moby = obj;
     frame.packet.flags = 0x830000;
     if (*(int *)(ctx + 0x18) < 0xF2)
@@ -238,9 +240,9 @@ finish:
     if (*(unsigned char *)(obj + 0xBC)) {
         table_clear_entry_flag(*(int *)(ctx + 0x1C));
         if (*(int *)(ctx + 0x14) < 17)
-            func_PAL_L00_00390F48(obj, &frame.velocity, &frame.normal);
+            part_spawn_big_explosion_pal(obj, &frame.velocity, &frame.normal);
         else
-            func_PAL_L00_00391958(obj, &frame.velocity, &frame.normal);
+            part_l00_spawn_impact_burst_pal(obj, &frame.velocity, &frame.normal);
     }
 }
 

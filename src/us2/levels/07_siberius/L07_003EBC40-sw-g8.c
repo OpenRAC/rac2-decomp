@@ -12,9 +12,9 @@ typedef struct {
     char pad00[0x80];
     float position[4];
     char pad90[0x40];
-    float targetPosition[4];
+    float target_position[4];
     char padE0[0x21B0];
-    char *targetObject;
+    char *target_object;
 } SiberiusPlayerView;
 extern SiberiusPlayerView g_hero_state;
 extern char *g_shooter_mount_table[] __attribute__((sda));
@@ -60,15 +60,15 @@ extern float math_random_float_range(float, float);
 void shooter_entity_update_us2(unsigned char *object)
 {
     char *state = PTR_AT(object, 0x68);
-    char *targetObject;
+    char *target_object;
     float origin[4] __attribute__((aligned(16)));
-    float targetPosition[4] __attribute__((aligned(16)));
+    float target_position[4] __attribute__((aligned(16)));
     float direction[4] __attribute__((aligned(16)));
-    float unitDirection[4] __attribute__((aligned(16)));
+    float unit_direction[4] __attribute__((aligned(16)));
     float axis[4] __attribute__((aligned(16)));
     float delta[4] __attribute__((aligned(16)));
     float angle;
-    int hitFlags;
+    int hit_flags;
 
     if (g_frame_l07_counter[0] >= 2 && g_cutscene_l07_active_flag != INT_AT(state, 0x320)) return;
     shooter_entity_base_update_b(object);
@@ -94,13 +94,13 @@ void shooter_entity_update_us2(unsigned char *object)
         }
         break;
     case 3:
-        hitFlags = moby_dispatch_action_by_kind(object, state + 0x140);
-        if (hitFlags & 1) {
+        hit_flags = moby_dispatch_action_by_kind(object, state + 0x140);
+        if (hit_flags & 1) {
             entity_spawn_death_effects_b(object);
             moby_mark_spawned(object);
             return;
         }
-        if (hitFlags & 2) {
+        if (hit_flags & 2) {
             if (INT_AT(state, 0x2DC) == 1) moby_set_state(object, 5, 2);
             else {
                 moby_set_state(object, 2, 1);
@@ -119,26 +119,26 @@ void shooter_entity_update_us2(unsigned char *object)
         if (flag_set_first_pending(object) && object[0x43] != 20) anim_start_blended(object, 20, 0, 20);
         if (math_is_value_within_step_us2(object, 17.0f)) {
             moby_transform_joint_to_world(object, 4, origin);
-            targetObject = PTR_AT(state, 0x220);
-            if (targetObject == g_hero_state.targetObject) {
-                qcopy(targetPosition, g_hero_state.targetPosition);
+            target_object = PTR_AT(state, 0x220);
+            if (target_object == g_hero_state.target_object) {
+                qcopy(target_position, g_hero_state.target_position);
                 if (PTR_AT(state, 0x314)) {
-                    moby_transform_point_by_attachment(object, PTR_AT(state, 0x314), targetPosition, axis);
-                    FastVecAdd(targetPosition, targetPosition, axis);
+                    moby_transform_point_by_attachment(object, PTR_AT(state, 0x314), target_position, axis);
+                    FastVecAdd(target_position, target_position, axis);
                 }
-            } else if (targetObject) {
-                qcopy(targetPosition, targetObject + 0x10);
-                targetPosition[2] += FLOAT_AT(targetObject, 0xC) * 0.0009765625f;
-            } else qcopy(targetPosition, state + 0x210);
-            FastVecSub(unitDirection, targetPosition, origin);
-            vec_scale_to_length(unitDirection, unitDirection, 1.0f);
-            angle = FastVecDot(object + 0xC0, unitDirection);
+            } else if (target_object) {
+                qcopy(target_position, target_object + 0x10);
+                target_position[2] += FLOAT_AT(target_object, 0xC) * 0.0009765625f;
+            } else qcopy(target_position, state + 0x210);
+            FastVecSub(unit_direction, target_position, origin);
+            vec_scale_to_length(unit_direction, unit_direction, 1.0f);
+            angle = FastVecDot(object + 0xC0, unit_direction);
             if (angle < math_fast_sin_or_cos_a(0.3490658700466156f)) {
-                FastVecSub(delta, targetPosition, origin);
+                FastVecSub(delta, target_position, origin);
                 qcopy(direction, object + 0xC0);
                 FastVecCross(axis, object + 0xC0, delta);
                 math_apply_axis_rotation_to_quat(direction, direction, axis, -0.3490658700466156f);
-            } else FastVecSub(direction, targetPosition, origin);
+            } else FastVecSub(direction, target_position, origin);
             vec_scale_to_length(direction, direction, 0.3333333432674408f);
             part_spawn_spinning_effect_moby(object, direction, origin, 0, INT_AT(state, 0x314), (float)BYTE_AT(state, 0x34));
         } else if (object[0x60] & 2) {
@@ -191,12 +191,12 @@ void shooter_entity_update_us2(unsigned char *object)
         FastVecAdd(origin, origin, g_shooter_mount_table[0] + (INT_AT(state, 0x2C0) << 7) + 0x30);
         moby_l01_turn_toward_target(object, origin);
         if (IsPointInCuboid(object + 0x10, INT_AT(state, 0x2C0))) {
-            FastVecSub(targetPosition, object + 0x10, g_shooter_mount_table[0] + (INT_AT(state, 0x2C0) << 7) + 0x30);
-            matrix_mul_vec3(targetPosition, targetPosition, g_shooter_mount_table[0] + (INT_AT(state, 0x2C0) << 7) + 0x40);
-            targetPosition[0] = math_random_float_range(0.0f, 1.0f);
-            matrix_mul_vec3(targetPosition, targetPosition, g_shooter_mount_table[0] + (INT_AT(state, 0x2C4) << 7));
-            FastVecAdd(targetPosition, targetPosition, g_shooter_mount_table[0] + (INT_AT(state, 0x2C4) << 7) + 0x30);
-            moby_aim_move_record_at_target(object, targetPosition, 0.10000000894069672f, 0.0055555556900799274f);
+            FastVecSub(target_position, object + 0x10, g_shooter_mount_table[0] + (INT_AT(state, 0x2C0) << 7) + 0x30);
+            matrix_mul_vec3(target_position, target_position, g_shooter_mount_table[0] + (INT_AT(state, 0x2C0) << 7) + 0x40);
+            target_position[0] = math_random_float_range(0.0f, 1.0f);
+            matrix_mul_vec3(target_position, target_position, g_shooter_mount_table[0] + (INT_AT(state, 0x2C4) << 7));
+            FastVecAdd(target_position, target_position, g_shooter_mount_table[0] + (INT_AT(state, 0x2C4) << 7) + 0x30);
+            moby_aim_move_record_at_target(object, target_position, 0.10000000894069672f, 0.0055555556900799274f);
             moby_set_state(object, 10, -1);
         }
         break;

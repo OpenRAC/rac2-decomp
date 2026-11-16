@@ -18,7 +18,8 @@ extern float IntToFloat(int);
 extern unsigned char *g_part_tex_spark;
 
 /* The effect-record initialiser of func_L00_0033E888, without the rotation argument. */
-Particle *func_PAL_002BD790(float life,Quad *position,Quad *velocity,int color,int value,int size,int extra,int texture,int flags,int weight)
+/* Spawns a spark particle with a velocity, colour and size; PAL's version of the initialiser, without a rotation argument. */
+Particle *part_spawn_spark_pal(float life,Quad *position,Quad *velocity,int color,int value,int size,int extra,int texture,int flags,int weight)
 {
     Particle *p;
     if(!size) return 0;

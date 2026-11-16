@@ -66,7 +66,7 @@ extern int part_l00_alloc_effect_slot_2(void *, float, float, float, float, floa
 /* The retail code checks flag pairs through the aligned lifetime/flags doubleword. */
 /* colorReset mirrors the radius cycle's reset flag but no colour path sets it: retail keeps the
  * constant test (li v0,1; bnel v0,zero), so a nonzero interval never randomizes the channel. */
-#define UPDATE_COLOR(n, randomFlag, pairMask, pairValue, pauseFlag, downFlag, topFlag, bottomFlag) { int colorReset = 0; \
+#define UPDATE_COLOR(n, randomFlag, pairMask, pairValue, pauseFlag, downFlag, topFlag, bottomFlag) { int color_reset = 0; \
     if (s->interval[n] && func_00282978(&s->timer[n])) { \
         s->timer[n] = ((s32)s->interval[n] * 5 + 2) / 6; \
         s->rgb[n] = (float)s->color[n].minimum; \
@@ -95,7 +95,7 @@ extern int part_l00_alloc_effect_slot_2(void *, float, float, float, float, floa
             if (s->hold[n] && func_002829A8(&s->delay[n])) s->flags ^= (pauseFlag); \
         } \
     } else { \
-        if (!s->interval[n] || colorReset == 1) { \
+        if (!s->interval[n] || color_reset == 1) { \
             s->rgb[n] = func_002A7878((float)func_00283CF0((float)s->color[n].minimum) * 0.01f, \
                                       (float)func_00283CF0((float)s->color[n].maximum) * 0.01f); \
         } \
@@ -104,15 +104,15 @@ extern int part_l00_alloc_effect_slot_2(void *, float, float, float, float, floa
  * the radius and colour timers and hold delays by 5/6 and the radius and colour steps by 1.2, and each
  * hold arm sets the delay before the flags. */
 /* Updates a configured animated point light: radius, RGB cycles and attachment. */
-void func_PAL_L00_003A0950(u8 *actor) {
+void UpdateAnimatedPointLight_pal(u8 *actor) {
     LightState *s;
     Vector sphere, origin, offset;
     u8 startup;
-    int radiusReset, index;
+    int radius_reset, index;
     float low, high, intensity;
     if (!actor) return;
     s = *(LightState **)(actor + 0x68);
-    radiusReset = 0;
+    radius_reset = 0;
     if (!s) return;
     if (!(u8)actor[0x20]) {
         actor[0x30] = 0xFF;
@@ -164,7 +164,7 @@ void func_PAL_L00_003A0950(u8 *actor) {
     } else qcopy((actor + 0x10), &origin);
     if (s->interval[3] && FastDecTimer(&s->timer[3])) {
         s->timer[3] = ((s32)s->interval[3] * 5 + 2) / 6;
-        if (s->flags & 4) { radiusReset = 1; s->radius = s->minimumRadius; s->flags &= ~8; }
+        if (s->flags & 4) { radius_reset = 1; s->radius = s->minimumRadius; s->flags &= ~8; }
     }
     if (!(s->flags & 0x80000)) {
         if ((*(u64 *)&s->lifetime & 0x300000000ULL) == 0x200000000ULL) s->flags ^= 2;
@@ -187,7 +187,7 @@ void func_PAL_L00_003A0950(u8 *actor) {
             if (s->hold[3] && vec_fast_helper_a(&s->delay[3])) s->flags ^= 2;
         }
     } else {
-        if (!s->interval[3] || radiusReset == 1) s->radius = math_random_float_range(s->minimumRadius, s->maximumRadius);
+        if (!s->interval[3] || radius_reset == 1) s->radius = math_random_float_range(s->minimumRadius, s->maximumRadius);
     }
     UPDATE_COLOR(0, 0x10000, 0x3000000000ULL, 0x2000000000ULL, 0x20, 0x80, 0x10, 0x40);
     UPDATE_COLOR(1, 0x20000, 0x30000000000ULL, 0x20000000000ULL, 0x200, 0x800, 0x100, 0x400);

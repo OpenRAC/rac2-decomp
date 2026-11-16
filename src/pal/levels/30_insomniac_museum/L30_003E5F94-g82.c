@@ -42,13 +42,13 @@ extern char *g_area_hit_targets[];
 extern int g_charge_weapon_state __attribute__((sda)), g_charge_weapon_initialized __attribute__((sda)), g_charge_cooldown_timer __attribute__((sda));
 extern char *g_charge_weapon_moby __attribute__((sda));
 extern float g_charge_rate_up __attribute__((sda)), g_charge_rate_down __attribute__((sda)), g_charge_min __attribute__((sda)), g_charge_boost_rate __attribute__((sda)), g_charge_max __attribute__((sda));
-extern void func_PAL_002A7E68(void *,int,int,int);
+extern void anim_start_blended_pal(void *,int,int,int);
 extern void AttachManipulator(void *,int,void *);
 extern int AcquireEntitySlot(void *,int,void *);
 extern u8 *level_get_slot_body(int,int);
 extern float math_random_signed_float_range(float,float), math_random_float_range(float,float);
 extern void vec_clear_128(void *), sheepinator_clear_records(void);
-extern s32 func_PAL_L00_002C4480(int,int);
+extern s32 hero_l00_set_action_pal(int,int);
 extern int math_fast_float_d(void *), get_ammo(int);
 extern void hud_add_moby_marker(void *,unsigned int,float,void *,float,int,int,float,int);
 extern void moby_transform_joint_to_world(void *,int,void *);
@@ -63,13 +63,14 @@ extern int PlayMobySound(int,int,void *);
 extern void vec_scale_to_length(void *,void *,float);
 extern int coll_process_hit(void *,int,void *,int,float);
 extern void FastVecSub(void *,void *,void *);
-extern char *func_PAL_L00_003CF868(void *,int,void *,void *);
-extern void ref_L00_003E8180_00(void *,void *),func_PAL_L00_003ECD58(void);
+extern char *SpawnParticlePoolMoby_pal(void *,int,void *,void *);
+extern void ref_L00_003E8180_00(void *,void *),plasma_coil_draw_beams_pal(void);
 extern float fast_subtract_rotations(float,float),math_fast_sin_or_cos_b(float),math_fast_sin_or_cos_a(float);
 typedef struct { float timer; int handle, anim, unknown; float charge, angle; char pad[8]; ChargeWeaponVec origin; float gap, sine, gap2, cosine; } ChargeWeaponVars;
 typedef struct { char position[0x20]; unsigned char state; char pad21[0x22]; unsigned char animation; char pad44[0x1C]; unsigned char flags; char pad61[7]; ChargeWeaponVars *vars; } ChargeWeaponMoby;
 
-void func_PAL_L30_003E6270(ChargeWeaponMoby *obj) {
+/* Updates the Plasma Coil weapon: it draws the aiming reticle, charges and recovers, and fires a projectile at the target (PAL version). */
+void UpdateMuseumChargedWeapon_pal(ChargeWeaponMoby *obj) {
     ChargeWeaponVec velocity, origin, target, delta, point;
     int unused;
     char *hit = 0;
@@ -80,7 +81,7 @@ void func_PAL_L30_003E6270(ChargeWeaponMoby *obj) {
     switch (obj->state) {
     case 0: {
         int i;
-        if (obj->animation != 0 || (obj->flags&2)) func_PAL_002A7E68(obj,1,0,0);
+        if (obj->animation != 0 || (obj->flags&2)) anim_start_blended_pal(obj,1,0,0);
         AttachManipulator(obj,0,&st->origin);
         st->timer=0.36666667f;
         st->unknown=-1;
@@ -117,7 +118,7 @@ void func_PAL_L30_003E6270(ChargeWeaponMoby *obj) {
         g_charge_weapon_effects.reticle=-1;
         if (g_hero_state.selected) g_hero_state.held=g_hero_state.selected;
         if (!g_charge_weapon_initialized) g_charge_weapon_initialized=1;
-        if (g_hero_state.mode==1) func_PAL_L00_002C4480(29,1);
+        if (g_hero_state.mode==1) hero_l00_set_action_pal(29,1);
         enabled=1;
         if (g_hero_state.mode==29) {
             if (!math_fast_float_d(&g_hero_state.timer)) enabled=0;
@@ -204,7 +205,7 @@ void func_PAL_L30_003E6270(ChargeWeaponMoby *obj) {
                     FastVecSub(&velocity,&delta,&target);
                     vec_scale_to_length(&velocity,&velocity,speed);
                 }
-                g_charge_weapon_moby=func_PAL_L00_003CF868(obj,st->handle,&target,&velocity);
+                g_charge_weapon_moby=SpawnParticlePoolMoby_pal(obj,st->handle,&target,&velocity);
                 if (g_charge_weapon_moby) *(ChargeWeaponMoby **)(g_charge_weapon_moby+0xB8)=obj;
                 g_charge_cooldown_timer=42; g_charge_weapon_state=2;
             }
@@ -214,7 +215,7 @@ void func_PAL_L30_003E6270(ChargeWeaponMoby *obj) {
             if (st->charge<=g_charge_min) { st->charge=g_charge_min; g_charge_weapon_state=0; }
             break;
         }
-        if (B(obj,0x31)) ref_L00_003E8180_00(func_PAL_L00_003ECD58,obj);
+        if (B(obj,0x31)) ref_L00_003E8180_00(plasma_coil_draw_beams_pal,obj);
         st->angle=fast_subtract_rotations(st->angle,st->charge*0.37699118f);
         st->sine=math_fast_sin_or_cos_b(st->angle*0.5f);
         st->cosine=math_fast_sin_or_cos_a(st->angle*0.5f);

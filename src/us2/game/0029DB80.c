@@ -10,12 +10,13 @@ extern void *memset(void *, int, int);
 extern void func_0029CD20(int);
 extern int *ui_return_second_arg(int, int);
 extern char *menu_system_init_us2(int *, int);
-extern void func_US2_0029CF08(void);
-extern void func_US2_0029CF40(void);
-extern void func_US2_0029CF10(void);
+extern void hud_empty_hook_us2(void);
+extern void hud_item_bolt_draw_call_us2(void);
+extern void hud_update_subsystems_call_us2(void);
 extern void func_0029CD18(void);
 typedef struct { char pad[0x79D4]; void *cb1; void *cb2; } SubBf;
 
+/* Sets up the level callbacks (USA v2.00 version of level_init_callbacks). */
 void level_init_callbacks_us2(void)
 {
     char *state = g_loader_memory;
@@ -38,11 +39,11 @@ void level_init_callbacks_us2(void)
     obj = menu_system_init_us2(ui_return_second_arg(0x3FB20, *(int *)(state + 0x80)), 0x40000);
     g_resident_data_base = obj;
     if (g_current_map_index == 0x1F5) {
-        ((SubBf *)(obj + 0x38000))->cb1 = func_US2_0029CF08;
+        ((SubBf *)(obj + 0x38000))->cb1 = hud_empty_hook_us2;
         ((SubBf *)(obj + 0x38000))->cb2 = func_0029CD18;
     } else {
-        ((SubBf *)(obj + 0x38000))->cb1 = func_US2_0029CF40;
-        ((SubBf *)(obj + 0x38000))->cb2 = func_US2_0029CF10;
+        ((SubBf *)(obj + 0x38000))->cb1 = hud_item_bolt_draw_call_us2;
+        ((SubBf *)(obj + 0x38000))->cb2 = hud_update_subsystems_call_us2;
     }
 }
 

@@ -14,12 +14,13 @@ extern int stub_empty_25(void);
 extern int stub_empty_25(void);
 extern void data_set_small_value_and_refresh(int, int);
 extern int request_begin_slot(int, int, int, int, int);
-extern int func_US2_0029D248(int);
+extern int info_panel_update_call_us2(int);
 extern int stub_empty_24(void);
 
 extern int ref_US2_002D65D8_00(void);
 extern int ref_US2_002D65D8_01(void);
 
+/* Reads the buttons on the page-select menu: cancel closes, confirm picks the highlighted page and plays a sound or starts the change. */
 int menu_page_select_handle_input_us2(void)
 {
     int result = 0;
@@ -64,7 +65,7 @@ int menu_page_select_handle_input_us2(void)
             FadeToBlack(4);
         }
     } else {
-        func_US2_0029D248(flags);
+        info_panel_update_call_us2(flags);
     }
 finish:
     return result;

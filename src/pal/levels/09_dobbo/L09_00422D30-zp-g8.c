@@ -8,7 +8,7 @@ extern void moby_set_state(void *, int, int);
 extern void *part_find_owned_effect_slot(void *, int, int);
 extern void moby_mark_spawned(void *);
 extern void *part_spawn_object_following_effect(float *, u8 *, int, int, int, int, int, int, float, float);
-extern void func_PAL_L00_002ED7E8(u8 *, float *, float *, int, int, float, float, float, float, float);
+extern void part_l00_spawn_spark_burst_pal(u8 *, float *, float *, int, int, float, float, float, float, float);
 extern void part_explode_object_into_pieces_pal(void *, void *, void *, void *, int, int, int, int, int, int, int);
 extern char *moby_l00_spawn_child(u8 *, int, int);
 extern float g_effect_explode_params_c __attribute__((sda));
@@ -16,36 +16,36 @@ extern float g_effect_explode_params_b __attribute__((sda));
 extern float g_effect_explode_params_a __attribute__((sda));
 
 /* Three-state effect object: spawns its first effect, waits for the hit, then fires the closing effects and retires itself. */
-void func_PAL_L09_00427350(u8 *self)
+void three_state_effect_update_pal(u8 *moby)
 {
-    EffectVector a;
-    EffectVector b;
-    u8 *state = *(u8 **)(self + 0x68);
+    EffectVector offset;
+    EffectVector drift;
+    u8 *vars = *(u8 **)(moby + 0x68);
 
-    a.bits = 0;
-    a.value[1] = -0.14f;
-    a.value[2] = 0.14f;
-    switch (self[0x20]) {
+    offset.bits = 0;
+    offset.value[1] = -0.14f;
+    offset.value[2] = 0.14f;
+    switch (moby[0x20]) {
     case 0:
-        part_spawn_object_following_effect(a.value, self, 0x50088030, -1, 1, -1, 0, -1, 136500.0f, 0.75f);
-        moby_set_state(self, 1, -1);
+        part_spawn_object_following_effect(offset.value, moby, 0x50088030, -1, 1, -1, 0, -1, 136500.0f, 0.75f);
+        moby_set_state(moby, 1, -1);
         break;
     case 1:
-        if (part_find_owned_effect_slot(self, 0x4010000, 0)) {
-            if (*(int *)state == 0)
-                moby_set_state(self, 2, -1);
+        if (part_find_owned_effect_slot(moby, 0x4010000, 0)) {
+            if (*(int *)vars == 0)
+                moby_set_state(moby, 2, -1);
         }
-        self[0xA8] = 0xFF;
+        moby[0xA8] = 0xFF;
         break;
     case 2:
-        b.bits = 0;
-        b.value[1] = -0.060000002f;
-        b.value[2] = 0.020000001f;
-        func_PAL_L00_002ED7E8(self, a.value, b.value, 25, 2, 0.2f, 0.10000001f, 1.5f, 6.0f, 0.8f);
-        part_explode_object_into_pieces_pal(self, &g_effect_explode_params_a, &g_effect_explode_params_b, &g_effect_explode_params_c,
+        drift.bits = 0;
+        drift.value[1] = -0.060000002f;
+        drift.value[2] = 0.020000001f;
+        part_l00_spawn_spark_burst_pal(moby, offset.value, drift.value, 25, 2, 0.2f, 0.10000001f, 1.5f, 6.0f, 0.8f);
+        part_explode_object_into_pieces_pal(moby, &g_effect_explode_params_a, &g_effect_explode_params_b, &g_effect_explode_params_c,
                           0xFFFF, 0, -1, 0, 0xFFFF, 0xFF, 0);
-        moby_l00_spawn_child(self, 0x1299, 0);
-        moby_mark_spawned(self);
+        moby_l00_spawn_child(moby, 0x1299, 0);
+        moby_mark_spawned(moby);
         break;
     }
 }

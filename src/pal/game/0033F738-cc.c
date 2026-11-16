@@ -12,26 +12,27 @@ extern void Fc558ca70_FUN_0033B018(char *p, float a, float b);
 extern int Fc558ca70_FUN_002E5E58(int a, int b, int c);
 extern unsigned char g_pal_toggle_flags[] __attribute__((sda));
 
-int func_PAL_0033F738(char *a0, int a1)
+/* Updates a menu with two on/off options: the left and right buttons switch the selected option and the cross button flips it (PAL: option flags in g_pal_toggle_flags). */
+int two_toggle_b_update_pal(char *object, int buttons)
 {
-    char *p = a0 + 8;
-    float *q;
-    int v;
+    char *child = object + 8;
+    float *position;
+    int value;
 
-    Fc558ca70_FUN_0033AE28(p);
-    q = *(float **)(a0 + 732);
-    Fc558ca70_FUN_0033B018(p, q[0], q[1]);
-    if (a1 & 0x1000) {
+    Fc558ca70_FUN_0033AE28(child);
+    position = *(float **)(object + 732);
+    Fc558ca70_FUN_0033B018(child, position[0], position[1]);
+    if (buttons & 0x1000) {
         Fc558ca70_FUN_002E5E58(3, 0, 0);
-        v = *(int *)(a0 + 728);
-        *(int *)(a0 + 728) = (v + 1) % 2;
-    } else if (a1 & 0x4000) {
+        value = *(int *)(object + 728);
+        *(int *)(object + 728) = (value + 1) % 2;
+    } else if (buttons & 0x4000) {
         Fc558ca70_FUN_002E5E58(3, 0, 0);
-        v = *(int *)(a0 + 728);
-        *(int *)(a0 + 728) = (v + 1) % 2;
-    } else if (a1 & 0x40) {
+        value = *(int *)(object + 728);
+        *(int *)(object + 728) = (value + 1) % 2;
+    } else if (buttons & 0x40) {
         Fc558ca70_FUN_002E5E58(4, 0, 0);
-        switch (*(int *)(a0 + 728)) {
+        switch (*(int *)(object + 728)) {
         case 0:
             g_pal_toggle_flags[2] = g_pal_toggle_flags[2] == 0;
             break;
@@ -40,7 +41,7 @@ int func_PAL_0033F738(char *a0, int a1)
             break;
         }
     }
-    return (a1 >> 6) & 1;
+    return (buttons >> 6) & 1;
 }
 
 /* func_0033B540 is matched in 0033AE20-g8.c (-G8 small data). */

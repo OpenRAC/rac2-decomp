@@ -71,7 +71,7 @@ typedef struct SweepQuery {
     int *params;
     int mode;
     float radius, scale, extra;
-    int field48, field4c, field50, hit, field58;
+    int unk_48, unk_4C, unk_50, hit, unk_58;
     float tolerance;
 } SweepQuery;
 typedef struct HitQuery {
@@ -79,7 +79,7 @@ typedef struct HitQuery {
     void *owner;
     unsigned flags;
     unsigned char type, active;
-    unsigned short classId;
+    unsigned short class_id;
     float scale;
     int enabled;
 } HitQuery;
@@ -98,13 +98,13 @@ typedef struct EffectWorkspace {
    0.12566373f, the timer takes the 5/6 scale and the two per-frame factors (x - 1.0f) take 1.2f.
    The three initial values on result, kind and swept give gcse its 193 buckets: self + 0x10 then
    numbers ahead of the workspace's tmp, as retail's spill slots have them. */
-void func_PAL_L00_00403780(char *self)
+void bouncing_l00_shot_update_pal(char *self)
 {
-    EffectState *p = *(EffectState **)(self + 0x68);
+    EffectState *state = *(EffectState **)(self + 0x68);
     EffectWorkspace work;
     int i, result = 0, kind = 0, swept = 0;
     float radius, extra, speed, scale;
-    float fadeRadius;
+    float fade_radius;
     int remaining;
     void **targets;
     cam_compute_view_direction(self + 0x10, work.normal.f, 1);
@@ -112,16 +112,16 @@ void func_PAL_L00_00403780(char *self)
     switch ((unsigned char)self[0x20]) {
     case 0:
         qcopy(work.old.f, self + 0x10);
-        FastVecAdd(self + 0x10, self + 0x10, p);
-        part_steer_effect_direction(p->rotation, p, 0);
-        vec_add_object_direction_scaled(self + 0x10, p, 0.00584f);
-        math_fast_float_d(&p->trail);
-        if (p->trail) {
+        FastVecAdd(self + 0x10, self + 0x10, state);
+        part_steer_effect_direction(state->rotation, state, 0);
+        vec_add_object_direction_scaled(self + 0x10, state, 0.00584f);
+        math_fast_float_d(&state->trail);
+        if (state->trail) {
             for (i = 0; i < 3; i++) {
                 int id;
-                EffectParticle *r;
-                float x;
-                float f;
+                EffectParticle *spark;
+                float spark_speed;
+                float unused_f;
                 float third = 0.33329999446868896f;
                 float one = 1.0f;
                 *(EffectQuad *)work.tmp.f = *(EffectQuad *)(self + 0x10);
@@ -130,39 +130,39 @@ void func_PAL_L00_00403780(char *self)
                 if (math_random_int_below(2)) {
                     id = -id;
                 }
-                x = (float)p->trail / IntToFloat(42) * 65000.0f + 10000.0f;
-                r = SpawnSpinningSparkParticle(work.params.point.f, 0.025f, one, one, id, g_default_vector, x, 0x80808080, 1);
-                if (r) {
+                spark_speed = (float)state->trail / IntToFloat(42) * 65000.0f + 10000.0f;
+                spark = SpawnSpinningSparkParticle(work.params.point.f, 0.025f, one, one, id, g_default_vector, spark_speed, 0x80808080, 1);
+                if (spark) {
                     short life = 42;
-                    EffectParticleExtension *extension = (EffectParticleExtension *)(r + 1);
-                    r->life = life;
+                    EffectParticleExtension *extension = (EffectParticleExtension *)(spark + 1);
+                    spark->life = life;
                     extension->mode = 2;
                     extension->alpha = 127;
-                    { int l = r->life & 0xFF; extension->life = l; }
+                    { int life_byte = spark->life & 0xFF; extension->life = life_byte; }
                 }
             }
         }
         __builtin_memcpy(work.params.excluded, g_bouncing_shot_excluded_ids, 8);
         extra = 1.5f;
-        if ((float)p->bounces == 3.0f) {
+        if ((float)state->bounces == 3.0f) {
             extra = 0.0f;
         }
         radius = g_bouncing_shot_radius;
-        if (p->charged) {
+        if (state->charged) {
             radius = g_bouncing_shot_alt_radius;
         }
         qcopy(work.query.start.f, work.old.f);
         qcopy(work.query.end.f, self + 0x10);
-        qcopy(work.query.delta.f, p);
+        qcopy(work.query.delta.f, state);
         work.query.params = work.params.excluded;
         work.query.owner = self;
         work.query.mode = 2;
         work.query.radius = radius;
         work.query.scale = (g_bouncing_shot_query_scale - 1.0f) * 1.2f + 1.0f;
         work.query.extra = extra;
-        work.query.field48 = 0;
-        work.query.field4c = 0;
-        work.query.field58 = 0;
+        work.query.unk_48 = 0;
+        work.query.unk_4C = 0;
+        work.query.unk_58 = 0;
         swept = CollideSweptSphere(&work.query);
         kind = weapon_get_group(work.query.hit);
         if (swept > 0 && (unsigned)(kind - 1) < 2) {
@@ -171,23 +171,23 @@ void func_PAL_L00_00403780(char *self)
             return;
         }
         qcopy(self + 0x10, work.query.end.f);
-        qcopy(p, work.query.delta.f);
-        vec_rotate_by_quaternion(self + 0xC0, self + 0xC0, p->axis.f);
-        vec_rotate_by_quaternion(self + 0xD0, self + 0xD0, p->axis.f);
-        vec_rotate_by_quaternion(self + 0xE0, self + 0xE0, p->axis.f);
+        qcopy(state, work.query.delta.f);
+        vec_rotate_by_quaternion(self + 0xC0, self + 0xC0, state->axis.f);
+        vec_rotate_by_quaternion(self + 0xD0, self + 0xD0, state->axis.f);
+        vec_rotate_by_quaternion(self + 0xE0, self + 0xE0, state->axis.f);
         work.hit.owner = self;
         work.hit.flags = 0x830000;
-        { EffectPlayer *pl = &g_weapon_l00_table[g_bouncer_weapon_index[0]]; work.hit.scale = pl->scale; }
+        { EffectPlayer *entry = &g_weapon_l00_table[g_bouncer_weapon_index[0]]; work.hit.scale = entry->scale; }
         work.hit.enabled = 1;
-        qcopy(work.hit.pos, p);
+        qcopy(work.hit.pos, state);
         vec_scale_to_length(work.hit.pos, work.hit.pos, 1.0f);
         work.hit.type = 3;
         work.hit.radius = 5627.9248046875f;
-        work.hit.classId = *(unsigned short *)(self + 0xAA);
+        work.hit.class_id = *(unsigned short *)(self + 0xAA);
         work.hit.active = 1;
         result = coll_process_hit(self + 0x10, 1, g_hero_moby[0], &work.hit, radius + 0.1f);
         if (result) {
-            if (p->charged) {
+            if (state->charged) {
                 if (result > 0) {
                     targets = g_area_hit_targets;
                     remaining = result;
@@ -211,52 +211,52 @@ void func_PAL_L00_00403780(char *self)
             return;
         }
         if (swept > 0) {
-            qcopy(work.tmp.f, p);
+            qcopy(work.tmp.f, state);
             work.tmp.f[2] = 0;
             FastVecCross(work.tmp.f, work.tmp.f, work.normal.f);
             vec_scale_to_length(work.tmp.f, work.tmp.f, 1.0f);
-            math_build_axis_angle_quat(p->axis.f, work.tmp.f, math_random_float_range(0.062831864f, 0.12566373f));
+            math_build_axis_angle_quat(state->axis.f, work.tmp.f, math_random_float_range(0.062831864f, 0.12566373f));
             PlayMobySound(1, 0, self);
-            p->bounces += 1;
-            if (p->bounces >= 4) {
+            state->bounces += 1;
+            if (state->bounces >= 4) {
                 qcopy(self + 0x10, g_collision_position);
                 self[0x20] = 1;
-                p->timer = ((s32)(g_bouncing_shot_timer) * 5 + 2) / 6;
+                state->timer = ((s32)(g_bouncing_shot_timer) * 5 + 2) / 6;
                 speed = g_bouncing_shot_fade_radius * 0.062831864f;
-                if (p->charged) {
+                if (state->charged) {
                     speed *= g_bouncing_shot_speed_scale;
                 }
                 moby_forward_position_call(self, work.offset.f, 1);
-                scale = FastVecDot(work.offset.f, p);
+                scale = FastVecDot(work.offset.f, state);
                 FastVecScale(work.step.f, work.offset.f, scale);
-                FastVecSub(p, p, work.step.f);
-                vec_scale_to_length(p, p, speed);
-                qcopy(p->axis.f, work.tmp.f);
-                p->axis.f[3] = 0.062831864f;
+                FastVecSub(state, state, work.step.f);
+                vec_scale_to_length(state, state, speed);
+                qcopy(state->axis.f, work.tmp.f);
+                state->axis.f[3] = 0.062831864f;
             }
         }
         break;
     case 1:
-        FastVecAdd(self + 0x10, self + 0x10, p);
-        math_build_axis_angle_quat(work.old.f, p->axis.f, p->axis.f[3]);
+        FastVecAdd(self + 0x10, self + 0x10, state);
+        math_build_axis_angle_quat(work.old.f, state->axis.f, state->axis.f[3]);
         vec_rotate_by_quaternion(self + 0xC0, self + 0xC0, work.old.f);
         vec_rotate_by_quaternion(self + 0xD0, self + 0xD0, work.old.f);
         vec_rotate_by_quaternion(self + 0xE0, self + 0xE0, work.old.f);
         scale = (g_bouncing_shot_scale - 1.0f) * 1.2f + 1.0f;
-        p->axis.f[3] *= scale;
-        FastVecScale(p, p, scale);
-        if (math_fast_float_d(&p->timer)) {
+        state->axis.f[3] *= scale;
+        FastVecScale(state, state, scale);
+        if (math_fast_float_d(&state->timer)) {
             shot_spawn_fragments(self);
             moby_mark_spawned(self);
             return;
         }
         break;
     }
-    fadeRadius = g_bouncing_shot_fade_radius;
-    if (p->charged) {
-        fadeRadius *= g_bouncing_shot_speed_scale;
+    fade_radius = g_bouncing_shot_fade_radius;
+    if (state->charged) {
+        fade_radius *= g_bouncing_shot_speed_scale;
     }
     if (g_hero_locked_flag[0] == 0 && g_hero_action_blocked_flag[0] == 0) {
-        part_queue_ground_shadow(self, fadeRadius);
+        part_queue_ground_shadow(self, fade_radius);
     }
 }

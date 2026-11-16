@@ -41,13 +41,13 @@ extern void copy_matrix_rotation(void *dst, void *src);
 extern void mat_get_euler_angles(void *src, void *dst);
 extern void level_init_pending_slot(void *obj, void *area);
 extern void level_append_record_to_table(void *area, int a, int b, float f);
-extern void func_PAL_002A7E68(void *obj, int a, int b, int c);
+extern void anim_start_blended_pal(void *obj, int a, int b, int c);
 
 /* Once per hero state, set up the object at resident +0x1220 (the special case uses a stored angle
    and the level vector at +0x150 of the block func_L00_002BA410 queries, otherwise the unit scale
    and the parent transform) and pass the composed transform to the object at +0xF0.
    Does nothing once the byte at +0x123A is set. */
-void func_PAL_L00_002BA480(void)
+void hero_setup_attached_object_transform_pal(void)
 {
     float scratch[4];
     u8 transform[48], level_transform[48], composed[64];
@@ -112,7 +112,7 @@ void func_PAL_L00_002BA480(void)
         level_append_record_to_table(D_00189E20_A508.area1A30, 48, 3, 0.0f);
         level_append_record_to_table(D_00189E20_A508.area1A30, 23, 5, 0.0f);
     }
-    func_PAL_002A7E68(object, 6, 0, 4);
+    anim_start_blended_pal(object, 6, 0, 4);
 }
 
 

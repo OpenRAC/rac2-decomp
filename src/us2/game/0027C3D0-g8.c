@@ -62,7 +62,7 @@ extern void gfx_render_object_preview_to_texture(void);
 extern void tex_upload_main_textures(void);
 extern void gfx_run_world_draw_callbacks(void);
 extern void DrawLensFlare(void);
-extern void func_US2_0027D7D0(void);
+extern void gfx_draw_light_quads_us2(void);
 extern void part_draw_all(void);
 extern void gfx_run_overlay_draw_callbacks(void);
 extern void DrawGlowSprites(void);
@@ -70,7 +70,7 @@ extern void gfx_run_final_draw_callbacks(void);
 extern void hud_draw_reticle_and_markers(void);
 extern void gfx_queue_first_strip_packet(void);
 extern void DrawLetterboxBars(void);
-extern void func_US2_0029CD18(void);
+extern void resident_menus_draw_us2(void);
 extern void hud_update_record_handlers(void);
 extern void DrawSubtitleBox_us2(void);
 extern void DrawSubtitles(void);
@@ -82,6 +82,7 @@ extern void patch_shrub_gifs(void);
 extern void PatchMobyGifs(void);
 extern void gfx_apply_display_config(void);
 
+/* Renders one frame: builds the view matrices, runs each draw layer (level, callbacks, particles, HUD, subtitles) in a DMA chain, applies the fades and patches the GIF data afterward (USA v2.00). */
 void RenderFrame_us2(void)
 {
     char text[64];
@@ -141,7 +142,7 @@ void RenderFrame_us2(void)
         VU1_addGSregister(0x42, 0x8000000048UL);
         DrawLensFlare();
         gfx_append_vu1_preset_c();
-        func_US2_0027D7D0();
+        gfx_draw_light_quads_us2();
         VU1_addGSregister(8, 5);
         gfx_append_vu1_preset_c();
         FlushCache(0);
@@ -165,7 +166,7 @@ void RenderFrame_us2(void)
         VU1_addGSregister(0x47, 0x33001);
         DrawLetterboxBars();
         if (g_render_layer_flags[0] & 0x80) {
-            func_US2_0029CD18();
+            resident_menus_draw_us2();
             hud_update_record_handlers();
             DrawSubtitleBox_us2();
         }

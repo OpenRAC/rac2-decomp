@@ -53,12 +53,13 @@ typedef struct {
     char pad00[0x10]; char pos[0x10];
     unsigned char state; char pad21[0x47];
     TriggerVars *vars; char pad6C[0x3E];
-    short id; char padAC[4];
+    short id; char pad_ac[4];
     unsigned char group; char padB1; short oclass; char padB4[8];
-    unsigned char hit; char padBD[0x33];
+    unsigned char hit; char pad_bd[0x33];
     char dir[0x10];
 } Thing;
 
+/* Waits for the player to enter the trigger zone, checks the required items, and fires the linked actions. */
 void trigger_l00_zone_update_us2(Thing *m)
 {
     TriggerVars *p = m->vars;

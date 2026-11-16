@@ -6,11 +6,11 @@ typedef unsigned int u32;
 typedef signed int s32;
 extern u8 g_barlow_trigger_started;
 extern u8 g_barlow_start_trigger_data;
-extern void moby_mark_spawned(void *a0);
-extern int flag_is_third_pending_set(u8 *a0);
-extern void moby_mark_table_entry_flagged(u32 a0);
-extern s32 req_push_queue(u8 *a0, s32 a1);
-extern s32 req_launch_queued(void *a0);
+extern void moby_mark_spawned(void *moby);
+extern int flag_is_third_pending_set(u8 *moby);
+extern void moby_mark_table_entry_flagged(u32 moby);
+extern s32 req_push_queue(u8 *moby, s32 link);
+extern s32 req_launch_queued(void *moby);
 extern void game_set_slowdown_factor(void);
 extern u8 g_moby_group_flags[];
 extern int g_current_map_index __attribute__((sda));
@@ -54,23 +54,23 @@ extern u8 g_barlow_l04_path_points_b_2[];
 
 /* Starts the object's encounter state and, once it is running, hands the level's
    camera table the object's slot and asks the frame helpers to update it. */
-void barlow_encounter_trigger_update_pal(u8 *a0) {
-    u32 *a1 = *(u32 **)(a0 + 0x68);
+void barlow_encounter_trigger_update_pal(u8 *moby) {
+    u32 *link = *(u32 **)(moby + 0x68);
 
-    if (a0[0x20] == 0) {
-        if (g_moby_group_flags[a0[0xB0] + g_current_map_index * 16] & 0x80) {
-            moby_mark_spawned(a0);
+    if (moby[0x20] == 0) {
+        if (g_moby_group_flags[moby[0xB0] + g_current_map_index * 16] & 0x80) {
+            moby_mark_spawned(moby);
             return;
         }
-        a0[0x20] = 1;
+        moby[0x20] = 1;
     }
-    if (a0[0x20] == 1) {
-        if (flag_is_third_pending_set((u8 *)(g_moby_l04_pool + (*a1 << 8)))) {
-            moby_mark_table_entry_flagged(a0[0xB0]);
+    if (moby[0x20] == 1) {
+        if (flag_is_third_pending_set((u8 *)(g_moby_l04_pool + (*link << 8)))) {
+            moby_mark_table_entry_flagged(moby[0xB0]);
             req_push_queue(g_request_l04_queue, 0x38);
             req_launch_queued(g_request_l04_queue);
             game_set_slowdown_factor();
-            moby_mark_spawned(a0);
+            moby_mark_spawned(moby);
         }
     }
 }
@@ -80,8 +80,8 @@ extern u8 g_game_flag_table[];
 extern s32 g_game_tick_counter[] __attribute__((sda));
 extern u8 *g_linked_record_table[] __attribute__((sda));
 extern u8 g_hero_position[];
-extern void hero_reset_position_and_direction_pal(void *a0, void *a1, s32 a2, s32 a3);
-extern s32 IsPointInCuboid(void *a0, void *a1);
+extern void hero_reset_position_and_direction_pal(void *moby, void *link, s32 a2, s32 a3);
+extern s32 IsPointInCuboid(void *moby, void *link);
 extern u8 g_tether_zero_vec[];
 extern u8 g_hero_position[];
 extern u8 g_str_linked_groups_debug_a[];
@@ -93,26 +93,26 @@ extern u8 g_str_linked_groups_debug_b[];
    call shape); with the item owned and that byte set, hands the object to
    func_0029F338. Later, once func_002ACBC8 accepts the hero position (D_00189EA0) for
    the object's volume and the item is still owned, sets the byte and does the same. */
-void barlow_item_pickup_trigger_update_pal(u8 *a0) {
-    u8 *s2 = *(u8 **)(a0 + 0x68);
-    u8 *p;
-    if (a0[0x20] == 0) {
+void barlow_item_pickup_trigger_update_pal(u8 *moby) {
+    u8 *vars = *(u8 **)(moby + 0x68);
+    u8 *record;
+    if (moby[0x20] == 0) {
         if (g_inventory_have_flags[0x1F] != 0 && g_game_flag_table[0x12] == 0 && g_game_tick_counter[0] < 5) {
-            p = g_linked_record_table[0] + (*(s32 *)(s2 + 4) << 7);
-            hero_reset_position_and_direction_pal(p + 0x30, p + 0x70, 0, 1);
+            record = g_linked_record_table[0] + (*(s32 *)(vars + 4) << 7);
+            hero_reset_position_and_direction_pal(record + 0x30, record + 0x70, 0, 1);
         } else if (g_inventory_have_flags[0x1F] != 0 && g_game_flag_table[0x12] != 0) {
-            moby_mark_spawned(a0);
+            moby_mark_spawned(moby);
             return;
         } else {
-            a0[0x20] = 1;
+            moby[0x20] = 1;
         }
-        a0[0x30] = 0xFF;
+        moby[0x30] = 0xFF;
     }
-    if (a0[0x20] == 1) {
-        if (IsPointInCuboid(g_hero_position, *(void **)s2) != 0) {
+    if (moby[0x20] == 1) {
+        if (IsPointInCuboid(g_hero_position, *(void **)vars) != 0) {
             if (g_inventory_have_flags[0x1F] != 0) {
                 g_game_flag_table[0x12] = 1;
-                moby_mark_spawned(a0);
+                moby_mark_spawned(moby);
             }
         }
     }

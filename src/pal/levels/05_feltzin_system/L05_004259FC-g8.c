@@ -32,18 +32,18 @@ typedef struct { u8 pad[0x270]; int id; } MissionState;
 
 /* Once per mission slot: pays the bolt reward for this completion (the table's column is capped
    at the third, times ten when D_001A7A0A is set), then waits for the prompt's buttons. */
-void func_PAL_L05_00425FB0(u8 *actor, int mission)
+void feltzin_mission_reward_update_pal(u8 *actor, int mission)
 {
     u8 *state = *(u8 **)(actor + 0x68);
     u8 *owner = g_feltzin_target_mobys + (*(int *)(state + 0x24) << 8);
-    MissionState *ownerState = *(MissionState **)(owner + 0x68);
-    int sound = ownerState->id;
+    MissionState *owner_state = *(MissionState **)(owner + 0x68);
+    int sound = owner_state->id;
     if (sound != -1) {
         u8 *record = g_sound_state + sound * 0x70;
         if (*(u8 **)(record + 0x88) == owner && record[0x74] != 0)
             snd_stop_voice(sound);
     }
-    ownerState->id = -1;
+    owner_state->id = -1;
     if (g_game_mode_a == 2)
         return;
     if (math_fast_float_d(state + 0x58) == 0)

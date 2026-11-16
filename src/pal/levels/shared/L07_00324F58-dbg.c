@@ -11,6 +11,7 @@ extern int hero_set_control_motion_and_step(char *, void *);
 extern int math_solve_quadratic(float *, float *, float, float, float);
 extern int g_frame_l07_counter __attribute__((sda));
 
+/* Tunes the speed of an object's jump so it lands at the right place. Returns 1 once the jump has ended. */
 int hero_adjust_jump_speed_to_target_pal(unsigned char *object, float lower, float target, float upper)
 {
     float roots[2];

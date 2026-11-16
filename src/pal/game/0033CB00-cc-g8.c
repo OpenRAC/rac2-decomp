@@ -4,7 +4,7 @@
 extern void *pool_alloc_cell(void *);
 extern int *ui_return_second_arg(int, int);
 extern void object_init_derived_arrays(void *, void *, void *);
-extern void func_PAL_00338688(void *, void *, void *);
+extern void hud_init_widget_defaults_pal(void *, void *, void *);
 extern int *object_get_fourth_field(void *);
 extern void object_set_helper_result(void *, void *, int);
 extern char *GetLocalizedString(int);
@@ -42,7 +42,7 @@ typedef struct { int first, second, color; float angle; short id; short pad; int
 extern void *pool_alloc_cell(void *);
 extern int *ui_return_second_arg(int, int);
 extern void object_init_derived_arrays(void *, void *, void *);
-extern void func_PAL_00338688(void *, void *, void *);
+extern void hud_init_widget_defaults_pal(void *, void *, void *);
 extern int *object_get_fourth_field(void *);
 extern void object_set_helper_result(void *, void *, int);
 extern void *memset(void *, int, int);
@@ -56,7 +56,7 @@ extern int g_prompt_bar_slot_colors[2] __attribute__((sda));
    spent list pointer, which keeps the compiler from hoisting it across the loop. */
 void prompt_bar_init_pal(char *object, char *owner, short *list)
 {
-    char *vel278, *vel280, *rec1E0, *rec228, *record, *rec198, *vel288;
+    char *first_offset, *third_offset, *text_third, *text_second, *sprite, *text_first, *second_offset;
     short *flags, *p;
     int *color;
     int i;
@@ -70,41 +70,41 @@ void prompt_bar_init_pal(char *object, char *owner, short *list)
         allocation[3] = 0;
         allocation[0] = 0;
     }
-    vel278 = object + 0x2a8;
-    rec198 = object + 0x198;
-    vel288 = object + 0x2b8;
-    rec228 = object + 0x248;
+    first_offset = object + 0x2a8;
+    text_first = object + 0x198;
+    second_offset = object + 0x2b8;
+    text_second = object + 0x248;
     flags = (short *)(object + 0x188);
-    rec1E0 = object + 0x1f0;
+    text_third = object + 0x1f0;
     color = g_prompt_bar_slot_colors;
-    record = object + 0xC;
-    vel280 = object + 0x2b0;
+    sprite = object + 0xC;
+    third_offset = object + 0x2b0;
     p = list;
     for (i = 4; i >= 0; i--) {
         if (*p != 0) {
-            object_init_derived_arrays(record, g_circle_menu_header_data + 8, owner);
-            *object_get_fourth_field(record) = *color;
-            object_set_helper_result(record, g_resident_data_base[0] + 0x8710, *p);
+            object_init_derived_arrays(sprite, g_circle_menu_header_data + 8, owner);
+            *object_get_fourth_field(sprite) = *color;
+            object_set_helper_result(sprite, g_resident_data_base[0] + 0x8710, *p);
         }
         *flags = *p;
         color++;
-        record += 0x4C;
+        sprite += 0x4C;
         p++;
         flags++;
     }
     p = (short *)g_circle_menu_icon_data;
-    func_PAL_00338688(rec198, p, owner);
-    memset(vel278, 0, 8);
-    object_set_first_float4(rec198, 0.0f, 0.0f, 0.0f, 0.0f);
-    *object_get_fourth_field(rec198) = 0x80F0F0F0;
-    func_PAL_00338688(rec228, p, owner);
-    memset(vel288, 0, 8);
-    object_set_first_float4(rec228, 0.0f, 0.0f, 0.0f, 0.0f);
-    *object_get_fourth_field(rec228) = 0x80F0F0F0;
-    func_PAL_00338688(rec1E0, p, owner);
-    memset(vel280, 0, 8);
-    object_set_first_float4(rec1E0, 0.0f, 0.0f, 0.0f, 0.0f);
-    *object_get_fourth_field(rec1E0) = 0x80F0F0F0;
+    hud_init_widget_defaults_pal(text_first, p, owner);
+    memset(first_offset, 0, 8);
+    object_set_first_float4(text_first, 0.0f, 0.0f, 0.0f, 0.0f);
+    *object_get_fourth_field(text_first) = 0x80F0F0F0;
+    hud_init_widget_defaults_pal(text_second, p, owner);
+    memset(second_offset, 0, 8);
+    object_set_first_float4(text_second, 0.0f, 0.0f, 0.0f, 0.0f);
+    *object_get_fourth_field(text_second) = 0x80F0F0F0;
+    hud_init_widget_defaults_pal(text_third, p, owner);
+    memset(third_offset, 0, 8);
+    object_set_first_float4(text_third, 0.0f, 0.0f, 0.0f, 0.0f);
+    *object_get_fourth_field(text_third) = 0x80F0F0F0;
     *(float *)(object + 0x2a4) = 0.0f;
     *(int *)(object + 0x2c0) = 1;
     *(int *)(object + 0x2c4) = 1;

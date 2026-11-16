@@ -16,8 +16,10 @@ extern void vec_scale_to_length(void *,void *,float);
 extern void FastVecScale(void *,void *,float);
 extern int math_random_int_range(int,int);
 extern int FloatToInt(float);
-extern void *func_PAL_002BD790(void *,void *,int,int,int,int,int,int,int,float);
-void func_PAL_002C7D8C(char *self) {
+extern void *part_spawn_spark_pal(void *,void *,int,int,int,int,int,int,int,float);
+/* Trail particle that blends its colour over its life, spawns smaller fading sparks while
+   its flag is set, and otherwise slows by 0.96. (PAL: 50 Hz timings) */
+void part_update_particle_trail_pal(char *self) {
     SplitVector saved, motion, random;
     char *p = self + 0x20;
     float ratio, speed;
@@ -48,7 +50,7 @@ void func_PAL_002C7D8C(char *self) {
         FastVecAdd(&motion,&motion,p);
         FastVecScale(&motion,&motion,math_random_float_range(0.75f,0.95f));
         life = (((int)(math_random_int_range(15,30)) * 5 + 2) / 6);
-        func_PAL_002BD790(self+0x10,&motion,*(int *)(self+4),*(int *)(p+0x14),life,0,*(unsigned char *)(self+2),*(unsigned char *)(self+3),FloatToInt(*(float *)(self+0x1C)),*(float *)(self+0xC));
+        part_spawn_spark_pal(self+0x10,&motion,*(int *)(self+4),*(int *)(p+0x14),life,0,*(unsigned char *)(self+2),*(unsigned char *)(self+3),FloatToInt(*(float *)(self+0x1C)),*(float *)(self+0xC));
     } else {
         FastVecScale(p,p,0.96f);
     }

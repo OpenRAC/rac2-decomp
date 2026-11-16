@@ -13,7 +13,7 @@
    - Retail keeps a copy of data + 0x350 for both qcopy targets: written as an
      expression each time, gcse's reaching register survives because cse does
      not rewrite the qcopy asm inputs.
-   - oldpos/origin/route are set before the event code; written as expressions,
+   - old_position/origin/route are set before the event code; written as expressions,
      gcse would insert them on the group loop's entry edges, and loop.c would no
      longer move the 0x264 exit block out of the loop.
    - The child's 0x38 field is stored as an array element (an in-struct store),
@@ -28,7 +28,7 @@ extern int CollLine(void *, void *, int, void *, int);
 extern char g_coll_hit_position[];
 extern float coll_probe_ground_height_below(void *, int, float);
 extern void moby_set_state(void *, int, int);
-extern void func_PAL_002A7E68(void *, int, int, int);
+extern void anim_start_blended_pal(void *, int, int, int);
 extern char *g_vec_record_table;
 extern char *CreateMoby(int);
 extern float g_turret_part_scale __attribute__((sda));
@@ -38,23 +38,24 @@ extern void moby_transform_joint_point(void *, int, void *);
 extern void vec_clear_128(void *);
 extern void transform_vector(void *, void *, void *);
 extern void FastVecAdd(void *, void *, void *);
-extern int func_PAL_002B1A50(void *, void *, int);
+extern int moby_apply_damage_to_object_pal(void *, void *, int);
 extern int g_moby_group_count __attribute__((sda));
 extern int moby_count_group_not_in_state(int, int);
 extern int hero_check_distance_zones(void *, int *, int, int, void *, float, float);
 
-void func_PAL_0031D2E8(unsigned char *self)
+/* Per-frame setup and upkeep of the three-part turret: first-frame setup, part transforms, health and group alerts (PAL: 50 Hz timings). */
+void three_part_turret_init_update_pal(unsigned char *self)
 {
     char local[0x40] __attribute__((aligned(16)));
     char *data = *(char **)(self + 0x68);
     char *position;
-    char *oldpos;
+    char *old_position;
     int *route;
     char *origin;
     int state;
     unsigned short *member;
     char *other;
-    char *otherdata;
+    char *other_data;
     if ((unsigned char)self[0x20] == 0) {
         *(char **)(data + 0x18) = data + 0x110;
         *(int *)(data + 0x290) = 1;
@@ -110,10 +111,10 @@ void func_PAL_0031D2E8(unsigned char *self)
         if (*(int *)(data + 0x24C) == 0 && *(int *)(data + 0x258) == -1) {
             *(float *)(self + 0x18) = coll_probe_ground_height_below(position, 0, 0.5f);
             moby_set_state(self, 1, 0);
-            if ((unsigned char)self[0x43] != 0) func_PAL_002A7E68(self, 0, 0, 0);
+            if ((unsigned char)self[0x43] != 0) anim_start_blended_pal(self, 0, 0, 0);
         } else {
             moby_set_state(self, 3, 2);
-            if ((unsigned char)self[0x43] != 12) func_PAL_002A7E68(self, 12, 0, 0);
+            if ((unsigned char)self[0x43] != 12) anim_start_blended_pal(self, 12, 0, 0);
         }
         if (*(int *)(data + 0x258) != -1) {
             moby_set_state(self, 2, 0);
@@ -145,7 +146,7 @@ void func_PAL_0031D2E8(unsigned char *self)
         func_002A0F48(*(char **)(data + 0x278));
         moby_copy_joint_transform_to_object(self, *(char **)(data + 0x278), 2, 0);
     }
-    oldpos = data + 0x5A0;
+    old_position = data + 0x5A0;
     origin = self + 0x10;
     route = (int *)(data + 0x248);
     moby_transform_joint_to_world(self, 3, data + 0x360);
@@ -160,7 +161,7 @@ void func_PAL_0031D2E8(unsigned char *self)
     moby_copy_joint_transform_to_object(self, *(char **)(data + 0x270), 0, 0);
     moby_copy_joint_transform_to_object(self, *(char **)(data + 0x274), 1, 0);
     moby_copy_joint_transform_to_object(self, *(char **)(data + 0x278), 2, 0);
-    state = func_PAL_002B1A50(self, data + 0x60, 0);
+    state = moby_apply_damage_to_object_pal(self, data + 0x60, 0);
     if (state) {
         if (state == 5) {
             *(int *)(data + 0xF0) = 0;
@@ -172,15 +173,15 @@ void func_PAL_0031D2E8(unsigned char *self)
             for (;;) {
                 other = g_moby_pool_start + ((*member & 0x7FFF) << 8);
                 if (*(short *)(other + 0xAA) == 0x9B4) {
-                    otherdata = *(char **)(other + 0x68);
-                    if (*(int *)(otherdata + 0x2A4) == 0) {
-                        *(int *)(otherdata + 0x2A4) = 1;
+                    other_data = *(char **)(other + 0x68);
+                    if (*(int *)(other_data + 0x2A4) == 0) {
+                        *(int *)(other_data + 0x2A4) = 1;
                         break;
                     }
                 } else if (*(short *)(other + 0xAA) == 0x9B5) {
-                    otherdata = *(char **)(other + 0x68);
-                    if (*(int *)(otherdata + 0x264) == 0) {
-                        *(int *)(otherdata + 0x264) = 1;
+                    other_data = *(char **)(other + 0x68);
+                    if (*(int *)(other_data + 0x264) == 0) {
+                        *(int *)(other_data + 0x264) = 1;
                         goto group_done_0;
                     }
                 }
@@ -196,15 +197,15 @@ void func_PAL_0031D2E8(unsigned char *self)
             for (;;) {
                 other = g_moby_pool_start + ((*member & 0x7FFF) << 8);
                 if (*(short *)(other + 0xAA) == 0x9B4) {
-                    otherdata = *(char **)(other + 0x68);
-                    if (*(int *)(otherdata + 0x2A4) == 0) {
-                        *(int *)(otherdata + 0x2A4) = 1;
+                    other_data = *(char **)(other + 0x68);
+                    if (*(int *)(other_data + 0x2A4) == 0) {
+                        *(int *)(other_data + 0x2A4) = 1;
                         break;
                     }
                 } else if (*(short *)(other + 0xAA) == 0x9B5) {
-                    otherdata = *(char **)(other + 0x68);
-                    if (*(int *)(otherdata + 0x264) == 0) {
-                        *(int *)(otherdata + 0x264) = 1;
+                    other_data = *(char **)(other + 0x68);
+                    if (*(int *)(other_data + 0x264) == 0) {
+                        *(int *)(other_data + 0x264) = 1;
                         goto group_done_1;
                     }
                 }
@@ -213,5 +214,5 @@ void func_PAL_0031D2E8(unsigned char *self)
         group_done_1:;
         }
     }
-    *(short *)(data + 0x244) = hero_check_distance_zones(self, route, *(int *)(data + 0x230), *(int *)(data + 0x234), oldpos, *(float *)(data + 0x238), *(float *)(data + 0x23C));
+    *(short *)(data + 0x244) = hero_check_distance_zones(self, route, *(int *)(data + 0x230), *(int *)(data + 0x234), old_position, *(float *)(data + 0x238), *(float *)(data + 0x23C));
 }

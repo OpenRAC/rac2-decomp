@@ -55,7 +55,8 @@ static __inline__ int label_y(void *handle, float value, float scale, float half
     return result;
 }
 
-void func_PAL_L04_0041B5C0(void) {
+/* Draws a framed menu box with a title, a highlight bar and a label below it (PAL). */
+void menu_draw_box_two_labels_pal(void) {
     MenuBox box;
     float s, s2, half, bx, kx, ky;
     int w, left, right, center, on, x1, y1, x4, y4;

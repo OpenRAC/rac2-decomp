@@ -11,7 +11,7 @@ extern int math_random_int_range(int, int);
 extern int math_random_int_below(int);
 extern void vec_build_spherical_offset(void *, float, float, float);
 extern void vec_scale_to_length(void *, void *, float);
-extern void *func_PAL_L00_00340CA0(float, void *, void *, int, int, int, int, float, int, int, int);
+extern void *part_spawn_spinning_particle_pal(float, void *, void *, int, int, int, int, float, int, int, int);
 extern void *part_spawn_object_relative_particle(void *, void *, void *, void *, int);
 extern char g_spark_burst_particle_def_c __attribute__((sda));
 extern char g_spark_burst_particle_def_a __attribute__((sda));
@@ -42,7 +42,7 @@ void part_emit_spark_burst_at_moby_pal(char *object)
         pos.f[0] = *(float *)(object + 0x10) + math_random_signed_float_range(0.0f, spread);
         pos.f[1] = *(float *)(object + 0x14) + math_random_signed_float_range(0.0f, spread);
         pos.f[2] = *(float *)(object + 0x18) + math_random_signed_float_range(0.0f, spread);
-        func_PAL_L00_00340CA0(life, &pos, &velocity, 0x4F808080, 0x08101010, math_random_int_range(29, 42), 1, 0.5f, 1, -1, 1);
+        part_spawn_spinning_particle_pal(life, &pos, &velocity, 0x4F808080, 0x08101010, math_random_int_range(29, 42), 1, 0.5f, 1, -1, 1);
     }
     cam_compute_view_direction(object + 0x10, &velocity, 1);
     vec_scale_to_length(&velocity, &velocity, 0.2f);

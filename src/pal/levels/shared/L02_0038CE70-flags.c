@@ -12,6 +12,7 @@ extern void moby_set_state(void *, int, int);
 extern int snd_play_from_global_bank(int, int, int);
 extern void value_set_entry_by_index_pal(int, int);
 
+/* Counts the hovering enemies on the map and fires the one-time reward when few are left. */
 void enemy_count_trigger_update_pal(unsigned char *object) {
     int state = object[0x20];
     switch (state) {

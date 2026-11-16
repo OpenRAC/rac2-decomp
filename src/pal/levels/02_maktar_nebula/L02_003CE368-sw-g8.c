@@ -11,11 +11,11 @@ extern float g_controller_speed_limit_b __attribute__((sda)), g_controller_spin_
 extern int g_pulse_color_pair[2];
 extern int g_frame_l02_counter[] MACRO_ADDR;
 extern float fast_vec_dist(void *, void *), vec_distance_xy(void *, void *), FastVecDot(void *, void *), vec_length_xy(void *), mat_fast_helper_a(float, float), FastAddRotations(float, float);
-extern void moby_update_ground_check(char *), moby_set_state(u8 *, int, int), func_PAL_002A7E68(char *, int, int, int);
+extern void moby_update_ground_check(char *), moby_set_state(u8 *, int, int), anim_start_blended_pal(char *, int, int, int);
 extern int flag_set_first_pending(u8 *), flag_is_third_pending_set(u8 *), math_random_int_below(int), moby_start_effect_from_entry(int, float);
 extern int path_build_route_nodes(void *, int, void *, int), path_find_route_node_containing_point(void *, void *, int, int *), enemy_follow_path_toward_point_pal(char *, int), IsPointInCuboid(void *, int), coll_test_point(void *, int, float, void *);
 extern void moby_set_controller_speed_limits(u8 *, float, float, float, float);
-extern void path_enemy_pick_patrol_point(char *, void *), func_PAL_L02_003CEF50(char *);
+extern void path_enemy_pick_patrol_point(char *, void *), path_enemy_refresh_timer_pal(char *);
 extern void pushable_moby_update_pal(char *, void *, float, float, float, int);
 extern void FastVecAdd(void *, void *, void *), vec_clear_128(Quad *), vec_fast_normalize_helper(void *, void *, float), vec_scale_to_length(void *, void *, float), vec_fast_normalize(void *, void *, void *), FastVecScale(void *, void *, float);
 extern int PulseColor(int, int, float);
@@ -29,10 +29,11 @@ typedef struct {
     u8 padA0[0xD4]; float f174, f178; u8 pad17C[0x114]; L02_PathRef refs[8]; int f390, f394; u8 pad398[0x1E]; short f3b6;
 } L02_PathState;
 
+/* Per-frame update of the path-following enemy (moby class 2492) (PAL: 50 Hz timings). */
 void UpdatePathFollowerAI_pal(char *self) {
     char *state = *(char **)(self + 0x68), *path;
     Vector point;
-    int step, pathCount;
+    int step, path_count;
     float slope, length;
     if (((u8 *)self)[0x31] && fast_vec_dist(self + 0x10, &g_camera_l02_position) < 24.0f) {
         moby_update_ground_check(self); ((u8 *)self)[0x6F] = 22;
@@ -56,12 +57,12 @@ void UpdatePathFollowerAI_pal(char *self) {
         ((u8 *)self)[0x20] = 1; ((u8 *)self)[0x30] = 0x80; *(u16 *)(self + 0x34) |= 0x1000;
         break;
     case 1:
-        if (flag_set_first_pending((u8 *)self) && ((u8 *)self)[0x43] != math_random_int_below(2)) func_PAL_002A7E68(self, math_random_int_below(2), 0, 8);
+        if (flag_set_first_pending((u8 *)self) && ((u8 *)self)[0x43] != math_random_int_below(2)) anim_start_blended_pal(self, math_random_int_below(2), 0, 8);
         if (*(int *)(state + 0x3C0) < (int)*(u16 *)(self + 0x96)) moby_set_state((u8 *)self, 2, -1);
         break;
     case 4:
         if (flag_set_first_pending((u8 *)self)) {
-            if (((u8 *)self)[0x43] != 5) func_PAL_002A7E68(self, 5, 0, 17);
+            if (((u8 *)self)[0x43] != 5) anim_start_blended_pal(self, 5, 0, 17);
             moby_set_controller_speed_limits((u8 *)self, 0.0032000002f, g_controller_speed_limit_b * 0.020000001f, 0.005026549f, 0.25132746f);
         }
         enemy_follow_path_toward_point_pal(self, (int)(&g_hero_state.position_80));
@@ -69,7 +70,7 @@ void UpdatePathFollowerAI_pal(char *self) {
         break;
     case 2:
         if (flag_set_first_pending((u8 *)self)) {
-            if (((u8 *)self)[0x43] != 4) func_PAL_002A7E68(self, 4, 0, 17);
+            if (((u8 *)self)[0x43] != 4) anim_start_blended_pal(self, 4, 0, 17);
             moby_set_controller_speed_limits((u8 *)self, 0.0016000001f, g_controller_speed_limit_a * 0.020000001f, 0.0012566373f, 0.12566373f);
             path_enemy_pick_patrol_point(self, state + 0x3A0);
         }
@@ -78,7 +79,7 @@ void UpdatePathFollowerAI_pal(char *self) {
         break;
     case 3:
         if (flag_set_first_pending((u8 *)self)) {
-            if (((u8 *)self)[0x43] != 5) func_PAL_002A7E68(self, 5, 0, 17);
+            if (((u8 *)self)[0x43] != 5) anim_start_blended_pal(self, 5, 0, 17);
             moby_set_controller_speed_limits((u8 *)self, 0.0056000003f, g_controller_speed_limit_b * 0.020000001f, 0.005026549f, 0.5026549f);
             path_enemy_pick_patrol_point(self, state + 0x3A0);
         }
@@ -87,16 +88,16 @@ void UpdatePathFollowerAI_pal(char *self) {
         break;
     case 5:
         if (flag_set_first_pending((u8 *)self)) {
-            if (((u8 *)self)[0x43] != 7) func_PAL_002A7E68(self, 7, 0, 8);
+            if (((u8 *)self)[0x43] != 7) anim_start_blended_pal(self, 7, 0, 8);
             *(short *)(state + 0x3B4) = 0;
         }
         slope = FastVecDot(self + 0xC0, state + 0x140);
-        if (slope < -0.040000003f) { if (((u8 *)self)[0x43] != 10) func_PAL_002A7E68(self, 10, 0, 8); }
-        else if (slope > 0.040000003f) { if (((u8 *)self)[0x43] != 9) func_PAL_002A7E68(self, 9, 0, 8); }
-        else if (((u8 *)self)[0x43] != 7) func_PAL_002A7E68(self, 7, 0, 8);
+        if (slope < -0.040000003f) { if (((u8 *)self)[0x43] != 10) anim_start_blended_pal(self, 10, 0, 8); }
+        else if (slope > 0.040000003f) { if (((u8 *)self)[0x43] != 9) anim_start_blended_pal(self, 9, 0, 8); }
+        else if (((u8 *)self)[0x43] != 7) anim_start_blended_pal(self, 7, 0, 8);
         moby_start_effect_from_entry((int)self, mat_fast_helper_a(g_hero_state.position_80.f[0] - *(float *)(self + 0x10), g_hero_state.position_80.f[1] - *(float *)(self + 0x14)));
         pushable_moby_update_pal(self, state + 0x140, 0.7f, 0.5f, 0.1f, *(int *)(state + 0x394));
-        func_PAL_L02_003CEF50(self);
+        path_enemy_refresh_timer_pal(self);
         if (flag_is_third_pending_set((u8 *)self)) {
             moby_set_state((u8 *)self, 6, -1);
             break;
@@ -104,14 +105,14 @@ void UpdatePathFollowerAI_pal(char *self) {
         if (self != g_hero_state.pointer_5c0) moby_set_state((u8 *)self, 3, 0);
         break;
     case 6:
-        if (flag_set_first_pending((u8 *)self) && ((u8 *)self)[0x43] != 13) func_PAL_002A7E68(self, 13, 0, 8);
+        if (flag_set_first_pending((u8 *)self) && ((u8 *)self)[0x43] != 13) anim_start_blended_pal(self, 13, 0, 8);
         moby_start_effect_from_entry((int)self, mat_fast_helper_a(g_hero_state.position_80.f[0] - *(float *)(self + 0x10), g_hero_state.position_80.f[1] - *(float *)(self + 0x14)));
-        func_PAL_L02_003CEF50(self);
+        path_enemy_refresh_timer_pal(self);
         break;
     case 7:
         FastVecAdd(self + 0x10, self + 0x10, state + 0xF0);
         *(float *)(state + 0xF8) -= g_controller_rotate_rate * 0.00040000002f;
-        func_PAL_L02_003CEF50(self);
+        path_enemy_refresh_timer_pal(self);
         if (IsPointInCuboid(self + 0x10, *(int *)(state + 0x398))) {
             length = vec_length_xy(state + 0xF0); if (length > 0.020000001f) length = 0.020000001f;
             vec_fast_normalize_helper(state + 0xF0, state + 0xF0, length);
@@ -138,8 +139,8 @@ void UpdatePathFollowerAI_pal(char *self) {
     }
     if ((g_frame_l02_counter[0] & 31) == (((int)self >> 8) & 31)) {
         step = *(int *)(state + 0x3C4);
-        pathCount = ((L02_PathState *)state)->f3b6;
-        path_find_route_node_containing_point(&g_hero_state.position_80, state + 0x290, pathCount, &step);
+        path_count = ((L02_PathState *)state)->f3b6;
+        path_find_route_node_containing_point(&g_hero_state.position_80, state + 0x290, path_count, &step);
         if (*(int *)(state + 0x3C4) < step) {
             path = g_route_polygons[((L02_PathState *)state)->refs[step].id];
             if (fast_vec_dist(path + 0x10, path + ((*(int *)path >> 1) * 16 + 0x10)) > 8) *(int *)(state + 0x3C4) = step;

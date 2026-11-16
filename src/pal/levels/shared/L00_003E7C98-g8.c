@@ -68,12 +68,12 @@ extern int *level_get_slot_header(int, int);
 extern char *mem_round_up_to_16(char *);
 extern void mem_fast_helper_b(void *, int);
 extern void ref_L00_003E3A18_00(int);
-extern s32 func_PAL_L00_002C4480(int, int);
+extern s32 hero_l00_set_action_pal(int, int);
 extern int math_fast_float_d(int *);
 extern int weapon_spend_ammo(int, int);
-extern void func_PAL_L00_002AF458(void);
+extern void start_equipped_item_animation_pal(void);
 extern int slot_copy_records_to_free(void *);
-extern void func_PAL_002A7E68(char *, int, int, int);
+extern void anim_start_blended_pal(char *, int, int, int);
 extern int PlayMobySound(int, int, char *);
 extern void slot_reset_active(int);
 extern int FastDecTimer(short *);
@@ -213,7 +213,7 @@ void vaporizer_update_pal(u8 *object)
         if (data->resource >= 0) ref_L00_003E3A18_00(data->resource);
         break;
     case 1:
-        if (g_hero_state.mode == 1) func_PAL_L00_002C4480(29, 1);
+        if (g_hero_state.mode == 1) hero_l00_set_action_pal(29, 1);
         if (g_hero_state.scope) {
             if (data->scoped == 0) g_render_state_word = 0;
             data->scoped = 1;
@@ -246,11 +246,11 @@ void vaporizer_update_pal(u8 *object)
         } else g_hero_state.delay = 33;
         if (g_hero_state.blocked == 0 && (g_pad_state[0x1A4/4] & g_hero_state.input) && canFire) {
             if (weapon_spend_ammo(-1, 1)) {
-                func_PAL_L00_002AF458();
+                start_equipped_item_animation_pal();
                 data->sound = slot_copy_records_to_free(g_vaporizer_sound_records);
                 data->firingDelay = 2;
                 object[0x20] = 2;
-                func_PAL_002A7E68(object, 2, 0, 0);
+                anim_start_blended_pal(object, 2, 0, 0);
             } else PlayMobySound(1, 0, object);
             if ((g_pad_state[0x1A0/4] & g_hero_state.input) && get_ammo(-1) && g_hero_state.active) break;
             if (data->sound >= 0) {

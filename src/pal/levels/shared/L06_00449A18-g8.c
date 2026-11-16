@@ -28,12 +28,12 @@ extern int g_game_l00_mode;
 extern int g_bouncer_timer;
 typedef struct { char pad00[0x54]; float rate; char pad58[0xE0 - 0x58]; } AimEntry;
 extern AimEntry g_weapon_l00_table[];
-extern s32 func_PAL_L00_002C4480(int a0, int a1);
+extern s32 hero_l00_set_action_pal(int a0, int a1);
 extern void anim_start_blended_with_flags(void *, int, int, int, int);
 extern int math_fast_float_d(int *);
 extern int vec_fast_helper_b(float *);
 extern void cancel_hero_item_animation_pal(void);
-extern void func_PAL_L00_002AF458(void);
+extern void start_equipped_item_animation_pal(void);
 extern int get_ammo(int);
 extern int weapon_spend_ammo(int, int);
 extern int PlayMobySound(int, int, char *);
@@ -52,11 +52,12 @@ extern void moby_draw_attached_effect_pal(void *);
 
 /* Coordinate the multi-object interaction and its repeat/cooldown timers. */
 
-void func_PAL_L06_00449A18(unsigned char *object) {
+/* Updates the bouncer weapon: it aims at the locked target, plays its sounds, and fires, spending ammo, while the button is held, with a repeat delay. */
+void bouncer_l06_update_pal(unsigned char *object) {
     float origin[4];
     float aim[4];
     AimEntry *entry;
-    char *state = *(char **)(object + 0x68);
+    char *vars = *(char **)(object + 0x68);
     char *target;
     s32 target_data;
     int allowed;
@@ -65,12 +66,12 @@ void func_PAL_L06_00449A18(unsigned char *object) {
 
     if (object[0x20] == 0) {
         object[0x20] = 1;
-        *(int *)(state + 0x28) = -1;
-        *(float *)(state + 0x20) = 0.0f;
-        *(int *)(state + 0x2C) = 0;
+        *(int *)(vars + 0x28) = -1;
+        *(float *)(vars + 0x20) = 0.0f;
+        *(int *)(vars + 0x2C) = 0;
         g_bouncer_timer = 17;
     }
-    if (g_hero_state.level == 1) func_PAL_L00_002C4480(29, 1);
+    if (g_hero_state.level == 1) hero_l00_set_action_pal(29, 1);
     if (object[0x42] == object[0x43] && (object[0x60] & 2)) anim_start_blended_with_flags(object, 1, 0, 2, 0);
     moby_compute_offset_point(object, (char *)origin);
     target = 0;
@@ -84,16 +85,16 @@ void func_PAL_L06_00449A18(unsigned char *object) {
     }
     else g_hero_state.cooldown = 33;
     CalculateAimedLaunchVelocity(1.6f, 10.0f, 0.3f, 0.00584f, aim, origin, target, 0);
-    *(int *)(state + 0x24) = coll_trace_projectile_to_impact_pal(0.00584f, origin, aim, state, state + 0x10, object, 0, 0);
-    was_running = *(float *)(state + 0x20) > 0.0f;
-    vec_fast_helper_b((float *)(state + 0x20));
-    if (was_running && *(float *)(state + 0x20) <= 0.0f && get_ammo(-1)) PlayMobySound(3, 0, object);
-    if (*(int *)(state + 0x2C) != 0 && math_fast_float_d((int *)(state + 0x2C))) cancel_hero_item_animation_pal();
+    *(int *)(vars + 0x24) = coll_trace_projectile_to_impact_pal(0.00584f, origin, aim, vars, vars + 0x10, object, 0, 0);
+    was_running = *(float *)(vars + 0x20) > 0.0f;
+    vec_fast_helper_b((float *)(vars + 0x20));
+    if (was_running && *(float *)(vars + 0x20) <= 0.0f && get_ammo(-1)) PlayMobySound(3, 0, object);
+    if (*(int *)(vars + 0x2C) != 0 && math_fast_float_d((int *)(vars + 0x2C))) cancel_hero_item_animation_pal();
     if ((g_pad_state.pressed & g_hero_state.buttons) && !get_ammo(-1)) {
         PlayMobySound(1, 0, object);
         g_bouncer_timer = 17;
     }
-    if (g_game_l00_mode == 0 && *(float *)(state + 0x20) == 0.0f && g_hero_state.busy == 0 &&
+    if (g_game_l00_mode == 0 && *(float *)(vars + 0x20) == 0.0f && g_hero_state.busy == 0 &&
         (u8)object[0x42] <= 1 && (g_pad_state.held & g_hero_state.buttons) && g_hero_state.resource >= 19 && allowed) {
         if (get_ammo(-1)) {
             PlayMobySound(0, 0, object);
@@ -101,19 +102,19 @@ void func_PAL_L06_00449A18(unsigned char *object) {
             part_spawn_muzzle_spark_burst_pal(object, origin, aim);
             anim_start_blended_with_flags(object, 2, 0, 2, 0);
             bouncer_spawn_debris((int)object, (int)origin, (int)aim);
-            func_PAL_L00_002AF458();
-            *(int *)(state + 0x2C) = 13;
-            *(int *)(state + 0x28) = slot_copy_records_to_free(&g_bouncer_sound_record);
+            start_equipped_item_animation_pal();
+            *(int *)(vars + 0x2C) = 13;
+            *(int *)(vars + 0x28) = slot_copy_records_to_free(&g_bouncer_sound_record);
         }
         if (!(g_pad_state.held & g_hero_state.buttons) || !get_ammo(-1) || g_hero_state.f22B8 == 0) {
-            handle = *(int *)(state + 0x28);
+            handle = *(int *)(vars + 0x28);
             if (handle >= 0) {
                 slot_reset_active(handle);
-                *(int *)(state + 0x28) = -1;
+                *(int *)(vars + 0x28) = -1;
             }
         }
         entry = g_weapon_l00_table + g_bouncer_weapon_index[0];
-        *(float *)(state + 0x20) = 1.0f / entry->rate;
+        *(float *)(vars + 0x20) = 1.0f / entry->rate;
     }
     ref_L00_003FDE48_00(moby_draw_attached_effect_pal, object);
 }

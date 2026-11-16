@@ -20,20 +20,20 @@ extern void FastVecSub(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
 extern float FastAddRotations(float, float);
 extern int PlayMobySound(int, int, char *);
-extern char *func_PAL_0032F3B8(char *, void *, void *, float);
+extern char *part_spawn_blast_effect_moby_pal(char *, void *, void *, float);
 extern int coll_sweep_from_object(char *, float, void *, int, float, float, int, int, int);
-extern void func_PAL_002B15D8(char *, int, float, void *, float, float, float, unsigned char);
+extern void part_spawn_masked_debris_pal(char *, int, float, void *, float, float, float, unsigned char);
 extern void moby_mark_spawned(char *);
 extern float math_step_value_toward_target(void *, float, void *, float, float, float);
-extern char *func_PAL_002C23B8(void *, void *, int, int, int, int, float, float, float, float, float);
+extern char *part_spawn_burst_pal(void *, void *, int, int, int, int, float, float, float, float, float);
 typedef struct { char pad[0x140]; Vec position; char gap[0x10]; float scale; int unused; int duration, timer; char gap2[0x10]; float speed; int unused2, limit; } Effect;
 extern Effect g_camera_state;
 
 extern unsigned char *g_particle_l06_byte_ptr;
 typedef struct { int timer; float speed, height; int handle; Vec velocity; } UpdateState;
-void func_PAL_L06_00404FE8(char *obj) {
+void hit_reaction_burst_update_pal(char *obj) {
     struct { Vec pos, direction, random; } frame;
-    UpdateState *ctx = *(UpdateState **)(obj+0x68);
+    UpdateState *state = *(UpdateState **)(obj+0x68);
     char *hit, *particle;
     float speed;
     char *position;
@@ -43,8 +43,8 @@ void func_PAL_L06_00404FE8(char *obj) {
     case 0:
         qcopy(&frame.pos,obj+0x10);
         frame.pos.f[2] += 10.0f;
-        FastVecAdd(&ctx->velocity,obj+0x10,&frame.pos);
-        ctx->handle=-1;
+        FastVecAdd(&state->velocity,obj+0x10,&frame.pos);
+        state->handle=-1;
         obj[0x20]=1;
         return;
     case 1:
@@ -52,11 +52,11 @@ void func_PAL_L06_00404FE8(char *obj) {
         if (hit) {
           if (*(short *)(*(char **)(hit+0x20)+0xAA)!=0x8B8) {
             if (math_random_int_below(3)==1) {
-                ctx->timer=(((int)(math_random_int_range(20,10)) * 5 + 2) / 6);
-                ctx->height=*(float *)(obj+0x18)+20.0f;
+                state->timer=(((int)(math_random_int_range(20,10)) * 5 + 2) / 6);
+                state->height=*(float *)(obj+0x18)+20.0f;
                 obj[0x20]=3;
             } else {
-                ctx->timer=(((int)(math_random_int_range(0,10)) * 5 + 2) / 6);
+                state->timer=(((int)(math_random_int_range(0,10)) * 5 + 2) / 6);
                 obj[0x20]=2;
             }
 
@@ -65,38 +65,38 @@ void func_PAL_L06_00404FE8(char *obj) {
         *(unsigned char *)(obj+0xA8)=255;
         return;
     case 2:
-        if (math_fast_float_d(ctx)) {
+        if (math_fast_float_d(state)) {
             float unit = 1.0f;
             PlayMobySound(0,0,obj);
             frame.random.q=0;
             frame.random.f[2]=0.060000002f;
             FastVecSub(&frame.direction,&g_camera_state.position,&frame.pos);
             vec_scale_to_length(&frame.direction,&frame.direction,unit);
-            func_PAL_0032F3B8(obj,obj+0x10,&frame.direction,5.0f);
+            part_spawn_blast_effect_moby_pal(obj,obj+0x10,&frame.direction,5.0f);
             g_camera_state.speed=0.1f;
             g_camera_state.limit=75;
             g_camera_state.scale=0.2f;
             g_camera_state.duration=50;
             g_camera_state.timer=0;
             coll_sweep_from_object(obj,3.0f,obj+0x10,0x10000,3.0f,1.0f,0,1,0);
-            func_PAL_002B15D8(obj,0xEF,3.0f,&frame.random,6.0f,3.0f,6.0f,255);
+            part_spawn_masked_debris_pal(obj,0xEF,3.0f,&frame.random,6.0f,3.0f,6.0f,255);
             moby_mark_spawned(obj);
         }
         return;
     case 3:
-        if (math_fast_float_d(ctx)) {obj[0x20]=2; return;}
-        math_step_value_toward_target(obj+0x18,ctx->height,&ctx->speed,0.040000003f,0.040000003f,0.40000004f);
+        if (math_fast_float_d(state)) {obj[0x20]=2; return;}
+        math_step_value_toward_target(obj+0x18,state->height,&state->speed,0.040000003f,0.040000003f,0.40000004f);
         *(float *)(obj+0xF0)=FastAddRotations(*(float *)(obj+0xF0),math_random_int_range(-10,10)*0.017453294f);
         *(float *)(obj+0xF4)=FastAddRotations(*(float *)(obj+0xF4),math_random_int_range(-10,10)*0.017453294f);
         *(float *)(obj+0xF8)=FastAddRotations(*(float *)(obj+0xF8),math_random_int_range(-5,25)*0.017453294f);
-        velocity=&ctx->velocity;
-        vec_scale_to_length(velocity,velocity,ctx->speed);
+        velocity=&state->velocity;
+        vec_scale_to_length(velocity,velocity,state->speed);
         break;
     default:
         speed = 0.0f;
         return;
     }
-    speed=ctx->speed;
+    speed=state->speed;
     frame.random.q=0;
     position=obj+0x10;
     frame.random.f[0]=math_random_float_range(-1.0f,1.0f);
@@ -108,7 +108,7 @@ void func_PAL_L06_00404FE8(char *obj) {
     FastVecAdd(&frame.direction,&frame.direction,&frame.pos);
     vec_scale_to_length(&frame.pos,velocity,math_random_float_range(0.0f,1.0f)*speed);
     FastVecAdd(&frame.pos,&frame.pos,position);
-    particle=func_PAL_002C23B8(&frame.pos,&frame.direction,17,60,0x606060,3,80000.0f,40000.0f,1.0f,-0.0002f,0.0f);
+    particle=part_spawn_burst_pal(&frame.pos,&frame.direction,17,60,0x606060,3,80000.0f,40000.0f,1.0f,-0.0002f,0.0f);
     if (particle) {
         particle[2]=*g_particle_l06_byte_ptr;
         particle[3]=0x44;
@@ -123,5 +123,5 @@ void func_PAL_L06_00404FE8(char *obj) {
         }
     }
     obj+=0x10;
-    func_PAL_002C23B8(obj,&frame.direction,6,127,0xB0B0B0,3,80000.0f,40000.0f,1.0f,-0.0004f,0.0f);
+    part_spawn_burst_pal(obj,&frame.direction,6,127,0xB0B0B0,3,80000.0f,40000.0f,1.0f,-0.0004f,0.0f);
 }

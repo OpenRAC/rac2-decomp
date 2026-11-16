@@ -10,25 +10,26 @@ extern s32 g_hero_l01_control_mode __attribute__((sda));
 extern void moby_set_state(s8 *, s32, s32);
 extern void math_store_angle_update_result(s8 *, s8 *, f32, s32, s32);
 
-void func_PAL_L12_0041DF18(s8 *arg0) {
-    s8 *s;
-    u8 t;
+/* Updates a TV screens moby: starts it, then keeps its screen effect running (PAL: 50 Hz rates). */
+void tv_l12_l01_screens_update_pal(s8 *moby) {
+    s8 *vars;
+    u8 state;
 
-    t = *(u8 *)(arg0 + 0x20);
-    s = *(s8 **)(arg0 + 0x68);
-    switch (t) {
+    state = *(u8 *)(moby + 0x20);
+    vars = *(s8 **)(moby + 0x68);
+    switch (state) {
     case 0:
-        moby_set_state(arg0, 1, -1);
+        moby_set_state(moby, 1, -1);
         return;
     case 1:
         if (g_current_map_index == 0x33) {
             break;
         }
-        if (s != 0) {
+        if (vars != 0) {
             if (g_hero_l01_control_mode == 2) {
-                math_store_angle_update_result(arg0, s + 0xC, 0.06632252f, 0x80AABED2, 0x80466464);
+                math_store_angle_update_result(moby, vars + 0xC, 0.06632252f, 0x80AABED2, 0x80466464);
             } else {
-                math_store_angle_update_result(arg0, s + 0xC, 0.04537857f, 0x8096AAAA, 0x80466464);
+                math_store_angle_update_result(moby, vars + 0xC, 0.04537857f, 0x8096AAAA, 0x80466464);
             }
         }
         break;

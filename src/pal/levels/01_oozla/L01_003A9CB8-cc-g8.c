@@ -34,7 +34,7 @@ extern OozlaMaterial g_action_table[];
 extern u8 g_collision_l01_hit[];
 extern u8 g_contact_moby_list[];
 extern int g_hero_misc_flag;
-extern void func_PAL_002A7E68(void *,int,int,int);
+extern void anim_start_blended_pal(void *,int,int,int);
 extern void hero_get_clamped_stick_tilt(float *,float *);
 extern float FastAddRotations(float,float);
 extern void vec_scale_to_length(void *,void *,float);
@@ -66,34 +66,35 @@ extern int coll_process_hit(void *,int,void *,void *,float);
 extern void moby_queue_knockback_for_nodes(void *,void *,void *,int,int,int,int,int,float,float,float);
 extern int math_fast_float_d(void *);
 extern void cam_set_mode_state(int);
-extern int func_PAL_L01_002BEC60(int,int);
+extern int SetHeroMoveState_pal(int,int);
 extern void moby_mark_spawned(void *);
 extern void part_queue_ground_shadow(void *,float);
-void func_PAL_L01_003A9CB8(u8 *object)
+/* Updates a moby the player steers with the stick: it moves, slides along walls, and explodes on Circle (PAL version). */
+void steered_moby_update_pal(u8 *moby)
 {
     float previous[4], velocity[4], position[4];
     float horizontal, vertical;
     float maximum, speed, progress, sign, angle, half;
-    u8 *state = *(u8 **)(object+0x68);
+    u8 *state = *(u8 **)(moby+0x68);
     int collision, count;
     /* Arguments named for the callees' parameters. They are set before the switch and read
        in its cases, so gcse folds them; they bring the RTL count to the 536 insns (269 hash
        buckets) that give retail's spill-slot order at 0x1B8-0x1C8. */
-    int lineFlags = 0;          /* CollLine flags */
-    void *linePacket = 0;       /* CollLine result packet: none */
+    int line_flags = 0;          /* CollLine flags */
+    void *line_packet = 0;       /* CollLine result packet: none */
     int detonate = 0x20;        /* PAD_CIRCLE in the pressed mask */
-    int sphereFlags = 0x10;     /* func_00277F48 flags */
-    void *sphereHit = 0;        /* func_00277F48 result: none */
+    int sphere_flags = 0x10;     /* func_00277F48 flags */
+    void *sphere_hit = 0;        /* func_00277F48 result: none */
     int spared = 0;             /* func_002A9850: no moby is left out */
-    float *explosionAt = 0;     /* SpawnExplosionEffects position: the owner's */
+    float *explosion_at = 0;     /* SpawnExplosionEffects position: the owner's */
     int sparks = 10, flashes = 3, smoke = 16;
 
-    qcopy(previous, (object+0x10));
-    switch (object[0x20]) {
+    qcopy(previous, (moby+0x10));
+    switch (moby[0x20]) {
     case 0:
         F(state,0x44) = F(state,0x18);
-        object[0x20] = 1;
-        if (object[0x43] != 1) func_PAL_002A7E68(object,1,0,10);
+        moby[0x20] = 1;
+        if (moby[0x43] != 1) anim_start_blended_pal(moby,1,0,10);
         break;
     case 1:
         /* The vectors' block closes inside the matrices' block, so both sets of slots are freed
@@ -109,16 +110,16 @@ void func_PAL_L01_003A9CB8(u8 *object)
                 maximum = ((OozlaMaterial *)((u32)g_action_table + g_item_slot_to_record[0x20]*sizeof(OozlaMaterial)))->speed*0.020000001f;
                 F(state,0x4C) += (((vertical*maximum-F(state,0x4C))) * 1.2f)*g_hover_vertical_smoothing;
                 speed = F(state,0x4C)/maximum;
-                F(object,0x48) = speed+speed+horizontal;
+                F(moby,0x48) = speed+speed+horizontal;
                 vec_scale_to_length(velocity,g_debris_velocity_vector,F(state,0x4C));
-                matrix_mul_vec3(velocity,velocity,object+0xC0);
+                matrix_mul_vec3(velocity,velocity,moby+0xC0);
                 velocity[2] += F(state,0x54);
-                FastVecAdd(position,object+0x10,velocity);
-                qcopy((object+0x10), position);
-                moby_move_with_collision(object);
+                FastVecAdd(position,moby+0x10,velocity);
+                qcopy((moby+0x10), position);
+                moby_move_with_collision(moby);
                 if (F(state,0x4C) < 0.0f) F(state,0x4C) = -FastVecLength(velocity);
                 else F(state,0x4C) = FastVecLength(velocity);
-                gfx_draw_vehicle_beam(object,state);
+                gfx_draw_vehicle_beam(moby,state);
                 *(OozlaQuad *)angles = 0;
                 angles[2] = g_hover_turn_rate_scale*(horizontal*0.0003490659f);
                 *(OozlaQuad *)start = *(OozlaQuad *)angles;
@@ -130,94 +131,94 @@ void func_PAL_L01_003A9CB8(u8 *object)
                 collision = 0;
                 while (progress <= g_hover_path_length && !collision) {
                     sign = vertical < 0.0f ? -1.0f : 1.0f;
-                    vec_scale_to_length(angles,object+0xE0,g_moby_probe_length);
-                    FastVecAdd(angles,angles,object+0x10);
-                    vec_scale_to_length(shift,object+0xC0,g_hover_shift_speed*progress*sign);
+                    vec_scale_to_length(angles,moby+0xE0,g_moby_probe_length);
+                    FastVecAdd(angles,angles,moby+0x10);
+                    vec_scale_to_length(shift,moby+0xC0,g_hover_shift_speed*progress*sign);
                     FastVecAdd(angles,angles,shift);
-                    vec_scale_to_length(offset,object+0xE0,g_hover_offset_length);
-                    FastVecSub(finish,object+0x10,offset);
+                    vec_scale_to_length(offset,moby+0xE0,g_hover_offset_length);
+                    FastVecSub(finish,moby+0x10,offset);
                     FastVecScale(normal,velocity,math_fabs(vertical));
                     half = g_hover_path_length*0.5f;
                     FastVecScale(shift,normal,(g_hover_push_strength*(half-progress))/half);
                     FastVecAdd(finish,finish,shift);
-                    collision = CollLine(angles,finish,lineFlags,object,linePacket);
+                    collision = CollLine(angles,finish,line_flags,moby,line_packet);
                     progress += 1.0f;
                 }
                 if (collision) {
                     qcopy(hit, (g_collision_l01_hit+0x20));
-                    vec_scale_to_length(normal,object+0xE0,1.0f);
+                    vec_scale_to_length(normal,moby+0xE0,1.0f);
                     vec_scale_to_length(force,g_collision_l01_hit+0x40,1.0f);
                     angle = 1.5707964f-math_fast_angle_helper(FastVecDot(normal,force));
                     if (g_hover_max_angle_degrees*0.017453294f < angle) {
-                        qcopy((object+0x10), previous);
+                        qcopy((moby+0x10), previous);
                     } else {
                         vec_scale_to_length(adjustment,g_collision_l01_hit+0x40,g_hover_adjust_length);
-                        vec_scale_to_length(angles,object+0xE0,g_moby_probe_length);
-                        FastVecSub(finish,object+0x10,angles);
-                        FastVecAdd(angles,angles,object+0x10);
-                        if (CollLine(angles,finish,lineFlags,object,linePacket)) {
+                        vec_scale_to_length(angles,moby+0xE0,g_moby_probe_length);
+                        FastVecSub(finish,moby+0x10,angles);
+                        FastVecAdd(angles,angles,moby+0x10);
+                        if (CollLine(angles,finish,line_flags,moby,line_packet)) {
                             vec_scale_to_length(edge,g_collision_l01_hit+0x40,g_hover_edge_length_a);
                             FastVecAdd(adjustment,adjustment,edge);
                         }
-                        vec_scale_to_length(edge,object+0xE0,g_hover_edge_length_b);
+                        vec_scale_to_length(edge,moby+0xE0,g_hover_edge_length_b);
                         FastVecAdd(adjustment,adjustment,edge);
-                        copy_matrix_rotation(basis[0],object+0xC0);
+                        copy_matrix_rotation(basis[0],moby+0xC0);
                         vec_scale_to_length(basis[2],adjustment,-1.0f);
                         FastVecCross(basis[1],basis[2],basis[0]);
                         FastVecCross(basis[0],basis[1],basis[2]);
                         multiply_matrix(matrix,basis[0],rotation);
-                        mat_get_euler_angles(matrix,object+0xF0);
-                        FastVecSub(edge,hit,object+0x10);
+                        mat_get_euler_angles(matrix,moby+0xF0);
+                        FastVecSub(edge,hit,moby+0x10);
                         vec_scale_to_length(edge,edge,
                             g_hover_max_step_speed*0.020000001f < FastVecLength(edge)
                             ? g_hover_max_step_speed*0.020000001f : FastVecLength(edge));
-                        FastVecAdd(object+0x10,object+0x10,edge);
+                        FastVecAdd(moby+0x10,moby+0x10,edge);
                         F(state,0x54) = 0.0f;
                     }
                 } else {
-                    qcopy((object+0x10), previous);
-                    copy_matrix_rotation(basis[0],object+0xC0);
-                    copy_matrix3x4(object+0xC0,matrix);
+                    qcopy((moby+0x10), previous);
+                    copy_matrix_rotation(basis[0],moby+0xC0);
+                    copy_matrix3x4(moby+0xC0,matrix);
                     multiply_matrix(matrix,basis[0],rotation);
-                    copy_matrix3x4(object+0xC0,matrix);
+                    copy_matrix3x4(moby+0xC0,matrix);
                 }
             }
         }
-        moby_move_with_collision(object);
+        moby_move_with_collision(moby);
         {
             float displacement[4], inverse[16], center[4];
 
-            matrix_from_basis_rows(inverse,object+0xC0);
-            FastVecSub(displacement,object+0x10,previous);
+            matrix_from_basis_rows(inverse,moby+0xC0);
+            FastVecSub(displacement,moby+0x10,previous);
             transform_vector(displacement,displacement,inverse);
             func_L00_002EE4D8(displacement,displacement,math_fabs(F(state,0x4C)));
-            matrix_mul_vec3(displacement,displacement,object+0xC0);
-            FastVecAdd(object+0x10,previous,displacement);
+            matrix_mul_vec3(displacement,displacement,moby+0xC0);
+            FastVecAdd(moby+0x10,previous,displacement);
             if (((OozlaInput *)g_pad_state)->flags & detonate) {
-                SpawnExplosionEffects_pal((char *)object,velocity,explosionAt,0.0f,0.0f,sparks,flashes,smoke,4.0f,2.0f,0.0f,1.0f,1,20.0f,1,1,-1,0,0x810001);
-                count = coll_process_hit(object+0x10,sphereFlags,object,sphereHit,g_hover_collision_radius);
-                *(OozlaQuad *)center = *(OozlaQuad *)(object+0x10);
-                moby_queue_knockback_for_nodes(object,center,g_contact_moby_list,count,spared,0x830000,3,2,((OozlaMaterial *)((u32)g_action_table + g_item_slot_to_record[0x20]*sizeof(OozlaMaterial)))->material,1.0f,1.0f);
+                SpawnExplosionEffects_pal((char *)moby,velocity,explosion_at,0.0f,0.0f,sparks,flashes,smoke,4.0f,2.0f,0.0f,1.0f,1,20.0f,1,1,-1,0,0x810001);
+                count = coll_process_hit(moby+0x10,sphere_flags,moby,sphere_hit,g_hover_collision_radius);
+                *(OozlaQuad *)center = *(OozlaQuad *)(moby+0x10);
+                moby_queue_knockback_for_nodes(moby,center,g_contact_moby_list,count,spared,0x830000,3,2,((OozlaMaterial *)((u32)g_action_table + g_item_slot_to_record[0x20]*sizeof(OozlaMaterial)))->material,1.0f,1.0f);
                 I(state,0x40) = (((int)(g_hover_state_flags) * 5 + 2) / 6);
-                I(object,0x98) = 0;
-                *(u16 *)(object+0x34) = (*(u16 *)(object+0x34) | 0x41)&0xEFFF;
+                I(moby,0x98) = 0;
+                *(u16 *)(moby+0x34) = (*(u16 *)(moby+0x34) | 0x41)&0xEFFF;
                 g_hero_misc_flag = 0;
-                object[0x20] = 2;
+                moby[0x20] = 2;
             }
         }
-        if (F(object,0x10)<2.0f || F(object,0x10)>1021.0f || F(object,0x14)<2.0f || F(object,0x14)>1021.0f || F(object,0x18)<2.0f || F(object,0x18)>1021.0f) {
-            moby_mark_spawned(object);
+        if (F(moby,0x10)<2.0f || F(moby,0x10)>1021.0f || F(moby,0x14)<2.0f || F(moby,0x14)>1021.0f || F(moby,0x18)<2.0f || F(moby,0x18)>1021.0f) {
+            moby_mark_spawned(moby);
             return;
         }
         break;
     case 2:
         if (math_fast_float_d(state+0x40)) {
             cam_set_mode_state(0);
-            func_PAL_L01_002BEC60(0,1);
-            moby_mark_spawned(object);
+            SetHeroMoveState_pal(0,1);
+            moby_mark_spawned(moby);
             return;
         }
         break;
     }
-    part_queue_ground_shadow(object,g_moby_probe_length);
+    part_queue_ground_shadow(moby,g_moby_probe_length);
 }

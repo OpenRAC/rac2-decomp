@@ -1,6 +1,8 @@
 #include "include_asm.h"
+#include "names.h"
 
-void func_PAL_L00_003E63F0(void)
+/* Empty function that does nothing. */
+void l00_empty_stub_pal(void)
 {
 }
 

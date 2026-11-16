@@ -8,24 +8,25 @@ extern void moby_play_anim_and_link_pal(char *arg0, int arg1, int arg2, int arg3
 extern void mothership_project_point_onto_surface(TI16 *, float);
 extern int CollLine(TI16 *, TI16 *, int, int, int);
 
-void func_PAL_L23_003C3AA0(char *arg0, int arg1) {
-    TI16 a;
-    TI16 b;
-    TI16 *p;
+/* Starts the snap animation and, if asked, moves the moby down to the ground below it (moby is reused as the pointer to b, as retail does). (PAL) */
+void enemy_snap_to_ground_pal(char *moby, int snap) {
+    TI16 ray_end;
+    TI16 ray_start;
+    TI16 *ray_end_ptr;
 
-    if ((unsigned char)(*(unsigned char *)(arg0 + 0x43) - 5) >= 2 && *(unsigned char *)(arg0 + 0x20) != 2)
-        moby_play_anim_and_link_pal(arg0, 5, 0, 5, 1, g_enemy_snap_anim_blend);
-    if (arg1 != 0) {
-        TI16 *pos = (TI16 *)(arg0 + 0x10);
+    if ((unsigned char)(*(unsigned char *)(moby + 0x43) - 5) >= 2 && *(unsigned char *)(moby + 0x20) != 2)
+        moby_play_anim_and_link_pal(moby, 5, 0, 5, 1, g_enemy_snap_anim_blend);
+    if (snap != 0) {
+        TI16 *pos = (TI16 *)(moby + 0x10);
 
-        /* b's address is formed between the two copies, where retail has it. */
-        p = &a;
-        a = *pos;
-        arg0 = (char *)&b;
-        b = *pos;
-        mothership_project_point_onto_surface((TI16 *)arg0, -2.0f);
-        mothership_project_point_onto_surface(p, 0.1f);
-        if (CollLine((TI16 *)arg0, p, 0x12, 0, 0) != 0)
+        /* ray_start's address is formed between the two copies, where retail has it. */
+        ray_end_ptr = &ray_end;
+        ray_end = *pos;
+        moby = (char *)&ray_start;
+        ray_start = *pos;
+        mothership_project_point_onto_surface((TI16 *)moby, -2.0f);
+        mothership_project_point_onto_surface(ray_end_ptr, 0.1f);
+        if (CollLine((TI16 *)moby, ray_end_ptr, 0x12, 0, 0) != 0)
             *pos = g_coll_line_hit_point_2;
     }
 }

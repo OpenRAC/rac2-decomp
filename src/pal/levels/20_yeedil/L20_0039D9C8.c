@@ -19,8 +19,9 @@ extern float math_random_float_range(float, float);
 extern float math_random_angle(void);
 extern void vec_build_spherical_offset(void *, float, float, float);
 extern int math_random_int_below(int);
-extern void func_PAL_002BEF58(void *, void *, int, float);
+extern void part_spawn_white_flash_pal(void *, void *, int, float);
 
+/* Updates a spark-spraying effect (moby class 3882) during a Yeedil scene. At a set moment it fires a burst, then it keeps shooting sparks from a scene object while the scene runs. (PAL version) */
 void spark_l20_burst_update_pal(unsigned char *object)
 {
     float position[4], velocity[4];
@@ -49,7 +50,7 @@ void spark_l20_burst_update_pal(unsigned char *object)
             tilt = math_random_float_range(0.523598849773407f, 2.6179940700531006f);
             vec_build_spherical_offset(velocity, speed, heading, tilt);
             if (math_random_int_below(2))
-                func_PAL_002BEF58(position, velocity, 0, math_random_float_range(1470.0f, 7350.0f));
+                part_spawn_white_flash_pal(position, velocity, 0, math_random_float_range(1470.0f, 7350.0f));
         }
         break;
     }

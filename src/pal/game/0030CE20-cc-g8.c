@@ -25,7 +25,8 @@ extern short ref_L00_0030BA38_15;
 extern short ref_L00_0030BA38_16;
 extern short ref_L00_0030BA38_17;
 
-void func_PAL_0030CE20(void *object) {
+/* Draws the beam: scrolls its texture, draws its two main ribbons and four small ones, then the glow at its end (PAL copy). */
+void beam_draw_ribbons_pal(void *object) {
     void *unit = *(void **)((char *)object + 0x68);
     float value = ref_L00_0030BA38_00 - ((ref_L00_0030BA38_01) * 1.2f);
 

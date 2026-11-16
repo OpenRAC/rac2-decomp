@@ -12,11 +12,12 @@ extern char *GetLocalizedString(int a);
 extern void hud_set_widget_field_b(char *a, int b);
 
 /* stores the count in a field, then loops count times calling one helper on each successive 72-byte slot and passing the result to a second helper. */
-void func_US2_00349378(char *a0, int a1, int *a2)
+/* Sets the page's label count and fills each label with the localized string for its text id. */
+void menu_page_set_labels_us2(char *page, int count, int *text_ids)
 {
     int i;
 
-    *(int *)(a0 + 1204) = a1;
-    for (i = 0; i < a1; i++)
-        hud_set_widget_field_b(a0 + 536 + i * 88, GetLocalizedString(a2[i]));
+    *(int *)(page + 1204) = count;
+    for (i = 0; i < count; i++)
+        hud_set_widget_field_b(page + 536 + i * 88, GetLocalizedString(text_ids[i]));
 }

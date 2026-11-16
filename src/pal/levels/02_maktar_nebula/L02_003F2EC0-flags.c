@@ -20,39 +20,39 @@ extern Pad003EE938 g_pad_state;
 
 /* The actor's state machine (byte at +0x20): 0 prepares it, 1 waits for the target to come within
    range on its own frame of eight, 2 follows the pad until the state asks to restart. */
-void path_l02_follower_update_pal(char *arg0) {
-    char *state = *(char **)(arg0 + 0x68);
-    int v;
+void path_l02_follower_update_pal(char *moby) {
+    char *state = *(char **)(moby + 0x68);
+    int alpha;
 
-    switch (*(unsigned char *)(arg0 + 0x20)) {
+    switch (*(unsigned char *)(moby + 0x20)) {
     case 0:
         if (*(int *)state == -1) {
-            moby_mark_spawned(arg0);
+            moby_mark_spawned(moby);
             return;
         }
-        path_init_bounds(arg0);
-        *(TI128 *)(arg0 + 0x10) = *(TI128 *)(state + 0x20);
-        v = FloatToInt(*(float *)(state + 0x2C) * 1.5f);
-        if (v >= 256)
-            v = 255;
-        *(unsigned char *)(arg0 + 0x30) = v;
-        moby_set_state(arg0, 1, -1);
+        path_init_bounds(moby);
+        *(TI128 *)(moby + 0x10) = *(TI128 *)(state + 0x20);
+        alpha = FloatToInt(*(float *)(state + 0x2C) * 1.5f);
+        if (alpha >= 256)
+            alpha = 255;
+        *(unsigned char *)(moby + 0x30) = alpha;
+        moby_set_state(moby, 1, -1);
         return;
     case 1:
-        if ((g_frame_l02_counter & 7) == (((int)arg0 >> 8) & 7)) {
-            if (path_is_hero_near_point(arg0)) {
-                moby_set_state(arg0, 2, -1);
+        if ((g_frame_l02_counter & 7) == (((int)moby >> 8) & 7)) {
+            if (path_is_hero_near_point(moby)) {
+                moby_set_state(moby, 2, -1);
                 *(int *)(state + 0x34) = 0;
             }
         }
         return;
     case 2:
-        *(float *)(state + 0x44) = path_update_progress(arg0);
-        path_update_hero_heading_pal(arg0);
+        *(float *)(state + 0x44) = path_update_progress(moby);
+        path_update_hero_heading_pal(moby);
         if (0.2f < g_pad_state.f100 + g_pad_state.f104)
             ApproachValue((float *)(state + 0x34), 0.0f, 0.40000004f);
         if (*(float *)(state + 4) + 1.0f < *(float *)(state + 0x44))
-            moby_set_state(arg0, 1, -1);
+            moby_set_state(moby, 1, -1);
         return;
     }
 }

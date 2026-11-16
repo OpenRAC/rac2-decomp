@@ -39,7 +39,7 @@ extern void meteor_gun_draw_glow(void);
 extern int math_fast_float_d(void *), vec_fast_helper_b(void *);
 extern int weapon_spend_ammo(int, int), get_ammo(int);
 extern void anim_start_blended_with_flags(char *, int, int, int, int);
-extern void func_PAL_002A7E68(char *, int, int, int);
+extern void anim_start_blended_pal(char *, int, int, int);
 extern int PlayMobySound(int, int, char *);
 extern int AcquireEntitySlot(char *, int, void *);
 extern unsigned char *level_get_slot_body(int, int);
@@ -48,11 +48,12 @@ extern void moby_transform_joint_to_world(char *, int, void *);
 extern char *projectile_spawn_small_pal(char *, int, void *, void *);
 extern void ref_L00_003EA540_00(void *, char *);
 
+/* Updates the Meteor Gun weapon: fires a shot when the player presses the button and the gun is ready (PAL: 50 Hz). */
 void meteor_gun_update_pal(char *self)
 {
-    float v[4];
-    int tmp[4];
-    char *st = *(char **)(self + 0x68);
+    float direction[4];
+    int scratch[4];
+    char *vars = *(char **)(self + 0x68);
     int ready = 1;
     char *shot;
 
@@ -71,30 +72,30 @@ void meteor_gun_update_pal(char *self)
     switch (*(unsigned char *)(self + 0x20)) {
     case 0:
         self[0x20] = 1;
-        *(int *)(st + 0xC) = 0;
-        *(int *)st = 0;
-        *(int *)(st + 4) = AcquireEntitySlot(self, 0, tmp);
-        *(int *)(st + 8) = level_get_slot_body(*(short *)(self + 0xAA), *(int *)(st + 4));
+        *(int *)(vars + 0xC) = 0;
+        *(int *)vars = 0;
+        *(int *)(vars + 4) = AcquireEntitySlot(self, 0, scratch);
+        *(int *)(vars + 8) = level_get_slot_body(*(short *)(self + 0xAA), *(int *)(vars + 4));
         /* Fall through. */
     case 1:
-        if (vec_fast_helper_b(st) && ready && g_hero_state.field_1240 >= 19 &&
+        if (vec_fast_helper_b(vars) && ready && g_hero_state.field_1240 >= 19 &&
             (g_pad_state.field_1A0 & g_hero_state.field_1230) &&
             !g_hero_state.field_22BC && weapon_spend_ammo(-1, 1)) {
-            vec_clear_128(v);
-            v[1] = -1.0f;
-            matrix_mul_vec3(v, v, self + 0xC0);
+            vec_clear_128(direction);
+            direction[1] = -1.0f;
+            matrix_mul_vec3(direction, direction, self + 0xC0);
             moby_transform_joint_to_world(self, 0, g_meteor_gun_muzzle);
-            shot = projectile_spawn_small_pal(self, *(int *)(st + 4), g_meteor_gun_muzzle, v);
+            shot = projectile_spawn_small_pal(self, *(int *)(vars + 4), g_meteor_gun_muzzle, direction);
             PlayMobySound(0, 0, self);
             if (*(unsigned char *)(self + 0x43) != 2)
-                func_PAL_002A7E68(self, 2, 0, 0);
+                anim_start_blended_pal(self, 2, 0, 0);
             *(float *)(self + 0x48) = 2.0f;
             if (shot)
                 *(char **)(shot + 0xB8) = self;
             {
                 int selected = g_item_slot_to_record.selected;
                 Entry *entry = &g_weapon_l00_table[selected];
-                *(float *)st = 1.0f / entry->rate;
+                *(float *)vars = 1.0f / entry->rate;
             }
         } else if ((g_pad_state.field_1A4 & g_hero_state.field_1230) &&
                    !get_ammo(-1) && !g_hero_state.field_22BC) {

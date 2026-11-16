@@ -16,7 +16,7 @@ extern char *g_resident_data_base[] __attribute__((sda));
    cells), then sets up the "aTxBrack" and "aTxTop" widgets at +0x10 and +0x5C with
    D_001A8CFC[0] + 0x8710 and colour 0x55F0C070. The cleared cells store word 0 last, as in
    func_00339078; the colour cell is cleared as floats before its integer colour is stored. */
-void func_US2_00338AB8(char *obj, void *pool)
+void text_panel_init_us2(char *obj, void *pool)
 {
     char *top;
     char *bracket;
@@ -81,47 +81,46 @@ void func_US2_00338AB8(char *obj, void *pool)
 
 extern int text_measure_width_small(unsigned char *text, int length); /* text width */
 
-/* func_US2_00338CD8, the v2.00 copy of func_00337E30, which also stores its second argument at
-   +0x1C4. */
-void func_US2_00338CD8(unsigned char *p, int a1, int a2, float f12, float f13)
+/* Sets up a message box: position, duration and text width (v2.00 version of msg_box_init_state, which also stores the mode at +0x1C4). */
+void msg_box_init_state_us2(unsigned char *panel, int mode, int duration, float x, float y)
 {
-    unsigned char *q = p + 168;
+    unsigned char *text = panel + 168;
 
-    *(int *)(p + 452) = a1;
-    *(float *)(*(int *)p) = f12;
-    *(float *)(*(int *)p + 4) = f13;
-    p[423] = 0;
-    *(int *)(p + 440) = a2;
-    *(int *)(p + 472) = (int)q;
-    *(int *)(p + 468) = text_measure_width_small(q, -1);
-    *(int *)(p + 432) = 1;
-    *(float *)(*(int *)(p + 4)) = 1.0f;
+    *(int *)(panel + 452) = mode;
+    *(float *)(*(int *)panel) = x;
+    *(float *)(*(int *)panel + 4) = y;
+    panel[423] = 0;
+    *(int *)(panel + 440) = duration;
+    *(int *)(panel + 472) = (int)text;
+    *(int *)(panel + 468) = text_measure_width_small(text, -1);
+    *(int *)(panel + 432) = 1;
+    *(float *)(*(int *)(panel + 4)) = 1.0f;
 }
 
 extern char *strncpy(void *, int, int);
-extern void func_US2_00338D48(void *, int, int, float, float);
+extern void layout_text_box_lines_us2(void *, int, int, float, float);
 
-/* clamps a caller-supplied terminator value (-1 meaning unset) to 360, then runs two callees on two sub-objects of one handle, the second with a float pair */
-void func_US2_00338F18(int object, int value, int count)
+/* Copies the long message text into the box and lays it out; a duration of -1 means the default 360 frames (v2.00 version of msg_box_init_long). */
+void msg_box_init_long_us2(int screen, int text, int requested_duration)
 {
-    int limit = (count == -1) ? 360 : count;
-    int inner = object + 8156;
+    int duration = (requested_duration == -1) ? 360 : requested_duration;
+    int text_box = screen + 8156;
 
-    strncpy((void *)(object + 8324), value, 255);
-    func_US2_00338D48((void *)inner, 2, limit, 255.0f, 80.0f);
+    strncpy((void *)(screen + 8324), text, 255);
+    layout_text_box_lines_us2((void *)text_box, 2, duration, 255.0f, 80.0f);
 }
 
 
 
 
 
-/* clamps a caller-supplied terminator value (-1 meaning unset) to 180, then runs two callees on two sub-objects of one handle, the second with a float pair */
-void msg_box_init_short_us2(int object, int value, int count)
+/* Copies the short message text into the box and lays it out; a duration of -1 means the default 180 frames. */
+void msg_box_init_short_us2(int screen, int text, int requested_duration)
 {
-    int limit = (count == -1) ? 180 : count;
-    int inner = object + 7564;
+    int duration = (requested_duration == -1) ? 180 : requested_duration;
+    int text_box = screen + 7564;
 
-    strncpy((void *)(object + 7732), value, 254);
-    func_US2_00338D48((void *)inner, 2, limit, 255.0f, 123.0f);
+    strncpy((void *)(screen + 7732), text, 254);
+    layout_text_box_lines_us2((void *)text_box, 2, duration, 255.0f, 123.0f);
 }
 

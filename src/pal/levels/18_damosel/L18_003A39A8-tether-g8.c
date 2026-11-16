@@ -157,43 +157,44 @@ extern void math_apply_axis_rotation_to_quat(void *, void *, void *, float);
 extern char *part_spawn_ground_effect(void *, int, float, float, unsigned int, int, int, void *, int, float);
 extern void vec_transform_or_copy(void *, void *);
 
-void func_PAL_L18_003B4448(Moby *self)
+/* Updates the lock-on tether each frame: picks up to two targets in front of the player, swings a chain of points between the player and them, and spawns the glow and spark effects. (PAL: 50 Hz timings) */
+void gadget_l18_update_lock_on_tether_pal(Moby *self)
 {
     int locked = g_weapon_l18_table[g_item_slot_to_record.cur].on != 0;
     float reach = g_tether_l18_reach_dist * 0.05f;
-    Rope *st = self->rope;
+    Rope *tether = self->rope;
     float v0[4] __attribute__((aligned(16)));
     float va[4] __attribute__((aligned(16)));
     float vb[4] __attribute__((aligned(16)));
     Hit hit1 __attribute__((aligned(16)));
-    float v60[4] __attribute__((aligned(16)));
-    float v70[4] __attribute__((aligned(16)));
-    float v80[4] __attribute__((aligned(16)));
-    float v90[4] __attribute__((aligned(16)));
-    float vA0[4] __attribute__((aligned(16)));
+    float direction[4] __attribute__((aligned(16)));
+    float step[4] __attribute__((aligned(16)));
+    float delta[4] __attribute__((aligned(16)));
+    float carry[4] __attribute__((aligned(16)));
+    float spark_offset[4] __attribute__((aligned(16)));
     Tgt *held[128];
-    float s2B0[4] __attribute__((aligned(16)));
+    float scratch[4] __attribute__((aligned(16)));
     union {
         float q[16];
         struct { Hit r; } b;
         struct { float pad[4]; Hit r; } a;
-    } hb __attribute__((aligned(16)));
-    float tmp[5][4] __attribute__((aligned(16)));
+    } hit_buf __attribute__((aligned(16)));
+    float jitter[5][4] __attribute__((aligned(16)));
     Tgt *best = 0, *second = 0;
     int got, nheld;
-    float bestScore = 0.0f, secondScore = 0.0f;
+    float best_score = 0.0f, second_score = 0.0f;
     float len;
     float angle0, angle1;
     int n;
     Tgt *t;
-    int sn;
+    int scan_i;
     float dist, ang, sa2, cs, sm, score, proj, fa, fb;
     float d0;
     float *ia, *ib;
     Tgt *ta, *tb;
     float length, blend;
     float amp, height, angle, old, cd;
-    int fa2;
+    int mirror_i;
     Tgt *ht;
     float *hinfo;
     float *tv, apj, *ainfo;
@@ -216,21 +217,21 @@ void func_PAL_L18_003B4448(Moby *self)
     g_tether_l18_wave_phase_b = fast_subtract_rotations(g_tether_l18_wave_phase_b, g_tether_l18_wave_speed_b);
     g_tether_l18_wave_phase_c = FastAddRotations(g_tether_l18_wave_phase_c, g_tether_l18_wave_speed_c);
 
-    if (st->lockA == 0 || (locked && st->lockB == 0)) {
-        if (st->lockB != 0) {
-            st->lockA = st->lockB;
-            st->u.s.h40 = st->u.s.h42;
-            st->lockB = 0;
-            st->u.s.h42 = 0;
+    if (tether->lockA == 0 || (locked && tether->lockB == 0)) {
+        if (tether->lockB != 0) {
+            tether->lockA = tether->lockB;
+            tether->u.s.h40 = tether->u.s.h42;
+            tether->lockB = 0;
+            tether->u.s.h42 = 0;
         } else {
-            sn = 0;
-            for (t = g_active_target_mobys[0]; t != 0; t = g_active_target_mobys[++sn]) {
-                if (t != st->lockA && t != st->lockB) {
+            scan_i = 0;
+            for (t = g_active_target_mobys[0]; t != 0; t = g_active_target_mobys[++scan_i]) {
+                if (t != tether->lockA && t != tether->lockB) {
                     if (t != 0 && t->cls != 0 && t->cls->id == 5) {
                         if (t->kind != 0xFE) {
                         if (t->kind != 0xFD) {
                             if (moby_get_private_value_0(t) != 0) {
-                                FastVecSub(v0, t->pos, st);
+                                FastVecSub(v0, t->pos, tether);
                                 if (g_hero_l18_busy_flag != 0) {
                                     proj = FastVecDot(v0, g_hero_state.ent + 0xE0);
                                     FastVecScale(va, g_hero_state.ent + 0xE0, proj);
@@ -262,14 +263,14 @@ void func_PAL_L18_003B4448(Moby *self)
                                                 fa = (g_tether_l18_angle_limit - ang) / g_tether_l18_angle_limit;
                                                 fb = (g_tether_l18_reach_dist - dist) / g_tether_l18_reach_dist;
                                                 score = fa * g_tether_l18_angle_score_weight + fb;
-                                                if (bestScore < score) {
-                                                    secondScore = bestScore;
-                                                    bestScore = score;
+                                                if (best_score < score) {
+                                                    second_score = best_score;
+                                                    best_score = score;
                                                     second = best;
                                                     best = t;
-                                                } else if (secondScore < score) {
+                                                } else if (second_score < score) {
                                                     second = t;
-                                                    secondScore = score;
+                                                    second_score = score;
                                                 }
                                             }
                                     }
@@ -284,35 +285,35 @@ void func_PAL_L18_003B4448(Moby *self)
     }
 
     if (best != 0) {
-        if (st->lockA != 0) {
+        if (tether->lockA != 0) {
             second = best;
         } else {
-            st->lockA = best;
-            st->u.s.h40 = 0;
+            tether->lockA = best;
+            tether->u.s.h40 = 0;
             if (math_fast_float_d(&g_tether_l18_spark_timer) != 0)
                 g_tether_l18_spark_timer = 8;
         }
     }
     if (second != 0 && locked) {
-        d0 = fast_vec_dist(st, best->pos);
+        d0 = fast_vec_dist(tether, best->pos);
         if (d0 < g_tether_l18_reach_dist && d0 + fast_vec_dist(best->pos, second->pos) < g_tether_l18_reach_dist) {
-            st->u.s.h42 = 0;
-            st->lockB = second;
+            tether->u.s.h42 = 0;
+            tether->lockB = second;
         }
     }
     len = 0.0f;
-    if (st->lockA != 0) {
-        ia = moby_get_private_value_0(st->lockA);
-        ta = st->lockA;
+    if (tether->lockA != 0) {
+        ia = moby_get_private_value_0(tether->lockA);
+        ta = tether->lockA;
         qcopy(v0, ta->pos);
         FastVecScale(va, (char *)ta + 0xE0, ia[4]);
         FastVecAdd(v0, v0, va);
-        len = fast_vec_dist(st, v0);
+        len = fast_vec_dist(tether, v0);
         reach = len * 0.05f;
     }
-    if (st->lockB != 0) {
-        ib = moby_get_private_value_0(st->lockB);
-        tb = st->lockB;
+    if (tether->lockB != 0) {
+        ib = moby_get_private_value_0(tether->lockB);
+        tb = tether->lockB;
         qcopy(va, tb->pos);
         FastVecScale(vb, (char *)tb + 0xE0, ib[4]);
         FastVecAdd(va, va, vb);
@@ -327,27 +328,27 @@ void func_PAL_L18_003B4448(Moby *self)
     hit1.kind = 5;
     hit1.flag = 1;
     hit1.tag = self->tag;
-    st->count = 0x14;
-    coll_process_hit(st, 0x10, g_hero_state.ent, &hit1, 0.3f);
-    FastVecSub(v60, st->b, st);
-    vec_scale_to_length(v60, v60, 1.0f);
-    if (st->lockA != 0 || st->lockB != 0) {
-        FastVecCross(v70, v60, (char *)&g_hero_state + 0x2C0);
-        math_apply_axis_rotation_to_quat(v60, v60, v70, 0.17453295f);
+    tether->count = 0x14;
+    coll_process_hit(tether, 0x10, g_hero_state.ent, &hit1, 0.3f);
+    FastVecSub(direction, tether->b, tether);
+    vec_scale_to_length(direction, direction, 1.0f);
+    if (tether->lockA != 0 || tether->lockB != 0) {
+        FastVecCross(step, direction, (char *)&g_hero_state + 0x2C0);
+        math_apply_axis_rotation_to_quat(direction, direction, step, 0.17453295f);
     }
     got = 0;
-    FastVecScale(v90, v60, reach);
+    FastVecScale(carry, direction, reach);
     nheld = 0;
     /* These named pointers, and the short locals below, are live but also steer: each adds
        insns that exist at gcse and die later (asm operands keep the copy; the sign extension
        dies at combine). gcse's hash needs 677 buckets, max_cuid >= 1352, for retail's spill
        slots. See F4 in docs/contributing/matching-blockers.md. */
     {
-        float *anchor = st->a;
+        float *anchor = tether->a;
         qcopy(&g_tether_l18_points[0][0], anchor);
     }
     {
-        float *anchor = st->a;
+        float *anchor = tether->a;
         qcopy(&g_tether_l18_points[1][0], anchor);
     }
     {
@@ -360,25 +361,25 @@ void func_PAL_L18_003B4448(Moby *self)
         g_tether_l18_old_heights[i] = height;
         g_tether_l18_points[0][i].f[2] = g_tether_l18_points[0][i].f[2] - old;
         vec_transform_or_copy(&g_tether_l18_points[0][i], &g_tether_l18_points[0][i]);
-        FastVecSub(v70, &g_tether_l18_points[0][i], g_tether_l18_ray_deltas[i]);
-        lerp_vector(v80, v70, v90, 0.85f);
+        FastVecSub(step, &g_tether_l18_points[0][i], g_tether_l18_ray_deltas[i]);
+        lerp_vector(delta, step, carry, 0.85f);
         {
-            float cm = FastVecLength(v80);
+            float cm = FastVecLength(delta);
             if (cm == 0.0f) {
                 prev = &g_tether_l18_points[0][i - 1];
                 qcopy(&g_tether_l18_points[0][i], prev);
             } else {
-                FastVecScale(v80, v80, reach / cm);
-                FastVecAdd(&g_tether_l18_points[0][i], g_tether_l18_ray_deltas[i], v80);
-                qcopy(v90, v80);
+                FastVecScale(delta, delta, reach / cm);
+                FastVecAdd(&g_tether_l18_points[0][i], g_tether_l18_ray_deltas[i], delta);
+                qcopy(carry, delta);
             }
         }
         g_tether_l18_points[0][i].f[2] = g_tether_l18_points[0][i].f[2] + height;
-        FastVecSub(v70, &g_tether_l18_points[0][i], g_tether_l18_ray_deltas[i]);
-        if (st->lockA != 0) {
-            if (!locked || st->lockB == 0) {
-                FastVecSub(s2B0, v0, &g_tether_l18_points[0][i]);
-                length = FastVecLength(s2B0);
+        FastVecSub(step, &g_tether_l18_points[0][i], g_tether_l18_ray_deltas[i]);
+        if (tether->lockA != 0) {
+            if (!locked || tether->lockB == 0) {
+                FastVecSub(scratch, v0, &g_tether_l18_points[0][i]);
+                length = FastVecLength(scratch);
                 if (length != 0.0f) {
                     if (i == 0x13) {
                         blend = 0.5f;
@@ -390,15 +391,15 @@ void func_PAL_L18_003B4448(Moby *self)
                     } else {
                         blend = 0.1f;
                     }
-                    FastVecScale(s2B0, s2B0, reach / length);
-                    lerp_vector(v90, v90, s2B0, blend);
+                    FastVecScale(scratch, scratch, reach / length);
+                    lerp_vector(carry, carry, scratch, blend);
                 }
             } else {
                 if (i >= 10)
-                    FastVecSub(s2B0, va, &g_tether_l18_points[0][i]);
+                    FastVecSub(scratch, va, &g_tether_l18_points[0][i]);
                 else
-                    FastVecSub(s2B0, v0, &g_tether_l18_points[0][i]);
-                length = FastVecLength(s2B0);
+                    FastVecSub(scratch, v0, &g_tether_l18_points[0][i]);
+                length = FastVecLength(scratch);
                 if (length != 0.0f) {
                     if (i == 9 || i == 0x13) {
                         blend = 0.7f;
@@ -414,8 +415,8 @@ void func_PAL_L18_003B4448(Moby *self)
                     } else {
                         blend = 0.2f;
                     }
-                    FastVecScale(s2B0, s2B0, reach / length);
-                    lerp_vector(v90, v90, s2B0, blend);
+                    FastVecScale(scratch, scratch, reach / length);
+                    lerp_vector(carry, carry, scratch, blend);
                 }
             }
         }
@@ -427,22 +428,22 @@ void func_PAL_L18_003B4448(Moby *self)
             g_tether_l18_heights[i] = height;
             g_tether_l18_points[1][i].f[2] = g_tether_l18_points[1][i].f[2] + height;
             {
-                float bearing = FastAddRotations(mat_fast_helper_a(v70[0], v70[1]), 1.5707965f);
+                float bearing = FastAddRotations(mat_fast_helper_a(step[0], step[1]), 1.5707965f);
                 {
                     float radial = g_tether_l18_radial_scale * math_fast_sin_or_cos_a(angle);
-                    vA0[0] = math_fast_sin_or_cos_a(bearing) * radial;
-                    vA0[1] = math_fast_sin_or_cos_b(bearing) * radial;
-                    vA0[2] = 0.0f;
-                    qcopy_nc(&g_tether_l18_spark_offsets[i], vA0);
+                    spark_offset[0] = math_fast_sin_or_cos_a(bearing) * radial;
+                    spark_offset[1] = math_fast_sin_or_cos_b(bearing) * radial;
+                    spark_offset[2] = 0.0f;
+                    qcopy_nc(&g_tether_l18_spark_offsets[i], spark_offset);
                 }
             }
-            FastVecAdd(&g_tether_l18_points[1][i], &g_tether_l18_points[1][i], vA0);
+            FastVecAdd(&g_tether_l18_points[1][i], &g_tether_l18_points[1][i], spark_offset);
         } else {
-            fa2 = 0x15 - i;
+            mirror_i = 0x15 - i;
             qcopy(&g_tether_l18_points[1][i], &g_tether_l18_points[0][i]);
-            g_tether_l18_points[1][i].f[2] = g_tether_l18_points[1][i].f[2] + g_tether_l18_heights[fa2];
-            FastVecAdd(&g_tether_l18_points[1][i], &g_tether_l18_points[1][i], &g_tether_l18_spark_offsets[fa2]);
-            qcopy(vA0, &g_tether_l18_spark_offsets[i]);
+            g_tether_l18_points[1][i].f[2] = g_tether_l18_points[1][i].f[2] + g_tether_l18_heights[mirror_i];
+            FastVecAdd(&g_tether_l18_points[1][i], &g_tether_l18_points[1][i], &g_tether_l18_spark_offsets[mirror_i]);
+            qcopy(spark_offset, &g_tether_l18_spark_offsets[i]);
         }
         if (i >= 2 && (i == 0x13 || !(i & 1))) {
             FastVecSub(vb, &g_tether_l18_points[0][i], g_camera_l18_position);
@@ -450,8 +451,8 @@ void func_PAL_L18_003B4448(Moby *self)
                 float cpj = FastVecDot(vb, g_hero_state.ent + 0xE0);
                 {
                     char *ax = g_hero_state.ent + 0xE0;
-                    FastVecScale(s2B0, ax, cpj);
-                    FastVecSub(vb, vb, s2B0);
+                    FastVecScale(scratch, ax, cpj);
+                    FastVecSub(vb, vb, scratch);
                 }
             } else {
                 *(int *)&vb[2] = 0;
@@ -482,12 +483,12 @@ void func_PAL_L18_003B4448(Moby *self)
                     qcopy(&g_tether_l18_points[0][i], g_tether_l18_hit_result.pos);
                     {
                         short last = i;
-                        st->count = last;
+                        tether->count = last;
                     }
-                    qcopy(st->b, g_tether_l18_hit_result.pos);
+                    qcopy(tether->b, g_tether_l18_hit_result.pos);
                     if (g_tether_l18_hit_result.hit == 0) {
-                        st->lockA = 0;
-                        st->u.s.h40 = 0;
+                        tether->lockA = 0;
+                        tether->u.s.h40 = 0;
                     }
                     break;
                 }
@@ -498,71 +499,71 @@ void func_PAL_L18_003B4448(Moby *self)
     for (n = 0; n < nheld; n++)
         held[n]->f98 = held[n]->cls->f10;
     if (got == 0)
-        qcopy(st->b, &g_tether_l18_anchor_vec);
-    if (st->lockA != 0 && (st->u.q & 0x0000FFFF0000FFFFUL) == 0) {
-        tv = hb.q;
-        FastVecSub(s2B0, st->lockA->pos, g_camera_l18_position);
+        qcopy(tether->b, &g_tether_l18_anchor_vec);
+    if (tether->lockA != 0 && (tether->u.q & 0x0000FFFF0000FFFFUL) == 0) {
+        tv = hit_buf.q;
+        FastVecSub(scratch, tether->lockA->pos, g_camera_l18_position);
         if (g_hero_l18_busy_flag != 0) {
-            apj = FastVecDot(s2B0, g_hero_state.ent + 0xE0);
+            apj = FastVecDot(scratch, g_hero_state.ent + 0xE0);
             FastVecScale(tv, g_hero_state.ent + 0xE0, apj);
-            FastVecSub(s2B0, s2B0, tv);
+            FastVecSub(scratch, scratch, tv);
         } else {
-            *(int *)&s2B0[2] = 0;
+            *(int *)&scratch[2] = 0;
         }
-        vec_scale_to_length(s2B0, s2B0, 1.0f);
-        s2B0[3] = 5627.925f;
-        make_hit_descriptor(&hb.a.r, self, 0x210000, s2B0, (&g_weapon_l18_table[g_item_slot_to_record.cur])->f70);
-        hb.a.r.kind = 5;
-        hb.a.r.flag = 3;
-        hb.a.r.tag = self->tag;
+        vec_scale_to_length(scratch, scratch, 1.0f);
+        scratch[3] = 5627.925f;
+        make_hit_descriptor(&hit_buf.a.r, self, 0x210000, scratch, (&g_weapon_l18_table[g_item_slot_to_record.cur])->f70);
+        hit_buf.a.r.kind = 5;
+        hit_buf.a.r.flag = 3;
+        hit_buf.a.r.tag = self->tag;
         an = 5;
-        QueueMobyImpact(st->lockA, &hb.a.r);
-        ainfo = moby_get_private_value_0(st->lockA);
+        QueueMobyImpact(tether->lockA, &hit_buf.a.r);
+        ainfo = moby_get_private_value_0(tether->lockA);
         if (ainfo != 0) {
             if (((short *)ainfo)[2] == 1)
                 an = 1;
         }
         {
             short result = ((s32)(an) * 5 + 2) / 6;
-            st->u.s.h44 = result;
+            tether->u.s.h44 = result;
         }
     }
-    if (st->lockB != 0 && (st->u.q & 0xFFFF0000FFFF0000UL) == 0) {
-        FastVecSub(s2B0, st->lockB->pos, g_camera_l18_position);
+    if (tether->lockB != 0 && (tether->u.q & 0xFFFF0000FFFF0000UL) == 0) {
+        FastVecSub(scratch, tether->lockB->pos, g_camera_l18_position);
         if (g_hero_l18_busy_flag != 0) {
-            bpj = FastVecDot(s2B0, g_hero_state.ent + 0xE0);
-            FastVecScale(hb.q, g_hero_state.ent + 0xE0, bpj);
-            FastVecSub(s2B0, s2B0, hb.q);
+            bpj = FastVecDot(scratch, g_hero_state.ent + 0xE0);
+            FastVecScale(hit_buf.q, g_hero_state.ent + 0xE0, bpj);
+            FastVecSub(scratch, scratch, hit_buf.q);
         } else {
-            *(int *)&s2B0[2] = 0;
+            *(int *)&scratch[2] = 0;
         }
-        vec_scale_to_length(s2B0, s2B0, 1.0f);
-        s2B0[3] = 5627.925f;
-        make_hit_descriptor(&hb.b.r, self, 0x210000, s2B0, (&g_weapon_l18_table[g_item_slot_to_record.cur])->f70);
-        hb.b.r.kind = 5;
-        hb.b.r.flag = 3;
-        hb.b.r.tag = self->tag;
+        vec_scale_to_length(scratch, scratch, 1.0f);
+        scratch[3] = 5627.925f;
+        make_hit_descriptor(&hit_buf.b.r, self, 0x210000, scratch, (&g_weapon_l18_table[g_item_slot_to_record.cur])->f70);
+        hit_buf.b.r.kind = 5;
+        hit_buf.b.r.flag = 3;
+        hit_buf.b.r.tag = self->tag;
         bn = 5;
-        QueueMobyImpact(st->lockB, &hb.b.r);
-        binfo = moby_get_private_value_0(st->lockB);
+        QueueMobyImpact(tether->lockB, &hit_buf.b.r);
+        binfo = moby_get_private_value_0(tether->lockB);
         if (binfo != 0) {
             if (((short *)binfo)[2] == 1)
                 bn = 1;
         }
         {
             short result = ((s32)(bn) * 5 + 2) / 6;
-            st->u.s.h46 = result;
+            tether->u.s.h46 = result;
         }
     }
     for (k = 0; k < 4; k++) {
         if (k < 2) {
             {
-                float *from = st->a;
-                qcopy(hb.q, from);
+                float *from = tether->a;
+                qcopy(hit_buf.q, from);
             }
             ksize = 0.4f;
         } else {
-            qcopy(hb.q, st->b);
+            qcopy(hit_buf.q, tether->b);
             ksize = 0.5f;
         }
         if (FastDecTimer(&g_tether_l18_segment_timers[k]) != 0) {
@@ -570,30 +571,30 @@ void func_PAL_L18_003B4448(Moby *self)
             g_tether_l18_segment_fades[k] = 0;
             angle0 = math_random_signed_float_range(0.52359885f, 1.0471977f);
             angle1 = math_random_float_range(-1.0471977f, 0.17453295f);
-            FastVecScale(s2B0, v60, ksize);
-            math_apply_axis_rotation_to_quat(s2B0, s2B0, g_tether_axis_vectors, angle1);
-            math_apply_axis_rotation_to_quat(s2B0, s2B0, g_tether_axis_vectors + 0x10, angle0);
-            qcopy(&g_tether_lightning_nodes[k].v[0], hb.q);
+            FastVecScale(scratch, direction, ksize);
+            math_apply_axis_rotation_to_quat(scratch, scratch, g_tether_axis_vectors, angle1);
+            math_apply_axis_rotation_to_quat(scratch, scratch, g_tether_axis_vectors + 0x10, angle0);
+            qcopy(&g_tether_lightning_nodes[k].v[0], hit_buf.q);
             ks = 1.0f;
-            FastVecAdd(&g_tether_lightning_nodes[k].v[1], hb.q, s2B0);
+            FastVecAdd(&g_tether_lightning_nodes[k].v[1], hit_buf.q, scratch);
             for (j1 = 2; j1 < 5; j1++) {
-                FastVecSub(hb.q + 4, &g_tether_lightning_points[k].p[j1 - 1], g_camera_l18_position);
+                FastVecSub(hit_buf.q + 4, &g_tether_lightning_points[k].p[j1 - 1], g_camera_l18_position);
                 kf = math_random_float_range(0.17453295f, 0.9599312f) * ks;
                 ks = -ks;
-                math_apply_axis_rotation_to_quat(s2B0, s2B0, hb.q + 4, kf);
-                FastVecAdd(g_tether_lightning_nodes[k].v + j1, &g_tether_lightning_points[k].p[j1 - 1], s2B0);
+                math_apply_axis_rotation_to_quat(scratch, scratch, hit_buf.q + 4, kf);
+                FastVecAdd(g_tether_lightning_nodes[k].v + j1, &g_tether_lightning_points[k].p[j1 - 1], scratch);
             }
         } else {
             for (j2 = 1; j2 < 5; j2++) {
-                q = tmp[j2];
+                q = jitter[j2];
                 FastVecSub(q, g_tether_lightning_nodes[k].v + j2, &g_tether_lightning_points[k].p[j2 - 1]);
                 q[0] = q[0] + math_random_signed_float_range(0.0f, 0.1f);
                 q[1] = q[1] + math_random_signed_float_range(0.0f, 0.1f);
                 q[2] = q[2] + math_random_signed_float_range(0.0f, 0.1f);
             }
-            qcopy(&g_tether_lightning_nodes[k].v[0], hb.q);
+            qcopy(&g_tether_lightning_nodes[k].v[0], hit_buf.q);
             for (j2 = 1; j2 < 5; j2++)
-                FastVecAdd(g_tether_lightning_nodes[k].v + j2, &g_tether_lightning_points[k].p[j2 - 1], tmp[j2]);
+                FastVecAdd(g_tether_lightning_nodes[k].v + j2, &g_tether_lightning_points[k].p[j2 - 1], jitter[j2]);
             {
                 int x = g_tether_l18_segment_x_offsets[k];
                 int y = g_tether_l18_segment_timers[k];
@@ -613,20 +614,20 @@ void func_PAL_L18_003B4448(Moby *self)
     {
         angle0 = math_random_signed_float_range(0.52359885f, 1.0471977f);
         angle1 = math_random_float_range(-0.52359885f, 1.0471977f);
-        FastVecScale(s2B0, v60, g_tether_l18_dir_scale * 1.2f);
-        math_apply_axis_rotation_to_quat(s2B0, s2B0, g_tether_axis_vectors, angle1);
-        math_apply_axis_rotation_to_quat(s2B0, s2B0, g_tether_axis_vectors + 0x10, angle0);
+        FastVecScale(scratch, direction, g_tether_l18_dir_scale * 1.2f);
+        math_apply_axis_rotation_to_quat(scratch, scratch, g_tether_axis_vectors, angle1);
+        math_apply_axis_rotation_to_quat(scratch, scratch, g_tether_axis_vectors + 0x10, angle0);
         spin = math_random_int_range(1, 8);
         if (math_random_int_below(2) != 0)
             spin = -spin;
         tsize = math_random_float_range(0.2f, 0.6f);
-        part_spawn_ground_effect(st, 0xC, tsize * 0.3f, tsize, g_tether_l18_color | 0x7F000000, 0, spin, s2B0, 1, 0.0f);
+        part_spawn_ground_effect(tether, 0xC, tsize * 0.3f, tsize, g_tether_l18_color | 0x7F000000, 0, spin, scratch, 1, 0.0f);
         spin = -spin;
-        part_spawn_ground_effect(st, 0xC, tsize * 0.15f, tsize * 0.5f, 0x307F7F7F, 0, spin, s2B0, 1, 0.0f);
+        part_spawn_ground_effect(tether, 0xC, tsize * 0.15f, tsize * 0.5f, 0x307F7F7F, 0, spin, scratch, 1, 0.0f);
         spin = math_random_int_range(1, 8);
         if (math_random_int_below(2) != 0)
             spin = -spin;
         tsize = math_random_float_range(0.15f, 3.0f);
-        part_spawn_ground_effect(st->b, 0xA, tsize * 0.1f, tsize, g_tether_l18_color | 0x7F000000, 0, spin, g_explosion_effect_desc, 1, 0.0f);
+        part_spawn_ground_effect(tether->b, 0xA, tsize * 0.1f, tsize, g_tether_l18_color | 0x7F000000, 0, spin, g_explosion_effect_desc, 1, 0.0f);
     }
 }

@@ -15,7 +15,8 @@ extern void FastVecScale(void *dst, void *src, float scale);
 extern void *part_spawn_trailing_spark(void *a0, void *a1, int a2, int a3, int a4, int a5, float f);
 extern int g_game_time __attribute__((sda));
 
-void func_PAL_002BE658(char *p)
+/* Updates a trailing spark: it falls, changes colour, and now and then leaves a short-lived spark behind it (PAL: 50 Hz timings). */
+void part_update_trailing_spark_pal(char *p)
 {
     char *s = p + 0x20;
     float inv;

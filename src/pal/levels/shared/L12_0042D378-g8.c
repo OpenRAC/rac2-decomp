@@ -47,33 +47,33 @@ extern struct L12PairWord g_pulsing_group_tween_colors;
 /* Turns the object's angle and its mirrored scale into its word at +0x78; when the frame
    counter D_L12_001B29C8 differs from the object's word at +0x350, walks the object's group
    and refreshes every live entity of kind 0x11EB, then registers func_L12_004281D8. */
-void pulsing_group_update_pal(struct L12Kind348Object *a0) {
-    struct L12Kind348 *o = a0->obj;
-    struct L12PairWord v = g_pulsing_group_color_pair;
-    float f;
-    unsigned short *q;
-    struct L12Kind348Entity *e;
-    struct L12Kind348 *s0;
+void pulsing_group_update_pal(struct L12Kind348Object *group) {
+    struct L12Kind348 *vars = group->obj;
+    struct L12PairWord colors = g_pulsing_group_color_pair;
+    float phase;
+    unsigned short *list;
+    struct L12Kind348Entity *entity;
+    struct L12Kind348 *entity_vars;
 
-    f = FastAddRotations(o->f348, 0.25132746f);
-    o->f348 = f;
-    f = math_fast_sin_or_cos_b(f);
-    o->f34C = f * 0.5f + 0.5f;
-    a0->f78 = FastTweenColor(v.a, v.b, o->f34C);
-    if (o->f350 != D_L12_001B29C8_s) {
-        for (q = g_moby_l12_group_lists[a0->group];
-             a0->group != 0xFF && a0->group <= g_moby_l12_group_count && q != 0 &&
-             ((q != 0 && (short)q[-1] >= 0) || q == g_moby_l12_group_lists[a0->group]);
-             q++) {
-            e = (struct L12Kind348Entity *)(g_moby_list_start[0] + ((*q & 0x7FFF) << 8));
-            if (e == 0)
+    phase = FastAddRotations(vars->f348, 0.25132746f);
+    vars->f348 = phase;
+    phase = math_fast_sin_or_cos_b(phase);
+    vars->f34C = phase * 0.5f + 0.5f;
+    group->f78 = FastTweenColor(colors.a, colors.b, vars->f34C);
+    if (vars->f350 != D_L12_001B29C8_s) {
+        for (list = g_moby_l12_group_lists[group->group];
+             group->group != 0xFF && group->group <= g_moby_l12_group_count && list != 0 &&
+             ((list != 0 && (short)list[-1] >= 0) || list == g_moby_l12_group_lists[group->group]);
+             list++) {
+            entity = (struct L12Kind348Entity *)(g_moby_list_start[0] + ((*list & 0x7FFF) << 8));
+            if (entity == 0)
                 break;
-            if (e->f31 != 0 && e->type == 0x11EB && e->state != 0xFE && e->state != 0xFD) {
-                s0 = e->obj;
-                moby_transform_joint_point((char *)e, 0, (char *)s0 + 0x240);
-                s0->f350 = g_frame_l12_counter[0];
+            if (entity->f31 != 0 && entity->type == 0x11EB && entity->state != 0xFE && entity->state != 0xFD) {
+                entity_vars = entity->obj;
+                moby_transform_joint_point((char *)entity, 0, (char *)entity_vars + 0x240);
+                entity_vars->f350 = g_frame_l12_counter[0];
             }
         }
-        gfx_add_draw_callback_first((void *)group_draw_entity_glows, a0);
+        gfx_add_draw_callback_first((void *)group_draw_entity_glows, group);
     }
 }

@@ -24,7 +24,8 @@ extern s32 FastTweenColor(s32, s32, float);
 extern void gfx_draw_screen_rectangle(s32, s32, s32, s32, s32, void *);
 extern s32 sprintf(char *, char *, ...);
 extern void FontPrintCenterScaled_pal(s32, s32, s64, char *, s32, float);
-s32 func_PAL_L18_0042B5F8(void)
+/* Draws the timer bar and the remaining seconds while the hero is on the timed vehicle; returns 1 if drawn (PAL: 50 Hz timings). */
+s32 hud_l18_draw_timer_bar_pal(void)
 {
     s32 colors[2];
     char text[16];

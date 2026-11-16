@@ -15,7 +15,8 @@ struct pos {
     float y;
 };
 
-void func_US2_0033FCE8(char *self)
+/* Places the three counter texts and the counter shift text relative to the panel anchor. */
+void info_panel_place_counters_us2(char *self)
 {
     float zero = 0.0f;
 

@@ -28,58 +28,58 @@ typedef struct {
 } __attribute__((packed)) ParticleColors99268;
 extern ParticleColors99268 g_record_particle_colors;
 
-void func_PAL_L05_0039C0D8(char *obj)
+void emit_scaled_particle_burst_pal(char *obj)
 {
     float pos[4];
     float vel[4];
     ParticleColors99268 colors;
-    char *s = *(char **)(obj + 0x68);
+    char *vars = *(char **)(obj + 0x68);
     int i, j, k, sign;
     float angle;
     char *p, *d;
 
-    for (i = 0; i < *(int *)(s + 0x20); i++) {
+    for (i = 0; i < *(int *)(vars + 0x20); i++) {
         int type, life;
         float scale;
 
         type = func_307778(func_332BB0(2.0f, 5.0f));
         life = func_332AF8(30, 50);
-        pos[0] = *(float *)(obj + 0x10) + func_332BB0(0.0f, 0.1f) * *(float *)(s + 0x14);
-        pos[1] = *(float *)(obj + 0x14) + func_332BB0(0.0f, 0.1f) * *(float *)(s + 0x14);
-        pos[2] = *(float *)(obj + 0x18) + func_332BB0(0.0f, 0.1f) * *(float *)(s + 0x14);
-        scale = func_332B50(0.6f, 1.0f) * *(float *)(s + 0x14);
+        pos[0] = *(float *)(obj + 0x10) + func_332BB0(0.0f, 0.1f) * *(float *)(vars + 0x14);
+        pos[1] = *(float *)(obj + 0x14) + func_332BB0(0.0f, 0.1f) * *(float *)(vars + 0x14);
+        pos[2] = *(float *)(obj + 0x18) + func_332BB0(0.0f, 0.1f) * *(float *)(vars + 0x14);
+        scale = func_332B50(0.6f, 1.0f) * *(float *)(vars + 0x14);
         func_332C60(vel, 0.06f, 0.1f);
         func_352B28(pos, vel, (life * 5 + 2) / 6, 0x102FFF, type, 255, 0, 1, scale * 210000.0f, scale * 105000.0f, 0.0028000001f);
     }
 
-    for (j = 0; j < *(int *)(s + 0x24); j++) {
+    for (j = 0; j < *(int *)(vars + 0x24); j++) {
         int type, life;
         float scale;
 
         type = func_307778(func_332BB0(2.0f, 5.0f));
         life = func_332AF8(30, 50);
-        pos[0] = *(float *)(obj + 0x10) + func_332BB0(0.0f, 0.1f) * *(float *)(s + 0x14);
-        pos[1] = *(float *)(obj + 0x14) + func_332BB0(0.0f, 0.1f) * *(float *)(s + 0x14);
-        pos[2] = *(float *)(obj + 0x18) + func_332BB0(0.0f, 0.1f) * *(float *)(s + 0x14);
-        scale = func_332B50(0.75f, 1.5f) * *(float *)(s + 0x14);
+        pos[0] = *(float *)(obj + 0x10) + func_332BB0(0.0f, 0.1f) * *(float *)(vars + 0x14);
+        pos[1] = *(float *)(obj + 0x14) + func_332BB0(0.0f, 0.1f) * *(float *)(vars + 0x14);
+        pos[2] = *(float *)(obj + 0x18) + func_332BB0(0.0f, 0.1f) * *(float *)(vars + 0x14);
+        scale = func_332B50(0.75f, 1.5f) * *(float *)(vars + 0x14);
         func_332C60(vel, 0.5f, 0.8f);
-        func_352B28(pos, vel, (life * 5 + 2) / 6, 0x8FFF, type, 127, 127, 5, scale * 210000.0f, *(float *)(s + 0x14) * 2100.0f, 0.00584f);
+        func_352B28(pos, vel, (life * 5 + 2) / 6, 0x8FFF, type, 127, 127, 5, scale * 210000.0f, *(float *)(vars + 0x14) * 2100.0f, 0.00584f);
     }
 
     angle = func_306CD0(g_hero_l05_state.pos[0] - *(float *)(obj + 0x10), g_hero_l05_state.pos[1] - *(float *)(obj + 0x14));
     sign = 1;
-    for (k = 0; (float)k < (float)*(int *)(s + 0x2C) * 3.0f + (float)(*(int *)(s + 0x3C) * 10); k++) {
+    for (k = 0; (float)k < (float)*(int *)(vars + 0x2C) * 3.0f + (float)(*(int *)(vars + 0x3C) * 10); k++) {
         float scale, a, b;
 
-        pos[0] = *(float *)(obj + 0x10) + func_332BB0(0.0f, 0.5f) * *(float *)(s + 0x14);
+        pos[0] = *(float *)(obj + 0x10) + func_332BB0(0.0f, 0.5f) * *(float *)(vars + 0x14);
         sign = -sign;
-        pos[1] = *(float *)(obj + 0x14) + func_332BB0(0.0f, 0.5f) * *(float *)(s + 0x14);
-        pos[2] = *(float *)(obj + 0x18) + func_332BB0(0.0f, 0.5f) * *(float *)(s + 0x14);
-        scale = func_332B50(0.020000001f, 0.030000001f) * *(float *)(s + 0x14);
+        pos[1] = *(float *)(obj + 0x14) + func_332BB0(0.0f, 0.5f) * *(float *)(vars + 0x14);
+        pos[2] = *(float *)(obj + 0x18) + func_332BB0(0.0f, 0.5f) * *(float *)(vars + 0x14);
+        scale = func_332B50(0.020000001f, 0.030000001f) * *(float *)(vars + 0x14);
         a = func_332BB0(0.0f, 1.396263599395752f);
         b = func_332BB0(0.0f, 1.5707964897155762f);
         func_33B330(vel, scale, func_307620(angle, b), a);
-        p = func_347040(pos, sign, vel, *(int *)(s + 0x3C) ? 0xD10572 : 0x5A182, 0.0f, 1.0f, 1.01f, *(float *)(s + 0x14) * 31500.001953125f, 0);
+        p = func_347040(pos, sign, vel, *(int *)(vars + 0x3C) ? 0xD10572 : 0x5A182, 0.0f, 1.0f, 1.01f, *(float *)(vars + 0x14) * 31500.001953125f, 0);
         colors = g_record_particle_colors;
         if (p) {
             d = p + 0x20;
@@ -87,7 +87,7 @@ void func_PAL_L05_0039C0D8(char *obj)
                 int index = func_001163B0() % 2;
                 p[3] = colors.v[index];
             }
-            if (*(int *)(s + 0x3C))
+            if (*(int *)(vars + 0x3C))
                 *(short *)(p + 0xA) = (func_332AF8(120, 150) * 5 + 2) / 6;
             else
                 *(short *)(p + 0xA) = (func_332AF8(90, 120) * 5 + 2) / 6;

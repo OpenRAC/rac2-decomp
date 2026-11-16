@@ -41,7 +41,9 @@ extern void part_spawn_two_colored_sparkles(unsigned char *,void *);
 extern int coll_sweep_from_object(void *,float *,float,int,float,float,int,int,int);
 #define I(p,o) (*(int *)((char *)(p)+(o)))
 #define U(p,o) (*(unsigned short *)((char *)(p)+(o)))
-void func_PAL_L00_003B9E80(unsigned char *object)
+/* Runs the two-ship minigame object and its shots. It starts the game, updates the scene, and moves
+ * each shot until it hits the middle or times out. (PAL: 50 Hz timings) */
+void pair_game_update_pal(unsigned char *object)
 {
     Vector point;
     /* 00283698 reads three source rows and writes all four destination rows. */

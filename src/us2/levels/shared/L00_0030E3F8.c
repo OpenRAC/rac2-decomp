@@ -4,7 +4,8 @@
 extern char *g_resident_data_base[] __attribute__((sda));
 extern void hud_update_subsystems_us2(void *);
 
-void func_US2_L00_0030E3F8(void) {
+/* Updates the HUD subsystems of the resident data, if loaded. */
+void hud_update_subsystems_resident_us2(void) {
     if (g_resident_data_base[0] != 0)
         hud_update_subsystems_us2(g_resident_data_base[0] + 0x36F28);
 }
@@ -12,34 +13,38 @@ void func_US2_L00_0030E3F8(void) {
 
 extern void hud_item_bolt_draw_us2(void *);
 
-void func_US2_L00_0030E428(void) {
+/* Draws the bolt HUD item of the resident data, if loaded. */
+void hud_item_bolt_draw_resident_us2(void) {
     if (g_resident_data_base[0] != 0)
         hud_item_bolt_draw_us2(g_resident_data_base[0] + 0x36F28);
 }
 
 
-extern void func_US2_00349C00(void *);
+extern void list_menu_draw_centered_rows_us2(void *);
 
-void func_US2_L00_0030E458(void) {
+/* Runs the per-frame routine of the resident-data sub-object at +0x39160, if loaded. */
+void resident_sub_39160_update_us2(void) {
     if (g_resident_data_base[0] != 0)
-        func_US2_00349C00(g_resident_data_base[0] + 0x39160);
+        list_menu_draw_centered_rows_us2(g_resident_data_base[0] + 0x39160);
 }
 
 
 
-extern void func_US2_00348628(void *);
+extern void item_grid_menu_draw_us2(void *);
 
-void func_US2_L00_0030E4C8(void) {
+/* Runs the per-frame routine of the resident-data sub-object at +0x39620, if loaded. */
+void resident_sub_39620_update_us2(void) {
     if (g_resident_data_base[0] != 0)
-        func_US2_00348628(g_resident_data_base[0] + 0x39620);
+        item_grid_menu_draw_us2(g_resident_data_base[0] + 0x39620);
 }
 
 
-extern void func_US2_00347550(void *);
+extern void menu_screen_large_draw_parts_us2(void *);
 
-void func_US2_L00_0030E4F8(void) {
+/* Runs the per-frame routine of the resident-data sub-object at +0x39AF0, if loaded. */
+void resident_sub_39af0_update_us2(void) {
     if (g_resident_data_base[0] != 0)
-        func_US2_00347550(g_resident_data_base[0] + 0x39AF0);
+        menu_screen_large_draw_parts_us2(g_resident_data_base[0] + 0x39AF0);
 }
 
 

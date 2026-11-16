@@ -1,6 +1,6 @@
 /* func_PAL_0030E0E0, the PAL copy of func_0030CCD0: the same C, where D_L00_001AF384 is scaled by 1.2f, the second
- * arguments 15, 15 and 12 of func_002C2210 become 12, 12 and 10, and s is declared before i, which puts i << 2 after
- * &s->end in gcse's buckets and so swaps their spill slots. */
+ * arguments 15, 15 and 12 of func_002C2210 become 12, 12 and 10, and beam is declared before i, which puts i << 2 after
+ * &beam->end in gcse's buckets and so swaps their spill slots. */
 #include "common.h"
 typedef int Quad __attribute__((mode(TI)));
 typedef union { Quad quad; float f[4]; } Vector;
@@ -55,10 +55,11 @@ extern float FastVecLength(void *);
 extern float math_fast_sin_or_cos_a(float);
 extern unsigned int beam_get_glow_color(void);
 
-void func_PAL_0030E0E0(Actor *actor)
+/* Moves the twenty points of the beam chain so they trail from the start toward the locked target. The chain waves about and sheds spark particles (PAL copy). */
+void beam_update_chain_points_pal(Actor *actor)
 {
     Vector goal, dir, side, step, last, delta, tip;
-    BeamState *s = actor->vars;
+    BeamState *beam = actor->vars;
     float angle;
     float len;
     float *p;
@@ -79,42 +80,42 @@ void func_PAL_0030E0E0(Actor *actor)
     float h;
 
     if (g_current_map_index == 1 && g_game_l00_mode == 2)
-        s = g_beam_state_primary;
+        beam = g_beam_state_primary;
     if (g_current_map_index == 0x14 && g_game_l00_mode == 2)
-        s = g_beam_state_secondary;
+        beam = g_beam_state_secondary;
     len = g_chain_beam_length_scale * 0.05f;
     g_chain_wave_phase = FastAddRotations(g_chain_wave_phase, g_chain_wave_phase_speed);
     g_chain_swirl_phase = fast_subtract_rotations(g_chain_swirl_phase, g_chain_swirl_phase_speed);
     g_chain_wave2_phase = FastAddRotations(g_chain_wave2_phase, g_chain_wave2_phase_speed);
     other = 0;
-    if (s->target == 0)
+    if (beam->target == 0)
         other = ((Hero *)g_hero_state)->ptr[0x5C0 / 4];
     if (other != 0) {
-        if (s->target == 0)
-            s->target = other;
+        if (beam->target == 0)
+            beam->target = other;
     }
-    target = s->target;
+    target = beam->target;
     if (target != 0) {
         info = 0;
         if (g_game_l00_mode != 2)
             info = moby_get_private_value_0(target);
-        qcopy(&goal, &((Thing *)s->target)->pos);
+        qcopy(&goal, &((Thing *)beam->target)->pos);
         if (info != 0)
             goal.f[2] += info->height;
         else
             goal.f[2] += 0.2f;
-        len = fast_vec_dist(s, &goal) * 0.05f;
+        len = fast_vec_dist(beam, &goal) * 0.05f;
     }
-    s->segment = 0x14;
-    FastVecSub(&dir, &s->end, s);
+    beam->segment = 0x14;
+    FastVecSub(&dir, &beam->end, beam);
     vec_scale_to_length(&dir, &dir, 1.0f);
-    if (s->target != 0) {
+    if (beam->target != 0) {
         FastVecCross(&side, &dir, g_hero_state + 0x2C0);
         math_apply_axis_rotation_to_quat(&dir, &dir, &side, 0.17453295f);
     }
     FastVecScale(&last, &dir, len);
-    qcopy(g_chain_beam_points[0], s);
-    qcopy(g_chain_beam_points[1], s);
+    qcopy(g_chain_beam_points[0], beam);
+    qcopy(g_chain_beam_points[1], beam);
     i = 1;
     do {
         float fi = i;
@@ -140,7 +141,7 @@ void func_PAL_0030E0E0(Actor *actor)
         }
         g_chain_beam_points[0][i].f[2] += wave;
         FastVecSub(&side, &g_chain_beam_points[0][i], &g_chain_beam_points[0][i - 1]);
-        if (s->target != 0) {
+        if (beam->target != 0) {
             FastVecSub(&tip, &goal, &g_chain_beam_points[0][i]);
             dist = FastVecLength(&tip);
             if (dist != zero) {
@@ -154,7 +155,7 @@ void func_PAL_0030E0E0(Actor *actor)
                 } else {
                     sway = 0.1f;
                 }
-                /* Live across the next call: loop.c hoists this copy, which retail's preheader order shows. */
+                /* Live across the next call: loop.c hoists this copy, which retail'beam preheader order shows. */
                 to = &last;
                 FastVecScale(&tip, &tip, len / dist);
                 lerp_vector(to, to, &tip, sway);
@@ -177,7 +178,7 @@ void func_PAL_0030E0E0(Actor *actor)
         FastVecAdd(&g_chain_beam_points[1][i], &g_chain_beam_points[1][i], &delta);
         i++;
     } while (i < 0x14);
-    qcopy(&s->end, g_chain_beam_end);
+    qcopy(&beam->end, g_chain_beam_end);
     {
         float pitch = math_random_signed_float_range(0.52359885f, 1.0471977f);
         float yaw = math_random_float_range(-0.52359885f, 1.0471977f);
@@ -189,11 +190,11 @@ void func_PAL_0030E0E0(Actor *actor)
     if (math_random_int_below(2))
         spin = -spin;
     wave = math_random_float_range(0.2f, 0.6f);
-    part_spawn_ground_effect(s, 0xC, wave * 0.3f, wave, beam_get_glow_color() | 0x7F000000, 0, spin, &tip, 0, 0.0f);
-    part_spawn_ground_effect(s, 0xC, wave * 0.15f, wave * 0.5f, 0x307F7F7F, 0, -spin, &tip, 0, 0.0f);
+    part_spawn_ground_effect(beam, 0xC, wave * 0.3f, wave, beam_get_glow_color() | 0x7F000000, 0, spin, &tip, 0, 0.0f);
+    part_spawn_ground_effect(beam, 0xC, wave * 0.15f, wave * 0.5f, 0x307F7F7F, 0, -spin, &tip, 0, 0.0f);
     spin = math_random_int_range(1, 8);
     if (math_random_int_below(2))
         spin = -spin;
     wave = math_random_float_range(0.15f, 3.0f);
-    part_spawn_ground_effect(&s->end, 0xA, wave * 0.1f, wave, beam_get_glow_color() | 0x7F000000, 0, spin, g_default_vector, 0, 0.0f);
+    part_spawn_ground_effect(&beam->end, 0xA, wave * 0.1f, wave, beam_get_glow_color() | 0x7F000000, 0, spin, g_default_vector, 0, 0.0f);
 }

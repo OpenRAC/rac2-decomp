@@ -31,7 +31,7 @@ extern float g_vaporizer_spark_angle_max __attribute__((sda));
 extern float g_vaporizer_spark_scale_min __attribute__((sda));
 extern float g_vaporizer_spark_scale_max __attribute__((sda));
 
-void func_PAL_L00_003FAD60(char *object, EffectVector *position) {
+void vaporizer_bolt_spawn_spark_pal(char *object, EffectVector *position) {
     char *state = *(char **)(object + 0x68);
     char *base = level_get_slot_body(0xC04, *(short *)(state + 0x1A));
     EffectRecord64 *record;

@@ -157,7 +157,8 @@ extern void math_apply_axis_rotation_to_quat(void *, void *, void *, float);
 extern char *part_spawn_ground_effect(void *, int, float, float, unsigned int, int, int, void *, int, float);
 extern void vec_transform_or_copy(void *, void *);
 
-void func_PAL_L16_00390B70(Moby *self)
+/* Updates the lock-on tether: a chain of twenty points hanging from the hero to up to two locked targets, with its glow spots and sparks (PAL). */
+void hero_l16_lock_on_tether_update_pal(Moby *self)
 {
     int locked = g_item_stage_records[g_item_slot_to_record.cur].on != 0;
     float reach = g_tether_rope_reach * 0.05f;
@@ -181,7 +182,7 @@ void func_PAL_L16_00390B70(Moby *self)
     float tmp[5][4] __attribute__((aligned(16)));
     Tgt *best = 0, *second = 0;
     int got, nheld;
-    float bestScore = 0.0f, secondScore = 0.0f;
+    float best_score = 0.0f, second_score = 0.0f;
     float len;
     float angle0, angle1;
     int n;
@@ -262,14 +263,14 @@ void func_PAL_L16_00390B70(Moby *self)
                                                 fa = (g_tether_rope_max_angle - ang) / g_tether_rope_max_angle;
                                                 fb = (g_tether_rope_reach - dist) / g_tether_rope_reach;
                                                 score = fa * g_tether_rope_score_scale + fb;
-                                                if (bestScore < score) {
-                                                    secondScore = bestScore;
-                                                    bestScore = score;
+                                                if (best_score < score) {
+                                                    second_score = best_score;
+                                                    best_score = score;
                                                     second = best;
                                                     best = t;
-                                                } else if (secondScore < score) {
+                                                } else if (second_score < score) {
                                                     second = t;
-                                                    secondScore = score;
+                                                    second_score = score;
                                                 }
                                             }
                                     }

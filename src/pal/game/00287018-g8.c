@@ -15,31 +15,31 @@
 /* Modal state observed by the menu and camera transition handlers. */
 typedef int Quadword __attribute__((mode(TI)));
 typedef struct {
-    float cameraPosition[4];
-    float cameraAngles[4];
-    float returnPosition[4];
-    float returnAngles[4];
+    float camera_position[4];
+    float camera_angles[4];
+    float return_position[4];
+    float return_angles[4];
     int mode;
     int countdown;
     char reserved48[12];
     int selection;
     int phase;
     int elapsed;
-    int inputDelay;
+    int input_delay;
     int reserved64;
     int pending;
     float fraction;
     float angle;
     char reserved74[8];
     short timer;
-    short cameraActive;
-    int savedValue;
+    short camera_active;
+    int saved_value;
     short result;
     short reserved86;
     int enabled;
-    unsigned int acceptMask;
-    unsigned int cancelMask;
-    int gameState;
+    unsigned int accept_mask;
+    unsigned int cancel_mask;
+    int game_state;
 } ModalState;
 
 typedef struct {
@@ -61,7 +61,7 @@ struct CameraObject {
     void (*update)(CameraObject *);
     char reserved68[0x42];
     short kind;
-    char reservedAC[0x54];
+    char reserved_ac[0x54];
 };
 
 extern ModalState g_modal_state;
@@ -76,7 +76,7 @@ typedef struct {
     char reserved00[0x18];
     int selection;
     char reserved1C[0xE4];
-    int savedSelection;
+    int saved_selection;
 } ModalSelection;
 extern ModalSelection g_pause_menu_state;
 extern int *g_save_packet_buffer NOT_SDA;
@@ -118,8 +118,8 @@ extern int request_begin_slot(int, int, int, int, unsigned char *);
 extern void FadeToBlack(int);
 extern int flag_get_word(void);
 extern void flag_clear_word(void);
-extern int func_PAL_00299518(void);
-extern int func_PAL_00299520(void);
+extern int menu_get_pending_value_pal(void);
+extern int menu_take_pending_value_pal(void);
 extern void menu_clear_counter(void);
 extern int menu_is_known_screen_active(void);
 extern int menu_get_saved_value(void);
@@ -134,7 +134,7 @@ extern float FastVecLength(void *);
 extern float math_step_value_toward_target(float *, float *, float, float, float, float);
 extern void vec_scale_to_length(void *, const void *, float);
 extern void FastVecAdd(void *, const void *, const void *);
-extern void func_PAL_002884F0(char *, int);
+extern void cam_update_follow_rotation_pal(char *, int);
 extern void matrix_mul_vec3(void *, const void *, const void *);
 extern void vec_clamp_length(float *, float);
 extern void FastVecScale(void *, const void *, float);
@@ -156,25 +156,25 @@ extern int weapon_wheel_draw();
 extern void weapon_wheel_init(unsigned char *);
 extern void UpdateRadialMenuSelection();
 extern int DrawRadialSelectorPanel();
-extern void func_PAL_0029D7D0(void);
+extern void resident_notice_timers_update(void);
 extern void level_forward_value_b_pal(int);
 extern void level_forward_value(int);
 extern void hud_clear_flag_b(void);
 extern void hud_clear_flag_a(void);
-extern void func_PAL_002B5570(int);
+extern void request_set_setting_b_pal(int);
 extern int snd_play_from_global_bank(int, int, void *);
 extern void gfx_apply_screen_aspect_mode(void);
 
 /* Run the active modal dialog, camera return, or display-confirmation phase. */
-void func_PAL_00287018(void)
+void UpdateModalState_pal(void)
 {
     float delta[4], target[4], transform[16];
     float distance;
-    ModalState *loadDialog, *saveDialog, *phaseDialog;
-    ModalInput *saveInput;
+    ModalState *load_dialog, *save_dialog, *phase_dialog;
+    ModalInput *save_input;
 
     UpdateSoundVoices_pal();
-    g_vis_fallback_mode = g_modal_state.gameState;
+    g_vis_fallback_mode = g_modal_state.game_state;
     if (g_modal_state.countdown)
         --g_modal_state.countdown;
     if (g_modal_state.timer)
@@ -182,8 +182,8 @@ void func_PAL_00287018(void)
     switch (g_modal_state.mode) {
     case 2:
         ++g_modal_state.elapsed;
-        if (g_modal_state.elapsed > 75 && g_modal_state.inputDelay)
-            --g_modal_state.inputDelay;
+        if (g_modal_state.elapsed > 75 && g_modal_state.input_delay)
+            --g_modal_state.input_delay;
         if (g_save_menu_screen == 2) {
             request_begin_slot(4, 2, 1, 0, 0);
             break;
@@ -196,9 +196,9 @@ void func_PAL_00287018(void)
         break;
     case 5:
         ++g_modal_state.elapsed;
-        if (g_modal_state.elapsed > 25 && g_modal_state.inputDelay)
-            --g_modal_state.inputDelay;
-        if (!g_modal_state.inputDelay && (g_pad_state.buttons & 0x40)) {
+        if (g_modal_state.elapsed > 25 && g_modal_state.input_delay)
+            --g_modal_state.input_delay;
+        if (!g_modal_state.input_delay && (g_pad_state.buttons & 0x40)) {
             g_save_menu_flags &= ~0x40;
             g_modal_state_word[0] = 0;
             { level_restart_keep_progress_pal(-1); load_data_and_setup_callback(); break; }
@@ -206,9 +206,9 @@ void func_PAL_00287018(void)
         break;
     case 4:
         ++g_modal_state.elapsed;
-        if (g_modal_state.elapsed > 25 && g_modal_state.inputDelay)
-            --g_modal_state.inputDelay;
-        if (!g_modal_state.inputDelay && (g_pad_state.buttons & 0x40)) {
+        if (g_modal_state.elapsed > 25 && g_modal_state.input_delay)
+            --g_modal_state.input_delay;
+        if (!g_modal_state.input_delay && (g_pad_state.buttons & 0x40)) {
             g_modal_state_word[0] = 0;
             { level_restart_keep_progress_pal(-1); load_data_and_setup_callback(); break; }
         }
@@ -253,27 +253,27 @@ void func_PAL_00287018(void)
         break;
     case 1:
         ++g_modal_state.elapsed;
-        if (g_modal_state.elapsed > 25 && g_modal_state.inputDelay)
-            --g_modal_state.inputDelay;
-        if (flag_get_word() || ((g_save_menu_flags & 0x600) && func_PAL_00299518())) {
+        if (g_modal_state.elapsed > 25 && g_modal_state.input_delay)
+            --g_modal_state.input_delay;
+        if (flag_get_word() || ((g_save_menu_flags & 0x600) && menu_get_pending_value_pal())) {
             if (!(g_pad_state.buttons & 0x40))
                 break;
             flag_clear_word();
             g_save_menu_flags &= ~0x640;
-            func_PAL_00299520();
+            menu_take_pending_value_pal();
             menu_clear_counter();
             { request_end_slot(0, 0); break; }
         }
         switch (g_save_menu_screen) {
         case 2:
-            if (!g_modal_state.inputDelay && (g_pad_state.buttons & 0x40)) {
+            if (!g_modal_state.input_delay && (g_pad_state.buttons & 0x40)) {
                 g_modal_state.result = 2;
                 g_save_menu_flags &= ~1;
                 { request_end_slot(0, 0); break; }
             }
             break;
         case 6:
-            if (!g_modal_state.inputDelay && (g_pad_state.buttons & 0x20)) {
+            if (!g_modal_state.input_delay && (g_pad_state.buttons & 0x20)) {
                 g_save_menu_flags |= 8;
                 g_modal_state.result = 2;
                 break;
@@ -295,7 +295,7 @@ void func_PAL_00287018(void)
             }
             break;
         case 13:
-            if (!g_modal_state.inputDelay && (g_pad_state.buttons & 0x20)) {
+            if (!g_modal_state.input_delay && (g_pad_state.buttons & 0x20)) {
                 g_save_menu_flags |= 0x10;
                 g_modal_state.result = 2;
                 break;
@@ -314,7 +314,7 @@ void func_PAL_00287018(void)
                 { request_end_slot(0, 0); break; }
             break;
         case 20:
-            if (g_modal_state.inputDelay || !(g_pad_state.buttons & 0x40))
+            if (g_modal_state.input_delay || !(g_pad_state.buttons & 0x40))
                 break;
             g_save_menu_flags &= ~0x40;
                 g_save_menu_flags &= ~0x400;
@@ -360,7 +360,7 @@ void func_PAL_00287018(void)
                     break;
                 }
             } else {
-                if (g_modal_state.inputDelay || !(g_pad_state.buttons & 0x40))
+                if (g_modal_state.input_delay || !(g_pad_state.buttons & 0x40))
                     break;
                 menu_clear_confirm_pending();
                 if (g_menu_panel_flag) {
@@ -379,14 +379,14 @@ void func_PAL_00287018(void)
         case 16:
             request_end_slot(0, 0);
             g_pause_menu_state.selection = g_modal_state.selection;
-            g_pause_menu_state.savedSelection = g_modal_state.selection;
+            g_pause_menu_state.saved_selection = g_modal_state.selection;
             break;
         case 12:
             if (!g_message_panel_flags)
                 break;
         case 3:
         case 5:
-            if (!g_modal_state.inputDelay && (g_pad_state.buttons & 0x10)) {
+            if (!g_modal_state.input_delay && (g_pad_state.buttons & 0x10)) {
                 g_modal_state.result = 1;
                 g_save_menu_flags &= ~2;
                 g_save_menu_flags &= ~4;
@@ -398,12 +398,12 @@ void func_PAL_00287018(void)
                 /* Set once, unlike a shared pointer, so alias analysis knows its
                  * base and the cancel arm's store has no tie to D_001A7424. The
                  * accept body below merges with case 23's copy at jump2. */
-                ModalState *pickDialog = &g_modal_state;
-                if (pickDialog->inputDelay)
+                ModalState *pick_dialog = &g_modal_state;
+                if (pick_dialog->input_delay)
                     break;
                 if (g_pad_state.buttons & 0x40) {
                     save_load_game_data_reset_menu_pal();
-                    pickDialog->result = 2;
+                    pick_dialog->result = 2;
                     g_save_menu_flags &= ~2;
                     g_save_menu_flags &= ~4;
                     g_save_menu_flags |= 0x20;
@@ -412,15 +412,15 @@ void func_PAL_00287018(void)
                 }
                 if (!(g_pad_state.buttons & 0x10))
                     break;
-                pickDialog->result = 1;
+                pick_dialog->result = 1;
                 g_save_menu_flags &= ~2;
                 g_save_menu_flags &= ~4;
                 { request_end_slot(0, 0); break; }
             }
             if (g_menu_panel_flag)
-                goto acceptReload;
+                goto accept_reload;
             {
-                if (g_modal_state.inputDelay)
+                if (g_modal_state.input_delay)
                     break;
                 if (!(g_pad_state.buttons & 0x40) || g_message_panel_flags) {
                     if (!(g_pad_state.buttons & 0x10) || !g_message_panel_flags)
@@ -433,12 +433,12 @@ void func_PAL_00287018(void)
             }
         case 23:
         case 24:
-            loadDialog = &g_modal_state;
-            if (loadDialog->inputDelay)
+            load_dialog = &g_modal_state;
+            if (load_dialog->input_delay)
                 break;
             if (g_pad_state.buttons & 0x40) {
                 save_load_game_data_reset_menu_pal();
-                loadDialog->result = 2;
+                load_dialog->result = 2;
                 g_save_menu_flags &= ~2;
                 g_save_menu_flags &= ~4;
                 g_save_menu_flags |= 0x20;
@@ -446,7 +446,7 @@ void func_PAL_00287018(void)
                 break;
             }
             if (g_pad_state.buttons & 0x10) {
-                loadDialog->result = 1;
+                load_dialog->result = 1;
                 g_save_menu_flags |= 0x20;
                 { request_end_slot(0, 0); break; }
             }
@@ -454,19 +454,19 @@ void func_PAL_00287018(void)
         case 4:
             if (g_menu_panel_active) {
                 if (!g_message_panel_flags) {
-                    saveDialog = &g_modal_state;
-                    if (saveDialog->inputDelay)
+                    save_dialog = &g_modal_state;
+                    if (save_dialog->input_delay)
                         break;
-                    saveInput = &g_pad_state;
-                    if (saveInput->buttons & 0x40) {
+                    save_input = &g_pad_state;
+                    if (save_input->buttons & 0x40) {
                         save_load_game_data_reset_menu_pal();
-                        saveDialog->result = 2;
+                        save_dialog->result = 2;
                         g_save_menu_flags &= ~2;
                         g_save_menu_flags &= ~4;
                         load_data_and_setup_callback();
                     }
-                    if (!saveDialog->inputDelay && (saveInput->buttons & 0x10)) {
-                        saveDialog->result = 1;
+                    if (!save_dialog->input_delay && (save_input->buttons & 0x10)) {
+                        save_dialog->result = 1;
                         g_save_menu_flags |= 0x20;
                         g_save_menu_flags &= ~2;
                         g_save_menu_flags &= ~4;
@@ -475,15 +475,15 @@ void func_PAL_00287018(void)
                     break;
                 }
             } else if (g_menu_panel_flag) {
-acceptReload:
-                if (!g_modal_state.inputDelay && (g_pad_state.buttons & 0x40)) {
+accept_reload:
+                if (!g_modal_state.input_delay && (g_pad_state.buttons & 0x40)) {
                     g_modal_state.result = 2;
                     level_restart_keep_progress_pal(-1);
                     load_data_and_setup_callback();
                 }
                 break;
             }
-            if (!g_modal_state.inputDelay && (g_pad_state.buttons & 0x10)) {
+            if (!g_modal_state.input_delay && (g_pad_state.buttons & 0x10)) {
                 g_modal_state.result = 1;
                 g_save_menu_flags |= 0x20;
                 g_save_menu_flags &= ~2;
@@ -500,8 +500,8 @@ acceptReload:
     case 6:
         switch (g_modal_state.phase) {
         case 0:
-            qcopy(g_modal_state.cameraPosition, g_camera_eye_state.position);
-            qcopy(g_modal_state.cameraAngles, g_camera_eye_state.angles);
+            qcopy(g_modal_state.camera_position, g_camera_eye_state.position);
+            qcopy(g_modal_state.camera_angles, g_camera_eye_state.angles);
             g_modal_state.phase = 1;
             break;
         case 1:
@@ -512,7 +512,7 @@ acceptReload:
                     0.060000002f, 0.060000002f, 6.0000005f);
             vec_scale_to_length(delta, delta, distance);
             FastVecAdd(g_camera_eye_state.position, delta, g_camera_vector_scratch);
-            func_PAL_002884F0((char *)&g_modal_state.angle, 0);
+            cam_update_follow_rotation_pal((char *)&g_modal_state.angle, 0);
             if ((float)g_modal_distance <= distance)
                 g_modal_state.phase = 2;
             break;
@@ -529,14 +529,14 @@ acceptReload:
                         (float)-g_modal_distance * 0.0003490659f * g_modal_speed_scale);
                 cam_offset_direction((char *)delta);
             }
-            func_PAL_002884F0((char *)&g_modal_state.angle, 1);
+            cam_update_follow_rotation_pal((char *)&g_modal_state.angle, 1);
             func_PAL_00288638(&g_pad_state.roll);
             break;
         case 3: {
             float speed;
             g_vis_fallback_mode = 3;
             speed = (float)g_modal_distance * 0.0003490659f * g_modal_speed_scale;
-            FastVecSub(target, g_modal_state.cameraPosition, g_camera_vector_scratch);
+            FastVecSub(target, g_modal_state.camera_position, g_camera_vector_scratch);
             vec_scale_to_length(target, target, (float)g_modal_distance);
             FastVecAdd(target, target, g_camera_vector_scratch);
             FastVecSub(delta, target, g_camera_eye_state.position);
@@ -548,17 +548,17 @@ acceptReload:
             vec_clamp_length(delta, speed);
             matrix_mul_vec3(delta, delta, g_camera_eye_state.matrix);
             cam_offset_direction((char *)delta);
-            func_PAL_002884F0((char *)&g_modal_state.angle, 1);
+            cam_update_follow_rotation_pal((char *)&g_modal_state.angle, 1);
             if (FastVecLength(delta) < speed - 0.01f) {
                 /* The transition publishes its separate state word before capturing the return pose. */
                 { extern int g_vis_update_mode; g_vis_update_mode = 2; }
-                qcopy(g_modal_state.returnPosition, g_camera_eye_state.position);
+                qcopy(g_modal_state.return_position, g_camera_eye_state.position);
                 if (g_cheat_flags) {
                     FastVecScale(g_camera_eye_state.matrix + 4, g_camera_eye_state.matrix + 4, -1.0f);
-                    mat_get_euler_angles(g_camera_eye_state.matrix, g_modal_state.returnAngles);
+                    mat_get_euler_angles(g_camera_eye_state.matrix, g_modal_state.return_angles);
                     FastVecScale(g_camera_eye_state.matrix + 4, g_camera_eye_state.matrix + 4, -1.0f);
                 } else {
-                    mat_get_euler_angles(g_camera_eye_state.matrix, g_modal_state.returnAngles);
+                    mat_get_euler_angles(g_camera_eye_state.matrix, g_modal_state.return_angles);
                 }
                 g_modal_state.phase = 4;
             }
@@ -568,10 +568,10 @@ acceptReload:
             g_vis_fallback_mode = 3;
             math_step_value_toward_target(&g_modal_state.fraction, &g_modal_state.angle,
                     1.0f, 0.00080000004f, 0.00080000004f, 0.030000001f);
-            lerp_vector(g_camera_eye_state.position, g_modal_state.returnPosition,
-                    g_modal_state.cameraPosition, g_modal_state.fraction);
-            mat_build_rotation_from_angles(delta, g_modal_state.returnAngles);
-            mat_build_rotation_from_angles(target, g_modal_state.cameraAngles);
+            lerp_vector(g_camera_eye_state.position, g_modal_state.return_position,
+                    g_modal_state.camera_position, g_modal_state.fraction);
+            mat_build_rotation_from_angles(delta, g_modal_state.return_angles);
+            mat_build_rotation_from_angles(target, g_modal_state.camera_angles);
             vec_fast_normalize3(transform, delta, target, g_modal_state.fraction);
             quaternion_to_rotation_basis(transform, g_camera_eye_state.matrix);
             if (g_cheat_flags)
@@ -580,7 +580,7 @@ acceptReload:
                 request_end_slot(0, 0);
             break;
         }
-        g_modal_state.cameraActive = 1;
+        g_modal_state.camera_active = 1;
         if ((g_pad_state.buttons & 0x500) && g_modal_state.phase == 2) {
             g_modal_state.fraction = 0.0f;
             g_modal_state.phase = 3;
@@ -600,7 +600,7 @@ acceptReload:
     case 7:
         switch (g_modal_state.phase) {
         case 0:
-            g_modal_state.cameraActive = 1;
+            g_modal_state.camera_active = 1;
             g_modal_state.phase = 1;
             if (g_screen_mode_flag != 1)
                 stub_empty_21_pal();
@@ -616,7 +616,7 @@ acceptReload:
             } else {
                 hud_set_slot_contents(0x23, 0, weapon_wheel_init, UpdateRadialMenuSelection, DrawRadialSelectorPanel, 0, 0);
             }
-            func_PAL_0029D7D0();
+            resident_notice_timers_update();
             level_forward_value_b_pal(300);
             level_forward_value(150);
             hud_request_letterbox_bars();
@@ -641,7 +641,7 @@ acceptReload:
             } else {
                 hud_set_slot_contents(0x23, 0, weapon_wheel_init, UpdateRadialMenuSelection, DrawRadialSelectorPanel, 0, 0);
             }
-            func_PAL_0029D7D0();
+            resident_notice_timers_update();
             level_forward_value_b_pal(300);
             level_forward_value(150);
             hud_request_letterbox_bars();
@@ -667,46 +667,46 @@ acceptReload:
         }
         break;
     case 8:
-        phaseDialog = &g_modal_state;
-        if (phaseDialog->phase != 2) {
-            if (phaseDialog->phase >= 3)
+        phase_dialog = &g_modal_state;
+        if (phase_dialog->phase != 2) {
+            if (phase_dialog->phase >= 3)
                 break;
-            if (phaseDialog->phase < 0)
+            if (phase_dialog->phase < 0)
                 break;
-            ++phaseDialog->phase;
+            ++phase_dialog->phase;
             break;
         }
-        request_begin_slot(3, 2, phaseDialog->selection, 0, 0);
-        func_PAL_002B5570(3);
-        goto advanceModalPhase;
+        request_begin_slot(3, 2, phase_dialog->selection, 0, 0);
+        request_set_setting_b_pal(3);
+        goto advance_modal_phase;
     case 9:
-        phaseDialog = &g_modal_state;
-        switch (phaseDialog->phase) {
+        phase_dialog = &g_modal_state;
+        switch (phase_dialog->phase) {
         case 1:
-            if (g_pad_state.pressed & phaseDialog->acceptMask) {
-                phaseDialog->result = 2;
+            if (g_pad_state.pressed & phase_dialog->accept_mask) {
+                phase_dialog->result = 2;
                 request_end_slot(0, 0);
-            } else if (g_pad_state.held & phaseDialog->cancelMask) {
-                phaseDialog->result = 1;
+            } else if (g_pad_state.held & phase_dialog->cancel_mask) {
+                phase_dialog->result = 1;
                 request_end_slot(0, 0);
             }
             break;
         case 0:
-            goto initializeDialog;
+            goto initialize_dialog;
         }
         break;
     case 10:
-        phaseDialog = &g_modal_state;
-        switch (phaseDialog->phase) {
+        phase_dialog = &g_modal_state;
+        switch (phase_dialog->phase) {
         case 0:
-initializeDialog:
+initialize_dialog:
             menu_clear_counter();
-advanceModalPhase:
-            ++phaseDialog->phase;
+advance_modal_phase:
+            ++phase_dialog->phase;
             break;
         case 1:
-            if (g_pad_state.pressed & phaseDialog->acceptMask) {
-                phaseDialog->result = 2;
+            if (g_pad_state.pressed & phase_dialog->accept_mask) {
+                phase_dialog->result = 2;
                 snd_play_from_global_bank(0x12, 0, 0);
                 request_end_slot(0, 0);
             }
@@ -737,7 +737,7 @@ advanceModalPhase:
             break;
         case 2:
             g_modal_state.elapsed = 750;
-            g_modal_state.inputDelay = 0;
+            g_modal_state.input_delay = 0;
             ++g_modal_state.phase;
             g_modal_state.result = 0;
             g_widescreen_flag = !g_widescreen_flag;
@@ -750,18 +750,18 @@ advanceModalPhase:
                 g_modal_state.result = 1;
             --g_modal_state.elapsed;
             if (g_modal_state.elapsed <= 0)
-                goto advanceConfirmation;
+                goto advance_confirmation;
             if (!g_modal_state.result)
                 break;
-            goto advanceConfirmation;
+            goto advance_confirmation;
         case 4:
             if (g_modal_state.result < 0)
-                goto advanceConfirmation;
+                goto advance_confirmation;
             if (g_modal_state.result < 2) {
                 g_widescreen_flag = !g_widescreen_flag;
                 gfx_apply_screen_aspect_mode();
             }
-advanceConfirmation:
+advance_confirmation:
             ++g_modal_state.phase;
             break;
         case 5:

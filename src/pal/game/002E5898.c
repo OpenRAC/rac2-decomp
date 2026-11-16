@@ -100,6 +100,7 @@ extern s32 snd_compute_voice_pan(VoiceSlot_DD68 *, Vec4 *);
 extern void snd_voice_started_callback();
 extern void voice_update_callback();
 
+/* Updates every sound voice each frame: volume, pan, pitch, occlusion and group volume fades. */
 s32 UpdateSoundVoices_pal(void) {
     VoiceSlot_DD68 *voices;
     Vec4 listener_occlusion_position;

@@ -6,7 +6,7 @@ typedef union { ProjectileQuad quad; struct { float x, y, z, w; } v; } Projectil
 typedef struct { float x, y, z; } ProjectileOffset;
 typedef struct {
     ProjectileVector previous, position, velocity;
-    unsigned char *hitObject;
+    unsigned char *hit_object;
     int *excluded;
     int mode;
     float radius, response, friction;
@@ -52,7 +52,7 @@ extern void transform_vector(void *, void *, void *);
 extern float moby_get_anim_value(void *);
 extern void projectile_launch_at_target(void *);
 extern void miniturret_aim_at_target(void *);
-extern void func_PAL_003062B8(void *);
+extern void miniturret_fire_shot_pal(void *);
 extern signed char part_alloc_effect_slot(float, float, float, void *, int);
 extern int slot_alloc_for_object(void *, int);
 extern void projectile_l00_move_check_hit_pal(void *);
@@ -75,17 +75,18 @@ extern void projectile_draw_effects(void *);
 #define PF(p,o) (*(float *)((p)+(o)))
 #define PP(p,o) (*(unsigned char **)((p)+(o)))
 
+/* Updates the Miniturret moby (class 4966): moves it, bounces it off what it hits, sticks it to surfaces and blows it up. (PAL) */
 void miniturret_update_pal(unsigned char *object) {
     unsigned char *state = PP(object, 0x68);
     unsigned char *attached, *created;
-    ProjectileVector oldPosition;
+    ProjectileVector old_position;
     int excluded[2];
     ProjectileVector normal, forward, quaternion, cross;
     float matrix[12];
     ProjectileQuery query;
     ProjectileVector relative;
     float inverse[16];
-    float halfAngle;
+    float half_angle;
     int collision, response, index;
     switch (object[0x20]) {
     case 0:
@@ -98,22 +99,22 @@ void miniturret_update_pal(unsigned char *object) {
         moby_get_facing_direction(object + 0x10, &normal);
         vec_scale_to_length(&forward, object + 0xE0, 1.0f);
         FastVecCross(&cross, &forward, &normal);
-        halfAngle = FastVecDot(&forward, &normal) * 0.5f;
-        FastVecScale(&quaternion, &cross, math_fast_sin_or_cos_b(halfAngle));
-        quaternion.v.w = math_fast_sin_or_cos_a(halfAngle);
+        half_angle = FastVecDot(&forward, &normal) * 0.5f;
+        FastVecScale(&quaternion, &cross, math_fast_sin_or_cos_b(half_angle));
+        quaternion.v.w = math_fast_sin_or_cos_a(half_angle);
         quaternion_to_rotation_basis(&quaternion, matrix);
         multiply_matrix3x3(object + 0xC0, matrix, object + 0xC0);
-        qcopy(&oldPosition, object + 0x10);
+        qcopy(&old_position, object + 0x10);
         FastVecAdd(object + 0x10, object + 0x10, state);
         part_steer_effect_direction((signed char)state[0x4F], state, 0);
         vec_add_object_direction_scaled(g_miniturret_move_speed * 0.00040000002f, object + 0x10, state);
         vec_transform_or_copy(object + 0x10, object + 0x10);
         excluded[0] = 0;
-        excluded[1] = 0xC5A;
-        qcopy(&query.previous, &oldPosition);
+        excluded[1] = MOBY_CLASS_MINITURRET_GLOVE;
+        qcopy(&query.previous, &old_position);
         qcopy(&query.position, object + 0x10);
         qcopy(&query.velocity, state);
-        query.hitObject = object;
+        query.hit_object = object;
         query.excluded = excluded;
         query.mode = 2;
         query.radius = 0.1f;
@@ -128,9 +129,9 @@ void miniturret_update_pal(unsigned char *object) {
         qcopy(object + 0x10, &query.position);
         qcopy(state, &query.velocity);
         if (collision == 2) {
-            unsigned char *hit = query.hitObject;
-            if (!hit || (*(short *)(hit + 0xAA) != 0xCB &&
-                *(short *)(hit + 0xAA) != 0x1366 && *(short *)(hit + 0xAA) != 0x1367)) {
+            unsigned char *hit = query.hit_object;
+            if (!hit || (*(short *)(hit + 0xAA) != MOBY_CLASS_DECOY &&
+                *(short *)(hit + 0xAA) != MOBY_CLASS_MINITURRET && *(short *)(hit + 0xAA) != MOBY_CLASS_MEGATURRET)) {
                 qzero_nc(state);
                 PP(state, 0x70) = hit;
                 if (hit) {
@@ -188,11 +189,11 @@ void miniturret_update_pal(unsigned char *object) {
         break;
     case 3:
         projectile_launch_at_target(object);
-        goto checkAttached;
+        goto check_attached;
     case 4:
         miniturret_aim_at_target(object);
-        func_PAL_003062B8(object);
-checkAttached:
+        miniturret_fire_shot_pal(object);
+check_attached:
         attached = PP(state, 0x70);
         if (attached) {
             if (attached[0x20] != 0xFE) {

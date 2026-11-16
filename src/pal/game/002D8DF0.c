@@ -12,7 +12,7 @@ extern int load_start_disc_read(int, int, int);
 extern void menu_stream_chunk_table_init(int);
 
 /* func_PAL_002D8DF0, the PAL copy of func_002D81B0: the same C without the stream halving and the read. */
-int func_PAL_002D8DF0(char *object)
+int menu_block_load_start_pal(char *object)
 {
     int i;
     unsigned int *key;
@@ -38,7 +38,8 @@ extern void load_request_disc_read_break(void);
 extern int g_subtitle_entries __attribute__((sda));
 extern int g_block_load_object_word;
 
-int func_PAL_002D8E90(char *object)
+/* Finishes the loader (PAL): stops a running read, then stores the loaded block values. */
+int menu_block_load_finish_pal(char *object)
 {
     if (g_sequence_active_flag != 0 && *(int *)(object + 0x50) == 3)
         load_request_disc_read_break();
@@ -74,7 +75,7 @@ typedef struct {
    length of 1 and state 2 a length of 100, at the 2048-byte block that the D_001A7BB4th word of
    the first read names, keeping the remainder as the offset state 3 unpacks from. A failed read
    ends in state 5, a finished load in state 4. */
-int func_PAL_002D8F00(char *object)
+int menu_block_loader_update_pal(char *object)
 {
     Loader2D8338 *loader = (Loader2D8338 *)object;
 
@@ -150,7 +151,7 @@ extern void *memset(void *, int, int);
 extern unsigned long GetEffectTextureDescriptor(int);
 extern char *GetLocalizedString(int);
 extern void gfx_disable_screen_flag(void), gfx_enable_screen_flag(void), DoGifPaging(void);
-extern void func_PAL_002804A8(short *, unsigned long, int, int, float, unsigned long, char *);
+extern void FontPrintWindow_pal(short *, unsigned long, int, int, float, unsigned long, char *);
 extern int g_object_initial_field SDATA(D_PAL_001ABBA4);
 extern int g_object_flag_value SDATA(D_PAL_001ABBA8);
 extern int g_rectangle_x_offset SDATA(D_PAL_001ABBAC);
@@ -161,22 +162,22 @@ extern void gfx_draw_screen_line(int, int, int, int, int, int);
    (func_PAL_002804A8 takes the scale between its integer arguments; each register bank keeps its
    order), and scrolling keeps the selected row inside a limit snapped to whole row steps, moving
    at most 4 at a time. */
-int func_PAL_002D9108(char *object)
+int menu_text_list_draw_checkboxes_pal(char *object)
 {
     MenuTextRectangle rectangle, initial;
     short *row;
-    int height = 12, texture = 1, lineHeight, top, bottomLimit, step, span;
+    int height = 12, texture = 1, line_height, top, bottom_limit, step, span;
     int count, index, selected, enabled, text;
     int active = *(char **)(g_active_menu_object + 0xE8) == object;
     char *font = g_font_glyphs_small;
     int spacing;
-    unsigned long textureWord;
+    unsigned long texture_word;
     int colour;
     float scale;
     if (*(int *)(object + 0x30) & 4) { height = 14; font = g_font_glyphs_large; texture = 3; }
     if (*(int *)(object + 0x30) & 8) { height = 11; font = g_font_glyphs_medium; texture = 2; }
     VU1_addGSregister(66, 68);
-    lineHeight = height + 2;
+    line_height = height + 2;
     VU1_addGSregister(71, 0x2004B);
     SetupGifPaging(0);
     row = *(short **)(object + 0x34);
@@ -192,13 +193,13 @@ int func_PAL_002D9108(char *object)
     initial.fields[2] = g_object_initial_field;
     initial.fields[3] = *(int *)(object + 0x20) - 2;
     initial.fields[5] = top - *(int *)(object + 0x44);
-    initial.fields[8] = lineHeight;
+    initial.fields[8] = line_height;
     rectangle = initial;
     step = rectangle.fields[8] * 2;
     if (*(int *)(object + 0x30) & 0x20) step += 6 + spacing;
     span = rectangle.fields[1] - (rectangle.fields[0] + top) + 2;
-    bottomLimit = step * ((span + rectangle.fields[8]) / step) + top;
-    textureWord = GetEffectTextureDescriptor(texture);
+    bottom_limit = step * ((span + rectangle.fields[8]) / step) + top;
+    texture_word = GetEffectTextureDescriptor(texture);
     for (index = 0; (*(short **)(object + 0x34))[index * 6]; index++) {
         selected = active && *(int *)(object + 0x40) == index;
         enabled = (*(short **)(object + 0x34))[index * 6 + 1] != 0;
@@ -219,7 +220,7 @@ int func_PAL_002D9108(char *object)
         if (selected) gfx_disable_screen_flag();
         scale = 1.0f;
         if (*(int *)(object + 0x30) & 0x20) scale = 0.9f;
-        func_PAL_002804A8(rectangle.fields, colour, text, -1, scale, textureWord, font);
+        FontPrintWindow_pal(rectangle.fields, colour, text, -1, scale, texture_word, font);
         if (selected) gfx_enable_screen_flag();
         if (*(int *)(object + 0x30) & 0x200)
             DrawMenuCheckBox(15, rectangle.fields[5] + 9, g_item_enabled_flags[index] != 0);
@@ -239,17 +240,17 @@ int func_PAL_002D9108(char *object)
             }
             scale = 1.0f;
             if (*(int *)(object + 0x30) & 0x20) scale = 0.9f;
-            func_PAL_002804A8(rectangle.fields, colour, text, -1, scale, textureWord, font);
+            FontPrintWindow_pal(rectangle.fields, colour, text, -1, scale, texture_word, font);
             rectangle.fields[5] += spacing;
         }
         rectangle.fields[5] += rectangle.fields[7];
         if (!(*(int *)(object + 0x30) & 0x10000) && selected) {
             int bottom = rectangle.fields[5];
-            if (bottom > bottomLimit) {
+            if (bottom > bottom_limit) {
                 if (*(int *)(object + 0x30) & 0x8000)
-                    *(int *)(object + 0x44) += bottom - bottomLimit;
+                    *(int *)(object + 0x44) += bottom - bottom_limit;
                 else {
-                    int distance = bottom - bottomLimit;
+                    int distance = bottom - bottom_limit;
                     if (distance > 4) distance = 4;
                     *(int *)(object + 0x44) += distance;
                 }

@@ -27,7 +27,7 @@ extern float g_effect_float_param __attribute__((sda));
 extern float g_effect_field_a __attribute__((sda)),g_effect_field_b __attribute__((sda));
 extern float g_effect_angle_degrees __attribute__((sda));
 extern Quad g_effect_quad_pad __attribute__((sda));
-typedef struct { s32 targetIndex, objectIndex, pad8; float rate; float velocity[4], position[4]; s32 sound, pad34, active, pad3C; PoolRecord64 *effect; } LaunchState;
+typedef struct { s32 target_index, object_index, pad8; float rate; float velocity[4], position[4]; s32 sound, pad34, active, pad3C; PoolRecord64 *effect; } LaunchState;
 extern void moby_mark_spawned(void *);
 extern float mat_fast_helper_a(float,float);
 extern void moby_set_state(u8 *,s32,s32);
@@ -41,11 +41,11 @@ extern void vec_fast_normalize_helper(void *,void *,float);
 extern float FastVecDot(void *,void *);
 extern PoolRecord64 *cam_alloc_override_slot_pal(int);
 extern void cam_end_override(u8 *);
-extern void func_PAL_L16_004114A0(u8 *);
+extern void part_spawn_sparkle_in_triangle_pal(u8 *);
 extern float vec_distance_squared_xy(void *,void *);
-extern int func_PAL_00289730(int,int);
+extern int subtitle_request_voice_line_pal(int,int);
 extern void snd_stop_voice(s32);
-void func_PAL_L16_00410D14(u8 *object)
+void UpdateTargetedHeroLauncher_pal(u8 *object)
 {
     float difference[4],value,distance,rate,multiplier;
     LaunchState *state=*(LaunchState **)(object+0x68);
@@ -56,12 +56,12 @@ void func_PAL_L16_00410D14(u8 *object)
     switch (object[0x20]) {
     case 0:
         if (level_gp==16) g_hero_speed_param_b[0]=g_effect_float_param;
-        if (state->targetIndex!=-1) {
-            target=(u8 *)((state->targetIndex<<7)+(u32)g_beam_definition_table);
+        if (state->target_index!=-1) {
+            target=(u8 *)((state->target_index<<7)+(u32)g_beam_definition_table);
             F(object,0xF8)=mat_fast_helper_a(F(object,0x10)-F(target,0x30),F(object,0x14)-F(target,0x34));
         } else {
-            if (state->objectIndex==-1) { moby_mark_spawned(object); return; }
-            target=(u8 *)((state->objectIndex<<8)+(u32)objects_gp);
+            if (state->object_index==-1) { moby_mark_spawned(object); return; }
+            target=(u8 *)((state->object_index<<8)+(u32)objects_gp);
             F(object,0xF8)=mat_fast_helper_a(F(object,0x10)-F(target,0x10),F(object,0x14)-F(target,0x14));
         }
         state->sound=-1;
@@ -91,7 +91,7 @@ void func_PAL_L16_00410D14(u8 *object)
                 moby_set_state(object,2,-1);
             }
         } else if ((g_frame_l16_counter&15)==(((s32)object>>8)&15)) {
-            if (state->objectIndex!=-1 && (*(u16 *)(objects_gp[state->objectIndex]+0x34)&1)) moby_set_state(object,3,-1);
+            if (state->object_index!=-1 && (*(u16 *)(objects_gp[state->object_index]+0x34)&1)) moby_set_state(object,3,-1);
         }
         break;
     case 2:
@@ -134,8 +134,8 @@ void func_PAL_L16_00410D14(u8 *object)
         }
         break;
     case 3: {
-        u8 *fadeTarget=g_moby_instance_table[0][state->objectIndex];
-        if ((*(u16 *)(fadeTarget+0x34)&1)) {
+        u8 *fade_target=g_moby_instance_table[0][state->object_index];
+        if ((*(u16 *)(fade_target+0x34)&1)) {
             if (object[0x23]) {
                 I(object,0x98)=0;
                 if (object[0x23]>3) object[0x23]-=4;
@@ -143,7 +143,7 @@ void func_PAL_L16_00410D14(u8 *object)
                 break;
             }
         }
-        if (((*(u16 *)(fadeTarget+0x34)^1)&1)) {
+        if (((*(u16 *)(fade_target+0x34)^1)&1)) {
             if (object[0x23]<124) object[0x23]+=4;
             else {
                 object[0x23]=128;
@@ -154,10 +154,10 @@ void func_PAL_L16_00410D14(u8 *object)
         break;
     }
     }
-    if (object[0x31] && object[0x20]!=3) func_PAL_L16_004114A0(object);
+    if (object[0x31] && object[0x20]!=3) part_spawn_sparkle_in_triangle_pal(object);
     if (g_current_map_index[0]==16 && vec_distance_squared_xy((u8 *)&g_hero_state+0x80,object+0x10)<9.0f) {
         if (g_subtitle_history[99].count!=0) {
-            if (((s32)(g_frame_counter[0])*5+2)/6-g_subtitle_history[99].time>900 || g_subtitle_history[99].time==0) func_PAL_00289730(0xA0C,99);
+            if (((s32)(g_frame_counter[0])*5+2)/6-g_subtitle_history[99].time>900 || g_subtitle_history[99].time==0) subtitle_request_voice_line_pal(0xA0C,99);
             else if (((s32)(g_frame_counter[0])*5+2)/6>g_subtitle_history[99].time) g_subtitle_history[99].time=((s32)(g_frame_counter[0])*5+2)/6;
         } else {
             g_subtitle_history[99].count++;

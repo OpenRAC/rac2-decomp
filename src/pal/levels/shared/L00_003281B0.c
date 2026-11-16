@@ -7,23 +7,25 @@ extern s32 g_bolt_amount_by_level[];
 extern f32 fast_vec_dist(u8 *, u8 *);
 extern void part_spawn_bolt_pickups_pal(u8 *, s32, s32, s32, s32, s32, f32);
 
-void part_spawn_scaled_bolts_pal(u8 *a0, s32 a1, f32 f12) {
+/* Spawns bolt pickups scaled by the level's bolt amount; the hero standing close gives mode 3. */
+void part_spawn_scaled_bolts_pal(u8 *object, s32 multiplier, f32 height) {
     s32 mode = 1;
     u32 i;
     s32 v;
 
-    if (fast_vec_dist(a0 + 0x10, g_hero_position) < 7.0f)
+    if (fast_vec_dist(object + 0x10, g_hero_position) < 7.0f)
         mode = 3;
     i = g_current_map_index;
     if (i > 25)
         i = 25;
-    v = g_bolt_amount_by_level[i] * a1 - 1;
-    part_spawn_bolt_pickups_pal(a0, v, v, mode, -1, 0, f12);
+    v = g_bolt_amount_by_level[i] * multiplier - 1;
+    part_spawn_bolt_pickups_pal(object, v, v, mode, -1, 0, height);
 }
 
 
 extern void func_0029CC50(void);
 
+/* Resets the particle effects (PAL). */
 void part_reset_effects_pal(void)
 {
     func_0029CC50();
@@ -41,7 +43,7 @@ extern void glow_fade_update_pal(char *);
 extern void set_moby_color(char *, unsigned long, unsigned long, unsigned long);
 
 /* Spawn count effects around origin, tinted by color (0xAABBGGRR). */
-void func_PAL_L00_00328480(char *owner, void *origin, int count, int mode,
+void part_spawn_glow_fade_effects_pal(char *owner, void *origin, int count, int mode,
                        void *velocity_origin, int color, Vector *fixed_rotation,
                        float radius, float speed, float low_scale, float high_scale)
 {

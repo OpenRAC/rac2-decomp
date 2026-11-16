@@ -36,7 +36,7 @@ void moby_probe_surface_and_move_pal(char *self)
     float inverse[4], end[4], opposite[4], normal[4], hit[4];
     char *state = *(char **)(self + 0x68);
     int negative, count;
-    char *rowD, *rowE;
+    char *row_d, *row_e;
     float *inverse_ptr, *end_ptr;
     char *result;
     int i;
@@ -54,18 +54,18 @@ void moby_probe_surface_and_move_pal(char *self)
         FastVecAdd(self + 0x10, offset, self + 0x10);
     }
     end_ptr = end;
-    rowD = self + 0xD0;
-    rowE = self + 0xE0;
+    row_d = self + 0xD0;
+    row_e = self + 0xE0;
     inverse_ptr = inverse;
     for (i = 0; i < 32; i++) {
         angle = IntToFloat(i);
         angle /= IntToFloat(31);
-        vec_scale_to_length(offset, rowD, g_vehicle_probe_radius);
+        vec_scale_to_length(offset, row_d, g_vehicle_probe_radius);
         angle *= 1.57079637f;
         sine = math_fast_sin_or_cos_b(angle);
         if (!negative)
             sine = -sine;
-        FastVecScale(quat, rowE, sine);
+        FastVecScale(quat, row_e, sine);
         quat[3] = math_fast_sin_or_cos_a(angle);
         inverse[0] = -quat[0];
         inverse[1] = -quat[1];

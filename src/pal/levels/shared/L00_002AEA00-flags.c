@@ -80,7 +80,7 @@ extern void initialize_moby_animation_blend(void *, HeldAnimationSlot *, int, in
 
 /* starts the equipped item's animation: the hero's own animation in the default control mode,
  * otherwise a held animation in one slot (two for a dual item) with its matrix workspaces */
-void func_PAL_L00_002AF458(void)
+void start_equipped_item_animation_pal(void)
 {
     int duration, item, primary, held, blendDuration, i;
     HeldAnimationSlot *slot;

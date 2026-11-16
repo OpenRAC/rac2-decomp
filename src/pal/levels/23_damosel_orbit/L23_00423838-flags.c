@@ -29,33 +29,33 @@ extern int queue_copy_record_by_index(s32);
 extern void part_start_random_scale_effect(void *, s32, s32);
 
 /* the object's first record is set up against the table entry, then its marker byte is set */
-void shot_update_hit_check_pal(u8 *arg0, void *arg1) {
-    u8 *payload = *(u8 **)(arg0 + 0x68);
+void shot_update_hit_check_pal(u8 *shot, void *ray_start) {
+    u8 *payload = *(u8 **)(shot + 0x68);
     L23Vec dir;
     L23Hit hit;
-    u8 *obj;
+    u8 *hit_moby;
 
-    if (CollLine(arg1, arg0 + 0x10, 0, arg0, 0) == 0) {
+    if (CollLine(ray_start, shot + 0x10, 0, shot, 0) == 0) {
         return;
     }
-    obj = g_last_ray_hit.f18;
-    if (obj != 0) {
-        if (*(s16 *)(obj + 0xAA) == 0x7E5) {
+    hit_moby = g_last_ray_hit.f18;
+    if (hit_moby != 0) {
+        if (*(s16 *)(hit_moby + 0xAA) == 0x7E5) {
             return;
         }
         vec_scale_to_length(dir.v, (float *)payload, 1.0f);
-        make_hit_descriptor(*(float *)(payload + 0x1C), &hit, arg0, 0x8B0003, &dir);
+        make_hit_descriptor(*(float *)(payload + 0x1C), &hit, shot, 0x8B0003, &dir);
         hit.b18 = 5;
         hit.b19 = 3;
-        hit.h1A = *(u16 *)(arg0 + 0xAA);
+        hit.h1A = *(u16 *)(shot + 0xAA);
         if (g_last_ray_hit.f18 == g_hero_moby) {
             QueueMobyImpact(g_last_ray_hit.f18, &hit);
             queue_copy_record_by_index(0x2B);
         }
-        part_start_random_scale_effect(arg0 + 0x10, 0xA, 1);
+        part_start_random_scale_effect(shot + 0x10, 0xA, 1);
     } else {
-        *(TI16 *)&dir = *(TI16 *)(arg0 + 0x10);
+        *(TI16 *)&dir = *(TI16 *)(shot + 0x10);
         part_start_random_scale_effect(&dir, 0xF, 0);
     }
-    arg0[0x20] = 2;
+    shot[0x20] = 2;
 }

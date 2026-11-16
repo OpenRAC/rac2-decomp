@@ -46,28 +46,29 @@ extern s32 UpdateSoundVoices(void);
 extern s16 snd_pump_music_and_disc_read(int);
 extern void pad_clear_port_state(void);
 
-void func_US2_002CB720(void)
+/* Leaves the pause screen: restores the saved camera and display values and lets the game run normally again (USA v2.00). */
+void RestoreMenuDisplayState_us2(void)
 {
-    GameState_2CB720 *s = (GameState_2CB720 *)(void *)g_pause_menu_state;
+    GameState_2CB720 *pause_state = (GameState_2CB720 *)(void *)g_pause_menu_state;
     TI128 *dst;
     int mode;
 
     *(int *)(void *)g_pause_menu_state = 0;
     gfx_select_packet_buffer_setup();
     dst = (TI128 *)g_camera_eye_state;
-    qcopy(dst, &s->field_050);
-    qcopy(dst + 1, &s->field_060);
-    mem_copy_aligned((char *)dst + 0x230, (char *)s + 0x200, 0x30);
-    *(float *)g_fov_tangent = s->field_0F8;
+    qcopy(dst, &pause_state->field_050);
+    qcopy(dst + 1, &pause_state->field_060);
+    mem_copy_aligned((char *)dst + 0x230, (char *)pause_state + 0x200, 0x30);
+    *(float *)g_fov_tangent = pause_state->field_0F8;
     UpdateViewContext();
     gfx_build_view_matrices();
     select_moby_context(0);
     gfx_apply_display_config();
-    mode = s->field_01C;
-    s->field_11C = 0;
-    s->field_114 = 0;
-    s->field_020 = 0;
-    s->field_118 = 0;
+    mode = pause_state->field_01C;
+    pause_state->field_11C = 0;
+    pause_state->field_114 = 0;
+    pause_state->field_020 = 0;
+    pause_state->field_118 = 0;
     if (mode == 3 || mode == 4 || mode == 6 || mode == 5) {
         FadeToBlack(0x10);
     }

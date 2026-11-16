@@ -18,7 +18,7 @@ extern int FastDecTimer(void *);
 extern char *SelectBestTargetInCone(void *, void *, int *, float, float, void *, int, int, float, float, float, int, int);
 extern char *pair_choose_owner_for_key(char *, char **, int, int *, int);
 extern void KeyOwnerTableInsert(char *, char *, int);
-extern void func_PAL_002A7E68(void *, int, int, int);
+extern void anim_start_blended_pal(void *, int, int, int);
 extern void cam_compute_view_direction(void *, void *, int);
 extern void part_steer_effect_direction(int, void *, int);
 extern void FastVecAdd(void *, void *, void *);
@@ -59,7 +59,8 @@ extern void moby_mark_spawned(void *);
 #define P(p, o) (*(char **)((char *)(p) + (o)))
 #define B(p, o) (*(u8 *)((char *)(p) + (o)))
 
-void func_PAL_L00_003ADEA8(char *moby)
+/* Per-frame update of a homing projectile: picks a target, steers toward it, hits things and explodes. */
+void UpdateHomingProjectile_pal(char *moby)
 {
     struct {
         float saved[4];
@@ -99,7 +100,7 @@ void func_PAL_L00_003ADEA8(char *moby)
         }
         if (P(state, 0x14)) {
             B(moby, 0x20) = 1;
-            func_PAL_002A7E68(moby, 0, 0, 8);
+            anim_start_blended_pal(moby, 0, 0, 8);
             qcopy(state + 0x40, state);
             H(state, 0x54) = 17;
         }

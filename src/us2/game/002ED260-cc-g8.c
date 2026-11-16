@@ -39,6 +39,7 @@ typedef struct { char pad[0x218]; float near_plane, far_plane, pad2[2], near_int
 typedef struct { char pad[0x10]; unsigned flags; } TransitionArchive;
 typedef struct { char pad[0x54]; char *current; } TransitionScene;
 
+/* Runs the whole level transition: shows the transition scene until the next level is loaded (USA v2.00). */
 void RunLevelTransition_us2(void)
 {
     int i,ready,done,kind,current;

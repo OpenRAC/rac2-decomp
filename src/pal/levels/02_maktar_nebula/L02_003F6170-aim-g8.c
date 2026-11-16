@@ -17,14 +17,15 @@ extern void FastVecAdd(float *, float *, u8 *);
 extern int moby_l01_turn_toward_target_pal(char *, float *);
 extern float vec_distance_xy(char *, void *);
 
+/* Looks through the actor's group for a nearby enemy in front of it and, if one is found, turns away from it slightly (PAL). Returns 1 when it turned, else 0. */
 int moby_turn_toward_nearby_enemy_pal(char *self) {
     char *state = *(char **)(self + 0x68);
-    float buf[4];
-    u16 *p;
+    float turn_point[4];
+    u16 *entry;
     char *e;
-    float saved;
-    float r;
-    char *ax;
+    float saved_turn_speed;
+    float turn_angle;
+    char *axis;
 
 #define GROUP (*(int *)(state + 0x4E0))
 #define ANGLE()                                                                       \
@@ -32,11 +33,11 @@ int moby_turn_toward_nearby_enemy_pal(char *self) {
                   *(float *)(e + 0x14) - *(float *)(self + 0x14))
     if (GROUP == -1)
         return 0;
-    for (p = g_entity_group_lists[GROUP];
-         (GROUP & 0xFF) != 0xFF && GROUP <= g_group_max_index && p != 0 &&
-         ((p != 0 && (s16)p[-1] >= 0) || p == g_entity_group_lists[GROUP]);
-         p++) {
-        e = (char *)D_L02_001B359C_1[0] + ((*p & 0x7FFF) << 8);
+    for (entry = g_entity_group_lists[GROUP];
+         (GROUP & 0xFF) != 0xFF && GROUP <= g_group_max_index && entry != 0 &&
+         ((entry != 0 && (s16)entry[-1] >= 0) || entry == g_entity_group_lists[GROUP]);
+         entry++) {
+        e = (char *)D_L02_001B359C_1[0] + ((*entry & 0x7FFF) << 8);
         if (e == 0)
             return 0;
         if (moby_get_busy_flag(e) == 0)
@@ -45,19 +46,19 @@ int moby_turn_toward_nearby_enemy_pal(char *self) {
             continue;
         if (!(FastDiffRots(*(float *)(self + 0xF8), ANGLE()) < g_moby_turn_max_angle_deg * 0.017453294f))
             continue;
-        if (p == 0)
+        if (entry == 0)
             return 0;
 
-        FastVecSub(buf, (float *)(self + 0x10), (float *)(e + 0x10));
-        ax = self + 0xE0;
-        r = g_moby_turn_angle_deg * 0.017453294f;
-        math_apply_axis_rotation_to_quat(buf, buf, ax,
-                      0.0f <= fast_subtract_rotations(*(float *)(self + 0xF8), ANGLE()) ? -r : r);
-        FastVecAdd(buf, buf, e + 0x10);
-        saved = *(float *)(state + 0x144);
+        FastVecSub(turn_point, (float *)(self + 0x10), (float *)(e + 0x10));
+        axis = self + 0xE0;
+        turn_angle = g_moby_turn_angle_deg * 0.017453294f;
+        math_apply_axis_rotation_to_quat(turn_point, turn_point, axis,
+                      0.0f <= fast_subtract_rotations(*(float *)(self + 0xF8), ANGLE()) ? -turn_angle : turn_angle);
+        FastVecAdd(turn_point, turn_point, e + 0x10);
+        saved_turn_speed = *(float *)(state + 0x144);
         *(float *)(state + 0x144) = 0.0001f;
-        moby_l01_turn_toward_target_pal(self, buf);
-        *(float *)(state + 0x144) = saved;
+        moby_l01_turn_toward_target_pal(self, turn_point);
+        *(float *)(state + 0x144) = saved_turn_speed;
         return 1;
     }
 #undef ANGLE

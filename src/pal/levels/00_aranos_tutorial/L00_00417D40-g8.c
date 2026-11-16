@@ -11,6 +11,7 @@ extern char g_hit_flash_piece_table_b[8] SDATA(D_L00_001B1368);
 extern char g_hit_flash_piece_table_a[8] SDATA(D_L00_001B1360);
 extern void part_explode_object_into_pieces_pal(void *,void *,void *,void *,int,int,int,int,int,int,int);
 
+/* Briefly shows a hit flash: when the hit effect appears, breaks the object into pieces, then removes it (PAL copy). */
 void hit_l00_flash_update_pal(unsigned char *object) {
     float minimum[4],maximum[4],size[4];
     int *state=*(int **)(object+0x68);

@@ -17,21 +17,22 @@ extern f32 mat_fast_helper_a(f32, f32);
 extern f32 vec_length_xy(void *);
 extern u8 *g_hero_moby;
 
-s32 part_fill_effect_record_pal(u8 *p, s32 a1, s32 a2, u8 *out, f32 f1, f32 f2) {
-    u8 *q;
-    if (p == 0)
+/* Fills a sound/effect record with the owner object, its position and two speeds. Returns -1 if the owner has no usable data. */
+s32 part_fill_effect_record_pal(u8 *owner, s32 value_a, s32 value_b, u8 *out, f32 speed_a, f32 speed_b) {
+    u8 *data;
+    if (owner == 0)
         return -1;
-    q = *(u8 **)(p + 0x24);
-    if (q == 0)
+    data = *(u8 **)(owner + 0x24);
+    if (data == 0)
         return -1;
-    if (*(s32 *)(q + 0x28) == 0)
+    if (*(s32 *)(data + 0x28) == 0)
         return -1;
-    *(u32 *)(out + 0x1C) = (u32)p;
-    *(f32 *)(out + 0x14) = f2 * 0.020000001f;
-    *(f32 *)(out + 0x10) = f1 * 0.020000001f;
-    *(TI128 *)out = *(TI128 *)(p + 0x10);
-    *(s32 *)(out + 0x18) = a2;
-    *(s32 *)(out + 0x20) = a1;
+    *(u32 *)(out + 0x1C) = (u32)owner;
+    *(f32 *)(out + 0x14) = speed_b * 0.020000001f;
+    *(f32 *)(out + 0x10) = speed_a * 0.020000001f;
+    *(TI128 *)out = *(TI128 *)(owner + 0x10);
+    *(s32 *)(out + 0x18) = value_b;
+    *(s32 *)(out + 0x20) = value_a;
     return 1;
 }
 

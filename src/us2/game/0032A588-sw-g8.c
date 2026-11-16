@@ -29,115 +29,116 @@ extern void moby_mark_spawned(void *);
 extern void gfx_register_overlay_draw_callback(void *, void *);
 extern void moby_do_nothing(void);
 
-void falling_chunk_update_us2(char *self)
+/* Updates a falling chunk of rock: it tumbles and falls, hits the ground with dust and sparks, then fades out in a puddle of bubbles (v2.00 copy). */
+void falling_chunk_update_us2(char *moby)
 {
     float old[4] __attribute__((aligned(16)));
     float hit[4], zero[4], random[4];
     float velocity[4] __attribute__((aligned(16)));
     float position[4] __attribute__((aligned(16)));
-    char *state = *(char **)(self + 0x68);
+    char *state = *(char **)(moby + 0x68);
     int i;
     float height;
-    switch ((unsigned char)self[0x20]) {
+    switch ((unsigned char)moby[0x20]) {
     case 0:
-        self[0x20]=1;
-        *(unsigned short *)(self + 0x34)|=8;
+        moby[0x20]=1;
+        *(unsigned short *)(moby + 0x34)|=8;
         *(int *)(state + 0x40)=0;
         *(int *)(state + 0x38)=0;
         *(int *)(state + 0x48)=0;
         if (!g_music_state.active && g_music_state.kind==-1) {
-            g_music_state.object=self;
+            g_music_state.object=moby;
             g_music_state.kind=0xDB8;
         }
     case 1:
-        qcopy(old, self + 0x10);
-        FastVecAdd(self + 0x10, self + 0x10, state);
+        qcopy(old, moby + 0x10);
+        FastVecAdd(moby + 0x10, moby + 0x10, state);
         *(float *)(state + 8)-=0.003055555745959282f;
-        *(float *)(self + 0xF4)=FastAddRotations(*(float *)(self + 0xF4), *(float *)(state + 0x14));
-        *(float *)(self + 0xF8)=FastAddRotations(*(float *)(self + 0xF8), *(float *)(state + 0x18));
-        coll_get_ground_height_at_position(self + 0x10, hit);
+        *(float *)(moby + 0xF4)=FastAddRotations(*(float *)(moby + 0xF4), *(float *)(state + 0x14));
+        *(float *)(moby + 0xF8)=FastAddRotations(*(float *)(moby + 0xF8), *(float *)(state + 0x18));
+        coll_get_ground_height_at_position(moby + 0x10, hit);
         vec_clear_128(zero);
         for (i=7;i>=0;i--) {
             random[0]=math_random_signed_float_range(0, g_falling_chunk_random_range);
             random[1]=math_random_signed_float_range(0, g_falling_chunk_random_range);
             random[2]=math_random_signed_float_range(0, g_falling_chunk_random_range);
-            FastVecAdd(random, random, self + 0x10);
+            FastVecAdd(random, random, moby + 0x10);
             part_spawn_drifting_2(random, state, math_random_int_range(20, 40));
         }
-        fast_vec_dist(old, self + 0x10);
-        if (moby_place_at_collision_point_mirror(self, old)) {
-            hero_check_under_falling_object_us2(self);
-            if (*(int *)(state + 0x38)==2) self[0x20]=2;
+        fast_vec_dist(old, moby + 0x10);
+        if (moby_place_at_collision_point_mirror(moby, old)) {
+            hero_check_under_falling_object_us2(moby);
+            if (*(int *)(state + 0x38)==2) moby[0x20]=2;
             else {
                 if (*(int *)(state + 0x38)) {
-                    *(float *)(self + 0x18)+=1;
-                    *(EffectVector *)velocity = ((EffectObject *)self)->position;
+                    *(float *)(moby + 0x18)+=1;
+                    *(EffectVector *)velocity = ((EffectObject *)moby)->position;
                     part_spawn_ground_impact_effect(velocity);
-                    *(float *)(self + 0x18)-=1;
-                    SampleSurfaceHeightMap(self + 0x18, velocity, *(float *)(self + 0x10), *(float *)(self + 0x14), *(float *)(self + 0x18));
-                    if (!*(int *)(state + 0x44)) part_emit_spark_burst(self);
+                    *(float *)(moby + 0x18)-=1;
+                    SampleSurfaceHeightMap(moby + 0x18, velocity, *(float *)(moby + 0x10), *(float *)(moby + 0x14), *(float *)(moby + 0x18));
+                    if (!*(int *)(state + 0x44)) part_emit_spark_burst(moby);
                 }
-                self[0x20]=3;
+                moby[0x20]=3;
                 *(int *)(state + 0x34)=80;
             }
         }
         break;
     case 2:
-        qcopy(old, self + 0x10);
-        FastVecAdd(self + 0x10, self + 0x10, state);
+        qcopy(old, moby + 0x10);
+        FastVecAdd(moby + 0x10, moby + 0x10, state);
         *(float *)(state + 8)-=0.003055555745959282f;
-        *(float *)(self + 0xF4)=FastAddRotations(*(float *)(self + 0xF4), *(float *)(state + 0x14));
-        *(float *)(self + 0xF8)=FastAddRotations(*(float *)(self + 0xF8), *(float *)(state + 0x18));
-        hero_check_under_falling_object_us2(self);
+        *(float *)(moby + 0xF4)=FastAddRotations(*(float *)(moby + 0xF4), *(float *)(state + 0x14));
+        *(float *)(moby + 0xF8)=FastAddRotations(*(float *)(moby + 0xF8), *(float *)(state + 0x18));
+        hero_check_under_falling_object_us2(moby);
         if (*(int *)(state + 0x38)==1) {
-            PlayMobySound(0, 0, self);
-            self[0x20]=3;
+            PlayMobySound(0, 0, moby);
+            moby[0x20]=3;
             *(int *)(state + 0x34)=80;
-            *(float *)(self + 0x18)+=1;
-            *(EffectVector *)position = ((EffectObject *)self)->position;
+            *(float *)(moby + 0x18)+=1;
+            *(EffectVector *)position = ((EffectObject *)moby)->position;
             part_spawn_ground_impact_effect(position);
-            *(float *)(self + 0x18)-=1;
-            SampleSurfaceHeightMap(self + 0x18, velocity, *(float *)(self + 0x10), *(float *)(self + 0x14), *(float *)(self + 0x18));
-            if (!*(int *)(state + 0x44)) part_emit_spark_burst(self);
+            *(float *)(moby + 0x18)-=1;
+            SampleSurfaceHeightMap(moby + 0x18, velocity, *(float *)(moby + 0x10), *(float *)(moby + 0x14), *(float *)(moby + 0x18));
+            if (!*(int *)(state + 0x44)) part_emit_spark_burst(moby);
         }
         break;
     case 3: {
         float one, low, high, scale;
-        qcopy(old, self + 0x10);
-        FastVecAdd(self + 0x10, self + 0x10, state);
+        qcopy(old, moby + 0x10);
+        FastVecAdd(moby + 0x10, moby + 0x10, state);
         FastVecScale(state, state, 0.8f);
         *(float *)(state + 8)-=0.002444444689899683f;
-        *(float *)(self + 0xF4)=FastAddRotations(*(float *)(self + 0xF4), *(float *)(state + 0x14));
-        *(float *)(self + 0xF8)=FastAddRotations(*(float *)(self + 0xF8), *(float *)(state + 0x18));
-        fast_vec_dist(old, self + 0x10);
+        *(float *)(moby + 0xF4)=FastAddRotations(*(float *)(moby + 0xF4), *(float *)(state + 0x14));
+        *(float *)(moby + 0xF8)=FastAddRotations(*(float *)(moby + 0xF8), *(float *)(state + 0x18));
+        fast_vec_dist(old, moby + 0x10);
         *(float *)(state + 0x14)*=0.8f;
         *(float *)(state + 0x18)*=0.8f;
-        if ((unsigned char)self[0x23] >= 3)
-            self[0x23] -= 2;
+        if ((unsigned char)moby[0x23] >= 3)
+            moby[0x23] -= 2;
         else
-            self[0x23] = 0;
+            moby[0x23] = 0;
         one = 1.0f;
         low = -0.5f;
         high = 0.5f;
         scale = 0.2f;
-        *(float *)(self + 0x18)+=one;
-        height=coll_get_ground_height_at_position(self + 0x10, hit);
-        *(float *)(self + 0x18)-=one;
+        *(float *)(moby + 0x18)+=one;
+        height=coll_get_ground_height_at_position(moby + 0x10, hit);
+        *(float *)(moby + 0x18)-=one;
         velocity[0]=math_random_float_range(low, high);
         velocity[1]=math_random_float_range(low, high);
         velocity[2]=math_random_float_range(low, 2);
         velocity[3]=0;
         vec_scale_to_length(velocity, velocity, math_random_float_range(0.06666667f, 0.13333334f)*scale);
-        part_spawn_bubble(self + 0x10, velocity, math_random_float_range(0.05f, 0.1f)*210000.0f, height);
-        if (math_fast_float_d(state + 0x34)) self[0x20]=4;
+        part_spawn_bubble(moby + 0x10, velocity, math_random_float_range(0.05f, 0.1f)*210000.0f, height);
+        if (math_fast_float_d(state + 0x34)) moby[0x20]=4;
         break;
     }
     case 4:
         if (!*(int *)(state + 0x40)) {
-            moby_mark_spawned(self);
+            moby_mark_spawned(moby);
             return;
         }
         break;
     }
-    gfx_register_overlay_draw_callback(moby_do_nothing, self);
+    gfx_register_overlay_draw_callback(moby_do_nothing, moby);
 }

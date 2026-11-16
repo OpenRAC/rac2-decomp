@@ -12,12 +12,12 @@ extern void vec_transform_or_copy(char *a, char *b);
 extern int FastDecTimer(char *p);
 extern void part_kill(char *p);
 
-/* Hand-adapted from func_002C8880. */
-void func_PAL_L00_00342BF4(char *self) {
+/* Updates a flying particle (PAL): moves it along its velocity, fades it and ends it (hand-adapted from func_002C8880). */
+void part_update_flying_pal(char *self) {
     float a[4];
     float b[4];
     char *p = self + 0x20;
-    float t, f20, f21, f22;
+    float remaining, faded_alpha, alpha, progress;
     int color;
 
     b[0] = *(float *)(self + 0x20);
@@ -25,18 +25,18 @@ void func_PAL_L00_00342BF4(char *self) {
     b[2] = *(float *)(p + 8);
     b[3] = 0;
     vec_transform_or_copy(self + 0x10, self + 0x10);
-    t = IntToFloat(*(short *)(self + 0xA)) / IntToFloat(*(unsigned char *)(p + 0x11));
-    f22 = 1.0f - t;
+    remaining = IntToFloat(*(short *)(self + 0xA)) / IntToFloat(*(unsigned char *)(p + 0x11));
+    progress = 1.0f - remaining;
     if (*(unsigned char *)(p + 0x13) == 0) {
-        color = FastTweenColor(f22, 0x103080, *(int *)(p + 0xC));
+        color = FastTweenColor(progress, 0x103080, *(int *)(p + 0xC));
         *(int *)(self + 4) = color | (*(unsigned char *)(p + 0x12) << 24);
-        *(float *)(self + 0xC) = *(float *)(p + 0x14) + (*(float *)(p + 0x18) - *(float *)(p + 0x14)) * f22;
-        FastVecScale(a, b, *(float *)(p + 0x1C) * math_ease_out_quad(f22));
+        *(float *)(self + 0xC) = *(float *)(p + 0x14) + (*(float *)(p + 0x18) - *(float *)(p + 0x14)) * progress;
+        FastVecScale(a, b, *(float *)(p + 0x1C) * math_ease_out_quad(progress));
     } else {
-        f21 = IntToFloat(*(unsigned char *)(p + 0x12));
-        f20 = IntToFloat(*(unsigned char *)(p + 0x12));
-        f20 = f20 * math_square(f22);
-        *(int *)(self + 4) = *(int *)(p + 0xC) | (FloatToInt(f21 - f20) << 24);
+        alpha = IntToFloat(*(unsigned char *)(p + 0x12));
+        faded_alpha = IntToFloat(*(unsigned char *)(p + 0x12));
+        faded_alpha = faded_alpha * math_square(progress);
+        *(int *)(self + 4) = *(int *)(p + 0xC) | (FloatToInt(alpha - faded_alpha) << 24);
         FastVecScale(a, b, *(float *)(p + 0x1C));
     }
     FastVecAdd(self + 0x10, a, self + 0x10);

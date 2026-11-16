@@ -51,18 +51,18 @@ typedef struct {
     char pad[0x60];
     float timer;
     int moving;
-    int unknown68;
-    float pitchRate;
-    float rollRate;
-    int forcedRoute;
-    int pointIndex;
+    int unknown_68;
+    float pitch_rate;
+    float roll_rate;
+    int forced_route;
+    int point_index;
     int enabled;
     int trigger[5], approach[5], depart[5], back[5];
     char padD0[0x2C];
-    float yawRate;
+    float yaw_rate;
     int persistent;
-    int returnTimer;
-    float baseHeight;
+    int return_timer;
+    float base_height;
 } Routes;
 typedef struct {
     char pad0[0x20];
@@ -74,16 +74,17 @@ typedef struct {
 } RouteMoby;
 #define M ((RouteMoby *)moby)
 
+/* Updates the Taxi moby (class 816). It waits at a stop, flies along a path to the next stop when called, and flies back when it is done (PAL: 50 Hz timings). */
 void UpdateRouteMoby_pal(char *moby)
 {
-    float oldpos[4] __attribute__((aligned(16)));
-    float oldrot[4] __attribute__((aligned(16)));
+    float old_pos[4] __attribute__((aligned(16)));
+    float old_rot[4] __attribute__((aligned(16)));
     float delta[4] __attribute__((aligned(16)));
     float rot[4] __attribute__((aligned(16)));
-    Routes *st = *(Routes **)(moby+0x68);
+    Routes *vars = *(Routes **)(moby+0x68);
     char *node;
     if (g_current_map_index == 11) {
-      if (!st->persistent && g_inventory_have_flags) {
+      if (!vars->persistent && g_inventory_have_flags) {
         moby_mark_spawned(moby);
         return;
       }
@@ -91,42 +92,42 @@ void UpdateRouteMoby_pal(char *moby)
     table_set_entry_field(moby,taxi_is_flying(moby));
     if (g_route_l06_flag) {
         int i;
-        for(i=0;i<I(g_path_list[st->approach[0]],0);i++)
-            effect_create_timed(g_path_list[st->approach[0]]+16+i*16,moby,4,0x800000FF,127,2,255,0.333f);
-        for(i=0;i<I(g_path_list[st->depart[0]],0);i++)
-            effect_create_timed(g_path_list[st->depart[0]]+16+i*16,moby,4,0x8000FF00,127,2,255,0.333f);
-        for(i=0;i<I(g_path_list[st->back[0]],0);i++)
-            effect_create_timed(g_path_list[st->back[0]]+16+i*16,moby,4,0x80FF0000,127,2,255,0.333f);
+        for(i=0;i<I(g_path_list[vars->approach[0]],0);i++)
+            effect_create_timed(g_path_list[vars->approach[0]]+16+i*16,moby,4,0x800000FF,127,2,255,0.333f);
+        for(i=0;i<I(g_path_list[vars->depart[0]],0);i++)
+            effect_create_timed(g_path_list[vars->depart[0]]+16+i*16,moby,4,0x8000FF00,127,2,255,0.333f);
+        for(i=0;i<I(g_path_list[vars->back[0]],0);i++)
+            effect_create_timed(g_path_list[vars->back[0]]+16+i*16,moby,4,0x80FF0000,127,2,255,0.333f);
     }
-    qcopy(oldpos,moby+0x10);
-    qcopy(oldrot,moby+0xF0);
+    qcopy(old_pos,moby+0x10);
+    qcopy(old_rot,moby+0xF0);
     switch(M->state) {
     case 0:
-        st->baseHeight=F(moby,0x18);
-        if(st->approach[0]!=-1) {
-            rot[2]=mat_fast_helper_a(F(g_path_list[st->approach[0]],0x20)-F(moby,0x10),F(g_path_list[st->approach[0]],0x24)-F(moby,0x14));
+        vars->base_height=F(moby,0x18);
+        if(vars->approach[0]!=-1) {
+            rot[2]=mat_fast_helper_a(F(g_path_list[vars->approach[0]],0x20)-F(moby,0x10),F(g_path_list[vars->approach[0]],0x24)-F(moby,0x14));
             if ((H(moby,0x34)^1)&1) {
-                node=g_path_list[st->approach[0]];
+                node=g_path_list[vars->approach[0]];
                 qcopy(moby+0x10,node+0x10);
                 qcopy(moby+0xF0,rot);
-                st->baseHeight=F(node,0x18);
+                vars->base_height=F(node,0x18);
             } else {
-                moby_fuse_linked_objects(moby,g_path_list[st->approach[0]]+16,rot,0,0);
-                st->baseHeight=F(g_path_list[st->approach[0]],0x18);
+                moby_fuse_linked_objects(moby,g_path_list[vars->approach[0]]+16,rot,0,0);
+                vars->base_height=F(g_path_list[vars->approach[0]],0x18);
             }
-        } else if(st->depart[0]!=-1) {
-            rot[2]=mat_fast_helper_a(F(g_path_list[st->depart[0]],0x20)-F(moby,0x10),F(g_path_list[st->depart[0]],0x24)-F(moby,0x14));
+        } else if(vars->depart[0]!=-1) {
+            rot[2]=mat_fast_helper_a(F(g_path_list[vars->depart[0]],0x20)-F(moby,0x10),F(g_path_list[vars->depart[0]],0x24)-F(moby,0x14));
             if ((H(moby,0x34)^1)&1) {
-                node=g_path_list[st->depart[0]];
+                node=g_path_list[vars->depart[0]];
                 qcopy(moby+0x10,node+0x10);
                 qcopy(moby+0xF0,rot);
-                st->baseHeight=F(node,0x18);
+                vars->base_height=F(node,0x18);
             } else {
-                moby_fuse_linked_objects(moby,g_path_list[st->depart[0]]+16,rot,0,0);
-                st->baseHeight=F(g_path_list[st->depart[0]],0x18);
+                moby_fuse_linked_objects(moby,g_path_list[vars->depart[0]]+16,rot,0,0);
+                vars->base_height=F(g_path_list[vars->depart[0]],0x18);
             }
         }
-        M->flags32=0x80; B(moby,0x30)=255; st->forcedRoute=-1;
+        M->flags32=0x80; B(moby,0x30)=255; vars->forced_route=-1;
         M->state=1; I(moby,0x98)=0;
         {
             u16 id=H(moby,0xB2);
@@ -138,65 +139,65 @@ void UpdateRouteMoby_pal(char *moby)
         }
     case 1: {
         int i;
-        if (!st->enabled) break;
+        if (!vars->enabled) break;
         if (!(g_moby_group_flags[B(moby,0xB0)+(currentLevelGp<<4)]&0x80)) break;
         for(i=0;i<5;i++) {
-            if(st->trigger[i]==-1 && st->forcedRoute!=i) continue;
-            if(!IsPointInCuboid(g_hero_position,st->trigger[i]) && st->forcedRoute!=i) continue;
+            if(vars->trigger[i]==-1 && vars->forced_route!=i) continue;
+            if(!IsPointInCuboid(g_hero_position,vars->trigger[i]) && vars->forced_route!=i) continue;
             I(moby,0x98)=I(*(char **)(moby+0x24),0x10);
-            if(st->approach[i]!=-1) {
-                rot[2]=mat_fast_helper_a(F(g_path_list[st->approach[i]],0x20)-F(moby,0x10),F(g_path_list[st->approach[i]],0x24)-F(moby,0x14));
-                moby_fuse_linked_objects(moby,g_path_list[st->approach[i]]+16,rot,0,0);
-                st->baseHeight=F(g_path_list[st->approach[i]],0x18);
-            } else if (st->depart[i]!=-1) {
-                if(fast_vec_dist(moby+0x10,g_path_list[st->depart[i]]+16)>4) {
-                    rot[2]=mat_fast_helper_a(F(g_path_list[st->depart[i]],0x20)-F(moby,0x10),F(g_path_list[st->depart[i]],0x24)-F(moby,0x14));
-                    moby_fuse_linked_objects(moby,g_path_list[st->depart[i]]+16,rot,0,0);
-                    st->baseHeight=F(g_path_list[st->depart[i]],0x18);
+            if(vars->approach[i]!=-1) {
+                rot[2]=mat_fast_helper_a(F(g_path_list[vars->approach[i]],0x20)-F(moby,0x10),F(g_path_list[vars->approach[i]],0x24)-F(moby,0x14));
+                moby_fuse_linked_objects(moby,g_path_list[vars->approach[i]]+16,rot,0,0);
+                vars->base_height=F(g_path_list[vars->approach[i]],0x18);
+            } else if (vars->depart[i]!=-1) {
+                if(fast_vec_dist(moby+0x10,g_path_list[vars->depart[i]]+16)>4) {
+                    rot[2]=mat_fast_helper_a(F(g_path_list[vars->depart[i]],0x20)-F(moby,0x10),F(g_path_list[vars->depart[i]],0x24)-F(moby,0x14));
+                    moby_fuse_linked_objects(moby,g_path_list[vars->depart[i]]+16,rot,0,0);
+                    vars->base_height=F(g_path_list[vars->depart[i]],0x18);
                 }
-                MobySpringTurn(moby,&st->yawRate,mat_fast_helper_a(F(g_path_list[st->depart[i]],0x20)-F(moby,0x10),F(g_path_list[st->depart[i]],0x24)-F(moby,0x14)),0.0016755164f,0.0016755164f,0.12566373f);
+                MobySpringTurn(moby,&vars->yaw_rate,mat_fast_helper_a(F(g_path_list[vars->depart[i]],0x20)-F(moby,0x10),F(g_path_list[vars->depart[i]],0x24)-F(moby,0x14)),0.0016755164f,0.0016755164f,0.12566373f);
             }
             M->route=i; M->state=2; M->flags32=0x80;
-            st->timer=g_path_wait_seconds*(0.020000001f); st->moving=1; st->forcedRoute=-1;
+            vars->timer=g_path_wait_seconds*(0.020000001f); vars->moving=1; vars->forced_route=-1;
             break;
         }
         break;
     }
     case 2:
-        if(st->approach[M->route]==-1 || moby_move_along_path_pal(moby,st->approach[M->route],&st->pointIndex)) {
-            M->state=3; I((char *)st,0xE4)=-1;
+        if(vars->approach[M->route]==-1 || moby_move_along_path_pal(moby,vars->approach[M->route],&vars->point_index)) {
+            M->state=3; I((char *)vars,0xE4)=-1;
         }
         break;
     case 3: {
         int i;
-        MobySpringTurn(moby,&st->yawRate,mat_fast_helper_a(F(g_path_list[st->depart[M->route]],0x20)-F(moby,0x10),F(g_path_list[st->depart[M->route]],0x24)-F(moby,0x14)),0.0008377582f,0.0008377582f,0.024434613f);
-        math_approach_target_with_direction_mode(moby+0xF4,0,&st->pitchRate,g_path_pitch_rate*6.981318e-06f,g_path_pitch_rate*6.981318e-06f,0.25132746f,0);
-        math_approach_target_with_direction_mode(moby+0xF0,0,&st->rollRate,g_path_roll_rate*6.981318e-06f,g_path_roll_rate*6.981318e-06f,0.25132746f,0);
+        MobySpringTurn(moby,&vars->yaw_rate,mat_fast_helper_a(F(g_path_list[vars->depart[M->route]],0x20)-F(moby,0x10),F(g_path_list[vars->depart[M->route]],0x24)-F(moby,0x14)),0.0008377582f,0.0008377582f,0.024434613f);
+        math_approach_target_with_direction_mode(moby+0xF4,0,&vars->pitch_rate,g_path_pitch_rate*6.981318e-06f,g_path_pitch_rate*6.981318e-06f,0.25132746f,0);
+        math_approach_target_with_direction_mode(moby+0xF0,0,&vars->roll_rate,g_path_roll_rate*6.981318e-06f,g_path_roll_rate*6.981318e-06f,0.25132746f,0);
         if(g_hero_state.attached==moby && !g_hero_state.animation) {
             hud_show_event_notice_pal(moby,M->route);
             if((g_pad_held_flags&16) && g_route_state_value==8) {
-                st->timer=0; M->state=5; st->moving=1;
+                vars->timer=0; M->state=5; vars->moving=1;
             }
         }
         for(i=0;i<5;i++) {
-            if(st->trigger[i]==-1 && st->forcedRoute!=i) continue;
+            if(vars->trigger[i]==-1 && vars->forced_route!=i) continue;
             if(i==M->route) continue;
-            if(!IsPointInCuboid(g_hero_position,st->trigger[i]) && st->forcedRoute!=i) continue;
+            if(!IsPointInCuboid(g_hero_position,vars->trigger[i]) && vars->forced_route!=i) continue;
             I(moby,0x98)=I(*(char **)(moby+0x24),0x10);
-            if(st->approach[i]!=-1) {
-                rot[2]=mat_fast_helper_a(F(g_path_list[st->approach[i]],0x20)-F(moby,0x10),F(g_path_list[st->approach[i]],0x24)-F(moby,0x14));
-                moby_fuse_linked_objects(moby,g_path_list[st->approach[i]]+16,rot,0,0);
-                st->baseHeight=F(g_path_list[st->approach[i]],0x18);
-            } else if (st->depart[i]!=-1) {
-                if(fast_vec_dist(moby+0x10,g_path_list[st->depart[i]]+16)>4) {
-                    rot[2]=mat_fast_helper_a(F(g_path_list[st->depart[i]],0x20)-F(moby,0x10),F(g_path_list[st->depart[i]],0x24)-F(moby,0x14));
-                    moby_fuse_linked_objects(moby,g_path_list[st->depart[i]]+16,rot,0,0);
-                    st->baseHeight=F(g_path_list[st->depart[i]],0x18);
+            if(vars->approach[i]!=-1) {
+                rot[2]=mat_fast_helper_a(F(g_path_list[vars->approach[i]],0x20)-F(moby,0x10),F(g_path_list[vars->approach[i]],0x24)-F(moby,0x14));
+                moby_fuse_linked_objects(moby,g_path_list[vars->approach[i]]+16,rot,0,0);
+                vars->base_height=F(g_path_list[vars->approach[i]],0x18);
+            } else if (vars->depart[i]!=-1) {
+                if(fast_vec_dist(moby+0x10,g_path_list[vars->depart[i]]+16)>4) {
+                    rot[2]=mat_fast_helper_a(F(g_path_list[vars->depart[i]],0x20)-F(moby,0x10),F(g_path_list[vars->depart[i]],0x24)-F(moby,0x14));
+                    moby_fuse_linked_objects(moby,g_path_list[vars->depart[i]]+16,rot,0,0);
+                    vars->base_height=F(g_path_list[vars->depart[i]],0x18);
                 }
-                MobySpringTurn(moby,&st->yawRate,mat_fast_helper_a(F(g_path_list[st->depart[i]],0x20)-F(moby,0x10),F(g_path_list[st->depart[i]],0x24)-F(moby,0x14)),0.0016755164f,0.0016755164f,0.12566373f);
+                MobySpringTurn(moby,&vars->yaw_rate,mat_fast_helper_a(F(g_path_list[vars->depart[i]],0x20)-F(moby,0x10),F(g_path_list[vars->depart[i]],0x24)-F(moby,0x14)),0.0016755164f,0.0016755164f,0.12566373f);
             }
             M->route=i; M->state=2; M->flags32=0x80;
-            st->timer=g_path_wait_seconds*(0.020000001f); st->moving=1; st->forcedRoute=-1;
+            vars->timer=g_path_wait_seconds*(0.020000001f); vars->moving=1; vars->forced_route=-1;
             break;
         }
         break;
@@ -207,24 +208,24 @@ void UpdateRouteMoby_pal(char *moby)
             g_hero_state.action=4; g_hero_state.mode=8;
             path_update_attached_point_table(moby);
         }
-        if(moby_move_along_path_pal(moby,st->depart[M->route],&st->pointIndex)) {
-            M->state=6; st->returnTimer=100;
+        if(moby_move_along_path_pal(moby,vars->depart[M->route],&vars->point_index)) {
+            M->state=6; vars->return_timer=100;
         }
         break;
     case 6:
-        math_approach_target_with_direction_mode(moby+0xF4,0,&st->pitchRate,g_path_pitch_rate*6.981318e-06f,g_path_pitch_rate*6.981318e-06f,0.25132746f,0);
-        math_approach_target_with_direction_mode(moby+0xF0,0,&st->rollRate,g_path_roll_rate*6.981318e-06f,g_path_roll_rate*6.981318e-06f,0.25132746f,0);
-        if(st->back[M->route]!=-1 && fast_vec_dist(moby+0x10,g_hero_position)>15) {
-            M->state=7; st->moving=1;
-        } else if(st->back[M->route]==-1 && vec_distance_xy(moby+0x10,g_hero_position)>5) M->state=1;
+        math_approach_target_with_direction_mode(moby+0xF4,0,&vars->pitch_rate,g_path_pitch_rate*6.981318e-06f,g_path_pitch_rate*6.981318e-06f,0.25132746f,0);
+        math_approach_target_with_direction_mode(moby+0xF0,0,&vars->roll_rate,g_path_roll_rate*6.981318e-06f,g_path_roll_rate*6.981318e-06f,0.25132746f,0);
+        if(vars->back[M->route]!=-1 && fast_vec_dist(moby+0x10,g_hero_position)>15) {
+            M->state=7; vars->moving=1;
+        } else if(vars->back[M->route]==-1 && vec_distance_xy(moby+0x10,g_hero_position)>5) M->state=1;
         break;
     case 7:
-        if(moby_move_along_path_pal(moby,st->back[M->route],&st->pointIndex)) {
+        if(moby_move_along_path_pal(moby,vars->back[M->route],&vars->point_index)) {
             M->flags32=0; M->state=1; I(moby,0x98)=0;
         }
         break;
     }
     moby_turn_parts_toward_targets_pal(moby);
-    FastVecSub(delta,moby+0x10,oldpos);
-    mat_combine_and_store((char *)st+0x20,delta,oldrot,moby+0xF0);
+    FastVecSub(delta,moby+0x10,old_pos);
+    mat_combine_and_store((char *)vars+0x20,delta,old_rot,moby+0xF0);
 }

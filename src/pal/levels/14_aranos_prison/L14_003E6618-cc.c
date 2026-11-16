@@ -135,17 +135,18 @@ extern int g_group_link_limit __attribute__((sda));
 
 /* func_L14_003E1E78 is in its -g8 unit. */
 
-float func_PAL_L14_003E6618(char *arg0) {
-    char *v = *(char **)(arg0 + 0x68);
-    unsigned int s = *(unsigned char *)(arg0 + 0x20);
+/* Returns how far the energy field has faded in, from 0 (off) to 1 (on), by its state and timer. (PAL: 50 Hz timings) */
+float moby_get_state_progress_pal(char *moby) {
+    char *vars = *(char **)(moby + 0x68);
+    unsigned int state = *(unsigned char *)(moby + 0x20);
 
-    if (s == 4) {
-        return (float)*(int *)(v + 0x7C) / (float)(((int)(*(int *)(v + 0x78)) * 5 + 2) / 6);
+    if (state == 4) {
+        return (float)*(int *)(vars + 0x7C) / (float)(((int)(*(int *)(vars + 0x78)) * 5 + 2) / 6);
     }
-    if (s == 2) {
-        return 1.0f - (float)*(int *)(v + 0x7C) / (float)(((int)(*(int *)(v + 0x70)) * 5 + 2) / 6);
+    if (state == 2) {
+        return 1.0f - (float)*(int *)(vars + 0x7C) / (float)(((int)(*(int *)(vars + 0x70)) * 5 + 2) / 6);
     }
-    if (s == 1) {
+    if (state == 1) {
         return 0.0f;
     }
     return 1.0f;

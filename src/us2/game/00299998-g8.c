@@ -9,7 +9,7 @@ extern unsigned char g_save_name_data[];
 extern unsigned char g_save_name_format[];
 extern char *strncpy(void *, int, int);
 
-void func_US2_00299998(unsigned char *source)
+void save_build_file_names_us2(unsigned char *source)
 {
     int i;
     int value = source[0x12];

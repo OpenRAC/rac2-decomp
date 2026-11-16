@@ -18,12 +18,12 @@ extern int info_panel_update_pal(char *, int);
 
 /* func_PAL_L00_0030F338, the PAL copy of func_L00_0030D4E8: the same C, where the object offset
  * 0x3B7C0 becomes 0x3BB08. */
-int func_PAL_L00_0030F338(int a0)
+int module_l00_call_handler_with_arg_10_pal(int argument)
 {
-    int v = D_L00_001A904C_2;
+    int value = D_L00_001A904C_2;
 
-    if (v != 0) {
-        return info_panel_update_pal((char *)v + 0x3BB08, a0);
+    if (value != 0) {
+        return info_panel_update_pal((char *)value + 0x3BB08, argument);
     }
     return 0;
 }

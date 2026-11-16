@@ -21,7 +21,7 @@ extern void moby_set_controller_speed_limits(char *, float, float, float, float)
 extern void moby_transform_joint_to_world(char *, int, void *);
 extern int CollLine(void *, void *, int, char *, int);
 extern float coll_probe_ground_height_below(void *, int, float);
-extern void func_PAL_002A7E68(char *, int, int, int);
+extern void anim_start_blended_pal(char *, int, int, int);
 extern int moby_count_group_not_in_state(int, int);
 extern int weapon_select_aim_target(char *, int, float, float, int, int);
 extern void part_spawn_explosion_with_sparks_pal(char *, void *, int, float, float);
@@ -30,7 +30,7 @@ extern void moby_update_ground_check(char *);
 extern void moby_transform_joint_point(char *, int, float *);
 extern void transform_vector(void *, void *, void *);
 extern void FastVecAdd(float *, float *, float *);
-extern int func_PAL_002B1A50(char *, void *, int);
+extern int moby_apply_damage_to_object_pal(char *, void *, int);
 extern float fast_vec_dist(void *, void *);
 extern float g_coll_hit_position[];
 extern char *g_vec_record_table MACRO_ADDR;
@@ -42,7 +42,8 @@ extern char *g_moby_pool_start MACRO_ADDR;
 #define I(p,o) (*(int *)((p)+(o)))
 #define U(p,o) (*(unsigned char *)((p)+(o)))
 #define H(p,o) (*(unsigned short *)((p)+(o)))
-int func_PAL_00322DA0(char *object)
+/* Sets up the robot enemy on its first frame, then each frame checks hits and damage. Returns 1 when the enemy should be removed (PAL: 50 Hz timings). */
+int robot_init_check_health_pal(char *object)
 {
     float matrix[16];
     char *data = *(char **)(object + 0x68);
@@ -99,10 +100,10 @@ int func_PAL_00322DA0(char *object)
         if(!I(data,0x27c) && I(data,0x288)==-1) {
             F(object,0x18)=coll_probe_ground_height_below(object+0x10,0,0.5f);
             moby_set_state((unsigned char *)object,1,0);
-            if(U(object,0x43)) func_PAL_002A7E68(object,0,0,0);
+            if(U(object,0x43)) anim_start_blended_pal(object,0,0,0);
         } else {
             moby_set_state((unsigned char *)object,3,2);
-            if(U(object,0x43)!=11) func_PAL_002A7E68(object,11,0,0);
+            if(U(object,0x43)!=11) anim_start_blended_pal(object,11,0,0);
             I(object,0x98)=0;F(data,0x30)=2.5f;
             child=CreateMoby(0xab7);
             *(char **)(data+0x2ac)=child;
@@ -134,7 +135,7 @@ int func_PAL_00322DA0(char *object)
     FastVecAdd((float *)(data+0x3c0),(float *)(data+0x3c0),matrix+12);
     special=0;
     if(U(data,0x2e)==2) special=1;
-    status=func_PAL_002B1A50(object,data+0x60,0);
+    status=moby_apply_damage_to_object_pal(object,data+0x60,0);
     if(status || special) {
         F(data,0x30)=0.5f;
         if(status==5) {I(data,0xf0)=0;F(data,0xf4)=1.0053098f;}

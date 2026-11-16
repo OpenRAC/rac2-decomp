@@ -34,13 +34,14 @@ extern void FastVecScale(void *, void *, float);
 extern void math_build_axis_angle_quat(void *, void *, float);
 extern void vec_rotate_by_quaternion(void *, void *, void *);
 extern u8 *part_spawn_trail_2_pal(void *, void *, int, float);
-extern char *func_PAL_003096D0(void *, void *, void *, int, int, int, int, int, float);
+extern char *part_spawn_shockwave_ring_pal(void *, void *, void *, int, int, int, int, int, float);
 extern void SpawnExplosionEffects_pal(void *, void *, void *, float, float, int, int, int, float, float, float, float, int, int, int, int, int, int, float);
 extern void vec_build_spherical_offset(float *, float, float, float);
-extern u8 *func_PAL_002BE9A8(void *, float, float, int, void *, int, int, float, float);
+extern u8 *part_spawn_spinning_spark_pal(void *, float, float, int, void *, int, int, float, float);
 extern float IntToFloat(int);
 
-void func_PAL_L16_0040B0C8(u8 *object, void *unused)
+/* Spawns the explosion burst of a Snivelak flash: fire glows, sparks, trails and shockwave rings (PAL: 50 Hz timings). */
+void part_l16_spawn_explosion_burst_pal(u8 *object, void *unused)
 {
     Vec4 position;
     Vec4 velocity;
@@ -146,7 +147,7 @@ void func_PAL_L16_0040B0C8(u8 *object, void *unused)
         *(Quad *)velocity = 0;
         velocity[2] = F(state, 0x14) * 0.16000001f;
         *(Quad *)position = *(Quad *)velocity;
-        func_PAL_003096D0(object, object + 0x10, position, 13, 0, 0, 255, 40, F(state, 0x14) * 3.5f);
+        part_spawn_shockwave_ring_pal(object, object + 0x10, position, 13, 0, 0, 255, 40, F(state, 0x14) * 3.5f);
     }
     SpawnExplosionEffects_pal(object, g_particle_template, object + 0x10, 0.0f, 0.0f, 0, 0, 0, 0.0f, 0.0f, 9.0f, 0.0f, -1, 0, 0, -1, 0, 0x810001, F(state, 0x14) * 20.0f);
     sign = 1;
@@ -162,7 +163,7 @@ void func_PAL_L16_0040B0C8(u8 *object, void *unused)
         turn = FastAddRotations(angle, math_random_signed_float_range(0.0f, 1.5707965f));
         vec_build_spherical_offset(velocity, radius, turn, roll);
         {
-            u8 *effect = func_PAL_002BE9A8(position, 0.0f, 1.0f, sign, velocity, 0x7F20FF60, 0, 1.01f, F(state, 0x14) * 315000.0f);
+            u8 *effect = part_spawn_spinning_spark_pal(position, 0.0f, 1.0f, sign, velocity, 0x7F20FF60, 0, 1.01f, F(state, 0x14) * 315000.0f);
             if (effect) {
                 u8 *extra = effect + 0x20;
                 *(u16 *)(effect + 0xA) = ((s32)(math_random_int_range(40, 70)) * 5 + 2) / 6;

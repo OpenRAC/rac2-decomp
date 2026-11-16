@@ -29,28 +29,28 @@ extern s32 g_unused_sda_word_b __attribute__((sda));
    object and queues its effect, 1 spawns it), and the object's own record in the shared
    table D_00188660 is then looked up before its effect of kind 0xF8D is created. */
 extern void moby_handler_empty(void);
-void cloud_puff_update_pal(u8 *arg0) {
-    u8 *s0 = arg0;
-    u8 *s1 = *(u8 **)(s0 + 0x68);
-    u8 state = s0[0x20];
-    u8 *p;
+void cloud_puff_update_pal(u8 *moby) {
+    u8 *self = moby;
+    u8 *vars = *(u8 **)(self + 0x68);
+    u8 state = self[0x20];
+    u8 *sound;
 
     switch (state) {
     case 0:
-        s0[0x30] = 0xFF;
+        self[0x30] = 0xFF;
         if (state_get_stored_pointer_value() == 0)
             return;
-        cloud_puff_init(s0);
-        if (*(s32 *)(s1 + 0x264) != 0)
-            level_append_object(s0, (s32)moby_handler_empty, 0, 0);
+        cloud_puff_init(self);
+        if (*(s32 *)(vars + 0x264) != 0)
+            level_append_object(self, (s32)moby_handler_empty, 0, 0);
         break;
     case 1:
-        moby_process_collision_hit(s0, 0, 1, 1);
-        part_spawn_large_tail_trail(s0);
+        moby_process_collision_hit(self, 0, 1, 1);
+        part_spawn_large_tail_trail(self);
         break;
     }
-    p = g_sound_state + *(s32 *)(s1 + 0x268) * 0x70;
-    if (*(u8 **)(p + 0x88) == s0 && p[0x74] != 0)
+    sound = g_sound_state + *(s32 *)(vars + 0x268) * 0x70;
+    if (*(u8 **)(sound + 0x88) == self && sound[0x74] != 0)
         return;
-    *(s32 *)(s1 + 0x268) = snd_play_from_class_bank(0, 6, s0, 0xF8D);
+    *(s32 *)(vars + 0x268) = snd_play_from_class_bank(0, 6, self, 0xF8D);
 }

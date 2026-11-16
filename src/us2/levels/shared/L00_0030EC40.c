@@ -14,6 +14,7 @@ int level_l00_call_module_handler_with_arg_2_us2(int argument)
     return 0;
 }
 
+/* Calls the list page draw handler in the loaded module, if a module is loaded. */
 void level_l00_call_module_handler_3_us2(void)
 {
     int value = D_L00_001A904C_2;

@@ -9,6 +9,7 @@ extern int func_0029CAE0(int);
 extern int func_00341E58(char *);
 extern void menu_start_action(int);
 
+/* Reads the buttons on a menu page: cancel goes back, other keys close it, and confirm sends the chosen entry to the menu request handler. (USA v2.00) */
 int menu_page_handle_input_close_us2(void)
 {
     int result = 0;

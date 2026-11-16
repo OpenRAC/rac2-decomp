@@ -24,10 +24,10 @@ extern float vec_distance_xy(void *,void *),fast_vec_dist(void *,void *),FastVec
 extern void vec_build_spherical_offset(void *,float,float,float);
 
 /* Target selection: the nearest visible candidate in front of the player within the aim cone. */
-char *hero_l07_find_aim_target_in_cone_pal(char *obj,Vec *origin,float *yaw,float *pitch) {
+char *hero_l07_find_aim_target_in_cone_pal(char *moby,Vec *origin,float *yaw,float *pitch) {
     struct { Vec origin,offset,player; char *disabled[128]; Vec target,aim,ray,axis; } frame;
     Vec *start=&frame.origin;
-    char *ctx=*(char **)(obj+0x68),*selected,*candidate,*definition,*hit;
+    char *vars=*(char **)(moby+0x68),*selected,*candidate,*definition,*hit;
     Vec *pos; int n,index,accepted,visible,tries,i;
     float best=g_aim_cone_max_distance,heading,elevation,delta,distance,dot,length,angle,radius;
     start->q=origin->q;
@@ -74,7 +74,7 @@ char *hero_l07_find_aim_target_in_cone_pal(char *obj,Vec *origin,float *yaw,floa
             }
         }
         if(accepted && !CollLine(start,&frame.target,6,g_hero_state.object,0)) { selected=candidate; *pitch=-elevation; *yaw=heading; break; }
-        if((distance>best && candidate!=*(char **)(ctx+0x10)) || distance>g_aim_cone_max_distance) goto next;
+        if((distance>best && candidate!=*(char **)(vars+0x10)) || distance>g_aim_cone_max_distance) goto next;
         vec_build_spherical_offset(&frame.aim,distance,*yaw,*pitch+g_hero_state.pitch*0.5f);
         FastVecAdd(&frame.aim,&frame.aim,start);
         angle=fast_vec_dist(&frame.aim,&frame.target);
@@ -87,7 +87,7 @@ char *hero_l07_find_aim_target_in_cone_pal(char *obj,Vec *origin,float *yaw,floa
         if(angle<g_aim_cone_half_angle_deg*0.017453294f) {
             visible=1;
             qcopy(&frame.ray,start); tries=0;
-            while(CollLine(&frame.ray,&frame.target,6,obj,0)) {
+            while(CollLine(&frame.ray,&frame.target,6,moby,0)) {
                 Collision *col;
                 if(++tries>6) break;
                 col=&g_collision_l07_result;
@@ -103,11 +103,11 @@ char *hero_l07_find_aim_target_in_cone_pal(char *obj,Vec *origin,float *yaw,floa
                 }
                 visible=0; break;
             }
-            if(visible) { *pitch=-elevation; best=distance; if(delta<0.17453295f) *yaw=heading; selected=candidate; if(candidate==*(char **)(ctx+0x10)) return selected; }
+            if(visible) { *pitch=-elevation; best=distance; if(delta<0.17453295f) *yaw=heading; selected=candidate; if(candidate==*(char **)(vars+0x10)) return selected; }
         }
 next:
         ++index;
     }
-    for(i=0;i<n;++i) { char *m=frame.disabled[i]; *(int *)(m+0x98)=*(int *)(*(char **)(m+0x24)+0x10); }
+    for(i=0;i<n;++i) { char *disabled_moby=frame.disabled[i]; *(int *)(disabled_moby+0x98)=*(int *)(*(char **)(disabled_moby+0x24)+0x10); }
     return selected;
 }

@@ -90,7 +90,7 @@ typedef struct { float rows[2][4]; float origin[4]; float bias[4]; char *hits[20
 typedef struct { float rows[2][4]; RayTail tail; } RayBlock;
 
 /* Control the two-stage blast and trace its individual fan rays. */
-void func_PAL_L00_003A89F0(char *moby)
+void blitz_gun_update_pal(char *moby)
 {
     char *state = *(char **)(moby + 0x68);
     char damage[0x30];

@@ -22,54 +22,55 @@ extern u8 *g_moby_pool_start MACRO_ADDR;
 /* func_0031D588 is in 0031D588-g8.c. */
 
 
+/* Starts a new spark on a free slot, flying toward the target with random spin and speed. */
 void spark_spawn_targeted_pal(char *self, char *target, int count)
 {
     int pool = g_spark_slot_pool;
     char *position = self + 0x10;
     char *target_position = target + 0x10;
     char *data = *(char **)(self + 0x68);
-    char *p;
+    char *slot;
     char *info;
-    float v[4];
+    float offset[4];
     int i;
     for (i = 0; i < 12; i++) {
-        p = (char *)(pool + i * 0xA0);
-        if (*(int *)(p + 0x8C) == 0) {
-            *(char **)(p + 0x8C) = self;
+        slot = (char *)(pool + i * 0xA0);
+        if (*(int *)(slot + 0x8C) == 0) {
+            *(char **)(slot + 0x8C) = self;
             (*(int *)(data + 0x1C))++;
-            qcopy(p + 0x20, position);
-            *(float *)(p + 64) = math_random_float_range(-3.14159274101257324219f, 3.14159274101257324219f);
-            *(float *)(p + 68) = math_random_float_range(-3.14159274101257324219f, 3.14159274101257324219f);
-            *(float *)(p + 72) = math_random_float_range(-3.14159274101257324219f, 3.14159274101257324219f);
-            *(float *)(p + 100) = math_random_float_range(-3.14159274101257324219f, 3.14159274101257324219f);
-            *(float *)(p + 104) = math_random_float_range(-3.14159274101257324219f, 3.14159274101257324219f);
-            *(float *)(p + 108) = math_random_float_range(-3.14159274101257324219f, 3.14159274101257324219f);
-            *(float *)(p + 76) = math_random_signed_float_range(0.001f, 0.05f);
-            *(float *)(p + 80) = math_random_signed_float_range(0.001f, 0.05f);
-            *(float *)(p + 84) = math_random_signed_float_range(0.001f, 0.05f);
-            *(float *)(p + 112) = math_random_signed_float_range(0.001f, 0.05f);
-            *(float *)(p + 116) = math_random_signed_float_range(0.001f, 0.05f);
-            *(float *)(p + 120) = math_random_signed_float_range(0.001f, 0.05f);
-            *(float *)(p + 88) = math_random_float_range(3.25f, 6.75f);
-            *(float *)(p + 92) = math_random_float_range(3.25f, 6.75f);
-            *(float *)(p + 96) = math_random_float_range(3.25f, 6.75f);
-            *(float *)(p + 124) = math_random_float_range(1.25f, 4.75f);
-            *(float *)(p + 128) = math_random_float_range(1.25f, 4.75f);
-            *(float *)(p + 132) = math_random_float_range(1.25f, 4.75f);
-            vec_clear_128(p);
-            vec_clear_128(p + 0x10);
-            *(int *)(p + 0x94) = count;
-            *(int *)(p + 0x98) = count;
-            *(char **)(p + 0x90) = target;
-            *(int *)(p + 0x9C) = 0;
-            *(int *)(p + 0x88) = 17;
+            qcopy(slot + 0x20, position);
+            *(float *)(slot + 64) = math_random_float_range(-3.14159274101257324219f, 3.14159274101257324219f);
+            *(float *)(slot + 68) = math_random_float_range(-3.14159274101257324219f, 3.14159274101257324219f);
+            *(float *)(slot + 72) = math_random_float_range(-3.14159274101257324219f, 3.14159274101257324219f);
+            *(float *)(slot + 100) = math_random_float_range(-3.14159274101257324219f, 3.14159274101257324219f);
+            *(float *)(slot + 104) = math_random_float_range(-3.14159274101257324219f, 3.14159274101257324219f);
+            *(float *)(slot + 108) = math_random_float_range(-3.14159274101257324219f, 3.14159274101257324219f);
+            *(float *)(slot + 76) = math_random_signed_float_range(0.001f, 0.05f);
+            *(float *)(slot + 80) = math_random_signed_float_range(0.001f, 0.05f);
+            *(float *)(slot + 84) = math_random_signed_float_range(0.001f, 0.05f);
+            *(float *)(slot + 112) = math_random_signed_float_range(0.001f, 0.05f);
+            *(float *)(slot + 116) = math_random_signed_float_range(0.001f, 0.05f);
+            *(float *)(slot + 120) = math_random_signed_float_range(0.001f, 0.05f);
+            *(float *)(slot + 88) = math_random_float_range(3.25f, 6.75f);
+            *(float *)(slot + 92) = math_random_float_range(3.25f, 6.75f);
+            *(float *)(slot + 96) = math_random_float_range(3.25f, 6.75f);
+            *(float *)(slot + 124) = math_random_float_range(1.25f, 4.75f);
+            *(float *)(slot + 128) = math_random_float_range(1.25f, 4.75f);
+            *(float *)(slot + 132) = math_random_float_range(1.25f, 4.75f);
+            vec_clear_128(slot);
+            vec_clear_128(slot + 0x10);
+            *(int *)(slot + 0x94) = count;
+            *(int *)(slot + 0x98) = count;
+            *(char **)(slot + 0x90) = target;
+            *(int *)(slot + 0x9C) = 0;
+            *(int *)(slot + 0x88) = 17;
             info = moby_get_private_value_0(target);
             if (info) {
-                gravity_get_dir_at_object(target, v, 1);
-                FastVecScale(v, v, *(float *)(info + 0x10));
-                FastVecAdd(p + 0x30, v, target + 0x10);
+                gravity_get_dir_at_object(target, offset, 1);
+                FastVecScale(offset, offset, *(float *)(info + 0x10));
+                FastVecAdd(slot + 0x30, offset, target + 0x10);
             } else {
-                qcopy(p + 0x30, target_position);
+                qcopy(slot + 0x30, target_position);
             }
             break;
         }
@@ -113,7 +114,7 @@ extern int math_fast_float_d(void *timer);
 extern void lerp_vector(void *out, void *from, void *to, float t);
 extern void make_hit_descriptor(void *packet, char *owner, int flags, void *direction, float amount);
 extern void QueueMobyImpact(char *target, void *packet);
-extern void func_PAL_00320D00(void *pos, int count, int mode);
+extern void part_spawn_hit_sparks_pal(void *pos, int count, int mode);
 extern int StartAttachedEffect_pal(char *target, int kind, int value);
 extern void FastVecSub(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
@@ -132,7 +133,7 @@ static inline Class31DEE8 *Class31DEE8At(int index)
    timer expires the record is released and the owner's count drops. */
 void spark_update_targeted_pal(char *owner)
 {
-    float v[4];
+    float offset[4];
     struct {
         char pad_00[0x18];
         unsigned char kind;
@@ -140,7 +141,7 @@ void spark_update_targeted_pal(char *owner)
         short id;
         char pad_1c[0x14];
     } packet;
-    char *ctx = *(char **)(owner + 0x68);
+    char *data = *(char **)(owner + 0x68);
     Slot31DEE8 *slot;
     char *other;
     float ratio;
@@ -177,9 +178,9 @@ void spark_update_targeted_pal(char *owner)
         if (slot->target) {
             other = moby_get_private_value_0(slot->target);
             if (other) {
-                gravity_get_dir_at_object(slot->target, v, 1);
-                FastVecScale(v, v, *(float *)(other + 0x10));
-                FastVecAdd(slot->pos, v, slot->target + 0x10);
+                gravity_get_dir_at_object(slot->target, offset, 1);
+                FastVecScale(offset, offset, *(float *)(other + 0x10));
+                FastVecAdd(slot->pos, offset, slot->target + 0x10);
             } else {
                 qcopy(slot->pos, slot->target + 0x10);
             }
@@ -190,21 +191,21 @@ void spark_update_targeted_pal(char *owner)
         if (!math_fast_float_d(&slot->time))
             continue;
         if (*(int *)(slot->target + 0x98) && !slot->hit) {
-            FastVecSub(v, slot->pos, slot->start);
-            vec_scale_to_length(v, v, 0.040000003f);
+            FastVecSub(offset, slot->pos, slot->start);
+            vec_scale_to_length(offset, offset, 0.040000003f);
             damage = Class31DEE8At(g_item_slot_to_record[0x1C])->f74;
-            make_hit_descriptor(&packet, owner, 0x210000, v, damage);
+            make_hit_descriptor(&packet, owner, 0x210000, offset, damage);
             packet.kind = 1;
             packet.mode = 3;
             packet.id = *(short *)(owner + 0xAA);
             QueueMobyImpact(slot->target, &packet);
             slot->hit = 1;
-            func_PAL_00320D00(slot->pos, 10, 1);
+            part_spawn_hit_sparks_pal(slot->pos, 10, 1);
             StartAttachedEffect_pal(slot->target, 28, *(int *)(owner + 0xB8));
         }
         if (math_fast_float_d(&slot->life)) {
             slot->owner = 0;
-            --*(int *)(ctx + 0x1C);
+            --*(int *)(data + 0x1C);
         }
     }
 }

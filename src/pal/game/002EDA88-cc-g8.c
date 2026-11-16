@@ -25,6 +25,7 @@ extern float FastVecDot(void *, void *);
 extern void FastVecScale(void *, void *, float);
 extern float square_root(float);
 extern void draw_world_quad(void *, int, int);
+/* Draws a shiny reflection mesh on an object, with textures that follow the camera. */
 void render_environment_mapped_object_pal(void *object)
 {
  struct {
@@ -39,7 +40,7 @@ void render_environment_mapped_object_pal(void *object)
  unsigned int color;
  float fraction;
  int i, j, next;
- char *o = object;
+ char *env_object = object;
  float (*points)[4] = g_env_object_points;
  float (*normals)[4] = g_env_object_normals;
  short (*quads)[8] = g_env_object_quads;
@@ -53,8 +54,8 @@ void render_environment_mapped_object_pal(void *object)
  moby_transform_joint_point(object, 0, matrix);
  transform = matrix;
  if (g_current_game_mode == 0 || g_current_game_mode == 2) {
-  if (math_fabs(g_active_camera[0x50] - *(float *)(o + 0x10)) < 16.0f &&
-      math_fabs(g_active_camera[0x51] - *(float *)(o + 0x14)) < 16.0f) active = 1;
+  if (math_fabs(g_active_camera[0x50] - *(float *)(env_object + 0x10)) < 16.0f &&
+      math_fabs(g_active_camera[0x51] - *(float *)(env_object + 0x14)) < 16.0f) active = 1;
  } else active = 1;
  if (g_current_game_mode == 6 && g_transition_mode == 2) active = 0;
  if (active || g_env_map_state == 1) {
@@ -62,15 +63,15 @@ void render_environment_mapped_object_pal(void *object)
   math_fast_float_d(&g_env_map_fade_timer);
   fraction = IntToFloat(g_env_map_fade_timer) / IntToFloat(50);
   {
-  float *t = transform;
-  float (*n)[4] = normals;
-  float (*p)[4] = points;
+  float *xform = transform;
+  float (*object_normals)[4] = normals;
+  float (*object_points)[4] = points;
   for (i = 0; i < 43; i++) {
    float divisor, x;
-   transform_vector(g_env_map_points[i], p[i], t);
+   transform_vector(g_env_map_points[i], object_points[i], xform);
    FastVecSub(ray, g_env_map_points[i], &g_active_camera[0x50]);
    vec_scale_to_length(ray, ray, 1.0f);
-   transform_vector(normal, n[i], t);
+   transform_vector(normal, object_normals[i], xform);
    vec_scale_to_length(normal, normal, 0.1f);
    FastVecScale(reflected, normal, 2.0f * FastVecDot(normal, ray));
    FastVecSub(reflected, ray, reflected);
@@ -99,8 +100,8 @@ void render_environment_mapped_object_pal(void *object)
   g_env_map_fade_timer = 50;
  } else {
   float (*dest)[4] = g_env_map_points;
-  float (*p)[4] = points;
-  for (i = 0; i < 43; i++) transform_vector(dest[i], p[i], transform);
+  float (*object_points)[4] = points;
+  for (i = 0; i < 43; i++) transform_vector(dest[i], object_points[i], transform);
   g_env_map_fade_timer = 50;
  }
  for (i = 0; i < 38; i = next) {

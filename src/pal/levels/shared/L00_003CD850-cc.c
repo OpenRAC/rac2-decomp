@@ -136,15 +136,15 @@ extern void table_clear_entry_flag(int);
 extern void part_steer_effect_direction(int, void *, int);
 extern void vec_transform_or_copy(void *, void *);
 extern void shop_trigger_current_state_effect(void *, void *);
-extern int func_PAL_00335DD0(void *, int, int);
+extern int weapon_start_health_drain_pal(void *, int, int);
 extern void ref_L00_003C9978_00(void (*)(Moby_003C9978 *), void *);
 extern void effect_update_in_state_one(Moby_003C9978 *);
 extern void vec_turn_toward_target(void *, void *, void *, void *, void *, int, float, float, float, float);
 extern void moby_forward_position_call(void *, void *, int);
 extern void moby_call_handler_on_inner_data(void *, void *);
-extern void * func_PAL_L00_00343940(void *, void *, void *, int, int, float);
+extern void * part_spawn_owner_forward_pal(void *, void *, void *, int, int, float);
 
-void func_PAL_L00_003CD850(Moby_003C9978 *self)
+void UpdateTargetSeekingProjectile_pal(Moby_003C9978 *self)
 {
     Vec4_003C9978 saved;
     Quad_003C9978 up;
@@ -275,7 +275,7 @@ void func_PAL_L00_003CD850(Moby_003C9978 *self)
                         info.hit.kind = 5;
                         info.hit.count = 3;
                         QueueMobyImpact(g_area_hit_targets[i], &info);
-                        func_PAL_00335DD0(g_area_hit_targets[i], 0x40, self->b8);
+                        weapon_start_health_drain_pal(g_area_hit_targets[i], 0x40, self->b8);
                     }
                 }
                 part_spawn_explosion_with_sparks_pal(self, g_collision_position, 1.0f, 13.0f, 0);
@@ -330,7 +330,7 @@ void func_PAL_L00_003CD850(Moby_003C9978 *self)
         spark = vars->spark;
         if (math_fast_float_d(&spark) != 0 || vars->spark == 0) {
             info.t.pair = g_seeker_info_pair;
-            func_PAL_L00_00343940(self, &info, info.t.pair.p[vars->flip % 2], vars->b78, vars->b79, travelled * 0.5f);
+            part_spawn_owner_forward_pal(self, &info, info.t.pair.p[vars->flip % 2], vars->b78, vars->b79, travelled * 0.5f);
             vars->flip++;
         }
         vars->spark = spark;

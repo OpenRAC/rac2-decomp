@@ -8,7 +8,7 @@ extern void vec_negate_and_forward(void *, void *, int);
 
 /* Turns the object's frame (a three-row rotation) by a small fixed angle about z, then places it from the
    state's +0x10 block. */
-void func_PAL_L22_00401A08(u8 *object)
+void moby_l22_spin_follow_state_pal(u8 *object)
 {
     u8 *state = *(u8 **)(object + 0x68);
     float angles[4] __attribute__((aligned(16)));

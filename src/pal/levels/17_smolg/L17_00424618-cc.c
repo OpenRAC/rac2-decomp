@@ -6,9 +6,9 @@ extern s32 g_moby_l17_pool __attribute__((sda));
 
 /* func_L17_003C7C70 is defined in L17_003C7C70-tilt-g8.c. */
 
-/* A 16-byte vector: the engine's helpers take and return these, and the copies between
+/* A 16-byte vector: the engine'vars helpers take and return these, and the copies between
    them are quadword moves. */
-/* Turns the vector at a1 into the object's frame, then into the world with the matrix at
+/* Turns the vector at a1 into the object'vars frame, then into the world with the matrix at
    a0 + 0xC0, and reports whether both of the first two coordinates stay below the two
    bounds. */
 typedef struct {
@@ -28,8 +28,8 @@ extern f32 g_fan_var_value SDATA(D_L17_001B04BC);
    the word D_L17_001B2C1C declared above as an int, reached here as a pointer under a second
    name. */
 extern u8 *D_L17_001B2C1C_base[] __asm__("D_L17_001B2C1C") __attribute__((sda));
-/* The object's state record up to the group word and the word stored beside it. */
-/* Walks the id list of the state's group and sets the state's mode word to 0x57 for every id
+/* The object'vars state record up to the group word and the word stored beside it. */
+/* Walks the id list of the state'vars group and sets the state'vars mode word to 0x57 for every id
    that has an entity, stopping at the first that has none. */
 /* Claims the shared slot at state+0x720 for this object (index into the object array):
    taken when free or when its holder is in state 0xFE/0xFD, then in mode 1 handed to the
@@ -55,31 +55,31 @@ extern void vec_build_spherical_offset(void *,float,float,float);
 extern void *part_spawn_ground_effect(void *,int,unsigned,int,int,void *,float,float,float,int);
 extern float vec_distance_xy(void *,void *);
 extern void moby_set_flag_bit(void *,int),moby_set_state(void *,int,int),moby_mark_spawned(void *),value_set_entry_by_index_pal(int,int);
-extern int func_PAL_00289730(int,int);
+extern int subtitle_request_voice_line_pal(int,int);
 /* Spins and sparkles an uncollected pickup; when the player comes within 1.5 units it bumps the
-   pickup's saved count and triggers its linked entity, and when inactive it removes itself once
+   pickup'vars saved count and triggers its linked entity, and when inactive it removes itself once
    that entity dies. */
-void func_PAL_L17_00424618(unsigned char *o)
+void proximity_pickup_update_pal(unsigned char *moby)
 {
-    int *s=*(int **)(o+0x68);
+    int *vars=*(int **)(moby+0x68);
     unsigned short id;
     unsigned char *position;
-    int n,sign,count;
+    int pass,sign,count;
     int bits;
     float size,ang,speed,scale;
     float vel[4] __attribute__((aligned(16)));
     float pos[4] __attribute__((aligned(16)));
-    if(o[0x20]!=0) goto inactive;
-    id=*(unsigned short *)(o+0xb2);
+    if(moby[0x20]!=0) goto inactive;
+    id=*(unsigned short *)(moby+0xb2);
     if(g_level_l17_save_state.flags[(short)id]!=0) goto remove_self;
     {
         bits=g_moby_nibble_table[((short)id>>1)+(g_current_map_index<<10)];
         if(id&1) bits=(bits>>4)&7; else bits=bits&7;
         if(bits) goto remove_self;
-        position=o+0x10;
+        position=moby+0x10;
         {
-            *(float *)(o+0xf8)=FastAddRotations(*(float *)(o+0xf8),0.087266474f);
-            n=1;
+            *(float *)(moby+0xf8)=FastAddRotations(*(float *)(moby+0xf8),0.087266474f);
+            pass=1;
             do {
                 size=math_random_float_range(2.0f,5.0f);
                 sign=math_random_int_below(2); if(sign==0)--sign;
@@ -93,12 +93,12 @@ void func_PAL_L17_00424618(unsigned char *o)
                 pos[2]+=math_random_signed_float_range(0.0f,0.15f);
                 part_spawn_ground_effect(pos,2,0x208020ff,0,sign,vel,size*0.1f,size,0.006f,0);
                 part_spawn_ground_effect(pos,2,0x20ffffff,1,-sign,vel,size*0.03f,size*0.3f,0.006f,0);
-            } while(--n>=0);
+            } while(--pass>=0);
             if(vec_distance_xy(position,g_hero_position)<1.5f) {
                 unsigned short pickupId;
                 unsigned char *counter;
                 g_grulch_reachable_flag=1;
-                pickupId=*(unsigned short *)(o+0xb2);
+                pickupId=*(unsigned short *)(moby+0xb2);
                 if(pickupId&1) {
                     counter=(((short)pickupId>>1)+(g_current_map_index<<10))+g_moby_nibble_table;
                     if(((*counter>>4)&7)!=7)*counter+=16;
@@ -106,23 +106,23 @@ void func_PAL_L17_00424618(unsigned char *o)
                     counter=(((short)pickupId>>1)+(g_current_map_index<<10))+g_moby_nibble_table;
                     if((*counter&7)!=7)++*counter;
                 }
-                if(*(int *)s!=-1) {
-                    ((unsigned short *)o)[0x1a]|=1;
-                    o[0x31]=0;
-                    moby_set_flag_bit(&entity_base_ptr[*s],1);
-                    moby_set_state(o,1,-1);
+                if(*(int *)vars!=-1) {
+                    ((unsigned short *)moby)[0x1a]|=1;
+                    moby[0x31]=0;
+                    moby_set_flag_bit(&entity_base_ptr[*vars],1);
+                    moby_set_state(moby,1,-1);
                 } else goto remove_self;
             }
             return;
         }
     }
 remove_self:
-    moby_mark_spawned(o);
+    moby_mark_spawned(moby);
     return;
 inactive:
-    if(*(int *)s!=-1) {
+    if(*(int *)vars!=-1) {
         int state;
-        state=entity_base_gp[*s].state;
+        state=entity_base_gp[*vars].state;
         if(state==0xfe)goto dead;
         if(state!=0xfd)goto done;
     }
@@ -131,8 +131,8 @@ dead:
         value_set_entry_by_index_pal(0x1292,0x64);
         count=g_game_flag_table[0x86]?1:2;
         if(g_game_flag_table[0x89])--count;
-        if(count>0)func_PAL_00289730(0xa0f,0x66);else func_PAL_00289730(0xa10,0x67);
-        moby_mark_spawned(o);
+        if(count>0)subtitle_request_voice_line_pal(0xa0f,0x66);else subtitle_request_voice_line_pal(0xa10,0x67);
+        moby_mark_spawned(moby);
     }
 done:;
 }

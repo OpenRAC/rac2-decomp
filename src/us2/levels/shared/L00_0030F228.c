@@ -3,7 +3,8 @@
 
 extern int D_L00_001A904C_2 __attribute__((sda));
 
-void func_US2_L00_0030F228(void)
+/* Calls the menu draw handler (with prompts) in the loaded module, if a module is loaded. */
+void level_l00_call_module_handler_10_us2(void)
 {
     int value = D_L00_001A904C_2;
 

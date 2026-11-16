@@ -45,6 +45,7 @@ extern f32 vec_length_xy(void *);
 extern u8 *g_hero_moby;
 extern void func_002A0F48();
 
+/* Spawns a bolt effect moby at a position flying in a direction for a number of frames, with two glowing particles following it. */
 Moby_L08_003B2DB0 *SpawnDirectedEffectObject_pal(int owner, float *pos, float *dir, int life)
 {
     float p[4] __attribute__((aligned(16)));
@@ -57,7 +58,7 @@ Moby_L08_003B2DB0 *SpawnDirectedEffectObject_pal(int owner, float *pos, float *d
 
     *(Quad_L08_003B2DB0 *)p = *(Quad_L08_003B2DB0 *)pos;
     *(Quad_L08_003B2DB0 *)d = *(Quad_L08_003B2DB0 *)dir;
-    moby = CreateMoby(0x4EA);
+    moby = CreateMoby(0x4EA /* moby class 1258 */);
     if (moby) {
         state = moby->state;
         state->owner = owner;

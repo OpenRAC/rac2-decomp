@@ -14,7 +14,9 @@ typedef struct {
 } L00_003781B0_Cell;
 #define L00_003781B0_X ((int)(D_L00_001B25E0 * 312.0f + 0.5f))
 
-void func_PAL_L00_0037ADD8(void)
+/* Draws the buy and back prompts of the selected item, using the red text when the player
+   cannot pay. */
+void draw_item_purchase_button_labels_pal(void)
 {
     if (g_purchase_menu_model[0x84 / 4] != 0) {
         L00_003781B0_Cell *cell = (L00_003781B0_Cell *)((char *)g_purchase_menu_model + 0x144);

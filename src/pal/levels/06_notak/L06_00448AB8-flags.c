@@ -11,7 +11,7 @@ extern void SetDeathBits_pal(char *, int, int);
 extern int PlayMobySound(int, int,char*);
 extern void matrix_mul_vec3(void *, void *, void *);
 extern unsigned char *SpawnExplosion_pal(void *, int, int, int, int, int, int, int, float, float, int, int, int, void *);
-extern void func_PAL_002B15D8(char *, int, float *, unsigned char, float, float, float, float);
+extern void part_spawn_masked_debris_pal(char *, int, float *, unsigned char, float, float, float, float);
 extern void moby_mark_spawned(void *);
 
 /* The func_L09_004050E0 burst with a particle spray (func_PAL_L00_003FB330) in place of the
@@ -31,6 +31,6 @@ void moby_l06_explode_and_remove_pal(char *object)
     FastVecSub(&impulse, origin, g_hero_position);
     impulse.f[2] = 0.0f;
     vec_scale_to_length(&impulse, &impulse, 0.120000005f);
-    func_PAL_002B15D8(object, 0x1F, impulse.f, 255, 3.0f, 6.0f, 3.0f, 6.0f);
+    part_spawn_masked_debris_pal(object, 0x1F, impulse.f, 255, 3.0f, 6.0f, 3.0f, 6.0f);
     moby_mark_spawned(object);
 }

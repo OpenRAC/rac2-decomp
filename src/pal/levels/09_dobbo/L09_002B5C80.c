@@ -18,10 +18,10 @@ extern float math_spring_float_to_goal(float *, float *, float, float, float, fl
    word, the two state words and the mode byte, then the aim check decides
    whether the channels are ramped towards their targets or the distance to
    the target is measured. */
-void func_PAL_L09_002B5C80(void) {
-    int a3;
-    int v1;
-    float r;
+void hero_l09_update_blend_channels_pal(void) {
+    int mode;
+    int hero_state_id;
+    float distance;
 
     if (g_hero_state[0x22B4] == 0) {
         *(float *)(g_hero_state + 0x258) = 0.8f;
@@ -29,23 +29,23 @@ void func_PAL_L09_002B5C80(void) {
         *(float *)(g_hero_state + 0x260) = 0.45f;
     }
 
-    a3 = *(int *)(g_hero_state + 0x229C);
-    if (a3 == 4) {
+    mode = *(int *)(g_hero_state + 0x229C);
+    if (mode == 4) {
         if (*(short *)(g_hero_state + 0x4AC) < *(int *)(g_hero_state + 0x1B8)) {
             if (g_hero_state[0x49E] == 0) {
                 *(float *)(g_hero_state + 0x25C) = *(float *)(g_hero_state + 0x4B8);
             }
         }
     } else {
-        v1 = *(int *)(g_hero_state + 0x2294);
-        if (v1 == 6) {
+        hero_state_id = *(int *)(g_hero_state + 0x2294);
+        if (hero_state_id == 6) {
             *(float *)(g_hero_state + 0x25C) = 0.5f;
-        } else if (v1 == 4) {
+        } else if (hero_state_id == 4) {
             *(float *)(g_hero_state + 0x258) = 0.35000002384185791f;
-        } else if ((u32)(a3 - 0x11) < 2) {
+        } else if ((u32)(mode - 0x11) < 2) {
             *(int *)(g_hero_state + 0x258) = 0;
             *(int *)(g_hero_state + 0x25C) = 0;
-        } else if (v1 == 0x7C) {
+        } else if (hero_state_id == 0x7C) {
             *(float *)(g_hero_state + 0x260) = 0.8f;
         }
     }
@@ -65,8 +65,8 @@ void func_PAL_L09_002B5C80(void) {
     if (g_hero_state[0x1494] != 0)
         goto slow;
 
-    r = vec_distance_xy(g_hero_state + 0x240, g_hero_state + 0x80);
-    if (r > *(float *)(g_hero_state + 0x264) * 0.5f)
+    distance = vec_distance_xy(g_hero_state + 0x240, g_hero_state + 0x80);
+    if (distance > *(float *)(g_hero_state + 0x264) * 0.5f)
         goto slow;
     return;
 
@@ -74,15 +74,15 @@ slow:
     {
         /* The channel block sits 0x250 into the runtime block; the block pointer
            is taken first and the runtime block is reached back from it. */
-        u8 *p = g_hero_state + 0x250;
-        u8 *s = p - 0x250;
+        u8 *channels = g_hero_state + 0x250;
+        u8 *runtime = channels - 0x250;
         float step = 0.024f;
-        ApproachValue((float *)p, *(float *)(s + 0x258), step);
-        ApproachValue((float *)(p + 4), *(float *)(s + 0x25C), step);
+        ApproachValue((float *)channels, *(float *)(runtime + 0x258), step);
+        ApproachValue((float *)(channels + 4), *(float *)(runtime + 0x25C), step);
         math_spring_float_to_goal(
-            (float *)(p + 0x14),
-            (float *)(p + 0x18),
-            *(float *)(s + 0x260),
+            (float *)(channels + 0x14),
+            (float *)(channels + 0x18),
+            *(float *)(runtime + 0x260),
             0.028800001f,
             0.43200004f,
             0.080000006f);

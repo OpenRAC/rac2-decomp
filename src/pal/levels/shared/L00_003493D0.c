@@ -38,6 +38,7 @@ extern int module_l00_call_handler_with_arg_12(int);
 extern char *tab_menu_get_selected_entry(int);
 extern void menu_start_action(int);
 
+/* Handles menu input like the other level callbacks, and when the select bit is set starts a menu action built from the selected entry's id and value. */
 int pad_update_input_callback_with_request_pal(void)
 {
     int result = 0;

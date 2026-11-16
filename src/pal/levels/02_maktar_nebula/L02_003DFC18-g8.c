@@ -17,24 +17,24 @@ extern float math_random_float_range(float, float);
 extern int math_random_int_below(int);
 extern void *enemy_spawn_record(void *, void *, void *, void *, int);
 
-/* Spawns arg1 particles at the point arg0 raised by D_L02_001B0524 and pushed along the vector
+/* Spawns count particles at the point raised by D_L02_001B0524 and pushed along the vector
    from D_L02_001BA500, each with a random upward speed (a sixtieth of the range D_L02_001B051C ..
    D_L02_001B0520) and the particle kind that func_002A77E0 picks for 2. */
-void func_PAL_L02_003DFC18(char *arg0, int arg1) {
+void part_spawn_rising_pal(char *point, int count) {
     float vel[4];
     float pos[4];
-    float tmp[4];
+    float push[4];
     int i;
 
     *(TI128 *)vel = 0;
-    *(TI128 *)pos = *(TI128 *)arg0;
+    *(TI128 *)pos = *(TI128 *)point;
     pos[2] += g_rising_particle_height_offset;
     pos[3] = 0;
-    FastVecSub(tmp, g_camera_l02_position, pos);
-    tmp[2] = 0;
-    vec_scale_to_length(tmp, tmp, g_rising_particle_push_length);
-    FastVecAdd(pos, pos, tmp);
-    for (i = 0; i < arg1; i++) {
+    FastVecSub(push, g_camera_l02_position, pos);
+    push[2] = 0;
+    vec_scale_to_length(push, push, g_rising_particle_push_length);
+    FastVecAdd(pos, pos, push);
+    for (i = 0; i < count; i++) {
         vec_add_random_offset(pos, g_rising_particle_jitter);
         vel[2] = math_random_float_range(g_rising_particle_speed_min, g_rising_particle_speed_max) * 0.020000001f;
         enemy_spawn_record(pos, vel, g_rising_particle_spawn_record, (void *)math_random_int_below(2), 1);

@@ -3,7 +3,7 @@
 
 typedef signed int s32;
 typedef unsigned long long u64;
-extern s32 mothership_is_value_not_in_slots(s32 arg0);
+extern s32 mothership_is_value_not_in_slots(s32 boss);
 extern s32 math_get_mask_bit(u64, s32);
 extern float math_fabs(float);
 extern float math_step_value_toward_target(float *, float *, float, float, float, float);
@@ -17,8 +17,8 @@ extern s32 g_effect_pools[3][60];
 
 /* Springs the second measure toward its target, doubles the word at +0x74, and latches the
  * measure once it is within a tenth of the target. */
-void mothership_spring_second_measure_pal(char *arg0) {
-    char *state = *(char **)(arg0 + 0x68);
+void mothership_spring_second_measure_pal(char *boss) {
+    char *state = *(char **)(boss + 0x68);
 
     if (*(s32 *)(state + 0x5D8) != 0)
         return;

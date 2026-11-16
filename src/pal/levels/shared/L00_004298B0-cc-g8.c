@@ -7,7 +7,7 @@
  * type-based alias analysis gives the camera-type test and the registers after it their
  * retail form. The owner block (+0x70) is read through its position (+0x60),
  * aim (+0xB0), movement (+0x160) and state (+0x1F0) parts; `goal` is assigned inside the
- * loop (loop.c hoists it) so its spill slot precedes the scan and hidden pointers. */
+ * loop (loop.projected hoists it) so its spill slot precedes the scan and hidden pointers. */
 
 extern char g_camera_move_state[],g_hero_l00_position[];
 typedef struct { char pad[404]; char *active; char gap[620]; int counter; } GlobalCamera243;
@@ -24,7 +24,7 @@ extern int coll_process_hit(void *,int,void *,int,float),level_has_pending_inner
 extern void FastVecSub(void *,void *,void *),FastVecScale(void *,void *,float),vec_scale_to_length(void *,void *,float);
 extern float FastVecDot(void *,void *),math_fast_angle_helper(float),math_fabs(float);
 extern void FastVecCross(void *,void *,void *),math_apply_axis_rotation_to_quat(void *,void *,void *,float);
-extern int func_PAL_L00_004295B8(void *), cam_check_noop(void *);
+extern int cam_follow_sweep_probe_pal(void *), cam_check_noop(void *);
 extern void *cam_follow_probe_collision(void *);
 extern int FastDecTimer(short *);
 extern float IntToFloat(int),math_cosine_blend(float,float,float);
@@ -36,15 +36,18 @@ extern void cam_reset_default(void);
 typedef struct { char pad[16]; float pos[4]; char pad20[4]; struct { char pad[16]; int value; } *info; char pad28[112]; int visible; char pad9C[14]; short type; } Moby243;
 typedef struct { char pad[44]; float distance; } Move243;
 typedef struct { char pad[48]; float offset; short timer; char gap[4]; short flag; char gap2[16]; short counter, locked; } State243;
-void func_PAL_L00_004298B0(char *obj)
+/* Hides the mobs between the camera and the hero for the frame (restoring them afterwards), turns
+   the camera away from nearby blockers, probes for collisions, eases the follow distance back out
+   and resets the camera when it stays blocked. */
+void follow_camera_hide_obstructions_pal(char *obj)
 {
     char *base=P(obj,112);
     char *pos=base+96;
     Move243 *move=(Move243 *)(base+352);
     State243 *state=(State243 *)(base+496);
     char *camera=g_camera_move_state;
-    char a[16],b[16],c[16],d[16],e[16];
-    Moby243 *m;
+    char mid_point[16],to_moby[16],projected[16],side_dir[16],turn_axis[16];
+    Moby243 *candidate;
     char *axis;
     int count,n,blocked=0,numhidden=0,type,camera_type,i;
     float distance=move->distance-state->offset+1.5f;
@@ -52,29 +55,29 @@ void func_PAL_L00_004298B0(char *obj)
     unsigned short timer;
     Moby243 *entry;
     char *goal;
-    lerp_vector(a,base+176,camera-96,0.5f);
-    count=coll_process_hit(a,1,g_camera_player.owner,0,distance*0.5f);
+    lerp_vector(mid_point,base+176,camera-96,0.5f);
+    count=coll_process_hit(mid_point,1,g_camera_player.owner,0,distance*0.5f);
     if(count>0) {
         char **scan,**hidden;
         scan=g_area_hit_targets;
         hidden=g_hidden_area_hit_targets;
         for(i=0;i<count;i++) {
             goal=base+176;
-            m=(Moby243 *)*scan;
-            if(m->visible && (!level_has_pending_inner_flag(m)||m->type==2923)) {
-                type=m->type;
+            candidate=(Moby243 *)*scan;
+            if(candidate->visible && (!level_has_pending_inner_flag(candidate)||candidate->type==2923)) {
+                type=candidate->type;
                 if(type!=2234 && type!=3335 && type!=4304 && type!=1143 && type!=11) {
-                    *hidden++=(char *)m;
+                    *hidden++=(char *)candidate;
                     numhidden++;
-                    m->visible=0;
+                    candidate->visible=0;
                 } else {
-                    FastVecSub(b,m->pos,goal);
+                    FastVecSub(to_moby,candidate->pos,goal);
                     axis=camera+48;
-                    dot=FastVecDot(axis,b);
-                    FastVecScale(c,axis,dot);
-                    FastVecSub(d,b,c);
-                    vec_scale_to_length(d,d,1.0f);
-                    dot=FastVecDot(d,move);
+                    dot=FastVecDot(axis,to_moby);
+                    FastVecScale(projected,axis,dot);
+                    FastVecSub(side_dir,to_moby,projected);
+                    vec_scale_to_length(side_dir,side_dir,1.0f);
+                    dot=FastVecDot(side_dir,move);
                     {
                     float span=move->distance-state->offset;
                     span=dot/span;
@@ -82,9 +85,9 @@ void func_PAL_L00_004298B0(char *obj)
                     }
                     t=math_fabs(1.5707963705062866f-t);
                     if(t<0.4363323450088501f) {
-                        FastVecCross(e,move,axis);
-                        vec_scale_to_length(e,e,1.0f);
-                        if(FastVecDot(e,b)>0.0f)math_apply_axis_rotation_to_quat(move,move,camera+32,-0.01745329424738884f);
+                        FastVecCross(turn_axis,move,axis);
+                        vec_scale_to_length(turn_axis,turn_axis,1.0f);
+                        if(FastVecDot(turn_axis,to_moby)>0.0f)math_apply_axis_rotation_to_quat(move,move,camera+32,-0.01745329424738884f);
                         else math_apply_axis_rotation_to_quat(move,move,camera+32,0.01745329424738884f);
                     }
                 }
@@ -93,7 +96,7 @@ void func_PAL_L00_004298B0(char *obj)
         }
     }
     if(!state->locked) {
-        if(func_PAL_L00_004295B8(obj)) blocked=1;
+        if(cam_follow_sweep_probe_pal(obj)) blocked=1;
         if(cam_check_noop(obj)) blocked=1;
     }
     if(cam_follow_probe_collision(obj))blocked=1;
@@ -127,9 +130,9 @@ hold:
     else state->timer=1667;
 scaled:
     vec_scale_to_length(move,move,move->distance-state->offset);
-    FastVecAdd(b,move,pos+80);
+    FastVecAdd(to_moby,move,pos+80);
     if(g_camera_player.mode!=49 && !state->locked &&
-       CollLine(pos+80,b,g_cam_collision_line_mask,g_camera_player.owner,0) &&
+       CollLine(pos+80,to_moby,g_cam_collision_line_mask,g_camera_player.owner,0) &&
        !coll_is_point_in_grid(g_hero_l00_position)) {
         state->counter++;
         if(state->counter>=25)cam_reset_default();

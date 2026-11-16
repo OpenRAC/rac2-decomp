@@ -10,7 +10,8 @@ extern int g_jitter_trail_reset_value_b __attribute__((sda));
 extern float g_jitter_trail_alpha_scale __attribute__((nosda));
 
 /* func_PAL_L00_003B88F8, the PAL copy of func_L00_003B4E88: the same C, with both latches scaled to 50 Hz. */
-void func_PAL_L00_003B88F8(void)
+/* Resets the four jitter trail slots and restarts the two latches. (PAL: 50 Hz timings) */
+void jitter_trail_reset_slots_pal(void)
 {
     int i;
     for (i = 0; i < 4; i++) {

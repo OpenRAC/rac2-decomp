@@ -28,7 +28,7 @@ extern void draw_world_quad(void *, void *, int);
 extern void VU1_addGSregister(int, int);
 extern void gfx_draw_colored_rectangle(int, int,int, int, unsigned int);
 /* Update four effect strips, then draw the active radial ring and fading quad. */
-void func_PAL_L00_003D6F08(char *object)
+void RenderRadialRingAndQuad_pal(char *object)
 {
     char render[0x90];
     EffectVector position, axis, direction;

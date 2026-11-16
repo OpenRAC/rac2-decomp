@@ -71,11 +71,12 @@ static inline void updateJoint(char *obj, char *joint, int index, float speed, f
     moby_update_eased_node(obj, joint, index, speed * 1.44f, rate * 1.44f);
 }
 
-void func_PAL_L09_0040F3A0(char *obj) {
+/* Per-frame update of the talking character (moby class 3678): it offers dialogue and rewards, then watches the hero with its head and eyes (PAL: 50 Hz timings). */
+void talking_npc_update_pal(char *obj) {
     float target[4], pos[4], delta[4];
     char *data = *(char **)(obj + 0x68);
     char *player;
-    float speed, rate, yaw, pitch, randomYaw;
+    float speed, rate, yaw, pitch, random_yaw;
     int active;
     u64 status;
 
@@ -243,9 +244,9 @@ void func_PAL_L09_0040F3A0(char *obj) {
         }
         if (FastDecTimer(data + 0x112)) {
             S16(data, 0x112) = FloatToInt((math_random_float_range(180.0f, 300.0f) * 5.0f + 2.0f) * 0.16666667f);
-            randomYaw = FastAddRotations(F32(obj, 0xF8), math_random_float_range(-90.0f, 90.0f) * 0.017453294f);
+            random_yaw = FastAddRotations(F32(obj, 0xF8), math_random_float_range(-90.0f, 90.0f) * 0.017453294f);
             pitch = math_random_float_range(0.0f, 30.0f) * 0.017453294f;
-            vec_build_spherical_offset(data + 0x100, 6.0f, randomYaw, pitch);
+            vec_build_spherical_offset(data + 0x100, 6.0f, random_yaw, pitch);
             FastVecAdd(data + 0x100, data + 0x100, obj + 0x10);
         }
         if (S16(data, 0x110)) {

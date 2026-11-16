@@ -9,6 +9,7 @@ extern void SetupGifPaging(long arg0);
 extern void SetupGifPaging(long param_1);
 extern void func_0029CB20(void);
 
+/* Draws a second kind of menu page between the start and end of screen drawing. */
 int menu_page_draw_second_us2(void) {
     SetupGifPaging(0);
     func_0029CB20();
@@ -21,6 +22,7 @@ extern void menu_set_value(char *, int);
 extern void list_menu_set_records(char *, char *);
 extern char g_list_menu_records_first[];
 
+/* Sets up the text of a menu page when the menu data is loaded. */
 int menu_page_text_init_first_us2(void)
 {
     if (g_resident_data_base[0] != 0) {
@@ -36,6 +38,7 @@ extern int func_0029CA70(int);
 extern int list_menu_get_selected_record(unsigned char *);
 extern void menu_start_action(int);
 
+/* Reads the buttons on a menu page: cancel goes back, other keys close it, and confirm sends the chosen entry to the menu request handler. */
 int menu_page_handle_input_confirm_us2(void)
 {
     int result = 0;

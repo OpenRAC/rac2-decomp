@@ -28,73 +28,74 @@ typedef struct {
 } PadPollState;
 extern PadPollState g_pad_state;
 
-void poll_pad_device_state_pal(void *arg)
+/* Polls one controller: reads its state, identifies the device and its vibration support, sends vibration and decodes the button reading (PAL). */
+void poll_pad_device_state_pal(void *device)
 {
-    PadPollState *p = arg;
+    PadPollState *pad = device;
     unsigned char buf[64];
     short vibration;
-    int status, n, i;
+    int status, count, i;
 
-    p->held = 0;
-    p->prev_held = p->latched_held;
-    p->prev_raw_held = p->raw_held;
-    p->raw_held = 0;
-    status = scePad2GetState(p->socket);
-    p->device_state = status;
+    pad->held = 0;
+    pad->prev_held = pad->latched_held;
+    pad->prev_raw_held = pad->raw_held;
+    pad->raw_held = 0;
+    status = scePad2GetState(pad->socket);
+    pad->device_state = status;
     if (status == 1) {
-        switch (p->profile_state) {
+        switch (pad->profile_state) {
         case 0: {
-            int n;
+            int count;
 
-            n = pad_read_button_mask(p->socket, buf);
+            count = pad_read_button_mask(pad->socket, buf);
             if (*(unsigned int *)buf == 0xFFFFFFFF)
-                p->profile_mask = 0x79;
+                pad->profile_mask = 0x79;
             else
-                p->profile_mask = 0;
-            if (n < 5) {
-                for (i = 0; i < n; i++)
-                    p->profile[i] = buf[i];
-                p->profile_state = 1;
+                pad->profile_mask = 0;
+            if (count < 5) {
+                for (i = 0; i < count; i++)
+                    pad->profile[i] = buf[i];
+                pad->profile_state = 1;
             } else {
-                p->profile_state = 2;
-                n = 0;
+                pad->profile_state = 2;
+                count = 0;
             }
-            for (i = n; i < 4; i++)
-                p->profile[i] = buf[i];
-            n = pad_send_command(p->socket, buf);
-            if (n < 5) {
-                for (i = 0; i < n; i++)
-                    p->act[i] = buf[i];
+            for (i = count; i < 4; i++)
+                pad->profile[i] = buf[i];
+            count = pad_send_command(pad->socket, buf);
+            if (count < 5) {
+                for (i = 0; i < count; i++)
+                    pad->act[i] = buf[i];
             } else {
-                n = 0;
+                count = 0;
             }
-            for (i = n; i < 4; i++)
-                p->act[i] = buf[i];
-            ClearPadInput(p);
+            for (i = count; i < 4; i++)
+                pad->act[i] = buf[i];
+            ClearPadInput(pad);
             break;
         }
         case 1:
-            n = pad_read_record(p->socket, buf);
+            count = pad_read_record(pad->socket, buf);
             vibration = 0;
-            if (p->act[0] & 2)
-                vibration = p->vibration1;
-            if (p->act[0] & 1) {
+            if (pad->act[0] & 2)
+                vibration = pad->vibration1;
+            if (pad->act[0] & 1) {
                 short shifted = vibration << 1;
 
-                vibration = shifted | (p->vibration0 & 1);
+                vibration = shifted | (pad->vibration0 & 1);
             }
-            sceVibSetActParam(p->socket, 1, p->act, 2, &vibration);
-            pad_decode_reading_pal(p, buf, n);
+            sceVibSetActParam(pad->socket, 1, pad->act, 2, &vibration);
+            pad_decode_reading_pal(pad, buf, count);
             break;
         case 2:
-            ClearPadInput(p);
+            ClearPadInput(pad);
             break;
         }
     } else {
-        ClearPadInput(p);
-        p->profile_state = 0;
+        ClearPadInput(pad);
+        pad->profile_state = 0;
     }
-    p->vibration0 = 0;
-    p->vibration1 = 0;
+    pad->vibration0 = 0;
+    pad->vibration1 = 0;
     g_pad_device_idle_flag = g_pad_state.device_state == 0;
 }

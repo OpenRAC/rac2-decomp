@@ -61,7 +61,7 @@ extern Moby *g_area_hit_targets[];
 extern CollisionResult g_collision_result;
 extern WeaponEntry g_weapon_table_2[];
 extern u8 g_megarocket_sound_records[];
-extern s32 func_PAL_L00_002C4480(int, int);
+extern s32 hero_l00_set_action_pal(int, int);
 extern void matrix_mul_vec3(void *, void *, void *);
 extern void FastVecAdd(void *, void *, void *);
 extern void FastVecScale(void *, void *, float);
@@ -78,20 +78,20 @@ extern int math_fast_float_d(int *);
 extern int PlayMobySound(int, int, void *);
 extern void snd_stop_voice(int);
 extern void ref_L00_0040F6A0_00(void (*)(Moby *), Moby *);
-extern void func_PAL_L00_00415498(Moby *);
+extern void charge_draw_glow_sprites_pal(Moby *);
 extern float math_random_angle(void);
 extern void math_apply_axis_rotation_to_quat(void *, void *, void *, float);
 extern float math_random_float_range(float, float);
 extern float math_random_signed_float_range(float, float);
 extern int FloatToInt(float);
-extern void *func_PAL_002C23B8(void *, void *, int, int, unsigned int, int, float, float, float, float, float);
-extern int func_PAL_L00_00415648(Moby *);
+extern void *part_spawn_burst_pal(void *, void *, int, int, unsigned int, int, float, float, float, float, float);
+extern int object_value_to_grade_pal(Moby *);
 extern int coll_process_hit(float, void *, int, void *, void *);
-extern void func_PAL_L00_00415690(Moby *, int);
+extern void particle_burst_around_object_pal(Moby *, int);
 extern void charge_shot_start_effect_pal(Moby *, Vector *, int);
-extern void func_PAL_L00_002AF458(void);
+extern void start_equipped_item_animation_pal(void);
 extern int slot_copy_records_to_free(void *);
-extern int func_PAL_00289730(int, int);
+extern int subtitle_request_voice_line_pal(int, int);
 extern void slot_reset_active(int);
 extern void sequenced_child_spawn_pal(Moby *, Vector *);
 extern void light_flash_update_pal(Moby *, Vector *);
@@ -122,7 +122,7 @@ void megarocket_cannon_update_pal(Moby *moby)
         vars->chargeSound = -1;
     }
     if (HERO->i[0x2294 / 4] == 1)
-        func_PAL_L00_002C4480(0x1D, 1);
+        hero_l00_set_action_pal(0x1D, 1);
     matrix_mul_vec3(&nozzle, &g_megarocket_nozzle_offset, &moby->right);
     FastVecAdd(&nozzle, &nozzle, &moby->position);
     if (HERO->i[0x1450 / 4] != 0)
@@ -213,7 +213,7 @@ void megarocket_cannon_update_pal(Moby *moby)
         vars->charge++;
         if (slot[1].owner != moby || !slot[1].active)
             vars->chargeSound = PlayMobySound(6, 4, moby);
-        ref_L00_0040F6A0_00(func_PAL_L00_00415498, moby);
+        ref_L00_0040F6A0_00(charge_draw_glow_sprites_pal, moby);
         level = g_item_ammo_counts[HERO->i[0x1248 / 4]];
         if (level >= 5)
             level = 4;
@@ -227,7 +227,7 @@ void megarocket_cannon_update_pal(Moby *moby)
             spark.f[0] = nozzle.f[0] + math_random_signed_float_range(0.0f, 0.1f);
             spark.f[1] = nozzle.f[1] + math_random_signed_float_range(0.0f, 0.1f);
             spark.f[2] = nozzle.f[2] + math_random_signed_float_range(0.0f, 0.1f);
-            func_PAL_002C23B8(&spark, &work, 12, 0x7F, 0x7F7F7F, life, size, 500.0f, 1.0f, 0.0f, 0.0f);
+            part_spawn_burst_pal(&spark, &work, 12, 0x7F, 0x7F7F7F, life, size, 500.0f, 1.0f, 0.0f, 0.0f);
         }
     } else {
         if (vars->chargeSound != -1) {
@@ -240,7 +240,7 @@ void megarocket_cannon_update_pal(Moby *moby)
             PlayMobySound(1, 0, moby);
         if (vars->charge != 0) {
             released = 1;
-            charged = func_PAL_L00_00415648(moby);
+            charged = object_value_to_grade_pal(moby);
         }
         vars->charge = 0;
         vars->unknown20 = 0;
@@ -287,15 +287,15 @@ void megarocket_cannon_update_pal(Moby *moby)
                 }
             }
             vars->flash = 12;
-            func_PAL_L00_00415690(moby, charged);
+            particle_burst_around_object_pal(moby, charged);
             charge_shot_start_effect_pal(moby, &nozzle, charged);
             anim_start_blended_with_flags(moby, 2, 0, 2, 0);
-            func_PAL_L00_002AF458();
+            start_equipped_item_animation_pal();
             vars->sound = slot_copy_records_to_free(g_megarocket_sound_records);
             if (charged)
                 g_subtitle_history[0x3A8 / 2] = 0xFFFF;
             else if (g_subtitle_history[0x3A8 / 2] < 40 && ++g_subtitle_history[0x3A8 / 2] == 40)
-                func_PAL_00289730(0x9F7, 0x4E);
+                subtitle_request_voice_line_pal(0x9F7, 0x4E);
         }
         if (!((g_pad_state[0x1A0 / 4] & HERO->u[0x1230 / 4]) && get_ammo(-1) && HERO->b[0x22B8]) &&
             vars->sound >= 0) {

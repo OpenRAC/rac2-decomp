@@ -27,7 +27,7 @@ extern void FastVecSub(void *, void *, void *);
 extern float moby_get_anim_value(void *);
 extern int math_fast_float_d(int *);
 extern float IntToFloat(int);
-extern void func_PAL_002A7E68(void *, int, int, int);
+extern void anim_start_blended_pal(void *, int, int, int);
 extern void part_spawn_random_direction_effect(void *, float, float);
 extern float math_random_float_range(float, float);
 extern float math_random_signed_float_range(float, float);
@@ -36,7 +36,7 @@ extern void UpdateScaledRecords(void);
 /* func_L00_002E6EF8 in most levels; its address differs per level. */
 extern void ref_L00_00395428_00(void *, void *);
 
-void func_PAL_L00_003986B0(char *object)
+void UpdateLightningArcs_pal(char *object)
 {
     Vector origin, random, difference, offsets[5];
     int emitting = 0;
@@ -82,7 +82,7 @@ void func_PAL_L00_003986B0(char *object)
         } else {
             g_arc_cooldown_a = (((int)(g_arc_duration_ticks_a) * 5 + 2) / 6);
             g_arc_cooldown_b = (((int)(g_arc_duration_ticks_b) * 5 + 2) / 6);
-            func_PAL_002A7E68(object, 1, 0, 10);
+            anim_start_blended_pal(object, 1, 0, 10);
         }
         break;
     }

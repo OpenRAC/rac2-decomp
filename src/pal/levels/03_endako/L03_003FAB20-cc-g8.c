@@ -26,26 +26,26 @@ extern int math_random_int_below(int id);
 /* Picks the entity's next behaviour.  A global word chooses it when it is not
  * negative; else the state's own counters do, each one running down as it is
  * used.  Every behaviour sets up its timers and calls. */
-void func_PAL_L03_003FAB20(u8 *entity) {
+void boss_choose_next_behaviour_pal(u8 *entity) {
     u8 *state = *(u8 **)(entity + 0x68);
-    s32 sel;
+    s32 behaviour;
 
     if (g_endako_boss_forced_behaviour >= 0) {
-        sel = g_endako_boss_forced_behaviour;
+        behaviour = g_endako_boss_forced_behaviour;
     } else if (state[0x30A] != 0) {
         state[0x30A]--;
-        sel = 1;
+        behaviour = 1;
     } else if (state[0x309] != 0) {
         state[0x309]--;
-        sel = 0;
+        behaviour = 0;
     } else if (state[0x30B] != 0) {
         state[0x30B]--;
-        sel = 2;
+        behaviour = 2;
     } else {
-        sel = math_random_int_below(state[0x308] + 1);
+        behaviour = math_random_int_below(state[0x308] + 1);
     }
 
-    switch (sel) {
+    switch (behaviour) {
     case 0:
         moby_set_state(entity, 7, 3);
         if (state[0x308] >= 2) {

@@ -23,8 +23,9 @@ extern void FastVecAdd(void *, void *, void *);
 extern void FastVecSub(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, f32);
 
+/* During the cutscene frames, moves the four scene markers onto the marker object and points the camera target at the scene object (PAL copy of hrugis_update_scene_markers). */
 void hrugis_update_scene_markers_pal(void) {
-    f32 tmp[4] __attribute__((aligned(16)));
+    f32 to_view[4] __attribute__((aligned(16)));
     s32 low, high, slot, i, j;
     u8 *obj;
     u8 *dst, *src;
@@ -64,9 +65,9 @@ void hrugis_update_scene_markers_pal(void) {
                 u8 *out = dst + j * 16;
                 matrix_mul_vec3(out, src + j * 16, obj + 0xC0);
                 FastVecAdd(out, out, obj + 0x10);
-                FastVecSub(tmp, g_view_origin_vec, out);
-                vec_scale_to_length(tmp, tmp, 0.15f);
-                FastVecAdd(out, out, tmp);
+                FastVecSub(to_view, g_view_origin_vec, out);
+                vec_scale_to_length(to_view, to_view, 0.15f);
+                FastVecAdd(out, out, to_view);
             }
         }
         *(u8 **)(g_scene_marker_state.target + 0x68) = g_scene_marker_state.objects[slot];

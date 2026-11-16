@@ -40,7 +40,7 @@ extern char g_hero_state[];
 
 /* Spawns a bubble particle at position with velocity; a floor of -1 follows
    the hero (just above it while swimming, else the water level). */
-Particle_002BF728 *func_PAL_002C0428(TI128 *position, float *velocity, float scale, float floor)
+Particle_002BF728 *part_spawn_bubble_pal(TI128 *position, float *velocity, float scale, float floor)
 {
     Particle_002BF728 *p = part_alloc(0x22);
     typeof(p->motion) *m = &p->motion;

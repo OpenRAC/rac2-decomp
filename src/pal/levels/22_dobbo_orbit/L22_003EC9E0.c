@@ -12,10 +12,11 @@ extern s32 g_unused_l22_level_word __attribute__((sda));
 extern s32 func_2F36F0(s32);
 extern void text_show_message_at_moby(s32, s32, s32);
 
-void text_show_message_clear_flag_pal(s32 a0) {
-    s32 x = *(u32 *)(a0 + 0x68);
+/* Shows the message effect for this object and clears one of its flags. */
+void text_show_message_clear_flag_pal(s32 moby) {
+    s32 vars_ptr = *(u32 *)(moby + 0x68);
 
-    text_show_message_at_moby(a0, x, x);
-    *(u8 *)(a0 + 0x30) = 0xFF;
+    text_show_message_at_moby(moby, vars_ptr, vars_ptr);
+    *(u8 *)(moby + 0x30) = 0xFF;
 }
 

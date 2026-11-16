@@ -16,8 +16,9 @@ extern int TryClaimNotice(int, int, int);
 extern void hero_reset_position_and_direction(void *, void *, int, int);
 extern void museum_info_stand_advance_state(char *);
 
+/* Updates a museum info stand: waits for the player to look at it and press the button, then moves the hero to the exhibit and back. */
 void museum_info_stand_update_us2(char *object) {
-    char *g;
+    char *hero;
     char *state = *(char **)(object + 0x68);
     int id;
 
@@ -58,15 +59,15 @@ void museum_info_stand_update_us2(char *object) {
         } else {
             id = 0x133F;
         }
-        g = g_hero_state;
-        if (*(char **)(g + 0x33C) == object && *(int *)(g + 0x340) != 0) {
+        hero = g_hero_state;
+        if (*(char **)(hero + 0x33C) == object && *(int *)(hero + 0x340) != 0) {
             TryClaimNotice(8, id, 1);
             if (g_pad_state.f1A4 & 0x10) {
-                char *s0 = g_museum_entries + (*(int *)state << 8);
+                char *entry = g_museum_entries + (*(int *)state << 8);
 
-                museum_info_stand_advance_state(s0);
-                hero_reset_position_and_direction(s0 + 0x10, s0 + 0xF0, 0x6F, 1);
-                *(unsigned char *)(g + 0x22B5) = 1;
+                museum_info_stand_advance_state(entry);
+                hero_reset_position_and_direction(entry + 0x10, entry + 0xF0, 0x6F, 1);
+                *(unsigned char *)(hero + 0x22B5) = 1;
             }
         }
         break;

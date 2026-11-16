@@ -18,7 +18,7 @@ extern void part_steer_effect_direction(int, void *, int);
 extern void vec_transform_or_copy(void *, void *);
 extern void shop_trigger_current_state_effect(void *, void *);
 extern void vec_add_object_direction_scaled(void *, void *, float);
-extern void func_PAL_L00_00392250(void *);
+extern void part_emit_sparkle_pal(void *);
 extern void vec_fast_normalize_helper(void *, void *, float);
 extern int CollLine(void *, void *, int, void *, void *);
 extern int GetCollHitMaterial(void);
@@ -31,12 +31,12 @@ extern float math_fast_sin_or_cos_a(float);
 extern float math_fast_sin_or_cos_b(float);
 extern int math_random_int_range(int, int);
 extern int math_random_int_below(int);
-extern void *func_PAL_002C0838(void *, void *, int, int);
+extern void *part_spawn_spark_2_pal(void *, void *, int, int);
 extern void vec_fast_normalize(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
 extern int math_fast_float_d(void *);
 extern void table_clear_entry_flag(int);
-extern void func_PAL_L00_00390F48(void *, void *, void *);
+extern void part_spawn_big_explosion_pal(void *, void *, void *);
 extern void FastVecAdd(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
 
@@ -56,7 +56,7 @@ typedef struct { char pad0[4]; int state; char pad1[2]; unsigned char opacity, a
 typedef struct { char pad0[8]; unsigned char color, size; short life; char pad1[0x14]; EffectTail tail; } CutsceneParticle;
 /* Each register bank keeps the callee's order (a0-t0: position, spin, axis, colour, count;
    f12-f15: jitter, lo, hi, size); the interleaving gives retail's argument setup order. */
-extern CutsceneParticle *func_PAL_002BE9A8(void *, int, float, float, void *, float, unsigned int, float, int);
+extern CutsceneParticle *part_spawn_spinning_spark_pal(void *, int, float, float, void *, float, unsigned int, float, int);
 extern int FloatToInt(float);
 
 /* Activates the scene's effect mobys during phase 6 and emits paired sparks from the
@@ -79,7 +79,7 @@ void cutscene_update_spark_effects_pal(unsigned char *self) {
         if (g_cutscene_l17_state.phase == 6) {
             EffectMoby *m;
             for (m = g_effect_moby_list; m; m = m->next) {
-                if (m->classId == 0xB88 || m->classId == 0x1249) {
+                if (m->classId == MOBY_CLASS_GRULCH || m->classId == 0x1249) {
                     m->unknown = 0;
                     m->flags = (m->flags | 0x43) & 0xEFFF;
                 }
@@ -96,7 +96,7 @@ void cutscene_update_spark_effects_pal(unsigned char *self) {
                 amount = math_random_int_below(16);
                 if (math_random_int_below(2))
                     amount = -amount;
-                first = func_PAL_002BE9A8(&point, amount, 0.1f, 1.0f, &velocity, 0.9f, 0x7F204080, 100000.0f, 0);
+                first = part_spawn_spinning_spark_pal(&point, amount, 0.1f, 1.0f, &velocity, 0.9f, 0x7F204080, 100000.0f, 0);
                 if (first) {
                     first->life = 13;
                     first->size = FloatToInt(4.0f) + 64;
@@ -105,7 +105,7 @@ void cutscene_update_spark_effects_pal(unsigned char *self) {
                     detail->state = state;
                     detail->age = (unsigned char)first->life;
                 }
-                second = func_PAL_002BE9A8(&point, 16, 0.05f, 1.0f, &velocity, 0.97f, 0x7FFFFFFF, 60000.0f, 0);
+                second = part_spawn_spinning_spark_pal(&point, 16, 0.05f, 1.0f, &velocity, 0.97f, 0x7FFFFFFF, 60000.0f, 0);
                 /* Retail tests the first spark again before writing the second. */
                 if (first) {
                     detail = &second->tail;
@@ -129,7 +129,7 @@ void cutscene_update_spark_effects_pal(unsigned char *self) {
                 amount = math_random_int_below(16);
                 if (math_random_int_below(2))
                     amount = -amount;
-                first = func_PAL_002BE9A8(&point, amount, 0.1f, 1.0f, &velocity, 0.9f, 0x7F204080, 100000.0f, 0);
+                first = part_spawn_spinning_spark_pal(&point, amount, 0.1f, 1.0f, &velocity, 0.9f, 0x7F204080, 100000.0f, 0);
                 if (first) {
                     first->life = 13;
                     first->size = FloatToInt(4.0f) + 64;
@@ -138,7 +138,7 @@ void cutscene_update_spark_effects_pal(unsigned char *self) {
                     detail->state = state;
                     detail->age = (unsigned char)first->life;
                 }
-                second = func_PAL_002BE9A8(&point, 16, 0.05f, 1.0f, &velocity, 0.97f, 0x7FFFFFFF, 60000.0f, 0);
+                second = part_spawn_spinning_spark_pal(&point, 16, 0.05f, 1.0f, &velocity, 0.97f, 0x7FFFFFFF, 60000.0f, 0);
                 if (first) {
                     detail = &second->tail;
                     second->size = FloatToInt(4.0f) + 64;
@@ -154,7 +154,9 @@ void cutscene_update_spark_effects_pal(unsigned char *self) {
     }
 }
 
-void func_PAL_L17_00393E08(unsigned char *obj) {
+/* Moves a flying projectile one step. When it hits something it either makes a splash of small
+   drops or marks itself finished and sets off its hit effect (PAL). */
+void splash_projectile_update_pal(unsigned char *obj) {
     struct {
         Vec old, velocity, normal;
         struct {
@@ -182,7 +184,7 @@ void func_PAL_L17_00393E08(unsigned char *obj) {
     vec_transform_or_copy(position, position);
     shop_trigger_current_state_effect(ctx, ctx);
     vec_add_object_direction_scaled(position, ctx, 0.0044f);
-    func_PAL_L00_00392250(obj);
+    part_emit_sparkle_pal(obj);
     frame.packet.moby = obj;
     frame.packet.flags = 0x830000;
     if (*(int *)(ctx + 0x18) < 0xF2)
@@ -222,7 +224,7 @@ void func_PAL_L17_00393E08(unsigned char *obj) {
                 frame.spread.f[1] = math_fast_sin_or_cos_b(angle) * speed;
                 frame.spread.f[2] = math_random_float_range(0.060000002f, 0.13000001f);
                 lifetime = math_random_int_range(90, 120);
-                func_PAL_002C0838(&frame.position, spread, math_random_int_below(2), lifetime);
+                part_spawn_spark_2_pal(&frame.position, spread, math_random_int_below(2), lifetime);
             } while (i >= 0);
         } else {
             /* The hit branch re-reads the collision record through its own pointer and has its
@@ -233,7 +235,7 @@ void func_PAL_L17_00393E08(unsigned char *obj) {
             hit = collision->hit;
             if (hit) {
                 Collision *reread;
-                if ((hit == g_hero_moby || *(short *)(hit + 0xAA) == 0xC0) && *(int *)(ctx + 0x18) > 0xF1)
+                if ((hit == g_hero_moby || *(short *)(hit + 0xAA) == MOBY_CLASS_BOMB_GLOVE) && *(int *)(ctx + 0x18) > 0xF1)
                     goto finish;
                 reread = &g_collision_result;
                 model = reread->hit;
@@ -261,7 +263,7 @@ void func_PAL_L17_00393E08(unsigned char *obj) {
 finish:
     if (obj[0xBC]) {
         table_clear_entry_flag(*(int *)(ctx + 0x1C));
-        func_PAL_L00_00390F48(obj, &frame.velocity, &frame.normal);
+        part_spawn_big_explosion_pal(obj, &frame.velocity, &frame.normal);
     }
 }
 
@@ -269,10 +271,12 @@ finish:
 extern unsigned char g_bouncing_weapon_index;
 extern void FastVecScale(void *, void *, float);
 extern void cam_compute_view_direction(void *, void *, int);
-extern void func_PAL_L00_00391958(void *, void *, void *);
-extern void func_PAL_L00_00392500(void *);
+extern void part_l00_spawn_impact_burst_pal(void *, void *, void *);
+extern void part_spawn_spark_puff_pal(void *);
 
-void func_PAL_L17_00394220(char *obj) {
+/* Moves a projectile one step and counts its age. When it hits something it sets off a small
+   hit effect if it is young, or a bigger one if it is older (PAL). */
+void aging_projectile_update_pal(char *obj) {
     struct {
         Vec velocity, normal, old, surface;
         struct {
@@ -298,7 +302,7 @@ void func_PAL_L17_00394220(char *obj) {
     FastVecAdd(position, position, ctx);
     cam_compute_view_direction(position, &frame.surface, 0);
     FastVecScale(&frame.surface, &frame.surface, 0.00044f);
-    func_PAL_L00_00392500(obj);
+    part_spawn_spark_puff_pal(obj);
     frame.packet.moby = obj;
     frame.packet.flags = 0x830000;
     if (*(int *)(ctx + 0x18) < 0xF2)
@@ -319,7 +323,7 @@ void func_PAL_L17_00394220(char *obj) {
         if (hit) {
             Collision *reread;
             char *model;
-            if ((hit == g_hero_moby || *(short *)(hit + 0xAA) == 0xC0) && *(int *)(ctx + 0x18) >= 0xF2)
+            if ((hit == g_hero_moby || *(short *)(hit + 0xAA) == MOBY_CLASS_BOMB_GLOVE) && *(int *)(ctx + 0x18) >= 0xF2)
                 goto finish;
             reread = &g_collision_result;
             model = reread->hit;
@@ -352,9 +356,9 @@ finish:
     if (*(unsigned char *)(obj + 0xBC)) {
         table_clear_entry_flag(*(int *)(ctx + 0x1C));
         if (*(int *)(ctx + 0x14) < 17)
-            func_PAL_L00_00390F48(obj, &frame.velocity, &frame.normal);
+            part_spawn_big_explosion_pal(obj, &frame.velocity, &frame.normal);
         else
-            func_PAL_L00_00391958(obj, &frame.velocity, &frame.normal);
+            part_l00_spawn_impact_burst_pal(obj, &frame.velocity, &frame.normal);
     }
 }
 
@@ -370,34 +374,36 @@ extern float IntToFloat(int);
 extern unsigned long GetEffectTextureDescriptor(int);
 extern void DrawTexturedQuad(int, int, int, int, int, int, int, int, unsigned long long, unsigned long long);
 
-void func_PAL_L17_003A7DB0(char *self) {
+/* Draws a grid of small square tiles over the whole screen. Each tile fades according to the
+   object's timer and shows a random part of the texture (PAL: 75-tick fade). */
+void gfx_draw_fading_tile_grid_pal(char *self) {
     char *data = *(char **)(self + 0x68);
-    float fv[2];
+    float screen_size[2];
     unsigned long packet;
-    int nx, ny, i, j;
-    float pv[2];
-    float base, a, b;
+    int cols, rows, i, j;
+    float tile_pos[2];
+    float scroll, fade, fade_max;
     int color;
-    int t0, t1;
+    int tex_u, tex_v;
 
-    fv[0] = IntToFloat(g_screen_width[2]);
-    fv[1] = IntToFloat(g_screen_width[3]);
+    screen_size[0] = IntToFloat(g_screen_width[2]);
+    screen_size[1] = IntToFloat(g_screen_width[3]);
     packet = GetEffectTextureDescriptor(0x1E);
-    nx = g_screen_width[0] / 32 + 1;
-    ny = g_screen_width[1] / 32 + 1;
+    cols = g_screen_width[0] / 32 + 1;
+    rows = g_screen_width[1] / 32 + 1;
 
-    for (i = 0; i < nx; i++) {
-        int *p = g_tile_grid_scroll;
-        for (j = 0; j < ny; j++) {
-            pv[0] = (float)(i * 32);
-            pv[1] = (float)(j * 32);
-            base = (float)*p;
-            a = IntToFloat(*(int *)(data + 0x140));
-            b = IntToFloat(0x4B);
-            color = (FloatToInt(a * 127.5f / b) << 24) + 0xFF7F7F;
-            t0 = math_random_int_below(0x20);
-            t1 = math_random_int_below(0x20);
-            DrawTexturedQuad(FloatToInt(pv[0] - base), FloatToInt(pv[1] - base), 0x20, 0x20, t0, t1, 0x20, 0x20, color, packet);
+    for (i = 0; i < cols; i++) {
+        int *scroll_ptr = g_tile_grid_scroll;
+        for (j = 0; j < rows; j++) {
+            tile_pos[0] = (float)(i * 32);
+            tile_pos[1] = (float)(j * 32);
+            scroll = (float)*scroll_ptr;
+            fade = IntToFloat(*(int *)(data + 0x140));
+            fade_max = IntToFloat(0x4B);
+            color = (FloatToInt(fade * 127.5f / fade_max) << 24) + 0xFF7F7F;
+            tex_u = math_random_int_below(0x20);
+            tex_v = math_random_int_below(0x20);
+            DrawTexturedQuad(FloatToInt(tile_pos[0] - scroll), FloatToInt(tile_pos[1] - scroll), 0x20, 0x20, tex_u, tex_v, 0x20, 0x20, color, packet);
         }
     }
 }

@@ -3,7 +3,7 @@
 extern void SetupGifPaging(int);
 extern void DoGifPaging(void);
 extern char *GetLocalizedString(s32);
-extern void func_PAL_0029CB40(void);
+extern void menu_draw_item_grid_pal(void);
 extern char *g_resident_data_base[] __attribute__((sda));
 extern int g_text_right_x_a __attribute__((sda));
 extern int g_text_right_y_a[] __attribute__((sda));
@@ -37,10 +37,10 @@ extern void PatchMobyGifs(void);
  * 367, the string id becomes 0xB60 and the owner field moves to +0x3FA9C. Retail
  * reads the first word through $gp and the second through lui, as it does the
  * next pair at 0x1ABA48 in func_PAL_002CE9BC, hence the two declaration forms. */
-int func_PAL_002CE388(void)
+int menu_draw_footer_and_panel_pal(void)
 {
     SetupGifPaging(0);
-    func_PAL_0029CB40();
+    menu_draw_item_grid_pal();
     text_draw_right_aligned_small(g_text_right_x_a, g_text_right_y_a[0], 0x80F0F0F0ULL, (char *)GetLocalizedString(0xb60), -1);
     DoGifPaging();
     if (g_resident_data_base[0] != 0) {

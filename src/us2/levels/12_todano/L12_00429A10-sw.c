@@ -47,6 +47,7 @@ extern f32 g_flying_boss_vec_scales[4] __attribute__((sda));
 extern s32 g_flying_boss_debris_ids[4] __attribute__((sda));
 typedef struct { u8 pad[0x74]; u8 active; u8 gap[0x13]; u8 *owner; } L12Sound;
 
+/* Updates a boss-like flying object. It has health, takes hits, goes through a set of moves, drops down and finally breaks into pieces. (USA v2.00) */
 void flying_boss_update_us2(u8 *self) {
     typedef u32 Q __attribute__((mode(TI)));
     union { Q q; f32 f[4]; } posv, vecv;

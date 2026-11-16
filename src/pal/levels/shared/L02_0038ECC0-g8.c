@@ -36,88 +36,88 @@ extern void SpawnExplosionEffects_pal(void *a0, float f12, void *a1, float f13, 
                           float f15, int t0, int t1, float f16, float f17, int t2, float f18,
                           int t3, int s0, int s1, int s2, int s3);
 extern float ApproachValue(float *p, float a, float b);
-extern void func_PAL_L02_0038FDC0(void *e);
-extern void func_PAL_L02_00390950(void *e);
+extern void update_lamp_glow_effects_pal(void *e);
+extern void blinking_lamp_update_pal(void *e);
 extern void func_002A0F48(void *e);
 
 /* Walks the group's entity list: each one moves along the path object (func_002C9828), turns its
    angle and advances its phase; a hit by the player while it is active switches it off and spawns
    the debris (func_PAL_L00_0032C328, func_PAL_002AC718); a live one tilts toward its turning speed
    (func_002AA2E8) and runs the level's two update calls. */
-void func_PAL_L02_0038F970(unsigned char *arg0) {
-    unsigned char *o = *(unsigned char **)(arg0 + 0x68);
-    int *path = *(int **)(o + 0x60);
+void target_update_moving_on_path_pal(unsigned char *group_owner) {
+    unsigned char *path_vars = *(unsigned char **)(group_owner + 0x68);
+    int *path = *(int **)(path_vars + 0x60);
     float range = (float)*path;
-    float step = *(float *)(o + 0x14);
-    int seg = *(short *)(o + 0x70);
+    float step = *(float *)(path_vars + 0x14);
+    int seg = *(short *)(path_vars + 0x70);
     float rate = g_target_spin_rate * 0.0003490659f;
-    unsigned short *q;
-    unsigned char *e;
-    unsigned char *s1;
+    unsigned short *list;
+    unsigned char *moby;
+    unsigned char *moby_vars;
     float prev;
-    float h;
+    float height;
 
-    q = (unsigned short *)g_entity_group_lists[arg0[0x21]];
-    while (arg0[0x21] != 0xFF && arg0[0x21] <= g_group_max_index && q != 0 &&
-           ((q != 0 && (short)q[-1] >= 0) || q == (unsigned short *)g_entity_group_lists[arg0[0x21]])) {
-        e = (unsigned char *)(g_moby_l02_pool + ((*q & 0x7FFF) << 8));
-        if (e == 0)
+    list = (unsigned short *)g_entity_group_lists[group_owner[0x21]];
+    while (group_owner[0x21] != 0xFF && group_owner[0x21] <= g_group_max_index && list != 0 &&
+           ((list != 0 && (short)list[-1] >= 0) || list == (unsigned short *)g_entity_group_lists[group_owner[0x21]])) {
+        moby = (unsigned char *)(g_moby_l02_pool + ((*list & 0x7FFF) << 8));
+        if (moby == 0)
             break;
-        s1 = *(unsigned char **)(e + 0x68);
-        prev = *(float *)(e + 0xF8);
-        h = *(float *)(s1 + 0x10) + *(float *)(s1 + 0x7C) * math_fast_sin_or_cos_b(*(float *)(s1 + 0x80));
-        if (range <= h)
-            h -= range;
-        else if (h < 0.0f)
-            h += range;
-        path_sample_position(path, seg, e + 0x10, e + 0xF0, 0, h);
-        *(float *)(s1 + 0x68) = FastAddRotations(*(float *)(s1 + 0x68), *(float *)(s1 + 0x6C));
-        *(float *)(e + 0x18) += math_fast_sin_or_cos_b(*(float *)(s1 + 0x68));
-        *(float *)(s1 + 0x10) += step;
-        if (range <= *(float *)(s1 + 0x10))
-            *(float *)(s1 + 0x10) -= range;
-        *(float *)(s1 + 0x80) = FastAddRotations(*(float *)(s1 + 0x80), *(float *)(s1 + 0x84));
-        if (part_find_owned_effect_slot(e, 0x4010000, 0) != 0) {
-            if (e[0x31] != 0) {
+        moby_vars = *(unsigned char **)(moby + 0x68);
+        prev = *(float *)(moby + 0xF8);
+        height = *(float *)(moby_vars + 0x10) + *(float *)(moby_vars + 0x7C) * math_fast_sin_or_cos_b(*(float *)(moby_vars + 0x80));
+        if (range <= height)
+            height -= range;
+        else if (height < 0.0f)
+            height += range;
+        path_sample_position(path, seg, moby + 0x10, moby + 0xF0, 0, height);
+        *(float *)(moby_vars + 0x68) = FastAddRotations(*(float *)(moby_vars + 0x68), *(float *)(moby_vars + 0x6C));
+        *(float *)(moby + 0x18) += math_fast_sin_or_cos_b(*(float *)(moby_vars + 0x68));
+        *(float *)(moby_vars + 0x10) += step;
+        if (range <= *(float *)(moby_vars + 0x10))
+            *(float *)(moby_vars + 0x10) -= range;
+        *(float *)(moby_vars + 0x80) = FastAddRotations(*(float *)(moby_vars + 0x80), *(float *)(moby_vars + 0x84));
+        if (part_find_owned_effect_slot(moby, 0x4010000, 0) != 0) {
+            if (moby[0x31] != 0) {
                 Vec4 dir;
                 float pos[4] __attribute__((aligned(16)));
 
-                ((Ent *)e)->f31 = 0;
-                ((Ent *)e)->f34 |= 1;
-                ((Ent *)e)->f98 = 0;
+                ((Ent *)moby)->f31 = 0;
+                ((Ent *)moby)->f34 |= 1;
+                ((Ent *)moby)->f98 = 0;
                 g_destroyed_target_count++;
-                part_explode_object_into_pieces_pal(e, g_explode_piece_params_a, g_explode_piece_params_b, g_explode_piece_params_c, 0x3F, 2,
+                part_explode_object_into_pieces_pal(moby, g_explode_piece_params_a, g_explode_piece_params_b, g_explode_piece_params_c, 0x3F, 2,
                                   g_explode_color, 0, 0xFFFF, 0xFF, 0);
                 dir.q = 0;
                 dir.f[2] = 0.060000002f;
-                moby_compute_local_point((char *)e, pos, 0.0f, 0.0f, 0.0f);
-                if (*(short *)(e + 0xAA) == 0x1290)
-                    PlayMobySound(0, 0, e);
-                if (*(short *)(e + 0xAA) == 0x134B)
-                    PlayMobySound(0, 0, e);
-                if (*(short *)(e + 0xAA) == 0xB15)
-                    PlayMobySound(1, 0, e);
-                if (*(short *)(e + 0xAA) == 0xB13)
-                    PlayMobySound(1, 0, e);
-                SpawnExplosionEffects_pal(e, 0.0f, &dir, 0.0f, pos, 5.0f, 0x23, 2.5f, 8, 0x10, 0.0f, 3.0f, -1,
+                moby_compute_local_point((char *)moby, pos, 0.0f, 0.0f, 0.0f);
+                if (*(short *)(moby + 0xAA) == 0x1290)
+                    PlayMobySound(0, 0, moby);
+                if (*(short *)(moby + 0xAA) == 0x134B)
+                    PlayMobySound(0, 0, moby);
+                if (*(short *)(moby + 0xAA) == 0xB15)
+                    PlayMobySound(1, 0, moby);
+                if (*(short *)(moby + 0xAA) == 0xB13)
+                    PlayMobySound(1, 0, moby);
+                SpawnExplosionEffects_pal(moby, 0.0f, &dir, 0.0f, pos, 5.0f, 0x23, 2.5f, 8, 0x10, 0.0f, 3.0f, -1,
                               15.0f, 1, 10, -1, 0, 0x810001);
             }
         }
-        e[0xA8] = 0xFF;
-        if (e[0x31] != 0) {
-            if ((*(unsigned short *)(e + 0x34) ^ 1) & 1) {
-                h = -fast_subtract_rotations(*(float *)(e + 0xF8), prev) * 50.0f;
-                if (0.78539824f < h)
-                    h = 0.78539824f;
-                if (h < -0.78539824f)
-                    h = -0.78539824f;
-                ApproachValue((float *)(e + 0xF0), h, rate);
-                if (*(short *)(s1 + 0x72) != 0)
-                    func_PAL_L02_0038FDC0(e);
-                func_PAL_L02_00390950(e);
+        moby[0xA8] = 0xFF;
+        if (moby[0x31] != 0) {
+            if ((*(unsigned short *)(moby + 0x34) ^ 1) & 1) {
+                height = -fast_subtract_rotations(*(float *)(moby + 0xF8), prev) * 50.0f;
+                if (0.78539824f < height)
+                    height = 0.78539824f;
+                if (height < -0.78539824f)
+                    height = -0.78539824f;
+                ApproachValue((float *)(moby + 0xF0), height, rate);
+                if (*(short *)(moby_vars + 0x72) != 0)
+                    update_lamp_glow_effects_pal(moby);
+                blinking_lamp_update_pal(moby);
             }
         }
-        func_002A0F48(e);
-        q++;
+        func_002A0F48(moby);
+        list++;
     }
 }

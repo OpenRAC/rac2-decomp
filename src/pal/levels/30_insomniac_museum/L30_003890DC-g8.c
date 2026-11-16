@@ -18,6 +18,7 @@ extern float FastVecLength(void *),math_fabs(float),FastAddRotations(float,float
 extern void DrawTexturedQuad(int,int,int,int,int,int,int,int,s64,u64);
 extern void AppendRotatedSpriteQuad(float,float,float,float,float,int,int,u64,unsigned,unsigned,int,int,float,float);
 
+/* Draws the vehicle gauges at the bottom of the screen: two flat panels and two turning dials (PAL version). */
 void hud_draw_vehicle_gauges_pal(char *obj) {
     char *st=*(char **)(obj+0x68);
     u64 texture=GetEffectTextureDescriptor(g_vehicle_gauge_texture_left+0x12);

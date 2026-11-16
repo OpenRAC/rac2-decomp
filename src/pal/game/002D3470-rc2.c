@@ -17,30 +17,31 @@ void gfx_draw_scaled_object_two_axes(s32, s32, f32, f32, f32, f32, f32);
 void *table_find_by_id(s32, s32);
 void text_draw_small(s32, s32, u64, s32, s32);
 
+/* Draws a paged menu screen with a title, left and right page arrows (shown only when there is a page to go to) and the back and select hints. (PAL) */
 s32 menu_paged_screen_draw_pal(void) {
-    s32 s0;
-    s32 s1;
-    f32 zf;
+    s32 color;
+    s32 blink_color;
+    f32 depth;
 
     SetupGifPaging(0);
-    zf = 0.0f;
-    gfx_draw_scaled_object_two_axes(table_find_by_id(g_resident_data_base + 0x8710, 0xE5), 0x60442D00, (f32) (g_screen_width / 2), (f32) g_paged_screen_title_y, 1.0f, g_menu_alpha_scale, zf);
-    gfx_draw_scaled_object_two_axes(table_find_by_id(g_resident_data_base + 0x8710, 0xE4), 0x55F0C070, (f32) (g_screen_width / 2), (f32) g_paged_screen_title_y, 1.0f, g_menu_alpha_scale, zf);
-    s1 = math_ping_pong_blend_values(0x60241700, 0x55F0C070, 0x19, 0, 0);
+    depth = 0.0f;
+    gfx_draw_scaled_object_two_axes(table_find_by_id(g_resident_data_base + 0x8710, 0xE5), 0x60442D00, (f32) (g_screen_width / 2), (f32) g_paged_screen_title_y, 1.0f, g_menu_alpha_scale, depth);
+    gfx_draw_scaled_object_two_axes(table_find_by_id(g_resident_data_base + 0x8710, 0xE4), 0x55F0C070, (f32) (g_screen_width / 2), (f32) g_paged_screen_title_y, 1.0f, g_menu_alpha_scale, depth);
+    blink_color = math_ping_pong_blend_values(0x60241700, 0x55F0C070, 0x19, 0, 0);
     if (g_scroll_list_repeat_timer > 0) {
-        s0 = 0x80F0F0F0;
+        color = 0x80F0F0F0;
         if (!(g_pad_menu_flags.w0 & 0x8000)) {
-            s0 = s1;
+            color = blink_color;
         }
-        gfx_draw_scaled_object_two_axes(table_find_by_id(g_resident_data_base + 0x8710, 0x4B), s0, 216.0f, 373.0f, 1.0f, g_menu_alpha_scale * 0.8f, zf);
+        gfx_draw_scaled_object_two_axes(table_find_by_id(g_resident_data_base + 0x8710, 0x4B), color, 216.0f, 373.0f, 1.0f, g_menu_alpha_scale * 0.8f, depth);
         text_draw_small(0x40, 0x171, 0x80F0F0F0, GetLocalizedString(0xE65), -1);
     }
     if (g_scroll_list_repeat_timer < 6) {
-        s0 = 0x80F0F0F0;
+        color = 0x80F0F0F0;
         if (!(g_pad_menu_flags.w0 & 0x2000)) {
-            s0 = s1;
+            color = blink_color;
         }
-        gfx_draw_scaled_object_two_axes(table_find_by_id(g_resident_data_base + 0x8710, 0x4A), s0, 295.0f, 373.0f, 1.0f, g_menu_alpha_scale * 0.8f, zf);
+        gfx_draw_scaled_object_two_axes(table_find_by_id(g_resident_data_base + 0x8710, 0x4A), color, 295.0f, 373.0f, 1.0f, g_menu_alpha_scale * 0.8f, depth);
         text_draw_right_aligned_small(0x1C1, 0x171, 0x80F0F0F0, GetLocalizedString(0xE66), -1);
     }
     text_draw_centered_small(g_screen_width / 2, 0x1D, 0x80F0F0F0, GetLocalizedString(0x1B62), -1);

@@ -16,7 +16,7 @@ extern void ship_save_transform_state(void);
 
 /* func_US2_L10_00425104, the v2.00 copy of func_L10_004235A0: the same C, without removing the two
    temporary objects. */
-void func_US2_L10_00425104(void) {
+void mission_reset_counters_us2(void) {
     char *state;
     int i;
     entry_init_all_registered();

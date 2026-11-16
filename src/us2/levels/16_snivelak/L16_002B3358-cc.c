@@ -67,7 +67,7 @@ extern s32 FloatToInt(float);
 extern void hero_clear_tracked_slots(void);
 extern void FastVecSub(void *, void *, void *);
 extern void hero_build_relative_point(void *, s32, float, float, float);
-extern s32 func_US2_L16_002C0E50(unsigned long, unsigned long);
+extern s32 hero_l16_enter_state_us2(unsigned long, unsigned long);
 extern u8 *part_find_owned_effect_slot(u8 *, s32, s32);
 extern void AdjustPlayerHealth_us2(s32);
 extern int hero_play_sound(s32, s32);
@@ -75,9 +75,11 @@ extern void hero_flatten_push_vector(void *, s32, float, float);
 extern void cam_scale_view_space_height(void *, void *, float);
 extern void FastVecAdd(void *, void *, void *);
 
-s32 hero_handle_contact_reaction_us2(s32 arg0) {
+/* Handles a contact between the hero and a moby (USA v2.00): finds the moby's reaction entry,
+   fades it and applies its impulse and state change to the hero. Returns 0 when ignored. */
+s32 hero_handle_contact_reaction_us2(s32 apply_reaction) {
     TI16 vec;
-    PlayerContactEntry *e;
+    PlayerContactEntry *entry;
     u8 *moby;
     u8 *other;
     s32 flag;
@@ -99,41 +101,41 @@ s32 hero_handle_contact_reaction_us2(s32 arg0) {
     if (moby[0xA8] == 0xFF) {
         return 0;
     }
-    e = &g_contact_reaction_table[moby[0xA8]];
-    if (e->f38 != moby) {
+    entry = &g_contact_reaction_table[moby[0xA8]];
+    if (entry->f38 != moby) {
         return 0;
     }
-    if ((e->f24 & 9) == 0) {
+    if ((entry->f24 & 9) == 0) {
         return 0;
     }
-    if (e->f2C != 0.0f) {
+    if (entry->f2C != 0.0f) {
         g_contact_hit_flag = 0;
         g_bolt_multiplier = 1;
     }
     if (fade_get_value() != 0.0f && g_hero_state.f22B4 == 0) {
-        e->f2C = fade_reduce_value(e->f2C);
-        if (e->f2C == 0.0f) {
+        entry->f2C = fade_reduce_value(entry->f2C);
+        if (entry->f2C == 0.0f) {
             return 0;
         }
     }
-    g_hero_state.f249C = e->f20;
+    g_hero_state.f249C = entry->f20;
     if (g_hero_state.f229C == 15) {
-        g_hero_state.f6C4 = e;
+        g_hero_state.f6C4 = entry;
         g_hero_state.f68E = 1;
         return 0;
     }
-    if (arg0 == 0) {
+    if (apply_reaction == 0) {
         return 1;
     }
     flag = 0;
     hero_clear_tracked_slots();
-    if (e->f30 & 1) {
-        qcopy(&vec, &e->f10);
-        if (e->f1C == 5627.9248046875f) {
+    if (entry->f30 & 1) {
+        qcopy(&vec, &entry->f10);
+        if (entry->f1C == 5627.9248046875f) {
             flag = 1;
         }
-    } else if (e->f20 != 0) {
-        FastVecSub(&vec, &g_hero_state.f80, e->f20 + 0x10);
+    } else if (entry->f20 != 0) {
+        FastVecSub(&vec, &g_hero_state.f80, entry->f20 + 0x10);
     } else {
         hero_build_relative_point(&vec, 0, -1.0f, 0.0f, 0.0f);
     }
@@ -141,18 +143,18 @@ s32 hero_handle_contact_reaction_us2(s32 arg0) {
     case 0:
         other = g_hero_state.f249C;
         if (other != 0 && (*(s16 *)(other + 0xAA) == 0x4EB || *(s16 *)(other + 0xAA) == 0x558)) {
-            func_US2_L16_002C0E50(0x7D, 1);
+            hero_l16_enter_state_us2(0x7D, 1);
             return 1;
         }
         if ((g_hero_state.f2294 == 1 || g_hero_state.f2294 == 0x1D || g_hero_state.f1500 != 0)
-            && !(e->f24 & 8)) {
+            && !(entry->f24 & 8)) {
             u8 *r = part_find_owned_effect_slot(g_hero_state.f2290, 1, 0);
 
             if (r != 0) {
                 AdjustPlayerHealth_us2(FloatToInt(*(float *)(r + 0x2C)));
             }
             if (g_hero_state.f24CC == 0) {
-                func_US2_L16_002C0E50(0x16, 1);
+                hero_l16_enter_state_us2(0x16, 1);
             }
             g_hero_state.f1DC = 0x4D;
             if (g_hero_state.f21C == 0) {
@@ -161,16 +163,16 @@ s32 hero_handle_contact_reaction_us2(s32 arg0) {
             hero_play_sound(0x14, 0);
             return 0;
         }
-        if (e->f24 & 8) {
-            func_US2_L16_002C0E50(0x8C, 1);
+        if (entry->f24 & 8) {
+            hero_l16_enter_state_us2(0x8C, 1);
         } else {
-            func_US2_L16_002C0E50(0x16, 1);
+            hero_l16_enter_state_us2(0x16, 1);
         }
         if (g_hero_state.f2294 == 0x8C) {
             qzero(&vec);
         } else {
             hero_flatten_push_vector(&vec, flag, g_hero_state.f1497 ? 0.0f : 0.055000003f, 0.028333336f);
-            if (flag != 0 && e->f28 == 4) {
+            if (flag != 0 && entry->f28 == 4) {
                 cam_scale_view_space_height(&vec, &vec, 2.0f);
             }
         }

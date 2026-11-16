@@ -26,8 +26,8 @@ extern char g_save_packet_scratch[];
 extern char g_load_slot_screen_alt[];
 extern char g_load_slot_screen[];
 extern void popup_set_row_us2(char *, int);
-extern int func_US2_00299960(void);
-extern int func_US2_00299968(void);
+extern int pending_request_get_us2(void);
+extern int pending_request_take_us2(void);
 extern void snd_set_default_group_volumes(void);
 extern int snd_pump_music_and_disc_read(int);
 extern void snd_send_cmd11_one_value(int);
@@ -40,7 +40,7 @@ extern int menu_get_counter(void);
 extern int menu_get_mode(void);
 extern int snd_play_from_global_bank(int, unsigned int, void *);
 
-int func_US2_002DDD30(SaveMenu *menu)
+int load_slot_menu_update_us2(SaveMenu *menu)
 {
     int old = menu->cursor;
     int buttons;
@@ -55,7 +55,7 @@ int func_US2_002DDD30(SaveMenu *menu)
         if (g_pause_menu_state.ready < 11)
             return 0;
         g_pause_menu_state.busy = 0;
-        if (g_memcard_state.f16c != 0 || g_memcard_state.f10 != 0 || func_US2_00299960() != 0) {
+        if (g_memcard_state.f16c != 0 || g_memcard_state.f10 != 0 || pending_request_get_us2() != 0) {
             g_memcard_state.f17c = 0;
             g_save_menu_flags |= 0x100;
             if (request_begin_slot(4, 1, 1, (int)g_pause_menu_state.owner, 0) == 0)
@@ -138,7 +138,7 @@ done:
                 save->f164 = 13;
             }
             g_pause_menu_state.busy = 1;
-            func_US2_00299968();
+            pending_request_take_us2();
             g_pause_menu_state.delay = 0x2C93;
             g_load_slot_menu_state[0] = 0;
         } else

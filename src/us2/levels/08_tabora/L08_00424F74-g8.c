@@ -34,7 +34,7 @@ extern void part_spawn_ground_sparkles(void *);
 extern void part_l08_spawn_spark_shower(void *, void *);
 extern void SpawnExplosionEffects(void *, void *, void *, float, float, int, int, int,
                          float, float, float, float, int, float, int, int, int, int, int);
-extern void func_US2_002A7AA8(void *, int, int);
+extern void SetDeathBits_us2(void *, int, int);
 extern char *g_hero_moby_target NOT_SDA;
 extern int g_frame_l08_counter MACRO_ADDR;
 extern struct { char pad[0x2294]; int state; int pad2298; int secondaryState; } g_hero_state;
@@ -50,7 +50,7 @@ typedef struct {
     char pad10[0x18];
     float height;
     char pad2C[0xC];
-    float secondHeight;
+    float second_height;
 } HeightGate;
 extern HeightGate g_init_context;
 extern struct { char pad[0x464]; u8 flags[0]; } g_moby_spawn_state_flags_b;
@@ -75,7 +75,7 @@ extern void moby_set_state(char *, int, int);
 extern void moby_mark_spawned(char *);
 
 /* Apply the height gates, dispatch the actor state, and update timers and bounds. */
-void func_US2_L08_00424F74(char *actor) {
+void sandfly_update_us2(char *actor) {
     char *p;
     int ready;
     int condition;
@@ -87,8 +87,8 @@ void func_US2_L08_00424F74(char *actor) {
         if (height < g_init_context.height && g_init_context.state == 1) return;
         if (g_init_context.height < height && g_init_context.state == 0) return;
         if (mode == 2) {
-            if (g_init_context.secondHeight < height && g_init_context.state == 1) return;
-            if (height < g_init_context.secondHeight && g_init_context.state == mode) return;
+            if (g_init_context.second_height < height && g_init_context.state == 1) return;
+            if (height < g_init_context.second_height && g_init_context.state == mode) return;
         }
     }
     p = *(char **)(actor + 0x68);
@@ -111,8 +111,8 @@ void func_US2_L08_00424F74(char *actor) {
                 unsigned short tag = *(unsigned short *)(other + 0xB2);
                 if (g_moby_spawn_state_flags_b.flags[(short)tag] ||
                     ((g_moby_nibble_table[((short)tag >> 1) + (g_current_map_index << 10)] >> ((tag & 1) ? 4 : 0)) & 7)) {
-                    unsigned short ownTag = *(unsigned short *)(actor + 0xB2);
-                    if ((g_moby_nibble_table[((short)ownTag >> 1) + (g_current_map_index << 10)] >> ((ownTag & 1) ? 4 : 0)) & 7) goto destroy;
+                    unsigned short own_tag = *(unsigned short *)(actor + 0xB2);
+                    if ((g_moby_nibble_table[((short)own_tag >> 1) + (g_current_map_index << 10)] >> ((own_tag & 1) ? 4 : 0)) & 7) goto destroy;
                 }
             }
         }
@@ -411,7 +411,7 @@ normalize:
         SpawnExplosionEffects(actor, p + 0x170, 0, 0.0f, 0.0f, 4, 0, 0,
                       2.0f, 1.0f, 9.0f, 1.0f, -1, 0.0f, 0, 0, -1, 1, 0x810001);
         snd_stop_queued(actor);
-        func_US2_002A7AA8(actor, FIELD(p, u8, 0x18A) == 2 ? 0x1000 : 0, 3);
+        SetDeathBits_us2(actor, FIELD(p, u8, 0x18A) == 2 ? 0x1000 : 0, 3);
         g_moby_spawn_state_flags_a.flags[FIELD(actor, s16, 0xB2)] = FIELD(actor, u8, 0xB0) + 2;
         kind = FIELD(actor, u8, 0xB0);
         if (kind == 255 || (!(g_moby_state_flags[(u8)kind] & 0x80) &&

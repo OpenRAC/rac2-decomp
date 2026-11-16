@@ -47,242 +47,243 @@ extern int coll_test_hit_at_bone(void *, int, int, int, int, int, float, float, 
 extern int moby_check_target_point_from_offset(char *, void *);
 extern int coll_sweep_from_object(void *, float, float *, int, float, float, int, int, int);
 
-void chickenbot_state_machine_update_us2(char *o)
+/* Per-frame update of a creature with a state machine. It picks animations, wanders, turns toward the hero and runs, then checks its own state to move or attack (USA v2.00). */
+void chickenbot_state_machine_update_us2(char *moby)
 {
-    char *p = *(char **)(o + 0x68);
+    char *vars = *(char **)(moby + 0x68);
     float angle, speed;
-    int r;
-    Quad temp;
+    int anim_index;
+    Quad path_pos;
 
-    enemy_init(o);
-    switch (U8(o, 0x95)) {
+    enemy_init(moby);
+    switch (U8(moby, 0x95)) {
     case 0:
-        if (flag_set_second_pending(o)) {
-            moby_set_controller_speed_limits(o, 0.005f, 0.06666667f, 0.006981317885220051f,
+        if (flag_set_second_pending(moby)) {
+            moby_set_controller_speed_limits(moby, 0.005f, 0.06666667f, 0.006981317885220051f,
                          0.41887909173965454f);
-            F(p, 0x1D0) = 0.06666667f;
-            F(p, 0x124) = 0.006666666828095913f;
-            F(p, 0x134) = 0.5f;
-            S(p, 0x33A) = math_random_int_range(0, 30);
+            F(vars, 0x1D0) = 0.06666667f;
+            F(vars, 0x124) = 0.006666666828095913f;
+            F(vars, 0x134) = 0.5f;
+            S(vars, 0x33A) = math_random_int_range(0, 30);
         }
-        if (S(p, 0x314) == 1) {
-            if (FastDecTimer(p + 0x33A)) {
+        if (S(vars, 0x314) == 1) {
+            if (FastDecTimer(vars + 0x33A)) {
                 if (math_random_int_below(3))
-                    moby_set_state(o, 9, 2);
+                    moby_set_state(moby, 9, 2);
                 else
-                    moby_set_state(o, 8, 2);
+                    moby_set_state(moby, 8, 2);
                 break;
             }
         }
-        if (S(p, 0x316)) {
+        if (S(vars, 0x316)) {
             if (math_random_int_below(2))
-                moby_set_state(o, 7, 1);
+                moby_set_state(moby, 7, 1);
             else
-                moby_set_state(o, 6, 1);
-            S(p, 0x316) = 0;
-            if (S(p, 0x310) < 300)
-                S(p, 0x310) = math_random_int_range(480, 600);
+                moby_set_state(moby, 6, 1);
+            S(vars, 0x316) = 0;
+            if (S(vars, 0x310) < 300)
+                S(vars, 0x310) = math_random_int_range(480, 600);
         }
         break;
     case 1:
-        if (flag_set_second_pending(o)) {
-            moby_set_controller_speed_limits(o, 0.005f, 0.06666667f, 0.01745329424738884f,
+        if (flag_set_second_pending(moby)) {
+            moby_set_controller_speed_limits(moby, 0.005f, 0.06666667f, 0.01745329424738884f,
                          1.047197699546814f);
-            F(p, 0x1D0) = 0.06666667f;
-            F(p, 0x134) = 0.05f;
+            F(vars, 0x1D0) = 0.06666667f;
+            F(vars, 0x134) = 0.05f;
         }
-        if (S(p, 0x314) == 1) {
-            moby_set_state(o, 9, 2);
-        } else if (S(p, 0x310) == 0)
-            moby_set_state(o, 1, 0);
+        if (S(vars, 0x314) == 1) {
+            moby_set_state(moby, 9, 2);
+        } else if (S(vars, 0x310) == 0)
+            moby_set_state(moby, 1, 0);
         break;
     case 2:
-        if (flag_set_second_pending(o)) {
-            moby_set_controller_speed_limits(o, 0.005f, 0.06666667f, 0.01745329424738884f,
+        if (flag_set_second_pending(moby)) {
+            moby_set_controller_speed_limits(moby, 0.005f, 0.06666667f, 0.01745329424738884f,
                          1.047197699546814f);
-            F(p, 0x1D0) = 0.06666667f;
-            F(p, 0x124) = 0.006666666828095913f;
-            F(p, 0x134) = 0.05f;
-            S(p, 0x33A) = math_random_int_range(0, 30);
+            F(vars, 0x1D0) = 0.06666667f;
+            F(vars, 0x124) = 0.006666666828095913f;
+            F(vars, 0x134) = 0.05f;
+            S(vars, 0x33A) = math_random_int_range(0, 30);
         }
-        if (S(p, 0x314) != 1 && FastDecTimer(p + 0x33A)) {
-            moby_set_state(o, 3, 1);
-            S(p, 0x310) = math_random_int_range(580, 600);
+        if (S(vars, 0x314) != 1 && FastDecTimer(vars + 0x33A)) {
+            moby_set_state(moby, 3, 1);
+            S(vars, 0x310) = math_random_int_range(580, 600);
         }
         break;
     case 3: {
         unsigned int flags;
-        flags = moby_dispatch_action_by_kind(o, p + 0x50);
+        flags = moby_dispatch_action_by_kind(moby, vars + 0x50);
         if (flags & 1)
-            moby_l02_explode_and_remove(o);
+            moby_l02_explode_and_remove(moby);
         else if (flags & 2) {
-            if (S(p, 0x314) == 1)
-                moby_set_state(o, 9, 2);
+            if (S(vars, 0x314) == 1)
+                moby_set_state(moby, 9, 2);
             else {
-                moby_set_state(o, 3, 1);
-                S(p, 0x310) = math_random_int_range(580, 600);
+                moby_set_state(moby, 3, 1);
+                S(vars, 0x310) = math_random_int_range(580, 600);
             }
         }
         break;
     }
     }
-    switch (U8(o, 0x20)) {
+    switch (U8(moby, 0x20)) {
     case 1:
-        if (U8(o, 0x31)) {
-            if (flag_set_first_pending(o)) {
-                r = !math_random_int_below(4);
-                if (U8(o, 0x43) != r)
-                    anim_start_blended(o, r, 0, 10);
-                S(p, 0x312) = math_random_int_range(60, 120);
+        if (U8(moby, 0x31)) {
+            if (flag_set_first_pending(moby)) {
+                anim_index = !math_random_int_below(4);
+                if (U8(moby, 0x43) != anim_index)
+                    anim_start_blended(moby, anim_index, 0, 10);
+                S(vars, 0x312) = math_random_int_range(60, 120);
             }
-            if (U8(o, 0x43) == 1) {
-                if (U8(o, 0x60) & 2)
-                    anim_start_blended(o, 0, 0, 20);
-            } else if (!S(p, 0x312) &&
-                       (!S(p, 0x338) || FastVecDot(p + 0x300, g_hero_state_block) > 0.8f))
-                moby_set_state(o, 2, -1);
+            if (U8(moby, 0x43) == 1) {
+                if (U8(moby, 0x60) & 2)
+                    anim_start_blended(moby, 0, 0, 20);
+            } else if (!S(vars, 0x312) &&
+                       (!S(vars, 0x338) || FastVecDot(vars + 0x300, g_hero_state_block) > 0.8f))
+                moby_set_state(moby, 2, -1);
         }
         break;
     case 2:
-        if (flag_set_first_pending(o)) {
-            if (U8(o, 0x43) != 6)
-                anim_start_blended(o, 6, 0, 20);
+        if (flag_set_first_pending(moby)) {
+            if (U8(moby, 0x43) != 6)
+                anim_start_blended(moby, 6, 0, 20);
             angle = math_random_angle();
             speed = math_random_float_range(2, 5);
-            F(p, 0x2F0) = math_fast_sin_or_cos_a(angle) * speed;
-            F(p, 0x2F4) = math_fast_sin_or_cos_b(angle) * speed;
-            F(p, 0x2F8) = 0;
-            FastVecAdd(p + 0x2F0, p + 0x2F0, p + 0x2E0);
-            if (I(p, 0x218) != -1) {
-                temp = *(Quad *)(p + 0x2E0);
-                path_clamp_move_to_area(&temp, p + 0x2F0, p + 0x2F0, I(p, 0x218), 1.5f);
+            F(vars, 0x2F0) = math_fast_sin_or_cos_a(angle) * speed;
+            F(vars, 0x2F4) = math_fast_sin_or_cos_b(angle) * speed;
+            F(vars, 0x2F8) = 0;
+            FastVecAdd(vars + 0x2F0, vars + 0x2F0, vars + 0x2E0);
+            if (I(vars, 0x218) != -1) {
+                path_pos = *(Quad *)(vars + 0x2E0);
+                path_clamp_move_to_area(&path_pos, vars + 0x2F0, vars + 0x2F0, I(vars, 0x218), 1.5f);
             }
         }
-        moby_run_entry_hook_by_mode(o, p + 0x2F0, 0);
-        if (U16(o, 0x96) > 30 && (F(p, 0x1CC) <= 0.5f || U16(o, 0x96) > 180))
-            moby_set_state(o, 1, -1);
+        moby_run_entry_hook_by_mode(moby, vars + 0x2F0, 0);
+        if (U16(moby, 0x96) > 30 && (F(vars, 0x1CC) <= 0.5f || U16(moby, 0x96) > 180))
+            moby_set_state(moby, 1, -1);
         break;
     case 3:
-        if (flag_set_first_pending(o) && U8(o, 0x43) != math_random_int_below(2) + 4)
-            anim_start_blended(o, math_random_int_below(2) + 4, 0, 10);
-        if (fast_vec_dist(o + 0x10, g_hero_position) < D_L02_001B00F8_abs)
-            moby_set_state(o, 4, -1);
-        else if (U8(o, 0x60) & 2) {
+        if (flag_set_first_pending(moby) && U8(moby, 0x43) != math_random_int_below(2) + 4)
+            anim_start_blended(moby, math_random_int_below(2) + 4, 0, 10);
+        if (fast_vec_dist(moby + 0x10, g_hero_position) < D_L02_001B00F8_abs)
+            moby_set_state(moby, 4, -1);
+        else if (U8(moby, 0x60) & 2) {
             switch (math_random_int_below(3)) {
             case 0:
-                moby_set_state(o, 6, -1);
+                moby_set_state(moby, 6, -1);
                 break;
             case 1:
-                moby_set_state(o, 7, -1);
+                moby_set_state(moby, 7, -1);
                 break;
             case 2:
-                moby_set_state(o, 5, -1);
+                moby_set_state(moby, 5, -1);
                 break;
             }
         }
         break;
     case 6:
-        if (flag_set_first_pending(o) && U8(o, 0x43) != math_random_int_below(2) + 2)
-            anim_start_blended(o, math_random_int_below(2) + 2, 0, 10);
-        moby_check_target_point_from_offset(o, p + 0x1F0);
-        if (U8(o, 0x60) & 2)
-            moby_set_state(o, 3, -1);
+        if (flag_set_first_pending(moby) && U8(moby, 0x43) != math_random_int_below(2) + 2)
+            anim_start_blended(moby, math_random_int_below(2) + 2, 0, 10);
+        moby_check_target_point_from_offset(moby, vars + 0x1F0);
+        if (U8(moby, 0x60) & 2)
+            moby_set_state(moby, 3, -1);
         break;
     case 7:
-        if (flag_set_first_pending(o) && U8(o, 0x43) != 12)
-            anim_start_blended(o, 12, 0, 10);
-        moby_check_target_point_from_offset(o, p + 0x1F0);
-        if (U8(o, 0x60) & 2)
-            moby_set_state(o, 3, -1);
+        if (flag_set_first_pending(moby) && U8(moby, 0x43) != 12)
+            anim_start_blended(moby, 12, 0, 10);
+        moby_check_target_point_from_offset(moby, vars + 0x1F0);
+        if (U8(moby, 0x60) & 2)
+            moby_set_state(moby, 3, -1);
         break;
     case 4:
-        if (flag_set_first_pending(o)) {
-            if (U8(o, 0x43) != 6)
-                anim_start_blended(o, 6, 0, 10);
+        if (flag_set_first_pending(moby)) {
+            if (U8(moby, 0x43) != 6)
+                anim_start_blended(moby, 6, 0, 10);
             {
                 float upper = g_chickenbot_wait_max;
-                F(p, 0x334) = math_random_float_range(g_chickenbot_wait_min, upper) + 0.5f;
+                F(vars, 0x334) = math_random_float_range(g_chickenbot_wait_min, upper) + 0.5f;
             }
         }
-        if ((moby_run_entry_hook_by_mode(o, p + 0x2E0, 0) & 0x80) ||
-            vec_distance_xy(o + 0x10, g_hero_position) > F(p, 0x334)) {
+        if ((moby_run_entry_hook_by_mode(moby, vars + 0x2E0, 0) & 0x80) ||
+            vec_distance_xy(moby + 0x10, g_hero_position) > F(vars, 0x334)) {
             if (math_random_int_below(2))
-                moby_set_state(o, 6, -1);
+                moby_set_state(moby, 6, -1);
             else
-                moby_set_state(o, 7, -1);
+                moby_set_state(moby, 7, -1);
         }
         break;
     case 5:
-        if (flag_set_first_pending(o)) {
-            if (U8(o, 0x43) != 6)
-                anim_start_blended(o, 6, 0, 20);
+        if (flag_set_first_pending(moby)) {
+            if (U8(moby, 0x43) != 6)
+                anim_start_blended(moby, 6, 0, 20);
             angle = math_random_angle();
             speed = math_random_float_range(2, 5);
-            F(p, 0x2F0) = math_fast_sin_or_cos_a(angle) * speed;
-            F(p, 0x2F4) = math_fast_sin_or_cos_b(angle) * speed;
-            F(p, 0x2F8) = 0;
-            FastVecAdd(p + 0x2F0, p + 0x2F0, p + 0x2E0);
-            if (I(p, 0x218) != -1) {
-                temp = *(Quad *)(p + 0x2E0);
-                path_clamp_move_to_area(&temp, p + 0x2F0, p + 0x2F0, I(p, 0x218), 1.5f);
+            F(vars, 0x2F0) = math_fast_sin_or_cos_a(angle) * speed;
+            F(vars, 0x2F4) = math_fast_sin_or_cos_b(angle) * speed;
+            F(vars, 0x2F8) = 0;
+            FastVecAdd(vars + 0x2F0, vars + 0x2F0, vars + 0x2E0);
+            if (I(vars, 0x218) != -1) {
+                path_pos = *(Quad *)(vars + 0x2E0);
+                path_clamp_move_to_area(&path_pos, vars + 0x2F0, vars + 0x2F0, I(vars, 0x218), 1.5f);
             }
         }
-        moby_run_entry_hook_by_mode(o, p + 0x2F0, 0);
-        if (U16(o, 0x96) > 30 && (F(p, 0x1CC) <= 0.5f || U16(o, 0x96) > 180))
-            moby_set_state(o, 3, -1);
+        moby_run_entry_hook_by_mode(moby, vars + 0x2F0, 0);
+        if (U16(moby, 0x96) > 30 && (F(vars, 0x1CC) <= 0.5f || U16(moby, 0x96) > 180))
+            moby_set_state(moby, 3, -1);
         break;
     case 8:
-        if (flag_set_first_pending(o) && U8(o, 0x43) != math_random_int_below(2) + 2)
-            anim_start_blended(o, math_random_int_below(2) + 2, 0, 10);
-        if (U8(o, 0x60) & 2)
-            moby_set_state(o, 9, -1);
+        if (flag_set_first_pending(moby) && U8(moby, 0x43) != math_random_int_below(2) + 2)
+            anim_start_blended(moby, math_random_int_below(2) + 2, 0, 10);
+        if (U8(moby, 0x60) & 2)
+            moby_set_state(moby, 9, -1);
         break;
     case 9:
-        if (flag_set_first_pending(o) && U8(o, 0x43) != 6)
-            anim_start_blended(o, 6, 0, 5);
-        if (!(U16(o, 0x96) & 3))
-            F(p, 0x31C) = moby_count_group_side_from_object(o, g_hero_moby, -1) * 0.087266475f;
-        moby_run_entry_hook_by_mode(o, p + 0x1F0, 1);
-        turret_clamp_aim_yaw_pitch(o);
-        if (F(p, 0x1CC) <= 1.25f)
-            moby_set_state(o, 10, -1);
+        if (flag_set_first_pending(moby) && U8(moby, 0x43) != 6)
+            anim_start_blended(moby, 6, 0, 5);
+        if (!(U16(moby, 0x96) & 3))
+            F(vars, 0x31C) = moby_count_group_side_from_object(moby, g_hero_moby, -1) * 0.087266475f;
+        moby_run_entry_hook_by_mode(moby, vars + 0x1F0, 1);
+        turret_clamp_aim_yaw_pitch(moby);
+        if (F(vars, 0x1CC) <= 1.25f)
+            moby_set_state(moby, 10, -1);
         break;
     case 10:
-        if (flag_set_first_pending(o)) {
-            F(p, 0x320) = mat_fast_helper_a(F(p, 0x1F0) - F(o, 0x10),
-                                       F(p, 0x1F4) - F(o, 0x14));
-            if (U8(o, 0x43) != 8)
-                anim_start_blended(o, 8, 2, 10);
+        if (flag_set_first_pending(moby)) {
+            F(vars, 0x320) = mat_fast_helper_a(F(vars, 0x1F0) - F(moby, 0x10),
+                                       F(vars, 0x1F4) - F(moby, 0x14));
+            if (U8(moby, 0x43) != 8)
+                anim_start_blended(moby, 8, 2, 10);
         }
-        moby_start_effect_from_entry(o, F(p, 0x320));
-        if (math_is_value_within_step_us2(o, 13))
-            coll_test_hit_at_bone(o, 1, 0x4000001, 0, 1, 0, 0.75f, U8(p, 0x34), 1);
-        if (U8(o, 0x60) & 2)
-            moby_set_state(o, 9, -1);
+        moby_start_effect_from_entry(moby, F(vars, 0x320));
+        if (math_is_value_within_step_us2(moby, 13))
+            coll_test_hit_at_bone(moby, 1, 0x4000001, 0, 1, 0, 0.75f, U8(vars, 0x34), 1);
+        if (U8(moby, 0x60) & 2)
+            moby_set_state(moby, 9, -1);
         break;
     case 14:
-        if (flag_set_first_pending(o)) {
-            if (U8(o, 0x43) != 10)
-                anim_start_blended(o, 10, 0, 5);
-            I(p, 0x1BC) = g_frame_l02_counter;
+        if (flag_set_first_pending(moby)) {
+            if (U8(moby, 0x43) != 10)
+                anim_start_blended(moby, 10, 0, 5);
+            I(vars, 0x1BC) = g_frame_l02_counter;
         }
-        vec_scale_to_length(&temp, p + 0x1A0, 1);
-        moby_run_entry_hook_by_mode(o, &temp, 0);
-        part_spawn_two_puffs(o);
-        coll_sweep_from_object(o, 0.6f, (float *)(o + 0x10), 0x4000000, 1, 1, 0, 1, 0);
-        if (F(p, 0x190) >= F(o, 0x18)) {
-            if (S(p, 0x314) == 1)
-                moby_set_state(o, 8, 2);
+        vec_scale_to_length(&path_pos, vars + 0x1A0, 1);
+        moby_run_entry_hook_by_mode(moby, &path_pos, 0);
+        part_spawn_two_puffs(moby);
+        coll_sweep_from_object(moby, 0.6f, (float *)(moby + 0x10), 0x4000000, 1, 1, 0, 1, 0);
+        if (F(vars, 0x190) >= F(moby, 0x18)) {
+            if (S(vars, 0x314) == 1)
+                moby_set_state(moby, 8, 2);
             else
-                moby_set_state(o, 2, 0);
-            I(p, 0x138) &= -18;
+                moby_set_state(moby, 2, 0);
+            I(vars, 0x138) &= -18;
         }
         break;
     case 12:
-        moby_l02_explode_and_remove(o);
+        moby_l02_explode_and_remove(moby);
         break;
     }
-    moby_reset_turn_place(o);
-    if (U8(o, 0x31))
-        chickenbot_update_group_pulse_color(o);
+    moby_reset_turn_place(moby);
+    if (U8(moby, 0x31))
+        chickenbot_update_group_pulse_color(moby);
 }

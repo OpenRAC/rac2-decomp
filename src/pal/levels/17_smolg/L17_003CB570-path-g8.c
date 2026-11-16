@@ -12,7 +12,9 @@ extern int func_002F00C0(float);
 extern void func_002EEEE8(void *, void *, void *);
 extern void func_002EEF40(void *, void *, float);
 extern void func_002EEEB8(void *, void *, void *);
-void func_PAL_L17_003CB570(char *self, int *path, float duration) {
+/* Places a platform along its path from its timer: the timer sets how far along the path it is,
+   eased with a cosine, and while the player stands on a linked object it holds the timer back. */
+void platform_move_along_path_by_timer_pal(char *self, int *path, float duration) {
     char *data = *(char **)(self + 0x68);
     float weight, part, phase;
     int index;

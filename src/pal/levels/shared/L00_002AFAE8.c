@@ -2,7 +2,7 @@
 #include "names.h"
 
 extern void moby_mark_spawned(void *moby);
-extern void func_PAL_002A7E68(void *, int, int, int);
+extern void anim_start_blended_pal(void *, int, int, int);
 typedef struct {
     char pad0[6];
     unsigned char flag;
@@ -117,7 +117,7 @@ void SpawnHeroItemMobies_pal(void)
             if (id == 10) {
                 HERO_ITEMS->slots[0].buttonMask = 128;
                 HERO_ITEMS->slots[0].state = 2;
-                func_PAL_002A7E68(moby, 1, 0, 1);
+                anim_start_blended_pal(moby, 1, 0, 1);
             } else {
                 HERO_ITEMS->slots[0].buttonMask = 32;
             }

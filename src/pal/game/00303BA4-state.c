@@ -8,10 +8,10 @@
 extern float math_random_float_range(float,float);
 extern int math_fast_float_d(int *);
 extern void surface_grid_build_control(void *);
-extern void func_PAL_00304D90(void *);
+extern void surface_grid_update_wave_tables_pal(void *);
 extern void surface_grid_update_heights(void *);
-extern void func_PAL_00303F38(void *);
-extern void func_PAL_00305348(void *);
+extern void surface_grid_update_pal(void *);
+extern void surface_grid_spawn_effect_pal(void *);
 extern void surface_grid_draw(void *);
 extern void gfx_register_early_draw_callback(void (*)(void *),void *);
 extern void moby_set_state(unsigned char *,unsigned char,int);
@@ -19,7 +19,7 @@ extern int flag_set_first_pending(unsigned char *);
 extern float math_step_value_toward_target(float *,float *,float,float,float,float);
 typedef struct { float x,y,a,b; float pad[4]; } Spark;
 extern Spark g_surface_grid_noise_table[];
-void func_PAL_00303BA4(unsigned char *object)
+void moby_update_rise_hold_fall_pal(unsigned char *object)
 {
     char *work=FIELD(char *,object,0x68);
     int i,ticks;
@@ -67,7 +67,7 @@ void func_PAL_00303BA4(unsigned char *object)
     case 5:break;
     default:break;
     }
-    if(!FIELD(int,work,0x40))func_PAL_00304D90(object);
-    surface_grid_update_heights(object);func_PAL_00303F38(object);func_PAL_00305348(object);
+    if(!FIELD(int,work,0x40))surface_grid_update_wave_tables_pal(object);
+    surface_grid_update_heights(object);surface_grid_update_pal(object);surface_grid_spawn_effect_pal(object);
     gfx_register_early_draw_callback(surface_grid_draw,object);
 }

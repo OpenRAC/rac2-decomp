@@ -93,7 +93,7 @@ extern void cam_update_state_pal(void);
 
 void OpenVendorMenu_pal(char *moby)
 {
-    int mode, v, visible, count;
+    int mode, vendor_type, visible, count;
     float vec[4];
 
     mem_clear(&g_vendor_menu_state, 0, 0x760);
@@ -132,17 +132,17 @@ void OpenVendorMenu_pal(char *moby)
         }
     } else if (*(short *)(moby + 0xAA) == 11) {
         g_vendor_menu_state.field744 = 0;
-        v = *(int *)(*(char **)(moby + 0x68) + 0x94);
-        if (v == 0) {
+        vendor_type = *(int *)(*(char **)(moby + 0x68) + 0x94);
+        if (vendor_type == 0) {
             g_vendor_menu_state.mode = 0;
-        } else if (v == 1) {
+        } else if (vendor_type == 1) {
             g_vendor_menu_state.mode = 1;
             shop_run_menu_input_pal();
-        } else if (v == 4) {
+        } else if (vendor_type == 4) {
             g_vendor_menu_state.mode = 2;
-        } else if (v == 2) {
+        } else if (vendor_type == 2) {
             g_vendor_menu_state.mode = 3;
-        } else if (v == 3) {
+        } else if (vendor_type == 3) {
             g_vendor_menu_state.field744 = 1;
             g_vendor_menu_state.mode = 0;
         }

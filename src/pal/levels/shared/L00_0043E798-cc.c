@@ -21,7 +21,8 @@ void* menu_init_two_sub_objects(void* param_1);
 
 /* Store the two scalar floating arguments through the supplied pointer cell; original game role is unknown. */
 /* Return the measured signed-word getter result for the owner subview at 0x 298. */
-int func_PAL_L00_0043E798(unsigned char *owner)
+/* Returns the selected id of the list sub-object at +0x2C8. */
+int sub_object_get_signed_word_pal(unsigned char *owner)
 {
     return menu_list_get_selected_id(owner + 0x2c8);
 }

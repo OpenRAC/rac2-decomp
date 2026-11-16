@@ -28,12 +28,12 @@ typedef struct {
     f32 damage;                  
 } MobyHit;
 extern MobyHit *part_find_owned_effect_slot(Moby *moby, u32 flags, s32 clear);
-extern void func_PAL_002AC3C0(Moby *moby, ColorFlash *flash);
-extern void func_PAL_002AC290(Moby *moby, ColorFlash *flash);
+extern void gfx_update_color_fade_pal(Moby *moby, ColorFlash *flash);
+extern void gfx_start_color_fade_pal(Moby *moby, ColorFlash *flash);
 extern s32 math_fast_float_d(s32 *timer);
 extern f32 math_random_float_range(f32 min, f32 max);
 extern s32 FloatToInt(f32 value);
-extern char *func_PAL_L05_0042A240(f32 *position, s32 a1, s32 a2, s32 a3, s32 a4, s32 a5,
+extern char *moby_spawn_large_explosion_pal(f32 *position, s32 a1, s32 a2, s32 a3, s32 a4, s32 a5,
                               s32 a6, s32 a7, s32 a8, s32 a9, s32 a10, f32 scale);
 extern void hrugis_drop_reward(Moby *moby, s32 bonus, s32 a2);
 extern s32 moby_is_in_use(Moby *moby);
@@ -46,7 +46,7 @@ extern s32 g_collision_effect_timer __attribute__((sda));
    of the hit it took off its health (class 0xCBE only from a class 0xF93 moby) with a
    sound, and at zero health blows it up and drops a reward; the moby is then retired
    unless keep is set. Returns 1 when the hit destroyed it. */
-s32 func_PAL_L10_00428E38(Moby *moby, s32 keep)
+s32 process_object_collision_damage_pal(Moby *moby, s32 keep)
 {
     ColorFlash *flash;
     f32 *health;
@@ -58,7 +58,7 @@ s32 func_PAL_L10_00428E38(Moby *moby, s32 keep)
     flash = moby->vars->flash;
     health = moby->vars->health;
     if (flash != 0)
-        func_PAL_002AC3C0(moby, flash);
+        gfx_update_color_fade_pal(moby, flash);
     if (*health <= 0.0f)
         return 0;
 
@@ -69,7 +69,7 @@ s32 func_PAL_L10_00428E38(Moby *moby, s32 keep)
         }
         if (flash != 0) {
             flash->flashColor[0] = 0xFF;
-            func_PAL_002AC290(moby, flash);
+            gfx_start_color_fade_pal(moby, flash);
         }
         *health -= hit->damage;
         if (moby->oClass != 0xB73 && moby->oClass != 0xF8E)
@@ -80,7 +80,7 @@ s32 func_PAL_L10_00428E38(Moby *moby, s32 keep)
         }
         if (*health <= 0.0f) {
             *health = 0.0f;
-            func_PAL_L05_0042A240(moby->position, 0, 0x32, 0x1E, 0x1E, 0x1E, 0x28, 1, 1, 0, 0, 0.5f);
+            moby_spawn_large_explosion_pal(moby->position, 0, 0x32, 0x1E, 0x1E, 0x1E, 0x28, 1, 1, 0, 0, 0.5f);
             hrugis_drop_reward(moby, 0, 0xA);
             if (moby_is_in_use(moby) != 0)
                 moby_release_from_group(moby);

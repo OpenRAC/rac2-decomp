@@ -15,11 +15,11 @@ extern s32 g_spark_timer_min __attribute__((sda));
 
 /* Starts the sub-object's timer when it has finished, then tells the engine to
    advance to mode 1.  The gp word at 0x30D0 needs its `sda` declaration (measured). */
-void func_PAL_L12_0042A8E0(u8 *a0) {
-    u8 *s0 = *(u8 **)(a0 + 0x68);
+void spark_timer_restart_sound_pal(u8 *moby) {
+    u8 *vars = *(u8 **)(moby + 0x68);
 
-    if (math_fast_float_d(s0 + 0x2C0) != 0) {
-        *(s32 *)(s0 + 0x2C0) = (((int)(math_random_int_range(g_spark_timer_min, (s32)g_spark_timer_max)) * 5 + 2) / 6);
-        PlayMobySound(1, 0, a0);
+    if (math_fast_float_d(vars + 0x2C0) != 0) {
+        *(s32 *)(vars + 0x2C0) = (((int)(math_random_int_range(g_spark_timer_min, (s32)g_spark_timer_max)) * 5 + 2) / 6);
+        PlayMobySound(1, 0, moby);
     }
 }

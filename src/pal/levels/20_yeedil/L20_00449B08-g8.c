@@ -12,19 +12,20 @@ extern int g_yeedil_shot_homing_param __attribute__((sda));
 
 extern void yeedil_boss_compute_shot_launch_pal(char *, char *, char *, float *);
 
-extern char *func_PAL_L20_00450D78(char *, char *, char *, char *, int, float, int);
+extern char *homing_l20_shot_spawn_pal(char *, char *, char *, char *, int, float, int);
 
 extern void vec_scale_to_length(char *, char *, float);
 
-char *func_PAL_L20_00449B08(char *arg0) {
-    char *state = *(char **)(arg0 + 0x68);
-    TI128 a;
-    TI128 b;
-    float f;
+/* Launches a damaging shot from the enemy muzzle, scaled by its speed and damage settings. (PAL: 50 Hz timings) */
+char *yeedil_boss_launch_damage_shot_pal(char *moby) {
+    char *state = *(char **)(moby + 0x68);
+    TI128 position;
+    TI128 velocity;
+    float aim_angle;
 
-    f = 0.78539824f;
-    yeedil_boss_compute_shot_launch_pal(arg0, (char *)&a, (char *)&b, (float *)&f);
-    vec_scale_to_length((char *)&b, (char *)&b, g_yeedil_shot_speed * 0.020000001f);
-    return func_PAL_L20_00450D78(arg0, (char *)&a, (char *)&b, state + 0x1F0, (g_yeedil_shot_homing_param * 5 + 2) / 6,
+    aim_angle = 0.78539824f;
+    yeedil_boss_compute_shot_launch_pal(moby, (char *)&position, (char *)&velocity, (float *)&aim_angle);
+    vec_scale_to_length((char *)&velocity, (char *)&velocity, g_yeedil_shot_speed * 0.020000001f);
+    return homing_l20_shot_spawn_pal(moby, (char *)&position, (char *)&velocity, state + 0x1F0, (g_yeedil_shot_homing_param * 5 + 2) / 6,
                                  (float)*(unsigned char *)(state + 0x35), *(int *)(state + 0x210));
 }

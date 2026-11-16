@@ -3,7 +3,8 @@
 
 extern int ref_L00_0030CDA0_00;
 
-void func_US2_0029CA88(void)
+/* Clears the saved mission select value. */
+void mission_select_reset_us2(void)
 {
     ref_L00_0030CDA0_00 = -1;
 }

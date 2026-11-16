@@ -36,8 +36,8 @@ extern CollisionADEA0 ref_L00_003ADEA0_4;
 extern void math_trap_always(void);
 extern float fast_vec_dist(void *, void *);
 extern int CollLine(void *, void *, int, void *, int);
-extern void func_PAL_L00_003B14C8(void *, void *);
-extern void func_PAL_002A7E68(void *, int, int, int);
+extern void part_spawn_sparks_between_mobys_pal(void *, void *);
+extern void anim_start_blended_pal(void *, int, int, int);
 extern int PlayMobySound(int, int, void *);
 extern void gfx_add_draw_callback_first(void *, void *);
 extern void DrawMobyLinkQuads(char *);
@@ -46,7 +46,7 @@ extern void DrawMobyLinkQuads(char *);
    12 units and in line of sight (up to eight, in the moby's row of ref_L00_003ADEA0_3), registers
    func_L00_003ADA30 to draw the links, and when a flagged moby of another class (not the hero's)
    blocks a link, marks whichever end of it is nearer to that moby and records the blocker. */
-void func_PAL_L00_003B16B8(void)
+void UpdateMobyLinks_pal(void)
 {
     int n, j, i, row;
     char *moby, *other, *vars, *hit;
@@ -77,7 +77,7 @@ void func_PAL_L00_003B16B8(void)
                 continue;
             if (CollLine(other + 0x10, moby + 0x10, 2, 0, 0))
                 continue;
-            func_PAL_L00_003B14C8(moby, other);
+            part_spawn_sparks_between_mobys_pal(moby, other);
             if (n >= 8)
                 math_trap_always();
             ref_L00_003ADEA0_3[row][n++] = other;
@@ -92,7 +92,7 @@ void func_PAL_L00_003B16B8(void)
                 other = moby;
             *(unsigned char *)(other + 0x20) |= 8;
             vars = *(char **)(other + 0x68);
-            func_PAL_002A7E68(other, 1, 0, 2);
+            anim_start_blended_pal(other, 1, 0, 2);
             PlayMobySound(0, 0, other);
             *(char **)(vars + 0x54) = hit;
             *(int *)(vars + 0x58) = 500;

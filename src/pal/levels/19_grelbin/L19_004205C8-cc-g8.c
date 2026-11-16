@@ -8,11 +8,11 @@ extern int g_max_active_yetis __attribute__((sda));
 extern char *g_moby_l19_array __attribute__((sda));
 extern void *g_group_ptr_table[];
 extern int moby_is_in_selected_zone(void *);
-extern int func_PAL_L19_00421568(void *);
+extern int yeti_init_stats_pal(void *);
 extern void moby_mark_spawned(void *);
 extern int moby_count_group_not_in_state(int,int);
 extern void moby_set_state(void *,int,int);
-extern void func_PAL_002A7E68(void *,int,int,int);
+extern void anim_start_blended_pal(void *,int,int,int);
 extern int math_fast_float_d(void *);
 extern int math_random_int_range(int,int);
 extern int flag_set_second_pending(void *);
@@ -30,7 +30,7 @@ extern int moby_l01_turn_toward_target_pal(void *,void *);
 extern float vec_distance_xy(void *,void *);
 extern float mat_fast_helper_a(float,float);
 extern int moby_start_effect_from_entry(void *,float);
-extern int func_PAL_002AF6C0(void *,float);
+extern int math_is_value_within_step_pal(void *,float);
 extern float FastDiffRots(float,float);
 extern int moby_turn_toward_target_and_step_pal(void *,void *,float);
 extern float moby_get_anim_value(void *);
@@ -61,19 +61,20 @@ typedef struct { char pad[0x34]; u16 flags; } GrelbinObjectFlags;
       I(data,0x230)=(((int)(timer) * 5 + 2) / 6); D_L19_001B1D20=active-1; } }
 #define DISABLE_COLLISION() { B(obj,0x31)=1; H(obj)&=0xFFFE; I(obj,0x98)=I(*(char **)(obj+0x24),0x10); SOLID(); }
 
-void func_PAL_L19_004205C8(char *obj)
+/* Updates a Y.E.T.I. every frame. It waits in hiding, runs toward the player, and attacks up close or with a leap. It runs away to a new spot when it is hurt. (PAL: 50 Hz timings) */
+void yeti_update_pal(char *obj)
 {
     char *data;
     char *entity;
     float vec[4] __attribute__((aligned(16)));
     float distance, angle;
-    int mode, result;
+    int ai_mode, path_result;
     if (!moby_is_in_selected_zone(obj+0x10) || g_game_mode==111) return;
     data=*(char **)(obj+0x68);
-    if (func_PAL_L19_00421568(obj)) { moby_mark_spawned(obj); return; }
+    if (yeti_init_stats_pal(obj)) { moby_mark_spawned(obj); return; }
     if(B(obj,0x20)==1) H(obj)&=0xEFFF;
-    mode=B(obj,0x95);
-    switch(mode) {
+    ai_mode=B(obj,0x95);
+    switch(ai_mode) {
     case 0:
         if(I(data,0x278)==1 && I(data,0x26C)==0 && g_active_yeti_count<g_max_active_yetis) {
             if(I(data,0x264)==-1) {
@@ -112,10 +113,10 @@ void func_PAL_L19_004205C8(char *obj)
         } else { DISABLE_COLLISION(); }
         break;
     case 3:
-        result=moby_dispatch_action_by_kind(obj,data+0x140);
-        if(result&1) {
+        path_result=moby_dispatch_action_by_kind(obj,data+0x140);
+        if(path_result&1) {
             SetDeathBits_pal(obj,0,3); part_queue_moby_for_glow(obj,0,0); g_active_yeti_count--;
-        } else if(result&2) {
+        } else if(path_result&2) {
             if(I(data,0x204)==1 && g_active_yeti_count<=g_max_active_yetis) {
                 ANIM(3,0,8); moby_set_state(obj,14,2);
             } else {
@@ -147,7 +148,7 @@ void func_PAL_L19_004205C8(char *obj)
     case 10:
         entity=*(char **)(data+0x200);
         moby_start_effect_from_entry(obj,mat_fast_helper_a(F(entity,0x10)-F(obj,0x10),F(entity,0x14)-F(obj,0x14)));
-        if(func_PAL_002AF6C0(obj,23.0f)) {
+        if(math_is_value_within_step_pal(obj,23.0f)) {
             ANIM(7,1,2);
             if(math_random_int_below(2)) {ANIM(6,0,2);}
             moby_set_state(obj,11,-1);
@@ -172,23 +173,23 @@ void func_PAL_L19_004205C8(char *obj)
         } else moby_turn_toward_target_and_step_pal(obj,data+0x1F0,F(data,0x270));
         break;
     case 15: {
-        float attackDistance;
+        float attack_distance;
         if(flag_set_first_pending(obj)) { SOLID(); }
-        attackDistance=moby_get_anim_value(obj);
-        if(attackDistance>4.0f && attackDistance<15.0f) moby_l01_turn_toward_target_pal(obj,data+0x1F0);
-        if(func_PAL_002AF6C0(obj,30.0f)) {
+        attack_distance=moby_get_anim_value(obj);
+        if(attack_distance>4.0f && attack_distance<15.0f) moby_l01_turn_toward_target_pal(obj,data+0x1F0);
+        if(math_is_value_within_step_pal(obj,30.0f)) {
             ANIM(7,0,8);moby_set_state(obj,24,-1);
             if(math_random_int_below(3)) {ANIM(6,0,8);} else if(math_random_int_below(2)) {ANIM(13,41,8);}
             if(math_random_int_below(5)) { ANIM(5,0,8);moby_set_state(obj,17,-1); }
         }
-        if(attackDistance<19.0f) {
+        if(attack_distance<19.0f) {
             coll_test_hit_at_bone(0.75f,(float)B(data,0x34),1.0f,obj,0,1,0,1,0);
         }
         break;
     }
     case 16:
         if(flag_set_first_pending(obj)) {SOLID();}
-        if(func_PAL_002AF6C0(obj,25.0f)) {
+        if(math_is_value_within_step_pal(obj,25.0f)) {
             ANIM(7,0,8);moby_set_state(obj,24,-1);
             if(math_random_int_below(3)) {ANIM(6,0,8);} else if(math_random_int_below(2)) {ANIM(13,41,8);}
             if(math_random_int_below(3)) {ANIM(5,0,8);moby_set_state(obj,17,-1);}
@@ -213,7 +214,7 @@ void func_PAL_L19_004205C8(char *obj)
             angle=mat_fast_helper_a(dx,dy); }
             moby_move_to_target_temp_limits_pal(obj,target,16,angle,-1.0f,-1.0f);
         }}
-        if(func_PAL_002AF6C0(obj,21.0f)) {
+        if(math_is_value_within_step_pal(obj,21.0f)) {
             ANIM(7,0,8);moby_set_state(obj,24,-1);
             if(math_random_int_below(3)) {ANIM(6,0,8);} else if(math_random_int_below(2)) {ANIM(13,41,8);}
         }

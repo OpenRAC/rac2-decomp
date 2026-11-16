@@ -10,10 +10,10 @@ extern u8 g_hero_prev_position[];
 extern void moby_set_controller_speed_limits(void *, float, float, float, float);
 extern void FastVecSub(void *, void *, void *), matrix_mul_vec3(void *, void *, void *);
 extern int path_build_route_nodes(void *, int, void *, int);
-extern void func_PAL_002A7E68(void *, int, int, int), moby_update_ground_check(void *);
+extern void anim_start_blended_pal(void *, int, int, int), moby_update_ground_check(void *);
 extern float fast_vec_dist(void *, void *);
 extern void gfx_add_draw_callback_third(void (*)(u8 *), void *);
-extern int func_PAL_002B1A50(void *, void *, int);
+extern int moby_apply_damage_to_object_pal(void *, void *, int);
 extern void gfx_add_two_glow_sprites(u8 *);
 typedef struct TodanoInitState {
     u8 pad0[0x28];
@@ -86,62 +86,63 @@ typedef struct TodanoInitObject {
     int f98;
 } TodanoInitObject;
 
-void func_PAL_L12_003E4728(TodanoInitObject *o) {
-    TodanoInitState *d = o->f68;
-    if (!o->f20) {
+/* Updates a Todano creature: on the first frame sets up its movement tuning, path route and timers, then keeps it near the hero and draws its glow sprites. */
+void todano_creature_update_pal(TodanoInitObject *moby) {
+    TodanoInitState *vars = moby->f68;
+    if (!moby->f20) {
         int kind;
-        o->f7C = 1 << math_random_int_below(6);
+        moby->f7C = 1 << math_random_int_below(6);
         kind = 3;
-        d->fCC = kind;
-        d->fCE = kind;
-        d->fA8 = kind;
-        d->f70 = 9;
-        d->f71 = 8;
-        d->f72 = 8;
-        d->f76 = 9;
-        d->f77 = 10;
-        d->f7C = 0.120000005f;
-        d->f80 = 0.080000006f;
-        d->f84 = 0.006f;
-        d->f88 = 0.012f;
-        d->f8C = 0.006f;
-        d->f90 = 0.5f;
-        d->f94 = 0.5f;
-        d->f9C = 0.4f;
-        d->fCD = 6;
-        d->fCF = 6;
-        d->fD2 = 13;
-        d->fD3 = 26;
-        d->f28 = kind;
-        o->f30 = 200;
-        o->f32 = 200;
-        d->f584 = 0.25f;
-        d->f554 = g_creature_float_param;
-        d->f550 = 0.3f;
-        d->f558 = 1;
-        d->f55C = 1;
-        d->f580 = 0.261799425f;
-        d->f57C = 0.008f;
-        d->f58C = -1;
-        d->f560 = 3.14159012f;
-        d->f588 |= 1;
-        moby_set_controller_speed_limits(o, 0.0048f, 0.120000005f, 0.005026549f, 0.25132746f);
-        qcopy((u8 *)d + 0x760, (u8 *)o + 0x10);
-        FastVecSub((u8 *)d + 0x770, (u8 *)o + 0x10, g_path_waypoint_table[0] + (d->f518 << 7) + 0x30);
-        matrix_mul_vec3((u8 *)d + 0x770, (u8 *)d + 0x770, g_path_waypoint_table[0] + (d->f518 << 7) + 0x40);
-        d->f598 = (u8 *)d + 0x6C0;
-        d->f59C = (u8 *)d + 0x640;
-        d->f790 = path_build_route_nodes(o, d->f510, (u8 *)d + 0x110, 32);
-        o->f98 = 0;
-        o->f34 = (o->f34 | 0x41) & 0xEFFF;
-        moby_set_state(o, 1, 0);
-        if (o->f43)func_PAL_002A7E68(o, 0, 0, 0);
+        vars->fCC = kind;
+        vars->fCE = kind;
+        vars->fA8 = kind;
+        vars->f70 = 9;
+        vars->f71 = 8;
+        vars->f72 = 8;
+        vars->f76 = 9;
+        vars->f77 = 10;
+        vars->f7C = 0.120000005f;
+        vars->f80 = 0.080000006f;
+        vars->f84 = 0.006f;
+        vars->f88 = 0.012f;
+        vars->f8C = 0.006f;
+        vars->f90 = 0.5f;
+        vars->f94 = 0.5f;
+        vars->f9C = 0.4f;
+        vars->fCD = 6;
+        vars->fCF = 6;
+        vars->fD2 = 13;
+        vars->fD3 = 26;
+        vars->f28 = kind;
+        moby->f30 = 200;
+        moby->f32 = 200;
+        vars->f584 = 0.25f;
+        vars->f554 = g_creature_float_param;
+        vars->f550 = 0.3f;
+        vars->f558 = 1;
+        vars->f55C = 1;
+        vars->f580 = 0.261799425f;
+        vars->f57C = 0.008f;
+        vars->f58C = -1;
+        vars->f560 = 3.14159012f;
+        vars->f588 |= 1;
+        moby_set_controller_speed_limits(moby, 0.0048f, 0.120000005f, 0.005026549f, 0.25132746f);
+        qcopy((u8 *)vars + 0x760, (u8 *)moby + 0x10);
+        FastVecSub((u8 *)vars + 0x770, (u8 *)moby + 0x10, g_path_waypoint_table[0] + (vars->f518 << 7) + 0x30);
+        matrix_mul_vec3((u8 *)vars + 0x770, (u8 *)vars + 0x770, g_path_waypoint_table[0] + (vars->f518 << 7) + 0x40);
+        vars->f598 = (u8 *)vars + 0x6C0;
+        vars->f59C = (u8 *)vars + 0x640;
+        vars->f790 = path_build_route_nodes(moby, vars->f510, (u8 *)vars + 0x110, 32);
+        moby->f98 = 0;
+        moby->f34 = (moby->f34 | 0x41) & 0xEFFF;
+        moby_set_state(moby, 1, 0);
+        if (moby->f43)anim_start_blended_pal(moby, 0, 0, 0);
         g_tourist_wait_counter = 0;
     }
-    if (o->f31 && fast_vec_dist((u8 *)o + 0x10, g_hero_prev_position) < 24) {
-        moby_update_ground_check(o);
-        o->f6F = 22;
+    if (moby->f31 && fast_vec_dist((u8 *)moby + 0x10, g_hero_prev_position) < 24) {
+        moby_update_ground_check(moby);
+        moby->f6F = 22;
     }
-    func_PAL_002B1A50(o, (u8 *)d + 0x60, 0);
-    if (o->f20 != 8 && o->f20 != 1)gfx_add_draw_callback_third(gfx_add_two_glow_sprites, o);
+    moby_apply_damage_to_object_pal(moby, (u8 *)vars + 0x60, 0);
+    if (moby->f20 != 8 && moby->f20 != 1)gfx_add_draw_callback_third(gfx_add_two_glow_sprites, moby);
 }

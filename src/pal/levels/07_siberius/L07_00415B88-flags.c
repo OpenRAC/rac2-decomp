@@ -13,9 +13,10 @@ extern void *part_find_owned_effect_slot(void *, int, int);
 extern void moby_compute_local_point(void *, void *, float, float, float);
 extern int coll_sweep_from_object(void *, void *, int, int, int, int, float, float, float);
 extern int PlayMobySound(int, int, void *);
-extern void func_PAL_002B15D8(void *, int, void *, float, float, float, float, int);
+extern void part_spawn_masked_debris_pal(void *, int, void *, float, float, float, float, int);
 extern void moby_mark_spawned(void *);
 
+/* Updates a falling Siberius debris piece (moby class 4776): it drifts down, hurts what it touches, then bursts into an effect and disappears (PAL: 50 Hz timings). */
 void siberius_debris_update_pal(unsigned char *object)
 {
     char *state = *(char **)(object + 0x68);
@@ -61,7 +62,7 @@ void siberius_debris_update_pal(unsigned char *object)
         if (object[0x31]) {
             effect = 0;
             ((float *)&effect)[2] = 0.060000002f;
-            func_PAL_002B15D8(object, 3, &effect, 3.0f, 6.0f, 3.0f, 6.0f, 255);
+            part_spawn_masked_debris_pal(object, 3, &effect, 3.0f, 6.0f, 3.0f, 6.0f, 255);
         }
         moby_mark_spawned(object);
         break;

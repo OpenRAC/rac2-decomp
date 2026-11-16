@@ -39,16 +39,18 @@ extern int g_gorn_course_miss_count __attribute__((sda));
 extern int g_gorn_path_waiting_flag __attribute__((sda));
 /* Retail reads this counter absolutely and writes the same address via $gp: D_L15_001B3698 through a second small-data declaration. */
 extern int D_L15_001B3698_1 __attribute__((sda));
-void func_US2_L15_00432BA8(char *self)
+/* Gorn path-marker course stage (USA v2.00): spawns the path markers one after another and
+   scores each as the hero or camera passes it, restarting after too many misses. */
+void gorn_path_course_update_us2(char *moby)
 {
-    PathVector up, camera, fromHero, fromCamera;
-    char *state = *(char **)(self + 0x68), *object, *hero;
+    PathVector up, camera, from_hero, from_camera;
+    char *vars = *(char **)(moby + 0x68), *marker, *hero_moby;
     PathRoute *path;
     char **list;
-    float heroDot, cameraDot;
-    int n, i;
-    unsigned short objectFlags;
-    char *oldFirst;
+    float hero_dot, camera_dot;
+    int count, i;
+    unsigned short marker_flags;
+    char *old_first;
     up.q = 0;
     up.f[2] = 1;
     if (!g_cutscene_l15_started_flag) {
@@ -61,89 +63,89 @@ void func_US2_L15_00432BA8(char *self)
         if (g_gorn_path_effect) moby_mark_spawned(g_gorn_path_effect);
         entry_init_all_registered(); g_gorn_path_effect = 0;
         hero_set_state_value_b(1);
-        g_gorn_challenge_vars.route = *(int *)(state + 0x30);
+        g_gorn_challenge_vars.route = *(int *)(vars + 0x30);
         hero_set_state_value_a(0);
-        list = level_get_object_list(); n = level_get_saved_value();
-        for (i = 0; i < n; i++) if (*(short *)(list[i] + 0xAA) == 0xF82) entry_spawn_list_objects_with_flag(list[i], 1);
-        path = g_path_l15_table[*(int *)(state + 0x30)];
+        list = level_get_object_list(); count = level_get_saved_value();
+        for (i = 0; i < count; i++) if (*(short *)(list[i] + 0xAA) == 0xF82) entry_spawn_list_objects_with_flag(list[i], 1);
+        path = g_path_l15_table[*(int *)(vars + 0x30)];
         while ((!g_gorn_path_first_node || !g_gorn_path_next_node) && g_gorn_course_marker_index != path->pointCount) {
             if (path->point[g_gorn_course_marker_index].f[3] != -1) {
-            object = CreateMoby(0x114A);
-            ((unsigned char *)object)[0x30] = 0xFF;
-            objectFlags = *(unsigned short *)(object + 0x34);
-            oldFirst = g_gorn_path_first_node;
-            *(short *)(object + 0x32) = 0x1FF;
-            *(unsigned short *)(object + 0x34) = objectFlags | 0x100;
-            if (!oldFirst) g_gorn_path_first_node = object; else g_gorn_path_next_node = object;
+            marker = CreateMoby(0x114A);
+            ((unsigned char *)marker)[0x30] = 0xFF;
+            marker_flags = *(unsigned short *)(marker + 0x34);
+            old_first = g_gorn_path_first_node;
+            *(short *)(marker + 0x32) = 0x1FF;
+            *(unsigned short *)(marker + 0x34) = marker_flags | 0x100;
+            if (!old_first) g_gorn_path_first_node = marker; else g_gorn_path_next_node = marker;
             if (g_gorn_course_marker_index == path->pointCount - 1) {
-                FastVecSub(object + 0xC0, &path->point[g_gorn_course_marker_index - 1], &path->point[g_gorn_course_marker_index]);
-                *(int *)(object + 0xCC) = 0;
-                vec_scale_to_length(object + 0xC0, object + 0xC0, -1);
+                FastVecSub(marker + 0xC0, &path->point[g_gorn_course_marker_index - 1], &path->point[g_gorn_course_marker_index]);
+                *(int *)(marker + 0xCC) = 0;
+                vec_scale_to_length(marker + 0xC0, marker + 0xC0, -1);
             } else {
-                FastVecSub(object + 0xC0, &path->point[g_gorn_course_marker_index + 1], &path->point[g_gorn_course_marker_index]);
-                *(int *)(object + 0xCC) = 0;
-                vec_scale_to_length(object + 0xC0, object + 0xC0, 1);
+                FastVecSub(marker + 0xC0, &path->point[g_gorn_course_marker_index + 1], &path->point[g_gorn_course_marker_index]);
+                *(int *)(marker + 0xCC) = 0;
+                vec_scale_to_length(marker + 0xC0, marker + 0xC0, 1);
             }
-            FastVecCross(object + 0xD0, object + 0xC0, &up);
-            vec_scale_to_length(object + 0xD0, object + 0xD0, 1);
-            FastVecCross(object + 0xE0, object + 0xD0, object + 0xC0);
-            qcopy(object + 0x10, &path->point[g_gorn_course_marker_index]);
-            *(int *)(object + 0x1C) = 0;
+            FastVecCross(marker + 0xD0, marker + 0xC0, &up);
+            vec_scale_to_length(marker + 0xD0, marker + 0xD0, 1);
+            FastVecCross(marker + 0xE0, marker + 0xD0, marker + 0xC0);
+            qcopy(marker + 0x10, &path->point[g_gorn_course_marker_index]);
+            *(int *)(marker + 0x1C) = 0;
             }
             g_gorn_course_marker_index++;
         }
     }
-    if (!g_gorn_path_first_node && !g_gorn_path_next_node && !g_gorn_path_waiting_flag) { gorn_finish_challenge_stage_us2(self, 3); return; }
+    if (!g_gorn_path_first_node && !g_gorn_path_next_node && !g_gorn_path_waiting_flag) { gorn_finish_challenge_stage_us2(moby, 3); return; }
     if (level_get_saved_value_b(level_find_object_by_class_id(0xF82))) {
         g_gorn_path_waiting_flag = 1;
-        if (math_fast_float_d((int *)(state + 0x64))) { g_gorn_path_waiting_flag = 0; *(int *)(state + 0x64) = 240; ResetGornStageCounters(self); entry_init_all_registered(); }
+        if (math_fast_float_d((int *)(vars + 0x64))) { g_gorn_path_waiting_flag = 0; *(int *)(vars + 0x64) = 240; ResetGornStageCounters(moby); entry_init_all_registered(); }
         else { pad_set_raw_input_value(10); level_l00_call_module_handler_with_arg_9_us2(GetLocalizedString(0x3074), -1); }
     } else if (g_gorn_course_miss_count >= 12) {
         g_gorn_path_waiting_flag = 1;
-        if (!math_fast_float_d((int *)(state + 0x64))) { pad_set_raw_input_value(10); level_l00_call_module_handler_with_arg_9_us2(GetLocalizedString(0x3074), -1); }
-        else { g_gorn_path_waiting_flag = 0; *(int *)(state + 0x64) = 240; ResetGornStageCounters(self); entry_init_all_registered(); }
+        if (!math_fast_float_d((int *)(vars + 0x64))) { pad_set_raw_input_value(10); level_l00_call_module_handler_with_arg_9_us2(GetLocalizedString(0x3074), -1); }
+        else { g_gorn_path_waiting_flag = 0; *(int *)(vars + 0x64) = 240; ResetGornStageCounters(moby); entry_init_all_registered(); }
     }
     if (g_gorn_path_waiting_flag) return;
     D_L15_001B3698_1 = g_gorn_course_timer + 1;
     if (D_L15_001B3698_1 < 2) return;
-    hero = g_moby_base + (*(int *)(state + 0x20) << 8);
+    hero_moby = g_moby_base + (*(int *)(vars + 0x20) << 8);
     qcopy(&camera, &g_camera_l15_position);
-    FastVecSub(&fromCamera, &camera, g_gorn_path_first_node + 0x10);
-    vec_scale_to_length(&fromCamera, &fromCamera, 1);
-    FastVecSub(&fromHero, hero + 0x10, g_gorn_path_first_node + 0x10);
-    vec_scale_to_length(&fromHero, &fromHero, 1);
-    heroDot = FastVecDot(g_gorn_path_first_node + 0xC0, &fromHero);
-    cameraDot = FastVecDot(g_gorn_path_first_node + 0xC0, &fromCamera);
-    if ((heroDot != g_gorn_old_hero_value && heroDot > 0) || (cameraDot != g_gorn_old_camera_value && cameraDot > 0)) {
-        path = g_path_l15_table[*(int *)(state + 0x30)];
-        if (fast_vec_dist(&camera, g_gorn_path_first_node + 0x10) <= 1.25f || fast_vec_dist(hero + 0x10, g_gorn_path_first_node + 0x10) <= 1.25f) {
-            snd_play_from_class_bank(15, 0, self, 0xFBF); hero_add_clamped_stat(0.5f);
+    FastVecSub(&from_camera, &camera, g_gorn_path_first_node + 0x10);
+    vec_scale_to_length(&from_camera, &from_camera, 1);
+    FastVecSub(&from_hero, hero_moby + 0x10, g_gorn_path_first_node + 0x10);
+    vec_scale_to_length(&from_hero, &from_hero, 1);
+    hero_dot = FastVecDot(g_gorn_path_first_node + 0xC0, &from_hero);
+    camera_dot = FastVecDot(g_gorn_path_first_node + 0xC0, &from_camera);
+    if ((hero_dot != g_gorn_old_hero_value && hero_dot > 0) || (camera_dot != g_gorn_old_camera_value && camera_dot > 0)) {
+        path = g_path_l15_table[*(int *)(vars + 0x30)];
+        if (fast_vec_dist(&camera, g_gorn_path_first_node + 0x10) <= 1.25f || fast_vec_dist(hero_moby + 0x10, g_gorn_path_first_node + 0x10) <= 1.25f) {
+            snd_play_from_class_bank(15, 0, moby, 0xFBF); hero_add_clamped_stat(0.5f);
         } else { hero_add_clamped_stat(-0.75f); g_gorn_course_miss_count++; }
         moby_mark_spawned(g_gorn_path_first_node); g_gorn_path_first_node = g_gorn_path_next_node; g_gorn_path_next_node = 0;
         while (!g_gorn_path_next_node && g_gorn_course_marker_index != path->pointCount) {
             if (path->point[g_gorn_course_marker_index].f[3] != -1) {
-            object = CreateMoby(0x114A);
-            ((PathObject *)object)->alpha = 0xFF; ((PathObject *)object)->colour = 0x1FF; ((PathObject *)object)->flags |= 0x100;
-            g_gorn_path_next_node = object;
+            marker = CreateMoby(0x114A);
+            ((PathObject *)marker)->alpha = 0xFF; ((PathObject *)marker)->colour = 0x1FF; ((PathObject *)marker)->flags |= 0x100;
+            g_gorn_path_next_node = marker;
             if (g_gorn_course_marker_index == path->pointCount - 1) {
-                FastVecSub(object + 0xC0, &path->point[g_gorn_course_marker_index - 1], &path->point[g_gorn_course_marker_index]);
-                *(int *)(object + 0xCC) = 0;
-                vec_scale_to_length(object + 0xC0, object + 0xC0, -1);
+                FastVecSub(marker + 0xC0, &path->point[g_gorn_course_marker_index - 1], &path->point[g_gorn_course_marker_index]);
+                *(int *)(marker + 0xCC) = 0;
+                vec_scale_to_length(marker + 0xC0, marker + 0xC0, -1);
             } else {
-                FastVecSub(object + 0xC0, &path->point[g_gorn_course_marker_index + 1], &path->point[g_gorn_course_marker_index]);
-                *(int *)(object + 0xCC) = 0;
-                vec_scale_to_length(object + 0xC0, object + 0xC0, 1);
+                FastVecSub(marker + 0xC0, &path->point[g_gorn_course_marker_index + 1], &path->point[g_gorn_course_marker_index]);
+                *(int *)(marker + 0xCC) = 0;
+                vec_scale_to_length(marker + 0xC0, marker + 0xC0, 1);
             }
-            FastVecCross(object + 0xD0, object + 0xC0, &up);
-            vec_scale_to_length(object + 0xD0, object + 0xD0, 1);
-            FastVecCross(object + 0xE0, object + 0xD0, object + 0xC0);
-            qcopy(object + 0x10, &path->point[g_gorn_course_marker_index]);
-            *(int *)(object + 0x1C) = 0;
+            FastVecCross(marker + 0xD0, marker + 0xC0, &up);
+            vec_scale_to_length(marker + 0xD0, marker + 0xD0, 1);
+            FastVecCross(marker + 0xE0, marker + 0xD0, marker + 0xC0);
+            qcopy(marker + 0x10, &path->point[g_gorn_course_marker_index]);
+            *(int *)(marker + 0x1C) = 0;
             }
             g_gorn_course_marker_index++;
         }
     }
-    g_gorn_old_hero_value = heroDot; g_gorn_old_camera_value = cameraDot;
+    g_gorn_old_hero_value = hero_dot; g_gorn_old_camera_value = camera_dot;
     if (g_gorn_path_first_node) {
         effect_set_enabled(g_gorn_path_first_node, 1);
         if (g_gorn_path_next_node) effect_set_color(g_gorn_path_first_node, 0x40008000);

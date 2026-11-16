@@ -51,18 +51,19 @@ extern void enemy_set_animation_state_pal(void *, int, int, int);
 extern void moby_destroy_linked(void *);
 extern int enemy_walk_to_next_path_point(void *, int);
 extern s32 enemy_select_path(void *, int, int);
-extern void func_PAL_L09_003FCF28(void *);
-extern void func_PAL_L09_003FD248(void *);
+extern void transfer_state_to_nearest_eligible_object_pal(void *);
+extern void trooper_rearm_spawn_timers_pal(void *);
 extern void trooper_legs_update_frame_pal(void *);
 extern void trooper_torso_update_attachment_pal(void *);
 extern void trooper_attach_arm_parts(void *);
 extern int enemy_check_line_of_sight(void *, int, int, int);
-extern void func_PAL_L09_003FE118(void *);
+extern void trooper_fire_arm_shot_pal(void *);
 extern void enemy_move_along_path(void *);
-extern void func_PAL_L09_003FE4C0(void *);
+extern void enemy_choose_next_action_pal(void *);
 extern int enemy_process_activation(void *);
 
-void func_PAL_L09_003FEAF0(char *self)
+/* Update for the Megacorp Trooper Legs (moby class 3343). It picks what the trooper does next: walk, aim, shoot or die (PAL: 50 Hz timings). */
+void trooper_legs_update_pal(char *self)
 {
     char *vars;
     int state;
@@ -186,7 +187,7 @@ void func_PAL_L09_003FEAF0(char *self)
             moby_set_state(self, 0xF, -1);
         if (flags & 1) {
             if (*(float *)(vars + 0x20) > 0.0f)
-                func_PAL_L09_003FCF28(self);
+                transfer_state_to_nearest_eligible_object_pal(self);
             shared_counter_release(self);
             moby_set_state(self, 0xF, -1);
         } else if (flags & 2) {
@@ -274,7 +275,7 @@ void func_PAL_L09_003FEAF0(char *self)
         }
         break;
     case 6:
-        func_PAL_L09_003FE4C0(self);
+        enemy_choose_next_action_pal(self);
         break;
     case 16: {
         int near;
@@ -395,7 +396,7 @@ void func_PAL_L09_003FEAF0(char *self)
         break;
     case 11:
         if (*(u16 *)(self + 0x96) > ((s32)(g_trooper_frame_max) * 5 + 2) / 6)
-            func_PAL_L09_003FE118(self);
+            trooper_fire_arm_shot_pal(self);
         if ((*(u16 *)(self + 0x96) > ((s32)(g_trooper_frame_min) * 5 + 2) / 6
              && g_trooper_attack_range < vec_distance_xy(self + 0x10, *(char **)(vars + 0x200) + 0x10))
             || *(char **)(vars + 0x2F8) == 0) {
@@ -423,7 +424,7 @@ void func_PAL_L09_003FEAF0(char *self)
         if (*(u8 *)(self + 0x60) & 2)
             enemy_set_animation_state_pal(self, (func_001163B0() & 1) ? 0xA : 0x13, 0, math_random_int_range(0x19, 0x2D));
         if (*(u8 *)(self + 0x42) == 0xA || *(u8 *)(self + 0x42) == 0x13)
-            func_PAL_L09_003FE118(self);
+            trooper_fire_arm_shot_pal(self);
         break;
     case 14:
         shared_counter_release(self);
@@ -441,10 +442,10 @@ void func_PAL_L09_003FEAF0(char *self)
     }
     trooper_torso_update_attachment_pal(self);
     trooper_attach_arm_parts(self);
-    func_PAL_L09_003FD248(self);
+    trooper_rearm_spawn_timers_pal(self);
     trooper_copy_owner_value_self_torso(self);
     if (*(int *)(vars + 0x1D8) != -1 && *(u8 *)(self + 0x20) != 0 && *(u8 *)(self + 0x20) < 0xE) {
-        func_PAL_L09_003FCF28(self);
+        transfer_state_to_nearest_eligible_object_pal(self);
         shared_counter_release(self);
         moby_set_state(self, 0xF, 0xA);
     }

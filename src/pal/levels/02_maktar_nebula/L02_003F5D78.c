@@ -8,20 +8,20 @@ extern void set_moby_color(void *, u8, u8, u8);
 extern u8 g_actor_match_key;
 
 /* Sets the actor up: re-registers its sub-objects and arms its effects. */
-void actor_revive_pal(char *arg0, int arg1) {
-    char *state = *(char **)(arg0 + 0x68);
+void actor_revive_pal(char *moby, int wave_threshold) {
+    char *state = *(char **)(moby + 0x68);
     int i;
 
     *(float *)(state + 0x20) = (float)*(short *)(state + 0x24);
     *(u16 *)(state + 0x98) = 0;
-    moby_set_controller_speed_limits((u8 *)arg0, 0.0064000003f, 0.16000001f,
+    moby_set_controller_speed_limits((u8 *)moby, 0.0064000003f, 0.16000001f,
                   0.0016755164f, 0.12566373f);
-    moby_set_state(arg0, 3, 0);
-    *(int *)(arg0 + 0x98) = *(int *)(*(char **)(arg0 + 0x24) + 0x10);
+    moby_set_state(moby, 3, 0);
+    *(int *)(moby + 0x98) = *(int *)(*(char **)(moby + 0x24) + 0x10);
     *(u8 *)(state + 0x7A) = 0;
-    *(u8 *)(arg0 + 0x31) = 1;
-    *(u8 *)(arg0 + 0x7F) = 0;
-    *(u16 *)(arg0 + 0x34) = (*(u16 *)(arg0 + 0x34) | 0x1000) & 0xFFB8;
+    *(u8 *)(moby + 0x31) = 1;
+    *(u8 *)(moby + 0x7F) = 0;
+    *(u16 *)(moby + 0x34) = (*(u16 *)(moby + 0x34) | 0x1000) & 0xFFB8;
     {
         char **slot = (char **)(state + 0x4C0);
 
@@ -37,11 +37,11 @@ void actor_revive_pal(char *arg0, int arg1) {
     {
         short flag = *(short *)(state + 0x60);
 
-        *(u16 *)(state + 0x4F0) = arg1;
+        *(u16 *)(state + 0x4F0) = wave_threshold;
         *(u16 *)(state + 0x4EA) = 0;
         if (flag != 0) {
             *(short *)(state + 0x60) = 0;
-            set_moby_color(arg0, *(u8 *)(state + 0x64), *(u8 *)(state + 0x65),
+            set_moby_color(moby, *(u8 *)(state + 0x64), *(u8 *)(state + 0x65),
                           *(u8 *)(state + 0x66));
             *(short *)(state + 0x62) = 1;
         }
@@ -50,33 +50,33 @@ void actor_revive_pal(char *arg0, int arg1) {
 
 
 extern void actor_tear_down(char *);
-extern void func_PAL_002A7E68(char *, int, int, int);
+extern void anim_start_blended_pal(char *, int, int, int);
 extern void func_PAL_002A0F68(char *);
 extern void vec_random_direction(char *, float, float);
-extern void func_PAL_002B15D8(char *, int, char *, float, float, float, float, int);
+extern void part_spawn_masked_debris_pal(char *, int, char *, float, float, float, float, int);
 extern void FastVecAdd(void *, void *, void *);
 extern void IncrementMaktarTypeCounter(int, int);
 extern char *SpawnExplosion_pal(char *, int, int, int, int, int, int, int, float, float, int, int, int, int);
 extern int snd_play_from_class_bank(int, int, char *, int);
 
 /* Tears the actor down: stops its effect, clears its sub-objects, resets flags. */
-void actor_tear_down_pal(char *arg0) {
-    char *state = *(char **)(arg0 + 0x68);
+void actor_tear_down_pal(char *moby) {
+    char *state = *(char **)(moby + 0x68);
     char buffer[0x10];
     int i;
 
     if (*(short *)(state + 0x4EA) == 1)
-        IncrementMaktarTypeCounter(*(int *)(arg0 + 0xB8), 0xB22);
+        IncrementMaktarTypeCounter(*(int *)(moby + 0xB8), 0xB22);
     *(short *)(state + 0x4EA) = 0;
     *(int *)(state + 0x4B0) = 0;
     *(unsigned char *)(state + 0x7A) = 0;
     *(unsigned char *)(state + 0x2E) = 1;
-    if (*(unsigned char *)(arg0 + 0x31) != 0) {
-        SpawnExplosion_pal(arg0 + 0x10, 0, 0x1E, 5, 5, 5, 0x2D, 1, 0.5f, 0.0f, 1, 0, 0, 0);
-        snd_play_from_class_bank(0, 0, arg0, 0xC3E);
+    if (*(unsigned char *)(moby + 0x31) != 0) {
+        SpawnExplosion_pal(moby + 0x10, 0, 0x1E, 5, 5, 5, 0x2D, 1, 0.5f, 0.0f, 1, 0, 0, 0);
+        snd_play_from_class_bank(0, 0, moby, 0xC3E);
         vec_random_direction(buffer, 0.040000003f, 0.10000001f);
         FastVecAdd(buffer, buffer, state + 0xE0);
-        func_PAL_002B15D8(arg0, 0x7F, buffer, 3.0f, 6.0f, 3.0f, 6.0f, 0xFF);
+        part_spawn_masked_debris_pal(moby, 0x7F, buffer, 3.0f, 6.0f, 3.0f, 6.0f, 0xFF);
     }
     {
         char **slot = (char **)(state + 0x4C0);
@@ -90,12 +90,12 @@ void actor_tear_down_pal(char *arg0) {
             slot++;
         }
     }
-    func_PAL_002A7E68(arg0, 0, 0, 3);
-    func_PAL_002A0F68(arg0);
-    moby_set_state(arg0, 1, 0);
-    *(unsigned char *)(arg0 + 0x31) = 0;
-    *(int *)(arg0 + 0x98) = 0;
-    *(unsigned short *)(arg0 + 0x34) =
-        (*(unsigned short *)(arg0 + 0x34) & 0xEFFF) | 0x47;
+    anim_start_blended_pal(moby, 0, 0, 3);
+    func_PAL_002A0F68(moby);
+    moby_set_state(moby, 1, 0);
+    *(unsigned char *)(moby + 0x31) = 0;
+    *(int *)(moby + 0x98) = 0;
+    *(unsigned short *)(moby + 0x34) =
+        (*(unsigned short *)(moby + 0x34) & 0xEFFF) | 0x47;
 }
 

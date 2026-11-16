@@ -30,7 +30,7 @@ extern void render_environment_mapped_object_pal(void *);
 extern void moby_update_ground_check(void *);
 extern void level_setup_glow_effects_pal(void *, int);
 extern void update_moby_pulsing_glow_effects_pal(void *);
-extern void func_PAL_L00_002FE768(void);
+extern void tutorial_scene_objects_update_pal(void);
 extern void UpdateLightingEnvironment(void);
 extern void gfx_compute_light_direction(void);
 extern int g_tutorial_probe_context[];
@@ -127,7 +127,7 @@ void cutscene_update_frame_pal(void) {
             }
         }
     }
-    func_PAL_L00_002FE768();
+    tutorial_scene_objects_update_pal();
     UpdateSoundVoices_pal();
     UpdateLightingEnvironment();
     gfx_compute_light_direction();

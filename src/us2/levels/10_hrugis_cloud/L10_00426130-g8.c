@@ -20,7 +20,7 @@ extern void *level_find_object_by_class_id(int);
 extern int list_count_ready_objects(void *);
 extern void hrugis_finish_mission_reward_us2(void *, int);
 
-void func_US2_L10_00426130(void *object)
+void mission_third_update_us2(void *object)
 {
     unsigned char **entries;
     int i, count;

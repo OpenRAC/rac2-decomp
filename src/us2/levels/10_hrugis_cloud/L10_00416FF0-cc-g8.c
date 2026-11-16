@@ -59,6 +59,8 @@ typedef struct {
     char dir[0x10];
 } Thing;
 
+/* Update of a trigger moby that waits for the player to step into it. It then checks the
+   conditions, plays the short sequence and gives the player the item, then removes itself. (USA v2.00) */
 void trigger_l10_zone_update_us2(Thing *m)
 {
     TriggerVars *p = m->vars;

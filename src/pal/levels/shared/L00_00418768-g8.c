@@ -10,14 +10,15 @@ extern int g_wave_ribbon_second_alpha __attribute__((sda));
 extern void VU1_addGSregister(unsigned int, unsigned long long);
 extern void wave_line_draw_ribbon(char *, int, int, int, int);
 
-void func_PAL_L00_00418768(char *object)
+/* Scrolls the wave line texture and draws its two ribbons (PAL: 1.2x scroll step). */
+void wave_line_draw_effect_pal(char *object)
 {
     char *state = *(char **)(object + 0x68);
-    float value = *(float *)(state + 0x14) - g_wave_line_scroll_step * 1.2f;
+    float scroll = *(float *)(state + 0x14) - g_wave_line_scroll_step * 1.2f;
 
-    *(float *)(state + 0x14) = value;
-    if (value <= -8.0f) {
-        *(float *)(state + 0x14) = value + 8.0f;
+    *(float *)(state + 0x14) = scroll;
+    if (scroll <= -8.0f) {
+        *(float *)(state + 0x14) = scroll + 8.0f;
     }
     VU1_addGSregister(0x47, 0x51001ULL);
 

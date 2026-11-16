@@ -13,9 +13,10 @@ extern unsigned int g_frame_counter[] __attribute__((sda));
 extern int g_current_map_index[] __attribute__((sda));
 extern char g_hero_position[];
 extern int IsPointInCuboid(void *, int);
-extern int func_PAL_00289730(int, int);
+extern int subtitle_request_voice_line_pal(int, int);
 
-void func_PAL_L01_002EBFB8(int key, int selection, int mode, int area, int exclude)
+/* Queues the subtitle for a key when the hero is inside the area cuboid (and not the excluded one), limited by the mode: once, repeat after a delay, once per level, or until seen (PAL: 50 Hz timings). */
+void trigger_subtitle_in_cuboid_pal(int key, int selection, int mode, int area, int exclude)
 {
     int limit = mode == 0 ? 1 : 65535;
     SubtitleHistory *entry = &g_subtitle_history[selection];
@@ -28,18 +29,18 @@ void func_PAL_L01_002EBFB8(int key, int selection, int mode, int area, int exclu
         if (IsPointInCuboid(g_hero_position, area)) {
             switch (mode) {
             case 0:
-                func_PAL_00289730(key, selection);
+                subtitle_request_voice_line_pal(key, selection);
                 break;
             case 1:
                 if (((int)g_frame_counter[0] * 5 + 2) / 6 - g_subtitle_history[selection].time > 900 || g_subtitle_history[selection].time == 0)
-                    func_PAL_00289730(key, selection);
+                    subtitle_request_voice_line_pal(key, selection);
                 else if (g_subtitle_history[selection].time < ((int)g_frame_counter[0] * 5 + 2) / 6)
                     g_subtitle_history[selection].time = ((int)g_frame_counter[0] * 5 + 2) / 6;
                 break;
             case 2:
                 if (g_subtitle_history[selection].count != 0) {
                     if (((int)g_frame_counter[0] * 5 + 2) / 6 - g_subtitle_history[selection].time > 900 || g_subtitle_history[selection].time == 0)
-                        func_PAL_00289730(key, selection);
+                        subtitle_request_voice_line_pal(key, selection);
                     else if (g_subtitle_history[selection].time < ((int)g_frame_counter[0] * 5 + 2) / 6)
                         g_subtitle_history[selection].time = ((int)g_frame_counter[0] * 5 + 2) / 6;
                     break;
@@ -51,7 +52,7 @@ void func_PAL_L01_002EBFB8(int key, int selection, int mode, int area, int exclu
                 break;
             case 3:
                 if (g_subtitle_history[selection].levels >= 0)
-                    func_PAL_00289730(key, selection);
+                    subtitle_request_voice_line_pal(key, selection);
                 break;
             }
         }

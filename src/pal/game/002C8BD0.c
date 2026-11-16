@@ -19,7 +19,9 @@ extern char g_hero_position[];
 extern float fast_vec_dist(char *, char *);
 extern void FastVecSub(char *, char *, char *);
 
-void func_PAL_002C8D68(char *p)
+/* Floating dust: slows, sways with the camera, is pushed away from the hero when close, and
+   fades in and out by its remaining life. */
+void part_update_floating_dust_pal(char *p)
 {
     char *d, *position = p + 16, *hero, *base;
     float v[4], origin[4];

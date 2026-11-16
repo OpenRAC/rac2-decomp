@@ -37,7 +37,7 @@ extern void SpawnExplosionEffects_pal(void *, void *, void *, float, float, int,
 
 
 /* Resolve the player onto the surface grid and blend their height into it. */
-void func_PAL_00303F38(char *object)
+void surface_grid_update_pal(char *object)
 {
     char *state=*(char **)(object+0x68);
     float center, ceiling, blend;

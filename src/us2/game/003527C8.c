@@ -10,6 +10,7 @@ extern char *g_movie_player_state[] __attribute__((sda));
 extern char *g_movie_player_state[] __attribute__((sda));
 extern char *g_movie_player_state[] __attribute__((sda));
 
+/* Starts the video decoder: resets its buffers, runs the decode loop, and waits until it is told to stop. */
 void mpeg_dec_start_us2(unsigned char *object)
 {
     char *base;

@@ -26,7 +26,8 @@ extern int FastDecTimer(void *);
 extern void moby_mark_spawned(void *);
 extern void part_queue_ground_shadow(void *, float);
 
-void func_PAL_L00_003B6A7C(char *obj)
+/* Moves a shard projectile; it explodes on hitting something, leaving the arena or when its timer runs out. */
+void shard_projectile_update_pal(char *obj)
 {
     Shard_3B3158 *st;
     V4_3B3158 from, dir, at;

@@ -40,43 +40,43 @@ extern u8 *g_hit_object_list[];
 
 /* Steers the object's two angles: the yaw toward the argument, the pitch from the shared
    record, and the two scaled fields of the state record. */
-void moby_steer_aim_yaw_pal(u8 *a0)
+void moby_steer_aim_yaw_pal(u8 *moby)
 {
-    u8 *s0;
-    u8 *s1;
-    u8 *s2;
-    u8 *v1;
-    u8 *v0;
-    f32 *p;
-    f32 t;
-    f32 r;
-    f32 q;
-    f32 f20;
-    f32 f21;
-    f32 f22;
+    u8 *world_state;
+    u8 *vars;
+    u8 *cam_state;
+    u8 *world;
+    u8 *target_moby;
+    f32 *cam_pos;
+    f32 yaw_error;
+    f32 target_yaw;
+    f32 current_yaw;
+    f32 max_turn_speed;
+    f32 turn_accel;
+    f32 pi;
 
-    v1 = g_world_info;
-    if (*(s16 *)(v1 + 0x86) != 0) {
+    world = g_world_info;
+    if (*(s16 *)(world + 0x86) != 0) {
         return;
     }
-    v0 = g_snowfall_target_moby;
-    if (v0 == 0) {
+    target_moby = g_snowfall_target_moby;
+    if (target_moby == 0) {
         return;
     }
-    f22 = 3.14159274f;
-    s0 = *(u8 **)(v1 + 0x70);
-    s1 = *(u8 **)(a0 + 0x68);
-    p = (f32 *)(s0 + 0x160);
-    r = FastAddRotations(*(f32 *)(v0 + 0xF8), f22);
-    s2 = s0 + 0x1C0;
-    q = mat_fast_helper_a(p[0], p[1]);
-    t = fast_subtract_rotations(r, q);
-    f21 = g_aim_yaw_turn_accel * 6.981318e-06f;
-    f20 = g_aim_yaw_max_turn_speed * 0.0003490659f;
+    pi = 3.14159274f;
+    world_state = *(u8 **)(world + 0x70);
+    vars = *(u8 **)(moby + 0x68);
+    cam_pos = (f32 *)(world_state + 0x160);
+    target_yaw = FastAddRotations(*(f32 *)(target_moby + 0xF8), pi);
+    cam_state = world_state + 0x1C0;
+    current_yaw = mat_fast_helper_a(cam_pos[0], cam_pos[1]);
+    yaw_error = fast_subtract_rotations(target_yaw, current_yaw);
+    turn_accel = g_aim_yaw_turn_accel * 6.981318e-06f;
+    max_turn_speed = g_aim_yaw_max_turn_speed * 0.0003490659f;
     if (g_aim_yaw_init_flag == 0) {
-        t = FastAddRotations(t, f22);
+        yaw_error = FastAddRotations(yaw_error, pi);
     }
-    math_approach_target_with_direction_mode(&t, s1 + 0x1A8, 0.0f, f21, f21, f20, 0);
-    *(f32 *)(s2 + 0x1C) = 1.0f;
-    *(f32 *)(s2 + 0x14) = -*(f32 *)(s1 + 0x1A8);
+    math_approach_target_with_direction_mode(&yaw_error, vars + 0x1A8, 0.0f, turn_accel, turn_accel, max_turn_speed, 0);
+    *(f32 *)(cam_state + 0x1C) = 1.0f;
+    *(f32 *)(cam_state + 0x14) = -*(f32 *)(vars + 0x1A8);
 }

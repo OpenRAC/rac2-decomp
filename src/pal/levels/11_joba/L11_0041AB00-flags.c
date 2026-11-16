@@ -23,7 +23,7 @@ extern void mat_combine_and_store(void *, void *, void *, void *);
 extern void glow_flicker_update_pal(u8 *, void *, s32);
 
 /* Moves the entity along its path, managing its effect and sound during state changes. */
-void func_PAL_L11_0041AB00(u8 *object) {
+void joba_path_follower_update_pal(u8 *object) {
     f32 previous[4] __attribute__((aligned(16)));
     f32 delta[4] __attribute__((aligned(16)));
     f32 rotation[4] __attribute__((aligned(16)));

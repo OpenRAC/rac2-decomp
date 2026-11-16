@@ -90,7 +90,7 @@ extern void hero_approach_speed(float, float);
 extern void cam_set_view_space_vector_length(float, void *, void *);
 extern void cam_offset_point_by_side_direction(void *, void *, float);
 extern void hero_steer_heading(float, float, float, int);
-extern void func_PAL_L01_002B6870(float);
+extern void hero_approach_velocity_pal(float);
 extern float FastVecDot(void *, void *);
 extern void matrix_mul_vec3(void *, void *, void *);
 extern float math_fast_sin_or_cos_a(float);
@@ -108,8 +108,8 @@ extern float ApproachValue(float *, float, float);
 extern void FastVecAdd(void *, void *, void *);
 
 /* Per-state airborne steering of the player: velocity, facing and speed targets. */
-void func_PAL_L03_002BC3A0(void) {
-    HopVector temp;
+void hero_update_hop_velocity_pal(void) {
+    HopVector move_vec;
     float step, scale;
 
     if (HOP_PLAYER.state == 10) {
@@ -135,7 +135,7 @@ void func_PAL_L03_002BC3A0(void) {
     if (HOP_PLAYER.state == 0x1B) {
         if (HOP_PLAYER.state_time > 0x21) {
             hero_steer_heading(0.057600003f, 0.28800002f, 0.30019668f, 0);
-            func_PAL_L01_002B6870(0.008f);
+            hero_approach_velocity_pal(0.008f);
         }
         if (HOP_PLAYER.anim_time >= 13.0f && HOP_PLAYER.anim_time <= 30.0f) {
             if (HOP_PLAYER.anim_time > 27.0f)
@@ -143,10 +143,10 @@ void func_PAL_L03_002BC3A0(void) {
             else
                 ApproachValue(&HOP_PLAYER.field_4BC, 0.040000003f, 0.0032000002f);
         }
-        temp.f.x = HOP_PLAYER.field_4BC;
-        temp.f.y = 0.0f;
-        temp.f.z = FastVecDot(&HOP_PLAYER.vel_x, &HOP_PLAYER.field_20);
-        matrix_mul_vec3(&HOP_PLAYER.vel_x, &temp, &HOP_PLAYER);
+        move_vec.f.x = HOP_PLAYER.field_4BC;
+        move_vec.f.y = 0.0f;
+        move_vec.f.z = FastVecDot(&HOP_PLAYER.vel_x, &HOP_PLAYER.field_20);
+        matrix_mul_vec3(&HOP_PLAYER.vel_x, &move_vec, &HOP_PLAYER);
         return;
     }
 
@@ -157,10 +157,10 @@ void func_PAL_L03_002BC3A0(void) {
             else
                 ApproachValue(&HOP_PLAYER.field_4BC, 0.025000002f, 0.0032000002f);
         }
-        temp.f.x = HOP_PLAYER.field_4BC;
-        temp.f.y = 0.0f;
-        temp.f.z = FastVecDot(&HOP_PLAYER.vel_x, &HOP_PLAYER.field_20);
-        matrix_mul_vec3(&HOP_PLAYER.vel_x, &temp, &HOP_PLAYER);
+        move_vec.f.x = HOP_PLAYER.field_4BC;
+        move_vec.f.y = 0.0f;
+        move_vec.f.z = FastVecDot(&HOP_PLAYER.vel_x, &HOP_PLAYER.field_20);
+        matrix_mul_vec3(&HOP_PLAYER.vel_x, &move_vec, &HOP_PLAYER);
         return;
     }
 
@@ -190,10 +190,10 @@ void func_PAL_L03_002BC3A0(void) {
             HOP_PLAYER.vel_y = math_fast_sin_or_cos_b(HOP_PLAYER.field_4C0);
             HOP_PLAYER.vel_y *= HOP_PLAYER.field_4DC;
         } else {
-            cam_set_view_space_vector_length(HOP_PLAYER.field_4DC, &temp, &HOP_PLAYER.field_470);
-            cam_set_view_space_height(0.0f, &temp, &temp);
+            cam_set_view_space_vector_length(HOP_PLAYER.field_4DC, &move_vec, &HOP_PLAYER.field_470);
+            cam_set_view_space_height(0.0f, &move_vec, &move_vec);
             cam_set_view_space_vector_length(0.0f, &HOP_PLAYER.vel_x, &HOP_PLAYER.vel_x);
-            FastVecAdd(&HOP_PLAYER.vel_x, &HOP_PLAYER.vel_x, &temp);
+            FastVecAdd(&HOP_PLAYER.vel_x, &HOP_PLAYER.vel_x, &move_vec);
         }
         if (!HOP_PLAYER.field_22C3 && !HOP_PLAYER.field_52D) {
             scale = HOP_PLAYER.field_4D8 * math_fast_sin_or_cos_b(FastDiffRots(HOP_PLAYER.field_4C4, HOP_PLAYER.field_4C0));
@@ -216,8 +216,8 @@ void func_PAL_L03_002BC3A0(void) {
                 HOP_PLAYER.vel_y = math_fast_sin_or_cos_b(HOP_PLAYER.facing_angle) * 0.09800001f;
             } else {
                 cam_set_view_space_vector_length(0.0f, &HOP_PLAYER.vel_x, &HOP_PLAYER.vel_x);
-                vec_scale_to_length(&temp, &HOP_PLAYER.field_190, 0.09800001f);
-                FastVecAdd(&HOP_PLAYER.vel_x, &HOP_PLAYER.vel_x, &temp);
+                vec_scale_to_length(&move_vec, &HOP_PLAYER.field_190, 0.09800001f);
+                FastVecAdd(&HOP_PLAYER.vel_x, &HOP_PLAYER.vel_x, &move_vec);
             }
         }
         HOP_PLAYER.field_1B4 = HOP_PLAYER.field_174;
@@ -239,18 +239,18 @@ void func_PAL_L03_002BC3A0(void) {
         delta = fast_subtract_rotations(angle, HOP_PLAYER.rot_z);
         hero_start_pose_offset(0.0f, 0.0f, delta);
     } else {
-        float oldAngle = HOP_PLAYER.facing_angle;
+        float old_angle = HOP_PLAYER.facing_angle;
 
-        qcopy(&temp, &HOP_PLAYER.field_190);
+        qcopy(&move_vec, &HOP_PLAYER.field_190);
         if (HOP_PLAYER.field_1454) {
             HOP_PLAYER.facing_angle = HOP_SAVED.angle;
             qcopy(&HOP_PLAYER.field_190, &HOP_SAVED.basis);
         }
         hero_steer_heading(0.057600003f, 0.28800002f, HOP_PLAYER.field_494, 0);
         if (HOP_PLAYER.field_1454) {
-            HOP_PLAYER.field_1458 = oldAngle;
-            qcopy(&HOP_PLAYER.field_1440, &temp);
-            HOP_PLAYER.facing_angle = oldAngle;
+            HOP_PLAYER.field_1458 = old_angle;
+            qcopy(&HOP_PLAYER.field_1440, &move_vec);
+            HOP_PLAYER.facing_angle = old_angle;
             qcopy(&HOP_PLAYER.field_190, &HOP_PLAYER.field_1440);
         }
     }
@@ -274,6 +274,6 @@ void func_PAL_L03_002BC3A0(void) {
             step = HOP_PLAYER.field_524 ? 0.00080000004f : 0.0032000002f;
     }
 
-    func_PAL_L01_002B6870(step);
+    hero_approach_velocity_pal(step);
 }
 

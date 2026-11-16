@@ -34,14 +34,14 @@ extern float math_spring_float_to_goal(float *, float *, float, float, float, fl
 extern int weapon_spend_ammo(int, int);
 extern int snd_is_voice_playing_for_owner(char *, int);
 extern int PlayMobySound(int, int, char *);
-extern void func_PAL_002A7E68(char *, int, int, int);
+extern void anim_start_blended_pal(char *, int, int, int);
 extern int coll_process_hit(float, char *, int, char *, int);
 extern void FastVecSub(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
 extern void make_hit_descriptor(void *, char *, int, void *, float);
 extern void QueueMobyImpact(char *, void *);
 extern int StartAttachedEffect_pal(char *, int, char *);
-extern s32 func_PAL_L12_002C8C58(int, int);
+extern s32 hero_l12_set_action_pal(int, int);
 extern void vec_clear_128(void *);
 extern void matrix_mul_vec3(void *, void *, void *);
 extern void vec_compute_object_to_target(char *, char *, void *, float);
@@ -56,20 +56,20 @@ extern void ref_L00_00419C98_01(void *, char *);
 
 /* Initializes the effect tables on first update, processes nearby targets while active,
    and advances the emission vector and scrolling phases. */
-void func_PAL_L03_00431370(char *object)
+void lava_l03_l00_gun_update_pal(char *moby)
 {
-    float vector[4];
+    float forward[4];
     union { EffectVectorBits word; float v[4]; } direction;
     struct { union { EffectVectorBits word; float position[4]; } u; char pad[8]; unsigned char a,b; short id; int pad3c; int flags; } packet;
     int unused, i = 0, count, enabled;
-    char *state = *(char **)(object+0x68);
+    char *state = *(char **)(moby+0x68);
     char **target;
     if (g_hero_state.i[0x1244/4]==3 && g_lava_gun_ring_entries) {
-        for (;i<35;i++) { char *p=g_lava_gun_ring_entries+i*64; if (*(int *)(p+0x38)>=0) { table_clear_entry_flag(*(int *)(p+0x38)); *(int *)(p+0x38)=-1; } }
+        for (;i<35;i++) { char *ring_entry=g_lava_gun_ring_entries+i*64; if (*(int *)(ring_entry+0x38)>=0) { table_clear_entry_flag(*(int *)(ring_entry+0x38)); *(int *)(ring_entry+0x38)=-1; } }
     }
-    if (!((unsigned char *)object)[0x20]) {
-        *(int *)(state+0x34)=AcquireEntitySlot(object,0,&unused);
-        g_lava_gun_beam_slots=level_get_slot_body(*(short *)(object+0xaa),*(int *)(state+0x34));
+    if (!((unsigned char *)moby)[0x20]) {
+        *(int *)(state+0x34)=AcquireEntitySlot(moby,0,&unused);
+        g_lava_gun_beam_slots=level_get_slot_body(*(short *)(moby+0xaa),*(int *)(state+0x34));
         g_lava_gun_particle_slots=(char *)mem_align_up_sixteen_alt((int)g_lava_gun_beam_slots+0x33e0);
         g_lava_gun_ring_entries=(char *)mem_align_up_sixteen_alt((int)g_lava_gun_particle_slots+0x1f40);
         for (i=124;i>=0;i--) ((EffectParticleSlot *)g_lava_gun_particle_slots)[i].active=1;
@@ -77,16 +77,16 @@ void func_PAL_L03_00431370(char *object)
         { int invalid=-1; for (i=34;i>=0;i--) ((EffectHandleSlot *)g_lava_gun_ring_entries)[i].handle=invalid; }
         *(int *)(state+0x3c)=0; *(int *)(state+0x48)=0; *(int *)(state+0x40)=0; *(int *)(state+0x44)=0;
         *(int *)(state+0x54)=0; *(int *)(state+0x50)=0; *(int *)(state+0x58)=0; *(int *)(state+0x5c)=0;
-        *(int *)(state+0x60)=0; *(int *)(state+0x64)=0; ((unsigned char *)object)[0x20]=1; *(int *)(state+0x38)=-1;
+        *(int *)(state+0x60)=0; *(int *)(state+0x64)=0; ((unsigned char *)moby)[0x20]=1; *(int *)(state+0x38)=-1;
     }
     if (g_hero_state.i[0x1244/4]==3) {
         { int handle=*(int *)(state+0x38);
-        if (handle!=-1 && ((EffectSoundSlot *)((char *)g_sound_state+handle*0x70))->owner==object && ((EffectSoundSlot *)((char *)g_sound_state+handle*0x70))->active) snd_stop_voice(handle); }
+        if (handle!=-1 && ((EffectSoundSlot *)((char *)g_sound_state+handle*0x70))->owner==moby && ((EffectSoundSlot *)((char *)g_sound_state+handle*0x70))->active) snd_stop_voice(handle); }
         *(int *)(state+0x38)=-1;
         return;
     }
-    moby_transform_joint_to_world(object,0,state);
-    if (((unsigned char *)object)[0x42]==((unsigned char *)object)[0x43] && (((unsigned char *)object)[0x60]&2)) anim_start_blended_with_flags(object,1,0,2,0);
+    moby_transform_joint_to_world(moby,0,state);
+    if (((unsigned char *)moby)[0x42]==((unsigned char *)moby)[0x43] && (((unsigned char *)moby)[0x60]&2)) anim_start_blended_with_flags(moby,1,0,2,0);
     enabled=1;
     if (g_hero_state.i[0x2294/4]==29) { if (!math_fast_float_d(&g_hero_state.i[0x2534/4])) enabled=0; }
     else g_hero_state.i[0x2534/4]=33;
@@ -94,49 +94,49 @@ void func_PAL_L03_00431370(char *object)
         math_spring_float_to_goal((float *)(state+0x50),(float *)(state+0x54),10.0f,0.009000001f,0.0024f,12.0f);
         { int divisor=10; if (*(int *)(state+0x60)%divisor==0) weapon_spend_ammo(-1,1); }
         ++*(int *)(state+0x60);
-        if (!snd_is_voice_playing_for_owner(object,*(int *)(state+0x38))) *(int *)(state+0x38)=PlayMobySound(0,4,object);
-        if (((unsigned char *)object)[0x43]!=2) func_PAL_002A7E68(object,2,0,0);
-        count=coll_process_hit(0.5f,state,16,object,0);
+        if (!snd_is_voice_playing_for_owner(moby,*(int *)(state+0x38))) *(int *)(state+0x38)=PlayMobySound(0,4,moby);
+        if (((unsigned char *)moby)[0x43]!=2) anim_start_blended_pal(moby,2,0,0);
+        count=coll_process_hit(0.5f,state,16,moby,0);
         if (count>0) { int remaining; target=g_area_hit_targets; remaining=count; do {
             if (*target!=g_hero_state.p[0x2290/4]) {
-            FastVecSub(&direction,*target+0x10,object+0x10);
+            FastVecSub(&direction,*target+0x10,moby+0x10);
             vec_scale_to_length(&direction,&direction,1.0f);
             vec_scale_to_length(&packet,&packet,1.0f);
-            make_hit_descriptor(&packet,object,0x910000,&direction,((EffectClassEntry *)((unsigned int)g_weapon_l00_table+g_item_slot_to_record[29]*0xe0))->value);
+            make_hit_descriptor(&packet,moby,0x910000,&direction,((EffectClassEntry *)((unsigned int)g_weapon_l00_table+g_item_slot_to_record[29]*0xe0))->value);
             packet.u.word=direction.word; packet.u.position[3]=5627.925f;
             packet.flags=1; packet.a=9; packet.b=1; packet.id=*(short *)(*target+0xaa);
             QueueMobyImpact(*target,&packet);
-            StartAttachedEffect_pal(*target,29,object); PlayMobySound(1,0,object);
+            StartAttachedEffect_pal(*target,29,moby); PlayMobySound(1,0,moby);
             }
             target++;
         } while (--remaining); }
     } else {
         { int handle=*(int *)(state+0x38);
-        if (handle!=-1 && ((EffectSoundSlot *)((char *)g_sound_state+handle*0x70))->owner==object && ((EffectSoundSlot *)((char *)g_sound_state+handle*0x70))->active) snd_stop_voice(handle); }
+        if (handle!=-1 && ((EffectSoundSlot *)((char *)g_sound_state+handle*0x70))->owner==moby && ((EffectSoundSlot *)((char *)g_sound_state+handle*0x70))->active) snd_stop_voice(handle); }
         *(int *)(state+0x38)=-1;
-        if ((g_pad_state[0x1a4/4]&g_hero_state.i[0x1230/4]) && !get_ammo(-1) && !g_hero_state.b[0x22bc]) PlayMobySound(2,0,object);
+        if ((g_pad_state[0x1a4/4]&g_hero_state.i[0x1230/4]) && !get_ammo(-1) && !g_hero_state.b[0x22bc]) PlayMobySound(2,0,moby);
         math_spring_float_to_goal((float *)(state+0x50),(float *)(state+0x54),0,0.072000004f,0.012f,0.15f);
         *(int *)(state+0x60)=0;
     }
-    if (g_hero_state.i[0x2294/4]==1) func_PAL_L12_002C8C58(29,1);
-    moby_transform_joint_to_world(object,0,state);
-    vec_clear_128(vector); vector[1]=-1;
-    matrix_mul_vec3(vector,vector,object+0xc0);
-    vector[2]+=0.02f;
-    vec_scale_to_length(vector,vector,*(float *)(state+0x50)*0.05f);
+    if (g_hero_state.i[0x2294/4]==1) hero_l12_set_action_pal(29,1);
+    moby_transform_joint_to_world(moby,0,state);
+    vec_clear_128(forward); forward[1]=-1;
+    matrix_mul_vec3(forward,forward,moby+0xc0);
+    forward[2]+=0.02f;
+    vec_scale_to_length(forward,forward,*(float *)(state+0x50)*0.05f);
     if (g_hero_state.p[0x1450/4]) {
         g_hero_state.p[0xbf8/4]=g_hero_state.p[0x1450/4];
-        vec_compute_object_to_target(g_hero_state.p[0x1450/4],state,vector,*(float *)(state+0x50)*0.05f);
-        if (g_hero_locked_flag) { FastVecScale(&direction,object+0xe0,0.02f); FastVecAdd(vector,vector,&direction); }
-        else vector[2]+=0.02f;
+        vec_compute_object_to_target(g_hero_state.p[0x1450/4],state,forward,*(float *)(state+0x50)*0.05f);
+        if (g_hero_locked_flag) { FastVecScale(&direction,moby+0xe0,0.02f); FastVecAdd(forward,forward,&direction); }
+        else forward[2]+=0.02f;
     }
     qcopy(state+0x10,state);
-    if (g_hero_state.i[0x2294/4]) math_apply_axis_rotation_to_quat(vector,vector,g_hero_state.p[0x2290/4]+0xd0,-0.09817477f);
-    if (*(float *)(state+0x50)!=0) AppendVectorRingEntry(object,state,vector,33);
+    if (g_hero_state.i[0x2294/4]) math_apply_axis_rotation_to_quat(forward,forward,g_hero_state.p[0x2290/4]+0xd0,-0.09817477f);
+    if (*(float *)(state+0x50)!=0) AppendVectorRingEntry(moby,state,forward,33);
     *(float *)(state+0x58)-=0.1f; if (*(float *)(state+0x58)<=-8) *(float *)(state+0x58)+=8;
     *(float *)(state+0x5c)-=0.025f; if (*(float *)(state+0x5c)<=-8) *(float *)(state+0x5c)+=8;
-    if (*(float *)(state+0x50)!=0) { lava_gun_update_blobs_pal(object); lava_gun_update_ring_entries(object); }
+    if (*(float *)(state+0x50)!=0) { lava_gun_update_blobs_pal(moby); lava_gun_update_ring_entries(moby); }
     else { *(int *)(state+0x44)=0; *(int *)(state+0x3c)=0; *(int *)(state+0x48)=0; *(int *)(state+0x40)=0; }
-    part_l00_update_effect_slots_2_pal(object);
-    if (g_game_l00_mode!=2 && ((unsigned char *)object)[0x31]) ref_L00_00419C98_01(ref_L00_00419C98_00,object);
+    part_l00_update_effect_slots_2_pal(moby);
+    if (g_game_l00_mode!=2 && ((unsigned char *)moby)[0x31]) ref_L00_00419C98_01(ref_L00_00419C98_00,moby);
 }

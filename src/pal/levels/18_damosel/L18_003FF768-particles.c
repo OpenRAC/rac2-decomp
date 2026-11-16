@@ -25,7 +25,7 @@ extern void *enemy_spawn_record(void *, void *, void *, int, int);
    around the object's position (+0x10): each from the position jittered by
    D_L18_001B05C8 and a direction from the vector at +0xC0, scaled by minus a random
    value between D_L18_001B05CC and D_L18_001B05D0 divided by 60, with two more draws. */
-void func_PAL_L18_003FF768(u8 *object)
+void part_spawn_trail_particles_pal(u8 *object)
 {
     float position[4] __attribute__((aligned(16)));
     float direction[4] __attribute__((aligned(16)));

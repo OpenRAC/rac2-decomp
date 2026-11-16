@@ -26,7 +26,7 @@ extern void shop_set_message_text(void *);
 extern int level_try_spend_counter(int);
 extern void level_spawn_on_second_mode(int);
 extern void BuildShopChannelList(void);
-extern void func_US2_002FC008(void);
+extern void PrepareVendorSelectionPreview_us2(void);
 
 void UpdateItemPurchaseConfirmation_us2(int *answer) {
     PurchaseModel *model = &g_purchase_menu_model;
@@ -99,6 +99,6 @@ void UpdateItemPurchaseConfirmation_us2(int *answer) {
         }
         } else PlayMobySound(0, 17, *(char **)((char *)model + 0x28));
         g_purchase_menu_model.head.state = 0;
-        func_US2_002FC008();
+        PrepareVendorSelectionPreview_us2();
     }
 }

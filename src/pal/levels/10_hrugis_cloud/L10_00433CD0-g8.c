@@ -40,32 +40,32 @@ extern Actor *g_cloud_object_list;
    from D_L10_002BABF0, jittered by +-5 on each axis, with a random orientation and
    timer. The first call also caches the last class-0xFBF object of the list in
    D_L10_001B1780. Classes 0x1315 and 0x1327 get 1.5 times their class scale. */
-Actor *func_PAL_L10_00433CD0(int arg)
+Actor *cloud_spawn_object_pal(int arg)
 {
-    Actor *p;
+    Actor *actor;
     CloudWork *st;
     int index;
     int kind = math_random_int_below(5);
 
-    if (kind == 0) p = CreateMoby(0x1315);
-    else if (kind == 1) p = CreateMoby(0x1328);
-    else p = CreateMoby(0x1327);
-    if (p) {
-        p->state = 0;
-        p->alpha = 255;
-        p->flags = 255;
-        p->active = 1;
-        st = p->work;
-        set_moby_color(p, 20, 20, 20);
+    if (kind == 0) actor = CreateMoby(0x1315);
+    else if (kind == 1) actor = CreateMoby(0x1328);
+    else actor = CreateMoby(0x1327);
+    if (actor) {
+        actor->state = 0;
+        actor->alpha = 255;
+        actor->flags = 255;
+        actor->active = 1;
+        st = actor->work;
+        set_moby_color(actor, 20, 20, 20);
         index = math_random_int_below(5);
         st->index = index;
-        qcopy(&p->pos, g_cloud_start_points + index * 16);
-        p->pos[0] += math_random_float_range(5.0f, -5.0f);
-        p->pos[1] += math_random_float_range(5.0f, -5.0f);
-        p->pos[2] += math_random_float_range(5.0f, -5.0f);
-        p->rx = math_random_angle();
-        p->ry = math_random_angle();
-        p->rz = math_random_angle();
+        qcopy(&actor->pos, g_cloud_start_points + index * 16);
+        actor->pos[0] += math_random_float_range(5.0f, -5.0f);
+        actor->pos[1] += math_random_float_range(5.0f, -5.0f);
+        actor->pos[2] += math_random_float_range(5.0f, -5.0f);
+        actor->rx = math_random_angle();
+        actor->ry = math_random_angle();
+        actor->rz = math_random_angle();
         st->timer = ((s32)(math_random_int_below(3600)) * 5 + 2) / 6;
         st->arg = arg;
         if (!g_cloud_boss_actor) {
@@ -75,13 +75,13 @@ Actor *func_PAL_L10_00433CD0(int arg)
                 cur = cur->next;
             }
         }
-        if (p->kind == 0x1315)
-            p->scale = *(float *)(p->classData + 0x24) * 1.5f;
-        else if (p->kind == 0x1328)
-            p->scale = *(float *)(p->classData + 0x24);
-        else if (p->kind == 0x1327)
-            p->scale = *(float *)(p->classData + 0x24) * 1.5f;
-        return p;
+        if (actor->kind == 0x1315)
+            actor->scale = *(float *)(actor->classData + 0x24) * 1.5f;
+        else if (actor->kind == 0x1328)
+            actor->scale = *(float *)(actor->classData + 0x24);
+        else if (actor->kind == 0x1327)
+            actor->scale = *(float *)(actor->classData + 0x24) * 1.5f;
+        return actor;
     }
     return 0;
 }

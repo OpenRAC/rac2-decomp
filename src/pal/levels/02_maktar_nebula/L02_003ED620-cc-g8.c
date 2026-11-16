@@ -40,8 +40,8 @@ typedef struct {
     int count;
 } TetherState;
 /* Relaxes and animates a pair of twenty-point tether strands, then emits sparks. */
-void func_PAL_L02_003ED620(char *actor) {
-    TetherState *state = *(TetherState **)(actor + 0x68);
+void tether_animate_strands_pal(char *moby) {
+    TetherState *state = *(TetherState **)(moby + 0x68);
     float endpoint[4], direction[4], delta[4], blended[4], tangent[4], sideways[4], toward[4];
     float length = g_tether_strand_length * 0.05f;
     float phase, span, distance, oscillation, lateral, radius;
@@ -69,8 +69,8 @@ void func_PAL_L02_003ED620(char *actor) {
     /* i is declared here, after the setup code: its later pseudo number sets the gcse order of the spilled state->start/state->end/i*4 copies. */
     int i;
     for (i = 1; i < 20; i++) {
-        float value, height, zero;
-        float *point;
+        float lateral_angle, height, zero;
+        float *strand_point;
         height = IntToFloat(i);
         height = g_tether_height_min + (g_tether_height_max - g_tether_height_min) * (height * 0.05f);
         height *= math_fast_sin_or_cos_b(math_wrap_angle_to_pi(g_tether_l02_height_phase + (float)i * g_tether_height_phase_spacing));
@@ -104,16 +104,16 @@ void func_PAL_L02_003ED620(char *actor) {
                 lerp_vector(tangent, tangent, toward, height);
             }
         }
-        value = math_wrap_angle_to_pi(g_tether_lateral_phase + (float)i * g_tether_lateral_phase_spacing);
+        lateral_angle = math_wrap_angle_to_pi(g_tether_lateral_phase + (float)i * g_tether_lateral_phase_spacing);
         oscillation = math_wrap_angle_to_pi(g_tether_l02_wave_phase_2 + (float)i * g_tether_wave_phase_spacing);
         height = g_tether_height_amplitude * math_fast_sin_or_cos_b(oscillation);
         qcopy(g_tether_strand_points[1][i], g_tether_strand_points[0][i]);
-        height *= math_fast_sin_or_cos_b(value);
+        height *= math_fast_sin_or_cos_b(lateral_angle);
         g_tether_strand_heights[i] = height;
-        point = g_tether_strand_points[0][i];
-        point[82] += height;
+        strand_point = g_tether_strand_points[0][i];
+        strand_point[82] += height;
         height = FastAddRotations(mat_fast_helper_a(delta[0], delta[1]), 1.5707965f);
-        lateral = g_tether_lateral_amplitude * math_fast_sin_or_cos_a(value);
+        lateral = g_tether_lateral_amplitude * math_fast_sin_or_cos_a(lateral_angle);
         sideways[0] = math_fast_sin_or_cos_a(height) * lateral;
         sideways[1] = math_fast_sin_or_cos_b(height) * lateral;
         sideways[2] = 0;

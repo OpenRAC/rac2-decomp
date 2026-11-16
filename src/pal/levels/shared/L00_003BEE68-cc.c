@@ -19,7 +19,7 @@ typedef struct { float x, y, z; int unused; float position[4]; } EffectLightReco
 extern EffectLightRecord g_light_table[];
 extern float FastVecDot(void *, void *);
 extern void vec_fast_normalize(void *, void *, void *);
-extern void func_PAL_L00_003C11A0(float *, float *, int, int);
+extern void part_l00_spawn_spark_burst_2_pal(float *, float *, int, int);
 extern int PlayMobySound(int, int, void *);
 extern void spark_spawn_orbit(char *, char *);
 
@@ -54,7 +54,7 @@ extern unsigned int func_002A7820_1(int a, int b);
 /* Implemented in L00_003B9CB8-state-g8.c. */
 
 /* Integrates motion, reflects a collision, updates the light and emits trail slots. */
-char *func_PAL_L00_003BEE68(char *self)
+char *spark_move_projectile_pal(char *self)
 {
     float saved[4] __attribute__((aligned(16)));
     float normal[4] __attribute__((aligned(16)));
@@ -62,10 +62,10 @@ char *func_PAL_L00_003BEE68(char *self)
     float remainder[4] __attribute__((aligned(16)));
     char *ctx = *(char **)(self + 0x68);
     char *hit = 0;
-    char *p;
+    char *collided;
     EffectLightRecord *light;
     int light_index;
-    float f;
+    float amount;
     *(float *)(self + 0xF0) = FastAddRotations(*(float *)(self + 0xF0), 0.062831864f);
     *(float *)(self + 0xF4) = fast_subtract_rotations(*(float *)(self + 0xF4), 0.015707966f);
     *(int *)(self + 0xFC) = 0;
@@ -78,21 +78,21 @@ char *func_PAL_L00_003BEE68(char *self)
     if (FastVecLength(ctx) != 0.0f && FastVecLength(ctx + 0x20) != 0.0f)
         mat_build_rotation_toward_vector(ctx, ctx, ctx + 0x20, 0, 0.075f);
     if (coll_test_point(self + 0x10, 0, self, *(float *)(ctx + 0x4C))) {
-        p = g_hit_l00_result;
-        if (p && p != g_hero_moby && *(short *)(p + 0xAA) != 0x5CA)
-            hit = (*(unsigned short *)(p + 0x34) & 0x1000) ? p : 0;
+        collided = g_hit_l00_result;
+        if (collided && collided != g_hero_moby && *(short *)(collided + 0xAA) != 0x5CA)
+            hit = (*(unsigned short *)(collided + 0x34) & 0x1000) ? collided : 0;
         qcopy(self + 0x10, g_collision_position);
         func_002EE178_1((char *)normal, g_collision_position + 0x10, 0.0009765625f);
         func_802EE3D0_1(normal, normal, 1.0f);
         vec_fast_normalize(ctx, ctx, normal);
-        f = FastVecDot(ctx, normal);
-        func_002EE178_1((char *)projection, (char *)normal, f);
+        amount = FastVecDot(ctx, normal);
+        func_002EE178_1((char *)projection, (char *)normal, amount);
         func_802EE138_1(remainder, (float *)ctx, (char *)projection);
         func_002EE178_1(ctx, (char *)projection, 0.85f);
         FastVecAdd(ctx, remainder, ctx);
         func_002EE178_1(ctx + 0x20, ctx + 0x20, 0.95f);
-        func_PAL_L00_003C11A0(g_collision_position - 0x10, normal, 6, 0x72FF);
-        func_PAL_L00_003C11A0(g_collision_position - 0x10, normal, 6, 0xFF0000);
+        part_l00_spawn_spark_burst_2_pal(g_collision_position - 0x10, normal, 6, 0x72FF);
+        part_l00_spawn_spark_burst_2_pal(g_collision_position - 0x10, normal, 6, 0xFF0000);
         PlayMobySound(1, 0, self);
     }
     light_index = *(int *)(ctx + 0x5C);
@@ -104,10 +104,10 @@ char *func_PAL_L00_003BEE68(char *self)
         light->y = 0.14f;
         light->z = 1.0f;
         light->unused = 0;
-        f = func_002A7878_2(-0.1f, 0.1f);
-        light->x += f;
-        light->y += f;
-        light->z += f;
+        amount = func_002A7878_2(-0.1f, 0.1f);
+        light->x += amount;
+        light->y += amount;
+        light->z += amount;
     }
     if (*(float *)(self + 0x10) < 2.0f || *(float *)(self + 0x10) > 1021.0f ||
         *(float *)(self + 0x14) < 2.0f || *(float *)(self + 0x14) > 1021.0f ||
@@ -173,7 +173,7 @@ void spark_spawn_orbit(char *owner, char *arg1);
 /* Emits count pairs of sparks at position, moving along direction turned by a random rotation;
    position is jittered a little before each pair. Both arms of the random-bit test are the same
    code: retail keeps the test, so it stays. */
-void func_PAL_L00_003C11A0(float *position, float *direction, int count, int color);
+void part_l00_spawn_spark_burst_2_pal(float *position, float *direction, int count, int color);
 
 /* func_L00_003BD7E0 is in L00_003B9CB8-update.c. */
 

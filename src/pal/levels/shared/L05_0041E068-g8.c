@@ -18,23 +18,24 @@ extern char *SpawnSpinningSparkParticle(void *, float, float, int, void *, int, 
 extern int math_random_int_range(int, int);
 extern int FloatToInt(float);
 
-void func_PAL_L05_0041E068(char *object)
+/* Updates the trail particles around the beam object and draws them as sprites (PAL: both effect lifetimes scaled for 50 Hz). */
+void UpdateBeamTrailParticles_pal(char *object)
 {
-    float local[4];
+    float back_step[4];
     char *state = *(char **)(object + 0x68);
-    char *other;
+    char *target_vars;
     char *axis;
-    float t, a;
+    float step, size;
     char *effect, *detail;
-    int kind, scale;
+    int sprite_kind, life_divisor;
 
     if (g_current_map_index == 5 || g_current_map_index == 25) {
-        other = ((EffectOwner *)((char *)g_feltzin_target_mobys + (*(int *)(state + 0xA4) << 8)))->state;
+        target_vars = ((EffectOwner *)((char *)g_feltzin_target_mobys + (*(int *)(state + 0xA4) << 8)))->state;
         if (g_current_map_index == 25 ||
-            (!coll_is_point_inside_unit_sphere(object + 0x10, *(int *)(other + 4)) &&
-             !coll_is_point_inside_unit_sphere(object + 0x10, *(int *)(other + 8)) &&
-             !coll_is_point_inside_unit_sphere(object + 0x10, *(int *)(other + 12)) &&
-             !coll_is_point_inside_unit_sphere(object + 0x10, *(int *)(other + 16)))) {
+            (!coll_is_point_inside_unit_sphere(object + 0x10, *(int *)(target_vars + 4)) &&
+             !coll_is_point_inside_unit_sphere(object + 0x10, *(int *)(target_vars + 8)) &&
+             !coll_is_point_inside_unit_sphere(object + 0x10, *(int *)(target_vars + 12)) &&
+             !coll_is_point_inside_unit_sphere(object + 0x10, *(int *)(target_vars + 16)))) {
             char *p;
             float *life;
             int i;
@@ -52,14 +53,14 @@ void func_PAL_L05_0041E068(char *object)
                     FastVecAdd(p, p, object + 0x10);
                     *life = math_random_float_range(11.0f, 14.0f);
                 }
-                qcopy(local, axis);
-                t = math_random_float_range(0.15f, 0.25f);
-                vec_scale_to_length(local, local, -t);
-                *life -= t;
-                FastVecAdd(p, p, local);
-                a = math_random_float_range(0.07f, 0.12f);
-                t = math_random_float_range(0.0f, 1.0f);
-                gfx_draw_billboard_quad(p, 0x47, 0x7F7F6464, 0, a, 0.0f, t);
+                qcopy(back_step, axis);
+                step = math_random_float_range(0.15f, 0.25f);
+                vec_scale_to_length(back_step, back_step, -step);
+                *life -= step;
+                FastVecAdd(p, p, back_step);
+                size = math_random_float_range(0.07f, 0.12f);
+                step = math_random_float_range(0.0f, 1.0f);
+                gfx_draw_billboard_quad(p, 0x47, 0x7F7F6464, 0, size, 0.0f, step);
                 life++;
                 p += 16;
             }
@@ -70,8 +71,8 @@ void func_PAL_L05_0041E068(char *object)
         int i;
 
         axis = object + 0xC0;
-        kind = 0x44;
-        scale = 6;
+        sprite_kind = 0x44;
+        life_divisor = 6;
         state += 0xB0;
         for (i = 3; i >= 0; i--) {
             if (*life <= 0.0f) {
@@ -83,21 +84,21 @@ void func_PAL_L05_0041E068(char *object)
                 FastVecAdd(state, state, object + 0x10);
                 *life = math_random_float_range(10.0f, 30.0f);
             }
-            qcopy(local, axis);
-            t = math_random_float_range(0.15f, 0.25f);
-            vec_scale_to_length(local, local, -t);
-            *life -= t;
-            FastVecAdd(state, state, local);
+            qcopy(back_step, axis);
+            step = math_random_float_range(0.15f, 0.25f);
+            vec_scale_to_length(back_step, back_step, -step);
+            *life -= step;
+            FastVecAdd(state, state, back_step);
             effect = SpawnSpinningSparkParticle(state, 2.0f, 1.03f, 1, g_effect_direction_vec, 0x0A786E64, 1.045f, 210000.0f, 0);
             if (effect) {
-                effect[3] = kind;
-                *(short *)(effect + 10) = (math_random_int_range(40, 70) * 5 + 2) / scale;
+                effect[3] = sprite_kind;
+                *(short *)(effect + 10) = (math_random_int_range(40, 70) * 5 + 2) / life_divisor;
             }
             effect = SpawnSpinningSparkParticle(state, 1.8f, 1.03f, 1, g_effect_direction_vec, 0x0AADA196, 1.045f, 210000.0f, 0);
             if (effect) {
-                effect[3] = kind;
+                effect[3] = sprite_kind;
                 detail = effect + 0x20;
-                *(short *)(effect + 10) = (math_random_int_range(40, 70) * 5 + 2) / scale;
+                *(short *)(effect + 10) = (math_random_int_range(40, 70) * 5 + 2) / life_divisor;
                 effect[9] = FloatToInt(4.0f) + 0x40;
                 *(float *)(detail + 0x1C) = 20.0f;
                 *(int *)(detail + 4) = 3;

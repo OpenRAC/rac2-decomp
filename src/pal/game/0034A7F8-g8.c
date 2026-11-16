@@ -2,7 +2,7 @@
 /* func_PAL_0034B088, the PAL copy of func_00348EC0: the same C, where the menu fields move to 0x4A4, the rows are 88 bytes and the colour call is func_PAL_002A9FA0. */
 #include "common.h"
 
-extern int func_PAL_002A9FA0(int, int, int, int, int);
+extern int math_ping_pong_blend_values_pal(int, int, int, int, int);
 extern void gfx_draw_screen_element_stored(char *);
 extern float *object_get_first_field(char *);
 extern int *object_get_fourth_field(char *);
@@ -24,7 +24,7 @@ typedef struct {
     int selected;
     int enabled;
     int count;
-    int showSpecial;
+    int show_special;
 } ListMenu;
 typedef struct { short pad[4]; short offset; short pad2; void (*call)(char *); } ListVtable;
 typedef struct {
@@ -65,50 +65,51 @@ static __inline__ int label_y(void *handle, float value, float scale, float half
     return result;
 }
 
-void list_menu_draw_centered_rows_pal(char *o)
+/* Draws the list menu's background and its rows centered vertically on screen, highlighting the selected row. (PAL) */
+void list_menu_draw_centered_rows_pal(char *list)
 {
-    int color = func_PAL_002A9FA0(0x20FFFEED, 0x70FFFEED, 20, 0, 0);
-    int start, i, sp, h, n;
-    float half, spf;
-    ListMenu *menu = (ListMenu *)o;
+    int color = math_ping_pong_blend_values_pal(0x20FFFEED, 0x70FFFEED, 20, 0, 0);
+    int first_y, i, row_height, half_height, row_count;
+    float half, row_height_f;
+    ListMenu *menu = (ListMenu *)list;
 
     if (menu->enabled) {
-        gfx_draw_screen_element_stored(o);
-        gfx_draw_screen_element_stored(o + 0x130);
-        gfx_draw_screen_element_stored(o + 0x4C);
-        gfx_draw_screen_element_stored(o + 0x98);
-        gfx_draw_screen_element_stored(o + 0xE4);
-        n = menu->count;
-        half = (float)n * 0.5f;
-        sp = label_y(o, g_list_menu_label_y, g_hud_scale[0], 0.5f, 1);
-        spf = (float)sp;
-        h = g_screen_height[0] >> 1;
-        start = (int)((float)h - spf * half);
+        gfx_draw_screen_element_stored(list);
+        gfx_draw_screen_element_stored(list + 0x130);
+        gfx_draw_screen_element_stored(list + 0x4C);
+        gfx_draw_screen_element_stored(list + 0x98);
+        gfx_draw_screen_element_stored(list + 0xE4);
+        row_count = menu->count;
+        half = (float)row_count * 0.5f;
+        row_height = label_y(list, g_list_menu_label_y, g_hud_scale[0], 0.5f, 1);
+        row_height_f = (float)row_height;
+        half_height = g_screen_height[0] >> 1;
+        first_y = (int)((float)half_height - row_height_f * half);
         for (i = 0; i < menu->count; i++) {
-            ListRect *p;
+            ListRect *pos;
             char *slot;
-            ListVtable *v;
-            int c;
+            ListVtable *vtable;
+            int row_color;
 
-            if (i == 7 && !menu->showSpecial)
+            if (i == 7 && !menu->show_special)
                 continue;
-            p = (ListRect *)((float *)object_get_first_field(o + 0x17C));
-            p->x = g_centered_rows_rect_x_offset + menu->origin->x;
-            p->y = (g_centered_rows_rect_y_base[0] + (float)i * g_centered_rows_rect_y_step) + (float)start;
-            c = i == menu->selected ? color : 0x55F0C070;
-            *((int *)object_get_fourth_field(o + 0x1C8)) = c;
-            gfx_draw_screen_element_stored(o + 0x17C);
-            p = (ListRect *)((float *)object_get_first_field(o + 0x1C8));
-            p->x = g_centered_rows_rect_x_offset + menu->origin->x;
-            p->y = (g_centered_rows_rect_y_base[0] + (float)i * g_centered_rows_rect_y_step) + (float)start;
-            gfx_draw_screen_element_stored(o + 0x1C8);
-            slot = (char *)&((ListSlot *)(o + 0x218))[i];
-            p = (ListRect *)((float *)object_get_first_field(slot));
-            p->x = g_centered_rows_alt_x_offset + menu->origin->x;
-            p->y = (g_centered_rows_alt_y_base[0] + (float)i * g_centered_rows_alt_y_step) + (float)start;
-            v = *(ListVtable **)(o + i * 88 + 0x248);
-            sp = v->offset;
-            v->call(slot + sp);
+            pos = (ListRect *)((float *)object_get_first_field(list + 0x17C));
+            pos->x = g_centered_rows_rect_x_offset + menu->origin->x;
+            pos->y = (g_centered_rows_rect_y_base[0] + (float)i * g_centered_rows_rect_y_step) + (float)first_y;
+            row_color = i == menu->selected ? color : 0x55F0C070;
+            *((int *)object_get_fourth_field(list + 0x1C8)) = row_color;
+            gfx_draw_screen_element_stored(list + 0x17C);
+            pos = (ListRect *)((float *)object_get_first_field(list + 0x1C8));
+            pos->x = g_centered_rows_rect_x_offset + menu->origin->x;
+            pos->y = (g_centered_rows_rect_y_base[0] + (float)i * g_centered_rows_rect_y_step) + (float)first_y;
+            gfx_draw_screen_element_stored(list + 0x1C8);
+            slot = (char *)&((ListSlot *)(list + 0x218))[i];
+            pos = (ListRect *)((float *)object_get_first_field(slot));
+            pos->x = g_centered_rows_alt_x_offset + menu->origin->x;
+            pos->y = (g_centered_rows_alt_y_base[0] + (float)i * g_centered_rows_alt_y_step) + (float)first_y;
+            vtable = *(ListVtable **)(list + i * 88 + 0x248);
+            row_height = vtable->offset;
+            vtable->call(slot + row_height);
         }
     }
 }

@@ -22,11 +22,11 @@ extern int math_random_int_range(int, int);
 extern float math_random_angle(void);
 
 /* Space the group's objects around a path and initialize their movement. */
-void func_PAL_L06_00401AA0(int group)
+void initialize_path_moby_group_pal(int group)
 {
     unsigned short *entry = g_group_l06_id_lists[group];
     char *path, *state, *last;
-    float reciprocal, pathLength;
+    float reciprocal, path_length;
     int count, reverse, closed;
     if (!entry)
         return;
@@ -35,7 +35,7 @@ void func_PAL_L06_00401AA0(int group)
     count = 0;
     reciprocal = fast_vec_dist(path + 0x10, path + 0x20);
     reciprocal = 1.0f / reciprocal;
-    pathLength = (float)*(int *)path;
+    path_length = (float)*(int *)path;
     closed = 1;
     if (!(fast_vec_dist(path + 0x10, path + (*(int *)path << 4)) < 5.0f))
         closed = 0;
@@ -56,7 +56,7 @@ void func_PAL_L06_00401AA0(int group)
         position = IntToFloat(reverse);
         reverse--;
         position = position / IntToFloat(count);
-        position *= pathLength;
+        position *= path_length;
         *(char **)(state + 0x34) = last;
         *(float *)(state + 0x60) = reciprocal;
         *(char **)(state + 0x30) = path;

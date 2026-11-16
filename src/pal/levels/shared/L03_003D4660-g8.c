@@ -22,86 +22,86 @@ extern void snd_stop_voice(int),gfx_add_draw_callback_first(void *,void *),gfx_l
 
 /* Interpolates the emitter position, keeps it relative to its attachment,
  * emits particles while active, and releases its sound and object after fading. */
-void UpdateInterpolatedParticleEmitter_pal(char *m) {
-    float tmp[4], a[4], b[4], hit[12], pos[4], vel[4];
-    char *v = P(m, 0x68), *p, *e;
+void UpdateInterpolatedParticleEmitter_pal(char *moby) {
+    float offset_step[4], ray_start[4], ray_end[4], hit[12], spawn_vec[4], spawn_vel[4];
+    char *vars = P(moby, 0x68), *position, *sound_slot;
     float angle, speed;
 
     if (g_hero_l03_mode == 2) {
-        moby_mark_spawned(m);
+        moby_mark_spawned(moby);
         return;
     }
-    p = m + 0x10;
-    if (P(v, 0x40)) {
-        moby_transform_point_and_rotation_by_parent(m, P(v, 0x40), p, m + 0xF0, p, m + 0xF0);
-        FastVecSub(p, p, P(v, 0x40) + 0x10);
-        vec_transform_by_object_or_given(P(v, 0x40), p, p, 0);
+    position = moby + 0x10;
+    if (P(vars, 0x40)) {
+        moby_transform_point_and_rotation_by_parent(moby, P(vars, 0x40), position, moby + 0xF0, position, moby + 0xF0);
+        FastVecSub(position, position, P(vars, 0x40) + 0x10);
+        vec_transform_by_object_or_given(P(vars, 0x40), position, position, 0);
     }
-    lerp_vector(tmp, v, v + 0x10, F(v, 0x20));
-    FastVecAdd(p, p, tmp);
-    ApproachValue(v + 0x20, 1.0f, F(v, 0x24));
-    if (P(v, 0x40)) {
-        matrix_mul_vec3(p, p, P(v, 0x40) + 0xC0);
-        FastVecAdd(p, p, P(v, 0x40) + 0x10);
+    lerp_vector(offset_step, vars, vars + 0x10, F(vars, 0x20));
+    FastVecAdd(position, position, offset_step);
+    ApproachValue(vars + 0x20, 1.0f, F(vars, 0x24));
+    if (P(vars, 0x40)) {
+        matrix_mul_vec3(position, position, P(vars, 0x40) + 0xC0);
+        FastVecAdd(position, position, P(vars, 0x40) + 0x10);
     }
-    switch ((unsigned char)m[0x20]) {
+    switch ((unsigned char)moby[0x20]) {
     case 0:
-        I(v, 0x3C) = -1;
-        if (F(v, 0x20) > 0.5f)
-            moby_set_state(m, 1, -1);
+        I(vars, 0x3C) = -1;
+        if (F(vars, 0x20) > 0.5f)
+            moby_set_state(moby, 1, -1);
         break;
     case 1:
-        qcopy(a, p);
-        qcopy(b, p);
-        b[2] -= F(v, 0x20) * 5.0f;
-        make_hit_descriptor(hit, m, 0x10001, g_effect_descriptor_default, (float)I(v, 0x38));
-        if (CollLine(a, b, 0, m, hit) && !P(v, 0x40)) {
+        qcopy(ray_start, position);
+        qcopy(ray_end, position);
+        ray_end[2] -= F(vars, 0x20) * 5.0f;
+        make_hit_descriptor(hit, moby, 0x10001, g_effect_descriptor_default, (float)I(vars, 0x38));
+        if (CollLine(ray_start, ray_end, 0, moby, hit) && !P(vars, 0x40)) {
             angle = math_random_angle();
             speed = math_random_float_range(0, 0.5f) * (0.020000001f);
-            pos[0] = math_fast_sin_or_cos_a(angle) * speed;
-            pos[1] = math_fast_sin_or_cos_b(angle) * speed;
-            pos[2] = 0;
-            pos[2] = math_random_float_range(1, 2) * (0.020000001f);
-            part_spawn_emitter_pair_pal(m, g_collision_start_point, pos);
+            spawn_vec[0] = math_fast_sin_or_cos_a(angle) * speed;
+            spawn_vec[1] = math_fast_sin_or_cos_b(angle) * speed;
+            spawn_vec[2] = 0;
+            spawn_vec[2] = math_random_float_range(1, 2) * (0.020000001f);
+            part_spawn_emitter_pair_pal(moby, g_collision_start_point, spawn_vec);
         }
-        if (!P(v, 0x40) && !math_random_int_below(2)) {
-            qcopy(pos, p);
-            pos[2] -= math_random_float_range(0, 5);
-            vec_random_direction(vel, 0, 0.040000003f);
-            part_spawn_emitter_pair_pal(m, pos, vel);
+        if (!P(vars, 0x40) && !math_random_int_below(2)) {
+            qcopy(spawn_vec, position);
+            spawn_vec[2] -= math_random_float_range(0, 5);
+            vec_random_direction(spawn_vel, 0, 0.040000003f);
+            part_spawn_emitter_pair_pal(moby, spawn_vec, spawn_vel);
         }
-        e = (char *)(I(v, 0x3C) * 0x70);
-        e = (char *)((int)e + (int)g_sound_state);
-        if (P(e, 0x88) != m || !((unsigned char *)e)[0x74])
-            I(v, 0x3C) = PlayMobySound(0, 4, m);
-        if (F(v, 0x34) < 1)
-            ApproachValue(v + 0x34, 1, 0.080000006f);
-        if (math_fast_float_d(v + 0x28))
-            moby_set_state(m, 2, -1);
+        sound_slot = (char *)(I(vars, 0x3C) * 0x70);
+        sound_slot = (char *)((int)sound_slot + (int)g_sound_state);
+        if (P(sound_slot, 0x88) != moby || !((unsigned char *)sound_slot)[0x74])
+            I(vars, 0x3C) = PlayMobySound(0, 4, moby);
+        if (F(vars, 0x34) < 1)
+            ApproachValue(vars + 0x34, 1, 0.080000006f);
+        if (math_fast_float_d(vars + 0x28))
+            moby_set_state(moby, 2, -1);
         break;
     case 2:
-        ApproachValue(v + 0x34, 0, 0.040000003f);
-        if (F(v, 0x34) <= 0) {
-            int handle = I(v, 0x3C);
+        ApproachValue(vars + 0x34, 0, 0.040000003f);
+        if (F(vars, 0x34) <= 0) {
+            int handle = I(vars, 0x3C);
             if (handle != -1) {
                 int offset = handle * 0x70;
                 char *slot = g_sound_state + offset;
-                if (P(slot, 0x88) == m && ((unsigned char *)slot)[0x74])
+                if (P(slot, 0x88) == moby && ((unsigned char *)slot)[0x74])
                     snd_stop_voice(handle);
             }
-            I(v, 0x3C) = -1;
-            moby_mark_spawned(m);
+            I(vars, 0x3C) = -1;
+            moby_mark_spawned(moby);
             return;
         }
         break;
     }
-    F(v, 0x2C) += g_vars_drift_rate_a * (0.020000001f);
-    if (F(v, 0x2C) > 1)
-        F(v, 0x2C) -= 1;
-    else if (F(v, 0x2C) < 1)
-        F(v, 0x2C) += 1;
-    F(v, 0x30) += g_vars_drift_rate_b * (0.020000001f);
-    if (F(v, 0x30) > 1)
-        F(v, 0x30) -= 1;
-    gfx_add_draw_callback_first(gfx_l03_draw_glowing_beam, m);
+    F(vars, 0x2C) += g_vars_drift_rate_a * (0.020000001f);
+    if (F(vars, 0x2C) > 1)
+        F(vars, 0x2C) -= 1;
+    else if (F(vars, 0x2C) < 1)
+        F(vars, 0x2C) += 1;
+    F(vars, 0x30) += g_vars_drift_rate_b * (0.020000001f);
+    if (F(vars, 0x30) > 1)
+        F(vars, 0x30) -= 1;
+    gfx_add_draw_callback_first(gfx_l03_draw_glowing_beam, moby);
 }

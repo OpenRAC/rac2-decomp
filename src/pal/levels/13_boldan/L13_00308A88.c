@@ -30,7 +30,8 @@ extern void UpdateEquipmentPieces(void *);
 extern void math_store_angle_update_result(void *, void *, int, int, float);
 typedef struct { unsigned char pad[0x7C]; short f7C; } Obj_L13_00306F38;
 
-void func_PAL_L13_00308A88(void) {
+/* Sets up the level's objects each load: shows some, runs setup on others, and prepares two special ones (PAL: 50 Hz timings, and the TV screens are also skipped in map 0x33). */
+void boldan_init_level_objects_pal(void) {
     int i;
 
     anim_start_startup_animations();
@@ -44,11 +45,11 @@ void func_PAL_L13_00308A88(void) {
             list = &ref_L13_00306F38_00;
             mob = list->mobs[i];
 
-            if (mob != 0 && mob->type == 0xE29)
+            if (mob != 0 && mob->type == 0xE29 /* moby class 3625 */)
                 mob->flags |= 0x800;
-            if (mob->type == 0xD54)
+            if (mob->type == 0xD54 /* moby class 3412 */)
                 UpdateEquipmentPieces(mob);
-            if (mob != 0 && mob->type == 0xFA0 && g_current_map_index != 0x33 && mob->p68 != 0)
+            if (mob != 0 && mob->type == 0xFA0 /* moby class 4000 */ && g_current_map_index != 0x33 && mob->p68 != 0)
                 math_store_angle_update_result(mob, (unsigned char *)mob->p68 + 0xC, 0x80AAAAD2, 0x80396464, 0.07330384f);
             i++;
         } while (i < list->count);

@@ -16,8 +16,9 @@ extern CollisionResultPrefix g_collision_result;
 extern void vec_scale_to_length(void *, void *, float);
 extern int CollLine(void *, void *, int, void *, void *);
 extern void SpawnConfiguredImpactEffects_pal(char *, void *);
-extern int func_PAL_00335DD0(void *, int, int);
+extern int weapon_start_health_drain_pal(void *, int, int);
 
+/* Tests the beam moby's last step for a hit; on a hit spawns the impact effects, damages what was hit and returns 1. */
 int beam_test_segment_hit_pal(char *object, void *target)
 {
     char local[64];
@@ -39,7 +40,7 @@ int beam_test_segment_hit_pal(char *object, void *target)
     if (CollLine(target, local + 48, 0, g_hero_moby, local) != 0) {
         SpawnConfiguredImpactEffects_pal(object, g_collision_result.position);
         if (g_collision_result.object != 0)
-            func_PAL_00335DD0(g_collision_result.object, 23, *(int *)(object + 184));
+            weapon_start_health_drain_pal(g_collision_result.object, 23, *(int *)(object + 184));
         return 1;
     }
     return 0;

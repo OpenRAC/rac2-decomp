@@ -13,6 +13,7 @@ extern int g_menu_input_flags;
 extern int g_menu_input_flags;
 extern int func_0029C6B0(int);
 
+/* Menu input handler: confirm keeps the selection, back or cancel closes the menu, anything else goes to the page helper. */
 int menu_handle_page_input_us2(void) {
     int result = 0;
     int flags = g_menu_input_flags;
@@ -43,6 +44,7 @@ void DoGifPaging(void);
 extern void SetupGifPaging(long arg0);
 extern void SetupGifPaging(long param_1);
 
+/* Draws a menu page through the paging helper. */
 int menu_page_draw_us2(void)
 {
     SetupGifPaging(0);

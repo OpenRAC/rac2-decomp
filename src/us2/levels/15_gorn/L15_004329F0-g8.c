@@ -38,10 +38,12 @@ typedef struct {
 extern Marker *g_gorn_path_first_node __attribute__((sda));
 extern Marker *g_gorn_path_next_node __attribute__((sda));
 
-void func_US2_L15_004329F0(void *self) {
-    Moby430C80 **list;
-    void *obj;
-    s32 n;
+/* Gorn challenge stage 2 setup and check (USA v2.00): on the first pass starts the scene and
+   releases the path markers, then finishes the stage once the ships are gone and the count is 6. */
+void scene_trigger_update_us2(void *moby) {
+    Moby430C80 **objects;
+    void *ship;
+    s32 count;
     s32 i;
 
     if (g_cutscene_l15_started_flag == 0) {
@@ -50,19 +52,19 @@ void func_US2_L15_004329F0(void *self) {
         music_Unpause();
         entry_init_all_registered();
         hero_set_state_value_a(0);
-        list = level_get_object_list();
-        n = level_get_saved_value();
-        for (i = 0; i < n; i++) {
-            if (list[i]->uid == 0x957) {
-                entry_spawn_list_objects_with_flag(list[i], 1);
-                func_L05_0037CEE0(list[i], g_scene_object_base[0] + g_gorn_challenge_vars[0] * 128 + 0x30, 64.0f);
-                func_L05_0037D608(list[i], g_scene_object_base[0] + g_gorn_challenge_vars[0] * 128 + 0x30, 64.0f);
+        objects = level_get_object_list();
+        count = level_get_saved_value();
+        for (i = 0; i < count; i++) {
+            if (objects[i]->uid == 0x957) {
+                entry_spawn_list_objects_with_flag(objects[i], 1);
+                func_L05_0037CEE0(objects[i], g_scene_object_base[0] + g_gorn_challenge_vars[0] * 128 + 0x30, 64.0f);
+                func_L05_0037D608(objects[i], g_scene_object_base[0] + g_gorn_challenge_vars[0] * 128 + 0x30, 64.0f);
             }
         }
-        obj = SpawnFreeLevelObjectById(0x1211, 1);
-        if (obj != 0) {
-            ResetGroupToPathStart(obj);
-            gorn_ship_start_falling(obj);
+        ship = SpawnFreeLevelObjectById(0x1211, 1);
+        if (ship != 0) {
+            ResetGroupToPathStart(ship);
+            gorn_ship_start_falling(ship);
         }
         if (g_gorn_path_first_node != 0 && g_gorn_path_first_node->flags != 0) {
             moby_mark_spawned(g_gorn_path_first_node);
@@ -74,6 +76,6 @@ void func_US2_L15_004329F0(void *self) {
         }
     }
     if (CountActiveLinkedListObjects(level_find_object_by_class_id(0x1211)) == 0 && g_gorn_challenge_count[0] >= 6) {
-        gorn_finish_challenge_stage_us2(self, 2);
+        gorn_finish_challenge_stage_us2(moby, 2);
     }
 }

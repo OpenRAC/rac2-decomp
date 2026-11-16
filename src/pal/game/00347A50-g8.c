@@ -12,6 +12,7 @@ extern int g_selection_grid_cursor[];
 extern int g_selected_item_material __attribute__((sda));
 extern SelectionEntry g_menu_item_table_second[];
 
+/* Moves the selection grid cursor by the pressed direction; confirming an owned item selects it (PAL). */
 void selection_grid_handle_input_pal(SelectionOwner *owner, int buttons)
 {
     if (buttons & 0x1000) {

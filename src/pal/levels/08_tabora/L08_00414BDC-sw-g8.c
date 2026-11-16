@@ -67,23 +67,23 @@ extern void part_steer_effect_direction(int, void *, int);
 extern void vec_transform_or_copy(void *, void *);
 extern void shop_trigger_current_state_effect(void *, void *);
 extern void vec_add_object_direction_scaled(void *, void *, float);
-extern s32 func_PAL_L08_002D3078(int, int);
+extern s32 hero_l08_enter_state_pal(int, int);
 extern void part_setup_object_effect_entry(void *, void *, void *);
-extern void func_PAL_002A7E68(void *, int, int, int);
+extern void anim_start_blended_pal(void *, int, int, int);
 extern int PlayMobySound(int, int, void *);
-extern void func_PAL_00331948(void *), moby_steer_heading_to_aim(void *), func_PAL_00331A48(void *);
+extern void pad_read_clamped_stick_pal(void *), moby_steer_heading_to_aim(void *), vehicle_update_speed_and_move_pal(void *);
 extern void nearby_typed_objects_notify_pal(void *), snd_play_on_threshold_crossing(void);
 extern int math_fast_float_d(void *);
 extern int CollideSweptSphere(UpdateQuery *);
 extern int weapon_get_group(int);
 extern void vec_clear_128(void *);
 extern float FastVecLength(void *);
-extern char *func_PAL_0032F3B8(void *, void *, void *, float);
+extern char *part_spawn_blast_effect_moby_pal(void *, void *, void *, float);
 extern void QueueRadialMobyImpacts(void *);
 extern void table_clear_entry_flag(int), slot_free(int), moby_mark_spawned(void *);
 extern void copy_matrix_rotation(void *, void *), mat_get_euler_angles(void *, void *);
 extern int moby_transform_point_and_rotation_by_parent(void *, void *, void *, void *, void *, void *);
-extern void euler_rotation_basis(void *, void *), func_PAL_00331118(void *);
+extern void euler_rotation_basis(void *, void *), vehicle_update_gun_aiming_pal(void *);
 extern void gfx_register_final_draw_callback(void (*)(void *), void *);
 extern void part_draw_ring_effect_and_trail_pal(void *);
 extern void part_queue_ground_shadow(void *, float);
@@ -93,7 +93,8 @@ extern void part_queue_ground_shadow(void *, float);
 #define STATE(p) (*(unsigned char *)((p) + 0x20))
 
 /* Advances launch, grounded movement, falling and teardown states of a timed actor. */
-void func_PAL_L08_00414BDC(char *obj)
+/* Updates the Turret Spider Bot (moby class 3705): it is launched, moves along the ground, falls, and is removed when its time runs out (PAL version). */
+void update_timed_ground_actor_l08_pal(char *obj)
 {
     /* The query and attachment transform use the same workspace in separate phases. */
     struct {
@@ -175,10 +176,10 @@ void func_PAL_L08_00414BDC(char *obj)
                 break;
             qcopy(obj + 0x10, &collision->point);
             ForceClaimNotice(6, 0, 1);
-            func_PAL_L08_002D3078(28, 1);
+            hero_l08_enter_state_pal(28, 1);
             part_setup_object_effect_entry(obj + 0x10, obj + 0xF0, obj);
             STATE(obj) = 2;
-            func_PAL_002A7E68(obj, 1, 0, 10);
+            anim_start_blended_pal(obj, 1, 0, 10);
             I(obj, 0x48) = 0;
         }
         break;
@@ -192,9 +193,9 @@ void func_PAL_L08_00414BDC(char *obj)
         }
         break;
     case 3:
-        func_PAL_00331948(obj);
+        pad_read_clamped_stick_pal(obj);
         moby_steer_heading_to_aim(obj);
-        func_PAL_00331A48(obj);
+        vehicle_update_speed_and_move_pal(obj);
         nearby_typed_objects_notify_pal(obj);
         snd_play_on_threshold_crossing();
         if (math_fast_float_d(g_global_object_timer)) {
@@ -254,7 +255,7 @@ void func_PAL_L08_00414BDC(char *obj)
         if (math_fast_float_d(vars + 0x60)) {
             PlayMobySound(1, 0, obj);
             vec_scale_to_length(&scratch.rotation, obj + 0xC0, 1.0f);
-            func_PAL_0032F3B8(obj, obj + 0x10, &scratch.rotation, F(obj, 0x18));
+            part_spawn_blast_effect_moby_pal(obj, obj + 0x10, &scratch.rotation, F(obj, 0x18));
             STATE(obj) = 6;
             *(unsigned short *)(obj + 0x34) |= 0x41;
             if (g_game_mode != 28 || g_game_l00_mode == 2) {
@@ -277,7 +278,7 @@ void func_PAL_L08_00414BDC(char *obj)
         break;
     case 8:
         if (g_game_mode == 28)
-            func_PAL_L08_002D3078(0, 1);
+            hero_l08_enter_state_pal(0, 1);
         if (*(short *)(g_follow_camera_object + 0x86) == 27)
             ref_L00_003FFBA0_00();
         table_clear_entry_flag(update_handle);
@@ -298,7 +299,7 @@ void func_PAL_L08_00414BDC(char *obj)
         euler_rotation_basis(obj + 0xC0, &scratch.workspace.attachment.adjusted);
     }
     if ((unsigned int)(STATE(obj) - 2) < 2)
-        func_PAL_00331118(obj);
+        vehicle_update_gun_aiming_pal(obj);
     gfx_register_final_draw_callback(part_draw_ring_effect_and_trail_pal, obj);
     part_queue_ground_shadow(obj, g_spider_bot_shadow_size);
 }

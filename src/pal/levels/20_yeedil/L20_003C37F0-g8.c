@@ -18,9 +18,9 @@ extern char g_hero_state[];
 extern s32 g_current_map_index[] __attribute__((sda));
 typedef struct {
     s32 group, timer;
-    f32 inverseDuration;
+    f32 inverse_duration;
     s32 target, parameter;
-    u8 expectedState, flag15, exitVehicle, flag17;
+    u8 expected_state, flag15, exit_vehicle, flag17;
 } ScriptState;
 typedef struct {
     u8 pad00[0x20];
@@ -32,6 +32,7 @@ typedef struct {
     u16 uid;
 } ScriptMoby;
 
+/* Updates moby class 1352: a scripted pickup. It waits for a linked moby to reach a state, records it in the save data, plays a sound, and finishes after two seconds. */
 void scripted_pickup_update_pal(ScriptMoby *self) {
     ScriptState *state = self->script;
 
@@ -61,7 +62,7 @@ void scripted_pickup_update_pal(ScriptMoby *self) {
     case 1: {
         u16 uid;
 
-        if (*(u8 *)((state->target << 8) + (s32)g_group_l20_member_table + 0x20) == state->expectedState) {
+        if (*(u8 *)((state->target << 8) + (s32)g_group_l20_member_table + 0x20) == state->expected_state) {
             uid = self->uid;
         } else {
             if (!state->flag15 || !flag_is_third_pending_set(self))
@@ -85,7 +86,7 @@ void scripted_pickup_update_pal(ScriptMoby *self) {
         state->timer = 100;
         {
             float duration = IntToFloat(100);
-            state->inverseDuration = 1.0f / duration;
+            state->inverse_duration = 1.0f / duration;
         }
         cam_lock_entry(state->parameter);
         break;
@@ -98,7 +99,7 @@ void scripted_pickup_update_pal(ScriptMoby *self) {
 
             if (*(s32 *)(hero + 0x2294) == 0x6F)
                 break;
-            if (state->exitVehicle)
+            if (state->exit_vehicle)
                 hero_exit_vehicle_mode_pal(0);
             if (state->flag17)
                 level_capture_checkpoint_state(hero + 0x80, hero + 0x90);

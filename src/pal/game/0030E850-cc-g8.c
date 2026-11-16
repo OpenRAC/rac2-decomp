@@ -33,7 +33,7 @@ extern char g_beam_ribbon_points[];
 extern void beam_draw_ribbon_with_halo(void *, int, int, int, float, float, float);
 extern void beam_draw_anchor_glow_level(SkyMoby30D430 *);
 
-void func_PAL_0030E850(SkyMoby30D430 *moby)
+void beam_draw_ribbons_level_pal(SkyMoby30D430 *moby)
 {
     SkyVars30D430 *vars = moby->vars;
     float offset;

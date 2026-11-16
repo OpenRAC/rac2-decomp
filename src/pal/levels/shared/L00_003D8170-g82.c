@@ -10,7 +10,8 @@ extern char g_drift_particle_desc_a __attribute__((sda));
 extern char g_drift_particle_desc_b __attribute__((sda));
 extern char g_drift_particle_desc_c __attribute__((sda));
 
-void func_PAL_L00_003D89F0(char *object)
+/* While the object is active, spawns three drifting particles that fall slowly from its first joint (PAL). */
+void part_emit_drifting_from_moby_pal(char *object)
 {
     Vector position, velocity, temporary;
     if (*(unsigned char *)(object + 0x31) != 0) {

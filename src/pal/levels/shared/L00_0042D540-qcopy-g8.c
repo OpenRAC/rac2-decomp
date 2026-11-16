@@ -25,14 +25,14 @@ extern void vec_transform_or_copy(void *, void *);
 
 /* Camera follow step for a target object: aims at a point offset from the target and
    adjusts the orbit by the hero's distance; returns 0 on the easing path, else 1. */
-int func_PAL_L00_0042D540(char *self, char *target)
+int cam_follow_update_target_pal(char *self, char *target)
 {
     V4_F42D540 offset, pos;
     char *cam = *(char **)(self + 0x70);
     float *orbit = (float *)(cam + 0x64);
     char *info;
     float angle;
-    float d;
+    float dist;
 
     *(char **)(cam + 0xF4) = target;
     if (target != 0) {
@@ -55,13 +55,13 @@ int func_PAL_L00_0042D540(char *self, char *target)
             angle = FastDiffRots(mat_fast_helper_a(g_scalar_transition_state.pos.f[0] - g_hero_state.pos.f[0],
                                                 g_scalar_transition_state.pos.f[1] - g_hero_state.pos.f[1]),
                                   g_scalar_transition_state.yaw);
-            d = vec_distance_xy(&g_hero_state.pos, &g_scalar_transition_state.pos);
-            if (d < 0.77f) {
+            dist = vec_distance_xy(&g_hero_state.pos, &g_scalar_transition_state.pos);
+            if (dist < 0.77f) {
                 if (angle < 1.5707965f) {
-                    *(float *)(cam + 0x1C) -= 0.7f - d;
+                    *(float *)(cam + 0x1C) -= 0.7f - dist;
                     *(int *)(info + 4) = 0;
                 } else {
-                    *(float *)(cam + 0x1C) += 0.7f - d;
+                    *(float *)(cam + 0x1C) += 0.7f - dist;
                 }
             } else {
                 *(float *)(cam + 0x1C) += *(float *)(info + 4);

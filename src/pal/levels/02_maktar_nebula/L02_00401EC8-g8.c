@@ -15,7 +15,8 @@ extern void SetCamera5Mode(int, int);
 extern void object_copy_vector_to_selected(char *);
 extern void cam_set_state_rotation(char *);
 
-void func_PAL_L02_00401EC8(char *a0) {
+/* Sets up the cutscene camera: pose, mode (its timing scaled for 50 Hz), position and rotation. */
+void cutscene_setup_camera_pal(char *moby) {
     char buf[16];
     vec_clear_128(buf);
     SetCamera5Pose(g_cutscene_camera_pose_start, g_cutscene_camera_pose_end, 1, 0, 0);

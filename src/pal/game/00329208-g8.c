@@ -6,6 +6,7 @@ extern float ref_L00_00327A60_00 __attribute__((sda));
 extern float fast_vec_dist(void *, void *);
 extern int pickup_start_fly_if_idle(void *, void *);
 
+/* Looks through the live objects and reacts to each one of a certain kind that is close to this object. */
 void moby_notify_nearby_of_kind_pal(char *object)
 {
     char *cursor;

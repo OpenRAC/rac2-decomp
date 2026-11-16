@@ -21,7 +21,8 @@ extern void water_advance_controller_state(void *);
 extern void water_update_ripple_patches(void *);
 extern void water_add_splash_entry(void *, float);
 
-void grouped_object_update_by_state_pal(char *object)
+/* Runs the water controller of a grouped object by its state: init and update, update only, or advance (PAL). */
+void grouped_object_update_by_state_pal(char *moby)
 {
     char *state;
     L04DispatchGlobals *globals = &g_hero_state;
@@ -29,7 +30,7 @@ void grouped_object_update_by_state_pal(char *object)
     if (player && *(short *)(player + 0xAA) == 0x45 &&
         (unsigned char)player[0x20] != 0xFE && (unsigned char)player[0x20] != 0xFD &&
         globals->mode == 0x31) return;
-    state = *(char **)(object + 0x68);
+    state = *(char **)(moby + 0x68);
     if (state) {
         int index = *(int *)(state + 0x18);
         int increment = 1;
@@ -49,11 +50,11 @@ void grouped_object_update_by_state_pal(char *object)
             args[7] = (int)g_grouped_object_call_arg_d;
             args[11] = (int)group_run_shared_routine;
             args[12] = (int)gfx_add_draw_callback_third;
-            args[10] = (int)object;
-            switch ((unsigned char)object[0x20]) {
+            args[10] = (int)moby;
+            switch ((unsigned char)moby[0x20]) {
             case 0:
                 water_init_object_pal(args);
-                water_add_splash_entry(object, *(float *)(state + 0x28));
+                water_add_splash_entry(moby, *(float *)(state + 0x28));
                 /* Fall through. */
             case 1:
                 water_update_controller_pal(args);

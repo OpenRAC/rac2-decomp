@@ -15,29 +15,29 @@ extern void vec_scale_to_length(float *, float *, float);
 char *directed_shot_create_pal(char *pos, char *dir, float *damage) {
     char axis[16];
     char scaled[16];
-    char *obj;
-    char *state;
+    char *shot;
+    char *shot_vars;
     cam_compute_view_direction(pos, axis, 1);
-    obj = CreateMoby(0x118E);
-    if (obj) {
-        state = *(char **)(obj + 0x68);
-        *(float *)(state + 0x1C) = *damage;
-        *(int *)(state + 0x10) = 0x32;
-        *(u8 *)(obj + 0x30) = 0xFF;
-        *(u16 *)(obj + 0x32) = 0xFF;
-        *(u8 *)(obj + 0x20) = 0;
-        qcopy(obj + 0x10, pos);
-        qcopy(state, dir);
-        *(int *)(state + 0x18) = 0;
-        *(int *)(state + 0x14) = 0;
+    shot = CreateMoby(0x118E);
+    if (shot) {
+        shot_vars = *(char **)(shot + 0x68);
+        *(float *)(shot_vars + 0x1C) = *damage;
+        *(int *)(shot_vars + 0x10) = 0x32;
+        *(u8 *)(shot + 0x30) = 0xFF;
+        *(u16 *)(shot + 0x32) = 0xFF;
+        *(u8 *)(shot + 0x20) = 0;
+        qcopy(shot + 0x10, pos);
+        qcopy(shot_vars, dir);
+        *(int *)(shot_vars + 0x18) = 0;
+        *(int *)(shot_vars + 0x14) = 0;
         vec_scale_to_length((float *)scaled, (float *)dir, 1.0f);
-        qcopy(obj + 0xC0, scaled);
-        FastVecCross((float *)(obj + 0xD0), (float *)(obj + 0xC0), (float *)axis);
-        vec_scale_to_length((float *)(obj + 0xD0), (float *)(obj + 0xD0), 1.0f);
-        FastVecCross((float *)(obj + 0xE0), (float *)(obj + 0xD0), (float *)(obj + 0xC0));
-        *(float *)(obj + 0xCC) = *(float *)(obj + 0xDC) = *(float *)(obj + 0xEC) = 0.0f;
+        qcopy(shot + 0xC0, scaled);
+        FastVecCross((float *)(shot + 0xD0), (float *)(shot + 0xC0), (float *)axis);
+        vec_scale_to_length((float *)(shot + 0xD0), (float *)(shot + 0xD0), 1.0f);
+        FastVecCross((float *)(shot + 0xE0), (float *)(shot + 0xD0), (float *)(shot + 0xC0));
+        *(float *)(shot + 0xCC) = *(float *)(shot + 0xDC) = *(float *)(shot + 0xEC) = 0.0f;
     }
-    return obj;
+    return shot;
 }
 
 

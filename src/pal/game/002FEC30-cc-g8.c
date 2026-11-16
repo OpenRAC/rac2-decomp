@@ -27,6 +27,7 @@ typedef struct {
     u64 zero, texture, blend, test;
 } DrawPacketDB;
 
+/* Draws two flat glowing squares that face a given direction and spin in opposite ways. */
 void part_draw_spinning_billboard_pair_pal(float *origin, float *direction, float scale, int *colors)
 {
     DrawPacketDB packet;

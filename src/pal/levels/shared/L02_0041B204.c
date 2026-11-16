@@ -19,7 +19,8 @@ extern struct { char pad[0x464]; u8 flags[0]; } g_cell_flags;
 extern int g_current_map_index __attribute__((sda));
 extern u8 g_moby_nibble_table[];
 
-void func_PAL_L02_0041B204(u8 *object)
+/* Updates a lift that carries one object up, drops it and tracks its height. */
+void capture_lift_update_pal(u8 *object)
 {
     CaptureState *state=*(CaptureState **)(object+0x68);
     if (state->child && moby_is_state_six(state->child)) {

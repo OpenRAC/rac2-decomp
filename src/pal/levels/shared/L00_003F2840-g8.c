@@ -44,6 +44,7 @@ typedef struct {
     BounceVector point, normal, offset;
 } BounceWorkspace;
 
+/* Updates a flying Gravity Bomb: it moves and bounces, sticks or explodes on a hit, and removes itself when it leaves the level (PAL: 50 Hz). */
 void gravity_bomb_projectile_update_pal(unsigned char *object) {
     char *state = *(char **)(object + 0x68);
     BounceWorkspace work;

@@ -15,28 +15,28 @@ extern u8 g_cloud_puff_table[];
 /* Two-state start-up for a cloud puff: state 0 lays the record at +0x10 out (position
    reset, colour limits, the builder call, its handle in the $gp variable), and states 0
    and 1 both fade the +0xF8 value down; anything else goes straight to the update. */
-void cloud_puff_startup_update_pal(u8 *a0) {
-    u8 *s0 = a0;
-    u8 state = *(u8 *)(s0 + 0x20);
-    f32 v;
+void cloud_puff_startup_update_pal(u8 *object) {
+    u8 *moby = object;
+    u8 state = *(u8 *)(moby + 0x20);
+    f32 zero;
 
     switch (state) {
     case 0:
-        *(int *)(s0 + 0x1C) = 0;
-        *(u8 *)(s0 + 0x20) = 1;
-        v = *(f32 *)(s0 + 0x1C);
-        *(u16 *)(s0 + 0x32) = 0x1FF;
-        *(u8 *)(s0 + 0x30) = 0xFF;
-        *(f32 *)(s0 + 0x10) = 512.0f;
-        *(f32 *)(s0 + 0x14) = 512.0f;
-        *(f32 *)(s0 + 0x18) = 512.0f;
-        g_cloud_puff_index = part_l00_alloc_effect_slot_2(s0 + 0x10, 40.0f, v, v, v, 1.0f);
+        *(int *)(moby + 0x1C) = 0;
+        *(u8 *)(moby + 0x20) = 1;
+        zero = *(f32 *)(moby + 0x1C);
+        *(u16 *)(moby + 0x32) = 0x1FF;
+        *(u8 *)(moby + 0x30) = 0xFF;
+        *(f32 *)(moby + 0x10) = 512.0f;
+        *(f32 *)(moby + 0x14) = 512.0f;
+        *(f32 *)(moby + 0x18) = 512.0f;
+        g_cloud_puff_index = part_l00_alloc_effect_slot_2(moby + 0x10, 40.0f, zero, zero, zero, 1.0f);
     case 1:
-        *(f32 *)(s0 + 0xF8) =
-            FastAddRotations(*(f32 *)(s0 + 0xF8), 0.011780974f);
+        *(f32 *)(moby + 0xF8) =
+            FastAddRotations(*(f32 *)(moby + 0xF8), 0.011780974f);
         break;
     default:
         break;
     }
-    gfx_add_draw_callback_third(g_cloud_puff_data, s0);
+    gfx_add_draw_callback_third(g_cloud_puff_data, moby);
 }

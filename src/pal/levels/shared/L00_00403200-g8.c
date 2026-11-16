@@ -40,7 +40,7 @@ extern float g_bouncer_l00_debris_scale __attribute__((sda));
 
 /* Spawns a piece of debris at the position with the given velocity, a random spin and a
    scale that depends on the flag. */
-DebrisObject_F3FED60 *func_PAL_L00_00403640(SpawnVector_F3FED60 *position, SpawnVector_F3FED60 *velocity, int flag)
+DebrisObject_F3FED60 *bouncer_spawn_debris_object_pal(SpawnVector_F3FED60 *position, SpawnVector_F3FED60 *velocity, int flag)
 {
     DebrisObject_F3FED60 *object = CreateMoby(0xE64);
     if (object != 0) {

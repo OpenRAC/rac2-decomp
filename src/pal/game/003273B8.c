@@ -9,6 +9,7 @@ extern void multiply_matrix3x3(void *, void *, void *);
 extern int math_random_int_below(int);
 extern void part_spawn_drifting_puff_pair_pal(void *, int, void *);
 
+/* Attaches the two child parts to their parent, turns them by the given angle and sometimes puffs out a small effect at each one. */
 void enemy_attach_turn_child_parts_pal(float angle, char *parent, char **children, int randomize, void *effect)
 {
     char rotation[0x30] __attribute__((aligned(16)));

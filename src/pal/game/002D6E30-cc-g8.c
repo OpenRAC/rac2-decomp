@@ -50,13 +50,13 @@ extern void DoGifPaging(void);
 extern void mem_clear(void *, int, int);
 extern unsigned long GetEffectTextureDescriptor(int);
 extern int measure_text_width(char *, int, unsigned char *);
-extern int func_PAL_002D74D8(int, int, int);
+extern int menu_blend_highlight_color_pal(int, int, int);
 extern int sprintf(char *, char *, ...);
 extern char *GetLocalizedString(int);
 extern void text_draw_line(int, int, unsigned long, char *, int, unsigned long, unsigned char *);
 
 /* RAC1 pause.c render_localized_ui_entry_list, with RaC2's formatted-text rows. */
-int func_PAL_002D6E30(MenuDescriptor *menu) {
+int RenderLocalizedUiEntryList_pal(MenuDescriptor *menu) {
     int selection_index;
     int entry_index;
     int focused;
@@ -72,7 +72,7 @@ int func_PAL_002D6E30(MenuDescriptor *menu) {
     int selected_entry;
     int enabled;
     int color;
-    char *text_id;
+    char *text;
     char *secondary_text;
     int x;
     int y;
@@ -157,12 +157,12 @@ int func_PAL_002D6E30(MenuDescriptor *menu) {
                 color = 0x80006060;
             } else if (enabled) {
             fade_timer:
-                color = func_PAL_002D74D8(selected_item->fade_timer, -1, -1);
+                color = menu_blend_highlight_color_pal(selected_item->fade_timer, -1, -1);
 
             } else {
                 color = 0x80303030;
             }
-            text_id = GetLocalizedString(menu->items[selection_index].text_id);
+            text = GetLocalizedString(menu->items[selection_index].text_id);
             if ((g_pause_menu_state.current == &g_menu_page_main || g_pause_menu_state.current == &g_menu_page_pause) &&
                 (menu == &g_menu_widget_a || menu == &g_menu_widget_b || menu == &g_menu_widget_c ||
                  menu == &g_menu_widget_d || menu == &g_menu_widget_e || menu == &g_menu_widget_f)) {
@@ -177,29 +177,29 @@ int func_PAL_002D6E30(MenuDescriptor *menu) {
                 }
                 if (found >= 0) {
                     mem_clear(g_menu_text_buffer, 0, 256);
-                    text_id = GetLocalizedString(menu->items[selection_index].text_id);
+                    text = GetLocalizedString(menu->items[selection_index].text_id);
                     sprintf(g_menu_text_buffer, g_str_render_text_fmt,
-                                 GetLocalizedString(g_menu_text_id_table[found]), text_id);
-                    text_id = g_menu_text_buffer;
+                                 GetLocalizedString(g_menu_text_id_table[found]), text);
+                    text = g_menu_text_buffer;
                 }
             }
             if (menu->items[selection_index].enabled == 2) {
-                text_id = GetLocalizedString(0xbd1);
+                text = GetLocalizedString(0xbd1);
             }
-            x = half_width - (measure_text_width(text_id, -1, glyphs) >> 1);
+            x = half_width - (measure_text_width(text, -1, glyphs) >> 1);
             if (menu->flags & 0x40) {
                 x = 4;
             } else if (menu->flags & 0x4000) {
                 x = half_width - (maximum_text_width >> 1);
             }
             gfx_disable_screen_flag();
-            text_draw_line(x + g_text_shadow_offset_x, y + g_text_shadow_offset_y, 0x80000000L, text_id, -1,
+            text_draw_line(x + g_text_shadow_offset_x, y + g_text_shadow_offset_y, 0x80000000L, text, -1,
                        GetEffectTextureDescriptor(font_texture_index), glyphs);
             gfx_enable_screen_flag();
             if (menu->flags & 0x80) {
                 gfx_disable_screen_flag();
             }
-            text_draw_line(x, y, color, text_id, -1, GetEffectTextureDescriptor(font_texture_index), glyphs);
+            text_draw_line(x, y, color, text, -1, GetEffectTextureDescriptor(font_texture_index), glyphs);
             y += row_height;
             if (menu->items[selection_index].secondary_text_id != 0) {
                 gfx_disable_screen_flag();

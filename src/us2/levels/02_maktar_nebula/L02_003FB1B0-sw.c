@@ -65,7 +65,7 @@ extern void DrawMaktarChallengeHud(char *);
 extern void moby_try_alloc_enter_state2(char *);
 extern void menu_select_next_usable(char *);
 extern void DrawRadialQuadEffect(char *);
-extern void func_US2_L02_00401A20(char *);
+extern void gfx_draw_screen_wipe_us2(char *);
 extern int arena_start_announcer_message(char *, int);
 extern void actor_pick_watched_message(char *);
 extern void arena_notify_mobys_challenge_start(void);
@@ -138,7 +138,7 @@ typedef struct MaktarState {
     s32 volume;           
     u8 pad22C[4];
     s32 track;            
-    s32 trackVolume;      
+    s32 track_volume;      
 } MaktarState;
 typedef struct MaktarObj {
     u8 pad00[0x20];
@@ -149,7 +149,7 @@ typedef struct MaktarObj {
     u16 timer;            
     u8 pad98[0xBC - 0x98];
     u8 phase;             
-    u8 padBD;
+    u8 pad_bd;
     u8 flags;             
 } MaktarObj;
 typedef struct { u8 pad0[0x284]; char *owner; s32 timer; } MaktarFlags;
@@ -169,6 +169,7 @@ typedef union { u8 b[0x2600]; s16 h[0x1300]; s32 i[0x980]; float f[0x980]; void 
 #define P(p,o) (*(char **)((p)+(o)))
 #define OBJ ((MaktarObj *)actor)
 
+/* Per-frame update of the Maktar arena controller (moby class 2905). It runs the challenge menu, starts each wave of enemies, and ends the challenge. */
 void UpdateArenaController_us2(char *actor) {
     MaktarState *st = OBJ->st;
     float f;
@@ -186,7 +187,7 @@ void UpdateArenaController_us2(char *actor) {
             moby_set_state(actor,2,-1);
             state_set_flag_one();
             st->fade = g_arena_fade_value;
-            gfx_add_draw_callback_first(func_US2_L02_00401A20,actor);
+            gfx_add_draw_callback_first(gfx_draw_screen_wipe_us2,actor);
             OBJ->timer = 31;
         }
         break;
@@ -204,7 +205,7 @@ void UpdateArenaController_us2(char *actor) {
             moby_set_state(actor,2,-1);
             state_set_flag_one();
             st->fade = g_arena_fade_value;
-            gfx_add_draw_callback_first(func_US2_L02_00401A20,actor);
+            gfx_add_draw_callback_first(gfx_draw_screen_wipe_us2,actor);
             OBJ->timer = 31;
         }
         g_level_script_flag = 0;
@@ -224,7 +225,7 @@ void UpdateArenaController_us2(char *actor) {
                 break;
             }
             st->fade=g_arena_fade_value;
-            gfx_add_draw_callback_first(func_US2_L02_00401A20,actor);
+            gfx_add_draw_callback_first(gfx_draw_screen_wipe_us2,actor);
             if (g_arena_l02_active_flag!=1) load_scene_chunk(1,st->music);
             a=g_matrix_l02_record_table[0]+st->camera*128;
             hero_reset_position_and_direction(a+0x30,a+0x70,0x6f,1);
@@ -235,7 +236,7 @@ void UpdateArenaController_us2(char *actor) {
             SetCamera5Pose(pos,g_matrix_l02_record_table[0]+st->camera*128+0x70,1,0,0);
             OBJ->phase=2;
         } else if (OBJ->phase==2) {
-            gfx_add_draw_callback_first(func_US2_L02_00401A20,actor);
+            gfx_add_draw_callback_first(gfx_draw_screen_wipe_us2,actor);
             g_grab_highlight_level=0;
             if (st->fade>0) break;
             if (!g_game_flag_table[5]) {
@@ -244,9 +245,9 @@ void UpdateArenaController_us2(char *actor) {
                 OBJ->timer=0;
                 break;
             }
-            goto beginApproach;
+            goto begin_approach;
         } else if (OBJ->phase==1 && OBJ->timer>=61 && g_arena_state_words[0]!=2) {
-        beginApproach:
+        begin_approach:
             OBJ->phase=3;
             hero_start_loader_state(0);
             hero_start_target_state(arena_get_camera_point(actor),0,0.0f);
@@ -450,19 +451,19 @@ void UpdateArenaController_us2(char *actor) {
             { MaktarFlags *g=(MaktarFlags *)g_hero_effect_state; if(!g->owner) { g->owner=a; g->timer=0; } }
             if(!g_boss_owner_slots[0]) { g_boss_owner_slots[0]=a; mem_clear(g_boss_damage_totals,0,224); }
             if(!g_boss_owner_slots[1]) { char *buf=g_boss_damage_totals; g_boss_owner_slots[1]=b; mem_clear(buf+224,0,224); }
-            arena_start_announcer_message(actor,15); script_queue_keyed_request(st->track,st->trackVolume);
+            arena_start_announcer_message(actor,15); script_queue_keyed_request(st->track,st->track_volume);
         } else if(!st->counts[4] && B(row,16)) {
             char *a;
             a=arena_claim_boss(actor,0x9f8,0); st->owner=a;
             { MaktarFlags *g=(MaktarFlags *)g_hero_effect_state; if(!g->owner) { g->owner=a; g->timer=0; } }
             { char *snd=st->owner; if(!g_boss_owner_slots[0]) { g_boss_owner_slots[0]=snd; mem_clear(g_boss_damage_totals,0,224); } }
-            arena_start_announcer_message(actor,14); script_queue_keyed_request(st->track,st->trackVolume);
+            arena_start_announcer_message(actor,14); script_queue_keyed_request(st->track,st->track_volume);
         } else if(!st->counts[5] && B(row,17)) {
             char *a;
             a=arena_claim_boss(actor,0xa44,0); st->owner=a;
             { MaktarFlags *g=(MaktarFlags *)g_hero_effect_state; if(!g->owner) { g->owner=a; g->timer=0; } }
             { char *snd=st->owner; if(!g_boss_owner_slots[1]) { char *buf=g_boss_damage_totals; g_boss_owner_slots[1]=snd; mem_clear(buf+224,0,224); } }
-            arena_start_announcer_message(actor,20); script_queue_keyed_request(st->track,st->trackVolume);
+            arena_start_announcer_message(actor,20); script_queue_keyed_request(st->track,st->track_volume);
         }
         if(!U(row,16)) { char *g=g_music_state; if(B(g,0x48)!=st->music && B(g,0x3c)!=st->music) script_queue_keyed_request(st->music,st->volume); }
         if(spawned) arena_activate_spawn_slots(actor);

@@ -21,7 +21,8 @@ extern int trooper_legs_find_largest_value(unsigned char *);
 
 extern int trooper_legs_count_with_value(unsigned char *, int);
 
-void func_PAL_L09_003FCF28(unsigned char *object) {
+/* Hands this trooper's path settings to the nearest eligible trooper and starts it moving (PAL: 50 Hz timings). */
+void transfer_state_to_nearest_eligible_object_pal(unsigned char *object) {
     unsigned char *source_data = *(unsigned char **)(object + 0x68);
     TI128 position;
     unsigned short *list;

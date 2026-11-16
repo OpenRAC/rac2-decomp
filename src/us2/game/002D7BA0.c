@@ -8,12 +8,13 @@ typedef struct { char pad[0x34]; int f34; int f38; int f3C; } Base2D75E8;
 extern Base2D75E8 g_page_preview;
 extern int g_level_page_entry_value[];
 
-int menu_preview_entry_init_us2(int *arg0)
+/* Sets up a preview of the selected entry by loading its two data words from the tables. */
+int menu_preview_entry_init_us2(int *menu)
 {
-    menu_update_entry_states(arg0);
-    *(int *)((char *)arg0 + 0xA0) = menu_list_active_entries(0x70000000, 0, 0x70000100, 1);
+    menu_update_entry_states(menu);
+    *(int *)((char *)menu + 0xA0) = menu_list_active_entries(0x70000000, 0, 0x70000100, 1);
     {
-        char *base = (char *)arg0 + 0x30;
+        char *base = (char *)menu + 0x30;
         int index = g_selected_map_index;
 
         if (*(int *)(base + (index << 2)) != -1) {
@@ -22,6 +23,6 @@ int menu_preview_entry_init_us2(int *arg0)
             *(int *)g_level_page_entry_value = *(int *)(0x70000100 + 4 * *(int *)(base + (index << 2)));
         }
     }
-    *(int *)((char *)arg0 + 0xA4) = 0;
+    *(int *)((char *)menu + 0xA4) = 0;
     return 0;
 }

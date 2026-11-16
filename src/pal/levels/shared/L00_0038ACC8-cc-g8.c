@@ -65,11 +65,12 @@ typedef struct {
     TrailWork *work;
 } TrailMoby;
 
-char *func_PAL_L00_0038ACC8(Vector4 *position, Vector4 *velocity)
+/* Creates a Miniturret shot at the given position moving the given way, and turns it to face its direction. Returns null if it cannot be set up (PAL: 50 Hz shot timer). */
+char *miniturret_spawn_shot_pal(Vector4 *position, Vector4 *velocity)
 {
     Vector4 direction, forward, quaternion, axis;
     Vector4 rotation[3];
-    char *object = CreateMoby(0x1366);
+    char *object = CreateMoby(MOBY_CLASS_MINITURRET);
     TrailWork *work;
     float angle;
     if (object) {

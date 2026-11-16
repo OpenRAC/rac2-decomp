@@ -17,8 +17,9 @@ extern int FloatToInt(float);
 extern char g_hero_state_block[];
 typedef struct {char pad[0x5C]; unsigned char *data;} ParticleGlobals;
 extern ParticleGlobals g_effect_definitions;
-extern char *func_PAL_002C23B8(void *,void *,int,int,int,int,float,float,float,float,float);
-void func_PAL_L00_003B0230(char *m,void *previous)
+extern char *part_spawn_burst_pal(void *,void *,int,int,int,int,float,float,float,float,float);
+/* Emits randomized smoke particles along the moby's motion since its previous position (PAL: lifetimes at 50 Hz). */
+void part_emit_shot_trail_pal(char *moby,void *previous)
 {
  float initial[4],velocity[4],position[4],step[4];
  float scale, speed, ratio;
@@ -29,11 +30,11 @@ void func_PAL_L00_003B0230(char *m,void *previous)
  int n,type,time,flags,color;
  char *particle;
  *(Quadword *)start=*(Quadword *)previous;
- scale=FIELD_F32(*(char **)(m+0x68),0x18);
+ scale=FIELD_F32(*(char **)(moby+0x68),0x18);
  n=FloatToInt(scale*10.0f);
  point=position;
  qcopy(point,start);
- FastVecSub(step,m+0x10,initial);
+ FastVecSub(step,moby+0x10,initial);
  ratio=IntToFloat(n);
  ratio=scale/ratio;
  vec_scale_to_length(step,step,ratio);
@@ -46,7 +47,7 @@ void func_PAL_L00_003B0230(char *m,void *previous)
  else {flags=64;color=0x7F7F7F;}
  vel=velocity;
  cursor=position;
- particle=func_PAL_002C23B8(cursor,vel,(time*5+2)/6,flags,color,type,21000.0f,speed,1.0f,0,0);
+ particle=part_spawn_burst_pal(cursor,vel,(time*5+2)/6,flags,color,type,21000.0f,speed,1.0f,0,0);
  FastVecAdd(cursor,cursor,step);
  if(particle) {particle[2]=g_effect_definitions.data[0];particle[3]=flags==64?0x48:0x44;}
  n--;

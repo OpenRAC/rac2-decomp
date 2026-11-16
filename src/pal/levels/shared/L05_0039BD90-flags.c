@@ -25,9 +25,11 @@ extern int math_fast_helper_a(void *, float);
 extern float fast_vec_dist(void *, void *);
 extern float FastVecDot(void *, void *);
 extern float math_fast_angle_helper(float);
-extern void func_PAL_L05_0039C0D8(void *, void *);
+extern void emit_scaled_particle_burst_pal(void *, void *);
 
-char *func_PAL_L05_0039BD90(void *position, int shake, int a2, int a3, int a4, int a5, int a6, int a7, float scale)
+/* Spawns an explosion effect at the position, with a camera shake when the hero is near, and starts
+   its particles (PAL). */
+char *moby_spawn_explosion_effect_pal(void *position, int shake, int a2, int a3, int a4, int a5, int a6, int a7, float scale)
 {
     float direction[4], normal[4], sphere[4], delta[4];
     char *obj;
@@ -81,7 +83,7 @@ char *func_PAL_L05_0039BD90(void *position, int shake, int a2, int a3, int a4, i
             state->delay = 0;
             state->visible = 0;
         }
-        func_PAL_L05_0039C0D8(obj, normal);
+        emit_scaled_particle_burst_pal(obj, normal);
     }
     return obj;
 }

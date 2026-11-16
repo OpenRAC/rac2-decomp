@@ -24,52 +24,53 @@ extern int g_menu_selection_input_state;
 extern StreamReads2DAD18 g_copy_setup_data;
 extern int load_start_disc_read(int, int, int);
 
-int func_US2_002DBA70(Handles_2DCB28 *object)
+/* Starts the read of the first, then the second stream once the loader is idle: states 0 to 4, or -1 when a read is refused. */
+int menu_stream_reads_update_us2(Handles_2DCB28 *handles)
 {
-    switch (object->state) {
+    switch (handles->state) {
     case 0:
-        if (object->first != 0) {
+        if (handles->first != 0) {
             if (g_sequence_active_flag != 0)
                 break;
             {
                 StreamReads2DAD18 *reads = &g_copy_setup_data;
                 int offset = reads->offset;
 
-                if (load_start_disc_read(object->first,
+                if (load_start_disc_read(handles->first,
                                   reads->first[g_menu_selection_input_state].start + offset,
                                   reads->first[g_menu_selection_input_state].length) != 0)
-                    object->state++;
+                    handles->state++;
                 else
-                    object->state = -1;
+                    handles->state = -1;
             }
         }
         break;
     case 1:
         if (g_sequence_active_flag != 0)
             break;
-        object->state = 2;
+        handles->state = 2;
         break;
     case 2:
-        if (object->second != 0) {
+        if (handles->second != 0) {
             if (g_sequence_active_flag != 0)
                 break;
             {
                 StreamReads2DAD18 *reads = &g_copy_setup_data;
                 int offset = reads->offset;
 
-                if (load_start_disc_read(object->second,
+                if (load_start_disc_read(handles->second,
                                   reads->second[g_menu_selection_input_state].start + offset,
                                   reads->second[g_menu_selection_input_state].length) != 0)
-                    object->state++;
+                    handles->state++;
                 else
-                    object->state = -1;
+                    handles->state = -1;
             }
         }
         break;
     case 3:
         if (g_sequence_active_flag != 0)
             break;
-        object->state = 4;
+        handles->state = 4;
         break;
     }
     return 0;

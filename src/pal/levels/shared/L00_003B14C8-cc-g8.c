@@ -22,22 +22,23 @@ static __inline__ void swap16(void *x, void *y) {
     __asm__ __volatile__("lq $2,0x0(%0)\n\tlq $3,0x0(%1)\n\tsq $2,0x0(%1)\n\tsq $3,0x0(%0)"
                          : : "r"(x), "r"(y) : "$2", "$3", "memory");
 }
-void func_PAL_L00_003B14C8(char *a, char *b)
+/* Spawns sparks that travel from one moby toward another, from a random end (PAL: counts at 50 Hz). */
+void part_spawn_sparks_between_mobys_pal(char *from, char *to)
 {
  float offset[4], position[4], delta[4];
  int i, count;
  unsigned char color;
  float distance;
- if(!b || *(short *)(b+0xAA)!=*(short *)(a+0xAA)) return;
- if((unsigned char)b[0x20]!=0xFE) { if((unsigned char)b[0x20]!=0xFD) {
+ if(!to || *(short *)(to+0xAA)!=*(short *)(from+0xAA)) return;
+ if((unsigned char)to[0x20]!=0xFE) { if((unsigned char)to[0x20]!=0xFD) {
  for(i=0;i<ref_L00_003ADCD8_0;) {
    if(func_001163B0()&1)
-     swap16(&a, &b);
+     swap16(&from, &to);
    i++;
-   *(TI128 *)position=*(TI128 *)(a+0x10);
+   *(TI128 *)position=*(TI128 *)(from+0x10);
    count=FloatToInt(((math_random_float_range(ref_L00_003ADCD8_1*0.5f,ref_L00_003ADCD8_1)) * 5.0f + 2.0f) * 0.16666667f);
    color=count;
-   FastVecSub(delta,b+0x10,position);
+   FastVecSub(delta,to+0x10,position);
    *(TI128 *)offset=*(TI128 *)delta;
    distance=FastVecLength(offset);
    FastVecScale(offset,offset,math_random_float_range(0,0.9f));

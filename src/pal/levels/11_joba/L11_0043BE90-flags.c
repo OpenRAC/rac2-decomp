@@ -2,15 +2,17 @@
 
 #include "common.h"
 extern void moby_set_controller_speed_limits(char *, float, float, float, float);
-extern void func_PAL_002A7E68(void *, int, int, int);
+extern void anim_start_blended_pal(void *, int, int, int);
 extern void moby_set_state(void *, int, int);
 extern void func_PAL_002A0F68(char *);
 extern void set_moby_color(char *, int, int, int);
 extern int moby_spawn_linked(char *, int, float, float);
-extern void func_PAL_002A7E68(void *, int, int, int);
+extern void anim_start_blended_pal(void *, int, int, int);
 extern void func_PAL_002A0F68(char *);
 extern void moby_set_state(void *, int, int);
 
+/* Sets up an enemy when it appears: clears its lock, picks its look (active or resting) and starts
+   its animation (PAL: 50 Hz speed limits). */
 void enemy_init_state_pal(char *object, int mode, int active) {
     char *state = *(char **)(object + 0x68);
     unsigned short flags;
@@ -32,7 +34,7 @@ void enemy_init_state_pal(char *object, int mode, int active) {
     if (*(short *)(state + 0x286) != 0) {
         moby_set_state(object, 7, 3);
         *(unsigned short *)(object + 0x34) |= 0x100;
-        func_PAL_002A7E68(object, 1, 0, 0);
+        anim_start_blended_pal(object, 1, 0, 0);
         func_PAL_002A0F68(object);
         moby_spawn_linked(object, 0, 2.0f, 2.0f);
     } else {

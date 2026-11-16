@@ -29,7 +29,7 @@ typedef struct L01_003C2680_OBJ {
 } L01_003C2680_OBJ;
 extern void STUB_printf(void *, int, int);
 extern float vec_distance_xy(void *, void *);
-extern float func_PAL_L01_003BEB40();
+extern float level_get_water_height_pal();
 extern float math_random_angle(void);
 extern void moby_set_state(void *, int, int);
 extern void moby_init_controller_params_pal(void *, void *, int, int, void *, int, int, int, void *, void *, int);
@@ -41,35 +41,36 @@ extern long long g_water_surface_param_c __attribute__((sda));
 extern long long g_water_surface_param_a __attribute__((sda));
 extern char g_str_water_surface_debug[];
 
-void water_surface_update_pal(L01_003C2680_OBJ *a0)
+/* Updates an object that sits on the water: it waits until water is present, then bobs along and reacts when the camera gets close (PAL version). */
+void water_surface_update_pal(L01_003C2680_OBJ *moby)
 {
-    char *p = (char *)a0;
-    L01_003C2680_OWNED *s1 = a0->f68;
+    char *moby_bytes = (char *)moby;
+    L01_003C2680_OWNED *state = moby->f68;
     Quad frame[2];
 
-    if (s1 == 0) {
-        STUB_printf(g_str_water_surface_debug, a0->fAA, a0->fB2);
+    if (state == 0) {
+        STUB_printf(g_str_water_surface_debug, moby->fAA, moby->fB2);
         return;
     }
-    qcopy(&frame[0], p + 0x10);
-    qcopy(&frame[1], p + 0xF0);
-    switch (a0->f20) {
+    qcopy(&frame[0], moby_bytes + 0x10);
+    qcopy(&frame[1], moby_bytes + 0xF0);
+    switch (moby->f20) {
     case 0:
-        if (func_PAL_L01_003BEB40(p + 0x10) > 0.0f) {
-            s1->f120 = math_random_angle();
-            s1->f124 = math_random_angle();
-            s1->f128 = 0.02f;
-            qcopy(&s1->f130, p + 0xF0);
-            qzero(&s1->f140);
-            moby_set_state(a0, 1, -1);
+        if (level_get_water_height_pal(moby_bytes + 0x10) > 0.0f) {
+            state->f120 = math_random_angle();
+            state->f124 = math_random_angle();
+            state->f128 = 0.02f;
+            qcopy(&state->f130, moby_bytes + 0xF0);
+            qzero(&state->f140);
+            moby_set_state(moby, 1, -1);
         }
-        a0->f18 = a0->f18 + g_water_surface_height_offset;
-        moby_init_controller_params_pal(a0, (char *)s1 + 0x60, 0, 0, &g_water_surface_param_a, 0, 0, 0, &g_water_surface_param_b, &g_water_surface_param_c, 0);
+        moby->f18 = moby->f18 + g_water_surface_height_offset;
+        moby_init_controller_params_pal(moby, (char *)state + 0x60, 0, 0, &g_water_surface_param_a, 0, 0, 0, &g_water_surface_param_b, &g_water_surface_param_c, 0);
         return;
     case 1:
-        if (a0->f31 != 0 && vec_distance_xy(p + 0x10, g_level_origin_vec) < 32.0f) {
-            s1->f68 = func_PAL_L01_003BEB40() + g_water_surface_height_offset;
-            moby_update_sway_pal(a0, (char *)s1 + 0x60, 0);
+        if (moby->f31 != 0 && vec_distance_xy(moby_bytes + 0x10, g_level_origin_vec) < 32.0f) {
+            state->f68 = level_get_water_height_pal() + g_water_surface_height_offset;
+            moby_update_sway_pal(moby, (char *)state + 0x60, 0);
         }
         return;
     }

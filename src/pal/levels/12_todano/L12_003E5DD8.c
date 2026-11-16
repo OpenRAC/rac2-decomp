@@ -2,7 +2,7 @@
 
 #include "common.h"
 extern u8 g_hero_prev_position[];
-extern void func_PAL_002A7E68(void *, s32, s32, s32);
+extern void anim_start_blended_pal(void *, s32, s32, s32);
 extern u8 g_hero_l12_state_records[];
 extern s32 func_315148();
 extern s32 func_32D988();
@@ -24,12 +24,13 @@ extern void moby_set_state(void *, s32, s32);
 extern char *GetLocalizedString(int);
 extern s32 *g_path_zone_table[];
 extern s32 point_in_path_xy(void *, void *, s32);
-extern void func_PAL_002A7E68(void *, s32, s32, s32);
+extern void anim_start_blended_pal(void *, s32, s32, s32);
 extern void moby_set_state(void *, s32, s32);
 
-u8 *squirrel_alert_for_object_pal(s32 index, u8 *obj)
+/* Finds the mutant squirrel in the group whose zone contains the object, wakes it and sends it after the object. Returns the squirrel or 0. */
+u8 *squirrel_alert_for_object_pal(s32 group_id, u8 *moby)
 {
-    u16 *list = g_moby_l12_group_lists[index];
+    u16 *list = g_moby_l12_group_lists[group_id];
     u16 *entry;
     u8 *found = 0;
 
@@ -38,28 +39,28 @@ u8 *squirrel_alert_for_object_pal(s32 index, u8 *obj)
     }
     entry = list;
     do {
-        u8 *rec = (u8 *)g_moby_list_start + (*entry & 0x7FFF) * 0x100;
+        u8 *squirrel = (u8 *)g_moby_list_start + (*entry & 0x7FFF) * 0x100;
 
-        if (*(s16 *)(rec + 0xAA) == 0xFB4) {
-            u8 *vars = *(u8 **)(rec + 0x68);
+        if (*(s16 *)(squirrel + 0xAA) == 0xFB4) {
+            u8 *vars = *(u8 **)(squirrel + 0x68);
             s32 *zone = g_path_zone_table[*(s32 *)(vars + 0x138)];
 
-            if (point_in_path_xy(obj + 0x10, zone + 4, zone[0]) != 0) {
-                if (rec[0x20] == 9) {
-                    *(u16 *)(rec + 0x34) = (*(u16 *)(rec + 0x34) & 0xFFBE) | 0x1000;
-                    *(s32 *)(rec + 0x98) = *(s32 *)(*(u8 **)(rec + 0x24) + 0x10);
-                    if (rec[0x43] != 5) {
-                        func_PAL_002A7E68(rec, 5, 0, 8);
+            if (point_in_path_xy(moby + 0x10, zone + 4, zone[0]) != 0) {
+                if (squirrel[0x20] == 9) {
+                    *(u16 *)(squirrel + 0x34) = (*(u16 *)(squirrel + 0x34) & 0xFFBE) | 0x1000;
+                    *(s32 *)(squirrel + 0x98) = *(s32 *)(*(u8 **)(squirrel + 0x24) + 0x10);
+                    if (squirrel[0x43] != 5) {
+                        anim_start_blended_pal(squirrel, 5, 0, 8);
                     }
-                    moby_set_state(rec, 10, -1);
-                } else if (rec != 0 && rec[0x20] != 0xFE && rec[0x20] != 0xFD) {
-                    moby_set_state(rec, 11, 4);
-                    if (rec[0x43] != 7) {
-                        func_PAL_002A7E68(rec, 7, 0, 0x11);
+                    moby_set_state(squirrel, 10, -1);
+                } else if (squirrel != 0 && squirrel[0x20] != 0xFE && squirrel[0x20] != 0xFD) {
+                    moby_set_state(squirrel, 11, 4);
+                    if (squirrel[0x43] != 7) {
+                        anim_start_blended_pal(squirrel, 7, 0, 0x11);
                     }
                 }
-                *(u8 **)(vars + 0x374) = obj;
-                found = rec;
+                *(u8 **)(vars + 0x374) = moby;
+                found = squirrel;
                 break;
             }
         }

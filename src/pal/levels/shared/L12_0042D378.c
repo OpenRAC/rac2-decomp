@@ -13,12 +13,13 @@ extern void FastVecSub(void *, void *, void *);
 extern void vec_transform_and_set_height(void *, void *, void *, int, float);
 extern void vec_scale_to_length(void *, void *, float);
 extern int math_random_int_below(int);
-extern void func_PAL_002B15D8(void *, int, void *, int, float, float, float, float);
+extern void part_spawn_masked_debris_pal(void *, int, void *, int, float, float, float, float);
 extern void moby_mark_spawned(void *);
 typedef int s32;
 extern s32 g_moby_list_start __attribute__((sda));
 extern s32 g_hero_l12_lock_flag __attribute__((sda));
 
+/* Plays the death blast of the hopping enemy: sound, sparks and a puff of smoke, then removes it. */
 void hopping_enemy_play_death_blast_pal(char *obj) {
     char pos[16];
     union { TI128 q; float f[4]; } offset;
@@ -37,7 +38,7 @@ void hopping_enemy_play_death_blast_pal(char *obj) {
     vec_transform_and_set_height(obj, dir, dir, 0, 0.0f);
     vec_scale_to_length(dir, dir, 0.120000005f);
     color = g_hero_l12_lock_flag ? math_random_int_below(0xFF) : 0xFF;
-    func_PAL_002B15D8(obj, color & 0x1F, dir, 0xFF, 3.0f, 6.0f, 3.0f, 6.0f);
+    part_spawn_masked_debris_pal(obj, color & 0x1F, dir, 0xFF, 3.0f, 6.0f, 3.0f, 6.0f);
     moby_mark_spawned(obj);
 }
 

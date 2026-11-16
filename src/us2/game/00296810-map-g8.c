@@ -156,13 +156,14 @@ extern void *memset(void *,s32,u32);
 extern void text_draw_window_medium(void *,u64,void *,s32);
 extern void text_draw_window_small(FontWindow_205E70 *,u64,char *,s32);
 extern char *GetLocalizedString(s32);
-extern void func_US2_00298AA8(f32,f32,f32,f32,f32);
+extern void map_draw_class_markers_us2(f32,f32,f32,f32,f32);
 extern s32 GetSpecialMapCoordinates(f32,f32,f32 *,f32 *,s32);
 extern void map_convert_world_to_map_position(f32,f32,f32 *,f32 *,s32);
 extern s32 moby_get_current_variant_index(void);
 
 /* UNK_NoMapAvailable */
-void func_US2_00296810(s32 paging, s32 set_clip) {
+/* Draws the map overlay: the map picture, icons and labels (v2.00 DrawMapOverlay). */
+void DrawMapOverlay_us2(s32 paging, s32 set_clip) {
     s32 rx0, ry0, rx1, ry1;
     struct DmaTag_205E70 *tag;
     u64 *packet_words;
@@ -617,7 +618,7 @@ void func_US2_00296810(s32 paging, s32 set_clip) {
                                     GetFrameTexture(image_index));
             }
             if (g_item_owned_flags[5]) {
-                func_US2_00298AA8((f32)rx0, (f32)rx1, (f32)ry0, (f32)ry1, s);
+                map_draw_class_markers_us2((f32)rx0, (f32)rx1, (f32)ry0, (f32)ry1, s);
             }
         }
     }

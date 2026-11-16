@@ -9,7 +9,7 @@ extern int g_menu_unlock_flags[];
 extern int g_extras_entries_unlocked[4] __attribute__((sda));
 extern unsigned char g_extras_unlocked_flag;
 
-int func_PAL_002D17F0(void)
+int menu_unlock_extras_page_entries_pal(void)
 {
     if (g_resident_data_base != 0) {
         g_menu_unlock_flags[0] = 1;

@@ -24,7 +24,7 @@ extern int g_boss_debris_countdown;
 /* PlayerStats. */
 extern u8 g_player_stats[] __attribute__((sda));
 extern int game_is_either_mode_two(void);
-extern void func_US2_002A7AA8(char *, int, int);
+extern void SetDeathBits_us2(char *, int, int);
 extern void mothership_destroy_parts_us2(void);
 extern void moby_set_flag_bit(unsigned char *, int);
 extern void moby_mark_spawned(void *);
@@ -39,7 +39,8 @@ extern void moby_fade_out_update(u8 *);
 extern int math_random_int_below(int);
 
 /* Move through the encounter's damage phases, detaching pieces and spawning debris. */
-void boss_update_damage_phases_us2(char *object) {
+/* Move through the encounter's damage phases, detaching pieces and spawning debris (USA v2.00). */
+void boss_update_damage_phases_us2(char *moby) {
     struct { Quad velocity, matrix[4], random; } local;
     /* The encounter state becomes a cursor into its part table in each phase. */
     union { PartState *state; char **parts; } cursor;
@@ -48,23 +49,23 @@ void boss_update_damage_phases_us2(char *object) {
     float scale;
     cursor.state = *(PartState **)(g_mothership_boss_moby + 0x68);
     if (g_player_stats[0xFD]) {
-        if (*(unsigned short *)(object + 0x96) > g_boss_phase_timer_base + 60) {
-            func_US2_002A7AA8(object, 0, 3);
+        if (*(unsigned short *)(moby + 0x96) > g_boss_phase_timer_base + 60) {
+            SetDeathBits_us2(moby, 0, 3);
             mothership_destroy_parts_us2();
             return;
         }
     } else {
-        if (*(unsigned short *)(object + 0x96) > g_boss_phase_timer_base + 200 && !game_is_either_mode_two()) {
-            func_US2_002A7AA8(object, 0, 3);
+        if (*(unsigned short *)(moby + 0x96) > g_boss_phase_timer_base + 200 && !game_is_either_mode_two()) {
+            SetDeathBits_us2(moby, 0, 3);
             mothership_destroy_parts_us2();
             return;
         }
-        if (!g_player_stats[0xFD] && *(unsigned short *)(object + 0x96) > g_boss_phase_timer_base + 60) {
-            char *entryState;
+        if (!g_player_stats[0xFD] && *(unsigned short *)(moby + 0x96) > g_boss_phase_timer_base + 60) {
+            char *entry_state;
             if (!g_mothership_moby) return;
-            entryState = *(char **)(g_mothership_moby + 0x68);
-            entryState[13] = 1;
-            entryState[8] = 0;
+            entry_state = *(char **)(g_mothership_moby + 0x68);
+            entry_state[13] = 1;
+            entry_state[8] = 0;
             moby_set_flag_bit((unsigned char *)g_mothership_moby, 1);
             g_mothership_moby = 0;
             return;
@@ -77,19 +78,19 @@ void boss_update_damage_phases_us2(char *object) {
             if (!g_boss_debris_countdown) {
                 moby_mark_spawned(*cursor.parts);
                 *cursor.parts = 0;
-                *(unsigned short *)(object + 0x34) |= 0x41;
-                SpawnExplosion(object + 16, 1, 135, 120, 120, 115, 125, 1, 6.5f, 20.0f, 1, 1, 1, 0);
-                PlayMobySound(12, 0, object);
+                *(unsigned short *)(moby + 0x34) |= 0x41;
+                SpawnExplosion(moby + 16, 1, 135, 120, 120, 115, 125, 1, 6.5f, 20.0f, 1, 1, 1, 0);
+                PlayMobySound(12, 0, moby);
             } else if (*cursor.parts) {
-                int debrisIndex = 10 - g_boss_debris_countdown;
-                moby_transform_joint_point(object, i - 4, (char *)local.matrix);
+                int debris_index = 10 - g_boss_debris_countdown;
+                moby_transform_joint_point(moby, i - 4, (char *)local.matrix);
                 FastVecScale((char *)&local.velocity, (char *)&local.matrix[1], g_boss_debris_speed);
                 scale = math_random_float_range(0.0f, g_boss_debris_speed * 0.5f);
-                FastVecScale((char *)&local.random, object + 0xE0, scale);
+                FastVecScale((char *)&local.random, moby + 0xE0, scale);
                 FastVecAdd((char *)&local.velocity, (char *)&local.velocity, (char *)&local.random);
                 {
-                    char *oldPart = *cursor.parts;
-                    particle = cam_moby_create(oldPart, 1, *(short *)(oldPart + 0xAA), debrisIndex, oldPart + 16, oldPart + 0xF0, (float *)&local.velocity, 255, 140.0f, 25.0f);
+                    char *old_part = *cursor.parts;
+                    particle = cam_moby_create(old_part, 1, *(short *)(old_part + 0xAA), debris_index, old_part + 16, old_part + 0xF0, (float *)&local.velocity, 255, 140.0f, 25.0f);
                     if (particle) *(void (**)(u8 *))(particle + 0x64) = moby_fade_out_update;
                 }
             }
@@ -97,12 +98,12 @@ void boss_update_damage_phases_us2(char *object) {
         g_boss_debris_countdown--;
         return;
     }
-    timer = *(unsigned short *)(object + 0x96);
+    timer = *(unsigned short *)(moby + 0x96);
     if ((g_boss_phase_timer_base << 1) / 3 < timer) {
         int i;
         cursor.parts = cursor.state->parts;
-        SpawnExplosion(object + 16, 1, 45, 30, 40, 25, 85, 1, 4.5f, 20.0f, 1, 1, 1, 0);
-        PlayMobySound(11, 0, object);
+        SpawnExplosion(moby + 16, 1, 45, 30, 40, 25, 85, 1, 4.5f, 20.0f, 1, 1, 1, 0);
+        PlayMobySound(11, 0, moby);
         for (i = 4; i >= 0; i--, cursor.parts++) {
             char *replacement = cursor.parts[5];
             if (replacement) {
@@ -141,7 +142,7 @@ void boss_update_damage_phases_us2(char *object) {
             parity = index & 1;
             SpawnExplosion(&local.velocity, parity, 20, 10, 14, 15, 25, 0, scale, 20.0f, parity, 0, 0, 0);
         }
-        PlayMobySound(math_random_int_below(3) + 13, 0, object);
+        PlayMobySound(math_random_int_below(3) + 13, 0, moby);
         return;
     }
     if (timer & 31) return;
@@ -158,5 +159,5 @@ void boss_update_damage_phases_us2(char *object) {
         parity = index & 1;
         SpawnExplosion(&local.velocity, parity, 20, 10, 14, 15, 25, 0, scale, 20.0f, parity, 0, 0, 0);
     }
-    PlayMobySound(math_random_int_below(3) + 13, 0, object);
+    PlayMobySound(math_random_int_below(3) + 13, 0, moby);
 }

@@ -18,7 +18,7 @@ extern unsigned char g_special_item_collected_g[] __attribute__((sda));
 extern unsigned char g_special_item_collected_h[] __attribute__((sda));
 
 /* func_US2_002D2538, the v2.00 copy of func_002D1590: the same C, where the last test also needs D_001A79F0 > 0. */
-int func_US2_002D2538(void)
+int menu_record_collected_special_items_us2(void)
 {
     if (g_resident_data_base[0] != 0 && ((unsigned char *)g_player_stats)[0xA] != 0) {
         if (g_language_settings[0x3A] != 0 && g_special_items_flag != 0)

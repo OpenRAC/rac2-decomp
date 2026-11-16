@@ -15,9 +15,9 @@ typedef struct {
 /* Scans the four slot words at state+0x20; at the first one that is set and passes func_002ACBC8,
    makes sure the pool record at state+0x14 exists and writes D_L14_001B17B8/BC into its first two
    floats. If none passes, frees the record. */
-void part_update_slot_triggered_record_pal(char *a0)
+void part_update_slot_triggered_record_pal(char *moby)
 {
-    char *state = *(char **)(a0 + 0x68);
+    char *state = *(char **)(moby + 0x68);
     int *slot = (int *)(state + 0x20);
     int i;
 

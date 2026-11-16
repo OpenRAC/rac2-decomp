@@ -24,14 +24,14 @@ extern void feltzin_challenge_reset(u8 *a0);
 
 extern s32 g_feltzin_failure_flag __attribute__((sda));
 
-void func_US2_L05_00422780(u8 *a0, s32 a1)
+void feltzin_mission_handle_failure_us2(u8 *actor, s32 mode)
 {
-    u8 *p = *(u8 **)(a0 + 0x68);
+    u8 *p = *(u8 **)(actor + 0x68);
 
     if (func_003062A0(p + 0x48) == 0) {
-        if (a1 == 1)
+        if (mode == 1)
             thrown_object_update(func_0030CBA8(0x305F), -1);
-        else if (a1 == 3) {
+        else if (mode == 3) {
             pad_set_raw_input_value(0xA);
             thrown_object_update(func_0030CBA8(0x3074), -1);
         }
@@ -40,7 +40,7 @@ void func_US2_L05_00422780(u8 *a0, s32 a1)
         *(s32 *)(p + 0x48) = 0x96;
         *(s32 *)(p + 0x44) = 0x1C20;
         func_002FF9F8(0x1E);
-        feltzin_challenge_reset(a0);
+        feltzin_challenge_reset(actor);
         func_0037B210();
         g_feltzin_failure_flag = 0;
     }

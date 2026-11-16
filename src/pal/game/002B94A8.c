@@ -48,149 +48,150 @@ extern float vec_length_xy(float *);
 extern float mat_fast_helper_a(float, float);
 extern float FastDiffRots(float, float);
 
-void pad_decode_reading_pal(PadState *p, u8 *buf, s32 len) {
-    float v[2];
+/* Decodes a raw pad reading into held, pressed and released buttons and analog stick values, with mirroring, flick detection and auto-repeat (PAL). */
+void pad_decode_reading_pal(PadState *pad_state, u8 *reading, s32 length) {
+    float stick[2];
     s32 i, j, k;
-    s32 cur;
-    float mag, ang;
+    s32 held_now;
+    float magnitude, angle;
 
-    p->raw_held = p->held = ((buf[0] << 8) | buf[1]) ^ 0xFFFF;
+    pad_state->raw_held = pad_state->held = ((reading[0] << 8) | reading[1]) ^ 0xFFFF;
     for (i = 0; i < 16; i++) {
-        p->analog[i] = 0;
+        pad_state->analog[i] = 0;
     }
-    if (len >= 6) {
+    if (length >= 6) {
         for (i = 0; i < 4; i++) {
-            s32 d = buf[i + 2] - 0x7F;
-            if (d < 0)
-                d = -d;
-            if (d >= 0x30) {
-                float f = IntToFloat(d - 0x30) / IntToFloat(0x4C);
-                p->analog[i] = f;
-                if (f > 1.0f) {
-                    p->analog[i] = 1.0f;
+            s32 deflection = reading[i + 2] - 0x7F;
+            if (deflection < 0)
+                deflection = -deflection;
+            if (deflection >= 0x30) {
+                float ratio = IntToFloat(deflection - 0x30) / IntToFloat(0x4C);
+                pad_state->analog[i] = ratio;
+                if (ratio > 1.0f) {
+                    pad_state->analog[i] = 1.0f;
                 }
-                if (buf[i + 2] < 0x7F) {
-                    p->analog[i] = -p->analog[i];
+                if (reading[i + 2] < 0x7F) {
+                    pad_state->analog[i] = -pad_state->analog[i];
                 }
             }
         }
     }
-    if (len >= 0x12) {
+    if (length >= 0x12) {
         for (i = 4; i < 16; i++) {
-            p->analog[i] = IntToFloat(buf[i + 2]) * 0.003921569f;
+            pad_state->analog[i] = IntToFloat(reading[i + 2]) * 0.003921569f;
         }
     }
     if (g_unlocked_item_flags.mirror) {
-        p->analog[2] = -p->analog[2];
-        p->analog[0] = -p->analog[0];
-        if (p->held & 0x8000) {
-            p->held = (p->held & ~0x8000) | 0x2000;
-        } else if (p->held & 0x2000) {
-            p->held = (p->held & ~0x2000) | 0x8000;
+        pad_state->analog[2] = -pad_state->analog[2];
+        pad_state->analog[0] = -pad_state->analog[0];
+        if (pad_state->held & 0x8000) {
+            pad_state->held = (pad_state->held & ~0x8000) | 0x2000;
+        } else if (pad_state->held & 0x2000) {
+            pad_state->held = (pad_state->held & ~0x2000) | 0x8000;
         }
-        p->raw_held = p->held;
+        pad_state->raw_held = pad_state->held;
     }
     for (i = 0; i < 16; i++) {
-        p->analog_prev[i] = p->analog[i];
+        pad_state->analog_prev[i] = pad_state->analog[i];
     }
-    if (p->analog[2] != 0.0f || p->analog[3] != 0.0f) {
-        p->stick_moved = 1;
+    if (pad_state->analog[2] != 0.0f || pad_state->analog[3] != 0.0f) {
+        pad_state->stick_moved = 1;
     } else {
-        p->stick_moved = 0;
+        pad_state->stick_moved = 0;
     }
-    if (p->analog[2] < 0.0f)
-        p->held |= 0x8000;
-    if (p->analog[2] > 0.0f)
-        p->held |= 0x2000;
-    if (p->analog[3] < 0.0f)
-        p->held |= 0x1000;
-    if (p->analog[3] > 0.0f)
-        p->held |= 0x4000;
-    p->pressed = ~p->prev_held & p->held;
-    p->released = ~p->held & p->prev_held;
-    p->no_buttons = p->held == 0;
-    p->no_direction = (p->held & 0xF000) == 0;
-    p->raw_pressed = ~p->prev_held & p->raw_held;
-    p->raw_released = ~p->held & p->prev_raw_held;
-    p->pressed_unmasked = p->pressed;
-    p->released_unmasked = p->released;
-    p->held_unmasked = p->held;
-    p->unk348 = p->held;
+    if (pad_state->analog[2] < 0.0f)
+        pad_state->held |= 0x8000;
+    if (pad_state->analog[2] > 0.0f)
+        pad_state->held |= 0x2000;
+    if (pad_state->analog[3] < 0.0f)
+        pad_state->held |= 0x1000;
+    if (pad_state->analog[3] > 0.0f)
+        pad_state->held |= 0x4000;
+    pad_state->pressed = ~pad_state->prev_held & pad_state->held;
+    pad_state->released = ~pad_state->held & pad_state->prev_held;
+    pad_state->no_buttons = pad_state->held == 0;
+    pad_state->no_direction = (pad_state->held & 0xF000) == 0;
+    pad_state->raw_pressed = ~pad_state->prev_held & pad_state->raw_held;
+    pad_state->raw_released = ~pad_state->held & pad_state->prev_raw_held;
+    pad_state->pressed_unmasked = pad_state->pressed;
+    pad_state->released_unmasked = pad_state->released;
+    pad_state->held_unmasked = pad_state->held;
+    pad_state->unk348 = pad_state->held;
     if (g_unlocked_item_flags.mirror) {
-        p->analog_prev[2] = -p->analog_prev[2];
-        p->analog_prev[0] = -p->analog_prev[0];
-        if (((s32)p->held_unmasked) & 0x8000) {
-            p->held_unmasked = (((s32)p->held_unmasked) & ~0x8000) | 0x2000;
-        } else if (((s32)p->held_unmasked) & 0x2000) {
-            p->held_unmasked = (((s32)p->held_unmasked) & ~0x2000) | 0x8000;
+        pad_state->analog_prev[2] = -pad_state->analog_prev[2];
+        pad_state->analog_prev[0] = -pad_state->analog_prev[0];
+        if (((s32)pad_state->held_unmasked) & 0x8000) {
+            pad_state->held_unmasked = (((s32)pad_state->held_unmasked) & ~0x8000) | 0x2000;
+        } else if (((s32)pad_state->held_unmasked) & 0x2000) {
+            pad_state->held_unmasked = (((s32)pad_state->held_unmasked) & ~0x2000) | 0x8000;
         }
-        if (((s32)p->pressed_unmasked) & 0x8000) {
-            p->pressed_unmasked = (((s32)p->pressed_unmasked) & ~0x8000) | 0x2000;
-        } else if (((s32)p->pressed_unmasked) & 0x2000) {
-            p->pressed_unmasked = (((s32)p->pressed_unmasked) & ~0x2000) | 0x8000;
+        if (((s32)pad_state->pressed_unmasked) & 0x8000) {
+            pad_state->pressed_unmasked = (((s32)pad_state->pressed_unmasked) & ~0x8000) | 0x2000;
+        } else if (((s32)pad_state->pressed_unmasked) & 0x2000) {
+            pad_state->pressed_unmasked = (((s32)pad_state->pressed_unmasked) & ~0x2000) | 0x8000;
         }
-        if (((s32)p->released_unmasked) & 0x8000) {
-            p->released_unmasked = (((s32)p->released_unmasked) & ~0x8000) | 0x2000;
+        if (((s32)pad_state->released_unmasked) & 0x8000) {
+            pad_state->released_unmasked = (((s32)pad_state->released_unmasked) & ~0x8000) | 0x2000;
 
-        } else if (((s32)p->released_unmasked) & 0x2000) {
-            p->released_unmasked = (((s32)p->released_unmasked) & ~0x2000) | 0x8000;
+        } else if (((s32)pad_state->released_unmasked) & 0x2000) {
+            pad_state->released_unmasked = (((s32)pad_state->released_unmasked) & ~0x2000) | 0x8000;
         }
     }
-    if (p->mode == 1) {
-        p->held &= ~0x5030;
-        p->pressed &= ~0x5030;
-        p->released &= ~0x5030;
-        p->analog[0] = 0.0f;
-        p->analog[1] = 0.0f;
-        p->mode = 0;
+    if (pad_state->mode == 1) {
+        pad_state->held &= ~0x5030;
+        pad_state->pressed &= ~0x5030;
+        pad_state->released &= ~0x5030;
+        pad_state->analog[0] = 0.0f;
+        pad_state->analog[1] = 0.0f;
+        pad_state->mode = 0;
     }
-    if (p->mode == 2) {
-        p->held &= 0x900;
-        p->pressed &= 0x900;
-        p->released &= 0x900;
-        p->raw_held &= 0x900;
-        p->no_direction = 1;
-        p->analog[2] = 0.0f;
-        p->analog[3] = 0.0f;
-        p->mode = 0;
+    if (pad_state->mode == 2) {
+        pad_state->held &= 0x900;
+        pad_state->pressed &= 0x900;
+        pad_state->released &= 0x900;
+        pad_state->raw_held &= 0x900;
+        pad_state->no_direction = 1;
+        pad_state->analog[2] = 0.0f;
+        pad_state->analog[3] = 0.0f;
+        pad_state->mode = 0;
     }
-    v[0] = p->analog[2];
-    v[1] = p->analog[3];
-    mag = vec_length_xy(v);
-    ang = mat_fast_helper_a(v[0], v[1]);
-    p->hist_mag[p->hist_idx] = mag;
-    p->hist_ang[p->hist_idx] = ang;
-    if (mag > 0.9f) {
-        s32 h;
-        for (j = 1; j < 3 && !(p->hist_mag[h = (p->hist_idx - j + 30) % 30] > 0.9f); j++) {
-            float m = p->hist_mag[h];
-            if (m < 0.25f) { p->pressed |= 0x10000; break; }
+    stick[0] = pad_state->analog[2];
+    stick[1] = pad_state->analog[3];
+    magnitude = vec_length_xy(stick);
+    angle = mat_fast_helper_a(stick[0], stick[1]);
+    pad_state->hist_mag[pad_state->hist_idx] = magnitude;
+    pad_state->hist_ang[pad_state->hist_idx] = angle;
+    if (magnitude > 0.9f) {
+        s32 hist_pos;
+        for (j = 1; j < 3 && !(pad_state->hist_mag[hist_pos = (pad_state->hist_idx - j + 30) % 30] > 0.9f); j++) {
+            float prev_mag = pad_state->hist_mag[hist_pos];
+            if (prev_mag < 0.25f) { pad_state->pressed |= 0x10000; break; }
         }
-        if (!(p->pressed & 0x10000)) {
+        if (!(pad_state->pressed & 0x10000)) {
             for (k = 1; k < 4; k++) {
-                if (FastDiffRots(p->hist_ang[(p->hist_idx - k + 30) % 30], ang) >
+                if (FastDiffRots(pad_state->hist_ang[(pad_state->hist_idx - k + 30) % 30], angle) >
                     0.959931194782257080078125f) {
-                    p->pressed |= 0x10000;
+                    pad_state->pressed |= 0x10000;
                     break;
                 }
             }
         }
     }
-    p->hist_btn[p->hist_idx] = p->pressed;
-    p->hist_idx = (p->hist_idx + 1) % 30;
-    if (++p->hist_count > 30) {
-        p->hist_count = 30;
+    pad_state->hist_btn[pad_state->hist_idx] = pad_state->pressed;
+    pad_state->hist_idx = (pad_state->hist_idx + 1) % 30;
+    if (++pad_state->hist_count > 30) {
+        pad_state->hist_count = 30;
     }
-    if (p->rep_rate) {
-        cur = p->held;
-        if (cur != 0 && cur == p->prev_held) {
-            u8 t = --p->rep_timer;
-            if (0 == t || t == 0xFF) {
-                p->rep_timer = p->rep_rate;
-                p->pressed = cur;
+    if (pad_state->rep_rate) {
+        held_now = pad_state->held;
+        if (held_now != 0 && held_now == pad_state->prev_held) {
+            u8 timer = --pad_state->rep_timer;
+            if (0 == timer || timer == 0xFF) {
+                pad_state->rep_timer = pad_state->rep_rate;
+                pad_state->pressed = held_now;
             }
         } else {
-            p->rep_timer = p->rep_delay;
+            pad_state->rep_timer = pad_state->rep_delay;
         }
     }
 }
@@ -203,6 +204,7 @@ typedef struct {
 } State_2B8518;
 extern State_2B8518 g_pad_state;
 
+/* Polls both pad devices (PAL). */
 void pad_poll_ports_pal(void) {
     extern void poll_pad_device_state(void *);
     extern State_2B8518 g_pad_device_state;

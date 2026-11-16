@@ -16,7 +16,7 @@ extern float g_hk22_speed_scale __attribute__((sda));
 extern float g_weapon_effect_scale[];
 extern void ReleaseDeadOrExpiredSlots(void *);
 extern void anim_start_blended_with_flags(void *, int, int, int, int);
-extern s32 func_PAL_L00_002C4480(int, int);
+extern s32 hero_l00_set_action_pal(int, int);
 extern void hud_add_moby_marker(void *, unsigned int, int, int, int, int, float, float, float);
 extern int math_fast_float_d(void *);
 extern int vec_fast_helper_b(void *);
@@ -27,12 +27,13 @@ extern int PlayMobySound(int, int, char *);
 extern void vec_scale_to_length(void *, void *, float);
 extern void math_compute_aim_direction(char *, char *, float, float, float);
 extern void vec_compute_object_to_target(char *, char *, char *, float);
-extern char *func_PAL_L00_003ADC68(void *, void *, void *, void *);
+extern char *effect_spawn_owned_moby_pal(void *, void *, void *, void *);
 extern void cam_compute_view_direction(char *, char *, int);
 extern void math_build_axis_angle_quat(void *, int, float);
 extern void vec_rotate_by_quaternion(void *, void *, void *);
 
-void func_PAL_L00_003F8134(unsigned char *object) {
+/* Updates the HK-22: when the fire button is pressed and the weapon is ready, it fires three shots in a small spread, aimed at the locked-on target if there is one, and starts the cooldown (PAL: 50 Hz). */
+void hk22_update_pal(unsigned char *object) {
     char *state = *(char **)(object + 0x68);
     ShotVector aim, velocity, position, direction, rotation, rotated;
     char *spawn, *target;
@@ -48,7 +49,7 @@ void func_PAL_L00_003F8134(unsigned char *object) {
     *(float *)(object + 0x2C) = *(float *)(*(char **)(object + 0x24) + 0x24) * g_hk22_speed_scale;
     g_weapon_effect_scale[0] = 0.1f;
     if (H->i[2213] == 1)
-        func_PAL_L00_002C4480(0x1D, 1);
+        hero_l00_set_action_pal(0x1D, 1);
     if (H->i[2213] == 0x1D) {
         if (*(float *)state > 0.0f && get_ammo(-1))
             color = 0x600000FF;
@@ -81,7 +82,7 @@ void func_PAL_L00_003F8134(unsigned char *object) {
                 vec_compute_object_to_target(H->ptr[766], (char *)&position, (char *)&velocity, speed);
                 target = H->ptr[766];
             }
-            spawn = func_PAL_L00_003ADC68(&position, &velocity, object, target);
+            spawn = effect_spawn_owned_moby_pal(&position, &velocity, object, target);
             if (spawn)
                 *(unsigned char **)(spawn + 0xB8) = object;
             if (H->h[420] != 0)
@@ -90,12 +91,12 @@ void func_PAL_L00_003F8134(unsigned char *object) {
                 cam_compute_view_direction((char *)object + 0x10, (char *)&direction, 1);
             math_build_axis_angle_quat(&rotation, (int)&direction, -0.122173056f);
             vec_rotate_by_quaternion(&rotated, &velocity, &rotation);
-            spawn = func_PAL_L00_003ADC68(&position, &rotated, object, target);
+            spawn = effect_spawn_owned_moby_pal(&position, &rotated, object, target);
             if (spawn)
                 *(unsigned char **)(spawn + 0xB8) = object;
             math_build_axis_angle_quat(&rotation, (int)&direction, 0.122173056f);
             vec_rotate_by_quaternion(&rotated, &velocity, &rotation);
-            spawn = func_PAL_L00_003ADC68(&position, &rotated, object, target);
+            spawn = effect_spawn_owned_moby_pal(&position, &rotated, object, target);
             if (spawn)
                 *(unsigned char **)(spawn + 0xB8) = object;
             entry = g_weapon_l00_table + g_item_slot_to_record[0x18];

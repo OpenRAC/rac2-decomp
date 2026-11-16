@@ -6,7 +6,7 @@ extern float math_random_float_range(float, float);
 extern float math_random_float_range(float, float);
 extern int math_random_int_range(int, int);
 extern void vec_random_direction(char *, float, float);
-extern char *func_PAL_002BE9A8(float, float, float, float, char *, int, char *,
+extern char *part_spawn_spinning_spark_pal(float, float, float, float, char *, int, char *,
                      unsigned int, int);
 extern void vec_scale_to_length(void *, void *, float);
 extern char *moby_spawn_template_effect(void *, void *, void *, void *);
@@ -17,38 +17,38 @@ extern char ref_L00_003FE310_00[];
    fills the new record's short and byte fields; the level's own data address is then
    handed to the vector routine with the third argument and a scale of 1.5, and to the
    level-object starter with the second argument. */
-void part_spawn_muzzle_spark_burst_pal(void *a0, void *a1, void *a2)
+void part_spawn_muzzle_spark_burst_pal(void *unused, void *position, void *direction)
 {
-    char local[16];
-    float f;
+    char velocity[16];
+    float speed;
     int i;
-    unsigned int v;
-    unsigned int w;
-    unsigned int x;
-    char *r;
+    unsigned int shade;
+    unsigned int packed;
+    unsigned int color;
+    char *spark;
 
     for (i = 19; i >= 0; i--) {
         math_random_int_below(2);
         math_random_int_below(2);
-        f = math_random_float_range(70000.0f, 1.5e+05f);
-        v = math_random_int_range(10, 127);
-        w = (v << 8) | 0x7f000000U;
-        x = (v << 16) | w;
-        v = x | v;
-        vec_random_direction(local, 2.0000003e-05f,
+        speed = math_random_float_range(70000.0f, 1.5e+05f);
+        shade = math_random_int_range(10, 127);
+        packed = (shade << 8) | 0x7f000000U;
+        color = (shade << 16) | packed;
+        shade = color | shade;
+        vec_random_direction(velocity, 2.0000003e-05f,
                 0.008f);
-        r = func_PAL_002BE9A8(0.3f, 1.0f, 1.01f, f, a1, 0, local, v, 1);
-        if (r != 0) {
-            char *q = r + 32;
+        spark = part_spawn_spinning_spark_pal(0.3f, 1.0f, 1.01f, speed, position, 0, velocity, shade, 1);
+        if (spark != 0) {
+            char *ext = spark + 32;
 
-            *(short *)(r + 10) = 100;
-            *(int *)(q + 4) = 2;
-            *(char *)(q + 10) = 127;
-            *(char *)(q + 11) = *(unsigned char *)(r + 10);
+            *(short *)(spark + 10) = 100;
+            *(int *)(ext + 4) = 2;
+            *(char *)(ext + 10) = 127;
+            *(char *)(ext + 11) = *(unsigned char *)(spark + 10);
         }
     }
-    vec_scale_to_length(ref_L00_003FE310_00, a2, 1.5f);
-    moby_spawn_template_effect(ref_L00_003FE310_00, a1, 0, 0);
+    vec_scale_to_length(ref_L00_003FE310_00, direction, 1.5f);
+    moby_spawn_template_effect(ref_L00_003FE310_00, position, 0, 0);
 }
 
 

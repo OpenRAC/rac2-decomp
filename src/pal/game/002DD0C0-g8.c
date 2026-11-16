@@ -29,7 +29,7 @@ extern u8 g_menu_text_a[] SDATA(D_001ABBA0);
 extern u8 g_menu_text_b[] SDATA(D_001ABBB8);
 extern int g_menu_text_id[];
 
-int func_PAL_002DD0C0(PageC3 *menu)
+int UpdateTimedTextPages_pal(PageC3 *menu)
 {
     int fast, previous, value, result;
     u8 *pad = g_pad_state;

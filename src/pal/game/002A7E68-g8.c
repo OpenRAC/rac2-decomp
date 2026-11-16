@@ -17,7 +17,8 @@ extern void update_moby_animation_state(void *);
 extern float IntToFloat(int);
 extern TI128_002A7470 ref_L00_002A7470_00[];
 
-void func_PAL_002A7E68(unsigned char *object, int animation, int frame, int rate)
+/* Starts a blended animation on a moby: picks a free blend slot, saves the current pose into it and fades to the new animation over the given number of frames (PAL). */
+void anim_start_blended_pal(unsigned char *object, int animation, int frame, int rate)
 {
     int count;
     int slot;

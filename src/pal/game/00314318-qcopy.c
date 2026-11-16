@@ -12,7 +12,8 @@ extern int moby_get_attachment_rotation_angles(char *, char *, char *, char *, c
 typedef struct { char prefix[0x18]; char *target; char reserved[0xC]; float height; } ContactView;
 extern char ref_L00_00312EB0_00[];
 
-void func_PAL_00314318(unsigned char *object)
+/* Keeps an object on the floor. It finds the ground below, rides any moving platform, and falls with gravity when in the air (PAL build). */
+void moby_ground_snapped_update_pal(unsigned char *object)
 {
     float start[4] __attribute__((aligned(16)));
     float end[4] __attribute__((aligned(16)));

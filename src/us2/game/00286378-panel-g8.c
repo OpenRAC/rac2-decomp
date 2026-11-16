@@ -128,7 +128,7 @@ extern unsigned long long GetFrameTexture(int);
 extern void DrawRotatedSprite(float, float, float, float, float, int, int, long long);
 extern void *memset(void *, int, int);
 extern int flag_get_word(void);
-extern int func_US2_00299960(void);
+extern int pending_request_get_us2(void);
 extern int g_save_menu_flags;
 extern int menu_is_confirm_pending(void);
 extern int sprintf(char *, const char *, ...);
@@ -142,7 +142,7 @@ extern void DoGifPaging(void);
 
 #define SPR ((unsigned char *)0x70000000)
 
-void func_US2_00286378(void)
+void menu_draw_message_panel_us2(void)
 {
     char buf[0x300];
     MenuBox box;
@@ -245,7 +245,7 @@ void func_US2_00286378(void)
             text = g_str_message_text;
             id1 = 0;
             id2 = 0;
-            if (flag_get_word() || ((g_save_menu_flags & 0x600) && func_US2_00299960())) {
+            if (flag_get_word() || ((g_save_menu_flags & 0x600) && pending_request_get_us2())) {
                 id1 = 0x31C3;
                 text = GetLocalizedString(0x2C9A);
             } else {

@@ -19,6 +19,7 @@ typedef struct {
 extern CameraTargetView g_camera_target_view;
 extern PlayerTargetView g_hero_state;
 
+/* Updates a marker object that follows the camera's target, and pushes it far away when the player is moving past it (PAL). */
 void camera_marker_update_pal(char *object)
 {
     Vector4 difference, projected;

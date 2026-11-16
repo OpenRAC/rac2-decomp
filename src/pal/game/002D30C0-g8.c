@@ -44,6 +44,7 @@ static __inline__ void draw_bar(s32 id, s32 color, f32 z)
     gfx_draw_scaled_object_two_axes(r, color, (f32)(g_screen_width / 2), (f32)ref_PAL_002D30C0_01, 1.0f, g_menu_alpha_scale, z);
 }
 
+/* Draws the six-page viewer with its title, arrows, divider line and the text of the current page. (PAL) */
 s32 page_viewer_draw_short_pal(void) {
     f32 z, s, half;
     s32 r;

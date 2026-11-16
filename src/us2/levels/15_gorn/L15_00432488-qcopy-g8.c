@@ -51,29 +51,31 @@ extern void hero_set_state_value_c(int);
 extern void moby_mark_flag_and_append_to_list(int);
 extern void gorn_finish_challenge_stage_us2(void *, int);
 
-void func_US2_L15_00432488(u8 *self)
+/* Gorn challenge stage 1 setup and check (USA v2.00): on the first pass starts the scene, then
+   once all ships are gone it runs the camera cutscene and finishes the stage. */
+void gorn_cutscene_update_us2(u8 *moby)
 {
     Vector step;
     Vector ahead;
     Vec up;
     Vector basis[3];
-    u8 *vars = *(u8 **)(self + 0x68);
+    u8 *vars = *(u8 **)(moby + 0x68);
 
     if (g_cutscene_l15_started_flag == 0) {
         u8 **list;
         int i, count;
-        u8 *owner = g_moby_base + (*(int *)(vars + 0x20) << 8);
-        u8 *data = *(u8 **)(owner + 0x68);
-        int id = *(int *)(data + 0x270);
+        u8 *owner_moby = g_moby_base + (*(int *)(vars + 0x20) << 8);
+        u8 *owner_data = *(u8 **)(owner_moby + 0x68);
+        int voice_id = *(int *)(owner_data + 0x270);
 
-        if (id != -1) {
-            u8 *entry = g_sound_state + id * 0x70;
+        if (voice_id != -1) {
+            u8 *entry = g_sound_state + voice_id * 0x70;
 
-            if (*(u8 **)(entry + 0x88) == owner && entry[0x74] != 0)
-                snd_stop_voice(id);
+            if (*(u8 **)(entry + 0x88) == owner_moby && entry[0x74] != 0)
+                snd_stop_voice(voice_id);
         }
-        *(int *)(data + 0x270) = -1;
-        *(int *)(data + 0x14) = 0;
+        *(int *)(owner_data + 0x270) = -1;
+        *(int *)(owner_data + 0x14) = 0;
         g_gorn_cutscene_basis_flag = 0;
         g_cutscene_l15_started_flag = 1;
         music_Unpause();
@@ -100,7 +102,7 @@ void func_US2_L15_00432488(u8 *self)
     if (g_gorn_challenge_count < 6)
         return;
     if (g_gorn_cutscene_started_flag == 0) {
-        u8 *obj;
+        u8 *stage_moby;
         u8 *pos;
         float dist;
 
@@ -108,13 +110,13 @@ void func_US2_L15_00432488(u8 *self)
             return;
         *(int *)(vars + 0x6C) = 60;
         effect_remove_family_mobys();
-        obj = g_moby_base + (*(int *)(vars + 0x20) << 8);
-        pos = obj + 0x10;
+        stage_moby = g_moby_base + (*(int *)(vars + 0x20) << 8);
+        pos = stage_moby + 0x10;
         qcopy(camera_pos, pos);
-        vec_scale_to_length(step, obj + 0xC0, 196.0f);
+        vec_scale_to_length(step, stage_moby + 0xC0, 196.0f);
         dist = 25.0f;
         FastVecAdd(ahead, pos, step);
-        if (CollLine(pos, ahead, 0, obj, 0) != 0) {
+        if (CollLine(pos, ahead, 0, stage_moby, 0) != 0) {
             Hit *hit = &g_hit_l15_result;
 
             if (hit->target != 0 && *(short *)(hit->target + 0xAA) == 0x1211)
@@ -124,18 +126,18 @@ void func_US2_L15_00432488(u8 *self)
             dist = -32.0f;
         else
             dist = dist * 0.5f;
-        vec_scale_to_length(step, obj + 0xC0, dist);
+        vec_scale_to_length(step, stage_moby + 0xC0, dist);
         FastVecAdd(camera_pos, camera_pos, step);
         g_cutscene_camera_pos[2] -= 16.0f;
         up.q = 0;
         up.f[2] = 1.0f;
-        qcopy(basis[0], obj + 0xC0);
+        qcopy(basis[0], stage_moby + 0xC0);
         qcopy(basis[2], up.f);
         FastVecCross(basis[1], basis[0], basis[2]);
         basis[0][3] = basis[1][3] = basis[2][3] = 0.0f;
         mat_get_euler_angles(basis, g_cutscene_l15_camera_rotation);
         ship_start_transition(camera_pos, g_cutscene_l15_camera_rotation, 300);
-        self[0x20] = 3;
+        moby[0x20] = 3;
         g_gorn_cutscene_started_flag = 1;
     } else if (g_gorn_cutscene_active_flag != 0) {
         if (math_fast_float_d(vars + 0x6C) == 0)
@@ -148,6 +150,6 @@ void func_US2_L15_00432488(u8 *self)
         hero_set_state_value_c(1);
     } else if (math_fast_float_d(vars + 0x6C) != 0) {
         entry_init_all_registered();
-        gorn_finish_challenge_stage_us2(self, 0);
+        gorn_finish_challenge_stage_us2(moby, 0);
     }
 }

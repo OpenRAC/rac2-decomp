@@ -11,12 +11,12 @@ extern void vec_build_spherical_offset(void *, float, float, float);
 extern void FastVecSub(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
 extern void FastVecAdd(void *, void *, void *);
-extern void *func_PAL_L00_00340CA0(float, float, void *, void *, int, int, int, int, int, int, int);
+extern void *part_spawn_spinning_particle_pal(float, float, void *, void *, int, int, int, int, int, int, int);
 extern void *part_spawn_pulled_particle(float, void *, float, int, int, int, int, float *, int, int, short, int);
 
 /* Both effect constructors replace the copied position W before consumption;
  * 0033E888 likewise replaces velocity W with its rotation value. */
-void part_l00_spawn_impact_spark_burst_2_pal(float *position, void *unused, int shortLife)
+void part_l00_spawn_impact_spark_burst_2_pal(float *position, void *unused, int short_life)
 {
     ImpactVector velocity, offset, point;
     int i = 1;
@@ -32,11 +32,11 @@ void part_l00_spawn_impact_spark_burst_2_pal(float *position, void *unused, int 
         point.x = position[0] + math_random_signed_float_range(0.0f, 0.15f);
         point.y = position[1] + math_random_signed_float_range(0.0f, 0.15f);
         point.z = position[2] + math_random_signed_float_range(0.0f, 0.15f);
-        if (shortLife)
-            func_PAL_L00_00340CA0(life, 0.5f, &point, &velocity, 0x4F93E5FF, 0x102434EE,
+        if (short_life)
+            part_spawn_spinning_particle_pal(life, 0.5f, &point, &velocity, 0x4F93E5FF, 0x102434EE,
                               math_random_int_range(8, 17), 1, -1, -1, 1);
         else
-            func_PAL_L00_00340CA0(life, 0.5f, &point, &velocity, 0x4F93E5FF, 0x102434EE,
+            part_spawn_spinning_particle_pal(life, 0.5f, &point, &velocity, 0x4F93E5FF, 0x102434EE,
                               math_random_int_range(21, 50), 1, -1, -1, 1);
     } while (--i >= 0);
     part_spawn_pulled_particle(0.1f, position, 1.05f, 33, 0x64FFFFFF, 2, 4, g_default_vector, 0, 1, 6, 1);

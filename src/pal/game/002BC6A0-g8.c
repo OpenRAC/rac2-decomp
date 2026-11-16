@@ -8,7 +8,7 @@ extern float FastAddRotations(float, float);
 extern int g_particle_fade_lifetime __attribute__((sda));
 
 /* func_PAL_002BC6A0, the PAL copy of func_002BBA38: the same C, with the frame count scaled to 50 Hz. */
-void func_PAL_002BC6A0(char *particle)
+void part_update_fade_in_out_pal(char *particle)
 {
     char *state = particle + 32;
     int alpha;

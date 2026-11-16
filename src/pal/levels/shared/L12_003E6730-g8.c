@@ -55,10 +55,10 @@ extern int g_robot_guard_effect_count __attribute__((sda));
 extern char g_str_debug_ground_height[], g_str_debug_robot_guard[], g_str_debug_initial_distance[];
 extern u8 g_zero_l12_vec[] __attribute__((sda));
 
-extern void func_PAL_L12_003E7E08(void *);
+extern void robot_guard_init_update_state_pal(void *);
 extern void group_try_claim_attack_slot_pal(void *);
 extern void group_release_attack_slot(void *);
-extern void func_PAL_L12_003E66F8(void *);
+extern void moby_init_state_byte_pal(void *);
 extern void enemy_choose_nearest_visible_path_point(void *);
 extern void enemy_move_along_path_keep_height_pal(void *);
 extern int AdvanceAlongPath_pal(void *, void *);
@@ -75,7 +75,7 @@ extern void moby_set_state(void *, int, int);
    RAC1 pause.c does for its duplicate start_audio_stream_read_r3/r4 calls. Both names
    have the same EE interface. */
 extern void changeModeL12Patrol(void *, int, int) __asm__("func_002A7750");
-extern void func_PAL_002A7E68(void *, int, int, int);
+extern void anim_start_blended_pal(void *, int, int, int);
 extern int flag_set_second_pending(void *);
 extern int flag_set_first_pending(void *);
 extern int FastDecTimer(void *);
@@ -90,14 +90,15 @@ extern float coll_probe_ground_height_below(void *, int, float);
 extern float fast_subtract_rotations(float, float);
 extern float math_fabs(float);
 extern void vec_scale_to_length(void *, void *, float);
-extern int func_PAL_002AF6C0(void *, float);
+extern int math_is_value_within_step_pal(void *, float);
 extern float math_random_float_range(float, float);
 extern int math_random_int_below(int);
 extern void *part_spawn_ground_effect(void *, int, float, float, int, int, int, void *, int, float);
 extern void FastVecSub(void *, void *, void *);
 extern u8 *blast_projectile_spawn_pal(void *, void *, void *, int, float);
 
-void func_PAL_L12_003E6730(u8 *obj) {
+/* Updates the robot guard enemy that walks a path (levels 12 and 17): it checks whether it is already destroyed, aims, shoots at the hero, takes hits and dies. */
+void robot_guard_update_pal(u8 *obj) {
     u8 *state = *(u8 **)(obj + 0x68);
     L12Vector pos;
     u8 matrix[64] __attribute__((aligned(16)));
@@ -131,7 +132,7 @@ void func_PAL_L12_003E6730(u8 *obj) {
         *(u16 *)(obj + 0x34) = (*(u16 *)(obj + 0x34) & 0xFFBE) | 0x1000;
         *(int *)(obj + 0x98) = *(int *)(*(u8 **)(obj + 0x24) + 0x10);
     }
-    func_PAL_L12_003E7E08(obj);
+    robot_guard_init_update_state_pal(obj);
     distance = vec_distance_xy(((L12PathEnemyState *)state)->targetObject + 0x10, obj + 0x10);
     if (distance < 8.0f && !((L12PathEnemyState *)state)->damageState) {
         ((L12PathEnemyState *)state)->damageState = 3;
@@ -217,13 +218,13 @@ destroy:
         if (obj[0x20] == 23 && ((L12PathEnemyState *)state)->damageState != 1) {
             moby_set_state(obj, 4, -1);
             if (obj[0x43] != 3)
-                func_PAL_002A7E68(obj, 3, 0, 17);
+                anim_start_blended_pal(obj, 3, 0, 17);
         }
         if (FastDecTimer(state + 0x29E)) {
             group_release_attack_slot(obj);
             moby_set_state(obj, 4, 10);
             if (obj[0x43] != 3)
-                func_PAL_002A7E68(obj, 3, 0, 17);
+                anim_start_blended_pal(obj, 3, 0, 17);
         } else if (((L12PathEnemyState *)state)->damageState == 1 && obj[0x20] == 4) {
             moby_set_state(obj, 15, 5);
             ((L12PathEnemyState *)state)->groupTimer = 125;
@@ -233,7 +234,7 @@ destroy:
         if (flag_set_second_pending(obj))
             enemy_choose_nearest_visible_path_point(obj);
         if ((obj[0x60] & 2) && obj[0x42] != 2 && obj[0x43] != 2)
-            func_PAL_002A7E68(obj, 2, 0, 17);
+            anim_start_blended_pal(obj, 2, 0, 17);
         group_try_claim_attack_slot_pal(obj);
         if (((L12PathEnemyState *)state)->damageState == 1) {
             moby_set_state(obj, 15, 5);
@@ -243,7 +244,7 @@ destroy:
                 ((L12PathEnemyState *)state)->idleTimer = 208;
             if (((L12PathEnemyState *)state)->perception == 0 && ((L12PathEnemyState *)state)->damageState == 0 && FastDecTimer(state + 0x260)) {
                 if (obj[0x43] != 0)
-                    func_PAL_002A7E68(obj, 0, 0, 17);
+                    anim_start_blended_pal(obj, 0, 0, 17);
                 moby_set_state(obj, 5, 0);
             }
         }
@@ -262,7 +263,7 @@ destroy:
             flag_set_first_pending(obj);
         }
         if (((L12PathEnemyState *)state)->grouped && FastDecTimer(state + 0x29C) && ((L12PathEnemyState *)state)->damageState != 1) {
-            func_PAL_L12_003E66F8(obj);
+            moby_init_state_byte_pal(obj);
             break;
         }
         moby_transform_joint_point(obj, 2, matrix);
@@ -275,7 +276,7 @@ destroy:
             ((L12PathEnemyState *)state)->idleTimer = 208;
         if (((L12PathEnemyState *)state)->perception == 0 && ((L12PathEnemyState *)state)->damageState == 0 && FastDecTimer(state + 0x260)) {
             if (obj[0x43] != 0)
-                func_PAL_002A7E68(obj, 0, 0, 17);
+                anim_start_blended_pal(obj, 0, 0, 17);
             moby_set_state(obj, 5, 0);
             break;
         }
@@ -413,12 +414,12 @@ destroy:
             ((L12PathEnemyState *)state)->flags = (((L12PathEnemyState *)state)->flags & ~0x10) | 1;
             *(float *)(state + 0x198) = (g_robot_guard_state_value * 0.5f * 5.0f + 2.0f) / 6.0f;
             if (obj[0x43] != 0)
-                func_PAL_002A7E68(obj, 0, 0, 17);
+                anim_start_blended_pal(obj, 0, 0, 17);
             ((L12PathEnemyState *)state)->attackTimer = 125;
         }
         if (FastDecTimer(state + 0x262)) {
             if (obj[0x43] != 1)
-                func_PAL_002A7E68(obj, 1, 0, 17);
+                anim_start_blended_pal(obj, 1, 0, 17);
             moby_set_state(obj, 21, -1);
         }
         break;
@@ -431,7 +432,7 @@ destroy:
         if (AdvanceAlongPath_pal(obj, g_path_zone_table[*(int *)(state + 0x164)])) {
             moby_set_state(obj, 5, 0);
             if (obj[0x43] != 0)
-                func_PAL_002A7E68(obj, 0, 0, 0);
+                anim_start_blended_pal(obj, 0, 0, 0);
             ((L12PathEnemyState *)state)->flags |= 0x10;
         }
         break;
@@ -481,7 +482,7 @@ destroy:
             ((L12PathEnemyState *)state)->attackTimer = 167;
             ((L12PathEnemyState *)state)->pathIndex = ((L12PathEnemyState *)state)->nextPoint;
             if (obj[0x43] != 0)
-                func_PAL_002A7E68(obj, 0, 0, 17);
+                anim_start_blended_pal(obj, 0, 0, 17);
             changeModeL12Patrol(obj, 5, -1);
         }
         break;
@@ -490,7 +491,7 @@ destroy:
         if (flag_set_first_pending(obj)) {
             ((L12PathEnemyState *)state)->attackTimer = 33;
             if (obj[0x43] != 8)
-                func_PAL_002A7E68(obj, 8, 0, 17);
+                anim_start_blended_pal(obj, 8, 0, 17);
             moby_set_controller_speed_limits(obj, g_robot_guard_turn_speed * 5.0000002e-05f,
                           g_robot_guard_move_speed * 0.0025000002f,
                           0.12566373f, 0.12566373f);
@@ -502,7 +503,7 @@ destroy:
             *(float *)(state + 0x198) = (g_robot_guard_state_value * 5.0f + 2.0f) / 6.0f;
             moby_set_controller_speed_limits(obj, turn, speed, 0.0025132746f, 0.25132746f);
             if (obj[0x43] != 7)
-                func_PAL_002A7E68(obj, 7, 0, 17);
+                anim_start_blended_pal(obj, 7, 0, 17);
             ((L12PathEnemyState *)state)->attackTimer = 17;
             moby_set_state(obj, 16, -1);
         } else {
@@ -523,7 +524,7 @@ destroy:
             vec_scale_to_length(&velocity, obj + 0xC0, speed * 0.02f);
             velocity.z = (*(float *)(state + 0x138) - pos.z) * 0.02f;
         }
-        if (!func_PAL_002AF6C0(obj, g_robot_guard_step_limit)) {
+        if (!math_is_value_within_step_pal(obj, g_robot_guard_step_limit)) {
 smoke:
             limit = math_random_float_range(g_robot_guard_size_min, g_robot_guard_size_max);
             i = math_random_int_below(g_robot_guard_effect_count);
@@ -552,17 +553,17 @@ smoke:
         if (FastDecTimer(state + 0x262))
             moby_set_state(obj, 15, -1);
         if (((L12PathEnemyState *)state)->attackTimer < 25 && obj[0x42] != 3 && obj[0x43] != 3)
-            func_PAL_002A7E68(obj, 3, 0, 17);
+            anim_start_blended_pal(obj, 3, 0, 17);
         if (vec_distance_xy(state + 0x130, (obj + 0x10)) < 8.0f && ((L12PathEnemyState *)state)->attackTimer < 29) {
             if (obj[0x43] != 7)
-                func_PAL_002A7E68(obj, 7, 0, 17);
+                anim_start_blended_pal(obj, 7, 0, 17);
             moby_set_state(obj, 16, -1);
         }
         break;
     case 24:
         if (flag_set_first_pending(obj) && obj[0x43] != 9)
-            func_PAL_002A7E68(obj, 9, 0, 17);
-        if (func_PAL_002AF6C0(obj, 12.5f))
+            anim_start_blended_pal(obj, 9, 0, 17);
+        if (math_is_value_within_step_pal(obj, 12.5f))
             *(int *)(obj + 0x48) = 0;
         break;
     }

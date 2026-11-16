@@ -20,6 +20,7 @@ extern char g_unlocked_item_flags[] __attribute__((sda));
 extern unsigned char g_cheat_unlocked_flags[] __attribute__((sda));
 extern CheatEntry_25FC90 g_cheat_list[];
 
+/* Fills the cheat list with the entries whose unlock flag is set and ends it with a zero entry (PAL). */
 int menu_build_unlocked_cheat_list_pal(void)
 {
     IdTable_1AB938 ids = g_cheat_id_table;

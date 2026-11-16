@@ -46,7 +46,8 @@ extern void FastVecAdd(char *, char *, char *);
 
 /* func_US2_L19_002FABB0, the USA v2.00 copy of func_L19_002FA1A8: the same C,
  * with the actor 4000 effect left out in level 51. */
-void func_US2_L19_002FABB0(void)
+/* Runs the cutscene effects: marks some actors and spawns sparks and bursts at set frames of the scene (USA v2.00 copy). */
+void UpdateCutsceneEffects_us2(void)
 {
     Vec position, direction, axis;
     char *actor;
@@ -157,7 +158,7 @@ void func_US2_L19_002FABB0(void)
             }
         }
         if (g_current_map_index == 19 && g_cutscene_l19_state.state == 5 && g_cutscene_l19_state.frame == 1375) {
-            char *burstActor = g_cutscene_l19_state.items[4];
+            char *burst_actor = g_cutscene_l19_state.items[4];
             int n;
             for (n = 0; n < 47; n++) {
                 int color, style, life, red, gray, high;
@@ -166,7 +167,7 @@ void func_US2_L19_002FABB0(void)
                 angle = math_random_angle();
                 pitch = math_random_angle();
                 vec_build_spherical_offset(direction.f, radius, angle, pitch);
-                FastVecAdd((char *)&direction, (char *)&direction, burstActor + 0x10);
+                FastVecAdd((char *)&direction, (char *)&direction, burst_actor + 0x10);
                 radius = math_random_float_range(0.006166667f, 0.023333333f);
                 angle = math_random_angle();
                 pitch = math_random_angle();

@@ -5,7 +5,8 @@
 extern void object_alloc_float4_arrays(void *);
 extern unsigned char g_font_glyphs_small[];
 
-void func_PAL_00338688(char *self)
+/* Sets up the text widget defaults: font glyphs, scale 1 and a width limit (PAL version). */
+void hud_init_widget_defaults_pal(char *self)
 {
     object_alloc_float4_arrays(self);
     *(char **)(self + 0x34) = (char *)g_font_glyphs_small;

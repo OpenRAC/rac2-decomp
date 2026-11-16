@@ -33,7 +33,7 @@ extern void vec_build_spherical_offset(void *, float, float, float);
 
 /* Draws the shield dome: ten rings of sixteen quads over the upper sphere, fading in at the
    seam, then three rings of a jagged band of twenty-eight quads around its base. */
-void func_PAL_L04_00400108(unsigned char *m)
+void DrawDomeEffect_pal(unsigned char *moby)
 {
     struct {
         float vertices[4][4];
@@ -43,15 +43,15 @@ void func_PAL_L04_00400108(unsigned char *m)
     } quad;
     float matrix[16];
     union { QuadWord q; float f[4]; } rotation;
-    L04_DomeVars *p = *(L04_DomeVars **)(m + 0x68);
-    float radius = p->radius * p->age;
+    L04_DomeVars *vars = *(L04_DomeVars **)(moby + 0x68);
+    float radius = vars->radius * vars->age;
     float phase = fast_fmod(IntToFloat(g_game_tick_counter), 25.333334f) * (1.0f / 25.333334f);
     int i, j, k, l;
 
-    rotation.q = *(QuadWord *)(m + 0xF0);
+    rotation.q = *(QuadWord *)(moby + 0xF0);
     rotation.f[0] = 0;
     euler_to_matrix(matrix, &rotation);
-    *(QuadWord *)(matrix + 12) = *(QuadWord *)(m + 0x10);
+    *(QuadWord *)(matrix + 12) = *(QuadWord *)(moby + 0x10);
     quad.packet[1] = GetEffectTextureDescriptor(21);
     quad.packet[2] = 0xFF9000000260UL;
     quad.packet[3] = 0x8000000048UL;
@@ -62,7 +62,7 @@ void func_PAL_L04_00400108(unsigned char *m)
         for (j = 0; j < 16; j++) {
             float left = math_fast_float_g(IntToFloat(j) * 1.3962636f / IntToFloat(16)) - 0.6981318f;
             float right = math_fast_float_g(IntToFloat(j + 1) * 1.3962636f / IntToFloat(16)) - 0.6981318f;
-            float alpha, baseAlpha;
+            float alpha, base_alpha;
             int alpha0, alpha1;
             quad.uv[0] = phase + (math_fast_sin_or_cos_a(left) + 1.0f) * 0.5f;
             quad.uv[2] = phase + (math_fast_sin_or_cos_a(right) + 1.0f) * 0.5f;
@@ -72,9 +72,9 @@ void func_PAL_L04_00400108(unsigned char *m)
             quad.uv[3] = (math_fast_sin_or_cos_b(lo) + 1.0f) * 0.5f;
             quad.uv[5] = (math_fast_sin_or_cos_b(hi) + 1.0f) * 0.5f;
             quad.uv[7] = (math_fast_sin_or_cos_b(hi) + 1.0f) * 0.5f;
-            baseAlpha = IntToFloat(64);
-            if (p->timer) alpha = IntToFloat(p->timer) * (baseAlpha * (1.0f / 15.0f));
-            else alpha = baseAlpha;
+            base_alpha = IntToFloat(64);
+            if (vars->timer) alpha = IntToFloat(vars->timer) * (base_alpha * (1.0f / 15.0f));
+            else alpha = base_alpha;
             alpha0 = FloatToInt(alpha * math_fast_sin_or_cos_b(IntToFloat(i) * 3.141593f / IntToFloat(10)));
             alpha1 = FloatToInt(alpha * math_fast_sin_or_cos_b(IntToFloat(i + 1) * 3.141593f / IntToFloat(10)));
             quad.colors[0] = j ? ((unsigned)alpha0 << 24) | 0xA06060 : 0xA06060;
@@ -94,7 +94,7 @@ void func_PAL_L04_00400108(unsigned char *m)
     }
     quad.packet[1] = GetEffectTextureDescriptor(14);
     for (k = 0; k < 3; k++) {
-        float previousHeight = 0, previous = 0;
+        float previous_height = 0, previous = 0;
         for (l = 0; l < 28; l++) {
             float left = math_fast_float_g(IntToFloat(l) * 0.04986656f) - 0.6981318f;
             float right = math_fast_float_g(IntToFloat(l + 1) * 0.04986656f) - 0.6981318f;
@@ -111,20 +111,20 @@ void func_PAL_L04_00400108(unsigned char *m)
             quad.uv[3] = 0;
             quad.uv[5] = 1;
             quad.uv[7] = 1;
-            if (p->timer) alpha = 1.0f - IntToFloat(p->timer) * (1.0f / 15.0f);
+            if (vars->timer) alpha = 1.0f - IntToFloat(vars->timer) * (1.0f / 15.0f);
             else alpha = 0;
             if (alpha < 0) alpha = 0;
             color = FastTweenColor(0x7FC04070, 0xFF0000, alpha);
             quad.colors[0] = quad.colors[1] = quad.colors[2] = quad.colors[3] = color;
-            height = (p->heights[l] * (math_random_float_range(-1, 1) * 0.017453294f)) * p->age;
+            height = (vars->heights[l] * (math_random_float_range(-1, 1) * 0.017453294f)) * vars->age;
             if (height > 0.069813184f) height = 0.069813184f;
             if (height < -0.069813184f) height = -0.069813184f;
-            if (l == 0) previousHeight = 0;
-            vec_build_spherical_offset(quad.vertices[0], radius, previous, previousHeight);
+            if (l == 0) previous_height = 0;
+            vec_build_spherical_offset(quad.vertices[0], radius, previous, previous_height);
             vec_build_spherical_offset(quad.vertices[1], radius, next, height);
-            vec_build_spherical_offset(quad.vertices[2], radius, previous, previousHeight);
+            vec_build_spherical_offset(quad.vertices[2], radius, previous, previous_height);
             vec_build_spherical_offset(quad.vertices[3], radius, next, height);
-            previousHeight = height;
+            previous_height = height;
             previous = next;
             quad.vertices[2][2] -= 0.15f;
             quad.vertices[3][2] -= 0.15f;

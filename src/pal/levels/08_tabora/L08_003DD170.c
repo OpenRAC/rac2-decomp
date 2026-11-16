@@ -9,10 +9,10 @@ extern float math_random_float_range(float, float);
 extern float math_fast_sin_or_cos_a(float);
 extern float math_fast_sin_or_cos_b(float);
 typedef struct {
-    f32 f0;
-    f32 f4;
-    f32 f8;
-    f32 fC;
+    f32 unk_0;
+    f32 unk_4;
+    f32 unk_8;
+    f32 unk_C;
 } Quad;
 extern f32 func_3278F0(f32, f32);
 extern f32 func_2FA3C8(f32);
@@ -36,7 +36,8 @@ extern f32 math_random_angle(void);
 extern f32 math_fast_sin_or_cos_a(f32);
 extern f32 math_fast_sin_or_cos_b(f32);
 
-int func_PAL_L08_003DD170(u8 *object, float accel, float unused1, float damping,
+/* Walks the Spitting Dune Crawler toward its goal at the given speed and turn rate, switches its wobble now and then, and sets its animation speed from how fast it moves (PAL: 50 Hz timings). */
+int crawler_move_toward_goal_pal(u8 *object, float accel, float unused1, float damping,
                      float speed, float unused4, float turn, float friction) {
     u8 *state = *(u8 **)(object + 0x68);
     int result;
@@ -74,67 +75,67 @@ int func_PAL_L08_003DD170(u8 *object, float accel, float unused1, float damping,
 
 typedef struct {
     u8 pad00[0x20];
-    u8 f20;
-    u8 f21;
+    u8 unk_20;
+    u8 unk_21;
     u8 pad22[0x24 - 0x22];
-    void *f24;
+    void *unk_24;
     u8 pad28[0x2C - 0x28];
-    f32 f2C;
+    f32 unk_2C;
     u8 pad30[0x68 - 0x30];
-    void *f68;
+    void *unk_68;
     u8 pad6C[0x95 - 0x6C];
-    u8 f95;
-    u16 f96;
+    u8 unk_95;
+    u16 unk_96;
     u8 pad98[0xBC - 0x98];
-    u8 fBC;
+    u8 unk_BC;
     u8 padBD[0x100 - 0xBD];
 } Ent;
 typedef struct {
     u8  pad00[0x20];
-    f32 f20;
-    void *f24;
+    f32 unk_20;
+    void *unk_24;
     u8  pad28[0x2C - 0x28];
-    f32 f2C;
+    f32 unk_2C;
     u8  pad30[0x50 - 0x30];
-    u8  f50[0x88 - 0x50];
-    u16 f88;
+    u8  unk_50[0x88 - 0x50];
+    u16 unk_88;
     u8  pad8A[0xE4 - 0x8A];
-    f32 fE4;
+    f32 unk_E4;
     u8  padE8[0x144 - 0xE8];
-    s32 f144;
+    s32 unk_144;
     u8  pad148[0x150 - 0x148];
-    f32 f150[4];
-    f32 f160;
-    f32 f164;
-    f32 f168;
+    f32 unk_150[4];
+    f32 unk_160;
+    f32 unk_164;
+    f32 unk_168;
     u8  pad16C[0x189 - 0x16C];
-    u8  f189;
+    u8  unk_189;
     u8  pad18A[0x18C - 0x18A];
-    u8  f18C;
+    u8  unk_18C;
     u8  pad18D[0x1B0 - 0x18D];
-    f32 f1B0;
-    f32 f1B4;
-    u8  f1B8[0x1BA - 0x1B8];
-    s16 f1BA;
-    s16 f1BC;
-    u16 f1BE;
+    f32 unk_1B0;
+    f32 unk_1B4;
+    u8  unk_1B8[0x1BA - 0x1B8];
+    s16 unk_1BA;
+    s16 unk_1BC;
+    u16 unk_1BE;
     u8  pad1C0[0x1CC - 0x1C0];
-    s32 f1CC;
-    f32 f1D0;
-    f32 f1D4;
-    s32 f1D8;
-    s32 f1DC;
-    u8  f1E0[0x254 - 0x1E0];
-    s32 f254;
+    s32 unk_1CC;
+    f32 unk_1D0;
+    f32 unk_1D4;
+    s32 unk_1D8;
+    s32 unk_1DC;
+    u8  unk_1E0[0x254 - 0x1E0];
+    s32 unk_254;
     u8  pad258[0x40E - 0x258];
-    u16 f40E;
+    u16 unk_40E;
     u8  pad410[0x440 - 0x410];
-    u8  f440[0x448 - 0x440];
-    s32 f448;
-    u8  f44C[0x484 - 0x44C];
-    s32 f484;
-    s32 f488;
-    u8  f48C[8];
+    u8  unk_440[0x448 - 0x440];
+    s32 unk_448;
+    u8  unk_44C[0x484 - 0x44C];
+    s32 unk_484;
+    s32 unk_488;
+    u8  unk_48C[8];
 } Moby;
 extern s32 math_fast_float_d();
 extern s32 math_random_int_range(s32, s32);
@@ -149,29 +150,30 @@ extern s32 game_is_either_mode_two(void);
 extern s32 math_random_int_range(s32, s32);
 
 /* the countdown runs while the entry is flagged, then the timer field saturates */
-void func_PAL_L08_003DD368(Ent *a0)
+/* Counts down the crawler's timers and ages it by one frame (PAL: 50 Hz timings). */
+void crawler_tick_timers_pal(Ent *moby)
 {
-    Moby *s0 = a0->f68;
-    u16 v1;
+    Moby *state = moby->unk_68;
+    u16 age;
 
-    if (a0->fBC != 0) {
-        a0->fBC = 0;
-        if (s0->f448 < 167) {
-            s0->f448 = ((s32)(math_random_int_range(300, 360)) * 5 + 2) / 6;
-            s0->f40E = 12;
+    if (moby->unk_BC != 0) {
+        moby->unk_BC = 0;
+        if (state->unk_448 < 167) {
+            state->unk_448 = ((s32)(math_random_int_range(300, 360)) * 5 + 2) / 6;
+            state->unk_40E = 12;
         }
     }
-    v1 = a0->f96;
-    if (s0->f254 == 2) {
-        if (math_fast_float_d(&s0->f448)) s0->f40E = 3;
+    age = moby->unk_96;
+    if (state->unk_254 == 2) {
+        if (math_fast_float_d(&state->unk_448)) state->unk_40E = 3;
     }
-    v1 = a0->f96;
-    if (v1 <= 0xFFFDu) a0->f96 = v1 + 1;
-    if (a0->f20 == 8) {
-        if (a0->f95 == 0) math_fast_float_d(&s0->f48C);
+    age = moby->unk_96;
+    if (age <= 0xFFFDu) moby->unk_96 = age + 1;
+    if (moby->unk_20 == 8) {
+        if (moby->unk_95 == 0) math_fast_float_d(&state->unk_48C);
     }
-    math_fast_float_d(&s0->f440);
-    math_fast_float_d(&s0->f44C);
+    math_fast_float_d(&state->unk_440);
+    math_fast_float_d(&state->unk_44C);
 }
 
 
@@ -191,13 +193,14 @@ extern int func_001163B0(void);
 
 /* func_PAL_L08_003DD918, the PAL copy of func_L08_003D9798: the same C, with speeds and
    accelerations times 6/5 and each particle lifetime scaled to 50 Hz, (x * 5 + 2) / 6. */
-void func_PAL_L08_003DD918(char *object)
+/* Makes the Spitting Dune Crawler's spit attack: a flash in front of it and two sprays of particles (PAL: 50 Hz timings). */
+void crawler_spawn_spit_effect_pal(char *object)
 {
     float origin[4], end[4], start[4], step[4], matrix[12], point[4];
     float velocity[4], accel[4], position[4];
     char *state = *(char **)(object + 0x68), *particle;
     float heading, angle;
-    int a, b, c;
+    int trail_a, trail_b, trail_c;
     coll_test_hit_at_bone(object,1,1,0,1,0,0.5f,(float)*(u8 *)(state+0x34),1.0f);
     copy_matrix_rotation(matrix,object+0xC0);
     moby_transform_joint_to_world(object,1,point);
@@ -240,10 +243,10 @@ void func_PAL_L08_003DD918(char *object)
         accel[1]=math_fast_sin_or_cos_b(FastAddRotations(heading,angle))*0.010000001f;
         accel[2]=0;
         accel[2]=math_random_float_range(0.018000001f,0.022000002f);
-        a=FloatToInt((math_random_float_range(2,4)*5.0f+2.0f)*0.16666667f);
-        b=FloatToInt((math_random_float_range(12,14.40000057220459f)*5.0f+2.0f)*0.16666667f);
-        c=FloatToInt((math_random_float_range(200,240.00001525878906f)*5.0f+2.0f)*0.16666667f);
-        particle=part_spawn_trail(position,velocity,accel,0x40101080,0x10101080,a,b,c,-1);
+        trail_a=FloatToInt((math_random_float_range(2,4)*5.0f+2.0f)*0.16666667f);
+        trail_b=FloatToInt((math_random_float_range(12,14.40000057220459f)*5.0f+2.0f)*0.16666667f);
+        trail_c=FloatToInt((math_random_float_range(200,240.00001525878906f)*5.0f+2.0f)*0.16666667f);
+        particle=part_spawn_trail(position,velocity,accel,0x40101080,0x10101080,trail_a,trail_b,trail_c,-1);
         if(particle && (func_001163B0()&1)) particle[3]=0x48;
     }
     }
@@ -263,10 +266,10 @@ void func_PAL_L08_003DD918(char *object)
         accel[1]=math_fast_sin_or_cos_b(FastAddRotations(heading,angle))*0.010000001f;
         accel[2]=0;
         accel[2]=math_random_float_range(0.014f,0.030000001f);
-        a=FloatToInt((math_random_float_range(2,4)*5.0f+2.0f)*0.16666667f);
-        b=FloatToInt((math_random_float_range(20,24)*5.0f+2.0f)*0.16666667f);
-        c=FloatToInt((math_random_float_range(200,240.00001525878906f)*5.0f+2.0f)*0.16666667f);
-        particle=part_spawn_trail(position,velocity,accel,0x801010FF,0x801010FF,a,b,c,-1);
+        trail_a=FloatToInt((math_random_float_range(2,4)*5.0f+2.0f)*0.16666667f);
+        trail_b=FloatToInt((math_random_float_range(20,24)*5.0f+2.0f)*0.16666667f);
+        trail_c=FloatToInt((math_random_float_range(200,240.00001525878906f)*5.0f+2.0f)*0.16666667f);
+        particle=part_spawn_trail(position,velocity,accel,0x801010FF,0x801010FF,trail_a,trail_b,trail_c,-1);
         if(particle && (func_001163B0()&1)) particle[3]=0x48;
     }
     }

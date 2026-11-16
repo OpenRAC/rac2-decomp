@@ -115,9 +115,9 @@ extern void FastVecSub(void *, void *, void *);
 extern void FastVecAdd(void *, void *, void *);
 extern void draw_world_quad(void *, void *, int);
 
-void target_tether_draw_beam_pal(Moby_L00_003B84F0 *obj)
+void target_tether_draw_beam_pal(Moby_L00_003B84F0 *moby)
 {
-    Packet_L00_003B84F0 pkt;
+    Packet_L00_003B84F0 packet;
     Vec4_L00_003B84F0 b;
     Vec4_L00_003B84F0 a;
     Vec4_L00_003B84F0 c;
@@ -125,16 +125,16 @@ void target_tether_draw_beam_pal(Moby_L00_003B84F0 *obj)
     Vec4_L00_003B84F0 vy;
     Vec4_L00_003B84F0 vz;
     Vec4_L00_003B84F0 p;
-    Ctl_L00_003B84F0 *ctl;
+    Ctl_L00_003B84F0 *control;
     long long alpha0;
     long long alpha1;
     int on;
     int flag;
     int col;
     int alpha;
-    int r;
-    int g;
-    int bl;
+    int red;
+    int green;
+    int blue;
     float dist;
     float x;
     float t;
@@ -145,11 +145,11 @@ void target_tether_draw_beam_pal(Moby_L00_003B84F0 *obj)
     float range;
     float inv;
 
-    ctl = g_target_lock_aim_state;
-    if (ctl == 0) {
+    control = g_target_lock_aim_state;
+    if (control == 0) {
         return;
     }
-    pkt.q78 = GetEffectTextureDescriptor(g_tether_texture);
+    packet.q78 = GetEffectTextureDescriptor(g_tether_texture);
     {
         /* Two ALPHA register values: alpha1 swaps the A and B fields of alpha0. The order of
            these steps, and building each value in a local of its own, decides sched1's order
@@ -170,59 +170,59 @@ void target_tether_draw_beam_pal(Moby_L00_003B84F0 *obj)
         swappedFull |= (long long)g_tether_prim_field_e << 32;
         alpha1 = swappedFull;
     }
-    pkt.col[3] = g_tether_vertex_color;
-    pkt.col[2] = g_tether_vertex_color;
-    pkt.col[1] = g_tether_vertex_color;
+    packet.col[3] = g_tether_vertex_color;
+    packet.col[2] = g_tether_vertex_color;
+    packet.col[1] = g_tether_vertex_color;
     on = (g_pad_state[0x1A0 / 4] & g_hero_state.f1230) != 0;
-    pkt.col[0] = g_tether_vertex_color;
-    pkt.q88 = alpha0;
-    pkt.uv[0] = g_tether_uv_offset;
-    pkt.uv[4] = g_tether_uv_offset;
-    pkt.q80 = 0xFF9000000260LL;
-    pkt.uv[2] = inv;
-    pkt.uv[6] = inv;
-    pkt.uv[1] = g_tether_uv_offset;
-    pkt.q70 = 4;
-    pkt.uv[3] = g_tether_uv_offset;
-    pkt.uv[5] = inv;
-    pkt.uv[7] = inv;
+    packet.col[0] = g_tether_vertex_color;
+    packet.q88 = alpha0;
+    packet.uv[0] = g_tether_uv_offset;
+    packet.uv[4] = g_tether_uv_offset;
+    packet.q80 = 0xFF9000000260LL;
+    packet.uv[2] = inv;
+    packet.uv[6] = inv;
+    packet.uv[1] = g_tether_uv_offset;
+    packet.q70 = 4;
+    packet.uv[3] = g_tether_uv_offset;
+    packet.uv[5] = inv;
+    packet.uv[7] = inv;
 
     dist = g_tether_beam_length;
     if (g_hero_state.f340 == 0 || g_hero_state.f34E != 0 || g_target_lock_disabled != 0 || g_hero_state.f1E0 != 0) {
         on = 0;
     }
-    if (ctl->moby != 0 && ctl->moby->f31 != 0) {
-        dist = vec_distance_xy(&obj->pos, &ctl->moby->pos);
+    if (control->moby != 0 && control->moby->f31 != 0) {
+        dist = vec_distance_xy(&moby->pos, &control->moby->pos);
     }
-    if (ctl->f44 < dist - g_tether_grow_speed * 0.020000001f && on != 0) {
-        ctl->f44 = ctl->f44 + g_tether_grow_speed * 0.020000001f;
-    } else if (ctl->f44 > dist + g_tether_shrink_speed * 0.020000001f || on == 0) {
-        ctl->f44 = ctl->f44 - g_tether_shrink_speed * 0.020000001f;
-        if (ctl->f44 < 0.0f) {
-            ctl->f44 = 0.0f;
+    if (control->f44 < dist - g_tether_grow_speed * 0.020000001f && on != 0) {
+        control->f44 = control->f44 + g_tether_grow_speed * 0.020000001f;
+    } else if (control->f44 > dist + g_tether_shrink_speed * 0.020000001f || on == 0) {
+        control->f44 = control->f44 - g_tether_shrink_speed * 0.020000001f;
+        if (control->f44 < 0.0f) {
+            control->f44 = 0.0f;
         }
     } else {
-        ctl->f44 = dist;
+        control->f44 = dist;
     }
-    if (on != 0 && g_target_lock_disabled == 0 && g_hero_state.f1E0 == 0 && ctl->f44 > dist - 0.5f && ctl->moby != 0) {
-        ctl->f44 = 0.0f;
-        ctl->f40 = 0.0f;
+    if (on != 0 && g_target_lock_disabled == 0 && g_hero_state.f1E0 == 0 && control->f44 > dist - 0.5f && control->moby != 0) {
+        control->f44 = 0.0f;
+        control->f40 = 0.0f;
         g_hero_state.f1E0 = 25;
-        moby_set_flag_bit(ctl->moby, 1);
+        moby_set_flag_bit(control->moby, 1);
         if (g_hero_state.f22B4 == 0) {
             level_capture_checkpoint_state(&g_hero_state.v80, &g_hero_state.v90);
         }
     }
-    if (ctl->f44 > dist) {
-        ctl->f44 = dist;
+    if (control->f44 > dist) {
+        control->f44 = dist;
     }
-    ctl->f40 = ctl->f40 + g_tether_scroll_speed * 0.020000001f;
-    if (ctl->f40 > g_tether_segment_length + g_tether_segment_length) {
-        ctl->f40 = ctl->f40 - (g_tether_segment_length + g_tether_segment_length);
+    control->f40 = control->f40 + g_tether_scroll_speed * 0.020000001f;
+    if (control->f40 > g_tether_segment_length + g_tether_segment_length) {
+        control->f40 = control->f40 - (g_tether_segment_length + g_tether_segment_length);
     }
     a.bits = 0;
     a.f[0] = 1.0f;
-    vec_scale_to_length(&b, &ctl->dir, -1.0f);
+    vec_scale_to_length(&b, &control->dir, -1.0f);
     b.f[2] = -b.f[2];
     flag = 0;
     FastVecCross(&c, &b, &a);
@@ -230,14 +230,14 @@ void target_tether_draw_beam_pal(Moby_L00_003B84F0 *obj)
     FastVecCross(&a, &b, &c);
     vec_scale_to_length(&a, &a, 1.0f);
     range = g_tether_beam_max_width - g_tether_beam_min_width;
-    for (x = ctl->f40; x < ctl->f44; x += g_tether_segment_length) {
-        if (x <= ctl->f44) {
+    for (x = control->f40; x < control->f44; x += g_tether_segment_length) {
+        if (x <= control->f44) {
             t = 0.5f;
-            if (g_tether_beam_length < ctl->f44) {
+            if (g_tether_beam_length < control->f44) {
                 if (x < g_tether_beam_length * 0.5f) {
                     t = x / g_tether_beam_length;
-                } else if (ctl->f44 - g_tether_beam_length * 0.5f < x) {
-                    t = (x - (ctl->f44 - g_tether_beam_length)) / g_tether_beam_length;
+                } else if (control->f44 - g_tether_beam_length * 0.5f < x) {
+                    t = (x - (control->f44 - g_tether_beam_length)) / g_tether_beam_length;
                 }
                 if (t > 1.0f) {
                     t = 1.0f;
@@ -253,7 +253,7 @@ void target_tether_draw_beam_pal(Moby_L00_003B84F0 *obj)
                 }
                 w = g_tether_beam_min_width + range * math_ease_out_quad(u);
             } else {
-                t = x / ctl->f44;
+                t = x / control->f44;
                 if (t > 1.0f) {
                     t = 1.0f;
                 } else if (t < 0.0f) {
@@ -268,63 +268,63 @@ void target_tether_draw_beam_pal(Moby_L00_003B84F0 *obj)
             }
             s = math_complement_power(math_fast_sin_or_cos_b(t * 3.1415927f), 2);
             alpha = FloatToInt((flag ? g_tether_alpha_b : g_tether_alpha_a) * s);
-            r = FloatToInt(g_tether_beam_red_amp * (math_fast_sin_or_cos_b(FastAddRotations(math_wrap_angle_to_pi(g_tether_color_rate_r * IntToFloat(g_frame_l00_counter) + x * g_tether_color_phase_r), g_tether_beam_red_freq_b * 0.017453294f)) + 1.0f));
-            g = FloatToInt(g_tether_beam_green_amp * (math_fast_sin_or_cos_b(FastAddRotations(math_wrap_angle_to_pi(g_tether_color_rate_g * IntToFloat(g_frame_l00_counter) + x * g_tether_beam_green_freq), g_tether_beam_green_freq_b * 0.017453294f)) + 1.0f));
-            bl = FloatToInt(g_tether_beam_blue_amp * (math_fast_sin_or_cos_b(FastAddRotations(math_wrap_angle_to_pi(g_tether_color_rate_b * IntToFloat(g_frame_l00_counter) + x * g_tether_beam_blue_freq_b), g_tether_beam_blue_freq_c * 0.017453294f)) + 1.0f));
+            red = FloatToInt(g_tether_beam_red_amp * (math_fast_sin_or_cos_b(FastAddRotations(math_wrap_angle_to_pi(g_tether_color_rate_r * IntToFloat(g_frame_l00_counter) + x * g_tether_color_phase_r), g_tether_beam_red_freq_b * 0.017453294f)) + 1.0f));
+            green = FloatToInt(g_tether_beam_green_amp * (math_fast_sin_or_cos_b(FastAddRotations(math_wrap_angle_to_pi(g_tether_color_rate_g * IntToFloat(g_frame_l00_counter) + x * g_tether_beam_green_freq), g_tether_beam_green_freq_b * 0.017453294f)) + 1.0f));
+            blue = FloatToInt(g_tether_beam_blue_amp * (math_fast_sin_or_cos_b(FastAddRotations(math_wrap_angle_to_pi(g_tether_color_rate_b * IntToFloat(g_frame_l00_counter) + x * g_tether_beam_blue_freq_b), g_tether_beam_blue_freq_c * 0.017453294f)) + 1.0f));
             if ((g_pad_state[0x1A0 / 4] & 8) || g_hero_state.f2294 == 0x1D) {
                 alpha = FloatToInt((flag ? g_tether_pulse_alpha_b : g_tether_pulse_alpha_a) * math_complement_power(math_fast_sin_or_cos_b(t * 3.1415927f), 2));
-                if (x < ctl->f44 * 0.5f) {
+                if (x < control->f44 * 0.5f) {
                     alpha = FloatToInt(flag ? g_tether_pulse_alpha_b : g_tether_pulse_alpha_a);
                 }
-                col = r | (g << 8);
-                col = col | (bl << 16);
+                col = red | (green << 8);
+                col = col | (blue << 16);
                 col = col | (alpha << 24);
-                pkt.col[3] = col;
-                pkt.col[2] = col;
-                pkt.col[1] = col;
-                pkt.col[0] = col;
+                packet.col[3] = col;
+                packet.col[2] = col;
+                packet.col[1] = col;
+                packet.col[0] = col;
             } else {
-                col = r | (g << 8);
-                col = col | (bl << 16);
+                col = red | (green << 8);
+                col = col | (blue << 16);
                 col = col | (alpha << 24);
-                pkt.col[3] = col;
-                pkt.col[2] = col;
-                pkt.col[1] = col;
-                pkt.col[0] = col;
+                packet.col[3] = col;
+                packet.col[2] = col;
+                packet.col[1] = col;
+                packet.col[0] = col;
             }
             flag ^= 1;
 
             vec_scale_to_length(&vx, &b, x);
             vec_scale_to_length(&vy, &a, w);
             vec_scale_to_length(&vz, &c, w);
-            FastVecSub(&p, &ctl->pos, &vx);
-            pkt.m[3].bits = p.bits;
-            FastVecAdd(&p, &pkt.m[3], &vz);
-            pkt.m[1].bits = p.bits;
-            FastVecSub(&p, &pkt.m[1], &vy);
-            pkt.m[0].bits = p.bits;
-            FastVecSub(&p, &pkt.m[3], &vy);
-            pkt.m[2].bits = p.bits;
-            draw_world_quad(&pkt, 0, 1);
-            FastVecAdd(&p, &pkt.m[1], &vy);
-            pkt.m[0].bits = p.bits;
-            FastVecAdd(&p, &pkt.m[3], &vy);
-            pkt.m[2].bits = p.bits;
-            draw_world_quad(&pkt, 0, 1);
-            FastVecSub(&p, &pkt.m[3], &vz);
-            pkt.m[1].bits = p.bits;
-            FastVecSub(&p, &pkt.m[2], &vz);
-            pkt.m[0].bits = p.bits;
-            draw_world_quad(&pkt, 0, 1);
-            FastVecSub(&p, &pkt.m[1], &vy);
-            pkt.m[0].bits = p.bits;
-            FastVecSub(&p, &pkt.m[3], &vy);
-            pkt.m[2].bits = p.bits;
-            draw_world_quad(&pkt, 0, 1);
+            FastVecSub(&p, &control->pos, &vx);
+            packet.m[3].bits = p.bits;
+            FastVecAdd(&p, &packet.m[3], &vz);
+            packet.m[1].bits = p.bits;
+            FastVecSub(&p, &packet.m[1], &vy);
+            packet.m[0].bits = p.bits;
+            FastVecSub(&p, &packet.m[3], &vy);
+            packet.m[2].bits = p.bits;
+            draw_world_quad(&packet, 0, 1);
+            FastVecAdd(&p, &packet.m[1], &vy);
+            packet.m[0].bits = p.bits;
+            FastVecAdd(&p, &packet.m[3], &vy);
+            packet.m[2].bits = p.bits;
+            draw_world_quad(&packet, 0, 1);
+            FastVecSub(&p, &packet.m[3], &vz);
+            packet.m[1].bits = p.bits;
+            FastVecSub(&p, &packet.m[2], &vz);
+            packet.m[0].bits = p.bits;
+            draw_world_quad(&packet, 0, 1);
+            FastVecSub(&p, &packet.m[1], &vy);
+            packet.m[0].bits = p.bits;
+            FastVecSub(&p, &packet.m[3], &vy);
+            packet.m[2].bits = p.bits;
+            draw_world_quad(&packet, 0, 1);
             if (flag) {
-                pkt.q88 = alpha1;
+                packet.q88 = alpha1;
             } else {
-                pkt.q88 = alpha0;
+                packet.q88 = alpha0;
             }
         }
     }

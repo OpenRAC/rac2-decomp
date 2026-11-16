@@ -77,19 +77,19 @@ void cam_update_chase_position_pal(char *camera)
         char *input = *(char **)(camera + 0x70) + 0x50;
         float t = -*(float *)(input + 0x64) / (*(float *)(input + 0x74) * DEG_TO_RAD);
         float rise = (g_cam_rise_rate_start + (g_cam_rise_rate_end - g_cam_rise_rate_start) * t) * FRAME_TIME;
-        float sideLow = g_cam_side_low, sideHigh = g_cam_side_high;
+        float side_low = g_cam_side_low, side_high = g_cam_side_high;
         float side;
         *(float *)(camera + 0x38) += rise;
         *(float *)(record + 0x38) = rise;
         t = *(float *)(input + 0x68) / (*(float *)(input + 0x78) * DEG_TO_RAD);
-        side = (sideLow + (sideHigh - sideLow) * t) * FRAME_TIME;
+        side = (side_low + (side_high - side_low) * t) * FRAME_TIME;
         FastVecScale(&delta, camera + 0x10, side);
         FastVecAdd(camera + 0x30, camera + 0x30, &delta);
         FastVecAdd(record + 0x30, record + 0x30, &delta);
     }
 
     if (g_current_map_index == 15) {
-        float oldHeight = *(float *)(camera + 0x38);
+        float old_height = *(float *)(camera + 0x38);
         float t = *(float *)(record + 0x40);
         float climb;
         if (hero_get_state_value_b())
@@ -101,7 +101,7 @@ void cam_update_chase_position_pal(char *camera)
             *(float *)(camera + 0x38) = 400.0f;
         else if (*(float *)(camera + 0x38) > 650.0f)
             *(float *)(camera + 0x38) = 650.0f;
-        *(float *)(record + 0x38) = *(float *)(camera + 0x38) - oldHeight;
+        *(float *)(record + 0x38) = *(float *)(camera + 0x38) - old_height;
     }
 
     {

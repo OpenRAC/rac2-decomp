@@ -15,7 +15,7 @@ extern int sprintf(char *,char *,...);
 extern void FontSetWindow(void *,int,int,int,int,int,int,int,int);
 extern void text_draw_window_large(void *,u64,char *,int);
 extern void text_draw_window_small(void *,u64,char *,int);
-extern int func_PAL_L02_00402928(void);
+extern int pal_language_at_least_two(void);
 extern unsigned char g_language MACRO_ADDR;
 extern void text_draw_small(int,int,u64,char *,int);
 extern void text_draw_medium(int,int,u64,char *,int);
@@ -102,7 +102,9 @@ static __inline__ int hud_coord1(float value, float scale, float half)
     return result;
 }
 
-void func_PAL_L11_004495E8(unsigned char *object) {
+/* Draws the Joba challenge selection panel: the challenge title, its best score and counts, and
+   the previous/next/confirm hints (PAL copy of joba_menu_draw_selection_panel). */
+void joba_menu_draw_selection_panel_pal(unsigned char *object) {
     unsigned char box[32]; char buffer[64];
     unsigned char *state; char *text,*unit,*str; int *x5,*x7,*x8; int i,value,y2,y3,y4,y5,y6,y7,y8,bx,by,bh; u64 c1,c2,c3,c4,c5,c6,c7,c8; float half,h;
     joba_menu_draw_help_prompts(object,1);
@@ -112,7 +114,7 @@ void func_PAL_L11_004495E8(unsigned char *object) {
     by=hud_coord((float)g_selection_panel_y, g_hud_label_y_param, 0.5f);
     bh=hud_coord((float)g_selection_panel_height, g_hud_label_y_param, 0.5f);
     FontSetWindow(box,bx,by,g_selection_panel_window_arg_a,g_selection_panel_window_arg_b,g_selection_panel_window_arg_d,bh,g_selection_panel_window_arg_c,3);
-    if(func_PAL_L02_00402928()) { c1=g_selection_panel_header_color; text_draw_window_small(box,c1,text,func_001157AC(text)); }
+    if(pal_language_at_least_two()) { c1=g_selection_panel_header_color; text_draw_window_small(box,c1,text,func_001157AC(text)); }
     else { c1=g_selection_panel_header_color; text_draw_window_large(box,c1,text,func_001157AC(text)); }
     if(SEL==0 && !g_game_flag_table[arena_get_challenge_flag_index(0)]) goto counts;
     if(SEL==1 && !g_game_flag_table[arena_get_challenge_flag_index(1)]) goto counts;

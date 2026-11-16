@@ -4,13 +4,13 @@
 typedef unsigned char u8;
 typedef unsigned long u64;
 extern u64 GetEffectTextureDescriptor(int);
-extern void func_PAL_0027FB48(float, float, u64, u8 *, int, float, u64, u8 *);
+extern void FontPrintScaled_pal(float, float, u64, u8 *, int, float, u64, u8 *);
 extern u8 g_font_glyphs_small[];
 
 /* Scaled FontPrint: the text is drawn at (x, y) with font texture 1. */
-void func_PAL_0027FE88(float x, float y, u64 color, u8 *text, int length, float scale) {
+void text_draw_small_scaled(float x, float y, u64 color, u8 *text, int length, float scale) {
     u64 texture;
 
     texture = GetEffectTextureDescriptor(1);
-    func_PAL_0027FB48(x, y, color, text, length, scale, texture, g_font_glyphs_small);
+    FontPrintScaled_pal(x, y, color, text, length, scale, texture, g_font_glyphs_small);
 }

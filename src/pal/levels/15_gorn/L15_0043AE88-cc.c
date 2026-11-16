@@ -43,13 +43,14 @@ extern float math_random_signed_float_range(float, float);
 extern float math_random_float_range(float, float);
 extern float FastAddRotations(float, float);
 extern void vec_build_spherical_offset(void *, float, float, float);
-extern unsigned char *func_PAL_002BE9A8(float, float, float, float,
+extern unsigned char *part_spawn_spinning_spark_pal(float, float, float, float,
                                    void *, int, void *, int, int);
 extern int math_random_int_range(int, int);
 extern int FloatToInt(float);
 extern float IntToFloat(int);
 
-void func_PAL_L15_0043AE88(char *object, int joint, int unused, float radius) {
+/* Spawns a puff of smoke particle at a joint of the Gorn ship, thrown away from the hero. (PAL: 50 Hz lifetimes) */
+void gorn_part_spawn_smoke_pal(char *object, int joint, int unused, float radius) {
     float initial[4], point[4], velocity[4];
     float heading, speed, tilt, yaw;
     unsigned char *particle;
@@ -66,7 +67,7 @@ void func_PAL_L15_0043AE88(char *object, int joint, int unused, float radius) {
     tilt = math_random_signed_float_range(0, 1.396263599395752f);
     yaw = FastAddRotations(heading, math_random_signed_float_range(0, 1.5707964897155762f));
     vec_build_spherical_offset(velocity, speed, yaw, tilt);
-    particle = func_PAL_002BE9A8(0, 1.0f, 1.01f, radius * 210000.0f,
+    particle = part_spawn_spinning_spark_pal(0, 1.0f, 1.01f, radius * 210000.0f,
                             point, -1, velocity, 0x307F7F7F, 0);
     if (particle != 0) {
         particle[3] = 0x48;

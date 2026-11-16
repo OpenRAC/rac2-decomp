@@ -24,10 +24,10 @@ extern float g_fog_far_intensity[] MACRO_ADDR;
 /* Measured fields of the record the fade writes. */
 typedef struct {
     char pad_00[0x218];
-    float f218, f21C;
+    float fog_near, fog_far;
     char pad_220[8];
-    float f228, f22C;
-    int i230, i234, i238;
+    float near_intensity, far_intensity;
+    int color_r, color_g, color_b;
 } L00FadeRecord;
 extern L00FadeRecord g_hud_float_params;
 
@@ -36,7 +36,8 @@ extern float IntToFloat(int);
 extern int FloatToInt(float);
 extern void UpdateViewContext(void);
 
-void func_PAL_L00_004007B0(void)
+/* Fades the fog colour and distances toward white while the screen fade timer runs (PAL: 50 Hz duration). */
+void cam_update_screen_fade_pal(void)
 {
     float ratio;
 
@@ -45,16 +46,16 @@ void func_PAL_L00_004007B0(void)
     }
     math_fast_float_d(&g_screen_fade_timer);
     ratio = IntToFloat(g_screen_fade_timer) / IntToFloat(((g_screen_fade_duration * 5 + 2) / 6));
-    g_hud_float_params.i230 =
+    g_hud_float_params.color_r =
         FloatToInt(IntToFloat(g_fog_color_r[0]) + (255.0f - IntToFloat(g_fog_color_r[0])) * ratio);
-    g_hud_float_params.i234 =
+    g_hud_float_params.color_g =
         FloatToInt(IntToFloat(g_fog_color_g[0]) + (255.0f - IntToFloat(g_fog_color_g[0])) * ratio);
-    g_hud_float_params.i238 =
+    g_hud_float_params.color_b =
         FloatToInt(IntToFloat(g_fog_color_b[0]) + (255.0f - IntToFloat(g_fog_color_b[0])) * ratio);
-    g_hud_float_params.f218 = g_fog_near[0] + -g_fog_near[0] * ratio;
-    g_hud_float_params.f21C =
+    g_hud_float_params.fog_near = g_fog_near[0] + -g_fog_near[0] * ratio;
+    g_hud_float_params.fog_far =
         g_fog_far[0] + (g_screen_l00_fade_scale_2[0] * (g_screen_l00_fade_scale * 1024.0f) - g_fog_far[0]) * ratio;
-    g_hud_float_params.f228 = g_fog_near_intensity[0] + (255.0f - g_fog_near_intensity[0]) * ratio;
-    g_hud_float_params.f22C = g_fog_far_intensity[0] + (100.0f - g_fog_far_intensity[0]) * ratio;
+    g_hud_float_params.near_intensity = g_fog_near_intensity[0] + (255.0f - g_fog_near_intensity[0]) * ratio;
+    g_hud_float_params.far_intensity = g_fog_far_intensity[0] + (100.0f - g_fog_far_intensity[0]) * ratio;
     UpdateViewContext();
 }

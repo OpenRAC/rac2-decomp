@@ -22,7 +22,7 @@ typedef struct {
     u8 pad54[8];
     s16 last;
     s16 length;
-    s16 maximumLength;
+    s16 max_length;
     s16 cursor;
     s16 depth;
     s16 pending;
@@ -50,21 +50,21 @@ extern void path_puzzle_choose_next_node(u8 *);
    0.5, or above -0.1 when none of the node's components is zero); then sets the orientation
    from the angles at +0xF0, builds the path (func_L03_003E2968, func_L03_003E2C08) and the
    choice list, and starts the walk at node 0 with the starting timer. */
-void func_PAL_L03_003E6CA8(u8 *p) {
-    PuzzlePath *q = *(PuzzlePath **)(p + 0x68);
+void path_puzzle_init_pal(u8 *moby) {
+    PuzzlePath *path = *(PuzzlePath **)(moby + 0x68);
     u8 *position;
     u8 *rotation;
     PuzzleNode *node;
     int k, row, col, i, j, n, m;
-    f32 d, t;
+    f32 dot, threshold;
 
     for (k = 0; k < 14; k++) {
         vec_scale_to_length(&g_puzzle_node_directions[k], &g_puzzle_node_directions[k], 1.0f);
-        q->facing[k] = 255;
+        path->facing[k] = 255;
     }
-    q->facing[14] = 255;
-    rotation = p + 0xC0;
-    position = p + 0xF0;
+    path->facing[14] = 255;
+    rotation = moby + 0xC0;
+    position = moby + 0xF0;
 
     for (row = 0; row < 14; row++)
         for (col = 0; col < 6; col++)
@@ -75,11 +75,11 @@ void func_PAL_L03_003E6CA8(u8 *p) {
         for (j = 0; j < 14; j++) {
             if (i != j) {
                 node = &g_puzzle_node_directions[i];
-                d = FastVecDot(node, &g_puzzle_node_directions[j]);
-                t = 0.5f;
+                dot = FastVecDot(node, &g_puzzle_node_directions[j]);
+                threshold = 0.5f;
                 if (node->x != 0.0f && node->y != 0.0f && node->z != 0.0f)
-                    t = -0.1f;
-                if (d > t)
+                    threshold = -0.1f;
+                if (dot > threshold)
                     g_path_puzzle_adjacency[i][n++] = j;
             }
         }
@@ -87,24 +87,24 @@ void func_PAL_L03_003E6CA8(u8 *p) {
 
     mat_get_euler_angles(rotation, position);
     mat_build_rotation_from_angles(g_puzzle_rotation_quat, position);
-    func_001163A0(q->sound);
-    path_puzzle_generate_route(p);
-    SelectPathStepNodes(p);
-    choice_list_build(p);
-    path_puzzle_choose_next_node(p);
+    func_001163A0(path->sound);
+    path_puzzle_generate_route(moby);
+    SelectPathStepNodes(moby);
+    choice_list_build(moby);
+    path_puzzle_choose_next_node(moby);
 
     for (m = 0; m < 16; m++) {
-        q->order[m] = 255;
-        q->visited[m] = 0;
+        path->order[m] = 255;
+        path->visited[m] = 0;
     }
-    q->order[0] = 0;
-    q->visited[0] = 1;
-    q->length = 0;
-    q->pending = -1;
-    q->current = 0;
-    q->last = 0;
-    q->next = 0;
-    q->cursor = 0;
-    q->depth = 0;
-    q->timer = ((s32)(g_path_puzzle_duration) * 5 + 2) / 6;
+    path->order[0] = 0;
+    path->visited[0] = 1;
+    path->length = 0;
+    path->pending = -1;
+    path->current = 0;
+    path->last = 0;
+    path->next = 0;
+    path->cursor = 0;
+    path->depth = 0;
+    path->timer = ((s32)(g_path_puzzle_duration) * 5 + 2) / 6;
 }

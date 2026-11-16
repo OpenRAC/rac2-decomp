@@ -67,6 +67,7 @@ typedef struct {
     float scroll;
 } BeamState;
 
+/* Draws a glowing laser beam from flat strips with a scrolling texture and a spinning glow at its end. */
 void gfx_draw_laser_beam_pal(int unused0, int unused1, int unused2, int unused3,
                       int unused4, char *obj)
 {

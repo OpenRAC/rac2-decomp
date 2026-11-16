@@ -11,9 +11,10 @@ typedef struct {
 extern CallbackState g_pause_menu_state;
 extern int g_menu_input_flags;
 extern int g_menu_input_flags;
-extern int func_PAL_0029D1D8(int);
+extern int menu_update_screen_adjust_pal(int);
 
-int func_PAL_002D40C8(void) {
+/* Handles input for a menu page: confirms the selection, closes on a button press, otherwise passes the buttons on (PAL). */
+int menu_page_update_send_request_pal(void) {
     int result = 0;
     int flags = g_menu_input_flags;
     if (flags & 0x10) {
@@ -31,20 +32,21 @@ return_value:
     if (flags & 0x900)
         result = 1;
     else
-        func_PAL_0029D1D8(flags);
+        menu_update_screen_adjust_pal(flags);
     return result;
 }
 
 
 #include "common.h"
 extern void SetupGifPaging(long);
-extern void func_PAL_0029D218(void);
+extern void menu_draw_screen_adjust_pal(void);
 extern void DoGifPaging(void);
 
-int func_PAL_002D4150(void)
+/* Draws a menu page between the start and end of screen drawing (PAL). */
+int menu_page_draw_7_pal(void)
 {
   SetupGifPaging(0);
-  func_PAL_0029D218();
+  menu_draw_screen_adjust_pal();
   DoGifPaging();
   return 0;
 }

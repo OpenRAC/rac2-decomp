@@ -13,12 +13,12 @@ extern void hero_set_state_value_a(int);
 extern int table_find_last_used_entry(int);
 extern void hero_set_state_value_b(int);
 extern int cam_is_mode_active(void);
-extern void func_PAL_L05_0037FEB0(void);
+extern void table_reset_working_values_pal(void);
 extern void level_clear_object_records(void);
 extern void ship_save_transform_state_pal(void);
 
 /* Resets the mission's shared counters. */
-void func_PAL_L10_00428C8C(void) {
+void mission_reset_counters_pal(void) {
     char *state;
     int i;
     entry_init_all_registered();
@@ -39,7 +39,7 @@ void func_PAL_L10_00428C8C(void) {
         *(int *)(state + 0x2C) = 0;
         g_hud_blink_moby[0x20] = 1;
     }
-    func_PAL_L05_0037FEB0();
+    table_reset_working_values_pal();
     level_clear_object_records();
     ship_save_transform_state_pal();
 }

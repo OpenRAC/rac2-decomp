@@ -14,10 +14,12 @@ extern u8 *g_moby_l18_table[] __attribute__((sda));
 extern void moby_set_controller_speed_limits(u8 *arg0, float, float, float, float);
 extern u8 g_data_block_base[];
 
-void extermibot_set_slow_limits_pal(u8 *a0) {
-    moby_set_controller_speed_limits(a0, 0.008f, 0.064f, 0.040212393f, 1.0053098f);
+/* Sets the turning and speed limits for slow movement. (PAL: 50 Hz values) */
+void extermibot_set_slow_limits_pal(u8 *moby) {
+    moby_set_controller_speed_limits(moby, 0.008f, 0.064f, 0.040212393f, 1.0053098f);
 }
 
-void extermibot_set_fast_limits_pal(u8 *a0) {
-    moby_set_controller_speed_limits(a0, 0.2f, 0.22000001f, 0.040212393f, 1.0053098f);
+/* Sets the turning and speed limits for fast movement. (PAL: 50 Hz values) */
+void extermibot_set_fast_limits_pal(u8 *moby) {
+    moby_set_controller_speed_limits(moby, 0.2f, 0.22000001f, 0.040212393f, 1.0053098f);
 }

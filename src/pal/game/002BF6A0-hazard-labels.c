@@ -18,7 +18,8 @@ extern unsigned char *g_part_tex_joint_glow_table;
 #define SPEED  (*(float *)(q + 0x10))
 #define EASE   (*(float *)(q + 0x14))
 
-void func_PAL_002BF8A8(char *p)
+/* Updates a glow that follows a joint of its owner, pulsing in size and alpha and cycling its texture, until the owner goes away. */
+void part_update_joint_glow_pal(char *p)
 {
     char *q;
     float pos[4] __attribute__((aligned(16)));

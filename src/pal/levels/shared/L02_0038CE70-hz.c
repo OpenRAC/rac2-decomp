@@ -18,6 +18,7 @@ struct TriggerState {
     unsigned char state;
 };
 
+/* Fires the one-time reward once enough targets are destroyed on map 16. */
 void one_shot_trigger_update_pal(struct TriggerState *self) {
     if (self->initialized == 0) {
         self->state = 0xFF;

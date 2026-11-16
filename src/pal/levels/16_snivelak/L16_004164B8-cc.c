@@ -24,7 +24,7 @@ extern s32 FloatToInt(float);
 extern s32 g_frame_l16_counter MACRO_ADDR;
 extern float math_fast_sin_or_cos_b(float);
 extern float math_step_value_toward_target(void *, void *, float, float, float, float);
-extern void func_PAL_L16_004180B0(u8 *);
+extern void snivelak_emit_fire_burst_pal(u8 *);
 extern void group_wake_members(u8 *);
 /* Object update: on the first frame (+0x20 still zero) sets the state's defaults and
    rates; then, with +0x31 set and the object within 32 units of D_L16_001B9B00, runs
@@ -54,22 +54,23 @@ void group_wake_members(u8 *arg0);
 
 /* func_L16_004110D0 is compiled from L16_004110D0-g8.c. */
 
-void func_PAL_L16_004164B8(u8 *arg)
+/* Moves the object up and down along a sine wave around its target height, then emits the fire burst. */
+void moby_bob_along_sine_wave_pal(u8 *moby)
 {
-    u8 *s0;
-    u8 *s1;
-    float f20;
+    u8 *self;
+    u8 *state;
+    float bob_height;
     float period = 1e+02f;
 
-    s0 = arg;
-    s1 = *(u8 **)(arg + 0x68);
-    f20 = 10.0f;
-    if (s0[0x20] == 0xD || s0[0x20] == 0xF || s0[0x20] == 0xE || s0[0x20] == 0x11)
-        f20 = 25.0f;
-    f20 = f20 + math_fast_sin_or_cos_b((float)(g_frame_l16_counter % FloatToInt(1e+02f)) / period * 6.2831855f - 3.1415927f);
-    math_step_value_toward_target(s0 + 0x18, s1 + 0x268, *(float *)(s1 + 0x264) + f20,
+    self = moby;
+    state = *(u8 **)(moby + 0x68);
+    bob_height = 10.0f;
+    if (self[0x20] == 0xD || self[0x20] == 0xF || self[0x20] == 0xE || self[0x20] == 0x11)
+        bob_height = 25.0f;
+    bob_height = bob_height + math_fast_sin_or_cos_b((float)(g_frame_l16_counter % FloatToInt(1e+02f)) / period * 6.2831855f - 3.1415927f);
+    math_step_value_toward_target(self + 0x18, state + 0x268, *(float *)(state + 0x264) + bob_height,
                   0.012f, 0.004f, 0.20000002f);
-    func_PAL_L16_004180B0(s0);
+    snivelak_emit_fire_burst_pal(self);
 }
 
 /* func_L16_00411480 is defined in L16_00403900-g8.c. */
@@ -105,11 +106,11 @@ extern L16VoiceState g_music_state;
 /* Asks the engine to load voice line idx, from the first table below 20 and the second from 20 up,
    unless a load is active or pending or that line is already the current one. The arms are written
    out: cross-jump merges their stores after allocation, which leaves them before the shared tail. */
-void RequestVoiceLine(u8 *arg, s32 idx);
+void RequestVoiceLine(u8 *moby, s32 idx);
 
 /* Walks a rotating candidate index over the measured byte table until a free slot
    is found, arms it, and clears the whole window when none is. */
-void snd_play_unplayed_voice_line(u8 *arg, s32 start, s32 end);
+void snd_play_unplayed_voice_line(u8 *moby, s32 start, s32 end);
 
 /* Finishes the pending entry (its two saved vectors are copied back), then resets the
    level's handles. */

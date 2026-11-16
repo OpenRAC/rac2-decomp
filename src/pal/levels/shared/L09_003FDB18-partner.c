@@ -3,7 +3,7 @@
 #include "common.h"
 extern void level_apply_colour_tint(char *);
 extern void moby_copy_color(char *, char *);
-extern void func_PAL_L09_003FC118(char *);
+extern void trooper_draw_flame_sprays_pal(char *);
 extern void moby_transform_joint_to_world(char *, int, void *);
 extern f32 math_approach_target_with_direction_mode(void *, void *, int, float, float,float, float);
 extern void FastVecSub(void *, void *,void *);
@@ -17,6 +17,7 @@ extern float math_random_float_range(float, float);
 #define B(p, o) (*(unsigned char *)((p) + (o)))
 #define P(p, o) (*(char **)((p) + (o)))
 
+/* Keeps the trooper's torso attached to its legs: copies colour, aims the arms and spawns flame sprays (PAL). */
 void trooper_torso_update_attachment_pal(char *object)
 {
     char *data=P(object,0x68);
@@ -36,7 +37,7 @@ void trooper_torso_update_attachment_pal(char *object)
     moby_transform_joint_to_world(object,0,P(data,0x2F8)+0x10);
     math_approach_target_with_direction_mode(P(data,0x2F8)+0xF8,data+0x2FC,0,F(data,0x2EC),F(data,0x114),F(data,0x118),F(data,0x11C));
     F(P(data,0x2F8),0x48)=F(object,0x48);
-    if ((unsigned)(B(object,0x20)-1)<3 || B(object,0x20)==16) func_PAL_L09_003FC118(object);
+    if ((unsigned)(B(object,0x20)-1)<3 || B(object,0x20)==16) trooper_draw_flame_sprays_pal(object);
     if (I(data,0x204)==1 && !B(data,0x30F)) {
         moby_transform_joint_to_world(P(data,0x2F8),4,v);
         FastVecSub(v,data+0x1F0,v);

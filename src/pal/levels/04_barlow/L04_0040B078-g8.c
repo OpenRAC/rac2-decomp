@@ -29,9 +29,10 @@ extern float math_fast_float_g(float);
 extern float math_fast_sin_or_cos_b(float);
 extern void font_queue_vu_state(void);
 extern void part_draw_glint_effect(int, void *, void *, void *, int);
-void func_PAL_L04_0040B078(char *object)
+/* Draws the first water surface: a ring of ripple vertices that wave up and down, with scrolling textures, coloured from the object (PAL: 50 Hz timing). */
+void water_draw_ripple_surface_pal(char *moby)
 {
-    float *state = *(float **)(object + 0x68);
+    float *ripple_state = *(float **)(moby + 0x68);
     float time;
     int red, green, blue;
     int colour;
@@ -44,10 +45,10 @@ void func_PAL_L04_0040B078(char *object)
     VU1_addGSregister(0x14,0xFF9000000260ULL);
     {
         float delta = 360.0f / ((g_water_ripple_segment_count * 5.0f + 2.0f) * 0.16666667f);
-        state[0] = state[1];
-        state[1] = FastAddRotations(state[1], delta * 0.0003490659f);
+        ripple_state[0] = ripple_state[1];
+        ripple_state[1] = FastAddRotations(ripple_state[1], delta * 0.0003490659f);
     }
-    get_moby_color(object, &red, &green, &blue);
+    get_moby_color(moby, &red, &green, &blue);
     {
         int high = (g_water_alpha << 24) | (blue << 16);
         int rgb = high | (green << 8);
@@ -60,11 +61,11 @@ void func_PAL_L04_0040B078(char *object)
                 math_fast_float_g((fast_fmod(
                     square_root(v[0] * v[0] + v[1] * v[1]),
                     g_water_wave_segment_count) * 6.28318596f) / g_water_wave_segment_count),
-                state[1]));
+                ripple_state[1]));
             float height = g_water_wave_height * wave;
-            g_water_ripple_positions[group][i * 3] = v[0] + *(float *)(object + 0x10);
-            g_water_ripple_positions[group][i * 3 + 1] = v[1] + *(float *)(object + 0x14);
-            g_water_ripple_positions[group][i * 3 + 2] = (v[2] + *(float *)(object + 0x18)) + height;
+            g_water_ripple_positions[group][i * 3] = v[0] + *(float *)(moby + 0x10);
+            g_water_ripple_positions[group][i * 3 + 1] = v[1] + *(float *)(moby + 0x14);
+            g_water_ripple_positions[group][i * 3 + 2] = (v[2] + *(float *)(moby + 0x18)) + height;
             g_water_ripple_colors[group][i] = colour;
         }
     }

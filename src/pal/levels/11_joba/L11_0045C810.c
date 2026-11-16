@@ -17,10 +17,10 @@ typedef struct {
 typedef struct {
     float points[8][4];
     s32 count;
-    float minRadius;
-    float maxRadius;
-    float maxElevation;
-    float minElevation;
+    float min_radius;
+    float max_radius;
+    float max_elevation;
+    float min_elevation;
     float f94;
     float f98;
     float f9C;
@@ -55,11 +55,11 @@ void joba_ring_effect_update_pal(JobaObject *obj)
             state->count = 8;
         obj->stage = 1;
         for (i = 0; i < state->count; i++) {
-            float newRadius, newAzimuth;
+            float new_radius, new_azimuth;
 
-            newRadius = math_random_float_range(state->minRadius, state->maxRadius);
-            newAzimuth = math_random_angle();
-            vec_build_spherical_offset(state->points[i], newRadius, newAzimuth, math_random_angle());
+            new_radius = math_random_float_range(state->min_radius, state->max_radius);
+            new_azimuth = math_random_angle();
+            vec_build_spherical_offset(state->points[i], new_radius, new_azimuth, math_random_angle());
             FastVecAdd(state->points[i], obj->position, state->points[i]);
         }
     }
@@ -75,18 +75,18 @@ void joba_ring_effect_update_pal(JobaObject *obj)
             azimuth = fast_subtract_rotations(azimuth, state->f9C * 0.017453294f);
             elevation = fast_subtract_rotations(elevation,
                                       math_random_signed_float_range(state->fA4, state->fA0) * 0.017453294f);
-            if (state->maxElevation < elevation)
-                elevation = state->maxElevation;
-            if (elevation < state->minElevation)
-                elevation = state->minElevation;
+            if (state->max_elevation < elevation)
+                elevation = state->max_elevation;
+            if (elevation < state->min_elevation)
+                elevation = state->min_elevation;
 
             radius = fast_vec_dist(obj->position, point);
             step = math_random_signed_float_range(state->f98 * 0.020000001f, state->f94 * 0.020000001f);
             radius += step;
-            if (state->maxRadius < radius)
-                radius = state->maxRadius;
-            if (radius < state->minRadius)
-                radius = state->minRadius;
+            if (state->max_radius < radius)
+                radius = state->max_radius;
+            if (radius < state->min_radius)
+                radius = state->min_radius;
 
             vec_build_spherical_offset(point, radius, azimuth, elevation);
             FastVecAdd(point, obj->position, point);

@@ -21,7 +21,7 @@ extern s32 g_game_mode[];
 extern u8 g_map_overlay_flag[] __attribute__((sda));
 extern u8 g_trigger_event_flags[] __attribute__((sda));
 extern int math_random_int_below(int);
-extern void func_PAL_L18_003FCE00(void *, void *);
+extern void owner_set_word_pal(void *, void *);
 extern void protopet_reset_group_members(void *);
 extern void state_set_flag_one(void);
 extern void hero_reset_position_and_direction_pal(void *, void *, int, int);
@@ -43,7 +43,7 @@ extern void script_queue_keyed_request(int, int);
 extern void L18_DisableModeGroups(void *, int);
 extern void moby_set_color_effect_pal(void *, int);
 extern void part_update_timed_sequence(void *);
-extern void func_PAL_L18_003FDF30(void *);
+extern void part_start_timed_sequence_pal(void *);
 extern void DrawSegmentedBeams(void *);
 extern void gfx_add_draw_callback_third(void *, void *);
 extern void protopet_clear_link_minus_one(void *);
@@ -78,11 +78,12 @@ static __inline__ int StreamGroup(u8 *state, int i, int base)
     return *(int *)((u8 *)ids + off);
 }
 
+/* Updates the Damosel group trigger: spawns and tracks the groups of Protopets, advances the encounter stages as the hero reaches each zone, and opens the way once the group is cleared. (PAL: 50 Hz timings) */
 /* The group id and D_001A7A7B are read again where the logic needs them: GCSE
  * reduces the rereads to one load and a copy. D_L18_001B2568 and D_001A7A7B are
  * written as a base plus offset, which keeps those stores out of delay slots.
  */
-void func_PAL_L18_003FD180(u8 *object)
+void damosel_group_trigger_update_pal(u8 *object)
 {
     u8 *state = *(u8 **)(object + 0x68);
     int mode;
@@ -103,7 +104,7 @@ void func_PAL_L18_003FD180(u8 *object)
                  entry++) {
                 entity = g_moby_l18_table[0] + ((*entry & 0x7FFF) << 8);
                 if (!entity) break;
-                func_PAL_L18_003FCE00(entity, object);
+                owner_set_word_pal(entity, object);
             }
         }
         HALF(state, 0xA8) = 1;
@@ -212,7 +213,7 @@ void func_PAL_L18_003FD180(u8 *object)
                     IsPointInCuboid(g_hero_position, *StateSlot(state, i, 0x90))) {
                     *StateSlot(state, i, 0x90) = -1;
                     HALF(state, 0xAE) = i;
-                    func_PAL_L18_003FDF30(object);
+                    part_start_timed_sequence_pal(object);
                     if ((u32)i < 8) g_game_flag_table[0x94] |= 1 << i;
                 }
             }
@@ -228,9 +229,9 @@ void func_PAL_L18_003FD180(u8 *object)
                 WORD(LOCAL_ENTITY(0xC8), 0x98) = WORD(*(u8 **)(LOCAL_ENTITY(0xC8) + 0x24), 0x10);
                 if (WORD(state, 0xCC) != -1) FLAGS(LOCAL_ENTITY(0xCC)) |= 2;
                 {
-                    u8 *nextBase = g_moby_l18_table[0];
-                    FLAGS((u8 *)((WORD(state, 0xCC) << 8) + (s32)nextBase)) |= 1;
-                    WORD((u8 *)((WORD(state, 0xCC) << 8) + (s32)nextBase), 0x98) = 0;
+                    u8 *next_base = g_moby_l18_table[0];
+                    FLAGS((u8 *)((WORD(state, 0xCC) << 8) + (s32)next_base)) |= 1;
+                    WORD((u8 *)((WORD(state, 0xCC) << 8) + (s32)next_base), 0x98) = 0;
                 }
             }
         }
@@ -301,10 +302,10 @@ void func_PAL_L18_003FD180(u8 *object)
                 break;
             }
             if (ready) {
-                int allReady = 1;
+                int all_ready = 1;
                 u16 *entry;
                 u8 *entity;
-                for (i = 0; i < 4 && allReady; i++) {
+                for (i = 0; i < 4 && all_ready; i++) {
                     for (entry = g_condition_target_lists[StreamGroup(state, i, 0xF0)];
                     (StreamGroup(state, i, 0xF0) & 255) != 255 &&
                     StreamGroup(state, i, 0xF0) <= g_max_l18_group_index[0] && entry &&
@@ -315,14 +316,14 @@ void func_PAL_L18_003FD180(u8 *object)
                         if (entity[0x20] != 0xFE) {
                             if (entity[0x20] != 0xFD) {
                                 if ((FLAGS(entity) ^ 1) & 1) {
-                                    allReady = 0;
+                                    all_ready = 0;
                                     break;
                                 }
                             }
                         }
                     }
                 }
-                if (allReady) {
+                if (all_ready) {
                     if (!g_trigger_event_flags[3]) {
                         g_trigger_event_flags[3] = 1;
                         snd_play_from_global_bank(1, 0, 0);

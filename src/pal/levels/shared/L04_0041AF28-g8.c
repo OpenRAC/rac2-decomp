@@ -17,7 +17,7 @@ typedef struct {
  s16 opacity;
  u16 flags;
  char pad36[0xc];
- u8 animState;
+ u8 anim_state;
  u8 anim;
  char pad44[0x4];
  float animSpeed;
@@ -55,7 +55,7 @@ extern int g_race_time_ticks __attribute__((sda));
 extern Object1006 *g_race_bike_child_moby __attribute__((sda));
 extern void func_PAL_002A0F68(void *);
 extern void func_002A0F48(void *);
-extern void func_PAL_002A7E68(void *,int,int,int);
+extern void anim_start_blended_pal(void *,int,int,int);
 extern int math_fast_float_d(void *);
 extern void FastVecSub(void *,void *,void *);
 extern float func_L00_002EE290(void *);
@@ -65,14 +65,15 @@ extern void moby_init_child_from_parent(void *,void *);
 extern void moby_copy_joint_transform_to_object(void *,void *,int,int);
 extern void moby_transform_joint_point(void *,int,void *);
 extern void mat_build_rotation_from_angles(void *,void *);
-extern void func_PAL_L04_00410920(void *);
-extern void func_PAL_L04_0041AB08(char *,void *,void *,float);
+extern void racer_spawn_exhaust_effects_pal(void *);
+extern void emit_trail_effects_pal(char *,void *,void *,float);
 
-void func_PAL_L04_0041AF28(char *m,char *s) {
+/* Updates the racer bike animation: leans the bike, plays the rider animation and spawns the effects (PAL: 50 Hz timings). */
+void racer_update_bike_animation_pal(char *moby,char *s) {
  float v[4] __attribute__((aligned(16)));
  float mat[16] __attribute__((aligned(16)));
  float a,b,c,target,scale,d,angle,period=0.6f; Object1006 *obj;
- if(!B(m,0xbc)) return;
+ if(!B(moby,0xbc)) return;
  a=F(s,0x30c)+F(s,0x27c);
  if(a<0.10000001f) a=0.10000001f;
  b=F(s,0x308)*11.459153f;
@@ -82,7 +83,7 @@ void func_PAL_L04_0041AF28(char *m,char *s) {
  d=1.0f-(1.0f-d)*(1.0f-d);
  if(c>1.0f) c=1.0f;
  if(F(s,0x4c8)!=0.0f) {
-  if(math_fabs(F(m,0xf0)-F(s,0x4c8))<0.003f) F(s,0x4c8)=0;
+  if(math_fabs(F(moby,0xf0)-F(s,0x4c8))<0.003f) F(s,0x4c8)=0;
   scale=5.0f;
   target=F(s,0x4c8);
  } else {
@@ -91,38 +92,38 @@ void func_PAL_L04_0041AF28(char *m,char *s) {
   if(target>1.0f) target=1.0f;
   if(target<-1.0f) target=-1.0f;
   target*=-0.52359885f;
-  if(B(m,0x20)!=3 && g_bike_speed_ratio<0.2f) target=0;
+  if(B(moby,0x20)!=3 && g_bike_speed_ratio<0.2f) target=0;
  }
- math_approach_with_velocity(m+0xf0,target,s+0x300,scale*0.050400004f,0.648f,scale*0.03316126f,0);
+ math_approach_with_velocity(moby+0xf0,target,s+0x300,scale*0.050400004f,0.648f,scale*0.03316126f,0);
  obj=(Object1006 *)(g_moby_l04_pool+(I(s,0x1dc)<<8));
  if(obj) {
   obj->scale=obj->model->scale*0.25f;
   obj->opacity=127; obj->enabled=1;
-  obj->pos=*(Quad1006 *)(m+0x10); obj->rotation=*(Quad1006 *)(m+0xf0);
+  obj->pos=*(Quad1006 *)(moby+0x10); obj->rotation=*(Quad1006 *)(moby+0xf0);
   obj->state=0;
   func_PAL_002A0F68(obj);func_002A0F48(obj);
   obj->flags|=6;
-  if((obj->flags60&2) && (unsigned)(obj->animState-2)<4) func_PAL_002A7E68(obj,0,0,2);
+  if((obj->flags60&2) && (unsigned)(obj->anim_state-2)<4) anim_start_blended_pal(obj,0,0,2);
   if(!I(s,0x36c)) {
-   if(H(s,0x274) && (obj->anim==0 || obj->anim==2)) func_PAL_002A7E68(obj,1,0,10);
+   if(H(s,0x274) && (obj->anim==0 || obj->anim==2)) anim_start_blended_pal(obj,1,0,10);
    if(!H(s,0x274) && obj->anim==1) {
-    if(H(s,0x276)>=13) func_PAL_002A7E68(obj,2,0,2);
-    else func_PAL_002A7E68(obj,0,0,5);
+    if(H(s,0x276)>=13) anim_start_blended_pal(obj,2,0,2);
+    else anim_start_blended_pal(obj,0,0,5);
    }
   } else math_fast_float_d(s+0x36c);
   if(obj->anim<2) {
    obj->animSpeed=F(s,0x30c)*3.0f/period;
    if(F(s,0x30c)>0.40000004f) obj->animSpeed*=3.0f;
   }
-  if(B(m,0xbc)==5) {
+  if(B(moby,0xbc)==5) {
    F(s,0x428)=g_stick_axis_scaled*-0.5f;
-   F(s,0x424)=math_fabs(F(m,0xf0))*-0.6f-F(m,0xf4);
+   F(s,0x424)=math_fabs(F(moby,0xf0))*-0.6f-F(moby,0xf4);
   } else { F(s,0x424)=F(s,0x428)=0; }
   if(P(s,0x3b0) && g_race_time_ticks>=101) {
-   FastVecSub(v,(char *)P(s,0x3b0)+0x10,m+0x10);
+   FastVecSub(v,(char *)P(s,0x3b0)+0x10,moby+0x10);
    if(func_L00_002EE290(v)<9.0f) {
     angle=mat_fast_helper_a(v[0],v[1]);
-    angle=fast_subtract_rotations(F(m,0xf8),angle);
+    angle=fast_subtract_rotations(F(moby,0xf8),angle);
     if(math_fabs(angle)<1.5707964f) {
      if(I(s,0x3b4)<180) { I(s,0x424)=0; F(s,0x428)=-angle; }
      I(s,0x3b4)++;
@@ -151,10 +152,10 @@ void func_PAL_L04_0041AF28(char *m,char *s) {
   }
  }
   if(g_race_bike_mode) {
-   *(Quad1006 *)v=*(Quad1006 *)(m+0x10);v[2]=g_height_threshold;*(Quad1006 *)mat=*(Quad1006 *)(m+0x10);
-   func_PAL_L04_0041AB08(m,mat,s+0x290,F(s,0x30c)+F(s,0x27c));
+   *(Quad1006 *)v=*(Quad1006 *)(moby+0x10);v[2]=g_height_threshold;*(Quad1006 *)mat=*(Quad1006 *)(moby+0x10);
+   emit_trail_effects_pal(moby,mat,s+0x290,F(s,0x30c)+F(s,0x27c));
   }
   F(s,0x6c0)=FastAddRotations(F(s,0x6c0),(F(s,0x30c)+F(s,0x27c)*4.0f)*0.2f+0.01f);
   mat_build_rotation_from_angles(s+0x450,s+0x6c0);
-  func_PAL_L04_00410920(m);
+  racer_spawn_exhaust_effects_pal(moby);
 }

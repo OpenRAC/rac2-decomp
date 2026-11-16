@@ -34,6 +34,7 @@ typedef struct {
 } EffectState;
 extern EffectState g_camera_state;
 
+/* Runs a destructible machine: it waits until hit, then charges up and blows apart with a big effect (USA v2.00). */
 void destructible_machine_update_us2(unsigned char *obj)
 {
     char *d = *(char **)(obj + 0x68);

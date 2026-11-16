@@ -18,24 +18,25 @@ extern void Fd1c2476b_FUN_003464D0(char *p);
 /* func_003463C8 and func_003464D0 are built from 00345358-g8.c for small-data access. */
 
 
-void func_PAL_00348728(char *a0)
+/* Draws the large menu screen parts when the menu is active. (PAL) */
+void menu_screen_large_draw_parts_pal(char *menu)
 {
-    if (*(int *)(a0 + 1272) == 0)
+    if (*(int *)(menu + 1272) == 0)
         return;
-    Fd1c2476b_FUN_00336320(a0);
-    Fd1c2476b_FUN_00336320(a0 + 76);
-    Fd1c2476b_FUN_00336320(a0 + 152);
-    Fd1c2476b_FUN_00336320(a0 + 228);
-    Fd1c2476b_FUN_00336A78(a0 + 456);
-    Fd1c2476b_FUN_003462A8(a0);
-    Fd1c2476b_FUN_003463C8(a0);
-    Fd1c2476b_FUN_003464D0(a0);
-    Fd1c2476b_FUN_00336320(a0 + 380);
-    Fd1c2476b_FUN_00336A78(a0 + 784);
-    Fd1c2476b_FUN_00336A78(a0 + 696);
-    Fd1c2476b_FUN_00336A78(a0 + 872);
-    Fd1c2476b_FUN_00336A78(a0 + 960);
-    Fd1c2476b_FUN_00336A78(a0 + 1048);
+    Fd1c2476b_FUN_00336320(menu);
+    Fd1c2476b_FUN_00336320(menu + 76);
+    Fd1c2476b_FUN_00336320(menu + 152);
+    Fd1c2476b_FUN_00336320(menu + 228);
+    Fd1c2476b_FUN_00336A78(menu + 456);
+    Fd1c2476b_FUN_003462A8(menu);
+    Fd1c2476b_FUN_003463C8(menu);
+    Fd1c2476b_FUN_003464D0(menu);
+    Fd1c2476b_FUN_00336320(menu + 380);
+    Fd1c2476b_FUN_00336A78(menu + 784);
+    Fd1c2476b_FUN_00336A78(menu + 696);
+    Fd1c2476b_FUN_00336A78(menu + 872);
+    Fd1c2476b_FUN_00336A78(menu + 960);
+    Fd1c2476b_FUN_00336A78(menu + 1048);
 }
 
 
@@ -44,26 +45,27 @@ extern void *F5a9e4f98_FUN_003363D0(char *p);
 extern char *F5a9e4f98_FUN_00336968(char *p);
 extern void *F5a9e4f98_FUN_003366D0(char *p);
 
-void *func_PAL_003487C8(char *p)
+/* Initializes the large menu screen parts and returns the menu. (PAL) */
+void *menu_screen_large_init_parts_pal(char *menu)
 {
-    F5a9e4f98_FUN_003361A8(p);
-    F5a9e4f98_FUN_003361A8(p + 0x4c);
-    F5a9e4f98_FUN_003361A8(p + 0x98);
-    F5a9e4f98_FUN_003361A8(p + 0xe4);
-    F5a9e4f98_FUN_003361A8(p + 0x130);
-    F5a9e4f98_FUN_003361A8(p + 0x17c);
-    F5a9e4f98_FUN_003363D0(p + 0x1c8);
-    F5a9e4f98_FUN_00336968(p + 0x210);
-    F5a9e4f98_FUN_00336968(p + 0x268);
-    F5a9e4f98_FUN_00336968(p + 0x2C0);
-    F5a9e4f98_FUN_00336968(p + 0x318);
-    F5a9e4f98_FUN_00336968(p + 0x370);
-    F5a9e4f98_FUN_003366D0(p + 0x3C8);
-    F5a9e4f98_FUN_003361A8(p + 0x404);
-    F5a9e4f98_FUN_003361A8(p + 0x450);
-    F5a9e4f98_FUN_003361A8(p + 0x49C);
+    F5a9e4f98_FUN_003361A8(menu);
+    F5a9e4f98_FUN_003361A8(menu + 0x4c);
+    F5a9e4f98_FUN_003361A8(menu + 0x98);
+    F5a9e4f98_FUN_003361A8(menu + 0xe4);
+    F5a9e4f98_FUN_003361A8(menu + 0x130);
+    F5a9e4f98_FUN_003361A8(menu + 0x17c);
+    F5a9e4f98_FUN_003363D0(menu + 0x1c8);
+    F5a9e4f98_FUN_00336968(menu + 0x210);
+    F5a9e4f98_FUN_00336968(menu + 0x268);
+    F5a9e4f98_FUN_00336968(menu + 0x2C0);
+    F5a9e4f98_FUN_00336968(menu + 0x318);
+    F5a9e4f98_FUN_00336968(menu + 0x370);
+    F5a9e4f98_FUN_003366D0(menu + 0x3C8);
+    F5a9e4f98_FUN_003361A8(menu + 0x404);
+    F5a9e4f98_FUN_003361A8(menu + 0x450);
+    F5a9e4f98_FUN_003361A8(menu + 0x49C);
 
-    return p;
+    return menu;
 }
 
 
@@ -79,34 +81,35 @@ extern MenuLabelOffset ref_003472B8_00;
 extern void object_set_flag_value(void *, int);
 extern void object_set_flag_value(void *, int);
 
-void func_PAL_00349450(char *obj)
+/* Updates the two small labels of the selected grid entry from its seen flags and positions them from the menu origin. (PAL) */
+void UpdateMenuGridLabels_pal(char *menu)
 {
-    MenuLabelOffset pad;
-    char *a;
-    char *b;
-    float x, y, x2, y2;
+    MenuLabelOffset label_offset;
+    char *first_label;
+    char *second_label;
+    float x, y, second_x, second_y;
     u8 *flags;
     int bits;
-    int index = g_menu_item_table_first[*(int *)(obj + 0x574) + *(int *)(obj + 0x578) * 4].id;
+    int index = g_menu_item_table_first[*(int *)(menu + 0x574) + *(int *)(menu + 0x578) * 4].id;
 
     if (g_item_owned_flags[index] == 0)
         return;
-    a = obj + 0x318;
-    pad = ref_003472B8_00;
+    first_label = menu + 0x318;
+    label_offset = ref_003472B8_00;
     flags = &g_movie_seen_flags[index];
-    b = obj + 0x370;
+    second_label = menu + 0x370;
     bits = flags[0] & 4;
-    object_set_flag_value(a, (flags[0] & 1) | (bits != 0));
+    object_set_flag_value(first_label, (flags[0] & 1) | (bits != 0));
     {
-        int b2 = flags[0] & 0x10;
-        object_set_flag_value(b, b2 != 0);
+        int bits_b = flags[0] & 0x10;
+        object_set_flag_value(second_label, bits_b != 0);
     }
-    x = (*(float **)(obj + 0x4E8))[0] + object_get_first_field(a)[0] + (float)pad.x;
-    y = (*(float **)(obj + 0x4E8))[1] + object_get_first_field(a)[1] + (float)pad.y;
-    object_set_first_float4(a, x, y, 0.0f, 0.0f);
-    x2 = (*(float **)(obj + 0x4E8))[0] + object_get_first_field(b)[0] + (float)pad.x;
-    y2 = (*(float **)(obj + 0x4E8))[1] + object_get_first_field(b)[1] + (float)pad.y;
-    object_set_first_float4(b, x2, y2, 0.0f, 0.0f);
+    x = (*(float **)(menu + 0x4E8))[0] + object_get_first_field(first_label)[0] + (float)label_offset.x;
+    y = (*(float **)(menu + 0x4E8))[1] + object_get_first_field(first_label)[1] + (float)label_offset.y;
+    object_set_first_float4(first_label, x, y, 0.0f, 0.0f);
+    second_x = (*(float **)(menu + 0x4E8))[0] + object_get_first_field(second_label)[0] + (float)label_offset.x;
+    second_y = (*(float **)(menu + 0x4E8))[1] + object_get_first_field(second_label)[1] + (float)label_offset.y;
+    object_set_first_float4(second_label, second_x, second_y, 0.0f, 0.0f);
 }
 
 

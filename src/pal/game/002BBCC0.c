@@ -53,7 +53,7 @@ static __inline__ int frac_byte(float value, float scale)
         scaled = scale;
     return result;
 }
-void func_PAL_002BBCC0(Particle_BB100 *p)
+void part_update_colliding_effect_pal(Particle_BB100 *p)
 {
     float next[4] __attribute__((aligned(16)));
     float temp[4] __attribute__((aligned(16)));

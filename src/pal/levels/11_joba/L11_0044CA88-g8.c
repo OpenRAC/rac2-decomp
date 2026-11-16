@@ -25,28 +25,28 @@ extern float g_object_spark_height_offset __attribute__((sda));
 extern char g_object_spark_record_name[8] __attribute__((sda));
 
 /* Emits count sparks at the object, then one more unless the chance roll says no. */
-void func_PAL_L11_0044CA88(char *obj, s32 count)
+void part_emit_object_sparks_pal(char *obj, s32 count)
 {
-    L11_447018_Spark s;
+    L11_447018_Spark spark;
     s32 i;
 
     for (i = 0; i < count; i++) {
-        qcopy(s.pos, arena_get_center_point(obj));
-        vec_add_random_offset(s.pos, g_object_spark_pos_jitter);
-        s.pos[2] += g_object_spark_height_offset;
-        vec_clear_128(&s);
-        vec_add_random_offset(&s, math_random_float_range(g_object_spark_speed_min, g_object_spark_speed_max) * 0.020000001f);
-        s.flag = 0;
-        enemy_spawn_record(s.pos, &s, g_object_spark_record_name, math_random_int_below(2), math_random_int_range(g_object_spark_type_min, g_object_spark_type_max));
+        qcopy(spark.pos, arena_get_center_point(obj));
+        vec_add_random_offset(spark.pos, g_object_spark_pos_jitter);
+        spark.pos[2] += g_object_spark_height_offset;
+        vec_clear_128(&spark);
+        vec_add_random_offset(&spark, math_random_float_range(g_object_spark_speed_min, g_object_spark_speed_max) * 0.020000001f);
+        spark.flag = 0;
+        enemy_spawn_record(spark.pos, &spark, g_object_spark_record_name, math_random_int_below(2), math_random_int_range(g_object_spark_type_min, g_object_spark_type_max));
     }
     if (math_random_int_below(g_object_spark_chance) == 0) {
-        qcopy(s.pos, arena_get_center_point(obj));
-        vec_add_random_offset(s.pos, g_object_spark_pos_jitter);
-        s.pos[2] += g_object_spark_height_offset;
-        vec_clear_128(&s);
-        vec_add_random_offset(&s, math_random_float_range(g_object_spark_speed_min, g_object_spark_speed_max) * 0.020000001f);
-        s.flag = 0;
-        enemy_spawn_record(s.pos, &s, g_object_spark_record_name, math_random_int_below(2), math_random_int_range(g_object_spark_type_min, g_object_spark_type_max));
+        qcopy(spark.pos, arena_get_center_point(obj));
+        vec_add_random_offset(spark.pos, g_object_spark_pos_jitter);
+        spark.pos[2] += g_object_spark_height_offset;
+        vec_clear_128(&spark);
+        vec_add_random_offset(&spark, math_random_float_range(g_object_spark_speed_min, g_object_spark_speed_max) * 0.020000001f);
+        spark.flag = 0;
+        enemy_spawn_record(spark.pos, &spark, g_object_spark_record_name, math_random_int_below(2), math_random_int_range(g_object_spark_type_min, g_object_spark_type_max));
     }
 }
 
@@ -84,7 +84,7 @@ typedef struct {
     u8 pad49;
     u8 f4A;
     u8 pad4B[5];
-    u8 hitInfo[0x10];        
+    u8 hit_info[0x10];        
     u8 f60;
     u8 pad61[8];
     u8 f69;
@@ -97,7 +97,7 @@ typedef struct {
     s32 f98;
     u8 pad9C[0xFC - 0x9C];
     float fFC;
-    float paramBlock[5];     
+    float param_block[5];     
     u8 pad114[0x12C - 0x114];
     float f12C;
     float f130;
@@ -110,15 +110,15 @@ typedef struct {
     u8 f1E8;
     u8 f1E9;
     u8 pad1EA[0x1FC - 0x1EA];
-    u16 spawnTimer;          
+    u16 spawn_timer;          
     u8 pad1FE[0x2F0 - 0x1FE];
     float basis[12];         
     float anchor[4];         
     u8 pad330[0x354 - 0x330];
     JobObject *turret;       
-    float turnRate;          
+    float turn_rate;          
     u8 pad35C[0x364 - 0x35C];
-    s16 fireTimer;           
+    s16 fire_timer;           
     u8 pad366[0x36E - 0x366];
     s16 f36E;
 } JobState;
@@ -145,7 +145,7 @@ extern s32 FloatToInt(float);
 extern float fast_vec_dist(void *, void *);
 extern void moby_update_ground_check(void *);
 extern void *part_find_owned_effect_slot(void *, s32, s32);
-extern s32 func_PAL_002B1A50(void *, void *, s32);
+extern s32 moby_apply_damage_to_object_pal(void *, void *, s32);
 extern void matrix_from_basis_rows(void *, void *);
 extern void cam_compute_view_direction(void *, void *, s32);
 extern s32 arena_is_point_in_inner_zone(s32, void *);
@@ -155,8 +155,8 @@ extern s32 g_enemy_ai_frozen;
 extern void security_robot_deactivate(void *);
 extern void security_robot_update_pairing(void *);
 extern s32 security_robot_is_holding_item_attacking(void *, void *);
-extern void func_PAL_L02_003D5FF0(void *, s32);
-extern void func_PAL_L11_0044F420(void *, s32, s32);
+extern void part_spawn_dust_pairs_pal(void *, s32);
+extern void security_robot_kill_pal(void *, s32, s32);
 
 /* Per-frame update of a turret-like enemy: on its first frame it seeds its parameter block
    (including a random-sign turn rate of 10 to 30 degrees), then handles hits, firing, damage
@@ -169,33 +169,33 @@ void turret_enemy_update_pal(JobObject *object)
     float speed;
 
     if (object->stage == 0) {
-        state->params = state->paramBlock;
+        state->params = state->param_block;
         state->f48 = FloatToInt(15.0f);
         state->f4A = FloatToInt(16.0f);
         speed = math_random_float_range(10.0f, 30.0f) * 0.01745329424738884f;
-        state->turnRate = math_random_int_below(2) ? -speed : speed;
+        state->turn_rate = math_random_int_below(2) ? -speed : speed;
         state->f80 = 1.3f;
         state->f84 = 1.3f;
         state->f69 = 2;
         state->f1E9 = 3;
         state->f1D4 = 0.5f;
-        state->paramBlock[1] = 0.5f;
-        state->paramBlock[2] = 0.5f;
+        state->param_block[1] = 0.5f;
+        state->param_block[2] = 0.5f;
         state->f60 = 16;
         state->f98 = 7;
         state->f8C = 0.4f;
         state->f1E6 = 5;
         state->f1E8 = 2;
-        state->paramBlock[0] = 1.3f;
-        state->paramBlock[3] = 0.5f;
-        state->paramBlock[4] = 1.5707964897155762f;
+        state->param_block[0] = 1.3f;
+        state->param_block[3] = 0.5f;
+        state->param_block[4] = 1.5707964897155762f;
         state->f130 = 0.523598849773407f;
         state->f134 = 0.01f;
         state->f12C = 0.008f;
         state->f28 = 3;
         state->f29 = 1;
         state->f30 = 0.75f;
-        state->fireTimer = 0;
+        state->fire_timer = 0;
         if (!math_random_int_below(2))
             object->flags |= 0x8000;
         state->turret = 0;
@@ -217,20 +217,20 @@ void turret_enemy_update_pal(JobObject *object)
             state->fFC = 1.0f;
             if (security_robot_is_holding_item_attacking(object, hit)) {
                 state->f60 = 15;
-                func_PAL_002B1A50(object, state->hitInfo, 1);
+                moby_apply_damage_to_object_pal(object, state->hit_info, 1);
                 state->f60 = 16;
-                if (state->turret && state->fireTimer == 0 && object->f31) {
-                    func_PAL_L02_003D5FF0(state->turret->position, 2);
-                    state->fireTimer = 50;
+                if (state->turret && state->fire_timer == 0 && object->f31) {
+                    part_spawn_dust_pairs_pal(state->turret->position, 2);
+                    state->fire_timer = 50;
                 }
             } else {
-                func_PAL_002B1A50(object, state->hitInfo, 0);
+                moby_apply_damage_to_object_pal(object, state->hit_info, 0);
             }
         } else {
-            func_PAL_002B1A50(object, state->hitInfo, 0);
+            moby_apply_damage_to_object_pal(object, state->hit_info, 0);
         }
         if (state->health <= 0.0f && object->f95 != 7 && object->f95 != 8)
-            func_PAL_L11_0044F420(object, 1, 0);
+            security_robot_kill_pal(object, 1, 0);
         if (state->f36E) {
             matrix_from_basis_rows(state->basis, object->rotation);
             cam_compute_view_direction(object->position, state->anchor, 0);
@@ -240,7 +240,7 @@ void turret_enemy_update_pal(JobObject *object)
             }
         }
         if (object->stage >= 2 && state->f2E == 2)
-            func_PAL_L11_0044F420(object, 1, 1);
+            security_robot_kill_pal(object, 1, 1);
         security_robot_update_pairing(object);
     }
 }

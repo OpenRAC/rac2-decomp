@@ -30,7 +30,9 @@ static inline void MeshStorePoint(MeshPoint *point, MeshVector *value)
     point->y = value->v[1];
     point->z = value->v[2];
 }
-void func_PAL_L00_003B7FC0(unsigned char *object, float opacity)
+/* Draws the four-sided glowing mesh that faces the camera, as eight flipped copies of two vertex
+ * sets, fading with opacity. (PAL: 50 Hz timings) */
+void mesh_draw_four_signs_pal(unsigned char *object, float opacity)
 {
     MeshVector transform[4];
     MeshPoint positions[148];

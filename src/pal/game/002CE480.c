@@ -31,6 +31,7 @@ extern ToggleState_2CD4E0 *g_menu_flag_target;
 extern int func_0029C248(int first, void *second);
 extern int menu_get_setting_value(void);
 
+/* Handles the menu input flags and updates the cursor flags of the highlighted entry (PAL). */
 int menu_update_input_flags_pal(void)
 {
     int local[4];

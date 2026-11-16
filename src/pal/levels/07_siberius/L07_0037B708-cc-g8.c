@@ -20,7 +20,7 @@ extern V g_hero_position_block[];   /* hero position (hero + 0x140) */
 extern float g_hero_l07_state_block[]; /* hero */
 extern V g_snow_velocity_vec MACRO_ADDR;
 
-extern void func_PAL_L07_0037BC50(void *);
+extern void part_scatter_around_camera_pal(void *);
 extern void moby_set_state(void *, int, int);
 extern void math_random_planar_offset(void *, float);
 extern void FastVecAdd(void *, void *, void *);
@@ -57,58 +57,59 @@ typedef struct {
     V previous;
 } Data;
 
-void func_PAL_L07_0037B708(Object *obj) {
-    V pos, vel, tmp, point;
-    Data *data = (Data *)obj->data;
+/* Makes snow fall around the hero, with a stronger burst when the hero moves fast or is in a snow zone (PAL: 50 Hz timings). */
+void snowfall_update_pal(Object *moby) {
+    V pos, vel, tmp_vec, point;
+    Data *data = (Data *)moby->data;
     int j, i, k;
     float lo, hi;
     V *hero_pos;
 
-    switch (obj->state) {
+    switch (moby->state) {
     case 0:
-        obj->alpha = 255;
-        obj->flags |= 0x100;
+        moby->alpha = 255;
+        moby->flags |= 0x100;
         if (g_current_map_index == 7 && g_frame_l07_counter) {
-            func_PAL_L07_0037BC50(obj);
-            moby_set_state(obj, 1, -1);
+            part_scatter_around_camera_pal(moby);
+            moby_set_state(moby, 1, -1);
         }
         data->speed = 1.5f;
         data->fall = 2.5f;
         data->enabled = 1;
-        g_snowfall_moby = (char *)obj;
+        g_snowfall_moby = (char *)moby;
         break;
     case 1:
         if (g_current_map_index == 7 && g_cutscene_l07_active_flag == 1) {
-            moby_set_state(obj, 2, -1);
+            moby_set_state(moby, 2, -1);
             break;
         }
         for (i = 0; i < math_random_int_below(2); i++) {
             math_random_planar_offset(&pos, 15.0f);
             pos.z += 7.0f;
             FastVecAdd(&pos, &pos, &g_hero_position_block);
-            FastVecScale(&tmp, &g_hero_position_block[35], 4.0f);
-            FastVecAdd(&pos, &tmp, &pos);
+            FastVecScale(&tmp_vec, &g_hero_position_block[35], 4.0f);
+            FastVecAdd(&pos, &tmp_vec, &pos);
             math_random_planar_offset(&vel, data->speed * (0.020000001f));
             vel.z = -(data->fall * (0.020000001f)) * math_random_float_range(0.8f, 1.2f);
             if (!coll_point_inside_region(&pos, data->group))
                 part_spawn_snow_pal(&pos, &vel, 0, 0);
         }
         FastVecScale(&point, &g_hero_position_block[35], 4.0f);
-        FastVecAdd(&tmp, &point, &g_hero_position_block);
-        FastVecSub(&g_snow_velocity_vec, &tmp, &data->previous);
+        FastVecAdd(&tmp_vec, &point, &g_hero_position_block);
+        FastVecSub(&g_snow_velocity_vec, &tmp_vec, &data->previous);
         data->scale = FastVecLength(&g_snow_velocity_vec) * 3.3333333f;
         if (data->scale > 1.0f)
             data->scale = 1.0f;
         else if (data->scale < 0.0f)
             data->scale = 0.0f;
         FastVecScale(&g_snow_velocity_vec, &g_snow_velocity_vec, data->scale);
-        qcopy_nc(&data->previous, &tmp);
+        qcopy_nc(&data->previous, &tmp_vec);
         break;
     case 2:
-        if (flag_set_first_pending(obj))
+        if (flag_set_first_pending(moby))
             g_snow_velocity_vec.z -= 60.0f;
         if (g_current_map_index == 7 && g_cutscene_l07_active_flag != 1) {
-            moby_set_state(obj, 1, -1);
+            moby_set_state(moby, 1, -1);
             break;
         }
         if (!g_snowfall_target_moby)
@@ -118,10 +119,10 @@ void func_PAL_L07_0037B708(Object *obj) {
         lo = g_snowfall_side_min_table[j * 2];
         hi = g_snowfall_side_max_table[j * 2];
         for (k = 0; k < 6; k++) {
-            FastVecScale(&tmp, &data->axisA, math_random_float_range(-25.0f, 25.0f));
-            FastVecAdd(&pos, &tmp, &data->origin);
-            FastVecScale(&tmp, &data->axisB, math_random_float_range(lo, hi));
-            FastVecAdd(&pos, &tmp, &pos);
+            FastVecScale(&tmp_vec, &data->axisA, math_random_float_range(-25.0f, 25.0f));
+            FastVecAdd(&pos, &tmp_vec, &data->origin);
+            FastVecScale(&tmp_vec, &data->axisB, math_random_float_range(lo, hi));
+            FastVecAdd(&pos, &tmp_vec, &pos);
             FastVecAdd(&pos, &pos, hero_pos);
             FastVecSub(&pos, &pos, g_snowfall_target_moby + 0x10);
             pos.z -= g_hero_l07_state_block[0x148 / 4] - *(float *)(g_snowfall_target_moby + 0x18);
@@ -130,8 +131,8 @@ void func_PAL_L07_0037B708(Object *obj) {
             part_spawn_snow_pal(&pos, &vel, 1, 0);
         }
         FastVecSub(&g_snow_velocity_vec, hero_pos, &data->previous);
-        FastVecScale(&tmp, g_snowfall_target_moby + 0xC0, 1.2f);
-        FastVecAdd(&g_snow_velocity_vec, &tmp, &g_snow_velocity_vec);
+        FastVecScale(&tmp_vec, g_snowfall_target_moby + 0xC0, 1.2f);
+        FastVecAdd(&g_snow_velocity_vec, &tmp_vec, &g_snow_velocity_vec);
         qcopy_nc(&data->previous, hero_pos);
         break;
     }

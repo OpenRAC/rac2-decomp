@@ -27,14 +27,16 @@ extern int g_current_map_index MACRO_ADDR;
 extern short *g_turn_state_table[];
 extern char *g_moby_array_base MACRO_ADDR;
 
-void cam_swingshot_update_pal(char *a)
+/* Per-frame swing shot update: eases the height and distance, turns the camera toward the next swing
+   node (or the hero's facing) with a spring and places the camera behind it. */
+void cam_swingshot_update_pal(char *moby)
 {
  char out[16] __attribute__((aligned(16)));
  char diff[16] __attribute__((aligned(16)));
  char unit[16] __attribute__((aligned(16)));
  float axis[4] __attribute__((aligned(16)));
- char *s=*(char **)(a+0x70),*cfg=s+0xA0,*part=s+0x40,*angle=s+0xB8;
- char *p,*best,*obj,*turn;
+ char *vars=*(char **)(moby+0x70),*cfg=vars+0xA0,*part=vars+0x40,*angle=vars+0xB8;
+ char *swing_moby,*best,*candidate,*turn;
  float height,dist,v,score,closest;
  short *list;
  if(D_00189E20_6.swing && D_00189E20_6.state==0x2B) {
@@ -52,21 +54,21 @@ void cam_swingshot_update_pal(char *a)
    *(float *)angle=math_step_spring_damper_stored(*(float *)angle,D_00189E20_6.yaw,angle+4,0.00125f,0.175f,0.0f);
   } else {
    turn=angle+4; best=0; closest=1000.0f;
-   p=D_00189E20_6.swing;
-   list=g_turn_state_table[*(unsigned char *)(p+0x21)];
+   swing_moby=D_00189E20_6.swing;
+   list=g_turn_state_table[*(unsigned char *)(swing_moby+0x21)];
    if(list) do {
-    obj=g_moby_array_base+(*list&0x7FFF)*0x100;
-    if(obj!=p && (*(short *)(obj+0xAA)==0x323 || *(short *)(obj+0xAA)==0x2F6)) {
-     FastVecSub(diff,obj+0x10,p+0x10);
+    candidate=g_moby_array_base+(*list&0x7FFF)*0x100;
+    if(candidate!=swing_moby && (*(short *)(candidate+0xAA)==0x323 || *(short *)(candidate+0xAA)==0x2F6)) {
+     FastVecSub(diff,candidate+0x10,swing_moby+0x10);
      vec_scale_to_length(unit,diff,1.0f);
      axis[0]=math_fast_sin_or_cos_a(D_00189E20_6.yaw);
      axis[1]=math_fast_sin_or_cos_b(D_00189E20_6.yaw);axis[2]=0.0f;
      v=FastVecDot(unit,(char *)axis);
-     if(v>0.0f) {score=FastVecLength(diff)-v*10.0f;if(score<closest){best=obj;closest=score;}}
+     if(v>0.0f) {score=FastVecLength(diff)-v*10.0f;if(score<closest){best=candidate;closest=score;}}
     }
    } while(*list++>=0);
    if(best) {
-    FastVecSub(diff,best+0x10,p+0x10);
+    FastVecSub(diff,best+0x10,swing_moby+0x10);
     *(float *)angle=math_step_spring_damper_stored(*(float *)angle,mat_fast_helper_a(*(float *)diff,*(float *)(diff+4)),turn,0.00125f,0.175f,0.0f);
    } else if(*(int *)(part+0x40)==1)
     *(float *)angle=math_step_spring_damper_stored(*(float *)angle,*(float *)(*(char **)(part+0x44)+0xF8),turn,0.00125f,0.175f,0.0f);
@@ -85,5 +87,5 @@ void cam_swingshot_update_pal(char *a)
  vec_scale_to_length(out,part+0x30,-*(float *)cfg);
  *(float *)(out+8)+=*(float *)(cfg+0x10);
  FastVecAdd(out,out,g_hero_position);
- if(FastDecTimer(s+0x1E)) {qcopy(a+0x30,out);} else {qcopy(a+0x30,out);}
+ if(FastDecTimer(vars+0x1E)) {qcopy(moby+0x30,out);} else {qcopy(moby+0x30,out);}
 }

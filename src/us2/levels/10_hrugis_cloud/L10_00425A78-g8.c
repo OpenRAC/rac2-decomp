@@ -21,7 +21,7 @@ extern void snd_stop_voice(s32);
 extern s32 math_fast_float_d(void *);
 extern void FadeToBlack(s32);
 extern void level_store_value_pair_us2(s32, void *);
-extern s32 func_US2_L10_004254C8(void);
+extern s32 menu_draw_reward_panel_us2(void);
 extern void mission_store_completion_counts(void);
 extern int MemcardSave(s32, s32);
 extern void hero_set_state_value_c(s32);
@@ -56,7 +56,7 @@ void hrugis_finish_mission_reward_us2(u8 *obj, s32 kind) {
         return;
     if (g_hud_sprite_table_base && !g_reward_active_flag) {
         FadeToBlack(30);
-        level_store_value_pair_us2(0, func_US2_L10_004254C8);
+        level_store_value_pair_us2(0, menu_draw_reward_panel_us2);
         n = D_L10_001B1390_gp[kind];
         capped = n < 3 ? n : 2;
         multiplier = g_extras_unlocked_flag;

@@ -12,7 +12,7 @@ extern SelectorOwner g_music_state;
 extern SelectorRow g_subtitle_history[];
 extern int g_current_game_mode __attribute__((sda));
 extern int g_game_time __attribute__((sda));
-int func_US2_00289840(int key, int selection)
+int subtitle_request_voice_line_us2(int key, int selection)
 {
     SelectorState *state = &ref_L00_00288E18_00;
     if (state->active == 0 && state->key == -1 && g_music_state.active == 0 &&

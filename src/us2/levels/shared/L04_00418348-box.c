@@ -54,7 +54,7 @@ static __inline__ int label_y(void *handle, float value, float scale, float half
     return result;
 }
 
-void func_US2_L04_00418348(void) {
+void race_draw_title_box_us2(void) {
     MenuBox box;
     float s, s2, half, bx, kx, ky;
     int w, left, right, center, on, x1, y1, x4, y4;

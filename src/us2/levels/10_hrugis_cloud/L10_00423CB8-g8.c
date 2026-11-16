@@ -116,7 +116,7 @@ static __inline__ s32 sprite_y(void *handle, f32 y, f32 adjustment)
     return result;
 }
 
-s32 func_US2_L10_00423CB8(void) {
+s32 menu_draw_mission_reward_us2(void) {
     char buf[128];
     f32 center, fade, image_y;
     void *sprite;

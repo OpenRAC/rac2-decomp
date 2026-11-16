@@ -14,7 +14,7 @@ extern char *part_spawn_size_changing(void *, void *, int, int, float, int, int,
 extern char ref_00304128_00[];
 
 /* Emit an effect at a sampled surface point while its timer is active. */
-void func_PAL_00305348(void *obj)
+void surface_grid_spawn_effect_pal(void *obj)
 {
     void *state = *(void **)((char *)obj + 0x68);
     TI128 position;

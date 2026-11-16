@@ -28,9 +28,10 @@ void* menu_init_two_sub_objects(void* param_1);
 /* Disassembly: jr ra; move v0,a0 (MIPS delay slot) */
 /* Compiled with: -O2 -G0 -ffunction-sections */
 
-unsigned long func_US2_L00_0043FEA0(unsigned long param_1)
+/* Returns its argument unchanged. */
+unsigned long stub_l00_return_arg_2_us2(unsigned long value)
 {
-  return param_1;
+  return value;
 }
 
 /* Return the complete supplied unsigned-long 64-bit value unchanged. */

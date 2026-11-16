@@ -14,6 +14,7 @@ extern void *SpawnExplosion_pal(void *, int, int, int, int, int, int, int, float
 extern void moby_fade_out_update_pal(unsigned char *);
 extern char g_hero_l20_extra_state[];
 
+/* Drops pieces off the trooper as its health falls, and removes its parts when it is out of health. */
 void SpawnHealthThresholdEffects_pal(char *self) {
     char *state = *(char **)(self + 0x68);
     float buf[4];

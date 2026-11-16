@@ -12,14 +12,14 @@ extern void part_spawn_scaled_bolts_pal(char *,float,int);
 extern void moby_compute_local_point(char *,float,float,float,void *);
 extern void func_002A0F48(char *);
 extern float moby_update_aim_target_strength_pal(char *,char *);
-extern void func_PAL_002AC290(char *,void *);
-extern void func_PAL_002AC3C0(char *,void *);
+extern void gfx_start_color_fade_pal(char *,void *);
+extern void gfx_update_color_fade_pal(char *,void *);
 extern int flag_set_first_pending(char *);
 extern char *SpawnExplosion_pal(void *,int,int,int,int,int,int,int,float,float,int,int,int,int);
 extern int PlayMobySound(int,int,char *);
 extern float FastAddRotations(float,float);
 extern int coll_sweep_from_object(char *,void *,float,float,float,int,int,int,int);
-extern void func_PAL_002B15D8(char *,int,void *,int,float,float,float,float);
+extern void part_spawn_masked_debris_pal(char *,int,void *,int,float,float,float,float);
 extern void part_spawn_crash_debris_pal(char *);
 extern int g_game_mode __attribute__((nosda));
 extern float g_breakable_local_point __attribute__((sda));
@@ -28,71 +28,72 @@ extern struct { char pad[0x160]; float f160; int pad164, n168, n16c; char pad170
 
 /* The two height tests read their own values: with -frac2-gcse-unsplit-edges gcse leaves both
    loads in place, and reorg skips the second ground load on the first test's failure edge. */
-void breakable_machine_update_pal(char *o) {
- float pos[4],v[4];
- char *s=*(char **)(o+0x68);
- float damage,t;
+/* Updates a Notak breakable machine: it takes damage until its health runs out, tips over with smoke and sparks, then falls and crashes (PAL: 50 Hz timings). */
+void breakable_machine_update_pal(char *moby) {
+ float pos[4],vec[4];
+ char *vars=*(char **)(moby+0x68);
+ float damage,step;
  int i;
- switch(*(unsigned char *)(o+0x20)) {
+ switch(*(unsigned char *)(moby+0x20)) {
  case 0:
- *(short *)(s+0x24)=6; *(float *)(s+0x20)=6; *(int *)(s+0x80)=0;
- *(Quad *)v=0; v[0]=0.080000006f; v[2]=math_random_float_range(6,9)*0.020000001f;
- *(Quad *)pos=*(Quad *)v;
- func_002A0F48(o);
- matrix_mul_vec3(s+0x70,pos,o+0xC0);
- moby_set_state(o,1,-1); break;
+ *(short *)(vars+0x24)=6; *(float *)(vars+0x20)=6; *(int *)(vars+0x80)=0;
+ *(Quad *)vec=0; vec[0]=0.080000006f; vec[2]=math_random_float_range(6,9)*0.020000001f;
+ *(Quad *)pos=*(Quad *)vec;
+ func_002A0F48(moby);
+ matrix_mul_vec3(vars+0x70,pos,moby+0xC0);
+ moby_set_state(moby,1,-1); break;
  case 1:
- damage=moby_update_aim_target_strength_pal(o,part_find_owned_effect_slot(o,0x230000,0));
+ damage=moby_update_aim_target_strength_pal(moby,part_find_owned_effect_slot(moby,0x230000,0));
  if(damage>0) {
- ((unsigned char *)s)[0x57]=255; ((unsigned char *)s)[0x58]=128; ((unsigned char *)s)[0x59]=128;
- func_PAL_002AC290(o,s+0x50);
- *(float *)(s+0x20)-=damage;
+ ((unsigned char *)vars)[0x57]=255; ((unsigned char *)vars)[0x58]=128; ((unsigned char *)vars)[0x59]=128;
+ gfx_start_color_fade_pal(moby,vars+0x50);
+ *(float *)(vars+0x20)-=damage;
  }
- if(*(float *)(s+0x20)<0) moby_set_state(o,2,-1);
- func_PAL_002AC3C0(o,s+0x50); ((unsigned char *)o)[0xA8]=255; break;
+ if(*(float *)(vars+0x20)<0) moby_set_state(moby,2,-1);
+ gfx_update_color_fade_pal(moby,vars+0x50); ((unsigned char *)moby)[0xA8]=255; break;
  case 2:
- if(flag_set_first_pending(o)) {
- SpawnExplosion_pal(o+0x10,1,25,20,20,20,45,1,1,20,1,1,0,0);
- PlayMobySound(1,0,o);
+ if(flag_set_first_pending(moby)) {
+ SpawnExplosion_pal(moby+0x10,1,25,20,20,20,45,1,1,20,1,1,0,0);
+ PlayMobySound(1,0,moby);
  }
- func_PAL_002AC3C0(o,s+0x50);
- *(float *)(s+0x68)+=0.0004188791f;
- *(float *)(o+0xF4)=FastAddRotations(*(float *)(o+0xF4),*(float *)(s+0x68));
- if(*(float *)(o+0xF4)>0.628318548f && g_game_mode!=140) {
- *(int *)(o+0x98)=0;
+ gfx_update_color_fade_pal(moby,vars+0x50);
+ *(float *)(vars+0x68)+=0.0004188791f;
+ *(float *)(moby+0xF4)=FastAddRotations(*(float *)(moby+0xF4),*(float *)(vars+0x68));
+ if(*(float *)(moby+0xF4)>0.628318548f && g_game_mode!=140) {
+ *(int *)(moby+0x98)=0;
  for(i=0;i<6;i++) {
- t=i*0.2f;
- moby_compute_local_point(o,t*1.5f+(-0.5f),0,t*7+2,pos);
- coll_sweep_from_object(o,pos,0.8f,4,1,0x30009,0,1,0);
+ step=i*0.2f;
+ moby_compute_local_point(moby,step*1.5f+(-0.5f),0,step*7+2,pos);
+ coll_sweep_from_object(moby,pos,0.8f,4,1,0x30009,0,1,0);
  }
- moby_compute_local_point(o,g_breakable_local_point,D_L06_001B1D70_4[1],D_L06_001B1D70_4[2],pos);
- coll_sweep_from_object(o,pos,2.5f,4,1,0x4030000,0,1,0);
+ moby_compute_local_point(moby,g_breakable_local_point,D_L06_001B1D70_4[1],D_L06_001B1D70_4[2],pos);
+ coll_sweep_from_object(moby,pos,2.5f,4,1,0x4030000,0,1,0);
  }
- if(*(float *)(o+0xF4)>1.2566371f) moby_set_state(o,3,-1);
+ if(*(float *)(moby+0xF4)>1.2566371f) moby_set_state(moby,3,-1);
  break;
  case 3:
- if(flag_set_first_pending(o)) {
+ if(flag_set_first_pending(moby)) {
  *(Quad *)pos=0; pos[2]=0.080000006f;
- func_PAL_002B15D8(o,0x6FF,pos,255,3,6,3,7);
- PlayMobySound(0,0,o);
- part_spawn_scaled_bolts_pal(o,0,9);
+ part_spawn_masked_debris_pal(moby,0x6FF,pos,255,3,6,3,7);
+ PlayMobySound(0,0,moby);
+ part_spawn_scaled_bolts_pal(moby,0,9);
  g_camera_state.f180=0.1f;
  g_camera_state.n188=75;
  g_camera_state.f160=0.2f;
  g_camera_state.n168=50;
  g_camera_state.n16c=0;
- *(unsigned short *)(o+0x7C)=0x8100;
- matrix_mul_vec3(v,&g_breakable_local_point,o+0xC0);
- FastVecAdd(o+0x10,o+0x10,v);
+ *(unsigned short *)(moby+0x7C)=0x8100;
+ matrix_mul_vec3(vec,&g_breakable_local_point,moby+0xC0);
+ FastVecAdd(moby+0x10,moby+0x10,vec);
  }
- coll_sweep_from_object(o,o+0x10,2.5f,4,1,0x4030000,0,1,0);
- FastVecAdd(o+0x10,o+0x10,s+0x70);
- *(float *)(s+0x78)-=0.0043200003f;
- if (!*(int *)(s+0x80) && *(float *)(o+0x18) < *(float *)(s+0x6C)) {
-     part_spawn_crash_debris_pal(o);
-     *(int *)(s+0x80)=1;
- } else if (*(float *)(o+0x18) < *(float *)(s+0x6C)-4.0f)
-     moby_mark_spawned(o);
+ coll_sweep_from_object(moby,moby+0x10,2.5f,4,1,0x4030000,0,1,0);
+ FastVecAdd(moby+0x10,moby+0x10,vars+0x70);
+ *(float *)(vars+0x78)-=0.0043200003f;
+ if (!*(int *)(vars+0x80) && *(float *)(moby+0x18) < *(float *)(vars+0x6C)) {
+     part_spawn_crash_debris_pal(moby);
+     *(int *)(vars+0x80)=1;
+ } else if (*(float *)(moby+0x18) < *(float *)(vars+0x6C)-4.0f)
+     moby_mark_spawned(moby);
  break;
  }
 }

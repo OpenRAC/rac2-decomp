@@ -99,12 +99,12 @@ extern float math_step_value_toward_target(float *, float *, float, float, float
 /* Resets the state of object +0x70: eases the motion and view values toward their
    targets (or the defaults in the record at D_L00_001BB040), settles the recoil spring,
    then restores the view, aim and sway defaults from the level tuning values. */
-void func_PAL_L00_004276D8(StateOwner *object)
+void weapon_reset_view_state_pal(StateOwner *object)
 {
     State *state;
-    float viewDefaultX, viewDefaultY, aim0, aim1, aim2;
+    float view_default_x, view_default_y, aim0, aim1, aim2;
     Motion *motion, *defaults;
-    View *view, *defaultView;
+    View *view, *default_view;
     Recoil *recoil;
     char *temporary;
     Aim *aim;
@@ -120,7 +120,7 @@ void func_PAL_L00_004276D8(StateOwner *object)
     motion = &state->motion;
     view = &state->view;
     defaults = &g_weapon_view_state->motion;
-    defaultView = &g_weapon_view_state->view;
+    default_view = &g_weapon_view_state->view;
     if (motion->h3C)
         motion->f2C = math_step_spring_damper_clamped(motion->v44, motion->f2C, motion->f40, motion->f48,
                                     g_weapon_view_reset_param_a, *(float *)(temporary + 0x1C));
@@ -136,7 +136,7 @@ void func_PAL_L00_004276D8(StateOwner *object)
     if (view->hDA)
         view->fB0 = math_step_spring_damper_clamped(view->vBC, view->fB0, view->fB4, view->fB8, 0.2f, 0.0f);
     else
-        view->fB0 = math_step_spring_damper_clamped(view->vBC, view->fB0, defaultView->fB0, view->fB8,
+        view->fB0 = math_step_spring_damper_clamped(view->vBC, view->fB0, default_view->fB0, view->fB8,
                                   0.2f, 0.0f);
     motion->h3C = 0;
     motion->h3E = 0;
@@ -159,11 +159,11 @@ void func_PAL_L00_004276D8(StateOwner *object)
                       recoil->f34, recoil->f38, 1.0f);
     recoil->f2C = 0.0f;
 
-    viewDefaultX = g_camera_default_view_x;
-    viewDefaultY = g_camera_default_view_y;
+    view_default_x = g_camera_default_view_x;
+    view_default_y = g_camera_default_view_y;
     view->bD6 = 0;
-    view->fDC = viewDefaultX;
-    view->fE4 = viewDefaultY;
+    view->fDC = view_default_x;
+    view->fE4 = view_default_y;
     view->fE0 = 0.2f;
     view->fE8 = 0.2f;
     view->hEC = (g_camera_default_angle_short * 5 + 2) / 6;

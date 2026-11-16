@@ -18,13 +18,13 @@ extern BatchA_A18_s32 path_get_entry_id(void *a0);
 
 /* runs the 0x1E gate and, when it clears, the record query into a local buffer;
    answers whether the query found anything */
-BatchA_A18_s32 protopet_find_for_group_pal(BatchA_A18_u8 *a0) {
+BatchA_A18_s32 protopet_find_for_group_pal(BatchA_A18_u8 *object) {
     BatchA_A18_u8 buf[16];
-    BatchA_A18_s32 p;
+    BatchA_A18_s32 state;
 
     if (math_random_int_below(0x19) == 0) {
-        p = *(BatchA_A18_s32 *)(a0 + 0x68);
-        return protopet_count_group(*(BatchA_A18_s32 *)((char *)p + 0x25C), buf) != 0;
+        state = *(BatchA_A18_s32 *)(object + 0x68);
+        return protopet_count_group(*(BatchA_A18_s32 *)((char *)state + 0x25C), buf) != 0;
     }
     return 0;
 }

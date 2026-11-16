@@ -33,21 +33,21 @@ extern float g_barrier_piece_speeds[2] __attribute__((sda)), g_barrier_piece_spi
    2. States 2 and 3 spawn rows of three explosions at rising heights on a timer, then state 3 raises
    the counter (up to 7), sets subtitle row 60's key to 0xFFFF, scatters the object's pieces and removes it. The row
    pointer is set at the store so the table keeps its own lui/addiu base, as retail has it. */
-void func_PAL_L03_00426850(u8 *obj)
+void endako_exploding_barrier_update_pal(u8 *moby)
 {
-    u8 *state = *(u8 **)(obj + 0x68);
+    u8 *state = *(u8 **)(moby + 0x68);
     u8 pos[16] __attribute__((aligned(16)));
     u8 *hit, *other;
-    u16 *p;
+    u16 *cursor;
     int i, j, index, bits;
     u8 *counter;
     SelectorRow *rows;
 
     if (!state) {
-        moby_mark_spawned(obj);
+        moby_mark_spawned(moby);
         return;
     }
-    switch (obj[0x20]) {
+    switch (moby[0x20]) {
     case 0: {
         int group;
 
@@ -57,74 +57,74 @@ void func_PAL_L03_00426850(u8 *obj)
                     ((EntryGroup *)(g_barrel_entry_groups + group * 0x150))->entries[j] = 0;
             ((EntryGroup *)(g_barrel_entry_groups + group * 0x150))->active = 0;
         }
-        index = *(s16 *)(obj + 0xB2);
+        index = *(s16 *)(moby + 0xB2);
         if (g_trigger_l03_flags.entries[index]) {
-            moby_mark_spawned(obj);
+            moby_mark_spawned(moby);
         } else {
             bits = g_moby_nibble_table[(index >> 1) + (g_current_map_index << 10)];
-            if (*(u16 *)(obj + 0xB2) & 1) {
-                if ((bits >> 4) & 7) moby_mark_spawned(obj);
-                else moby_set_state(obj, 1, -1);
+            if (*(u16 *)(moby + 0xB2) & 1) {
+                if ((bits >> 4) & 7) moby_mark_spawned(moby);
+                else moby_set_state(moby, 1, -1);
             } else {
-                if (bits & 7) moby_mark_spawned(obj);
-                else moby_set_state(obj, 1, -1);
+                if (bits & 7) moby_mark_spawned(moby);
+                else moby_set_state(moby, 1, -1);
             }
         }
         break;
     }
     case 1:
-        hit = part_find_owned_effect_slot(obj, 0x10000, 0);
-        if (hit && (other = *(u8 **)(hit + 0x20)) && *(s16 *)(other + 0xAA) == 0xCFC &&
-            *(float *)(obj + 0x18) <= *(float *)(other + 0x18) + 0.5f) {
-            for (p = g_entity_id_lists[obj[0x21]];
-                 obj[0x21] != 0xFF && obj[0x21] <= g_object_group_count && p != 0 &&
-                 ((p != 0 && (s16)p[-1] >= 0) || p == g_entity_id_lists[obj[0x21]]); p++) {
-                other = g_moby_record_base + ((*p & 0x7FFF) << 8);
+        hit = part_find_owned_effect_slot(moby, 0x10000, 0);
+        if (hit && (other = *(u8 **)(hit + 0x20)) && *(s16 *)(other + 0xAA) == 0xCFC /* moby class 3324 */ &&
+            *(float *)(moby + 0x18) <= *(float *)(other + 0x18) + 0.5f) {
+            for (cursor = g_entity_id_lists[moby[0x21]];
+                 moby[0x21] != 0xFF && moby[0x21] <= g_object_group_count && cursor != 0 &&
+                 ((cursor != 0 && (s16)cursor[-1] >= 0) || cursor == g_entity_id_lists[moby[0x21]]); cursor++) {
+                other = g_moby_record_base + ((*cursor & 0x7FFF) << 8);
                 if (!other) break;
                 moby_set_state(other, 2, -1);
             }
         }
-        obj[0xA8] = 0xFF;
+        moby[0xA8] = 0xFF;
         break;
     case 2:
-        if (flag_set_first_pending(obj)) {
+        if (flag_set_first_pending(moby)) {
             *(int *)(state + 4) = 192;
             for (i = -1; i < 2; i++) {
-                vec_local_offset_to_world(obj, pos, (float)(i << 3), -6.0f, 5.0f);
+                vec_local_offset_to_world(moby, pos, (float)(i << 3), -6.0f, 5.0f);
                 SpawnExplosion_pal(pos, 0, 5, 5, 5, 5, 5, 0, .75f, 20.0f, 0, 0, 0, 0);
             }
             *(int *)(state + 4) = 8;
         } else if (math_fast_float_d(state + 4)) {
             for (i = -1; i < 2; i++) {
-                vec_local_offset_to_world(obj, pos, (float)(i << 3), -6.0f, 15.0f);
+                vec_local_offset_to_world(moby, pos, (float)(i << 3), -6.0f, 15.0f);
                 SpawnExplosion_pal(pos, 0, 5, 5, 5, 5, 5, 0, .75f, 20.0f, 0, 0, 0, 0);
             }
             *(int *)(state + 4) = 8;
-            moby_set_state(obj, 3, -1);
+            moby_set_state(moby, 3, -1);
         }
         break;
     case 3:
         if (!math_fast_float_d(state + 4)) break;
         for (i = -1; i < 2; i++) {
-            vec_local_offset_to_world(obj, pos, (float)(i << 3), -6.0f, 25.0f);
+            vec_local_offset_to_world(moby, pos, (float)(i << 3), -6.0f, 25.0f);
             SpawnExplosion_pal(pos, 0, 5, 5, 5, 5, 5, 0, .75f, 20.0f, 0, 0, i == 0, 0);
         }
-        if (*(u16 *)(obj + 0xB2) & 1) {
-            counter = g_moby_nibble_table + ((*(s16 *)(obj + 0xB2) >> 1) + (g_current_map_index << 10));
+        if (*(u16 *)(moby + 0xB2) & 1) {
+            counter = g_moby_nibble_table + ((*(s16 *)(moby + 0xB2) >> 1) + (g_current_map_index << 10));
             if (((*counter >> 4) & 7) != 7) *counter += 16;
         } else {
-            counter = g_moby_nibble_table + ((*(s16 *)(obj + 0xB2) >> 1) + (g_current_map_index << 10));
+            counter = g_moby_nibble_table + ((*(s16 *)(moby + 0xB2) >> 1) + (g_current_map_index << 10));
             if ((*counter & 7) != 7) *counter += 1;
         }
         rows = g_subtitle_history;
         rows[60].key = 0xFFFF;
         if (*(int *)state)
-            ScatterObjectPieces_pal(obj, g_barrier_piece_lifetimes, g_barrier_piece_spin, g_barrier_piece_speeds,
+            ScatterObjectPieces_pal(moby, g_barrier_piece_lifetimes, g_barrier_piece_spin, g_barrier_piece_speeds,
                               0xFFFF, 0, -1, 1, 0xFFFF, 0xFF, fading_effect_update);
         else
-            ScatterObjectPieces_pal(obj, g_barrier_piece_lifetimes, g_barrier_piece_spin, g_barrier_piece_speeds,
+            ScatterObjectPieces_pal(moby, g_barrier_piece_lifetimes, g_barrier_piece_spin, g_barrier_piece_speeds,
                               0xFFFF, 0, -1, 1, 0xFFFF, 0xFF, 0);
-        moby_mark_spawned(obj);
+        moby_mark_spawned(moby);
         break;
     }
 }

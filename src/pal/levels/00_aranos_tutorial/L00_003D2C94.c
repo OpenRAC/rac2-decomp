@@ -56,7 +56,7 @@ typedef struct {
 } AranosDriftCtx;
 
 /* Once its flag is set, drifts the object along its heading for 100 frames, then removes it. */
-void func_PAL_L00_003D3478(AranosMoby *obj) {
+void aranos_drift_update_pal(AranosMoby *obj) {
     AranosDriftCtx *ctx;
     int result;
     float angle;
@@ -93,7 +93,8 @@ extern int math_fast_float_d(void *);
 extern float math_random_signed_float_range(float, float);
 extern float math_spring_float_to_goal(float *, float *, float, float, float, float);
 
-void func_PAL_L00_003D38F8(char *obj) {
+/* Slowly turns the object to random angles and pauses between turns (PAL copy). */
+void random_turner_update_pal(char *obj) {
     char *ctx;
     float limit;
     ctx = *(char **)(obj + 0x68);
@@ -149,7 +150,7 @@ typedef struct {
 } AranosSparkerCtx;
 
 /* Spawns a burst of sparks around the object, then fades them until the timer runs out. */
-void func_PAL_L00_003D3A48(AranosMoby *obj) {
+void aranos_spark_burst_update_pal(AranosMoby *obj) {
     struct {
         Vec velocity, offset, position;
     } frame;

@@ -16,10 +16,10 @@ extern void level_forward_value(int);
 
 /* Finds the row of D_00264630 whose first four ids hold the object's id at +0xAA,
    then counts it in column `type` of D_00188510 (capped at 9999). */
-void moby_count_kill_or_event_pal(char *p, int type)
+void moby_count_kill_or_event_pal(char *moby, int type)
 {
     int found = -1, i, j;
-    int id = *(short *)(p + 0xAA);
+    int id = *(short *)(moby + 0xAA);
 
     for (i = 0; i < 64; i++) {
         for (j = 0; j < 4; j++) {

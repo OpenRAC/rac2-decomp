@@ -54,7 +54,8 @@ extern unsigned int stub_empty_9_us2(int, int);
 extern void stub_empty_12();
 extern int stub_empty_7(int);
 
-void UpdateProjectileThrower_us2(unsigned char *self)
+/* Updates the projectile thrower weapon: aims the arc from the camera, spawns the held projectile and launches it when fired (v2.00 copy). */
+void UpdateProjectileThrower_us2(unsigned char *moby)
 {
     typedef unsigned int Quad __attribute__((mode(TI)));
     typedef union { Quad q; float f[4]; } Vec;
@@ -71,32 +72,32 @@ void UpdateProjectileThrower_us2(unsigned char *self)
 #define aim frame.aim
 #define velocity frame.velocity
 #define temp frame.temp
-    unsigned char *data, *heldData, *player;
+    unsigned char *vars, *held_data, *hero_moby;
     float angle, pitch, slope, distance, height, power;
     int hit;
-    if (!self) return;
+    if (!moby) return;
     grip.q = 0;
     grip.f[0] = 0.4f;
     grip.f[1] = -0.15f;
     grip.f[2] = -0.05f;
-    data = THROW_PTR(self,0x68);
+    vars = THROW_PTR(moby,0x68);
     copy_matrix3x4(matrix,g_active_camera);
     matrix_from_basis_rows(inverse,matrix);
-    if (!data) return;
-    qcopy(&position,self+0x10);
-    FastVecScale(&basis[0],self+0xD0,-1.0f);
-    qcopy(&basis[1],self+0xC0);
-    qcopy(&basis[2],self+0xE0);
+    if (!vars) return;
+    qcopy(&position,moby+0x10);
+    FastVecScale(&basis[0],moby+0xD0,-1.0f);
+    qcopy(&basis[1],moby+0xC0);
+    qcopy(&basis[2],moby+0xE0);
     transform_vector(&offset,&grip,basis);
-    FastVecAdd(data+0x40,&position,&offset);
-    if (THROW_PTR(data,0x50)) {
-        THROW_INT(THROW_PTR(data,0x50),0x9C)=1;
+    FastVecAdd(vars+0x40,&position,&offset);
+    if (THROW_PTR(vars,0x50)) {
+        THROW_INT(THROW_PTR(vars,0x50),0x9C)=1;
     }
-    if (!THROW_PTR(data,0x50) || THROW_PTR(data,0x50)[0x20]==0xFE || THROW_PTR(data,0x50)[0x20]==0xFD)
-        THROW_PTR(data,0x50)=0;
+    if (!THROW_PTR(vars,0x50) || THROW_PTR(vars,0x50)[0x20]==0xFE || THROW_PTR(vars,0x50)[0x20]==0xFD)
+        THROW_PTR(vars,0x50)=0;
     if (g_hero_state.mode==1) stub_empty_9_us2(0x1D,1);
-    if (THROW_PTR(data,0x50) && !g_hero_state.locked) {
-        heldData=THROW_PTR(THROW_PTR(data,0x50),0x68);
+    if (THROW_PTR(vars,0x50) && !g_hero_state.locked) {
+        held_data=THROW_PTR(THROW_PTR(vars,0x50),0x68);
         velocity.q=0;
         velocity.f[0]=(g_pad_state.buttons&4)?0.10000000894f:0.06666667014f;
         aim.q=velocity.q;
@@ -115,22 +116,22 @@ void UpdateProjectileThrower_us2(unsigned char *self)
             hit=0;
             velocity.q=temp.q;
             transform_vector(&velocity,&velocity,inverse);
-            player=g_hero_state.moby;
-            fast_subtract_rotations(THROW_FLOAT(player,0xF8),mat_fast_helper_a(velocity.f[0],velocity.f[1]));
+            hero_moby=g_hero_state.moby;
+            fast_subtract_rotations(THROW_FLOAT(hero_moby,0xF8),mat_fast_helper_a(velocity.f[0],velocity.f[1]));
             angle=mat_fast_helper_a(velocity.f[0],velocity.f[1]);
             pitch=mat_fast_helper_a(vec_length_xy(&velocity),velocity.f[2]);
             if(pitch>0.5934119821f) pitch=0.5934119821f;
             if(pitch< -1.396263599f) pitch=-1.396263599f;
             vec_build_spherical_offset(&velocity,(g_pad_state.buttons&4)?6.0f:4.0f,angle,pitch);
             {
-                float planarLength=vec_length_xy(&velocity);
+                float planar_length=vec_length_xy(&velocity);
                 float z = velocity.f[2];
-                if(planarLength!=0) slope=z/planarLength;
+                if(planar_length!=0) slope=z/planar_length;
                 else slope=z*100.0f;
             }
             {
-                float fallTime=square_root((g_pad_state.buttons&4)?0.008166667074f:0.005444444716f);
-                distance=((fallTime+fallTime)*fallTime)*(1.0f-slope)*367.3469238f;
+                float fall_time=square_root((g_pad_state.buttons&4)?0.008166667074f:0.005444444716f);
+                distance=((fall_time+fall_time)*fall_time)*(1.0f-slope)*367.3469238f;
             }
             height=slope*distance;
             if(distance>0) {
@@ -138,7 +139,7 @@ void UpdateProjectileThrower_us2(unsigned char *self)
                 velocity.f[1]=math_fast_sin_or_cos_b(angle)*distance;
                 velocity.f[2]=height;
                 FastVecAdd(&temp,g_camera_eye_state,&velocity);
-                if(CollLine(g_camera_eye_state,&temp,2,self,0) && g_collision_hit.moby!=g_hero_state.moby) {
+                if(CollLine(g_camera_eye_state,&temp,2,moby,0) && g_collision_hit.moby!=g_hero_state.moby) {
                     qcopy(&end,g_collision_hit.point);
                     hit=1;
                     angle=mat_fast_helper_a(end.f[0]-launch.f[0],end.f[1]-launch.f[1]);
@@ -152,57 +153,57 @@ void UpdateProjectileThrower_us2(unsigned char *self)
             }
         }
         power=(g_pad_state.buttons&4)?6.0f:4.0f;
-        moby_compute_throw_velocity(&launch,&end,heldData,0.002722222358f,1.0f,power);
+        moby_compute_throw_velocity(&launch,&end,held_data,0.002722222358f,1.0f,power);
     }
-    vec_fast_helper_b(data+0x58);
-    switch(self[0x20]) {
+    vec_fast_helper_b(vars+0x58);
+    switch(moby[0x20]) {
     case 0:
-        THROW_PTR(data,0x50)=0;
-        if (self[0x60]&2) self[0x20]=2;
-        else self[0x20]=1;
+        THROW_PTR(vars,0x50)=0;
+        if (moby[0x60]&2) moby[0x20]=2;
+        else moby[0x20]=1;
         /* Fall through. */
     case 1:
-        if(self[0x60]&2) self[0x20]=2;
+        if(moby[0x60]&2) moby[0x20]=2;
         /* Fall through. */
     case 2:
         if(g_hero_state.mode==1) stub_empty_9_us2(0x1D,1);
-        if(self[0x42]==self[0x43] && self[0x42]==3 && (self[0x60]&2)) anim_start_blended(self,1,0,2);
-        if(THROW_FLOAT(data,0x58)==0 && !g_hero_state.locked && (g_pad_state.buttons&g_hero_state.fireMask)) {
+        if(moby[0x42]==moby[0x43] && moby[0x42]==3 && (moby[0x60]&2)) anim_start_blended(moby,1,0,2);
+        if(THROW_FLOAT(vars,0x58)==0 && !g_hero_state.locked && (g_pad_state.buttons&g_hero_state.fireMask)) {
             if(stub_empty_5(-1,1)) {
                 stub_empty_11(4);
-                if(self[0x43]!=3) anim_start_blended(self,3,0,2);
-                self[0x20]=3;
+                if(moby[0x43]!=3) anim_start_blended(moby,3,0,2);
+                moby[0x20]=3;
                 {
                     ThrowClass *weapon = &((ThrowClass *)g_weapon_table)[g_throw_weapon_index];
-                    THROW_FLOAT(data,0x58) = 1.0f / weapon->speed;
+                    THROW_FLOAT(vars,0x58) = 1.0f / weapon->speed;
                 }
-            } else PlayMobySound(4,0,self);
+            } else PlayMobySound(4,0,moby);
         }
         if(!(g_pad_state.buttons&g_hero_state.fireMask) || !stub_empty_7(-1)) {
             if(g_hero_state.action>=9 || !g_hero_state.active) stub_empty_12();
         }
         break;
     case 3:
-        if(self[0x42]==self[0x43] && self[0x42]==3 && moby_get_anim_value(self)>=2.0f) {
-            if(THROW_PTR(data,0x50)) {
-                thrown_item_launch(&launch,THROW_PTR(data,0x50),THROW_PTR(THROW_PTR(data,0x50),0x68));
-                AddMobyToIndexList(THROW_PTR(data,0x50),g_throw_moby_list,0x3F);
-                THROW_PTR(data,0x50)=0;
-                THROW_INT(data,0x54)=10;
+        if(moby[0x42]==moby[0x43] && moby[0x42]==3 && moby_get_anim_value(moby)>=2.0f) {
+            if(THROW_PTR(vars,0x50)) {
+                thrown_item_launch(&launch,THROW_PTR(vars,0x50),THROW_PTR(THROW_PTR(vars,0x50),0x68));
+                AddMobyToIndexList(THROW_PTR(vars,0x50),g_throw_moby_list,0x3F);
+                THROW_PTR(vars,0x50)=0;
+                THROW_INT(vars,0x54)=10;
             }
-            self[0x20]=2;
+            moby[0x20]=2;
         }
         break;
     case 4: break;
-    case 5: self[0x20]=6; break;
+    case 5: moby[0x20]=6; break;
     case 6:
-        if(THROW_PTR(data,0x50)) {moby_mark_spawned(THROW_PTR(data,0x50));THROW_PTR(data,0x50)=0;}
+        if(THROW_PTR(vars,0x50)) {moby_mark_spawned(THROW_PTR(vars,0x50));THROW_PTR(vars,0x50)=0;}
         break;
     }
-    math_fast_float_d(data+0x54);
-    if(THROW_PTR(data,0x50)) qcopy(THROW_PTR(data,0x50)+0x10,data+0x40);
-    else if(!THROW_INT(data,0x54) && stub_empty_7(-1)) {
+    math_fast_float_d(vars+0x54);
+    if(THROW_PTR(vars,0x50)) qcopy(THROW_PTR(vars,0x50)+0x10,vars+0x40);
+    else if(!THROW_INT(vars,0x54) && stub_empty_7(-1)) {
         qzero_nc(&aim);
-        THROW_PTR(data,0x50)=thrown_item_spawn(self,data+0x40,&aim);
+        THROW_PTR(vars,0x50)=thrown_item_spawn(moby,vars+0x40,&aim);
     }
 }

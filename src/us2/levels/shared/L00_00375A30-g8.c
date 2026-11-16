@@ -11,18 +11,18 @@ extern void UpdateSelectedItemPurchaseDialog(int *a, int *b);
 /* Dispatch on a mode word held in the level's own data, once the module's registry word is set. */
 void shop_dispatch_purchase_confirm_us2(void)
 {
-    int *d = g_purchase_menu_model;
-    int v;
+    int *model = g_purchase_menu_model;
+    int mode;
 
-    if (d[0x84 / 4] == 0)
+    if (model[0x84 / 4] == 0)
         return;
-    v = d[0x50 / 4];
-    if (v == 0)
+    mode = model[0x50 / 4];
+    if (mode == 0)
         VendorPurchaseDialogUpdate(&g_purchase_dialog_selection, &g_purchase_dialog_result);
-    else if (v == 1)
+    else if (mode == 1)
         UpdateItemPurchaseConfirmation(&g_purchase_dialog_selection, &g_purchase_dialog_result);
-    else if (v == 2)
+    else if (mode == 2)
         UpdatePurchaseConfirmationDialog(&g_purchase_dialog_selection, &g_purchase_dialog_result);
-    else if (v == 3)
+    else if (mode == 3)
         UpdateSelectedItemPurchaseDialog(&g_purchase_dialog_selection, &g_purchase_dialog_result);
 }

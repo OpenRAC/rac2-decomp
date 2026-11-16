@@ -14,7 +14,7 @@ typedef struct { u8 bytes[16]; } Block;
 typedef struct {
     s32 active;
     u8 pad04[8];
-    s32 maxLevel;
+    s32 max_level;
     s32 maxAmmo;
     s32 value;
     u8 pad18[4];
@@ -30,8 +30,8 @@ typedef struct {
 /* The HUD object's variables: the health bar blinks while health is low. */
 typedef struct {
     u8 pad00[0x34];
-    s32 blinkTimer;
-    s32 blinkOn;
+    s32 blink_timer;
+    s32 blink_on;
 } HudBlinkVars;
 
 extern u8 *g_hud_blink_moby __attribute__((sda));
@@ -86,9 +86,9 @@ extern void gfx_draw_screen_rectangle(s32, s32, s32, s32, s32, u32 *);
 extern int GetIconFrame(s32, s32);
 extern void hud_draw_sprite_gradient(void *, s32, s32, s32, s32, Block *);
 extern void text_draw_small(s32, s32, u64, char *, s32);
-extern void func_US2_L05_00327640(s32);
+extern void level_store_value_plus_one_us2(s32);
 extern s32 level_lookup_step_table(void);
-extern void func_US2_0029CC48(void), hud_draw_object_markers(void);
+extern void hud_draw_scaled_us2(void), hud_draw_object_markers(void);
 
 /* The shape of scaled_screen_coord in src/game/002D3390.c, with this level's display scale. */
 static __inline__ s32 screen_coord(s32 mode, f32 value, f32 offset)
@@ -121,15 +121,15 @@ static __inline__ int label_y(void *handle, float value, float scale, float half
     return result;
 }
 
-s32 func_US2_L10_00422CA8(void) {
+s32 hrugis_draw_mission_hud_us2(void) {
     char text[128];
     char *label;
     u32 colors[2], colors2[2];
     Block b0, b1, b2;
-    s32 a, b, c, score, idx, newidx, color, textX;
+    s32 a, b, c, score, idx, newidx, color, text_x;
     void *object;
     HudBlinkVars *data = *(HudBlinkVars **)(g_hud_blink_moby + 0x68);
-    f32 x, y, ratio, tmp, base, end, fill, tweenColor;
+    f32 x, y, ratio, tmp, base, end, fill, tween_color;
     void *sprite0, *sprite2;
 
     switch (g_selected_mission_kind) {
@@ -142,8 +142,8 @@ s32 func_US2_L10_00422CA8(void) {
             score = 0;
         label = GetLocalizedString(0x306e);
         sprintf(text, g_str_hud_score_format, label, score);
-        textX = g_hud_panel_third_x - 65;
-        text_draw_medium(textX, label_y((void *)textX, g_hud_panel_third_y - 8, g_screen_l10_scale, 0.5f, 1), 0x80808080, text, 128);
+        text_x = g_hud_panel_third_x - 65;
+        text_draw_medium(text_x, label_y((void *)text_x, g_hud_panel_third_y - 8, g_screen_l10_scale, 0.5f, 1), 0x80808080, text, 128);
         if (hrugis_take_boss_flag_a() && g_hud_boss_flag_latched) {
             g_hud_boss_flag_latched = 0;
             g_hud_blink_timer_first = 180;
@@ -167,40 +167,40 @@ s32 func_US2_L10_00422CA8(void) {
         label = GetLocalizedString(0x3071);
         fmt = g_str_hud_score_format;
         sprintf(text, fmt, label, list_count_ready_objects(level_find_object_by_class_id(0xf93)));
-        textX = g_hud_panel_second_x - 65;
-        text_draw_medium(textX, label_y((void *)textX, g_hud_panel_second_y - 8, g_screen_l10_scale, half, 1), 0x80808080, text, 128);
+        text_x = g_hud_panel_second_x - 65;
+        text_draw_medium(text_x, label_y((void *)text_x, g_hud_panel_second_y - 8, g_screen_l10_scale, half, 1), 0x80808080, text, 128);
         label = GetLocalizedString(0x3072);
         sprintf(text, fmt, label, list_count_ready_objects(level_find_object_by_class_id(0xcbe)));
-        textX = g_hud_panel_third_x - 65;
-        text_draw_medium(textX, label_y((void *)textX, g_hud_panel_third_y - 8, g_screen_l10_scale, half, 1), 0x80808080, text, 128);
+        text_x = g_hud_panel_third_x - 65;
+        text_draw_medium(text_x, label_y((void *)text_x, g_hud_panel_third_y - 8, g_screen_l10_scale, half, 1), 0x80808080, text, 128);
         break;
     }
     case 2: {
         char *fmt;
-        s32 textX2;
+        s32 text_x2;
 
         DrawFadingHudIconPairs(0, 1, 0, 1);
         label = GetLocalizedString(0x3073);
         fmt = g_str_hud_score_format;
         sprintf(text, fmt, label, list_count_ready_objects(level_find_object_by_class_id(0xf8e)));
-        textX2 = g_hud_panel_third_x - 70;
-        text_draw_medium(textX2, label_y((void *)textX2, g_hud_panel_third_y - 8, g_screen_l10_scale, 0.5f, 1), 0x80808080, text, 128);
+        text_x2 = g_hud_panel_third_x - 70;
+        text_draw_medium(text_x2, label_y((void *)text_x2, g_hud_panel_third_y - 8, g_screen_l10_scale, 0.5f, 1), 0x80808080, text, 128);
         break;
     }
     case 3: {
         f32 half = 0.5f;
-        s32 textX2;
+        s32 text_x2;
 
         DrawFadingHudIconPairs(1, 1, 0, 1);
         label = GetLocalizedString(0x306d);
         sprintf(text, g_str_hud_score_format, label, g_gate_frame_counter);
-        textX = g_hud_panel_third_x - 65;
-        text_draw_medium(textX, label_y((void *)textX, g_hud_panel_third_y - 8, g_screen_l10_scale, half, 1), 0x80808080, text, 128);
+        text_x = g_hud_panel_third_x - 65;
+        text_draw_medium(text_x, label_y((void *)text_x, g_hud_panel_third_y - 8, g_screen_l10_scale, half, 1), 0x80808080, text, 128);
         math_split_time_into_parts(g_mission_time_value, &a, &b, &c);
         label = GetLocalizedString(0x2e19);
         sprintf(text, g_str_hud_time_format, label, a, b, c);
-        textX2 = g_hud_panel_first_x - 80;
-        text_draw_medium(textX2, label_y((void *)textX2, g_hud_panel_first_y - 8, g_screen_l10_scale, half, 1), 0x80808080, text, 128);
+        text_x2 = g_hud_panel_first_x - 80;
+        text_draw_medium(text_x2, label_y((void *)text_x2, g_hud_panel_first_y - 8, g_screen_l10_scale, half, 1), 0x80808080, text, 128);
         break;
     }
     }
@@ -219,40 +219,40 @@ s32 func_US2_L10_00422CA8(void) {
 
         /* The weapon's level gauge, red to green in one, two or three segments. */
         idx = table_find_last_used_entry(6);
-        ratio = IntToFloat(g_reward_slot_table[idx].value) / IntToFloat(g_reward_slot_table[idx].maxLevel);
+        ratio = IntToFloat(g_reward_slot_table[idx].value) / IntToFloat(g_reward_slot_table[idx].max_level);
         switch (idx) {
         case 6:
             if (ratio > 0.0f) {
-                tweenColor = FastTweenColor(0x800000ff, 0x8000ff00, ratio);
-                gfx_draw_scaled_object(g_hud_blink_sprite_first, x, y, (s32)tweenColor, 1.0f, 0.0f);
+                tween_color = FastTweenColor(0x800000ff, 0x8000ff00, ratio);
+                gfx_draw_scaled_object(g_hud_blink_sprite_first, x, y, (s32)tween_color, 1.0f, 0.0f);
             }
             break;
         case 12:
             if (ratio > 0.5f) {
                 ratio -= 0.5f;
-                tweenColor = FastTweenColor(0x800000ff, 0x8000ff00, ratio + ratio);
-                gfx_draw_scaled_object(g_hud_blink_sprite_second, x, y, (s32)tweenColor, 1.0f, 0.0f);
+                tween_color = FastTweenColor(0x800000ff, 0x8000ff00, ratio + ratio);
+                gfx_draw_scaled_object(g_hud_blink_sprite_second, x, y, (s32)tween_color, 1.0f, 0.0f);
                 gfx_draw_scaled_object(g_hud_blink_sprite_first, x, y, 0x8000ff00, 1.0f, 0.0f);
             } else if (ratio > 0.0f) {
-                tweenColor = FastTweenColor(0x800000ff, 0x8000ff00, ratio + ratio);
-                gfx_draw_scaled_object(g_hud_blink_sprite_first, x, y, (s32)tweenColor, 1.0f, 0.0f);
+                tween_color = FastTweenColor(0x800000ff, 0x8000ff00, ratio + ratio);
+                gfx_draw_scaled_object(g_hud_blink_sprite_first, x, y, (s32)tween_color, 1.0f, 0.0f);
             }
             break;
         case 14:
             if (ratio > 0.6666667f) {
                 ratio -= 0.6666667f;
-                tweenColor = FastTweenColor(0x800000ff, 0x8000ff00, ratio * 3.0f);
-                gfx_draw_scaled_object(g_hud_blink_sprite_third, x, y, (s32)tweenColor, 1.0f, 0.0f);
+                tween_color = FastTweenColor(0x800000ff, 0x8000ff00, ratio * 3.0f);
+                gfx_draw_scaled_object(g_hud_blink_sprite_third, x, y, (s32)tween_color, 1.0f, 0.0f);
                 gfx_draw_scaled_object(g_hud_blink_sprite_second, x, y, 0x8000ff00, 1.0f, 0.0f);
                 gfx_draw_scaled_object(g_hud_blink_sprite_first, x, y, 0x8000ff00, 1.0f, 0.0f);
             } else if (ratio > 0.33333334f) {
                 ratio -= 0.33333334f;
-                tweenColor = FastTweenColor(0x800000ff, 0x8000ff00, ratio * 3.0f);
-                gfx_draw_scaled_object(g_hud_blink_sprite_second, x, y, (s32)tweenColor, 1.0f, 0.0f);
+                tween_color = FastTweenColor(0x800000ff, 0x8000ff00, ratio * 3.0f);
+                gfx_draw_scaled_object(g_hud_blink_sprite_second, x, y, (s32)tween_color, 1.0f, 0.0f);
                 gfx_draw_scaled_object(g_hud_blink_sprite_first, x, y, 0x8000ff00, 1.0f, 0.0f);
             } else if (ratio > 0.0f) {
-                tweenColor = FastTweenColor(0x800000ff, 0x8000ff00, ratio * 3.0f);
-                gfx_draw_scaled_object(g_hud_blink_sprite_first, x, y, (s32)tweenColor, 1.0f, 0.0f);
+                tween_color = FastTweenColor(0x800000ff, 0x8000ff00, ratio * 3.0f);
+                gfx_draw_scaled_object(g_hud_blink_sprite_first, x, y, (s32)tween_color, 1.0f, 0.0f);
             }
             break;
         }
@@ -260,15 +260,15 @@ s32 func_US2_L10_00422CA8(void) {
         /* Health bar: blinks below 30%. */
         fill = g_mission_state.health * 0.01f;
         if (fill > 0.3f) {
-            data->blinkOn = 1;
-        } else if (math_fast_float_d(&data->blinkTimer)) {
-            data->blinkTimer = 5;
-            data->blinkOn ^= 1;
+            data->blink_on = 1;
+        } else if (math_fast_float_d(&data->blink_timer)) {
+            data->blink_timer = 5;
+            data->blink_on ^= 1;
         }
         colors[1] = FastTweenColor(0x800000ff, 0x8000ff00, fill);
         colors[0] = 0x800000ff;
         tmp = fill * 200.0f + 156.0f;
-        if (data->blinkOn)
+        if (data->blink_on)
             gfx_draw_screen_rectangle(156, 14, (s32)tmp, 27, 1, colors);
 
         /* Ammo bar. */
@@ -300,7 +300,7 @@ s32 func_US2_L10_00422CA8(void) {
         text_draw_small(67, 5, 0x80808080, text, 128);
 
         /* Weapon switch. */
-        func_US2_L05_00327640(2);
+        level_store_value_plus_one_us2(2);
         newidx = level_lookup_step_table();
         if (newidx >= 0) {
             g_reward_slot_table[table_find_last_used_entry(g_mission_record_index)].active = 0;
@@ -310,7 +310,7 @@ s32 func_US2_L10_00422CA8(void) {
         gfx_draw_scaled_object(g_hud_label_sprite_third, x, y, 0x80f0f0f0, 1.0f, 0.0f);
     }
 
-    func_US2_0029CC48();
+    hud_draw_scaled_us2();
     sprite0 = table_find_by_id(g_hud_sprite_table_base + 0x8710, 186);
     /* data, done with, holds the second sprite. */
     data = table_find_by_id(g_hud_sprite_table_base + 0x8710, 187);

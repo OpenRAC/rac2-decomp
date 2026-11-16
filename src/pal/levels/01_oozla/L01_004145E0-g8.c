@@ -11,59 +11,60 @@ extern int g_breakable_count SDATA(D_L01_001B3468);
 extern void moby_set_state(char *, int, int);
 extern void *part_find_owned_effect_slot(char *, int, int);
 extern void FastVecScale(char *, char *, float);
-extern void func_PAL_002B15D8(char *, int, void *, float, float, float, float, int);
+extern void part_spawn_masked_debris_pal(char *, int, void *, float, float, float, float, int);
 extern void part_spawn_scaled_bolts_pal(char *, float, int);
 extern int PlayMobySound(int, int, char *);
 extern int flag_set_first_pending(char *);
 extern void moby_mark_spawned(char *);
 typedef struct { char pad0[0x31]; u8 active; u16 pad32; u16 flags; char pad36[0x62]; int target; } RetiringObject;
 
-void func_PAL_L01_004145E0(char *a0)
+/* Breakable object that bursts into debris and one bolt when hit, then hides and deletes itself after a short count (PAL copy). */
+void breakable_object_update_burst_pal(char *arg)
 {
-    char *s0 = a0;
-    char *s1 = *(char **)(a0 + 0x68);
-    float buf[4];
-    int current;
+    char *moby = arg;
+    char *vars = *(char **)(arg + 0x68);
+    float velocity[4];
+    int active_count;
 
-    switch (*(u8 *)(s0 + 0x20)) {
+    switch (*(u8 *)(moby + 0x20)) {
     case 0:
         g_oozla_intro_timer = g_oozla_intro_timer + 1;
-        moby_set_state(s0, 1, -1);
+        moby_set_state(moby, 1, -1);
         return;
     case 1:
-        if (part_find_owned_effect_slot(s0, 0x4010000, 0) != 0 && *(int *)s1 == 0) {
+        if (part_find_owned_effect_slot(moby, 0x4010000, 0) != 0 && *(int *)vars == 0) {
             g_oozla_intro_timer = counter_abs - 1;
-            moby_set_state(s0, 2, -1);
+            moby_set_state(moby, 2, -1);
         }
-        *(u8 *)(s0 + 0xA8) = 0xFF;
+        *(u8 *)(moby + 0xA8) = 0xFF;
         return;
     case 2:
-        FastVecScale((char *)buf, s0 + 0xD0, -0.080000006f);
-        if (*(u8 *)(s0 + 0x31) != 0 && g_breakable_alpha_check_a < 0.9f &&
-            g_breakable_alpha_check_b < 0.9f && (current = g_breakable_count, current < g_breakable_active_limit)) {
-            func_PAL_002B15D8(s0, 0x1F, buf, 1.0f, 3.0f, 2.0f, 5.0f, 0xFF);
+        FastVecScale((char *)velocity, moby + 0xD0, -0.080000006f);
+        if (*(u8 *)(moby + 0x31) != 0 && g_breakable_alpha_check_a < 0.9f &&
+            g_breakable_alpha_check_b < 0.9f && (active_count = g_breakable_count, active_count < g_breakable_active_limit)) {
+            part_spawn_masked_debris_pal(moby, 0x1F, velocity, 1.0f, 3.0f, 2.0f, 5.0f, 0xFF);
         } else {
-            func_PAL_002B15D8(s0, 0x5, buf, 1.0f, 3.0f, 2.0f, 5.0f, 0xFF);
+            part_spawn_masked_debris_pal(moby, 0x5, velocity, 1.0f, 3.0f, 2.0f, 5.0f, 0xFF);
         }
-        part_spawn_scaled_bolts_pal(s0, 0.0f, 1);
-        PlayMobySound(0, 0, s0);
-        moby_set_state(s0, 3, -1);
+        part_spawn_scaled_bolts_pal(moby, 0.0f, 1);
+        PlayMobySound(0, 0, moby);
+        moby_set_state(moby, 3, -1);
         return;
     case 3:
-        if (flag_set_first_pending(s0) != 0) {
-            RetiringObject *retiring = (RetiringObject *)s0;
+        if (flag_set_first_pending(moby) != 0) {
+            RetiringObject *retiring = (RetiringObject *)moby;
             unsigned int flags = retiring->flags;
             int count;
             retiring->active = 0;
             retiring->target = 0;
             count = active_abs;
             retiring->flags = flags | 1;
-            *(int *)(s1 + 4) = 0x64;
+            *(int *)(vars + 4) = 0x64;
             active_abs = count + 1;
         }
-        if (math_fast_float_d(s1 + 4) != 0) {
+        if (math_fast_float_d(vars + 4) != 0) {
             g_breakable_count = g_breakable_count - 1;
-            moby_mark_spawned(s0);
+            moby_mark_spawned(moby);
         }
         return;
     }

@@ -102,7 +102,8 @@ extern int snd_play_from_class_bank(int, int, void *, int);
     func_002E5DA0(0, 0, obj, 0x8A1);                  \
     ctx->child->f98 = 0
 
-void func_PAL_L00_003D3F50(LiftMoby *obj) {
+/* Moves the lift between its top and bottom heights when the player steps on its button, with a blinking light and a looping sound (PAL copy). */
+void UpdateAranosButtonLift_pal(LiftMoby *obj) {
     struct {
         Vec old, rotation, delta, offset;
     } frame;

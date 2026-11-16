@@ -3,7 +3,7 @@
 #include "common.h"
 extern void vec_add_random_offset(void *, float);
 extern int coll_process_hit(float, void *, int, int, int);
-extern char *func_PAL_002C63D0(void *, int, int, int, int, int, int, float, float);
+extern char *part_spawn_debris_two_mode_pal(void *, int, int, int, int, int, int, float, float);
 extern unsigned char *g_part_tex_burst_ember_table;
 extern char *g_particle_pool_base[] __attribute__((sda));
 typedef struct {
@@ -30,7 +30,9 @@ extern float IntToFloat(int v);
 
 /* func_PAL_002C63D0 uses the quadword-copy profile in 002C56B0-qcopy.c. */
 
-void func_PAL_002C65C8(char *p) {
+/* Updates a burst ember in two modes: 0 emits debris and hurts the hero near it every ten
+   frames; 1 is flying debris that fades its colour and size. */
+void part_update_burst_ember_pal(char *p) {
  char *q=p+32; SplitVector v; struct { float v[4]; void *owner; int flags; unsigned char mode, enabled; short mask; float scale; int last; } c; int i; float f,a,speed;
  switch(*(unsigned char *)(q+20)) {
  case 0:
@@ -39,7 +41,7 @@ void func_PAL_002C65C8(char *p) {
    vec_add_random_offset(&v,0.05f);
    speed=1.0f;
    if(*(short *)(p+10)<8)speed=IntToFloat(*(short *)(p+10))*0.125f;
-   func_PAL_002C63D0(&v,0,1,*(short *)(q+16),*(unsigned char *)(q+19),*(unsigned char *)(q+21),*(int *)(q+24),*(float *)(q+28),speed);
+   part_spawn_debris_two_mode_pal(&v,0,1,*(short *)(q+16),*(unsigned char *)(q+19),*(unsigned char *)(q+21),*(int *)(q+24),*(float *)(q+28),speed);
   }
   if(FastDecTimer((short *)(p+10)))part_kill(p);
   vec_clear_128(&c);
@@ -61,7 +63,7 @@ void func_PAL_002C65C8(char *p) {
  }
 }
 
-extern char *func_PAL_002C6890(void *, void *, int, int);
+extern char *part_spawn_smoke_alt_pal(void *, void *, int, int);
 typedef struct { SplitVector v; f32 x10; s16 h14; s16 h16; u8 b18; u8 pad[3]; s32 x1C; } FadeSplitMotion;
 typedef struct { u8 pad[2]; u8 b2; u8 pad3; u32 x4; u8 b8; u8 pad9; s16 hA; f32 fC; SplitVector pos; FadeSplitMotion e; } FadeSplitParticle;
 typedef struct { SplitVector v; s32 x10; s32 x14; u8 pad[4]; f32 x1C; s32 x20; } FadeSplitCollision;
@@ -84,7 +86,7 @@ extern void FastVecSub(void *, void *, void *);
 /* func_PAL_002C6890 uses the quadword-copy profile in 002C5B70-qcopy.c. */
 
 /* Adapted from RAC1 effect_particle_updates.c; measured against RAC2 retail. */
-void func_PAL_002C6A20(FadeSplitParticle *m) {
+void part_update_split_spark_low_gravity_pal(FadeSplitParticle *m) {
     SplitVector v, p;
     FadeSplitCollision c;
     FadeSplitMotion *e = &m->e;
@@ -106,7 +108,7 @@ void func_PAL_002C6A20(FadeSplitParticle *m) {
         v.f[0] += math_random_float_range(-e->v.f[0] * 0.2f, e->v.f[0] * 0.2f);
         v.f[1] += math_random_float_range(-e->v.f[1] * 0.2f, e->v.f[1] * 0.2f);
         v.f[2] += math_random_float_range(-e->v.f[2] * 0.2f, 0.0f);
-        n = (FadeSplitParticle *)func_PAL_002C6890((char *)&p, (char *)&v, 0x88, e->x1C);
+        n = (FadeSplitParticle *)part_spawn_smoke_alt_pal((char *)&p, (char *)&v, 0x88, e->x1C);
         if (n) {
             n->hA = 2;
             n->fC = m->fC;

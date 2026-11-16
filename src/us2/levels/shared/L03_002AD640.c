@@ -33,8 +33,8 @@ extern void attachment_update_all(void);
 extern void update_hero_moby(void);
 extern void part_spawn_effect_from_record(int a0);
 extern void hero_update_items_and_flags(void);
-extern void func_US2_L00_002B2408(void);
-extern void func_US2_L00_002B22D0(void);
+extern void hero_update_zapper_us2(void);
+extern void hero_play_collection_voice_line_us2(void);
 extern void hero_update_items_frame(void);
 extern int hero_is_action_allowed(void);
 extern void gfx_fade_screen_effect(void);
@@ -49,10 +49,11 @@ extern void func_002A677C(int a0);
 extern void ref_L03_002AD540_06(void);
 extern void UpdateHeroMobyProbedHeightBounds(void);
 
-void func_US2_L03_002AD640(void) {
+/* Runs the per-frame hero update for the level 3 build, restoring the pad words afterwards (USA v2.00). */
+void level_update_frame_us2(void) {
     char *pad;
     char *player;
-    char *p;
+    char *hero;
     int held;
     int pressed;
     int timer;
@@ -75,10 +76,10 @@ void func_US2_L03_002AD640(void) {
     if (timer == 0)
         masked_pressed = *(int *)(pad + 0x1A4);
     *(int *)(pad + 0x1A4) = masked_pressed;
-    p = g_hero_state;
-    *(short *)(p + 0x2162) = 0;
-    *(short *)(p + 0x2160) = 0;
-    if (*(unsigned char *)(p + 0x22B4) != 0) {
+    hero = g_hero_state;
+    *(short *)(hero + 0x2162) = 0;
+    *(short *)(hero + 0x2160) = 0;
+    if (*(unsigned char *)(hero + 0x22B4) != 0) {
         ref_L03_002AD540_00();
         *(int *)(pad + 0x1A0) = held;
         *(int *)(pad + 0x1A4) = pressed;
@@ -87,11 +88,11 @@ void func_US2_L03_002AD640(void) {
     AdvanceHeroAnimation();
     ref_L03_002AD540_01();
     ref_L03_002AD540_02();
-    ref_L03_002AD540_03(p + 0x80, p + 0x90, p + 0x550);
+    ref_L03_002AD540_03(hero + 0x80, hero + 0x90, hero + 0x550);
     ref_L03_002AD540_04();
     ref_L03_002AD540_05();
     if (g_hero_l03_mode == 2 || g_hero_l03_mode == 6) {
-        if (*(unsigned char *)(p + 0x22B5) != 0)
+        if (*(unsigned char *)(hero + 0x22B5) != 0)
             hero_set_objects_flag_bit();
         else
             hero_clear_objects_flag_bit();
@@ -103,7 +104,7 @@ void func_US2_L03_002AD640(void) {
         return;
     }
     RebuildRegionObjectMembership();
-    if (*(unsigned char *)(p + 0x22B4) != 0) {
+    if (*(unsigned char *)(hero + 0x22B4) != 0) {
         *(int *)(pad + 0x1A0) = held;
         *(int *)(pad + 0x1A4) = pressed;
         return;
@@ -121,8 +122,8 @@ void func_US2_L03_002AD640(void) {
     update_hero_moby();
     part_spawn_effect_from_record(0);
     hero_update_items_and_flags();
-    func_US2_L00_002B2408();
-    func_US2_L00_002B22D0();
+    hero_update_zapper_us2();
+    hero_play_collection_voice_line_us2();
     hero_update_items_frame();
     {
         char *q = g_hero_state;

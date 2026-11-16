@@ -8,18 +8,18 @@ extern void func_0031E3C0(void *, int, int, int);
 
 /* Restarts the record's resident effect once it has settled, picking the
    variant by the resident query and the record's own byte 0x43. */
-void moby_start_idle_anim_variant_pal(u8 *a0) {
-    u8 *s0 = a0;
+void moby_start_idle_anim_variant_pal(u8 *moby) {
+    u8 *record = moby;
 
-    if (*(u8 *)(s0 + 0x20) != 0)
+    if (*(u8 *)(record + 0x20) != 0)
         return;
-    func_0031E6A0(s0, 1, -1);
+    func_0031E6A0(record, 1, -1);
     if (func_0031E770(2) != 0) {
-        if (*(u8 *)(s0 + 0x43) != 0)
-            func_0031E3C0(s0, 0, 0, 0x8);
+        if (*(u8 *)(record + 0x43) != 0)
+            func_0031E3C0(record, 0, 0, 0x8);
     } else {
-        if (*(u8 *)(s0 + 0x43) != 1)
-            func_0031E3C0(s0, 1, 0, 0x8);
+        if (*(u8 *)(record + 0x43) != 1)
+            func_0031E3C0(record, 1, 0, 0x8);
     }
 }
 

@@ -17,6 +17,8 @@ extern void coll_move_resolve_collisions(char *, char *, void *, void *, void *)
 extern void coll_update_ground_contact(char *, char *, void *, void *, void *);
 extern int g_frame_l02_counter __attribute__((sda));
 
+/* Runs one frame of the collision controller once per frame: steers toward the target, resolves
+   collisions and updates ground contact. Returns the controller's status flags. */
 int coll_update_controller_pal(char *object, void *target, void *input) {
     float inverse[16], direction[4], rotated[12];
     float previous[4], output0[4], output1[4];

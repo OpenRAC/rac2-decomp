@@ -33,21 +33,23 @@ extern void follower_start_push_from_target_pal(unsigned char *);
 #define FEDA(p,o) (*(float *)((p)+(o)))
 #define PEDA(p,o) (*(unsigned char **)((p)+(o)))
 
-void func_PAL_L05_0037E8E0(unsigned char *owner)
+/* Per-frame follower movement: applies velocity, clamps, then steers toward its target by state
+   (PAL: 50 Hz timings). */
+void follower_l05_update_pal(unsigned char *owner)
 {
     VecEDA v, extra, frame[3], zero, up, basis[3], test, rotated;
-    unsigned char *d = (unsigned char *)moby_get_motion_data(owner);
+    unsigned char *vars = (unsigned char *)moby_get_motion_data(owner);
     unsigned char *cam;
     unsigned char *target;
     float sign;
-    if (!d) return;
+    if (!vars) return;
     zero.q = 0;
     up.q = 0;
     zero.f[2] = 1.0f;
     up.f[0] = 1.0f;
-    qcopy(d+0xB0,owner+0x10);
+    qcopy(vars+0xB0,owner+0x10);
     if (follower_get_state(owner) != 8)
-        FastVecAdd(owner+0x10,d+0x90,owner+0x10);
+        FastVecAdd(owner+0x10,vars+0x90,owner+0x10);
     follower_clamp_range_spawn_sparks_pal(owner);
     follower_check_hazard_contact_pal(owner);
     follower_move_toward_target(owner);
@@ -56,30 +58,30 @@ void func_PAL_L05_0037E8E0(unsigned char *owner)
     cam = g_camera_state_ptr;
     switch(follower_get_state(owner)) {
     case 7:
-        vec_scale_to_length(&v,PEDA(d,0x120)+0xC0,-50.0f);
-        FastVecAdd(&v,PEDA(d,0x120)+0x10,&v);
+        vec_scale_to_length(&v,PEDA(vars,0x120)+0xC0,-50.0f);
+        FastVecAdd(&v,PEDA(vars,0x120)+0x10,&v);
         follower_set_push_vector(owner,&v);
         if(follower_has_reached_target(owner)) {
             follower_set_state(owner,8);
-            IEDA(d,0x130)=750;
+            IEDA(vars,0x130)=750;
             sign = (func_001163B0()&1) ? -1.0f : 1.0f;
-            FEDA(d,0x140)=sign;
-            FEDA(d,0x134)=sign < 0.0f ? 1.5707964f : -1.5707964f;
-            FEDA(d,0x144)=math_random_float_range(5.0f,15.0f);
+            FEDA(vars,0x140)=sign;
+            FEDA(vars,0x134)=sign < 0.0f ? 1.5707964f : -1.5707964f;
+            FEDA(vars,0x144)=math_random_float_range(5.0f,15.0f);
         }
         break;
     case 8:
         v.f[2]=0.0f;
-        v.f[0]=math_fast_sin_or_cos_b(FEDA(d,0x134))*FEDA(d,0x144);
-        v.f[1]=-math_fast_sin_or_cos_a(FEDA(d,0x134))*FEDA(d,0x144);
+        v.f[0]=math_fast_sin_or_cos_b(FEDA(vars,0x134))*FEDA(vars,0x144);
+        v.f[1]=-math_fast_sin_or_cos_a(FEDA(vars,0x134))*FEDA(vars,0x144);
         v.f[3]=0.0f;
-        FEDA(d,0x134)=FastAddRotations(FEDA(d,0x134),FEDA(d,0x140)*0.015707966f);
+        FEDA(vars,0x134)=FastAddRotations(FEDA(vars,0x134),FEDA(vars,0x140)*0.015707966f);
         qcopy(&basis[2],cam+0x20);
         FastVecCross(&basis[1],&up,&basis[2]);
         vec_scale_to_length(&basis[1],&basis[1],1.0f);
         FastVecCross(&basis[0],&basis[2],&basis[1]);
         matrix_mul_vec3(&v,&v,&basis[0]);
-        FastVecAdd(owner+0x10,PEDA(d,0x120)+0x10,&v);
+        FastVecAdd(owner+0x10,PEDA(vars,0x120)+0x10,&v);
         follower_set_push_vector(owner,&v);
         if(follower_try_place_at_saved_spot(owner)) follower_set_state(owner,9);
         if(!follower_has_reached_target(owner)) break;
@@ -99,50 +101,50 @@ void func_PAL_L05_0037E8E0(unsigned char *owner)
         }
         break;
     case 4:
-        if (!PEDA(d,0x120)) { moby_release_motion_slot(owner); follower_set_state(owner,1); break; }
-        vec_scale_to_length(&v,PEDA(d,0x120)+0xC0,25.0f);
-        if (IEDA(d,0xFC)) {
-            matrix_mul_vec3(&rotated,d+0x70,PEDA(d,0x120)+0xC0);
+        if (!PEDA(vars,0x120)) { moby_release_motion_slot(owner); follower_set_state(owner,1); break; }
+        vec_scale_to_length(&v,PEDA(vars,0x120)+0xC0,25.0f);
+        if (IEDA(vars,0xFC)) {
+            matrix_mul_vec3(&rotated,vars+0x70,PEDA(vars,0x120)+0xC0);
             FastVecAdd(&v,&rotated,&v);
         }
-        FastVecAdd(&v,PEDA(d,0x120)+0x10,&v);
+        FastVecAdd(&v,PEDA(vars,0x120)+0x10,&v);
         follower_set_push_vector(owner,&v);
         if (follower_has_reached_target(owner)) {
             follower_set_state(owner,5);
-            IEDA(d,0x130)=((s32)(math_random_int_range(300,600)) * 5 + 2) / 6;
+            IEDA(vars,0x130)=((s32)(math_random_int_range(300,600)) * 5 + 2) / 6;
         }
         break;
     case 5:
-        if (!PEDA(d,0x120)) { moby_release_motion_slot(owner); follower_set_state(owner,1); break; }
-        vec_scale_to_length(&v,PEDA(d,0x120)+0xC0,5.0f);
-        if (IEDA(d,0xFC)) {
-            matrix_mul_vec3(&rotated,d+0x70,PEDA(d,0x120)+0xC0);
+        if (!PEDA(vars,0x120)) { moby_release_motion_slot(owner); follower_set_state(owner,1); break; }
+        vec_scale_to_length(&v,PEDA(vars,0x120)+0xC0,5.0f);
+        if (IEDA(vars,0xFC)) {
+            matrix_mul_vec3(&rotated,vars+0x70,PEDA(vars,0x120)+0xC0);
             FastVecAdd(&v,&rotated,&v);
         }
-        FastVecAdd(&v,PEDA(d,0x120)+0x10,&v);
+        FastVecAdd(&v,PEDA(vars,0x120)+0x10,&v);
         follower_set_push_vector(owner,&v);
         if(follower_has_reached_target(owner)) { moby_release_motion_slot(owner); follower_set_state(owner,1); }
         break;
     case 6:
-        if (!PEDA(d,0x120)) { moby_release_motion_slot(owner); follower_set_state(owner,1); break; }
-        vec_scale_to_length(&v,PEDA(d,0x120)+0xC0,10.0f);
-        vec_scale_to_length(&extra,PEDA(d,0x120)+0xE0,0.05f);
-        if (IEDA(d,0xFC)) {
-            matrix_mul_vec3(&rotated,d+0x70,PEDA(d,0x120)+0xC0);
+        if (!PEDA(vars,0x120)) { moby_release_motion_slot(owner); follower_set_state(owner,1); break; }
+        vec_scale_to_length(&v,PEDA(vars,0x120)+0xC0,10.0f);
+        vec_scale_to_length(&extra,PEDA(vars,0x120)+0xE0,0.05f);
+        if (IEDA(vars,0xFC)) {
+            matrix_mul_vec3(&rotated,vars+0x70,PEDA(vars,0x120)+0xC0);
             FastVecAdd(&v,&rotated,&v);
         }
         FastVecAdd(&v,&extra,&v);
-        FastVecAdd(&v,PEDA(d,0x120)+0x10,&v);
+        FastVecAdd(&v,PEDA(vars,0x120)+0x10,&v);
         follower_set_push_vector(owner,&v);
         if(follower_has_reached_target(owner)) { moby_release_motion_slot(owner); follower_set_state(owner,1); }
         break;
     case 3:
-        target=PEDA(d,0x10);
+        target=PEDA(vars,0x10);
         qcopy(&frame[0],target+0xC0);
         FastVecCross(&frame[1],&frame[0],&zero);
         vec_scale_to_length(&frame[1],&frame[1],1.0f);
         FastVecCross(&frame[2],&frame[1],&frame[0]);
-        matrix_mul_vec3(&v,d,&frame[0]);
+        matrix_mul_vec3(&v,vars,&frame[0]);
         FastVecAdd(&v,target+0x10,&v);
         follower_set_push_vector(owner,&v);
         break;

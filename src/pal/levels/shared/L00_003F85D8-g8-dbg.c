@@ -65,7 +65,7 @@ extern float FastVecDot(const Vector *, const Vector *);
 extern void LerpVector4(Vector *, const Vector *, const Vector *, float);
 extern int math_random_int_below(int);
 extern float IntToFloat(int);
-extern char *func_PAL_002BE9A8(Vector *, float, float, float, int, const Vector *, float, int, int);
+extern char *part_spawn_spinning_spark_pal(Vector *, float, float, float, int, const Vector *, float, int, int);
 extern int CollLine(Vector *, Vector *, int, char *, int);
 extern void vec_scale_to_length(Vector *, const Vector *, float);
 extern void vec_fast_normalize(Vector *, const Vector *, const Vector *);
@@ -80,11 +80,11 @@ extern void SpawnExplosionEffects_pal(void *, float, void *, float, void *, int,
                          float, float, float, float, int, float, int, int, int, int, int);
 extern void part_init_effect_record(char *, int, int, float);
 extern int coll_process_hit(Vector *, int, char *, DamageRequest *, float);
-extern int func_PAL_00335DD0(char *, int, int);
+extern int weapon_start_health_drain_pal(char *, int, int);
 extern void moby_mark_spawned(void *);
 extern float FastAddRotations(float, float);
 
-void func_PAL_L00_003F85D8(char *object)
+void bouncing_explosive_update_pal(char *object)
 {
     union {
         DamageRequest request;
@@ -131,7 +131,7 @@ void func_PAL_L00_003F85D8(char *object)
                 if (math_random_int_below(2) != 0) spin = -spin;
                 fade = IntToFloat(((s32)(g_bouncing_explosive_timer) * 5 + 2) / 6);
                 life = (float)state->particle_timer / fade * 45000.0f + 5000.0f;
-                particle = func_PAL_002BE9A8(&point, 0.025f, one, one, spin, &g_default_vector,
+                particle = part_spawn_spinning_spark_pal(&point, 0.025f, one, one, spin, &g_default_vector,
                                         life, (int)0x80808080, 1);
                 if (particle != 0) {
                     char *properties;
@@ -253,7 +253,7 @@ void func_PAL_L00_003F85D8(char *object)
         int remaining = count;
         hit = g_area_hit_targets;
         do {
-            func_PAL_00335DD0(*hit, 61, *(int *)(object + 0xb8));
+            weapon_start_health_drain_pal(*hit, 61, *(int *)(object + 0xb8));
             ++hit;
             --remaining;
         } while (remaining != 0);

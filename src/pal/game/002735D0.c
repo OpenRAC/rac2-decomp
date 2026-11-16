@@ -72,11 +72,11 @@ int target_seeker_update_pal(char *obj)
     float buf[4];
     float out[4];
     char *p;
-    char *s1;
+    char *seeker_pos;
     unsigned char k;
     int r;
-    int s4;
-    int s5;
+    int sound_id;
+    int target_slot;
 
     p = *(char **)(obj + 104);
     k = *(unsigned char *)(p + 92);
@@ -87,27 +87,27 @@ int target_seeker_update_pal(char *obj)
     else
         Fdb046c5d_FUN_00274128(obj);
 
-    s5 = Fdb046c5d_FUN_00274500(obj);
-    if (s5 == -1)
+    target_slot = Fdb046c5d_FUN_00274500(obj);
+    if (target_slot == -1)
         return 0;
 
-    s1 = Fdb046c5d_D_001BAFC0;
-    s4 = -1;
-    Fdb046c5d_FUN_00282F20(1.0f, s1, s1);
-    Fdb046c5d_FUN_00282DD8(buf, s1, p);
+    seeker_pos = Fdb046c5d_D_001BAFC0;
+    sound_id = -1;
+    Fdb046c5d_FUN_00282F20(1.0f, seeker_pos, seeker_pos);
+    Fdb046c5d_FUN_00282DD8(buf, seeker_pos, p);
     Fdb046c5d_FUN_00274A88(obj, p + 16, buf);
     Fdb046c5d_FUN_002AFFD8(obj + 16, out, 1);
-    r = Fdb046c5d_FUN_00274BA8(p, s1, out, *(float *)(p + 56), *(float *)(p + 60));
+    r = Fdb046c5d_FUN_00274BA8(p, seeker_pos, out, *(float *)(p + 56), *(float *)(p + 60));
     if (r == 0) {
         if (*(unsigned char *)(p + 94) != 255 && *(unsigned char *)(p + 92) == 0)
-            s4 = Fdb046c5d_FUN_002E5CF8(*(unsigned char *)(p + 94), 0, obj);
-        Fdb046c5d_FUN_00274768(obj, s5, out);
+            sound_id = Fdb046c5d_FUN_002E5CF8(*(unsigned char *)(p + 94), 0, obj);
+        Fdb046c5d_FUN_00274768(obj, target_slot, out);
     } else {
         if (*(unsigned char *)(p + 94) != 255)
-            s4 = Fdb046c5d_FUN_002E5CF8(*(unsigned char *)(p + 94), 0, obj);
+            sound_id = Fdb046c5d_FUN_002E5CF8(*(unsigned char *)(p + 94), 0, obj);
     }
-    if (s4 != -1)
-        Fdb046c5d_FUN_002E5F00(s4, p + 32);
+    if (sound_id != -1)
+        Fdb046c5d_FUN_002E5F00(sound_id, p + 32);
     return 0;
 }
 

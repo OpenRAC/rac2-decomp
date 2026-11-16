@@ -3,7 +3,7 @@
 #include "common.h"
 
 /* Clear both entry tables and reset the record state. */
-void func_PAL_L00_00418190(char *object)
+void wave_line_reset_effect_pal(char *object)
 {
     char *state = *(char **)(object + 0x68);
     int i;

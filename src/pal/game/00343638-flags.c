@@ -1,4 +1,6 @@
 #include "include_asm.h"
+#include "names.h"
 
-void func_PAL_00343830(void) {
+/* Does nothing (PAL). */
+void tab_menu_noop_pal(void) {
 }

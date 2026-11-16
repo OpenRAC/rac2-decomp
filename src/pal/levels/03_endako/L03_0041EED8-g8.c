@@ -15,39 +15,40 @@ extern void *SpawnExplosion_pal(void *,int,int,int,int,int,int,int,float,float,i
 extern int PlayMobySound(int,int,void *);
 extern char *moby_l00_spawn_child(void *,int,int);
 extern int flag_set_first_pending(void *);
-extern void func_PAL_L03_002EE460(void *,void *,void *,void *,void *,int,int);
+extern void part_spawn_particle_burst_l03_pal(void *,void *,void *,void *,void *,int,int);
 extern void lerp_vector(void *,void *,void *,float);
 extern int math_fast_float_d(void *);
 extern void moby_mark_spawned(void *);
 typedef struct { int enabled; void *handle; int timer; } DestructionState;
 
-void UpdateDestructibleObjectEffects_pal(u8 *e) {
-    DestructionState *s=*(DestructionState **)(e+0x68);
+/* Destructible object: follows effect, explodes into pieces, then fades out debris sparks (PAL). */
+void UpdateDestructibleObjectEffects_pal(u8 *moby) {
+    DestructionState *state=*(DestructionState **)(moby+0x68);
     Vec pos, a,b,c,d,f,g,h,i,j,k,l,m;
     pos.q=0; pos.f[2]=-8.0f;
-    switch(e[0x20]) {
+    switch(moby[0x20]) {
     case 0:
-        FastVecScale(&pos,&pos,*(float *)(e+0x2c));
-        s->handle=part_spawn_object_following_effect(&pos,e,0x40202080,*(float *)(e+0x2c)*4200000.0f,-1,1,1.5f,-1,0,-1);
-        moby_set_state(e,1,-1);
-        if (s->enabled) g_arc_effect_count--;
+        FastVecScale(&pos,&pos,*(float *)(moby+0x2c));
+        state->handle=part_spawn_object_following_effect(&pos,moby,0x40202080,*(float *)(moby+0x2c)*4200000.0f,-1,1,1.5f,-1,0,-1);
+        moby_set_state(moby,1,-1);
+        if (state->enabled) g_arc_effect_count--;
         break;
     case 1:
-        if(part_find_owned_effect_slot(e,0x4010000,0) && !s->enabled) {
-            g_arc_effect_count--; moby_set_state(e,2,-1);
+        if(part_find_owned_effect_slot(moby,0x4010000,0) && !state->enabled) {
+            g_arc_effect_count--; moby_set_state(moby,2,-1);
         }
-        e[0xa8]=255;
+        moby[0xa8]=255;
         break;
     case 2: {
         int skip = g_explode_skip_flag;
-        part_explode_object_into_pieces_pal(e,g_explode_piece_lifetimes,g_explode_piece_spin,g_explode_piece_speeds,63,0,skip,0,65535,255,0);
-        PlayMobySound(0,0,e);
-        SpawnExplosion_pal(e+0x10,0,25,20,20,20,45,1,0.75f,20.0f,1,1,0,0);
-        { u16 *flags=(u16 *)(e+0x34);
+        part_explode_object_into_pieces_pal(moby,g_explode_piece_lifetimes,g_explode_piece_spin,g_explode_piece_speeds,63,0,skip,0,65535,255,0);
+        PlayMobySound(0,0,moby);
+        SpawnExplosion_pal(moby+0x10,0,25,20,20,20,45,1,0.75f,20.0f,1,1,0,0);
+        { u16 *flags=(u16 *)(moby+0x34);
           *flags |= 0x41;
-          s->timer=25; }
-        moby_l00_spawn_child(e,0xf40,0);
-        moby_set_state(e,3,-1);
+          state->timer=25; }
+        moby_l00_spawn_child(moby,0xf40,0);
+        moby_set_state(moby,3,-1);
         break;
     }
     case 3:
@@ -60,13 +61,13 @@ void UpdateDestructibleObjectEffects_pal(u8 *e) {
         g.f[0]=5; g.f[1]=5; g.f[2]=-7;
         h.f[0]=-15; h.f[1]=-5; h.f[2]=-10;
         i.f[0]=-7; i.f[1]=5;
-        if(flag_set_first_pending(e)) func_PAL_L03_002EE460(e,&a,&b,&f,&g,40,1);
-        lerp_vector(&l,&f,&h,1.0f-(float)s->timer*0.04f);
-        lerp_vector(&m,&g,&i,1.0f-(float)s->timer*0.04f);
-        lerp_vector(&j,&a,&c,1.0f-(float)s->timer*0.04f);
-        lerp_vector(&k,&b,&d,1.0f-(float)s->timer*0.04f);
-        func_PAL_L03_002EE460(e,&j,&k,&l,&m,3,1);
-        if(math_fast_float_d(&s->timer)) moby_mark_spawned(e);
+        if(flag_set_first_pending(moby)) part_spawn_particle_burst_l03_pal(moby,&a,&b,&f,&g,40,1);
+        lerp_vector(&l,&f,&h,1.0f-(float)state->timer*0.04f);
+        lerp_vector(&m,&g,&i,1.0f-(float)state->timer*0.04f);
+        lerp_vector(&j,&a,&c,1.0f-(float)state->timer*0.04f);
+        lerp_vector(&k,&b,&d,1.0f-(float)state->timer*0.04f);
+        part_spawn_particle_burst_l03_pal(moby,&j,&k,&l,&m,3,1);
+        if(math_fast_float_d(&state->timer)) moby_mark_spawned(moby);
         break;
     }
 }

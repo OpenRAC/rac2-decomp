@@ -49,7 +49,7 @@ extern void moby_draw_attached_effect(void *);
 
 typedef struct { char *target; int pad04; float timer; s16 delay; s16 repeat; } BeamState;
 
-void func_PAL_L04_003F2BD0(unsigned char *object) {
+void hoverbomb_l04_gun_update_pal(unsigned char *object) {
     float origin[4];
     AimEntry *entry;
     BeamState *state = *(BeamState **)(object + 0x68);

@@ -100,29 +100,29 @@ extern void hero_set_state_value_b(s32 value);
 extern void level_select_random_object(void);
 extern void level_store_pair_with_increment(s32 a0, s32 a1);
 extern void moby_set_flag_bit(Moby *moby, s32 enabled);
-extern s32 func_US2_L00_002C4560(s32 action, s32 animate);
+extern s32 hero_l00_change_action_us2(s32 action, s32 animate);
 extern void hero_set_state_value_c(s32 value);
 extern s32 LockedEntryMenuInput_us2(void);
 extern void ship_save_transform_state(void);
-extern s32 func_US2_00289840(s32 key, s32 selection);
+extern s32 subtitle_request_voice_line_us2(s32 key, s32 selection);
 extern s32 status_any_record_nonzero(void);
 extern s32 math_fast_float_d(s32 *timer);
-extern void func_US2_L15_00432488(Moby *moby);
-extern void func_US2_L15_00432858(Moby *moby);
-extern void func_US2_L15_004329F0(Moby *moby);
-extern void func_US2_L15_00432BA8(Moby *moby);
+extern void gorn_cutscene_update_us2(Moby *moby);
+extern void gorn_stage_materials_apply_us2(Moby *moby);
+extern void scene_trigger_update_us2(Moby *moby);
+extern void gorn_path_course_update_us2(Moby *moby);
 extern void level_store_value_pair_us2(s32 a0, void (*callback)(void));
 extern s32 cam_is_mode_active(void);
-extern s32 func_US2_L15_0042F6D0(void);
-extern void func_US2_L10_00425104(void);
-extern void func_US2_L10_004251D0(void);
+extern s32 gorn_stage_hud_draw_us2(void);
+extern void mission_reset_counters_us2(void);
+extern void mission_reset_counters_alt_us2(void);
 extern s32 moby_l15_apply_hit_damage(Moby *moby, s32 keep);
 
 /* Update of the Gorn mission controller. State 0 sets up the mission state, its callbacks and
    the controller's timers and loads the saved completion counts. State 1 runs the shared update
    and the chosen kind's handler. State 3 waits for func_L05_00442860, then counts the round and
    goes back to state 1. */
-void func_US2_L15_0042F288(Moby *moby)
+void gorn_controller_update_us2(Moby *moby)
 {
     ControllerVars *vars = moby->vars;
     u8 completed0;
@@ -161,8 +161,8 @@ void func_US2_L15_0042F288(Moby *moby)
         vars->timer = 360;
         g_gorn_timer_start_value = 540;
         g_gorn_timer_limit_value = 360;
-        g_gorn_challenge_vars.reset = func_US2_L10_00425104;
-        g_gorn_challenge_vars.resetAll = func_US2_L10_004251D0;
+        g_gorn_challenge_vars.reset = mission_reset_counters_us2;
+        g_gorn_challenge_vars.resetAll = mission_reset_counters_alt_us2;
         g_gorn_save_loaded_flag = 0;
         g_gorn_challenge_vars.onHit = moby_l15_apply_hit_damage;
         g_gorn_challenge_vars.controller = moby;
@@ -172,8 +172,8 @@ void func_US2_L15_0042F288(Moby *moby)
         completed1 = g_game_flag_table.completions[1];
         completed2 = g_game_flag_table.completions[2];
         completed3 = g_game_flag_table.completions[3];
-        g_challenge_callback_a = func_US2_L10_00425104;
-        g_challenge_callback_b = func_US2_L10_004251D0;
+        g_challenge_callback_a = mission_reset_counters_us2;
+        g_challenge_callback_b = mission_reset_counters_alt_us2;
         g_challenge_completed_b = completed1;
         g_challenge_completed_c = completed2;
         g_challenge_completed_d = completed3;
@@ -199,7 +199,7 @@ void func_US2_L15_0042F288(Moby *moby)
         if (g_gorn_message_counter++ < 5 || g_challenge_mode == 2)
             break;
 
-        func_US2_L00_002C4560(0x31, 0);
+        hero_l00_change_action_us2(0x31, 0);
         if (g_gorn_enabled_flag) {
             hero_set_state_value_c(on);
             g_challenge_menu_choice = LockedEntryMenuInput_us2();
@@ -208,12 +208,12 @@ void func_US2_L15_0042F288(Moby *moby)
             break;
         }
         if (!g_gorn_setup_flag) {
-            func_US2_00289840(0xA17, 0x6E);
+            subtitle_request_voice_line_us2(0xA17, 0x6E);
             g_gorn_setup_flag = on;
         }
         if ((g_item_state_words[5] == on || g_item_state_words[5] == 5 || g_item_state_words[5] == 10)
             && !status_any_record_nonzero() && !g_gorn_save_loaded_flag) {
-            func_US2_00289840(0xA18, 0x6F);
+            subtitle_request_voice_line_us2(0xA18, 0x6F);
             g_gorn_save_loaded_flag = 1;
         }
         if (math_fast_float_d(&vars->timer))
@@ -224,21 +224,21 @@ void func_US2_L15_0042F288(Moby *moby)
         if (g_challenge_menu_choice != -2 && g_gorn_challenge_count >= 3) {
             switch (g_challenge_menu_choice) {
             case 0:
-                func_US2_L15_00432488(moby);
+                gorn_cutscene_update_us2(moby);
                 break;
             case 1:
-                func_US2_L15_00432858(moby);
+                gorn_stage_materials_apply_us2(moby);
                 break;
             case 2:
-                func_US2_L15_004329F0(moby);
+                scene_trigger_update_us2(moby);
                 break;
             case 3:
-                func_US2_L15_00432BA8(moby);
+                gorn_path_course_update_us2(moby);
                 break;
             }
         }
         if (g_challenge_menu_data && !g_challenge_menu_loaded && !g_gorn_stage_finished_flag) {
-            level_store_value_pair_us2(0, func_US2_L15_0042F6D0);
+            level_store_value_pair_us2(0, gorn_stage_hud_draw_us2);
             g_gorn_challenge_active_flag = 0;
             g_challenge_menu_loaded = 1;
         }

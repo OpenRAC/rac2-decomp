@@ -11,6 +11,8 @@ extern void vec_scale_to_length(void *, void *, float);
 extern int math_random_int_range(int, int);
 extern void gfx_draw_beam_ribbon(void *, int, void *, int);
 
+/* Draws a jittery lightning bolt along a curve between two ring points, brighter once the ring
+   piece is older (PAL: same as USA v1.01). */
 void gfx_draw_lightning_bolt_variant_pal(char *object, char *state) {
     CurveVector points[25];
     CurveVector start, end, jitter;

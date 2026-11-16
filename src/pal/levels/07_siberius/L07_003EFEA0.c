@@ -11,27 +11,28 @@ extern char *SpawnExplosion_pal(TI128 *, int, int, int, int, int, int, int, floa
                           int);
 extern int PlayMobySound(int, int, char *);
 extern void vec_scale_to_length(TI128 *, TI128 *, float);
-extern void func_PAL_002B15D8(char *, int, TI128 *, float, float, float, float, int);
+extern void part_spawn_masked_debris_pal(char *, int, TI128 *, float, float, float, float, int);
 
 /* func_L07_003EB838 is in L07_003EB838.c. */
 
-void func_PAL_L07_003EFEA0(char *actor)
+/* Blows up the entity when it dies: sets its death bits, spawns an explosion and throws debris pieces. */
+void entity_spawn_death_effects_b_pal(char *moby)
 {
     float position[4] __attribute__((aligned(16)));
     float direction[4] __attribute__((aligned(16)));
-    char *state = *(char **)(actor + 0x68);
-    *(int *)(actor + 0x98) = 0;
-    *(unsigned short *)(actor + 0x34) = (*(unsigned short *)(actor + 0x34) | 0x41) & 0xefff;
-    SetDeathBits_pal(actor, 0, 3);
+    char *vars = *(char **)(moby + 0x68);
+    *(int *)(moby + 0x98) = 0;
+    *(unsigned short *)(moby + 0x34) = (*(unsigned short *)(moby + 0x34) | 0x41) & 0xefff;
+    SetDeathBits_pal(moby, 0, 3);
     *(TI128 *)position = 0;
     position[2] = 0.75f;
-    matrix_mul_vec3((TI128 *)position, (TI128 *)position, actor + 0xc0);
-    FastVecAdd((TI128 *)position, (TI128 *)position, actor + 0x10);
+    matrix_mul_vec3((TI128 *)position, (TI128 *)position, moby + 0xc0);
+    FastVecAdd((TI128 *)position, (TI128 *)position, moby + 0x10);
     SpawnExplosion_pal((TI128 *)position, 0, 25, 20, 20, 20, 45, 1, 0.6f, 20.0f,
-                 1, 0, 0, *(int *)(state + 0x314));
-    PlayMobySound(9, 0, actor);
-    vec_scale_to_length((TI128 *)direction, (TI128 *)(state + 0x1c0), 0.060000002f);
-    func_PAL_002B15D8(actor, 0x7f8, (TI128 *)direction, 3.0f, 6.0f, 3.0f, 6.0f, 0xff);
+                 1, 0, 0, *(int *)(vars + 0x314));
+    PlayMobySound(9, 0, moby);
+    vec_scale_to_length((TI128 *)direction, (TI128 *)(vars + 0x1c0), 0.060000002f);
+    part_spawn_masked_debris_pal(moby, 0x7f8, (TI128 *)direction, 3.0f, 6.0f, 3.0f, 6.0f, 0xff);
 }
 
 
@@ -41,15 +42,15 @@ extern void *part_spawn_between_points_depth_push(char *, int, int, char *, int,
 extern void moby_set_state(int, int, int);
 
 /* Arm the object's mode ten and hand it to the shared launcher. */
-void func_PAL_L07_003EFFD0(char *arg, int a1, int a2, int a3, int a4)
+void entity_launch_member_b_pal(char *moby, int from_pos, int to_pos, int owner, int flag)
 {
-    int r;
+    int life;
 
-    moby_set_state(arg, 8, -1);
-    *(unsigned short *)(arg + 0x34) = (*(unsigned short *)(arg + 0x34) & 0xFFBE) | 0x1000;
-    *(int *)(arg + 0x98) = *(int *)(*(char **)(arg + 0x24) + 0x10);
-    r = ((s32)(math_random_int_range(0x2D, 0x4B)) * 5 + 2) / 6;
-    part_spawn_between_points_depth_push(arg, a1, a2, arg + 0xF0, r, a3, a4);
+    moby_set_state(moby, 8, -1);
+    *(unsigned short *)(moby + 0x34) = (*(unsigned short *)(moby + 0x34) & 0xFFBE) | 0x1000;
+    *(int *)(moby + 0x98) = *(int *)(*(char **)(moby + 0x24) + 0x10);
+    life = ((s32)(math_random_int_range(0x2D, 0x4B)) * 5 + 2) / 6;
+    part_spawn_between_points_depth_push(moby, from_pos, to_pos, moby + 0xF0, life, owner, flag);
 }
 
 

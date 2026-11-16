@@ -14,34 +14,36 @@ extern void moby_get_facing_direction(s32, void *);
 extern void vec_scale_to_length(void *, void *, f32);
 extern void FastVecAdd(void *, void *, void *);
 
+/* Spawns a blue and a red sparkle at each of the 50 trail points and pushes each point back along the hero target
+   facing (PAL: 50 points). */
 void part_init_trail_sparkle_pairs_pal(void) {
-    s8 sp0[16];
-    s8 sp10[16];
-    s32 s4;
-    s32 s3;
-    s8 *s1;
-    s8 *s0;
-    s8 *p;
-    f32 t;
+    s8 zero[16];
+    s8 direction[16];
+    s32 i;
+    s32 color_alpha;
+    s8 *point;
+    s8 *sparkle;
+    s8 *hero;
+    f32 red_size;
 
-    s4 = 0;
-    vec_clear_128(sp0);
+    i = 0;
+    vec_clear_128(zero);
     do {
-        s3 = math_random_int_range(0, 0x6F) << 24;
-        s1 = g_trail_sparkle_points + s4 * 16;
-        s0 = part_spawn_ground_effect(s1, 0xA, s3 | 0x7F2020, 0, 1, sp0, 0, g_trail_sparkle_size * 0.5f, g_trail_sparkle_size, 0.0f);
-        if (s0 != NULL) {
-            *(s8 *)(s0 + 9) = (s8)(FloatToInt(4.0f) + 0x70);
+        color_alpha = math_random_int_range(0, 0x6F) << 24;
+        point = g_trail_sparkle_points + i * 16;
+        sparkle = part_spawn_ground_effect(point, 0xA, color_alpha | 0x7F2020, 0, 1, zero, 0, g_trail_sparkle_size * 0.5f, g_trail_sparkle_size, 0.0f);
+        if (sparkle != NULL) {
+            *(s8 *)(sparkle + 9) = (s8)(FloatToInt(4.0f) + 0x70);
         }
-        t = g_trail_sparkle_red_size;
-        s0 = part_spawn_ground_effect(s1, 0xA, s3 | 0xFF4040, 1, 1, sp0, 0, t * 0.5f, t, 0.0f);
-        if (s0 != NULL) {
-            *(s8 *)(s0 + 9) = (s8)(FloatToInt(4.0f) + 0x70);
+        red_size = g_trail_sparkle_red_size;
+        sparkle = part_spawn_ground_effect(point, 0xA, color_alpha | 0xFF4040, 1, 1, zero, 0, red_size * 0.5f, red_size, 0.0f);
+        if (sparkle != NULL) {
+            *(s8 *)(sparkle + 9) = (s8)(FloatToInt(4.0f) + 0x70);
         }
-        s4 += 1;
-        p = g_hero_state;
-        moby_get_facing_direction(*(s32 *)(p + 0x2290) + 0x10, sp10);
-        vec_scale_to_length(sp10, sp10, -0.004f);
-        FastVecAdd(s1, s1, sp10);
-    } while (s4 < 0x32);
+        i += 1;
+        hero = g_hero_state;
+        moby_get_facing_direction(*(s32 *)(hero + 0x2290) + 0x10, direction);
+        vec_scale_to_length(direction, direction, -0.004f);
+        FastVecAdd(point, point, direction);
+    } while (i < 0x32);
 }

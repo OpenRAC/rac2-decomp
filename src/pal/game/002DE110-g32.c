@@ -36,15 +36,16 @@ extern void level_restart_keep_progress_pal(int);
 extern void save_clear_slot_and_start_pal(int, int);
 extern void load_data_and_setup_callback(void);
 extern void save_load_game_data_reset_menu(void);
-extern int func_PAL_002D6710(int, char *);
+extern int menu_send_request_pal(int, char *);
 extern int request_begin_slot(int, int, int, int, int);
 extern int menu_get_counter(void);
 extern int menu_get_mode(void);
 extern void func_PAL_002DFF60(int, int);
-extern int func_PAL_00299518(void);
-extern int func_PAL_00299520(void);
+extern int menu_get_pending_value_pal(void);
+extern int menu_take_pending_value_pal(void);
 
-int func_PAL_002DE110(SaveMenu *menu)
+/* Save slot menu input with overwrite confirmation: picks a slot, clears and saves into it, or opens the confirm screen. */
+int save_slot_menu_update_with_confirm_pal(SaveMenu *menu)
 {
     int old;
     int buttons;
@@ -65,7 +66,7 @@ int func_PAL_002DE110(SaveMenu *menu)
             save_clear_slot_and_start_pal(menu->f48, menu->cursor);
         g_memcard_state.f17c = 1;
         g_pause_menu_state.busy = 1;
-        func_PAL_00299520();
+        menu_take_pending_value_pal();
         g_pause_menu_state.ready = 0;
         g_pause_menu_state.delay = 0xC0D;
     }
@@ -79,7 +80,7 @@ int func_PAL_002DE110(SaveMenu *menu)
         if (g_pause_menu_state.ready < 11)
             return 0;
         g_pause_menu_state.busy = 0;
-        if (save->f16c != 0 || save->f10 != 0 || func_PAL_00299518() != 0) {
+        if (save->f16c != 0 || save->f10 != 0 || menu_get_pending_value_pal() != 0) {
             if (g_menu_panel_flag != 0) {
                 g_save_menu_flags |= 0x80;
                 request_begin_slot(4, 1, 5, (int)g_pause_menu_state.owner, 0);
@@ -129,7 +130,7 @@ finish:
             screen = g_save_slot_screen_alt;
         else
             screen = g_save_slot_screen;
-        func_PAL_002D6710(4, screen);
+        menu_send_request_pal(4, screen);
     }
     else if (g_save_menu_screen != 16 && g_save_menu_screen != 1) {
         if (menu_get_counter() == 0 && menu_get_mode() == 1)

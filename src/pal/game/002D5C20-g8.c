@@ -44,7 +44,7 @@ extern int g_menu_selection_input_state __attribute__((nosda));
 /* PAL only: indexed by D_001A7BB4, which USA stores directly. Its extent is not established, so it
    stays incomplete behind the GP view retail uses. */
 extern int g_ui_value_table[] SDATA(D_PAL_001ABB58);
-int func_PAL_002D5C20(int selection)
+int menu_check_selection_input_pal(int selection)
 {
     CallbackState *state = &g_pause_menu_state;
     g_menu_selection_input_state = g_ui_value_table[g_language];

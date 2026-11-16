@@ -59,7 +59,8 @@ typedef struct {
     char dir[0x10];
 } Thing;
 
-void func_PAL_L17_0041D4E8(Thing *m)
+/* Waits for the player to enter the trigger zone, checks the required items, and fires the linked actions (PAL build). */
+void trigger_l17_zone_update_pal(Thing *m)
 {
     TriggerVars *p = m->vars;
     int notify, i, missing, fail;

@@ -36,6 +36,7 @@ extern void math_apply_axis_rotation_to_quat(void *, void *, void *, float);
 extern int moby_l01_turn_toward_target_pal(void *, void *);
 extern int moby_get_busy_flag(void *);
 
+/* Same as AimAtGroupEntityInCone_pal, with the second set of range and cone limits. */
 s32 enemy_aim_at_group_entity_in_cone_b_pal(AimObject *obj)
 {
     AimState *state = *(AimState **)((u8 *)obj + 0x68);

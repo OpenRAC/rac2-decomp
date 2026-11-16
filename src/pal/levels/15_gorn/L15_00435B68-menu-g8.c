@@ -64,7 +64,8 @@ static __inline__ int label_y(void *handle, float value, float scale, float half
     return result;
 }
 
-s32 func_PAL_L15_00435B68(void) {
+/* Draws the Gorn reward panel: the finished stage's title, text and bolt reward, plus the option labels. */
+s32 gorn_reward_panel_draw_pal(void) {
     char buf[128];
     f32 center = IntToFloat(g_screen_width) * 0.5f;
     void *sprite;

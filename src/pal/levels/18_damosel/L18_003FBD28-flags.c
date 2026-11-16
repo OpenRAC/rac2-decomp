@@ -9,7 +9,8 @@ extern int moby_turn_toward_target_and_step_pal(void *,void *,float);
 extern void moby_set_state(void *,int,int);
 extern void vec_add_random_offset(void *,float);
 
-void func_PAL_L18_003FCB78(u8 *obj) {
+/* Moves an enemy each frame: walks it along its path or toward its target, and drops it into state 3 when it takes a hit. (PAL version) */
+void enemy_update_movement_pal(u8 *obj) {
     u8 *state = *(u8 **)(obj + 0x68);
     int mode = obj[0x42];
     if (mode<0) return;

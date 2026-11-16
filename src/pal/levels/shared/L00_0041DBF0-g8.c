@@ -56,11 +56,11 @@ typedef struct {
 
 /* Spawns a burst's particles: fixed sprites at the object, the three counted groups from the state record,
    an optional shockwave and the counted smoke group. */
-void func_PAL_L00_0041DBF0(char *object, char *unused)
+void burst_particles_spawn_pal(char *object, char *unused)
 {
     EffectVector position, velocity;
-    EffectBurstObject *m = (EffectBurstObject *)object;
-    EffectBurstState *state = m->state;
+    EffectBurstObject *self = (EffectBurstObject *)object;
+    EffectBurstState *state = self->state;
     float heading;
     int i, sign;
     {
@@ -68,8 +68,8 @@ void func_PAL_L00_0041DBF0(char *object, char *unused)
         for (i = 0; i < 1; i++) {
             char *particle;
             float size, speed;
-            EffectVector *source = &m->position;
-            FastVecScale(&position, &m->forward, 0.5f);
+            EffectVector *source = &self->position;
+            FastVecScale(&position, &self->forward, 0.5f);
             qcopy(&velocity, source);
             FastVecAdd(&velocity, &velocity, &position);
             size = g_particle_effect_size_scale * state->scale * 210000.0f;
@@ -96,13 +96,13 @@ void func_PAL_L00_0041DBF0(char *object, char *unused)
             char *particle;
             float size, speed, angle, dir;
             int turn, life;
-            angle = mat_fast_helper_a(((EffectCamera *)g_scalar_transition_state)->position[0] - m->position.v[0],
-                                   ((EffectCamera *)g_scalar_transition_state)->position[1] - m->position.v[1]);
+            angle = mat_fast_helper_a(((EffectCamera *)g_scalar_transition_state)->position[0] - self->position.v[0],
+                                   ((EffectCamera *)g_scalar_transition_state)->position[1] - self->position.v[1]);
             turn = FloatToInt(math_random_signed_float_range(2.0f, 5.0f));
             life = math_random_int_range(30, 50);
-            position.v[0] = m->position.v[0] + math_random_signed_float_range(0.0f, 0.1f) * state->scale;
-            position.v[1] = m->position.v[1] + math_random_signed_float_range(0.0f, 0.1f) * state->scale;
-            position.v[2] = m->position.v[2] + math_random_signed_float_range(0.0f, 0.1f) * state->scale;
+            position.v[0] = self->position.v[0] + math_random_signed_float_range(0.0f, 0.1f) * state->scale;
+            position.v[1] = self->position.v[1] + math_random_signed_float_range(0.0f, 0.1f) * state->scale;
+            position.v[2] = self->position.v[2] + math_random_signed_float_range(0.0f, 0.1f) * state->scale;
             size = math_random_float_range(0.6f, 1.0f) * state->scale;
             speed = 2.0f * (math_random_float_range(9.0f, 12.0f) * state->scale);
             dir = FastAddRotations(angle, math_random_signed_float_range(0.0f, 1.396263599395752f));
@@ -121,13 +121,13 @@ void func_PAL_L00_0041DBF0(char *object, char *unused)
         for (i = 0; i < state->largeCount; i++) {
             float size, speed, angle, dir;
             int turn, life;
-            angle = mat_fast_helper_a(((EffectCamera *)g_scalar_transition_state)->position[0] - m->position.v[0],
-                                   ((EffectCamera *)g_scalar_transition_state)->position[1] - m->position.v[1]);
+            angle = mat_fast_helper_a(((EffectCamera *)g_scalar_transition_state)->position[0] - self->position.v[0],
+                                   ((EffectCamera *)g_scalar_transition_state)->position[1] - self->position.v[1]);
             turn = FloatToInt(math_random_signed_float_range(2.0f, 5.0f));
             life = math_random_int_range(30, 50);
-            position.v[0] = m->position.v[0] + math_random_signed_float_range(0.0f, 0.1f) * state->scale;
-            position.v[1] = m->position.v[1] + math_random_signed_float_range(0.0f, 0.1f) * state->scale;
-            position.v[2] = m->position.v[2] + math_random_signed_float_range(0.0f, 0.1f) * state->scale;
+            position.v[0] = self->position.v[0] + math_random_signed_float_range(0.0f, 0.1f) * state->scale;
+            position.v[1] = self->position.v[1] + math_random_signed_float_range(0.0f, 0.1f) * state->scale;
+            position.v[2] = self->position.v[2] + math_random_signed_float_range(0.0f, 0.1f) * state->scale;
             size = math_random_float_range(0.75f, 1.5f) * state->scale;
             speed = 2.0f * (math_random_float_range(9.0f, 12.0f) * state->scale);
             dir = FastAddRotations(angle, math_random_signed_float_range(0.0f, 1.396263599395752f));
@@ -144,13 +144,13 @@ void func_PAL_L00_0041DBF0(char *object, char *unused)
         for (i = 0; i < state->smallCount; i++) {
             float size, speed, angle, dir;
             int turn, life;
-            angle = mat_fast_helper_a(((EffectCamera *)g_scalar_transition_state)->position[0] - m->position.v[0],
-                                   ((EffectCamera *)g_scalar_transition_state)->position[1] - m->position.v[1]);
+            angle = mat_fast_helper_a(((EffectCamera *)g_scalar_transition_state)->position[0] - self->position.v[0],
+                                   ((EffectCamera *)g_scalar_transition_state)->position[1] - self->position.v[1]);
             turn = FloatToInt(math_random_signed_float_range(2.0f, 5.0f));
             life = math_random_int_range(30, 50);
-            position.v[0] = m->position.v[0] + math_random_signed_float_range(0.0f, 0.1f) * state->scale;
-            position.v[1] = m->position.v[1] + math_random_signed_float_range(0.0f, 0.1f) * state->scale;
-            position.v[2] = m->position.v[2] + math_random_signed_float_range(0.0f, 0.1f) * state->scale;
+            position.v[0] = self->position.v[0] + math_random_signed_float_range(0.0f, 0.1f) * state->scale;
+            position.v[1] = self->position.v[1] + math_random_signed_float_range(0.0f, 0.1f) * state->scale;
+            position.v[2] = self->position.v[2] + math_random_signed_float_range(0.0f, 0.1f) * state->scale;
             size = math_random_float_range(0.6f, 1.0f) * state->scale;
             speed = math_random_float_range(9.0f, 12.0f) * state->scale;
             dir = FastAddRotations(angle, math_random_signed_float_range(0.0f, 1.396263599395752f));
@@ -166,19 +166,19 @@ void func_PAL_L00_0041DBF0(char *object, char *unused)
         velocity.word = 0;
         velocity.v[2] = state->scale * 0.16000001f;
         position.word = velocity.word;
-        part_spawn_shockwave_ring(object, &m->position, &position, ((s32)(16) * 5 + 2) / 6, 0, 0, 255, 40, state->scale * 3.5f);
+        part_spawn_shockwave_ring(object, &self->position, &position, ((s32)(16) * 5 + 2) / 6, 0, 0, 255, 40, state->scale * 3.5f);
     }
-    heading = mat_fast_helper_a(((EffectCamera *)g_scalar_transition_state)->position[0] - m->position.v[0],
-                           ((EffectCamera *)g_scalar_transition_state)->position[1] - m->position.v[1]);
+    heading = mat_fast_helper_a(((EffectCamera *)g_scalar_transition_state)->position[0] - self->position.v[0],
+                           ((EffectCamera *)g_scalar_transition_state)->position[1] - self->position.v[1]);
     sign = 1;
     for (i = 0; i < state->smokeCount; i++) {
         char *particle;
         float size, spread, angle;
 
         sign = -sign;
-        position.v[0] = m->position.v[0] + math_random_signed_float_range(0.0f, 1.0f) * state->scale;
-        position.v[1] = m->position.v[1] + math_random_signed_float_range(0.0f, 1.0f) * state->scale;
-        position.v[2] = m->position.v[2] + math_random_signed_float_range(0.0f, 1.0f) * state->scale;
+        position.v[0] = self->position.v[0] + math_random_signed_float_range(0.0f, 1.0f) * state->scale;
+        position.v[1] = self->position.v[1] + math_random_signed_float_range(0.0f, 1.0f) * state->scale;
+        position.v[2] = self->position.v[2] + math_random_signed_float_range(0.0f, 1.0f) * state->scale;
         size = math_random_float_range(0.020000001f, 0.040000003f) * state->scale;
         spread = math_random_signed_float_range(0.0f, 1.396263599395752f);
         angle = math_random_signed_float_range(0.0f, 1.5707964897155762f);

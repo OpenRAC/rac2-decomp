@@ -38,7 +38,8 @@ extern float g_slot_t_increment __attribute__((sda));
 extern float g_slot_u_increment __attribute__((sda));
 extern float g_rotation_length_scale __attribute__((sda));
 
-int func_PAL_L00_003FA5C8(TrailActor *self)
+/* Advances one vaporizer trail sample each frame: scrolls its texture coordinates and moves it along its direction, and frees it when it has expired (PAL: 50 Hz steps). */
+int vaporizer_bolt_update_trail_sample_pal(TrailActor *self)
 {
     TrailSource *source = self->source;
     char *base = level_get_slot_body(0xC04, source->id);

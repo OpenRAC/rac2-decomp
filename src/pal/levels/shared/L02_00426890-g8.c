@@ -14,16 +14,16 @@ extern float math_random_float_range(float, float);
 extern int math_random_int_below(int);
 extern int math_random_int_range(int, int);
 extern char *part_spawn_firework_spark(void *, void *, int, int, float, int, int, int, int, float);
-extern char *func_PAL_003096D0(char *, char *, char *, int, float, u8, u8, u8, u8);
+extern char *part_spawn_shockwave_ring_pal(char *, char *, char *, int, float, u8, u8, u8, u8);
 /* Called with a constant radius: each ring loads it afresh instead of sharing one register. */
 static __inline__ void spawn_ring(char *obj, char *pos, char *velocity, float radius, int type,
                                   u8 r, u8 g, u8 b, u8 a)
 {
-    func_PAL_003096D0(obj, pos, velocity, type, radius, r, g, b, a);
+    part_spawn_shockwave_ring_pal(obj, pos, velocity, type, radius, r, g, b, a);
 }
 
 /* Bursts at pos: six sparks, three coloured rings, then a damage ring for an owner. */
-void func_PAL_L02_00427320(char *obj, char *pos)
+void part_spawn_spark_ring_burst_pal(char *obj, char *pos)
 {
     float velocity[4];
     float scale, damage;

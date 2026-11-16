@@ -22,80 +22,80 @@ typedef union { int q __attribute__((mode(TI))); float f[4]; } CollisionVec;
 #define F(p,o) (*(float *)((char *)(p)+(o)))
 typedef union { float f[20]; int i[20]; } MovementConfig;
 /* Accelerates obj toward target, probes the ground ahead and returns the collision flags. */
-int moby_move_toward_target_pal(char *obj,MovementConfig *cfg,float *target,void *out,float scale)
+int moby_move_toward_target_pal(char *moby,MovementConfig *config,float *target,void *out,float scale)
 {
     CollisionVec old;
     float move[4] __attribute__((aligned(16)));
     float test[4] __attribute__((aligned(16)));
     float probe[4] __attribute__((aligned(16)));
-    float accel=cfg->f[0x1C/4]*scale;
-    float max=cfg->f[0x24/4]*scale;
+    float accel=config->f[0x1C/4]*scale;
+    float max_step=config->f[0x24/4]*scale;
     float distance,step,height,first,second,speed;
     int flags=0,result;
-    FastVecSub(move,target,(float *)(obj+0x10));
+    FastVecSub(move,target,(float *)(moby+0x10));
     distance=vec_length_xy(move);
-    old.q=((CollisionVec *)(obj+0x10))->q;
+    old.q=((CollisionVec *)(moby+0x10))->q;
     step=accel*distance;
     if (accel<step) step=accel;
-    cfg->f[0x10/4]+=step;
-    if (distance<cfg->f[0x10/4]*10.0f) cfg->f[0x10/4]-=cfg->f[0x20/4]*cfg->f[0x10/4];
-    if (max<cfg->f[0x10/4]) cfg->f[0x10/4]=max;
-    else if (cfg->f[0x10/4]<-max) cfg->f[0x10/4]=-max;
-    if (cfg->i[0x38/4]&4) {
-        move[0]=math_fast_sin_or_cos_a(cfg->f[0x4C/4])*cfg->f[0x10/4];
-        move[1]=math_fast_sin_or_cos_b(cfg->f[0x4C/4])*cfg->f[0x10/4];
+    config->f[0x10/4]+=step;
+    if (distance<config->f[0x10/4]*10.0f) config->f[0x10/4]-=config->f[0x20/4]*config->f[0x10/4];
+    if (max_step<config->f[0x10/4]) config->f[0x10/4]=max_step;
+    else if (config->f[0x10/4]<-max_step) config->f[0x10/4]=-max_step;
+    if (config->i[0x38/4]&4) {
+        move[0]=math_fast_sin_or_cos_a(config->f[0x4C/4])*config->f[0x10/4];
+        move[1]=math_fast_sin_or_cos_b(config->f[0x4C/4])*config->f[0x10/4];
     } else {
-        move[0]=math_fast_sin_or_cos_a(F(obj,0xF8))*cfg->f[0x10/4];
-        move[1]=math_fast_sin_or_cos_b(F(obj,0xF8))*cfg->f[0x10/4];
+        move[0]=math_fast_sin_or_cos_a(F(moby,0xF8))*config->f[0x10/4];
+        move[1]=math_fast_sin_or_cos_b(F(moby,0xF8))*config->f[0x10/4];
     }
-    if (cfg->i[0x38/4]&1) move[2]=0;
-    else { move[2]=cfg->f[0x18/4]; cfg->f[0x18/4]-=0.0036000002f; }
-    height=F(obj,0x18)+0.04f;
-    FastVecAdd(test,obj+0x10,move);
-    test[2]=F(obj,0x18)-cfg->f[0x30/4];
-    if (coll_check_ground_below_point(test,obj,cfg->i[0x38/4]&0x20,cfg->f[8/4],cfg->f[12/4])) {
+    if (config->i[0x38/4]&1) move[2]=0;
+    else { move[2]=config->f[0x18/4]; config->f[0x18/4]-=0.0036000002f; }
+    height=F(moby,0x18)+0.04f;
+    FastVecAdd(test,moby+0x10,move);
+    test[2]=F(moby,0x18)-config->f[0x30/4];
+    if (coll_check_ground_below_point(test,moby,config->i[0x38/4]&0x20,config->f[8/4],config->f[12/4])) {
         step=mat_fast_helper_a(g_probe_hit.normal[2],vec_length_xy(g_probe_hit.normal));
         first=g_probe_hit.fields[10];
         if (step>0.5f) {
             if (vec_length_xy(move)>0.1f) {
                 vec_scale_to_length(probe,move,0.57f);
-                FastVecAdd(probe,probe,obj+0x10);
-                probe[2]=F(obj,0x18)-cfg->f[0x30/4];
-                if (coll_check_ground_below_point(probe,obj,cfg->i[0x38/4]&0x20,cfg->f[8/4],cfg->f[12/4])) {
+                FastVecAdd(probe,probe,moby+0x10);
+                probe[2]=F(moby,0x18)-config->f[0x30/4];
+                if (coll_check_ground_below_point(probe,moby,config->i[0x38/4]&0x20,config->f[8/4],config->f[12/4])) {
                     second=g_probe_hit.fields[10];
                     if (mat_fast_helper_a(g_probe_hit.normal[2],vec_length_xy(g_probe_hit.normal))>=0.5f) {
                         flags=0x22;
-                        if ((cfg->i[0x38/4]&8) && second<height && first<height) flags=8;
+                        if ((config->i[0x38/4]&8) && second<height && first<height) flags=8;
                     }
                 } else {
                     flags=0x22;
-                    if ((cfg->i[0x38/4]&8) && first<height) flags=8;
+                    if ((config->i[0x38/4]&8) && first<height) flags=8;
                 }
             }
         }
     } else {
         flags=0x22;
-        if (cfg->i[0x38/4]&8) flags=8;
+        if (config->i[0x38/4]&8) flags=8;
     }
     if (!(flags&2)) {
         speed=vec_length_xy(move);
         FastVecScale(test,move,1.0f/speed);
-        result=math_blend_scaled_count(cfg->f[4/4],obj,move,cfg->i[0/4],cfg->f[0x30/4],cfg->i[0x38/4]);
-        if (result&2) cfg->f[0x18/4]=-0.012f;
+        result=math_blend_scaled_count(config->f[4/4],moby,move,config->i[0/4],config->f[0x30/4],config->i[0x38/4]);
+        if (result&2) config->f[0x18/4]=-0.012f;
         if (result&1) {
             flags|=1;
             if (move[0]*test[0]+move[1]*test[1]<speed*0.2f) flags|=2;
             {
-                float ground=coll_probe_ground_height_below(obj+0x10,0,0.5f);
+                float ground=coll_probe_ground_height_below(moby+0x10,0,0.5f);
                 float old_height=old.f[2];
-                if (cfg->f[8/4]<old_height-ground || cfg->f[12/4]<ground-old_height) {
+                if (config->f[8/4]<old_height-ground || config->f[12/4]<ground-old_height) {
                     flags|=0x22;
-                    ((CollisionVec *)(obj+0x10))->q=old.q;
+                    ((CollisionVec *)(moby+0x10))->q=old.q;
                 }
             }
         }
         qcopy(out,move);
-    } else if ((cfg->i[0x38/4]^1)&1) cfg->f[0x18/4]=-0.012f;
-    if (distance<cfg->f[0x2C/4]) flags|=4;
+    } else if ((config->i[0x38/4]^1)&1) config->f[0x18/4]=-0.012f;
+    if (distance<config->f[0x2C/4]) flags|=4;
     return flags;
 }

@@ -10,16 +10,17 @@ extern int ref_L04_003C6FE8_00 SDATA(ref_L04_003C6FE8_00);
 extern float ref_L04_003C6FE8_01 SDATA(ref_L04_003C6FE8_01);
 extern float ref_L04_003C6FE8_02 SDATA(ref_L04_003C6FE8_02);
 
-void water_timer_update_pal(u8 *a0)
+/* Runs the water timer: on the first call it sets up the particle timing values (PAL: 50 Hz), then it scrolls a texture offset every frame. */
+void water_timer_update_pal(u8 *moby_data)
 {
     int v;
 
-    switch (a0[0x20]) {
+    switch (moby_data[0x20]) {
     case 0:
         v = 0x32;
         D_L04_001B2E84_1 = 0;
-        a0[0x20] = 1;
-        a0[0x30] = 0xFF;
+        moby_data[0x20] = 1;
+        moby_data[0x30] = 0xFF;
         g_particle_life_step = v;
         ref_L04_003C6FE8_00 = v;
         {

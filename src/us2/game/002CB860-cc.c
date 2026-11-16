@@ -155,6 +155,7 @@ extern int UpdateSoundVoices(void);
 extern void moby_update_visible_objects(void);
 extern void menu_close_and_save_choices_us2(void);
 
+/* Runs one frame of the pause menu and calls the handler for the current menu mode. */
 void menu_update_pause_us2(void)
 {
     ((PauseState *)g_pause_menu_state)->update_count = ((PauseState *)g_pause_menu_state)->update_count > 31999 ? 32000 : ((PauseState *)g_pause_menu_state)->update_count + 1;

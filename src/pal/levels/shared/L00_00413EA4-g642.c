@@ -5,7 +5,7 @@ extern float IntToFloat(int);
 extern int FloatToInt(float);
 extern float math_fast_sin_or_cos_b(float);
 extern float FastAddRotations(float, float);
-extern int func_PAL_L00_00415648(char *);
+extern int object_value_to_grade_pal(char *);
 extern void matrix_mul_vec3(void *, void *, void *);
 extern void FastVecAdd(void *, void *, void *);
 extern void gfx_draw_billboard_quad(void *, int, unsigned int, int, float, float, float);
@@ -23,12 +23,12 @@ extern int g_item_ammo_counts[];
    func_PAL_L00_00415648) are transformed by the object, and each draws two sprites.
    The global loads pass the float phase store only under -fstrict-aliasing, and
    D_0018B068, far from $gp, is split into %hi/%lo by nosda as retail does. */
-void func_PAL_L00_00415498(char *object)
+void charge_draw_glow_sprites_pal(char *object)
 {
     float position[4] __attribute__((aligned(16)));
     char *state = *(char **)(object + 0x68);
     float fraction, size;
-    int alpha, count, n, i;
+    int alpha, count, grade_limit, i;
     unsigned int color;
     fraction = IntToFloat(*(short *)(state + 0x1a));
     fraction /= IntToFloat(75);
@@ -40,8 +40,8 @@ void func_PAL_L00_00415498(char *object)
     *(float *)(state + 0x20) = FastAddRotations(*(float *)(state + 0x20), 0.139626354f);
     color = alpha | g_charge_glow_color;
     count = g_item_ammo_counts[g_weapon_slot];
-    n = func_PAL_L00_00415648(object);
-    if (n < count) count = n;
+    grade_limit = object_value_to_grade_pal(object);
+    if (grade_limit < count) count = grade_limit;
     for (i = 0; i < count; i++) {
         matrix_mul_vec3(position, g_charge_glow_offset_table[i], object + 0xc0);
         FastVecAdd(position, object + 0x10, position);

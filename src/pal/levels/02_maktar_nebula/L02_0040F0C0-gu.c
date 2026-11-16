@@ -15,10 +15,10 @@ typedef union { u8 b[0x2600]; s8 c[0x2600]; s16 h[0x1300]; u16 uh[0x1300]; s32 i
 extern u8 g_hero_state[];
 typedef struct { u8 pad00[0x5C]; u8 *ids; } L02_Palette;
 extern L02_Palette g_chain_link_palette;
-extern void func_PAL_L02_0040FD10(u8 *);
+extern void flamethrower_robot_update_common_pal(u8 *);
 extern void moby_set_state(u8 *, u8, s32);
 extern s32 math_random_int_below(s32);
-extern void func_PAL_002A7E68(void *, s32, s32, s32);
+extern void anim_start_blended_pal(void *, s32, s32, s32);
 extern float mat_fast_helper_a(float, float);
 extern float vec_distance_xy(void *, void *);
 extern int moby_l01_turn_toward_target_pal(char *, char *);
@@ -49,14 +49,14 @@ extern float math_random_float_range(float, float);
 extern float math_random_signed_float_range(float, float);
 extern void *part_spawn_gravity_fade(void *, void *, s32, u32, s32, s32, s32, float, float, float, s32);
 extern s32 coll_sweep_from_object(void *, void *, float, u32, float, float, s32, s32, s32);
-extern void *func_PAL_002C23B8(void *, void *, s32, s32, u32, s32, float, float, float, float, float);
+extern void *part_spawn_burst_pal(void *, void *, s32, s32, u32, s32, float, float, float, float, float);
 extern s32 math_random_int_range(s32, s32);
 extern void flamethrower_robot_update_hit_effects(u8 *);
 extern void flamethrower_robot_draw_glow_trails(u8 *);
 extern void gfx_add_draw_callback_third(void (*)(u8 *), void *);
 
 /* Update the sentry's patrol, alert state and close-range flame effect. */
-void func_PAL_L02_0040F0C0(u8 *object)
+void flamethrower_l02_robot_update_pal(u8 *object)
 {
     ActorVector target;
     ActorVector bounds[2];
@@ -71,24 +71,24 @@ void func_PAL_L02_0040F0C0(u8 *object)
     float range;
     float angle;
     s32 selection;
-    u8 *hp;
-    float dx;
-    float dy;
+    u8 *unused_hp;
+    float unused_dx;
+    float unused_dy;
     u8 *goal;
 
     if (object[0x20] == 1 || object == 0 || object[0x20] == 0xFE || object[0x20] == 0xFD)
         return;
     state = *(u8 **)(object + 0x68);
-    func_PAL_L02_0040FD10(object);
+    flamethrower_robot_update_common_pal(object);
     if (object[0x20] == 1 || object[0x20] == 0xFE || object[0x20] == 0xFD)
         return;
     if (*(s16 *)(state + 0x2E2) == 0 && object[0x95] == 3) {
         moby_set_state(object, 4, 2);
         if (math_random_int_below(2)) {
             if (object[0x43] != 2)
-                func_PAL_002A7E68(object, 2, 0, 8);
+                anim_start_blended_pal(object, 2, 0, 8);
         } else if (object[0x43] != 3)
-            func_PAL_002A7E68(object, 3, 0, 8);
+            anim_start_blended_pal(object, 3, 0, 8);
     }
     if (*(u8 **)(state + 0x2D4)) {
         target.quad = *(TI128 *)(*(u8 **)(state + 0x2D4) + 0x10);
@@ -102,7 +102,7 @@ void func_PAL_L02_0040F0C0(u8 *object)
     case 2: {
         if (flag_set_second_pending(object)) {
             if (object[0x43] != 10)
-                func_PAL_002A7E68(object, 10, 0, 8);
+                anim_start_blended_pal(object, 10, 0, 8);
             object[0xBC] = 0;
             moby_set_controller_speed_limits(object, 0.0064000003f, 0.16000001f, 0.0008377582f, 0.062831864f);
             robot_pick_random_walk_target(object, arena_get_camera_point(*(char **)(object + 0xB8)));
@@ -111,18 +111,18 @@ void func_PAL_L02_0040F0C0(u8 *object)
         if (object[0xBC] == 1 && *(u16 *)(object + 0x96) >= 251) {
             selection = math_random_int_below(5);
             switch (selection) {
-            case 0: if (object[0x43] != 2) func_PAL_002A7E68(object, 2, 0, 8); break;
-            case 1: if (object[0x43] != 3) func_PAL_002A7E68(object, 3, 0, 8); break;
-            case 2: if (object[0x43] != 5) func_PAL_002A7E68(object, 5, 0, 8); break;
-            case 3: if (object[0x43] != 6) func_PAL_002A7E68(object, 6, 0, 8); break;
+            case 0: if (object[0x43] != 2) anim_start_blended_pal(object, 2, 0, 8); break;
+            case 1: if (object[0x43] != 3) anim_start_blended_pal(object, 3, 0, 8); break;
+            case 2: if (object[0x43] != 5) anim_start_blended_pal(object, 5, 0, 8); break;
+            case 3: if (object[0x43] != 6) anim_start_blended_pal(object, 6, 0, 8); break;
             }
             *(u16 *)(object + 0x96) = math_random_int_below(83);
         }
         if (*(s16 *)(state + 0x2E2)) {
             moby_set_state(object, 5, 3);
             if (math_random_int_below(2)) {
-                if (object[0x43] != 1) func_PAL_002A7E68(object, 1, 0, 8);
-            } else if (object[0x43] != 4) func_PAL_002A7E68(object, 4, 0, 8);
+                if (object[0x43] != 1) anim_start_blended_pal(object, 1, 0, 8);
+            } else if (object[0x43] != 4) anim_start_blended_pal(object, 4, 0, 8);
         }
         angle = mat_fast_helper_a(target.f[0] - *(float *)(object + 0x10), target.f[1] - *(float *)(object + 0x14));
         if (FastDiffRots(*(float *)(object + 0xF8), angle) > 2.7925272f)
@@ -148,11 +148,11 @@ void func_PAL_L02_0040F0C0(u8 *object)
     case 3:
         if (flag_set_first_pending(object)) {
             object[0xBC] = 0;
-            if (object[0x43] != 2) func_PAL_002A7E68(object, 2, 0, 0);
+            if (object[0x43] != 2) anim_start_blended_pal(object, 2, 0, 0);
             *(s32 *)(state + 0x13C) = -1;
         }
         if (object[0xBC] == 0 && (s32)*(u16 *)(object + 0x96) > *(s16 *)(state + 0x2E8)) {
-            if (object[0x43] != 10) func_PAL_002A7E68(object, 10, 0, 8);
+            if (object[0x43] != 10) anim_start_blended_pal(object, 10, 0, 8);
             object[0xBC] = 1;
         } else if (object[0xBC] == 1) {
             if (coll_point_inside_record_volume(object + 0x10, arena_get_state_word(*(char **)(object + 0xB8)))) {
@@ -164,7 +164,7 @@ void func_PAL_L02_0040F0C0(u8 *object)
         break;
     case 6:
         if (flag_set_first_pending(object)) {
-            if (object[0x43] != 9) func_PAL_002A7E68(object, 9, 0, 8);
+            if (object[0x43] != 9) anim_start_blended_pal(object, 9, 0, 8);
             moby_set_controller_speed_limits(object, 0.0064000003f, 0.16000001f, 0.005026549f, 0.5026549f);
         }
         moby_step_at_own_position_factor_pal(object, heading);
@@ -176,11 +176,11 @@ void func_PAL_L02_0040F0C0(u8 *object)
     case 7:
         if (flag_set_first_pending(object)) {
             moby_set_controller_speed_limits(object, 0.0064000003f, 0.16000001f, 0.0008377582f, 0.062831864f);
-            if (object[0x43] != 10) func_PAL_002A7E68(object, 10, 0, 12);
+            if (object[0x43] != 10) anim_start_blended_pal(object, 10, 0, 12);
         }
         if (object[0x42] != 13 && vec_distance_xy(object + 0x10, &((Hero *)g_hero_state)->q[8]) < 15.0f &&
             FastDiffRots(*(float *)(object + 0xF8), mat_fast_helper_a(((Hero *)g_hero_state)->f[0x20] - *(float *)(object + 0x10), ((Hero *)g_hero_state)->f[0x21] - *(float *)(object + 0x14))) < 1.5707965f) {
-            if (object[0x43] != 13) func_PAL_002A7E68(object, 13, 0, 8);
+            if (object[0x43] != 13) anim_start_blended_pal(object, 13, 0, 8);
             moby_set_controller_speed_limits(object, 0.0016000001f, 0.040000003f, 0.0008377582f, 0.062831864f);
         } else if (vec_distance_xy(object + 0x10, &((Hero *)g_hero_state)->q[8]) > 2.8f) {
             if (!robot_turn_toward_target_pal(object))
@@ -202,7 +202,7 @@ void func_PAL_L02_0040F0C0(u8 *object)
             if (math_fast_helper_a(bounds, 128.0f) > 0) {
                 s32 i;
                 s32 j;
-                ActorVector *tmpl;
+                ActorVector *particle_ptr;
                 moby_transform_joint_point((char *)object, 4, (char *)matrix);
                 qcopy(&bounds[1], &matrix[1]);
                 moby_transform_joint_to_world((char *)object, 4, (char *)&effect);
@@ -213,7 +213,7 @@ void func_PAL_L02_0040F0C0(u8 *object)
                 FastVecAdd(&near_point, &near_point, &effect);
                 FastVecAdd(&far_point, &far_point, &effect);
                 near_point.f[2] -= 0.1f;
-                tmpl = &particle;
+                particle_ptr = &particle;
                 far_point.f[2] -= 0.1f;
                 for (i = 0; i < 3; i++) {
                     float first;
@@ -235,7 +235,7 @@ void func_PAL_L02_0040F0C0(u8 *object)
                 particle.f[2] = 0.1f;
                 particle.f[3] = 1.0f;
                 for (j = 0; j < 2; j++) {
-                    u8 *part = func_PAL_002C23B8(&near_point, tmpl, 12, 60, 0x606060, 3,
+                    u8 *part = part_spawn_burst_pal(&near_point, particle_ptr, 12, 60, 0x606060, 3,
                         105000.0f, 21000.0f, 1.0f, -0.0002f, 0.0f);
                     if (part) {
                         part[2] = *g_chain_link_palette.ids;

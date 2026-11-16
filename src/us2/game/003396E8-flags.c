@@ -1,4 +1,6 @@
 #include "include_asm.h"
+#include "names.h"
 
-void func_US2_00339A80(void) {
+/* Empty function (v2.00 version of ui_nop_c). */
+void ui_nop_c_us2(void) {
 }

@@ -10,9 +10,9 @@ extern u8 *part_find_owned_effect_slot(u8 *, s32, s32);
 extern int FastDecTimer(u8 *);
 extern s32 mothership_is_attack_state(void);
 extern s32 mothership_is_held(void);
-extern void func_PAL_L23_00423838(void);
-extern void func_PAL_002AC290(u8 *, u8 *);
-extern void func_PAL_002AC3C0(u8 *, u8 *);
+extern void boss_start_fight_once_pal(void);
+extern void gfx_start_color_fade_pal(u8 *, u8 *);
+extern void gfx_update_color_fade_pal(u8 *, u8 *);
 extern void part_l23_spawn_hit_sparks_pal(u8 *);
 extern float math_random_signed_float_range(float, float);
 extern float FastAddRotations(float, float);
@@ -28,9 +28,9 @@ extern void moby_fade_out_update_pal(void);
 void boss_part_handle_hit_pal(u8 *moby) {
     u8 *vars = *(u8 **)(moby + 0x68);
     u8 *hit;
-    s32 n;
+    s32 spark_count;
     s32 i;
-    float vec[3];
+    float spark_vel[3];
 
     hit = part_find_owned_effect_slot(moby, 0x30000, 1);
     moby[0xA8] = 0xFF;
@@ -40,7 +40,7 @@ void boss_part_handle_hit_pal(u8 *moby) {
             (g_mothership_boss_moby != 0 && mothership_is_held() != 0) ||
             (*(s32 *)(hit + 0x20) == g_hero_moby && g_charged_l23_blast_timer < 0)) {
             if (mothership_is_held() != 0)
-                func_PAL_L23_00423838();
+                boss_start_fight_once_pal();
             hit = 0;
         }
     }
@@ -48,42 +48,42 @@ void boss_part_handle_hit_pal(u8 *moby) {
         *(float *)(vars + 0x20) = *(float *)(vars + 0x20) - *(float *)(hit + 0x2C);
         if (*(float *)(vars + 0x20) > 0.0f) {
             vars[0x147] = 0xFF;
-            func_PAL_002AC290(moby, vars + 0x140);
+            gfx_start_color_fade_pal(moby, vars + 0x140);
             part_l23_spawn_hit_sparks_pal(*(u8 **)(hit + 0x20));
             if (*(s16 *)(*(u8 **)(hit + 0x20) + 0xAA) != 0x118F)
                 *(s16 *)(vars + 0x26) = 0x11;
             if (*(u16 *)(moby + 0x7C) != 0) {
-                float f;
+                float health_ratio;
 
-                f = *(float *)(vars + 0x20) / g_mothership_max_health;
-                n = 10 - (s32)(f * 10.0f);
-                for (i = 0; i < n; i++) {
+                health_ratio = *(float *)(vars + 0x20) / g_mothership_max_health;
+                spark_count = 10 - (s32)(health_ratio * 10.0f);
+                for (i = 0; i < spark_count; i++) {
                     s32 mask = *(u16 *)(moby + 0x7C);
 
                     if ((mask >> i) & 1) {
                         float angle, speed;
-                        u8 *p;
-                        u8 *base = (u8 *)g_hero_l23_state_block;
+                        u8 *spark;
+                        u8 *hero_block = (u8 *)g_hero_l23_state_block;
                         float spread = 90.0f;
                         float per_tick = 0.020000001f;
                         float to_rad = 0.017453294f;
 
                         *(u16 *)(moby + 0x7C) = mask & ~(1 << i);
                         angle = FastAddRotations(math_random_signed_float_range(spread, 120.0f) * to_rad,
-                                              *(float *)(base + 0x158));
+                                              *(float *)(hero_block + 0x158));
                         speed = math_random_float_range(2.0f, 4.0f) * per_tick;
-                        vec[0] = math_fast_sin_or_cos_a(angle) * speed;
-                        vec[1] = math_fast_sin_or_cos_b(angle) * speed;
-                        vec[2] = 0.0f;
-                        vec[2] = math_random_float_range(5.0f, 8.0f) * per_tick;
-                        p = cam_moby_create_pal(moby, 1, *(s16 *)(moby + 0xAA), i, moby + 0x10, moby + 0xF0,
-                                          vec, spread, 15.0f, 0xFF);
-                        if (p != 0)
-                            *(void (**)(void))(p + 0x64) = moby_fade_out_update_pal;
+                        spark_vel[0] = math_fast_sin_or_cos_a(angle) * speed;
+                        spark_vel[1] = math_fast_sin_or_cos_b(angle) * speed;
+                        spark_vel[2] = 0.0f;
+                        spark_vel[2] = math_random_float_range(5.0f, 8.0f) * per_tick;
+                        spark = cam_moby_create_pal(moby, 1, *(s16 *)(moby + 0xAA), i, moby + 0x10, moby + 0xF0,
+                                          spark_vel, spread, 15.0f, 0xFF);
+                        if (spark != 0)
+                            *(void (**)(void))(spark + 0x64) = moby_fade_out_update_pal;
                     }
                 }
             }
         }
     }
-    func_PAL_002AC3C0(moby, vars + 0x140);
+    gfx_update_color_fade_pal(moby, vars + 0x140);
 }

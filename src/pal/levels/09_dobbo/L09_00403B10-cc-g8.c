@@ -28,8 +28,8 @@ extern void child_objects_draw(char *);
 extern void record_release_rebuild_effect(char *);
 extern void counter_tick_restart_tracks(char *);
 extern void group_flag_peers(char *);
-extern void func_PAL_L09_00403698(char *);
-extern void func_PAL_L09_00403900(char *);
+extern void dobbo_fire_shots_at_hero_pal(char *);
+extern void part_spawn_joint_sparkles_pal(char *);
 extern int aim_update_at_target(char *, int);
 extern void sub_object_ramp_channels(char *);
 extern void path_move_moby_smooth(char *);
@@ -38,7 +38,7 @@ extern void moby_rebuild_frame_if_visible(char *);
 extern void gfx_queue_draw_callback(void (*)(char *), char *);
 extern void moby_update_eased_node(void *, void *, int, float, float);
 extern float FastAddRotations(float, float);
-extern void func_PAL_002A7E68(void *, int, int, int);
+extern void anim_start_blended_pal(void *, int, int, int);
 extern void moby_set_state(void *, int, int);
 extern void snd_stop_voice(int);
 extern int PlayMobySound(void *, int, void *);
@@ -62,7 +62,7 @@ extern void vec_scale_to_length(void *, void *, float);
 extern void FastVecCross(void *, void *, void *);
 extern float math_random_signed_float_range(float, float);
 extern void math_apply_axis_rotation_to_quat(void *, void *, void *, float);
-extern void func_PAL_002B15D8(void *, float, int, float, float, void *, float, int);
+extern void part_spawn_masked_debris_pal(void *, float, int, float, float, void *, float, int);
 extern void FastVecAdd(void *, void *, void *);
 extern float math_fabs(float);
 extern int FastDecTimer(void *);
@@ -72,7 +72,7 @@ extern void moby_mark_spawned(void *);
 extern int math_random_int_range(int, int);
 extern int math_random_int_below(int);
 extern void *part_spawn_trailing_spark(void *, void *, int, int, int, int, float);
-extern char *func_PAL_002BE9A8(void *, float, float, float, int, void *, float, int, int);
+extern char *part_spawn_spinning_spark_pal(void *, float, float, float, int, void *, float, int, int);
 
 #define F(p, o) (*(float *)((char *)(p) + (o)))
 #define I(p, o) (*(int *)((char *)(p) + (o)))
@@ -80,12 +80,12 @@ extern char *func_PAL_002BE9A8(void *, float, float, float, int, void *, float, 
 #define B(p, o) (*(u8 *)((char *)(p) + (o)))
 #define P(p, o) (*(char **)((char *)(p) + (o)))
 
-/* State 1 patrols and picks a target (hero or classes 0xCB, 0x76C, 0xEB0), state 2 falls or lands,
+/* State 1 patrols and picks point_a target (hero or classes 0xCB, 0x76C, 0xEB0), state 2 falls or lands,
  * state 3 chases, state 4 starts breaking up, state 6 is falling debris that vanishes out of
  * bounds and explodes on timeout or contact. */
-void func_PAL_L09_00403B10(char *obj)
+void patrol_drone_update_pal(char *obj)
 {
-    float a[4], b[4], previous[4];
+    float point_a[4], point_b[4], previous[4];
     char *data = P(obj, 0x68);
     if (g_dobbo_limits.active) {
         if (F(obj, 0x18) < g_dobbo_limits.low && g_dobbo_limits.state == 1) return;
@@ -148,20 +148,20 @@ void func_PAL_L09_00403B10(char *obj)
             path_move_moby_smooth(obj);
             sub_object_update_turn_ramps_pal(obj);
             if (live) {
-                lerp_vector(a, data + 0x330, data + 0x370, 0.5f);
-                qcopy(b, data + 0x330);
-                count = coll_process_hit(a, 0, 0, 0, F(data, 0x434) * 0.48f);
-                if (!count) count = coll_process_hit(b, 0, 0, 0, F(data, 0x434) * 0.9f);
+                lerp_vector(point_a, data + 0x330, data + 0x370, 0.5f);
+                qcopy(point_b, data + 0x330);
+                count = coll_process_hit(point_a, 0, 0, 0, F(data, 0x434) * 0.48f);
+                if (!count) count = coll_process_hit(point_b, 0, 0, 0, F(data, 0x434) * 0.9f);
                 if (count) {
                     for (i = 0; i < count; i++) {
                         char *candidate = g_impact_l09_moby_table[i];
                         char *hero = g_hero_state;
                         if (candidate != P(hero, 0x2290)) {
-                            int first = 0xCB;
+                            int first = MOBY_CLASS_DECOY;
                             int kind;
                             if (!candidate) continue;
                             kind = H(candidate, 0xAA);
-                            if (kind != first && kind != 0x76C && kind != 0xEB0) continue;
+                            if (kind != first && kind != 0x76C /* moby class 1900 */ && kind != MOBY_CLASS_DARK_SHEEP) continue;
                         }
                         {
                             group_flag_peers(obj);
@@ -196,7 +196,7 @@ void func_PAL_L09_00403B10(char *obj)
             if (F(data, 0x20) <= 0.0f) {
                 int live;
 
-                if (B(obj, 0x43)) func_PAL_002A7E68(obj, 0, 0, 10);
+                if (B(obj, 0x43)) anim_start_blended_pal(obj, 0, 0, 10);
                 live = I(data, 0x3F0);
                 if (live != -1) {
                     {
@@ -207,7 +207,7 @@ void func_PAL_L09_00403B10(char *obj)
                 I(data, 0x3F0) = -1;
                 moby_set_state(obj, 4, -1);
             } else if (B(obj, 0x60) & 2) {
-                if (B(obj, 0x43)) func_PAL_002A7E68(obj, 0, 0, 10);
+                if (B(obj, 0x43)) anim_start_blended_pal(obj, 0, 0, 10);
                 H(data, 0x412) = 500;
                 moby_set_state(obj, 3, -1);
             }
@@ -222,22 +222,22 @@ void func_PAL_L09_00403B10(char *obj)
                 H(data, 0x420) = 1;
                 H(data, 0x422) = 1;
                 aim_update_at_target(obj, 1);
-                qcopy(a, P(data, 0x3AC) + 0x10);
-                a[2] += 0.5f;
-                qcopy(b, a);
-                b[2] -= 4.0f;
-                if (CollLine(a, b, 0x12, 0, 0)) qcopy(a, g_collision_l09_hit_point);
-                else a[2] -= 0.5f;
+                qcopy(point_a, P(data, 0x3AC) + 0x10);
+                point_a[2] += 0.5f;
+                qcopy(point_b, point_a);
+                point_b[2] -= 4.0f;
+                if (CollLine(point_a, point_b, 0x12, 0, 0)) qcopy(point_a, g_collision_l09_hit_point);
+                else point_a[2] -= 0.5f;
                 qcopy(previous, data + 0x390);
                 phase = IntToFloat(g_frame_l09_counter[0]) + H(obj, 0xB2) * 36;
                 angle1 = math_wrap_angle_to_pi(phase * 0.025f);
                 angle2 = math_wrap_angle_to_pi(phase * 0.016666668f);
                 step1 = math_fast_sin_or_cos_b(angle1) + 1.5f;
                 step2 = math_fast_sin_or_cos_b(angle2) + 1.5f;
-                a[0] += math_fast_sin_or_cos_b(angle2);
-                a[1] += math_fast_sin_or_cos_a(angle2);
-                math_spring_float_to_goal(data + 0x390, a[0], data + 0x3A0, step1 * 0.003f, 0.2f, 0.0f);
-                math_spring_float_to_goal(data + 0x394, a[1], data + 0x3A4, step2 * 0.003f, 0.2f, 0.0f);
+                point_a[0] += math_fast_sin_or_cos_b(angle2);
+                point_a[1] += math_fast_sin_or_cos_a(angle2);
+                math_spring_float_to_goal(data + 0x390, point_a[0], data + 0x3A0, step1 * 0.003f, 0.2f, 0.0f);
+                math_spring_float_to_goal(data + 0x394, point_a[1], data + 0x3A4, step2 * 0.003f, 0.2f, 0.0f);
                 if (I(data, 0x444) != -1) {
                     if (path_push_point_away(I(data, 0x444), data + 0x390, data + 0x390, F(data, 0x434) * 1.3f)) {
                         F(data, 0x3A0) = F(data, 0x390) - previous[0];
@@ -251,18 +251,18 @@ void func_PAL_L09_00403B10(char *obj)
                 if (replacement && B(replacement, 0x20) != 0xFE && B(replacement, 0x20) != 0xFD)
                     I(data, 0x44C) = H(replacement, 0xAA);
             }
-            find_nearest_path_point(g_path_l09_table[I(data, 0x314)], data + 0x390, a,
+            find_nearest_path_point(g_path_l09_table[I(data, 0x314)], data + 0x390, point_a,
                              data + 0x324, data + 0x3EC, 1, 20.0f, 5.0f, 0.0f);
             path_move_moby_smooth(obj);
-            qcopy(a, obj + 0x10);
-            a[3] = 4.0f;
-            if (math_fast_helper_a(a, IntToFloat(H(obj, 0x32))) >= 0) {
+            qcopy(point_a, obj + 0x10);
+            point_a[3] = 4.0f;
+            if (math_fast_helper_a(point_a, IntToFloat(H(obj, 0x32))) >= 0) {
                 float *dst;
-                moby_transform_joint_to_world(obj, 8, b);
+                moby_transform_joint_to_world(obj, 8, point_b);
                 dst = (float *)(data + 0x3F4);
-                dst[0] = b[0];
-                dst[1] = b[1];
-                dst[2] = b[2];
+                dst[0] = point_b[0];
+                dst[1] = point_b[1];
+                dst[2] = point_b[2];
                 I(data, 0x42C) |= 8;
                 sub_object_update_turn_ramps_pal(obj);
             }
@@ -307,13 +307,13 @@ void func_PAL_L09_00403B10(char *obj)
             I(data, 0x3F0) = -1;
             SpawnExplosionEffects_pal(obj, data + 0x400, obj + 0x10, 0.0f, 0.0f, 5, 2, 4,
                          4.0f, 2.0f, 9.0f, 1.0f, 1, 15.0f, 1, 5, -1, 0, 0x810001);
-            FastVecSub(a, obj + 0x10, (g_hero_state + 0x80));
-            a[2] = 0.0f;
-            vec_scale_to_length(a, a, math_random_float_range(0.09f, 0.24000001f));
-            FastVecCross(b, g_hero_state + 0x2C0, a);
-            math_apply_axis_rotation_to_quat(data + 0x400, a, g_hero_state + 0x2C0, math_random_signed_float_range(0.698131799697876f, 1.2217305898666382f));
+            FastVecSub(point_a, obj + 0x10, (g_hero_state + 0x80));
+            point_a[2] = 0.0f;
+            vec_scale_to_length(point_a, point_a, math_random_float_range(0.09f, 0.24000001f));
+            FastVecCross(point_b, g_hero_state + 0x2C0, point_a);
+            math_apply_axis_rotation_to_quat(data + 0x400, point_a, g_hero_state + 0x2C0, math_random_signed_float_range(0.698131799697876f, 1.2217305898666382f));
             F(data, 0x408) = math_random_float_range(0.120000005f,0.24000001f);
-            func_PAL_002B15D8(obj, 3.0f, 0x7F, 6.0f, 3.0f, g_default_particle_vec, 6.0f, 0xFF);
+            part_spawn_masked_debris_pal(obj, 3.0f, 0x7F, 6.0f, 3.0f, g_default_particle_vec, 6.0f, 0xFF);
             F(obj, 0x2C) *= 0.1f;
             F(data, 0x280) = 1e+01f;
             F(data, 0x414) = math_random_signed_float_range(0.0f, 0.087266475f);
@@ -361,7 +361,7 @@ void func_PAL_L09_00403B10(char *obj)
                 colour = math_random_int_range(0x30, 0xFF);
                 tint = (colour << 8) | 0x60000000;
                 colour = colour | ((colour << 16) | tint);
-                particle = func_PAL_002BE9A8(obj + 0x10, 0.025f, 1.0f, 1.0f, spin, g_default_particle_vec,
+                particle = part_spawn_spinning_spark_pal(obj + 0x10, 0.025f, 1.0f, 1.0f, spin, g_default_particle_vec,
                                        energy, colour, 0);
                 if (particle) {
                     char *extra = particle + 0x20;
@@ -380,8 +380,8 @@ void func_PAL_L09_00403B10(char *obj)
 tail:
     counter_tick_restart_tracks(obj);
     moby_update_eased_node(obj, data + 0x210, 0, 0.21600002f, 0.43200004f);
-    func_PAL_L09_00403698(obj);
+    dobbo_fire_shots_at_hero_pal(obj);
     F(data, 0x2F8) = FastAddRotations(F(data, 0x2D8), 0.062831864f);
     moby_update_eased_node(obj, data + 0x290, 11, 0.21600002f, 0.43200004f);
-    func_PAL_L09_00403900(obj);
+    part_spawn_joint_sparkles_pal(obj);
 }

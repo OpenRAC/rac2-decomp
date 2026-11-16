@@ -4,12 +4,13 @@
 
 extern void func_323FF0(char *, int, int, int);
 
-void moby_play_anim_and_link_pal(char *arg0, int arg1, int arg2, int arg3, int arg4, float arg5) {
-    char *state = *(char **)(arg0 + 0x68);
+/* Plays an animation on the moby, on its linked part, or both (bits 1 and 2 of the mask). (PAL) */
+void moby_play_anim_and_link_pal(char *moby, int anim, int unused_2, int unused_3, int mask, float blend) {
+    char *vars = *(char **)(moby + 0x68);
 
-    if (arg4 & 1)
-        func_323FF0(arg0, arg1, 0, 3);
-    if (arg4 & 2)
-        func_323FF0(*(char **)(state + 0x2A0), arg1, 0, 3);
+    if (mask & 1)
+        func_323FF0(moby, anim, 0, 3);
+    if (mask & 2)
+        func_323FF0(*(char **)(vars + 0x2A0), anim, 0, 3);
 }
 

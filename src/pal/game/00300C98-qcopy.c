@@ -17,6 +17,7 @@ extern void SwitchCachedDiscAsset_pal(s32);
 extern char *part_init_shared_effect_object(s32, s32);
 
 /* Spawns the object for the current mode and hands it the caller's position and rotation. */
+/* Spawns the object for the current mode and hands it the caller's position and rotation. */
 char *part_spawn_mode_effect_object_pal(char *obj)
 {
     V4_F2FFB68 pos, rot;

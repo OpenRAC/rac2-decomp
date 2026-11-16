@@ -12,7 +12,7 @@ extern void snd_stop_voice(s32);
 extern s32 moby_count_group_not_in_state(s32, s32);
 extern void part_spawn_scaled_bolts_pal(void *, s32, float);
 extern void matrix_mul_vec3(void *, void *, void *);
-extern void func_PAL_002B15D8(char *, s32, void *, u8, float, float, float, float);
+extern void part_spawn_masked_debris_pal(char *, s32, void *, u8, float, float, float, float);
 extern void moby_mark_spawned(void *);
 
 /* Keep the trigger slot alive until touched, then release it and emit the final burst. */
@@ -53,7 +53,7 @@ void trigger_slot_burst_update_pal(u8 *object)
         offset.quad = 0;
         offset.f[0] = -0.14000002f;
         matrix_mul_vec3(&offset, &offset, object + 0xC0);
-        func_PAL_002B15D8((char *)object, 31, &offset, 255, 3.0f, 6.0f, 3.0f, 6.0f);
+        part_spawn_masked_debris_pal((char *)object, 31, &offset, 255, 3.0f, 6.0f, 3.0f, 6.0f);
         moby_mark_spawned(object);
         break;
     }

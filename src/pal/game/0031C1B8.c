@@ -13,10 +13,11 @@ extern void part_spawn_spark_pairs_pal(void *, int);
 extern int snd_is_voice_playing_for_owner(void *, int);
 extern int PlayMobySound(int, int, void *);
 extern void snd_stop_voice(int);
-extern void func_PAL_002AC3C0(void *, void *);
+extern void gfx_update_color_fade_pal(void *, void *);
 extern int FastDecTimer(void *);
 extern char g_sound_state[];
 
+/* Turns the three attached parts toward the target and throws sparks from them while active. It keeps a looping sound going, and stops it when the object is not active (PAL: 50 Hz timings). */
 void three_part_turret_update_parts_pal(char *object)
 {
     float axis[4];
@@ -73,7 +74,7 @@ void three_part_turret_update_parts_pal(char *object)
         }
         *(int *)(state + 0x290) = -1;
     }
-    func_PAL_002AC3C0(object, state + 0x50);
+    gfx_update_color_fade_pal(object, state + 0x50);
     FastDecTimer(state + 0x240);
     FastDecTimer(state + 0x242);
     if (*(unsigned short *)(object + 0x96) < 0xFFFF)

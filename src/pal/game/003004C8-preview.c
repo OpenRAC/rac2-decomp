@@ -83,7 +83,7 @@ extern int request_begin_slot(int, int, int, int, int);
 /* Steps the object preview through its eight states: wait for the subtitle
    owner (at most 181 frames), set up the camera and the object, show it,
    fade, release it and hand control back. */
-void func_PAL_003004C8(void)
+void UpdateObjectPreviewSequence_pal(void)
 {
     char *object, *current;
     float angle, sine, tangent, zero;

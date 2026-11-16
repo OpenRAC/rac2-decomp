@@ -33,7 +33,7 @@ extern void CalculateAimedLaunchVelocity(void *, void *, void *, int, float, flo
 extern int coll_trace_projectile_to_impact_pal(void *, void *, void *, void *, void *, int, int, float);
 extern void cancel_hero_item_animation_pal(void);
 extern int weapon_spend_ammo(int, int);
-extern void func_PAL_L00_002AF458(void);
+extern void start_equipped_item_animation_pal(void);
 extern int slot_copy_records_to_free(struct Rac2Native_5f824a0e369ccf7b_src_record *);
 extern int PlayMobySound(int, int, char *);
 extern char *mini_nuke_projectile_spawn_pal(int, char *, char *);
@@ -43,6 +43,7 @@ extern int vec_fast_helper_b(void *);
 extern void moby_apply_active_effect_pal(void *);
 extern void ref_L00_003C2FC8_00(void (*)(void *), void *);
 
+/* Updates the Mini-Nuke moby: picks an aim target and fires when the player presses the button (PAL). */
 void mini_l00_nuke_update_pal(unsigned char *object) {
     unsigned char *state = *(unsigned char **)(object + 0x68);
     unsigned char *target;
@@ -88,7 +89,7 @@ void mini_l00_nuke_update_pal(unsigned char *object) {
         if (allowed && *(float *)(state + 0x20) == 0.0f && !H->b[0x22BC] && (PAD->u[0x1A0 / 4] & H->u[0x1230 / 4]) && H->i[0x1240 / 4] >= 19) {
             if (weapon_spend_ammo(-1, 1)) {
                 g_nuke_fire_held = 1;
-                func_PAL_L00_002AF458();
+                start_equipped_item_animation_pal();
                 *(int *)(state + 0x2C) = slot_copy_records_to_free(g_mini_nuke_sound_records);
                 anim_start_blended_with_flags(object, 2, 0, 2, 0);
                 mini_nuke_projectile_spawn_pal((int)object, (char *)&position, (char *)&config);

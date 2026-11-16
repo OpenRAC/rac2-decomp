@@ -8,13 +8,14 @@ extern void object_set_first_float4(void *, float, float, float, float);
 extern float g_menu_empty_label_y_offset;
 extern float g_menu_empty_label_x_offset __attribute__((sda));
 
-void func_US2_003444E8(u8 *a0) {
-    if (menu_list_get_count(a0 + 0x2C8) == 0) {
-        object_set_flag_value(a0 + 0x208, 0);
+/* Hides the empty-list label when the list has entries, otherwise places it next to the menu (USA v2.00 menu_update_empty_label). */
+void menu_update_empty_label_us2(u8 *menu) {
+    if (menu_list_get_count(menu + 0x2C8) == 0) {
+        object_set_flag_value(menu + 0x208, 0);
     } else {
-        int *v = *(int **)(a0 + 0x2B8);
-        object_set_first_float4(a0 + 0x208, g_menu_empty_label_x_offset + *(float *)v,
-                      g_menu_empty_label_y_offset + *(float *)((u8 *)v + 4), 0.0f, 0.0f);
+        int *position = *(int **)(menu + 0x2B8);
+        object_set_first_float4(menu + 0x208, g_menu_empty_label_x_offset + *(float *)position,
+                      g_menu_empty_label_y_offset + *(float *)((u8 *)position + 4), 0.0f, 0.0f);
     }
 }
 
@@ -27,7 +28,8 @@ extern char g_str_string_format[];
 extern float g_menu_title_text_x_offset __attribute__((sda));
 extern float g_menu_title_text_y_offset;
 
-void func_US2_00344558(char *object)
+/* Builds the menu title text for the current mode, truncates it to fit and places its widget (USA v2.00 menu_update_title_text). */
+void menu_update_title_text_us2(char *object)
 {
     char buffer[256];
     float *position;

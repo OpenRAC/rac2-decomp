@@ -23,6 +23,7 @@ extern int PlayMobySound(int index, int kind, char *object);
 extern void FastVecSub(void *out, void *a, void *b);
 extern void mat_combine_and_store(void *matrix, void *offset, void *a, void *b);
 
+/* Moves a lift between two heights and plays a sound while it moves. It carries the hero standing on it. (USA v2.00) */
 void UpdateTodanoLift_us2(u8 *object)
 {
     LiftQuad oldPosition;

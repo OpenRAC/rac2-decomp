@@ -31,69 +31,70 @@ extern void mat_combine_and_store(void *matrix, void *offset, void *a, void *b);
 extern u8 g_lift_sound_table[];
 extern u8 g_lift_sound_table_alt[];
 
+/* Moves a lift between two heights and plays a sound while it moves. It carries the hero standing on it (PAL: 50 Hz timings). */
 void UpdateTodanoLift_pal(u8 *object)
 {
-    LiftQuad oldPosition;
+    LiftQuad old_position;
     LiftQuad displacement;
-    u8 *data = *(u8 **)(object + 0x68);
+    u8 *vars = *(u8 **)(object + 0x68);
 
     float target;
     float rate;
     float reference;
     int index;
-    qcopy(&oldPosition, object + 0x10);
+    qcopy(&old_position, object + 0x10);
     switch (object[0x20]) {
     case 0:
-        qcopy(data + 0x70, object + 0x10);
+        qcopy(vars + 0x70, object + 0x10);
         moby_set_state(object, 1, -1);
         break;
     case 1:
         if (!flag_is_third_pending_set(object)) break;
-        if (*(int *)(data + 0x68))
-            target = *(float *)(g_path_waypoint_table + *(int *)(data + 0x60) * 128 + 0x38);
+        if (*(int *)(vars + 0x68))
+            target = *(float *)(g_path_waypoint_table + *(int *)(vars + 0x60) * 128 + 0x38);
         else
-            target = *(float *)(data + 0x78);
+            target = *(float *)(vars + 0x78);
         if (math_fabs(target - *(float *)(object + 0x18)) < 2.0f) {
-            reference = *(float *)(g_path_waypoint_table + *(int *)(data + 0x60) * 128 + 0x38);
+            reference = *(float *)(g_path_waypoint_table + *(int *)(vars + 0x60) * 128 + 0x38);
             if (g_hero_state.standing == object && g_hero_state.flags) {
                 TryClaimNotice(8, 0x12EC, 1);
                 if (g_pad_held_flags & 0x10)
-                    *(int *)(data + 0x68) = (*(int *)(data + 0x68) + 1) & 1;
-            } else if (*(int *)(data + 0x68)) {
-                if (math_fabs(g_hero_state.position[2] - *(float *)(data + 0x78)) < 4.0f &&
+                    *(int *)(vars + 0x68) = (*(int *)(vars + 0x68) + 1) & 1;
+            } else if (*(int *)(vars + 0x68)) {
+                if (math_fabs(g_hero_state.position[2] - *(float *)(vars + 0x78)) < 4.0f &&
                     vec_distance_xy(g_hero_state.position, object + 0x10) < 24.0f)
-                    *(int *)(data + 0x68) = 0;
+                    *(int *)(vars + 0x68) = 0;
             } else {
                 if (math_fabs(g_hero_state.position[2] - reference) < 4.0f &&
                     vec_distance_xy(g_hero_state.position, object + 0x10) < 24.0f)
-                    *(int *)(data + 0x68) = 1;
+                    *(int *)(vars + 0x68) = 1;
             }
         }
         rate = 0.0056000003f;
-        if (*(int *)(data + 0x68)) {
+        if (*(int *)(vars + 0x68)) {
             if (g_hero_state.position[2] < *(float *)(object + 0x18) - 1.0f &&
-                IsPointInCuboid(g_hero_state.position, *(int *)(data + 0x60))) {
+                IsPointInCuboid(g_hero_state.position, *(int *)(vars + 0x60))) {
                 target += 3.0f;
                 rate = 0.0112000005f;
             } else {
                 target += 0.5f;
             }
         }
-        math_step_value_toward_target((float *)(object + 0x18), (float *)(data + 0x6C), target, 0.0028000001f, rate, 0.6f);
+        math_step_value_toward_target((float *)(object + 0x18), (float *)(vars + 0x6C), target, 0.0028000001f, rate, 0.6f);
         if (math_fabs(target - *(float *)(object + 0x18)) < 0.8f) {
-            index = *(int *)(data + 0x80);
+            index = *(int *)(vars + 0x80);
             if (index != -1) {
                 LiftSound *sound = (LiftSound *)(index * 112 + (s32)g_lift_sound_table);
                 if (sound->owner == object && sound->active)
                     snd_stop_voice(index);
             }
-            *(int *)(data + 0x80) = -1;
+            *(int *)(vars + 0x80) = -1;
         } else {
-            LiftSound *sound = (LiftSound *)(*(int *)(data + 0x80) * 112 + (s32)g_lift_sound_table_alt);
+            LiftSound *sound = (LiftSound *)(*(int *)(vars + 0x80) * 112 + (s32)g_lift_sound_table_alt);
             if (sound->owner != object || sound->active == 0)
-                *(int *)(data + 0x80) = PlayMobySound(0, 4, (char *)object);
+                *(int *)(vars + 0x80) = PlayMobySound(0, 4, (char *)object);
         }
     }
-    FastVecSub(&displacement, object + 0x10, &oldPosition);
-    mat_combine_and_store(data + 0x20, &displacement, object + 0xF0, object + 0xF0);
+    FastVecSub(&displacement, object + 0x10, &old_position);
+    mat_combine_and_store(vars + 0x20, &displacement, object + 0xF0, object + 0xF0);
 }

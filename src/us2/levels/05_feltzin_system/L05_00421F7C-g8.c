@@ -63,7 +63,7 @@ static __inline__ int label_y(void *handle, float value, float scale, float half
     return result;
 }
 
-s32 func_US2_L05_00421F7C(void) {
+s32 hud_draw_feltzin_mission_reward_us2(void) {
     char buf[128];
     f32 center = IntToFloat(g_screen_width) * 0.5f;
     void *sprite;

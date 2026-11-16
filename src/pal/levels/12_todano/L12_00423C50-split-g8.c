@@ -15,42 +15,43 @@ extern int math_fast_float_d(void *);
 extern float math_step_value_toward_target(void *, void *, float, float, float, float);
 extern void FastVecScale(float, void *, void *);
 
-void secret_door_update_pal(u8 *a0)
+/* Slides the door open while the hero or buddy is near its switch, and closes it again a moment after they leave (PAL: 50 Hz timings). */
+void secret_door_update_pal(u8 *moby)
 {
-    s32 *s = *(s32 **)(a0 + 0x68);
-    int state = a0[0x20];
-    f32 v[4];
+    s32 *vars = *(s32 **)(moby + 0x68);
+    int state = moby[0x20];
+    f32 open_offset[4];
 
     switch (state) {
     case 0:
-        qcopy((u8 *)s + 0x10, a0 + 0x10);
-        moby_set_state(a0, 1, -1);
-        a0[0x30] = 0x7F;
+        qcopy((u8 *)vars + 0x10, moby + 0x10);
+        moby_set_state(moby, 1, -1);
+        moby[0x30] = 0x7F;
         break;
     case 1:
-        if (vec_distance_xy(a0 + 0x10, g_moby_list_start + (s[0] << 8) + 0x10) < 5.0f) {
-            s[0xB] = state;
-            s[8] = 0x32;
-        } else if ((IsPointInCuboid(g_hero_position, s[1]) && s[0xB] != 0) ||
-                   (IsPointInCuboid(g_hero_prev_position, s[1]) && s[0xB] != 0)) {
-            s[8] = 0x32;
+        if (vec_distance_xy(moby + 0x10, g_moby_list_start + (vars[0] << 8) + 0x10) < 5.0f) {
+            vars[0xB] = state;
+            vars[8] = 0x32;
+        } else if ((IsPointInCuboid(g_hero_position, vars[1]) && vars[0xB] != 0) ||
+                   (IsPointInCuboid(g_hero_prev_position, vars[1]) && vars[0xB] != 0)) {
+            vars[8] = 0x32;
         }
-        if (math_fast_float_d((u8 *)s + 0x20))
-            math_step_value_toward_target((u8 *)s + 0x24, (u8 *)s + 0x28, 0.0f, 0.00080000004f, 0.00080000004f, 0.080000006f);
+        if (math_fast_float_d((u8 *)vars + 0x20))
+            math_step_value_toward_target((u8 *)vars + 0x24, (u8 *)vars + 0x28, 0.0f, 0.00080000004f, 0.00080000004f, 0.080000006f);
         else
-            math_step_value_toward_target((u8 *)s + 0x24, (u8 *)s + 0x28, 1.0f, 0.00080000004f, 0.00080000004f, 0.080000006f);
-        if (*(f32 *)((u8 *)s + 0x28) != 0.0f) {
-            *(TI128 *)v = 0;
-            v[0] = 1.0f;
-            v[2] = 3.0f;
-            matrix_mul_vec3(v, v, a0 + 0xC0);
-            FastVecScale(*(f32 *)((u8 *)s + 0x24), v, v);
-            FastVecAdd(a0 + 0x10, (u8 *)s + 0x10, v);
-            if (s[0xC] % 120 == 0)
-                PlayMobySound(0, 0, (s32)a0);
-            s[0xC]++;
+            math_step_value_toward_target((u8 *)vars + 0x24, (u8 *)vars + 0x28, 1.0f, 0.00080000004f, 0.00080000004f, 0.080000006f);
+        if (*(f32 *)((u8 *)vars + 0x28) != 0.0f) {
+            *(TI128 *)open_offset = 0;
+            open_offset[0] = 1.0f;
+            open_offset[2] = 3.0f;
+            matrix_mul_vec3(open_offset, open_offset, moby + 0xC0);
+            FastVecScale(*(f32 *)((u8 *)vars + 0x24), open_offset, open_offset);
+            FastVecAdd(moby + 0x10, (u8 *)vars + 0x10, open_offset);
+            if (vars[0xC] % 120 == 0)
+                PlayMobySound(0, 0, (s32)moby);
+            vars[0xC]++;
         } else {
-            s[0xC] = 0;
+            vars[0xC] = 0;
         }
         break;
     }

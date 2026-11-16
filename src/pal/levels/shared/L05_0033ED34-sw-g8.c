@@ -8,8 +8,8 @@
 #define H(p, o) (*(u16 *)((char *)(p) + (o)))
 extern int moby_pick_random_matching_pal(void *, int, int *, float *, float *, float *, float *,
                          float *, float *, float *);
-extern void func_PAL_002A7E68(void *, int, int, int);
-extern void func_PAL_002AC290(void *, void *);
+extern void anim_start_blended_pal(void *, int, int, int);
+extern void gfx_start_color_fade_pal(void *, void *);
 extern int g_ground_check_inhibit;
 extern float vec_get_vertical_offset(void *, void *, int);
 extern void cam_compute_view_direction(void *, void *, int);
@@ -26,14 +26,14 @@ extern void vec_fast_normalize_helper(void *, void *, float);
 extern float mat_fast_helper_a(float, float);
 extern float FastAddRotations(float, float);
 
-/* Select a reaction animation and initialize its velocity and timers. */
-int func_PAL_L05_0033F3A8(char *object, char *state, float *vector, int reaction)
+/* Select anim_a reaction animation and initialize its velocity and timers. */
+int follower_start_reaction_pal(char *object, char *state, float *vector, int reaction)
 {
     float forward[4];
     float projected[4];
     float backward[4];
     int index;
-    float horizontal, vertical, duration, delay, a, b, scale;
+    float horizontal, vertical, duration, delay, anim_a, anim_b, scale;
     int valid = 1;
     float length;
 
@@ -49,40 +49,40 @@ int func_PAL_L05_0033F3A8(char *object, char *state, float *vector, int reaction
         break;
     case 2:
         U(state, 7) = 255;
-        if (moby_pick_random_matching_pal(object, 0, &index, &horizontal, &vertical, &duration, &delay, &a, &b, &scale))
+        if (moby_pick_random_matching_pal(object, 0, &index, &horizontal, &vertical, &duration, &delay, &anim_a, &anim_b, &scale))
             goto play;
-        if (moby_pick_random_matching_pal(object, 1, &index, &horizontal, &vertical, &duration, &delay, &a, &b, &scale))
+        if (moby_pick_random_matching_pal(object, 1, &index, &horizontal, &vertical, &duration, &delay, &anim_a, &anim_b, &scale))
             break;
         if (U(state, 0x11) != 255) {
             horizontal *= 0.5f;
             vertical *= 0.5f;
-            a = S(state, 0x6c);
-            b = S(state, 0x6d);
-            func_PAL_002A7E68(object, U(state, 0x11), 0, 2);
+            anim_a = S(state, 0x6c);
+            anim_b = S(state, 0x6d);
+            anim_start_blended_pal(object, U(state, 0x11), 0, 2);
             break;
         }
         valid = 0;
         break;
     case 3:
         U(state, 7) = 255;
-        if (moby_pick_random_matching_pal(object, 1, &index, &horizontal, &vertical, &duration, &delay, &a, &b, &scale))
+        if (moby_pick_random_matching_pal(object, 1, &index, &horizontal, &vertical, &duration, &delay, &anim_a, &anim_b, &scale))
             goto play;
-        if (moby_pick_random_matching_pal(object, 0, &index, &horizontal, &vertical, &duration, &delay, &a, &b, &scale))
+        if (moby_pick_random_matching_pal(object, 0, &index, &horizontal, &vertical, &duration, &delay, &anim_a, &anim_b, &scale))
             goto play;
         if (U(state, 0x12) != 255) {
             horizontal *= 0.75f;
             vertical *= 0.75f;
-            a = S(state, 0x6e);
-            b = S(state, 0x6f);
-            func_PAL_002A7E68(object, U(state, 0x12), 0, 2);
+            anim_a = S(state, 0x6e);
+            anim_b = S(state, 0x6f);
+            anim_start_blended_pal(object, U(state, 0x12), 0, 2);
             break;
         }
         valid = 0;
         break;
     case 6:
         U(state, 7) = 255;
-        if (moby_pick_random_matching_pal(object, 5, &index, &horizontal, &vertical, &duration, &delay, &a, &b, &scale)) {
-            func_PAL_002A7E68(object, index, 0, 2);
+        if (moby_pick_random_matching_pal(object, 5, &index, &horizontal, &vertical, &duration, &delay, &anim_a, &anim_b, &scale)) {
+            anim_start_blended_pal(object, index, 0, 2);
         } else {
             valid = 0;
         }
@@ -92,15 +92,15 @@ int func_PAL_L05_0033F3A8(char *object, char *state, float *vector, int reaction
         H(state, 0x38) |= 1;
         I(object, 0x98) = 0;
         H(object, 0x34) &= 0xefff;
-        if (moby_pick_random_matching_pal(object, 3, &index, &horizontal, &vertical, &duration, &delay, &a, &b, &scale)) {
+        if (moby_pick_random_matching_pal(object, 3, &index, &horizontal, &vertical, &duration, &delay, &anim_a, &anim_b, &scale)) {
 play:
-            func_PAL_002A7E68(object, index, 0, 2);
+            anim_start_blended_pal(object, index, 0, 2);
             break;
         }
         if (U(state, 0x16) != 255) {
-            a = S(state, 0x72);
-            b = S(state, 0x73);
-            func_PAL_002A7E68(object, U(state, 0x16), 0, 2);
+            anim_a = S(state, 0x72);
+            anim_b = S(state, 0x73);
+            anim_start_blended_pal(object, U(state, 0x16), 0, 2);
             break;
         }
         valid = 0;
@@ -110,14 +110,14 @@ play:
         H(state, 0x38) |= 2;
         I(object, 0x98) = 0;
         H(object, 0x34) &= 0xefff;
-        if (moby_pick_random_matching_pal(object, 4, &index, &horizontal, &vertical, &duration, &delay, &a, &b, &scale)) {
-            func_PAL_002A7E68(object, index, 0, 2);
+        if (moby_pick_random_matching_pal(object, 4, &index, &horizontal, &vertical, &duration, &delay, &anim_a, &anim_b, &scale)) {
+            anim_start_blended_pal(object, index, 0, 2);
         } else if (U(state, 0x17) != 255) {
             horizontal *= 1.5f;
             vertical *= 1.5f;
-            a = S(state, 0x72);
-            b = S(state, 0x73);
-            func_PAL_002A7E68(object, U(state, 0x17), 0, 2);
+            anim_a = S(state, 0x72);
+            anim_b = S(state, 0x73);
+            anim_start_blended_pal(object, U(state, 0x17), 0, 2);
         } else {
             valid = 0;
         }
@@ -126,7 +126,7 @@ play:
         break;
     }
 update:
-    func_PAL_002AC290(object, state);
+    gfx_start_color_fade_pal(object, state);
     if (reaction == 1)
         goto done;
     if (!valid)
@@ -165,8 +165,8 @@ update:
         F(state, 0x54) = -1.0f;
         F(state, 0x60) = -1.0f;
     } else {
-        F(state, 0x54) = a;
-        F(state, 0x60) = b;
+        F(state, 0x54) = anim_a;
+        F(state, 0x60) = anim_b;
         F(state, 0x4c) = duration;
         F(state, 0x50) = delay;
         F(state, 0x2c) = scale;

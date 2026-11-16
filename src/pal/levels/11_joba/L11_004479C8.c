@@ -44,49 +44,49 @@ extern u8 g_music_state[];
    halfword at +0xAA); then runs the test once more on the entity D_00189E20 holds at +0x2290. */
 void arena_update_fighters_inside_pal(u8 *object) {
     u8 *state = *(u8 **)(object + 0x68);
-    u16 *p;
-    u8 *e;
+    u16 *cursor;
+    u8 *entry;
     u8 *player;
 
-    FOR_EACH_ID(p, 0xC0) {
-        e = g_moby_l11_table + ((*p & 0x7FFF) << 8);
-        if (e == 0)
+    FOR_EACH_ID(cursor, 0xC0) {
+        entry = g_moby_l11_table + ((*cursor & 0x7FFF) << 8);
+        if (entry == 0)
             break;
-        if (e[0x20] == 0xFE)
+        if (entry[0x20] == 0xFE)
             continue;
-        if (e[0x20] == 0xFD)
+        if (entry[0x20] == 0xFD)
             continue;
-        if (e[0x20] < 3)
+        if (entry[0x20] < 3)
             continue;
-        if (arena_is_target_outside(object, e, 0) == 0)
+        if (arena_is_target_outside(object, entry, 0) == 0)
             continue;
-        switch (*(s16 *)(e + 0xAA)) {
+        switch (*(s16 *)(entry + 0xAA)) {
         case 0xD98:
-            security_robot_kill(e, 0, 0);
+            security_robot_kill(entry, 0, 0);
             break;
         case 0xDCF:
-            moby_set_anim_type_three(e, 0, -1);
-            smasher_robot_deactivate(e);
+            moby_set_anim_type_three(entry, 0, -1);
+            smasher_robot_deactivate(entry);
             break;
         case 0xDF4:
-            moby_set_anim_type_three(e, 0, -1);
-            flamethrower_robot_deactivate(e);
+            moby_set_anim_type_three(entry, 0, -1);
+            flamethrower_robot_deactivate(entry);
             break;
         case 0xDF7:
-            moby_set_anim_type_three(e, 0, -1);
-            drone_reset_to_idle(e);
+            moby_set_anim_type_three(entry, 0, -1);
+            drone_reset_to_idle(entry);
             break;
         case 0xDF9:
-            moby_set_anim_type_three(e, 0, -1);
-            part_queue_moby_for_glow(e, 0, fighter_reset_to_idle);
+            moby_set_anim_type_three(entry, 0, -1);
+            part_queue_moby_for_glow(entry, 0, fighter_reset_to_idle);
             break;
         case 0xD37:
-            moby_set_anim_type_three(e, 0, -1);
-            enemy_reset_to_idle(e);
+            moby_set_anim_type_three(entry, 0, -1);
+            enemy_reset_to_idle(entry);
             break;
         case 0xD4B:
-            if (drone_is_state_at_least_four(e))
-                drone_kill_with_effects(e);
+            if (drone_is_state_at_least_four(entry))
+                drone_kill_with_effects(entry);
             break;
         }
     }

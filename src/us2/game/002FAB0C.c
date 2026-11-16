@@ -34,7 +34,7 @@ extern void draw_large_text_edge_faded_us2(float,float,unsigned long,float,char 
 
 #define screen_y(y) ((int)(D_001B2280[0] * (y) + 0.5f) + (D_001A7B90 ? 4 : 0))
 
-void func_US2_002FAB0C(void)
+void DrawVendorItemSelectList_us2(void)
 {
     int pulse;
     int i, index, y, icon, kind, special, alpha0, alpha1;
@@ -78,12 +78,12 @@ void func_US2_002FAB0C(void)
             hud_draw_sprite_gradient(icon,y+4,screen_y(329),40,(int)(g_pal_aspect_scale[0]*40.0f+0.5f),colors);
             if (g_vendor_menu_state.rows[index].owned) {
                 char *text = GetLocalizedString(0x30f5);
-                int tx = (text_run_helper_first_set(text,-1,0.75f) >> 1) - 25;
-                draw_large_text_edge_faded_us2((float)(y - tx - 1),(float)screen_y(366),0x80f0f0f0UL,0.75f,text,-1);
+                int text_x = (text_run_helper_first_set(text,-1,0.75f) >> 1) - 25;
+                draw_large_text_edge_faded_us2((float)(y - text_x - 1),(float)screen_y(366),0x80f0f0f0UL,0.75f,text,-1);
             } else if (g_vendor_menu_state.rows[index].kind == 1) {
                 char *text = GetLocalizedString(0x2c5f);
-                int tx = (text_run_helper_first_set(text,-1,0.75f) >> 1) - 25;
-                draw_large_text_edge_faded_us2((float)(y - tx - 1),(float)screen_y(366),0x80f0f0f0UL,0.75f,text,-1);
+                int text_x = (text_run_helper_first_set(text,-1,0.75f) >> 1) - 25;
+                draw_large_text_edge_faded_us2((float)(y - text_x - 1),(float)screen_y(366),0x80f0f0f0UL,0.75f,text,-1);
             }
         }
         i++;

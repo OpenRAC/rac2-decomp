@@ -82,7 +82,9 @@ static __inline__ int StreamGroup(u8 *state, int i, int base)
  * reduces the rereads to one load and a copy. D_L18_001B2568 and D_001A7A7B are
  * written as a base plus offset, which keeps those stores out of delay slots.
  */
-void func_US2_L18_003FA510(u8 *object)
+/* Runs the level's main sequence: it tracks four groups of enemies, steps through
+   its stages as triggers fire, and opens and closes the linked doors and gates (USA v2.00 copy). */
+void UpdateDamoselGroupTriggerController_us2(u8 *object)
 {
     u8 *state = *(u8 **)(object + 0x68);
     int mode;
@@ -228,9 +230,9 @@ void func_US2_L18_003FA510(u8 *object)
                 WORD(LOCAL_ENTITY(0xC8), 0x98) = WORD(*(u8 **)(LOCAL_ENTITY(0xC8) + 0x24), 0x10);
                 if (WORD(state, 0xCC) != -1) FLAGS(LOCAL_ENTITY(0xCC)) |= 2;
                 {
-                    u8 *nextBase = g_moby_l18_table[0];
-                    FLAGS((u8 *)((WORD(state, 0xCC) << 8) + (s32)nextBase)) |= 1;
-                    WORD((u8 *)((WORD(state, 0xCC) << 8) + (s32)nextBase), 0x98) = 0;
+                    u8 *next_base = g_moby_l18_table[0];
+                    FLAGS((u8 *)((WORD(state, 0xCC) << 8) + (s32)next_base)) |= 1;
+                    WORD((u8 *)((WORD(state, 0xCC) << 8) + (s32)next_base), 0x98) = 0;
                 }
             }
         }
@@ -301,10 +303,10 @@ void func_US2_L18_003FA510(u8 *object)
                 break;
             }
             if (ready) {
-                int allReady = 1;
+                int all_ready = 1;
                 u16 *entry;
                 u8 *entity;
-                for (i = 0; i < 4 && allReady; i++) {
+                for (i = 0; i < 4 && all_ready; i++) {
                     for (entry = g_condition_target_lists[StreamGroup(state, i, 0xF0)];
                     (StreamGroup(state, i, 0xF0) & 255) != 255 &&
                     StreamGroup(state, i, 0xF0) <= g_max_l18_group_index[0] && entry &&
@@ -315,14 +317,14 @@ void func_US2_L18_003FA510(u8 *object)
                         if (entity[0x20] != 0xFE) {
                             if (entity[0x20] != 0xFD) {
                                 if ((FLAGS(entity) ^ 1) & 1) {
-                                    allReady = 0;
+                                    all_ready = 0;
                                     break;
                                 }
                             }
                         }
                     }
                 }
-                if (allReady) {
+                if (all_ready) {
                     if (!g_trigger_event_flags[3]) {
                         g_trigger_event_flags[3] = 1;
                         snd_play_from_global_bank(1, 0, 0);

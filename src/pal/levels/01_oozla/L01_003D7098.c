@@ -16,19 +16,19 @@ typedef struct {
 } HeroView;
 
 typedef struct PurchaseMoby {
-    u8 pad00[0x10];
+    u8 pad_00[0x10];
     f32 position[4];
     u8 state, group;
-    u8 pad22[0xE];
-    u8 field30, enabled;
-    u16 field32, flags;
-    u8 pad36[0xD];
+    u8 pad_22[0xE];
+    u8 field_30, enabled;
+    u16 field_32, flags;
+    u8 pad_36[0xD];
     u8 animation;
-    u8 pad44[0x1C];
-    u8 animFlags;
-    u8 pad61[7];
+    u8 pad_44[0x1C];
+    u8 anim_flags;
+    u8 pad_61[7];
     u8 *data;
-    u8 pad6C[0x8C];
+    u8 pad_6C[0x8C];
     f32 yaw;
 } PurchaseMoby;
 
@@ -71,14 +71,14 @@ extern void moby_set_byte_on_group(s32, s32);
 extern void help_unlock_entry(s32);
 extern int moby_handle_request_slot_state(s32);
 extern void value_set_entry_by_index_pal(s32, s32);
-extern int func_PAL_00289730(s32, s32);
+extern int subtitle_request_voice_line_pal(s32, s32);
 extern void cam_lock_entry(s32);
 extern int MemcardSave(s32, s32);
 extern void moby_mark_spawned(void *);
 extern s32 FastDecTimer(void *);
 extern f32 math_random_float_range(f32, f32);
 extern s32 FloatToInt(f32);
-extern void func_PAL_002A7E68(void *, s32, s32, s32);
+extern void anim_start_blended_pal(void *, s32, s32, s32);
 extern f32 vec_distance_xy(void *, void *);
 extern f32 mat_fast_helper_a(f32, f32);
 extern f32 FastDiffRots(f32, f32);
@@ -97,14 +97,14 @@ extern void moby_copy_joint_transform_to_object(void *, void *, s32, s32);
 
 /* An item vendor: offers the current item table entry, compares its cost with D_001A79F8, takes
    the cost on purchase and removes itself. */
-void func_PAL_L01_003D7098(PurchaseMoby *moby)
+void item_vendor_update_pal(PurchaseMoby *moby)
 {
     u8 target[16] __attribute__((aligned(16)));
     u8 origin[16] __attribute__((aligned(16)));
     f32 delta[4] __attribute__((aligned(16)));
     u8 *state = moby->data;
     u8 *child, *record;
-    f32 turnRate, turnLimit, angle, yaw, pitch;
+    f32 turn_rate, turn_limit, angle, yaw, pitch;
     s32 active;
     u64 flag;
 
@@ -126,8 +126,8 @@ void func_PAL_L01_003D7098(PurchaseMoby *moby)
         child = CreateMoby(0xD7E);
         STATE_CHILD = child;
         if (child) {
-            child[0x30] = moby->field30;
-            *(u16 *)(STATE_CHILD + 0x32) = moby->field32;
+            child[0x30] = moby->field_30;
+            *(u16 *)(STATE_CHILD + 0x32) = moby->field_32;
             STATE_CHILD[0x31] = 1;
             func_002A0F48(STATE_CHILD);
             hero_copy_field_to_moby(STATE_CHILD);
@@ -210,7 +210,7 @@ void func_PAL_L01_003D7098(PurchaseMoby *moby)
                 help_unlock_entry(46);
                 moby_handle_request_slot_state(46);
                 value_set_entry_by_index_pal(0x1226, -1);
-                func_PAL_00289730(0x9BC, 19);
+                subtitle_request_voice_line_pal(0x9BC, 19);
                 if (*(s32 *)(state + 0x12C) != -1)
                     cam_lock_entry(*(s32 *)(state + 0x12C));
                 MemcardSave(0, -1);
@@ -228,12 +228,12 @@ remove_self:
     if (moby->state) {
         if (!moby->animation && FastDecTimer(state + 0x11E)) {
             *(u16 *)(state + 0x11E) = FloatToInt((math_random_float_range(1200.0f, 2400.0f) * 5.0f + 2.0f) * 0.16666667f);
-        } else if ((moby->animFlags & 2) && moby->animation) {
-            func_PAL_002A7E68(moby, 0, 0, 8);
+        } else if ((moby->anim_flags & 2) && moby->animation) {
+            anim_start_blended_pal(moby, 0, 0, 8);
         }
     }
-    turnRate = 0.02f;
-    turnLimit = 0.3f;
+    turn_rate = 0.02f;
+    turn_limit = 0.3f;
     active = 0;
     if (!moby->animation) {
         active = 1;
@@ -256,8 +256,8 @@ remove_self:
         }
         if (*(s32 *)(state + 0x114)) {
             qcopy(target, g_hero_target_point);
-            turnRate = 0.04f;
-            turnLimit = 0.3f;
+            turn_rate = 0.04f;
+            turn_limit = 0.3f;
         } else {
             qcopy(target, state + 0x100);
         }
@@ -282,8 +282,8 @@ remove_self:
     }
     if (g_unlocked_item_flags[0])
         *(f32 *)(state + 0x70) = 2.75f;
-    moby_update_eased_node(moby, state, 0, turnRate * 1.44f, turnLimit * 1.44f);
-    moby_update_eased_node(moby, state + 0x80, 1, turnRate * 1.44f, turnLimit * 1.44f);
+    moby_update_eased_node(moby, state, 0, turn_rate * 1.44f, turn_limit * 1.44f);
+    moby_update_eased_node(moby, state + 0x80, 1, turn_rate * 1.44f, turn_limit * 1.44f);
     if (STATE_CHILD)
         moby_copy_joint_transform_to_object(moby, STATE_CHILD, 2, 0);
 }

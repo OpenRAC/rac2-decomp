@@ -4,7 +4,8 @@
 extern int g_menu_mode __attribute__((sda));
 extern int g_pal_return_value_b __attribute__((sda));
 
-int func_PAL_L00_0032D618(void) {
+/* Returns PAL global value b. */
+int get_pal_return_value_b(void) {
     return g_pal_return_value_b;
 }
 

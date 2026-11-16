@@ -12,10 +12,11 @@ extern void FastVecAdd(void *, void *, void *);
 extern float IntToFloat(int);
 extern void lerp_vector(void *, void *, void *, float);
 extern void vaporizer_add_chain_joint_pal(char *, void *);
-extern void func_PAL_L00_003FAD60(char *, void *);
+extern void vaporizer_bolt_spawn_spark_pal(char *, void *);
 extern int vaporizer_bolt_test_hit_pal(char *, void *);
 extern int math_fast_float_d(void *);
 
+/* Updates a Vaporizer bolt moby. It moves each frame, leaves a trail and sparks behind it, and ends when it hits something, leaves the map, or runs out of time. */
 void vaporizer_bolt_update_pal(unsigned char *object) {
     char *state = *(char **)(object + 0x68);
     MovingEffectVector previous, point;
@@ -45,9 +46,9 @@ void vaporizer_bolt_update_pal(unsigned char *object) {
         lerp_vector(&point, &previous, position, IntToFloat(i) * 0.25f);
         vaporizer_add_chain_joint_pal(object, &point);
     }
-    func_PAL_L00_003FAD60(object, position);
+    vaporizer_bolt_spawn_spark_pal(object, position);
     lerp_vector(&point, &previous, position, 0.5f);
-    func_PAL_L00_003FAD60(object, &point);
+    vaporizer_bolt_spawn_spark_pal(object, &point);
     if (*(float *)(object + 0x10) < 2.0f || *(float *)(object + 0x10) > 1021.0f ||
         *(float *)(object + 0x14) < 2.0f || *(float *)(object + 0x14) > 1021.0f ||
         *(float *)(object + 0x18) < 2.0f || *(float *)(object + 0x18) > 1021.0f) {

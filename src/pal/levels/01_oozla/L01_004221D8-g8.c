@@ -3,7 +3,7 @@
 #include "common.h"
 
 extern s32 moby_is_in_selected_zone(void *);
-extern f32 func_PAL_L01_003BEB40(void);
+extern f32 level_get_water_height_pal(void);
 extern f32 math_random_angle(void);
 extern void moby_set_state(void *,s32,s32);
 extern f32 math_ease_out_quad(f32);
@@ -70,89 +70,89 @@ typedef struct {
 } Object0041C970;
 /* Tilting lift: initializes its height range, moves while the hero rides it,
  * and tilts toward the hero's offset projected on the object's axes. */
-void func_PAL_L01_004221D8(Object0041C970 *obj) {
- f32 oldpos[4] __attribute__((aligned(16)));
- f32 oldrot[4] __attribute__((aligned(16)));
+void UpdateOozlaTiltingLift_pal(Object0041C970 *moby) {
+ f32 old_position[4] __attribute__((aligned(16)));
+ f32 old_rotation[4] __attribute__((aligned(16)));
  f32 delta[4] __attribute__((aligned(16)));
  f32 local[4] __attribute__((aligned(16)));
- f32 oldstate[4] __attribute__((aligned(16)));
- f32 current[4] __attribute__((aligned(16)));
+ f32 old_tilt[4] __attribute__((aligned(16)));
+ f32 current_position[4] __attribute__((aligned(16)));
  f32 out[4] __attribute__((aligned(16)));
- State0041C970 *p;
- f32 height0, height1, height2, x, y, speed, scaledX;
+ State0041C970 *vars;
+ f32 height0, height1, height2, x, y, speed, scaled_x;
  f32 timestep;
  s32 trigger;
- if(!moby_is_in_selected_zone(obj->position)) return;
- p=obj->stateData;
- qcopy(oldpos,obj->position);
- qcopy(oldrot,obj->rotation);
- switch(obj->state) {
+ if(!moby_is_in_selected_zone(moby->position)) return;
+ vars=moby->stateData;
+ qcopy(old_position,moby->position);
+ qcopy(old_rotation,moby->rotation);
+ switch(moby->state) {
  case 0:
-  height0=func_PAL_L01_003BEB40();
-  *(s32 *)((u8 *)p+0xAC)=0;
+  height0=level_get_water_height_pal();
+  *(s32 *)((u8 *)vars+0xAC)=0;
   if(height0>100.0f) {
-   p->field78=math_random_angle();
-   p->field7C=math_random_angle();
-   p->field6C=obj->position[2]-height0;
-   p->field60=p->field6C;
-   p->field64=p->field6C-g_muckdweller_ease_offset;
-   p->field68=0;
-   qcopy((u8 *)p+0x80,obj->rotation);
-   qzero((u8 *)p+0x90);
-   if(!p->fieldA0) moby_set_state(obj,2,-1);
-   else moby_set_state(obj,1,-1);
+   vars->field78=math_random_angle();
+   vars->field7C=math_random_angle();
+   vars->field6C=moby->position[2]-height0;
+   vars->field60=vars->field6C;
+   vars->field64=vars->field6C-g_muckdweller_ease_offset;
+   vars->field68=0;
+   qcopy((u8 *)vars+0x80,moby->rotation);
+   qzero((u8 *)vars+0x90);
+   if(!vars->fieldA0) moby_set_state(moby,2,-1);
+   else moby_set_state(moby,1,-1);
   }
   break;
  case 1:
-  height1=func_PAL_L01_003BEB40();
+  height1=level_get_water_height_pal();
   trigger=0;
-  if(g_hero_state.mode==25 && p->field68<0.0f &&
-     g_hero_state.position[2]>obj->position[2]-0.2f &&
-     obj->position[2]<height1+0.1f) trigger=1;
-  if((g_hero_state.platform==obj && !g_hero_state.flag34E) || trigger) {
-   if(trigger) obj->collisionFlags=0;
-   else obj->collisionFlags=obj->classData->flags;
-   x=math_ease_out_quad((p->field6C-p->field64)/g_muckdweller_ease_offset);
+  if(g_hero_state.mode==25 && vars->field68<0.0f &&
+     g_hero_state.position[2]>moby->position[2]-0.2f &&
+     moby->position[2]<height1+0.1f) trigger=1;
+  if((g_hero_state.platform==moby && !g_hero_state.flag34E) || trigger) {
+   if(trigger) moby->collisionFlags=0;
+   else moby->collisionFlags=moby->classData->flags;
+   x=math_ease_out_quad((vars->field6C-vars->field64)/g_muckdweller_ease_offset);
    timestep=0.020000001f;
-   p->field68=-(g_muckdweller_back_speed*timestep)*x;
+   vars->field68=-(g_muckdweller_back_speed*timestep)*x;
   } else {
-   obj->collisionFlags=obj->classData->flags;
-   x=math_ease_out_quad((g_muckdweller_ease_offset-(p->field6C-p->field64))/g_muckdweller_ease_offset);
+   moby->collisionFlags=moby->classData->flags;
+   x=math_ease_out_quad((g_muckdweller_ease_offset-(vars->field6C-vars->field64))/g_muckdweller_ease_offset);
    timestep=0.020000001f;
-   p->field68=g_muckdweller_forward_speed*(x*timestep);
+   vars->field68=g_muckdweller_forward_speed*(x*timestep);
   }
-  p->field6C+=p->field68;
-  obj->position[2]=height1+p->field6C;
-  moby_scale_owner_words_by_angles(obj,(u8 *)p+0x78,(u8 *)p+0x7C,g_muckdweller_scale_param,g_muckdweller_angle_x_degrees*0.0003490659f,g_muckdweller_angle_y_degrees*0.0003490659f);
-  FastVecSub(delta,obj->position,oldpos);
-  mat_combine_and_store((u8 *)p+0x20,delta,oldrot,obj->rotation);
+  vars->field6C+=vars->field68;
+  moby->position[2]=height1+vars->field6C;
+  moby_scale_owner_words_by_angles(moby,(u8 *)vars+0x78,(u8 *)vars+0x7C,g_muckdweller_scale_param,g_muckdweller_angle_x_degrees*0.0003490659f,g_muckdweller_angle_y_degrees*0.0003490659f);
+  FastVecSub(delta,moby->position,old_position);
+  mat_combine_and_store((u8 *)vars+0x20,delta,old_rotation,moby->rotation);
   break;
  case 2:
-  if(obj->field31) {
-   p->fieldAC=FastAddRotations(p->fieldAC,0.062831864f);
-   obj->color=FastTweenColor(0xFFEEFC0E,0xF03B4004,math_fast_sin_or_cos_b(p->fieldAC)*0.5f+0.5f);
+  if(moby->field31) {
+   vars->fieldAC=FastAddRotations(vars->fieldAC,0.062831864f);
+   moby->color=FastTweenColor(0xFFEEFC0E,0xF03B4004,math_fast_sin_or_cos_b(vars->fieldAC)*0.5f+0.5f);
   }
-  height2=func_PAL_L01_003BEB40();
-  if(!g_hero_state.flag34E && g_hero_state.platform==obj) {
-   FastVecSub(local,g_hero_state.position,obj->position);
-   x=FastVecDot(local,obj->matrix);
-   y=-g_muckdweller_tilt_gain * FastVecDot(local,obj->matrix+4);
-   scaledX=g_muckdweller_side_gain*x;
-   *(UpdateQuad *)oldstate=*(UpdateQuad *)((u8 *)p+0x80);
-   *(UpdateQuad *)current=*(UpdateQuad *)(obj->position);
-   math_approach_with_velocity((u8 *)p+0x80,y,(u8 *)p+0x90,g_muckdweller_approach_accel_a*1.44f,g_muckdweller_approach_accel_b*1.44f,g_muckdweller_approach_accel_c*1.2f,0);
-   math_approach_with_velocity((u8 *)p+0x84,scaledX,(u8 *)p+0x94,g_muckdweller_approach_accel_a*1.44f,g_muckdweller_approach_accel_b*1.44f,g_muckdweller_approach_accel_c*1.2f,0);
-   mat_transform_offset_two_matrices(g_hero_state.position,out,obj->position,oldstate,(u8 *)p+0x80);
+  height2=level_get_water_height_pal();
+  if(!g_hero_state.flag34E && g_hero_state.platform==moby) {
+   FastVecSub(local,g_hero_state.position,moby->position);
+   x=FastVecDot(local,moby->matrix);
+   y=-g_muckdweller_tilt_gain * FastVecDot(local,moby->matrix+4);
+   scaled_x=g_muckdweller_side_gain*x;
+   *(UpdateQuad *)old_tilt=*(UpdateQuad *)((u8 *)vars+0x80);
+   *(UpdateQuad *)current_position=*(UpdateQuad *)(moby->position);
+   math_approach_with_velocity((u8 *)vars+0x80,y,(u8 *)vars+0x90,g_muckdweller_approach_accel_a*1.44f,g_muckdweller_approach_accel_b*1.44f,g_muckdweller_approach_accel_c*1.2f,0);
+   math_approach_with_velocity((u8 *)vars+0x84,scaled_x,(u8 *)vars+0x94,g_muckdweller_approach_accel_a*1.44f,g_muckdweller_approach_accel_b*1.44f,g_muckdweller_approach_accel_c*1.2f,0);
+   mat_transform_offset_two_matrices(g_hero_state.position,out,moby->position,old_tilt,(u8 *)vars+0x80);
   } else {
-   math_approach_with_velocity((u8 *)p+0x80,0.0f,(u8 *)p+0x90,g_muckdweller_settle_accel_a*1.44f,g_muckdweller_settle_accel_b*1.44f,g_muckdweller_settle_accel_c*1.2f,0);
-   math_approach_with_velocity((u8 *)p+0x84,0.0f,(u8 *)p+0x94,g_muckdweller_settle_accel_a*1.44f,g_muckdweller_settle_accel_b*1.44f,g_muckdweller_settle_accel_c*1.2f,0);
+   math_approach_with_velocity((u8 *)vars+0x80,0.0f,(u8 *)vars+0x90,g_muckdweller_settle_accel_a*1.44f,g_muckdweller_settle_accel_b*1.44f,g_muckdweller_settle_accel_c*1.2f,0);
+   math_approach_with_velocity((u8 *)vars+0x84,0.0f,(u8 *)vars+0x94,g_muckdweller_settle_accel_a*1.44f,g_muckdweller_settle_accel_b*1.44f,g_muckdweller_settle_accel_c*1.2f,0);
   }
-  obj->position[2]=height2+p->field6C;
-  moby_scale_owner_words_by_angles(obj,(u8 *)p+0x78,(u8 *)p+0x7C,g_muckdweller_scale_param,g_muckdweller_angle_x_degrees*0.0003490659f,g_muckdweller_angle_y_degrees*0.0003490659f);
-  obj->rotation[0]=FastAddRotations(p->field80,obj->rotation[0]);
-  obj->rotation[1]=FastAddRotations(p->field84,obj->rotation[1]);
-  FastVecSub(delta,obj->position,oldpos);
-  mat_combine_and_store((u8 *)p+0x20,delta,oldrot,obj->rotation);
+  moby->position[2]=height2+vars->field6C;
+  moby_scale_owner_words_by_angles(moby,(u8 *)vars+0x78,(u8 *)vars+0x7C,g_muckdweller_scale_param,g_muckdweller_angle_x_degrees*0.0003490659f,g_muckdweller_angle_y_degrees*0.0003490659f);
+  moby->rotation[0]=FastAddRotations(vars->field80,moby->rotation[0]);
+  moby->rotation[1]=FastAddRotations(vars->field84,moby->rotation[1]);
+  FastVecSub(delta,moby->position,old_position);
+  mat_combine_and_store((u8 *)vars+0x20,delta,old_rotation,moby->rotation);
   break;
  }
 }

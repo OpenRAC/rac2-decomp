@@ -16,36 +16,36 @@ extern char *SpawnExplosion_pal(char *, s32, s32, s32, s32, s32, s32, s32, s32, 
 extern void moby_mark_spawned(char *);
 
 /* Alternates its hit color, then emits the three configured destruction bursts. */
-void destructible_burst_update_pal(char *self) {
+void destructible_burst_update_pal(char *moby) {
     char pos[16];
-    char *st = *(char **)(self + 0x68);
+    char *state = *(char **)(moby + 0x68);
     s32 i;
-    switch (*(u8 *)(self + 0x20)) {
+    switch (*(u8 *)(moby + 0x20)) {
     case 0:
-        *(u16 *)(self + 0x34) |= 16;
-        moby_set_state(self, 1, -1);
+        *(u16 *)(moby + 0x34) |= 16;
+        moby_set_state(moby, 1, -1);
         break;
     case 1:
-        if (math_fast_float_d(st + 4)) {
-            if (*(u32 *)(self + 0x78) & 1)
-                *(u32 *)(self + 0x78) = 0x7F60800E;
-            else *(u32 *)(self + 0x78) = 0x7F4C6C01;
-            *(s32 *)(st + 4) = 2;
+        if (math_fast_float_d(state + 4)) {
+            if (*(u32 *)(moby + 0x78) & 1)
+                *(u32 *)(moby + 0x78) = 0x7F60800E;
+            else *(u32 *)(moby + 0x78) = 0x7F4C6C01;
+            *(s32 *)(state + 4) = 2;
         }
-        if (part_find_owned_effect_slot(self, 0x04010000, 0) && *(s32 *)st == 0)
-            moby_set_state(self, 2, -1);
-        *(u8 *)(self + 0xA8) = 255;
+        if (part_find_owned_effect_slot(moby, 0x04010000, 0) && *(s32 *)state == 0)
+            moby_set_state(moby, 2, -1);
+        *(u8 *)(moby + 0xA8) = 255;
         break;
     case 2:
-        part_explode_object_into_pieces_pal(self, g_destructible_burst_params_c, g_destructible_burst_params_b, g_destructible_burst_params_a, 65535, 0, g_destructible_burst_group_bit, 0, 65535, 255, 0);
+        part_explode_object_into_pieces_pal(moby, g_destructible_burst_params_c, g_destructible_burst_params_b, g_destructible_burst_params_a, 65535, 0, g_destructible_burst_group_bit, 0, 65535, 255, 0);
         for (i = 0; i < 3; i++) {
-            vec_local_offset_to_world(self, pos, g_destructible_burst_points[i].x, g_destructible_burst_points[i].y, g_destructible_burst_points[i].z);
-            SpawnExplosion_pal(pos, 0, 12, 12, 12, 12, 12, 0, 1, 0, 0, 0, *(f32 *)(self + 0x2C), 20.0f);
+            vec_local_offset_to_world(moby, pos, g_destructible_burst_points[i].x, g_destructible_burst_points[i].y, g_destructible_burst_points[i].z);
+            SpawnExplosion_pal(pos, 0, 12, 12, 12, 12, 12, 0, 1, 0, 0, 0, *(f32 *)(moby + 0x2C), 20.0f);
         }
         if (g_destructible_burst_group_bit >= 0) {
-            *(u16 *)(self + 0x7C) = (1 << g_destructible_burst_group_bit) | 0x8000;
-            moby_set_state(self, 3, -1);
-        } else moby_mark_spawned(self);
+            *(u16 *)(moby + 0x7C) = (1 << g_destructible_burst_group_bit) | 0x8000;
+            moby_set_state(moby, 3, -1);
+        } else moby_mark_spawned(moby);
         break;
     }
 }

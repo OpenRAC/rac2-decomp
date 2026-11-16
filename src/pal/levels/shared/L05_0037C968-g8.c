@@ -34,7 +34,7 @@ extern int snd_play_from_class_bank(int,int,char *,int);
 extern void hero_apply_damage_pal(float);
 extern int math_fast_helper_a(void *,float);
 extern int CollLine(void *,void *,int,void *,void *);
-extern void func_PAL_L05_00380258(void *,int,int,int);
+extern void emit_particle_pair_burst_pal(void *,int,int,int);
 extern void part_queue_impact_effect(void *,void *,int,void *,void *,float);
 extern float math_random_angle(void);
 extern void gfx_draw_billboard_quad(void *,int,int,int,float,float,float);
@@ -86,7 +86,7 @@ void UpdateSpaceProjectilePool_pal(void *unused)
             qcopy(check, pos);
             check[3] = 1.0f;
             if (math_fast_helper_a(check,256.0f) != -1 && CollLine(record->previous,record->position,0,0,0)) {
-                func_PAL_L05_00380258(g_hit_l05_result.pos,20,record->color,60);
+                emit_particle_pair_burst_pal(g_hit_l05_result.pos,20,record->color,60);
                 if (g_hit_l05_result.on)
                     part_queue_impact_effect(*(u8 **)(state+0x120),record->object,0x10000,g_hit_l05_result.pos,g_effect_direction_vec,0.25f);
                 record->object = 0;

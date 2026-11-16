@@ -32,7 +32,7 @@ extern void UpdateViewContext(void);
 extern void FastVecScale(void *, void *, float);
 extern void FastVecAdd(void *, void *, void *);
 extern float IntToFloat(int);
-extern void func_US2_002E72D8(int);
+extern void UpdateEquipmentPieces_us2(int);
 
 typedef struct {
  char pad0[0x10]; float position[4]; char pad20[4]; char *definition;
@@ -87,10 +87,11 @@ extern float g_transition_scale_factor __attribute__((sda));
 typedef struct { char pad[0xb0]; float fov; } TransitionView;
 extern TransitionView g_view_params;        /* view: +0xB0 float */
 
+/* Runs one frame of the transition scene: moves each object along its path and starts the next scene part when one ends (USA v2.00). */
 int transition_update_scene_us2(void)
 {
-    float sp0[4], sp10[4], sp20[16];
-    float f20;
+    float vec_a[4], vec_b[4], joint_matrix[16];
+    float fade_ratio;
     int i, fp;
 
     game_reset_frame_counters();
@@ -194,63 +195,63 @@ after:
             g_view_params.fov = t;
     }
     UpdateViewContext();
-    f20 = 1.0f;
+    fade_ratio = 1.0f;
     if (g_hero_moby_default.index == 4) {
-        f20 = (float)(g_scene_playback_state.duration - g_scene_playback_state.frame) / (float)g_scene_playback_state.duration;
-        FastVecScale(sp0, g_transition_fade_vec, f20);
-        FastVecAdd(g_transition_vec_b, g_transition_vec_b, sp0);
+        fade_ratio = (float)(g_scene_playback_state.duration - g_scene_playback_state.frame) / (float)g_scene_playback_state.duration;
+        FastVecScale(vec_a, g_transition_fade_vec, fade_ratio);
+        FastVecAdd(g_transition_vec_b, g_transition_vec_b, vec_a);
     }
-    FastVecScale(&g_transition_vector, g_transition_vec_table + g_hero_moby_default.index * 16, (float)(g_scene_playback_state.frame - 0x78) * (f20 * 20.0f));
+    FastVecScale(&g_transition_vector, g_transition_vec_table + g_hero_moby_default.index * 16, (float)(g_scene_playback_state.frame - 0x78) * (fade_ratio * 20.0f));
     g_transition_fov_scale = g_transition_fov_table[g_hero_moby_default.index];
     for (i = 0; i < g_scene_playback_state.count; i = fp) {
         TransitionActor *o;
-        int s1, s2;
+        int key_index, next_index;
         float r;
         char *s0m;
-        s1 = g_scene_playback_state.tick >> 1;
+        key_index = g_scene_playback_state.tick >> 1;
         o = (TransitionActor *)g_scene_playback_state.objects[i];
         fp = i + 1;
         r = IntToFloat(g_scene_playback_state.tick & 1);
-        s2 = s1 + 1;
+        next_index = key_index + 1;
         o->blend = r * 0.5f;
         s0m = (char *)o->keys;
-        FastVecScale(sp0, s0m + s1 * 16, 1.0f - o->blend);
-        FastVecScale(sp10, s0m + s2 * 16, o->blend);
-        FastVecAdd(o->position, sp0, sp10);
+        FastVecScale(vec_a, s0m + key_index * 16, 1.0f - o->blend);
+        FastVecScale(vec_b, s0m + next_index * 16, o->blend);
+        FastVecAdd(o->position, vec_a, vec_b);
         {
             char *d = (char *)o->definition;
             o->current_anim = B(d, 0xC) - 1;
             o->next_anim = B(d, 0xC) - 1;
-            o->key = s1;
-            o->next_key = s2;
+            o->key = key_index;
+            o->next_key = next_index;
         }
         update_moby_animation_state(o);
         o->draw_flags = 0x1FF;
         if (o->type == 0xD54) {
             if (D_001B2148_first[0] != 0) {
-                moby_transform_joint_point(o, 0, sp20);
+                moby_transform_joint_point(o, 0, joint_matrix);
                 {
-                    int a3 = 0;
+                    int effect_index = 0;
                     o->flags = 0;
                     o->draw_flags = 0;
                     if (D_001B2148_first[0] != 0) {
                         do {
                             int k;
-                            B((char *)g_transition_effect_list[a3], 0x63) = 0;
-                            H((char *)g_transition_effect_list[a3], 0x32) = 0x1FF;
-                            qcopy((char *)g_transition_effect_list[a3] + 0x10, o->position);
+                            B((char *)g_transition_effect_list[effect_index], 0x63) = 0;
+                            H((char *)g_transition_effect_list[effect_index], 0x32) = 0x1FF;
+                            qcopy((char *)g_transition_effect_list[effect_index] + 0x10, o->position);
                             for (k = 0; k < 3; k++) {
-                                ((MatrixEntity *)g_transition_effect_list[a3])->basis[k].x = sp20[k * 4];
-                                ((MatrixEntity *)g_transition_effect_list[a3])->basis[k].y = sp20[k * 4 + 1];
-                                ((MatrixEntity *)g_transition_effect_list[a3])->basis[k].z = sp20[k * 4 + 2];
+                                ((MatrixEntity *)g_transition_effect_list[effect_index])->basis[k].x = joint_matrix[k * 4];
+                                ((MatrixEntity *)g_transition_effect_list[effect_index])->basis[k].y = joint_matrix[k * 4 + 1];
+                                ((MatrixEntity *)g_transition_effect_list[effect_index])->basis[k].z = joint_matrix[k * 4 + 2];
                             }
-                            func_002A10E8((void *)g_transition_effect_list[a3]);
-                            a3 = a3 + 1;
-                        } while (g_transition_effect_list[a3] != 0);
+                            func_002A10E8((void *)g_transition_effect_list[effect_index]);
+                            effect_index = effect_index + 1;
+                        } while (g_transition_effect_list[effect_index] != 0);
                     }
                 }
             } else {
-                func_US2_002E72D8(g_scene_playback_state.id);
+                UpdateEquipmentPieces_us2(g_scene_playback_state.id);
             }
             o->opacity = 0xE8;
         }
@@ -266,19 +267,19 @@ after:
             o->current_anim = B(d, 0xC) - 1;
             o->next_anim = B(d, 0xC) - 1;
             if (g_hero_moby_default.index == 4) {
-                int a0 = g_scene_playback_state.duration;
-                int v1 = g_scene_playback_state.frame;
-                if (a0 - 0x28 < v1) {
-                    float f1 = (float)(a0 - v1 - 4) * 0.027777778f;
-                    if (f1 < 0.0f)
-                        f1 = 0.0f;
-                    o->scale = F(d, 0x24) * f1;
-                    g_transition_scale_factor = f1;
+                int scene_duration = g_scene_playback_state.duration;
+                int scene_frame = g_scene_playback_state.frame;
+                if (scene_duration - 0x28 < scene_frame) {
+                    float fade_scale = (float)(scene_duration - scene_frame - 4) * 0.027777778f;
+                    if (fade_scale < 0.0f)
+                        fade_scale = 0.0f;
+                    o->scale = F(d, 0x24) * fade_scale;
+                    g_transition_scale_factor = fade_scale;
                     if (D_001B2148_first[0] != 0) {
                         char *e = (char *)D_001B2148_first[0];
-                        F(e, 0x2C) = F((char *)W(e, 0x24), 0x24) * f1;
+                        F(e, 0x2C) = F((char *)W(e, 0x24), 0x24) * fade_scale;
                     }
-                    o->opacity = (int)(f1 * 232.0f);
+                    o->opacity = (int)(fade_scale * 232.0f);
                     if (o->type == 0xD54) {
                         if (D_001B2148_first[0] == 0) {
                             int j;
@@ -288,7 +289,7 @@ after:
                                 do {
                                     ScaleEntity *e = g_equipment_pieces[j];
                                     j++;
-                                    e->scale = e->definition->scale * f1;
+                                    e->scale = e->definition->scale * fade_scale;
                                 } while (g_equipment_pieces[j] != 0);
                             }
                         }

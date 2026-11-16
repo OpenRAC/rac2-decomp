@@ -13,35 +13,35 @@ extern float math_fast_sin_or_cos_b(float a);
 extern int FastTweenColor(int a, int b, float c);
 
 /* Steps the owner's state block, then blends the two colours its state asks for. */
-void pulsing_tint_update_pal(char *self)
+void pulsing_tint_update_pal(char *moby)
 {
-    char *v = *(char **)(self + 0x68);
-    int c1 = 0x808C8C8C;
-    int c2 = 0x80282828;
-    int idx;
-    float f;
-    int r;
+    char *vars = *(char **)(moby + 0x68);
+    int bright_color = 0x808C8C8C;
+    int dark_color = 0x80282828;
+    int link_index;
+    float phase;
+    int blended;
 
-    switch (*(unsigned char *)(self + 0x20)) {
+    switch (*(unsigned char *)(moby + 0x20)) {
     case 0:
-        if (hero_is_current_selected_id(self) != 0) {
-            idx = *(int *)(v + 0);
-            if (idx != -1) {
-                moby_set_flag_bit(g_moby_l14_pool + (idx << 8), 1);
+        if (hero_is_current_selected_id(moby) != 0) {
+            link_index = *(int *)(vars + 0);
+            if (link_index != -1) {
+                moby_set_flag_bit(g_moby_l14_pool + (link_index << 8), 1);
             }
-            moby_set_state(self, 1, -1);
+            moby_set_state(moby, 1, -1);
         }
         break;
     case 1:
-        if (flag_set_first_pending(self) != 0) {
-            PlayMobySound(0, 0, self);
+        if (flag_set_first_pending(moby) != 0) {
+            PlayMobySound(0, 0, moby);
         }
-        c1 = 0x80468CDC;
-        c2 = 0x801E78AA;
+        bright_color = 0x80468CDC;
+        dark_color = 0x801E78AA;
         break;
     }
-    f = FastAddRotations(*(float *)(v + 4), 0.12915438f);
-    *(float *)(v + 4) = f;
-    r = FastTweenColor(c1, c2, math_fast_sin_or_cos_b(f) * 0.5f + 0.5f);
-    *(int *)(self + 0x78) = FastTweenColor(*(int *)(self + 0x78), r, 0.18f);
+    phase = FastAddRotations(*(float *)(vars + 4), 0.12915438f);
+    *(float *)(vars + 4) = phase;
+    blended = FastTweenColor(bright_color, dark_color, math_fast_sin_or_cos_b(phase) * 0.5f + 0.5f);
+    *(int *)(moby + 0x78) = FastTweenColor(*(int *)(moby + 0x78), blended, 0.18f);
 }

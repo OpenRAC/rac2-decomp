@@ -60,7 +60,7 @@ void DrawTargetReticle_pal(void)
     char *info;
     float *pos;
     float health;
-    float maxHealth;
+    float max_health;
     float radius;
     float scale;
     float angle;
@@ -95,12 +95,12 @@ void DrawTargetReticle_pal(void)
         return;
     }
     health = 0.0f;
-    maxHealth = health;
+    max_health = health;
     info = moby_get_private_value_0(obj);
     if (info) {
         vec_scale_to_length(position, obj + 0xE0, *(float *)(info + 0x10));
         FastVecAdd(position, position, obj + 0x10);
-        maxHealth = *(short *)(info + 4);
+        max_health = *(short *)(info + 4);
         health = *(float *)info;
         pos = position;
     } else {
@@ -145,7 +145,7 @@ void DrawTargetReticle_pal(void)
         AppendRotatedSpriteQuad(offset[0], offset[1], size, size, fast_subtract_rotations(angle, 1.57079637f), 64, 64,
                       texture, 0xFFFFF3, color, 0, 0, 0.0f, 0.0f);
     }
-    if (maxHealth != 0.0f) {
+    if (max_health != 0.0f) {
         uv[0] = g_target_uv_table[0];
         uv[1] = g_target_uv_table[1];
         uv[2] = g_target_uv_table[2];
@@ -154,14 +154,14 @@ void DrawTargetReticle_pal(void)
             FastTweenColor(g_target_color_a & 0xFFFFFF, g_target_color_a, g_hero_state.fade);
         x = FloatToInt(screen[0]);
         y = FloatToInt(screen[1]);
-        bar = g_target_bar_scale_b * mat_fast_helper_a(g_target_bar_scale_a, maxHealth);
+        bar = g_target_bar_scale_b * mat_fast_helper_a(g_target_bar_scale_a, max_health);
         edge = -bar;
         width = FloatToInt(scale * (float)g_target_width);
         height = FloatToInt(scale * (float)g_target_height);
         DrawTexturedArc(x, y, width, height, colors, uv, g_target_arc_param, 16, bar, edge);
         colors[0] = colors[1] = colors[2] = colors[3] =
             FastTweenColor(g_target_color_b & 0xFFFFFF, g_target_color_b, g_hero_state.fade);
-        edge = bar - (bar + bar) * (health / maxHealth);
+        edge = bar - (bar + bar) * (health / max_health);
         width2 = FloatToInt(scale * (float)g_target_width);
         height2 = FloatToInt(scale * (float)g_target_height);
         DrawTexturedArc(x, y, width2, height2, colors, uv, g_target_arc_param, 16, bar, edge);

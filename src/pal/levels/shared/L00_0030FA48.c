@@ -3,6 +3,7 @@
 
 extern int D_L00_001A904C_2 __attribute__((sda));
 
+/* Draws the rows of the bound small list menu (PAL). */
 void level_l00_call_module_handler_7_pal(void)
 {
     int value = D_L00_001A904C_2;

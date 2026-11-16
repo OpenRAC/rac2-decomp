@@ -31,14 +31,14 @@ extern void math_build_axis_angle_quat(void *, void *, float);
 extern void vec_rotate_by_quaternion(void *, void *, void *);
 extern int math_fast_float_d(void *);
 extern int slot_copy_records_to_free(void *);
-extern void func_PAL_L05_0044B738(void *, void *);
+extern void ResolveLinkedMobyMovementCollisions_pal(void *, void *);
 extern void ship_update_aim_point(void *, void *);
 extern void moby_sync_equipment_parts(void *);
-extern void func_PAL_L05_00449FF0(void *, void *);
-extern void func_PAL_L05_0044A970(void *);
+extern void UpdateShipWeapons_pal(void *, void *);
+extern void ship_update_target_lock_pal(void *);
 extern void gfx_add_draw_callback_first(void *, void *);
 extern void gfx_add_draw_callback_third(void *, void *);
-extern void func_PAL_L05_0044AED0(void);
+extern void ship_draw_lock_on_reticle_pal(void);
 extern void ship_draw_aim_crosshair(void);
 #define F(p, o) (*(float *)((char *)(p) + (o)))
 #define P(p, o) (*(char **)((char *)(p) + (o)))
@@ -48,12 +48,12 @@ extern void ship_draw_aim_crosshair(void);
 /* Updates the driven moby position and rebuilds its basis, including bank and roll. */
 void UpdateDrivenMobyTransform_pal(char *obj)
 {
-    char old[16] __attribute__((aligned(16)));
-    char a[16] __attribute__((aligned(16)));
-    char b[16] __attribute__((aligned(16)));
-    char c[16] __attribute__((aligned(16)));
-    char d[16] __attribute__((aligned(16)));
-    char e[16] __attribute__((aligned(16)));
+    char old_pos[16] __attribute__((aligned(16)));
+    char fwd_offset[16] __attribute__((aligned(16)));
+    char up_offset[16] __attribute__((aligned(16)));
+    char side_offset[16] __attribute__((aligned(16)));
+    char look_dir[16] __attribute__((aligned(16)));
+    char look_point[16] __attribute__((aligned(16)));
     char rotation[16] __attribute__((aligned(16)));
     char *input = P(obj, 0x70) + 0x50;
     char *moby = g_feltzin_target_mobys +
@@ -62,18 +62,18 @@ void UpdateDrivenMobyTransform_pal(char *obj)
     float t, angle;
     float forward;
 
-    qcopy(old, moby + 0x10);
+    qcopy(old_pos, moby + 0x10);
     forward = g_ship_forward_offset;
     F(moby, 0x2C) = F(P(moby, 0x24), 0x24) * g_ship_moby_scale_factor;
-    FastVecScale(a, obj, forward);
-    FastVecAdd(moby + 0x10, obj + 0x30, a);
-    FastVecScale(b, obj + 0x20, g_ship_lift_offset_scale);
-    FastVecAdd(moby + 0x10, moby + 0x10, b);
+    FastVecScale(fwd_offset, obj, forward);
+    FastVecAdd(moby + 0x10, obj + 0x30, fwd_offset);
+    FastVecScale(up_offset, obj + 0x20, g_ship_lift_offset_scale);
+    FastVecAdd(moby + 0x10, moby + 0x10, up_offset);
     t = -F(input, 0x68) / (F(input, 0x78) * 0.017453294f);
     if (t > 1.0f) t = 1.0f;
     else if (t < -1.0f) t = -1.0f;
-    FastVecScale(c, obj + 0x10, F(state, 0x250) * t);
-    FastVecAdd(moby + 0x10, moby + 0x10, c);
+    FastVecScale(side_offset, obj + 0x10, F(state, 0x250) * t);
+    FastVecAdd(moby + 0x10, moby + 0x10, side_offset);
     t = F(input, 0x64) / (F(input, 0x74) * 0.017453294f);
     if (t < 0.0f) {
         t *= F(state, 0x24C);
@@ -83,8 +83,8 @@ void UpdateDrivenMobyTransform_pal(char *obj)
     }
     F(state, 0xC) = math_step_spring_damper_clamped(F(state, 0xC), t, g_ship_lean_spring_stiffness,
                                   g_ship_lean_spring_damping, 0.0f, state + 0x10);
-    FastVecScale(b, obj + 0x20, F(state, 0x254) * F(state, 0xC));
-    FastVecAdd(moby + 0x10, moby + 0x10, b);
+    FastVecScale(up_offset, obj + 0x20, F(state, 0x254) * F(state, 0xC));
+    FastVecAdd(moby + 0x10, moby + 0x10, up_offset);
     if (g_feltzin_challenge_state.flag) {
         if (!math_fast_float_d(&g_feltzin_challenge_state.timer)) {
             slot_copy_records_to_free(g_slot_record_source);
@@ -93,12 +93,12 @@ void UpdateDrivenMobyTransform_pal(char *obj)
             g_feltzin_challenge_state.timer = 6;
         }
     }
-    func_PAL_L05_0044B738(obj, old);
+    ResolveLinkedMobyMovementCollisions_pal(obj, old_pos);
     ship_update_aim_point(obj, moby);
-    FastVecSub(d, state + 0x20, obj + 0x30);
-    vec_scale_to_length(d, d, g_cam_look_d_spring_length);
-    FastVecAdd(e, obj + 0x30, d);
-    FastVecSub(moby + 0xC0, e, moby + 0x10);
+    FastVecSub(look_dir, state + 0x20, obj + 0x30);
+    vec_scale_to_length(look_dir, look_dir, g_cam_look_d_spring_length);
+    FastVecAdd(look_point, obj + 0x30, look_dir);
+    FastVecSub(moby + 0xC0, look_point, moby + 0x10);
     vec_scale_to_length(moby + 0xC0, moby + 0xC0, 1.0f);
     FastVecCross(moby + 0xD0, moby + 0xC0, obj + 0x20);
     vec_scale_to_length(moby + 0xD0, moby + 0xD0, 1.0f);
@@ -127,8 +127,8 @@ void UpdateDrivenMobyTransform_pal(char *obj)
     matrix_mul_vec3(rotation, rotation, moby + 0xC0);
     FastVecAdd(moby + 0x10, moby + 0x10, rotation);
     moby_sync_equipment_parts(moby);
-    func_PAL_L05_00449FF0(moby, obj);
-    func_PAL_L05_0044A970(moby);
-    gfx_add_draw_callback_first(func_PAL_L05_0044AED0, moby);
+    UpdateShipWeapons_pal(moby, obj);
+    ship_update_target_lock_pal(moby);
+    gfx_add_draw_callback_first(ship_draw_lock_on_reticle_pal, moby);
     gfx_add_draw_callback_third(ship_draw_aim_crosshair, moby);
 }

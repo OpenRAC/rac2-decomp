@@ -30,18 +30,19 @@ extern u8 g_sound_state[];
 extern s32 g_unused_sda_word_a __attribute__((sda));
 extern s32 g_unused_sda_word_b __attribute__((sda));
 
-void pulsing_light_init_pal(u8 *arg0) {
-    u8 *s3 = *(u8 **)(arg0 + 0x68);
-    u8 *s1 = (u8 *)func_0037BA88(arg0);
+/* Sets the pulsing light up: its state, flags and size (PAL copy of pulsing_light_init). */
+void pulsing_light_init_pal(u8 *moby) {
+    u8 *vars = *(u8 **)(moby + 0x68);
+    u8 *motion = (u8 *)func_0037BA88(moby);
 
-    *(s32 *)(s1 + 0x148) = 1;
-    func_0037CCB0(arg0, 1);
-    *(s32 *)(s1 + 0x14C) = 0;
-    *(f32 *)(s3 + 0x180) = 1.0f;
-    arg0[0x30] = 0xFF;
-    arg0[0x20] = 1;
-    *(u16 *)(arg0 + 0x32) = 0x1FF;
-    *(u16 *)(arg0 + 0x34) |= 0x100;
-    *(f32 *)(arg0 + 0x2C) = *(f32 *)(*(u8 **)(arg0 + 0x24) + 0x24) * 4.1f;
+    *(s32 *)(motion + 0x148) = 1;
+    func_0037CCB0(moby, 1);
+    *(s32 *)(motion + 0x14C) = 0;
+    *(f32 *)(vars + 0x180) = 1.0f;
+    moby[0x30] = 0xFF;
+    moby[0x20] = 1;
+    *(u16 *)(moby + 0x32) = 0x1FF;
+    *(u16 *)(moby + 0x34) |= 0x100;
+    *(f32 *)(moby + 0x2C) = *(f32 *)(*(u8 **)(moby + 0x24) + 0x24) * 4.1f;
 }
 

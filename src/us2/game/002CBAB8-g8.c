@@ -28,11 +28,12 @@ typedef struct {
     char *previous;
 } State_2CAB00;
 
+/* Updates the widgets of the current pause menu page: opens them when the page starts, runs each one, switches the active widget, and closes them when leaving. */
 void menu_update_pause_widgets_us2(void)
 {
     Widget_2CAB00 **widgets = (Widget_2CAB00 **)(((State_2CAB00 *)g_pause_menu_state)->source + 0xEC);
-    Widget_2CAB00 *w;
-    int i, openIndex, closeIndex;
+    Widget_2CAB00 *widget;
+    int i, open_index, close_index;
     if (g_pause_widgets_active) {
         if (!((State_2CAB00 *)g_pause_menu_state)->count && ((State_2CAB00 *)g_pause_menu_state)->source == g_pause_page_b) menu_clear_saved_selection(0, 0);
         if (menu_update_page_input_us2()) {
@@ -41,9 +42,9 @@ void menu_update_pause_widgets_us2(void)
         }
     }
     if (!((State_2CAB00 *)g_pause_menu_state)->count) {
-        for (openIndex = 0; openIndex < 14; openIndex++) {
-            w = ((Source_2CAB00 *)((State_2CAB00 *)g_pause_menu_state)->source)->widgets[openIndex];
-            if (w && w->open) w->open(w, 0);
+        for (open_index = 0; open_index < 14; open_index++) {
+            widget = ((Source_2CAB00 *)((State_2CAB00 *)g_pause_menu_state)->source)->widgets[open_index];
+            if (widget && widget->open) widget->open(widget, 0);
         }
         (((State_2CAB00 *)g_pause_menu_state)->count)++;
     }
@@ -54,19 +55,19 @@ void menu_update_pause_widgets_us2(void)
         }
     }
     if (((State_2CAB00 *)g_pause_menu_state)->source && *(int *)(((State_2CAB00 *)g_pause_menu_state)->source + 0x128)) {
-        w = *(Widget_2CAB00 **)(((State_2CAB00 *)g_pause_menu_state)->source + 0xE8);
-        if (w->close) w->close(w, 1);
+        widget = *(Widget_2CAB00 **)(((State_2CAB00 *)g_pause_menu_state)->source + 0xE8);
+        if (widget->close) widget->close(widget, 1);
         *(int *)(((State_2CAB00 *)g_pause_menu_state)->source + 0xE8) = *(int *)(((State_2CAB00 *)g_pause_menu_state)->source + 0x128);
         *(int *)(((State_2CAB00 *)g_pause_menu_state)->source + 0x128) = 0;
-        w = *(Widget_2CAB00 **)(((State_2CAB00 *)g_pause_menu_state)->source + 0xE8);
-        if (w->open) w->open(w, 1);
+        widget = *(Widget_2CAB00 **)(((State_2CAB00 *)g_pause_menu_state)->source + 0xE8);
+        if (widget->open) widget->open(widget, 1);
     }
     if (((State_2CAB00 *)g_pause_menu_state)->destination) {
         if (((State_2CAB00 *)g_pause_menu_state)->source == ((State_2CAB00 *)g_pause_menu_state)->destination) snd_play_from_global_bank(17, 0, 0);
         else snd_play_from_global_bank(18, 0, 0);
-        for (closeIndex = 0; closeIndex < 14; closeIndex++) {
-            w = ((Source_2CAB00 *)((State_2CAB00 *)g_pause_menu_state)->source)->widgets[closeIndex];
-            if (w && w->close) w->close(w, 0);
+        for (close_index = 0; close_index < 14; close_index++) {
+            widget = ((Source_2CAB00 *)((State_2CAB00 *)g_pause_menu_state)->source)->widgets[close_index];
+            if (widget && widget->close) widget->close(widget, 0);
         }
         ((State_2CAB00 *)g_pause_menu_state)->mode = 3;
         ((State_2CAB00 *)g_pause_menu_state)->previous = ((State_2CAB00 *)g_pause_menu_state)->source;

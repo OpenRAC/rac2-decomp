@@ -6,6 +6,7 @@ extern void *ui_return_second_arg(int, int);
 extern void hud_init_widget_defaults(void *, void *, void *);
 extern char g_list_menu_attach_widget_defaults[];
 
+/* Resets a list menu: clears the selection and count, stores the pool, allocates its position and sets default colors. (PAL) */
 void list_menu_reset_attach_items_pal(char *object, void *data)
 {
     int *position;

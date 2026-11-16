@@ -11,7 +11,7 @@ extern void FastVecScale(void *,void *,float),vec_scale_to_length(void *,void *,
 extern void FastVecAdd(void *,void *,void *),FastVecSub(void *,void *,void *);
 extern void vec_add_random_offset(void *,float),anim_start_blended(void *,int,int,int);
 extern void moby_update_eased_node(void *,void *,int,float,float);
-extern void *func_PAL_L09_003B20E8(void *,void *,void *,int,int,float,float,float,float);
+extern void *projectile_l09_spawn_pal(void *,void *,void *,int,int,float,float,float,float);
 extern char g_hero_zero_vector[] MACRO_ADDR;
 extern int g_frame_l09_counter MACRO_ADDR;
 extern int D_L09_001B2388_gp SDATA(D_L09_001B2388);
@@ -34,7 +34,7 @@ typedef union { u8 pad[0x318]; struct { u8 pad0[0x298]; float yaw; u8 pad1[0x314
 /* Tracks a shot direction in active states and drives the two aim channels.
  * The joint transform is a complete 64-byte matrix, not one vector.
  */
-void func_PAL_L09_003EE908(u8 *object)
+void enemy_face_hero_sway_pal(u8 *object)
 {
     struct { float point[4], direction[4], joint[16]; } frame;
     u8 *state = *(u8 **)(object + 0x68);
@@ -68,7 +68,7 @@ void func_PAL_L09_003EE908(u8 *object)
             moby_transform_joint_to_world(object, 2, frame.point);
             moby_transform_joint_point(object, 2, frame.joint);
             vec_scale_to_length(frame.direction, frame.joint, g_enemy_sway_speed * 0.020000001f);
-            func_PAL_L09_003B20E8(frame.point, object, frame.direction, 1, 1,
+            projectile_l09_spawn_pal(frame.point, object, frame.direction, 1, 1,
                               (float)state[0x34], distance, 1.0f, 1.0f);
             state[0x369]++;
             state[0x368] = (g_enemy_sway_byte * 5 + 2) / 6;

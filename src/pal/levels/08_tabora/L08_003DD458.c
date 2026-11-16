@@ -11,19 +11,19 @@ extern void moby_transform_joint_to_world(void *, int, void *);
 
 typedef struct {
     u8 pad00[0x20];
-    u8 f20;
-    u8 f21;
+    u8 unk_20;
+    u8 unk_21;
     u8 pad22[0x24 - 0x22];
-    void *f24;
+    void *unk_24;
     u8 pad28[0x2C - 0x28];
-    f32 f2C;
+    f32 unk_2C;
     u8 pad30[0x68 - 0x30];
-    void *f68;
+    void *unk_68;
     u8 pad6C[0x95 - 0x6C];
-    u8 f95;
-    u16 f96;
+    u8 unk_95;
+    u16 unk_96;
     u8 pad98[0xBC - 0x98];
-    u8 fBC;
+    u8 unk_BC;
     u8 padBD[0x100 - 0xBD];
 } Ent;
 
@@ -67,13 +67,14 @@ extern void moby_update_eased_node(void *, void *, int, float, float);
 extern void matrix_mul_vec3(void *, void *, void *);
 
 extern void crawler_release_sounds(Ent *a0);
-void func_PAL_L08_003DD458(u8 *object)
+/* Handles hits on the Spitting Dune Crawler and turns its body and three joints to face the hero (PAL: 50 Hz timings). */
+void crawler_update_hits_aim_pal(u8 *object)
 {
     float point[4], angles[4], matrix[16], inverse[16], other[16];
     char *state = *(char **)(object + 0x68);
     float yaw, pitch, target;
-    float pointX, pointY;
-    float *pitchAngle, *rollAngle;
+    float point_x, point_y;
+    float *pitch_angle, *roll_angle;
     int hit;
 
     if (g_init_context.active) {
@@ -105,8 +106,8 @@ void func_PAL_L08_003DD458(u8 *object)
         crawler_release_sounds((Ent *)object);
     }
     if (object[0x20] < 9 && object[0x20] != 4) {
-        pitchAngle = (float *)(object + 0xF4);
-        rollAngle = (float *)(object + 0xF0);
+        pitch_angle = (float *)(object + 0xF4);
+        roll_angle = (float *)(object + 0xF0);
         *(V4 *)angles = 0;
         angles[2] = *(float *)(object + 0xF8);
         *(V4 *)point = *(V4 *)angles;
@@ -117,10 +118,10 @@ void func_PAL_L08_003DD458(u8 *object)
         func_2FA0B8(angles, g_collision_aim_vector, 1.0f);
         matrix_mul_vec3(angles, angles, inverse);
         target = mat_fast_helper_a(angles[2], angles[0]);
-        math_approach_target_with_direction_mode(pitchAngle, state + 0x460, target, 0.0025132746f,
+        math_approach_target_with_direction_mode(pitch_angle, state + 0x460, target, 0.0025132746f,
                       0.0025132746f, 0.12566373f, 0);
         target = -mat_fast_helper_a(angles[2], angles[1]);
-        math_approach_target_with_direction_mode(rollAngle, state + 0x464, target, 0.0025132746f,
+        math_approach_target_with_direction_mode(roll_angle, state + 0x464, target, 0.0025132746f,
                       0.0025132746f, 0.12566373f, 0);
     }
     if (object[0x20] == 8 && !object[0x95]) {
@@ -129,9 +130,9 @@ void func_PAL_L08_003DD458(u8 *object)
             qcopy(state + 0x210, &g_hero_state.position);
             qcopy(state + 0x230, &g_hero_state.other);
         }
-        pointY = point[1];
-        pointX = point[0];
-        yaw = mat_fast_helper_a(*(float *)(state + 0x230) - pointX, *(float *)(state + 0x234) - pointY);
+        point_y = point[1];
+        point_x = point[0];
+        yaw = mat_fast_helper_a(*(float *)(state + 0x230) - point_x, *(float *)(state + 0x234) - point_y);
         pitch = mat_fast_helper_a(vec_distance_xy(point, state + 0x230), *(float *)(state + 0x238) - point[2]);
         yaw = fast_subtract_rotations(yaw, *(float *)(object + 0xF8)) * 0.5f;
         pitch = fast_subtract_rotations(-pitch, *(float *)(object + 0xF4)) * 0.3333333432674408f;

@@ -21,30 +21,31 @@ extern float math_random_float_range(float, float);
 extern int beam_get_glow_color(void);
 extern void *part_spawn_ground_effect(void *, float, float, s32, s32, s32, s32, void *, float, s32);
 
-void func_PAL_0030F2B0(u8 *obj, int count)
+/* Sprays a burst of small coloured spark particles from just in front of the object (PAL copy). */
+void spawn_effect_burst_pal(u8 *obj, int count)
 {
-    Vec4_0030F2B0 v;
-    Vec4_0030F2B0 w;
+    Vec4_0030F2B0 origin;
+    Vec4_0030F2B0 spark_vel;
     int i;
 
-    v.bits = 0;
-    v.f[1] = -0.9f;
-    matrix_mul_vec3(&v, &v, obj + 0xC0);
-    FastVecAdd(&v, &v, obj + 0x10);
+    origin.bits = 0;
+    origin.f[1] = -0.9f;
+    matrix_mul_vec3(&origin, &origin, obj + 0xC0);
+    FastVecAdd(&origin, &origin, obj + 0x10);
     for (i = 0; i < count; i++) {
         int spin;
         int colour;
         float size;
         float life;
-        vec_random_direction(&w, 0.0f, g_beam_particle_speed * 1.2f);
-        w.f[0] = math_fabs(w.f[0]);
-        matrix_mul_vec3(&w, &w, g_hero_matrix);
+        vec_random_direction(&spark_vel, 0.0f, g_beam_particle_speed * 1.2f);
+        spark_vel.f[0] = math_fabs(spark_vel.f[0]);
+        matrix_mul_vec3(&spark_vel, &spark_vel, g_hero_matrix);
         spin = math_random_int_range(-8, 8);
         size = math_random_float_range(0.2f, 0.6f);
         life = size * 0.3f;
         colour = beam_get_glow_color() | 0x7F000000;
-        part_spawn_ground_effect(&v, life, size, 12, colour, 0, spin, &w, 0.0f, 0);
+        part_spawn_ground_effect(&origin, life, size, 12, colour, 0, spin, &spark_vel, 0.0f, 0);
         colour = 0x307F7F7F;
-        part_spawn_ground_effect(&v, size * 0.15f, size * 0.5f, 12, colour, 0, -spin, &w, 0.0f, 0);
+        part_spawn_ground_effect(&origin, size * 0.15f, size * 0.5f, 12, colour, 0, -spin, &spark_vel, 0.0f, 0);
     }
 }

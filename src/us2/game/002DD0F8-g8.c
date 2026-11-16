@@ -29,14 +29,15 @@ extern u8 g_menu_text_a[] SDATA(D_001ABBA0);
 extern u8 g_menu_text_b[] SDATA(D_001ABBB8);
 extern int g_menu_text_id[];
 
-int func_US2_002DD0F8(PageC3 *menu)
+/* Runs the timed text pages (such as the credits): each page shows a text for a while, scrolls it, then moves to the next. Holding buttons speeds it up and the player can leave early. */
+int UpdateTimedTextPages_us2(PageC3 *menu)
 {
-    int fast, previous, value, result;
+    int fast_forward, previous, value, result;
     u8 *pad = g_pad_state;
     u8 *ctx = g_pause_menu_state;
     u8 *owner;
-    fast = (((InputC3 *)pad)->held & 15) == 15;
-    if (!((CtxC3 *)ctx)->mode || (fast && ((u32)((InputC3 *)pad)->held & 16))) {
+    fast_forward = (((InputC3 *)pad)->held & 15) == 15;
+    if (!((CtxC3 *)ctx)->mode || (fast_forward && ((u32)((InputC3 *)pad)->held & 16))) {
         if ((((u32 *)&((InputC3 *)pad)->held)[1] & 0x900) && !((CtxC3 *)ctx)->active) return 1;
         {
             u8 *pad2 = g_pad_state;
@@ -57,7 +58,7 @@ back_done:
     }
     previous = menu->timer;
     menu->timer = previous - 1;
-    if (fast) menu->timer = previous - 2;
+    if (fast_forward) menu->timer = previous - 2;
     if (menu->timer < 0) menu->timer = 0;
     switch (menu->state) {
     case 0:
@@ -83,7 +84,7 @@ back_done:
     case 17:
         previous = menu->scroll;
         menu->scroll = previous + 10;
-        if (fast) menu->scroll = previous + 20;
+        if (fast_forward) menu->scroll = previous + 20;
         if (menu->done) {
             menu->timer = 180;
             ++menu->state;

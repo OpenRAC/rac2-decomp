@@ -11,7 +11,7 @@ extern void moby_get_facing_direction(void *, void *);
 extern float FastVecDot(void *, void *);
 extern int weapon_spend_ammo(int, int);
 extern int ForceClaimNotice(int, int, int);
-extern void func_PAL_L00_002AF458(void);
+extern void start_equipped_item_animation_pal(void);
 extern void cancel_hero_item_animation_pal(void);
 extern int PlayMobySound(int, int, void *);
 extern char *spider_bot_spawn(void *, void *);
@@ -29,104 +29,105 @@ extern int g_input_lock_state MACRO_ADDR;
 extern int g_hero_action_blocked_flag MACRO_ADDR;
 extern int g_pad_held_flags NOT_SDA;
 
-void func_PAL_L01_003B6050(char *m) {
+/* Updates the Spiderbot Glove pickup: checks that the hero may use it, lets the hero grab it with the button, and plays its use effect (PAL). */
+void spiderbot_glove_update_pal(char *moby) {
     float pos[4], sweep_storage[4], normal[4];
     float *sweep;
     char *hit;
     int aux;
-    char *d = *(char **)(m + 0x68);
+    char *moby_vars = *(char **)(moby + 0x68);
     int result, state, ready;
     float height;
 
     {
-        char *g = g_hero_state;
+        char *hero = g_hero_state;
 
-        if (*(int *)(g + 0x1244) == 3)
+        if (*(int *)(hero + 0x1244) == 3)
             g_active_pickup_object = 0;
-        moby_transform_joint_to_world(m, 0, pos);
-        *(int *)(d + 0x2C) = 0;
+        moby_transform_joint_to_world(moby, 0, pos);
+        *(int *)(moby_vars + 0x2C) = 0;
         sweep = sweep_storage;
-        height = (*(int *)(g + 0x2294) == 29) ? 11.0f : 4.5f;
+        height = (*(int *)(hero + 0x2294) == 29) ? 11.0f : 4.5f;
         CalculateAimedLaunchVelocity(sweep, pos, 0, 0, 1.6f, height, 0.16000001f, 0.0044f);
     }
-    *(int *)(d + 0x24) = coll_trace_projectile_to_impact_pal(pos, sweep, d, d + 0x10, m, &hit, &aux, 0.0044f);
+    *(int *)(moby_vars + 0x24) = coll_trace_projectile_to_impact_pal(pos, sweep, moby_vars, moby_vars + 0x10, moby, &hit, &aux, 0.0044f);
     result = weapon_get_group(aux);
     if (g_game_l00_mode || g_input_lock_state != -2)
-        *(int *)(d + 0x2C) = 1;
-    if (g_hero_action_blocked_flag && *(float *)(d + 8) < 462.42999267578125f)
-        *(int *)(d + 0x2C) = 1;
-    if (result || !*(int *)(d + 0x24) || !*(int *)(d + 0x28))
+        *(int *)(moby_vars + 0x2C) = 1;
+    if (g_hero_action_blocked_flag && *(float *)(moby_vars + 8) < 462.42999267578125f)
+        *(int *)(moby_vars + 0x2C) = 1;
+    if (result || !*(int *)(moby_vars + 0x24) || !*(int *)(moby_vars + 0x28))
         goto blocked;
     {
-        char *g = g_hero_state;
+        char *hero = g_hero_state;
 
-        state = *(int *)(g + 0x2294);
+        state = *(int *)(hero + 0x2294);
         if (state == 40 || state == 62 || state == 39 || state == 41 || state == 42 || state == 6 ||
             state == 116 || state == 129)
             goto blocked;
-        if (*(char **)(g + 0x33C) && (*(short *)(*(char **)(g + 0x33C) + 0xAA) == 0x330 ||
-                                      *(short *)(*(char **)(g + 0x33C) + 0xAA) == 0xB21))
+        if (*(char **)(hero + 0x33C) && (*(short *)(*(char **)(hero + 0x33C) + 0xAA) == MOBY_CLASS_TAXI ||
+                                      *(short *)(*(char **)(hero + 0x33C) + 0xAA) == 0xB21))
             goto blocked;
         if (hit && (*(short *)(hit + 0xAA) == 0xB21 || *(short *)(hit + 0xAA) == 0xB5B))
             goto blocked;
     }
-    moby_get_facing_direction(d, normal);
-    if (!(FastVecDot(d + 0x10, normal) < 0.75f))
+    moby_get_facing_direction(moby_vars, normal);
+    if (!(FastVecDot(moby_vars + 0x10, normal) < 0.75f))
         goto timer;
 blocked:
-    *(int *)(d + 0x2C) = 1;
+    *(int *)(moby_vars + 0x2C) = 1;
 timer:
     {
-        char *g = g_hero_state;
+        char *hero = g_hero_state;
 
         ready = 1;
-        if (*(int *)(g + 0x2294) == 29) {
-            if (!math_fast_float_d(g + 0x2534))
+        if (*(int *)(hero + 0x2294) == 29) {
+            if (!math_fast_float_d(hero + 0x2534))
                 ready = 0;
         } else
-            *(int *)(g + 0x2534) = 33;
+            *(int *)(hero + 0x2534) = 33;
     }
-    switch (*(unsigned char *)(m + 0x20)) {
+    switch (*(unsigned char *)(moby + 0x20)) {
     case 0:
-        g_active_pickup_object = (OBJ2 *)m;
-        *(unsigned char *)(m + 0x20) = 1;
-        *(int *)(d + 0x28) = 1;
-        *(int *)(d + 0x24) = 0;
+        g_active_pickup_object = (OBJ2 *)moby;
+        *(unsigned char *)(moby + 0x20) = 1;
+        *(int *)(moby_vars + 0x28) = 1;
+        *(int *)(moby_vars + 0x24) = 0;
         /* falls through */
     case 1: {
-        char *g = g_hero_state;
+        char *hero = g_hero_state;
 
-        if ((g_pad_held_flags & *(int *)(g + 0x1230)) && !*(unsigned char *)(g + 0x22BC) &&
-            !*(int *)(d + 0x2C) && ready) {
+        if ((g_pad_held_flags & *(int *)(hero + 0x1230)) && !*(unsigned char *)(hero + 0x22BC) &&
+            !*(int *)(moby_vars + 0x2C) && ready) {
             if (weapon_spend_ammo(-1, 1)) {
-                *(short *)(g + 0x1E0) = 120;
+                *(short *)(hero + 0x1E0) = 120;
                 ForceClaimNotice(6, 0, 1);
-                *(short *)(g + 0x1D2) = 0;
-                func_PAL_L00_002AF458();
-                *(unsigned char *)(m + 0x20) = 2;
-                *(int *)(d + 0x20) = 10;
-                *(int *)(d + 0x28) = 0;
+                *(short *)(hero + 0x1D2) = 0;
+                start_equipped_item_animation_pal();
+                *(unsigned char *)(moby + 0x20) = 2;
+                *(int *)(moby_vars + 0x20) = 10;
+                *(int *)(moby_vars + 0x28) = 0;
             } else
-                PlayMobySound(0, 0, m);
+                PlayMobySound(0, 0, moby);
         }
         break;
     }
     case 2:
-        if (math_fast_float_d(d + 0x20)) {
-            char *p = spider_bot_spawn(pos, sweep);
+        if (math_fast_float_d(moby_vars + 0x20)) {
+            char *effect_moby = spider_bot_spawn(pos, sweep);
 
-            if (p)
-                *(char **)(p + 0xB8) = m;
-            PlayMobySound(1, 0, m);
+            if (effect_moby)
+                *(char **)(effect_moby + 0xB8) = moby;
+            PlayMobySound(1, 0, moby);
             cancel_hero_item_animation_pal();
-            *(unsigned char *)(m + 0x20) = 3;
-            *(int *)(d + 0x20) = 4;
+            *(unsigned char *)(moby + 0x20) = 3;
+            *(int *)(moby_vars + 0x20) = 4;
         }
         break;
     case 3:
-        if (math_fast_float_d(d + 0x20))
-            *(unsigned char *)(m + 0x20) = 1;
+        if (math_fast_float_d(moby_vars + 0x20))
+            *(unsigned char *)(moby + 0x20) = 1;
         break;
     }
-    ref_L00_003B7D48_00(helper_update_hit_test_pal, m);
+    ref_L00_003B7D48_00(helper_update_hit_test_pal, moby);
 }

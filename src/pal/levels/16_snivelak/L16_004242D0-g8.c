@@ -6,7 +6,7 @@ extern char g_aim_target_position[];
 extern f32 g_shockwave_growth_rate __attribute__((sda));
 extern f32 g_shockwave_radius_limit __attribute__((sda));
 extern void FastVecAdd(char *, char *, char *);
-extern void func_PAL_L16_00424590(char *);
+extern void part_spawn_spinning_fragment_pal(char *);
 extern s32 CollLine(char *, char *, s32, s32, s32);
 extern void moby_set_state(char *, s32, s32);
 extern char *SpawnExplosion_pal(char *, f32, f32, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32);
@@ -18,21 +18,21 @@ extern void SweepAndDrawRibbonRing(char *);
 extern void gfx_add_draw_callback_first(void (*)(char *), char *);
 
 /* Moves a fragment until impact and runs its fading shock-wave effect. */
-void func_PAL_L16_004242D0(char *self) {
+void fragment_shockwave_update_pal(char *self) {
     quad previous;
-    char *st = *(char **)(self + 0x68);
+    char *vars = *(char **)(self + 0x68);
 
     switch (*(u8 *)(self + 0x20)) {
     case 0: {
         char *old = (char *)&previous;
         char *position = self + 16;
         qcopy(old,position);
-        FastVecAdd(position, position, st);
-        *(f32 *)(st + 8) -= *(f32 *)(st + 0x24);
-        func_PAL_L16_00424590(self);
+        FastVecAdd(position, position, vars);
+        *(f32 *)(vars + 8) -= *(f32 *)(vars + 0x24);
+        part_spawn_spinning_fragment_pal(self);
         if (CollLine(old, position, 0, *(s32 *)(self + 0xB8), 0)) {
             qcopy(position ,g_aim_target_position);
-            if (*(s32 *)(st + 0x20)) moby_set_state(self, 2, -1);
+            if (*(s32 *)(vars + 0x20)) moby_set_state(self, 2, -1);
             else moby_set_state(self, 1, -1);
         }
         break;
@@ -50,18 +50,18 @@ void func_PAL_L16_004242D0(char *self) {
             *(s32 *)(self + 0x98) = 0;
             *(u16 *)(self + 0x34) = (*(u16 *)(self + 0x34) | 0x41) & 0xEFFF;
             *(f32 *)(self + 0x18) += 0.5f;
-            *(f32 *)(st + 0x30) = 1.0f;
+            *(f32 *)(vars + 0x30) = 1.0f;
         }
-        *(f32 *)(st + 0x34) += 0.080000006f;
-        if (*(f32 *)(st + 0x34) > 1.0f) *(f32 *)(st + 0x34) -= 1.0f;
-        { f32 radius = *(f32 *)(st + 0x2C);
+        *(f32 *)(vars + 0x34) += 0.080000006f;
+        if (*(f32 *)(vars + 0x34) > 1.0f) *(f32 *)(vars + 0x34) -= 1.0f;
+        { f32 radius = *(f32 *)(vars + 0x2C);
           f32 growth = g_shockwave_growth_rate * 0.020000001f;
           f32 limit = g_shockwave_radius_limit;
           radius += growth;
-          *(f32 *)(st + 0x2C) = radius;
-        if (radius >= limit) ApproachValue((f32 *)(st + 0x30), 0.0f, 0.080000006f);
+          *(f32 *)(vars + 0x2C) = radius;
+        if (radius >= limit) ApproachValue((f32 *)(vars + 0x30), 0.0f, 0.080000006f);
         }
-        if (*(f32 *)(st + 0x30) <= 0.0f) moby_mark_spawned(self);
+        if (*(f32 *)(vars + 0x30) <= 0.0f) moby_mark_spawned(self);
         else gfx_add_draw_callback_first(SweepAndDrawRibbonRing, self);
         break;
     }

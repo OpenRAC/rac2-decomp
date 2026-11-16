@@ -5,43 +5,44 @@ extern int g_game_l00_mode __attribute__((sda));
 extern void gfx_set_clamped_view_distance(float value);
 extern float math_fabs(float value);
 
-void func_PAL_L00_003EE6E0(char *p)
+/* Slides an object back and forth along one axis and shrinks it near both ends (PAL: 50 Hz speed). */
+void sweeping_scale_update_pal(char *moby)
 {
-    float v;
-    float x;
-    float a;
-    float b;
-    float c;
-    int *q;
+    float pos;
+    float distance;
+    float near_dist;
+    float fade_in;
+    float scale;
+    int *model;
 
-    if (*(unsigned char *)(p + 0x20) == 0) {
-        *(unsigned short *)(p + 0x32) = 0xAF0;
-        *(unsigned char *)(p + 0x30) = 0xFF;
-        *(unsigned char *)(p + 0x20) = 1;
+    if (*(unsigned char *)(moby + 0x20) == 0) {
+        *(unsigned short *)(moby + 0x32) = 0xAF0;
+        *(unsigned char *)(moby + 0x30) = 0xFF;
+        *(unsigned char *)(moby + 0x20) = 1;
         gfx_set_clamped_view_distance(3000.0f);
     }
-    if (*(unsigned char *)(p + 0x20) != 1)
+    if (*(unsigned char *)(moby + 0x20) != 1)
         return;
     if (g_game_l00_mode == 2)
         return;
 
-    v = *(float *)(p + 0x14);
-    v = v - 2.0000002f;
-    *(float *)(p + 0x14) = v;
-    x = math_fabs(v);
+    pos = *(float *)(moby + 0x14);
+    pos = pos - 2.0000002f;
+    *(float *)(moby + 0x14) = pos;
+    distance = math_fabs(pos);
 
-    a = 3000.0f - x;
-    b = 750.0f - a;
-    c = 1.0f - b * (1.0f / 750.0f);
-    if (c > 3.0f)
-        c = 3.0f;
-    if (c < 0.0f)
-        c = 0.0f;
+    near_dist = 3000.0f - distance;
+    fade_in = 750.0f - near_dist;
+    scale = 1.0f - fade_in * (1.0f / 750.0f);
+    if (scale > 3.0f)
+        scale = 3.0f;
+    if (scale < 0.0f)
+        scale = 0.0f;
 
-    q = *(int **)(p + 0x24);
-    *(float *)(p + 0x2C) = *(float *)((char *)q + 0x24) * c;
-    if (*(float *)(p + 0x14) <= -3000.0f)
-        *(float *)(p + 0x14) = 3000.0f;
+    model = *(int **)(moby + 0x24);
+    *(float *)(moby + 0x2C) = *(float *)((char *)model + 0x24) * scale;
+    if (*(float *)(moby + 0x14) <= -3000.0f)
+        *(float *)(moby + 0x14) = 3000.0f;
 }
 
 

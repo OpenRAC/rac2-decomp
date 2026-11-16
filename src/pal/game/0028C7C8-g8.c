@@ -33,7 +33,7 @@ extern int g_current_map_index;
 extern short g_sequence_active_flag NOT_SDA;
 extern int menu_is_state_seven(void), hud_is_open_done(void);
 extern void hud_request_open(void), menu_set_state_word_three(void);
-extern void func_PAL_0034ED50(void *, int);
+extern void menu_set_screen_value_restart_six_fades_pal(void *, int);
 extern int FastDecTimer(void *);
 extern float square_root(float), mat_fast_helper_a(float, float), IntToFloat(int), fast_subtract_rotations(float, float), FastDiffRots(float, float), math_fast_float_g(float);
 extern int FloatToInt(float);
@@ -48,12 +48,13 @@ static inline Info *InfoOf(int id)
     return &g_weapon_table[g_item_slot_to_record[id]];
 }
 
-void func_PAL_0028C7C8(Selector *p)
+/* Updates the round weapon-select menu: reads the stick, picks a slot, plays the click sound and equips the chosen weapon when the button is let go (PAL: timeout 150, 50 Hz frame record). */
+void weapon_wheel_update_select_pal(Selector *selector)
 {
-    float x, y, mag, ang, a, f, r;
-    int old, n, s, k, id;
+    float stick_x, stick_y, stick_magnitude, stick_angle, shifted_angle, slot_position, old_slot_angle;
+    int old_selection, nudge, slot, next_slot, weapon_id;
     int active;
-    unsigned char *c, *e;
+    unsigned char *fade, *fade_start;
 
     if (g_notice_owner) return;
     active = 0;
@@ -64,122 +65,122 @@ void func_PAL_0028C7C8(Selector *p)
             if (!hud_is_open_done()) active = 0;
         }
     }
-    e = p->fade;
+    fade_start = selector->fade;
     if (active && g_resident_data_base) {
-        func_PAL_0034ED50((char *)g_resident_data_base + 0x376C8, menu_is_state_seven() ? g_wheel_fade_count : 2);
+        menu_set_screen_value_restart_six_fades_pal((char *)g_resident_data_base + 0x376C8, menu_is_state_seven() ? g_wheel_fade_count : 2);
         menu_set_state_word_three();
     }
-    p->timeout = 150;
-    p->timer = 24;
+    selector->timeout = 150;
+    selector->timer = 24;
     if (FastDecTimer(g_weapon_wheel_timer) && !g_language_settings[3]) g_pad_state.inhibit = 2;
-    x = g_pad_state.x;
-    y = g_pad_state.y;
-    mag = square_root(x * x + y * y);
-    if (mag != 0.0f) {
-        x /= mag;
-        y /= mag;
+    stick_x = g_pad_state.x;
+    stick_y = g_pad_state.y;
+    stick_magnitude = square_root(stick_x * stick_x + stick_y * stick_y);
+    if (stick_magnitude != 0.0f) {
+        stick_x /= stick_magnitude;
+        stick_y /= stick_magnitude;
     }
-    ang = mat_fast_helper_a(x, y);
-    if ((p->state >> 24) == 0) {
-        if ((g_pad_state.pressed & 0xF000) || mag < 0.5f || --p->state == -1) {
-            p->selected = -1;
-            p->state = 0x10000FF;
+    stick_angle = mat_fast_helper_a(stick_x, stick_y);
+    if ((selector->state >> 24) == 0) {
+        if ((g_pad_state.pressed & 0xF000) || stick_magnitude < 0.5f || --selector->state == -1) {
+            selector->selected = -1;
+            selector->state = 0x10000FF;
         }
     }
-    n = 0;
-    old = p->selected;
-    if ((p->state >> 24) == 1 && (g_pad_state.held & 0x10) && active) {
-        if (mag > 0.9f) {
-            a = ang + 3.1415927f + 3.1415927f + 1.5707964f + 3.1415927f / (float)g_radial_slot_count;
-            f = a * 0.15915494f * (float)g_radial_slot_count;
-            r = (float)old * 6.2831855f / IntToFloat(g_radial_slot_count) - 3.1415927f;
-            if (old == -1 || FastDiffRots(r, fast_subtract_rotations(ang, 1.5707964f)) > 0.5890487f) {
-                s = (int)f % g_radial_slot_count;
-                if ((s ^ 1) & 1) {
-                    float fr = f - (float)FloatToInt(f);
-                    if (fr > 0.8f) s++;
-                    else if (fr < 0.2f) s--;
-                    s = (s + g_radial_slot_count) % g_radial_slot_count;
+    nudge = 0;
+    old_selection = selector->selected;
+    if ((selector->state >> 24) == 1 && (g_pad_state.held & 0x10) && active) {
+        if (stick_magnitude > 0.9f) {
+            shifted_angle = stick_angle + 3.1415927f + 3.1415927f + 1.5707964f + 3.1415927f / (float)g_radial_slot_count;
+            slot_position = shifted_angle * 0.15915494f * (float)g_radial_slot_count;
+            old_slot_angle = (float)old_selection * 6.2831855f / IntToFloat(g_radial_slot_count) - 3.1415927f;
+            if (old_selection == -1 || FastDiffRots(old_slot_angle, fast_subtract_rotations(stick_angle, 1.5707964f)) > 0.5890487f) {
+                slot = (int)slot_position % g_radial_slot_count;
+                if ((slot ^ 1) & 1) {
+                    float fraction = slot_position - (float)FloatToInt(slot_position);
+                    if (fraction > 0.8f) slot++;
+                    else if (fraction < 0.2f) slot--;
+                    slot = (slot + g_radial_slot_count) % g_radial_slot_count;
                 }
-                p->selected = s;
-                n = -1;
-                g_wheel_angle_delta = math_fast_float_g(a - ((float)s * 0.78539824f + 0.39269912f));
-                if (g_wheel_angle_delta > 0.0f) n = 1;
+                selector->selected = slot;
+                nudge = -1;
+                g_wheel_angle_delta = math_fast_float_g(shifted_angle - ((float)slot * 0.78539824f + 0.39269912f));
+                if (g_wheel_angle_delta > 0.0f) nudge = 1;
             }
         } else if (g_pad_state.repeat == 0 && (g_pad_state.pressed & 0xF000)) {
-            int w;
-            w = old;
+            int wanted;
+            wanted = old_selection;
             if (g_pad_state.pressed & 0x1000) {
-                int t;
-                if (w == -1) t = g_wheel_default_choices[4];
-                else t = g_radial_menu_pages[g_radial_menu_page_index][w].f10;
-                w = t;
+                int target;
+                if (wanted == -1) target = g_wheel_default_choices[4];
+                else target = g_radial_menu_pages[g_radial_menu_page_index][wanted].f10;
+                wanted = target;
             }
             if (g_pad_state.pressed & 0x4000) {
-                int t;
-                if (w == -1) t = g_wheel_default_choices[5];
-                else t = g_radial_menu_pages[g_radial_menu_page_index][w].f14;
-                w = t;
+                int target;
+                if (wanted == -1) target = g_wheel_default_choices[5];
+                else target = g_radial_menu_pages[g_radial_menu_page_index][wanted].f14;
+                wanted = target;
             }
             if (g_pad_state.pressed & 0x8000) {
-                int t;
-                if (w == -1) t = g_wheel_default_choices[2];
-                else t = g_radial_menu_pages[g_radial_menu_page_index][w].f8;
-                w = t;
+                int target;
+                if (wanted == -1) target = g_wheel_default_choices[2];
+                else target = g_radial_menu_pages[g_radial_menu_page_index][wanted].f8;
+                wanted = target;
             }
             if (g_pad_state.pressed & 0x2000) {
-                int t;
-                if (w == -1) t = g_wheel_default_choices[3];
-                else t = g_radial_menu_pages[g_radial_menu_page_index][w].fC;
-                w = t;
+                int target;
+                if (wanted == -1) target = g_wheel_default_choices[3];
+                else target = g_radial_menu_pages[g_radial_menu_page_index][wanted].fC;
+                wanted = target;
             }
-            p->selected = w;
+            selector->selected = wanted;
         }
         {
-            Slot *t = g_radial_menu_pages[g_radial_menu_page_index];
-            int cur = p->selected;
-            if (t[cur].f0 == 0 && n != 0) {
-                k = (cur + n) % g_radial_slot_count;
-                if (t[k].f0 != 0) p->selected = k;
+            Slot *target = g_radial_menu_pages[g_radial_menu_page_index];
+            int current = selector->selected;
+            if (target[current].f0 == 0 && nudge != 0) {
+                next_slot = (current + nudge) % g_radial_slot_count;
+                if (target[next_slot].f0 != 0) selector->selected = next_slot;
             }
         }
     }
-    c = p->fade;
-    if (p->selected != old) {
+    fade = selector->fade;
+    if (selector->selected != old_selection) {
         STUB_printf(g_str_wheel_debug);
         load_request_disc_read_break();
-        c[1] = 0;
+        fade[1] = 0;
         snd_play_from_global_bank(3, 0, 0);
-    } else if (c[1] < 8) c[1]++;
-    if (p->selected >= 0 && !load_is_class_cached(InfoOf(g_radial_menu_pages[g_radial_menu_page_index][p->selected].f18)->name)) {
-        LoadClassIntoFreeCacheSlot(InfoOf(g_radial_menu_pages[g_radial_menu_page_index][p->selected].f18)->name);
+    } else if (fade[1] < 8) fade[1]++;
+    if (selector->selected >= 0 && !load_is_class_cached(InfoOf(g_radial_menu_pages[g_radial_menu_page_index][selector->selected].f18)->name)) {
+        LoadClassIntoFreeCacheSlot(InfoOf(g_radial_menu_pages[g_radial_menu_page_index][selector->selected].f18)->name);
     } else {
         if (!(g_pad_state.held & 0x10) && !g_sequence_active_flag) {
-            if (c[0]) c[0]--;
-            if (c[0] == 0 && p->selected >= 0 && (id = g_radial_menu_pages[g_radial_menu_page_index][p->selected].f18) != 0) {
-                Info *rr;
-                if (g_hero_state.selected != id && g_progress_statistics.uses < 0xFFFF) g_progress_statistics.uses++;
+            if (fade[0]) fade[0]--;
+            if (fade[0] == 0 && selector->selected >= 0 && (weapon_id = g_radial_menu_pages[g_radial_menu_page_index][selector->selected].f18) != 0) {
+                Info *info;
+                if (g_hero_state.selected != weapon_id && g_progress_statistics.uses < 0xFFFF) g_progress_statistics.uses++;
                 if (g_progress_statistics.maxFrame < ((s32)(g_frame_counter) * 5 + 2) / 6) g_progress_statistics.maxFrame = ((s32)(g_frame_counter) * 5 + 2) / 6;
                 g_progress_statistics.levels = g_progress_statistics.levels | (1 << g_current_map_index) | 0x80000000;
-                g_hero_state.pending = id;
-                rr = InfoOf(id);
-                if (rr->valid && rr->ammo < g_item_ammo_counts[id]) g_item_ammo_counts[id] = rr->ammo;
+                g_hero_state.pending = weapon_id;
+                info = InfoOf(weapon_id);
+                if (info->valid && info->ammo < g_item_ammo_counts[weapon_id]) g_item_ammo_counts[weapon_id] = info->ammo;
             }
             if (g_language_settings[3]) menu_advance_state_in_mode_seven();
             else {
                 hud_clear_flag_b();
                 hud_clear_flag_a();
             }
-        } else if (c[0] < 8) c[0]++;
+        } else if (fade[0] < 8) fade[0]++;
     }
-    if (e[0] == 0) {
+    if (fade_start[0] == 0) {
         {
-            int state = p->state;
-            g_weapon_wheel_selected = p->selected;
+            int state = selector->state;
+            g_weapon_wheel_selected = selector->selected;
             g_weapon_wheel_state = state;
         }
-        hud_close_element_by_key(p->handle);
-        p->timer = -6;
+        hud_close_element_by_key(selector->handle);
+        selector->timer = -6;
         g_weapon_wheel_open_frame = g_frame_counter_3;
     }
 }

@@ -37,7 +37,7 @@ extern void vec_clear_128(void *p);
 
 /* Claims the first free record of the twelve 0xB0-byte records at D_002351A0, keeps the owner's
    pointer in it, copies two quadwords in and fills the drawn values. */
-void part_claim_ring_piece_pal(char *owner, char *src, int arg)
+void part_claim_ring_piece_pal(char *owner, char *src, int timer)
 {
     Rec_0032B598 *base = g_ring_pieces;
     Rec_0032B598 *slot;
@@ -71,9 +71,9 @@ void part_claim_ring_piece_pal(char *owner, char *src, int arg)
         vec_clear_128(slot);
         vec_clear_128((char *)slot + 0x10);
         slot->w_A8 = 0;
-        slot->w_A0 = arg;
+        slot->w_A0 = timer;
         slot->w_98 = 17;
-        slot->w_A4 = arg;
+        slot->w_A4 = timer;
         break;
     }
 }

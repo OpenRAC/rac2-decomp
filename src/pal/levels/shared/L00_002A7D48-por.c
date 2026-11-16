@@ -24,6 +24,7 @@ extern void *part_spawn_object_following_effect(void *, void *, int, float, int,
 #define ARMED(k) (F(D_L00_00262570 + D_00139568[k] * 0xE0, u8, 4) != 0)
 #define CAP(a, m) ((a) < (m) ? (a) : (m))
 
+/* Makes the equipped item glow and pulse in the hero's hand. Each item type has its own colors, speed and sparkle spots (PAL). */
 void hero_update_item_glow_pal(void)
 {
     u8 *moby;

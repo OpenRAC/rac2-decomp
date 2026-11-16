@@ -30,15 +30,15 @@ extern s32 math_random_int_range(s32, s32);
 extern void *part_spawn_hero_relative(void *, void *, s32, float, u8, u8, s32);
 
 /* Advance four spark timers, reroll expired ones, and randomly emit a particle. */
-void func_PAL_L22_003CD898(char *obj)
+void spark_emit_random_pal(char *obj)
 {
     V4_F3c9b60 aim, spark;
     SparkTimers *timers = (SparkTimers *)(*(char **)(obj + 0x68) + 0x10);
     int i = 0;
     s32 count = 3;
-    float step, t;
-    float c, s;
-    s32 color, id;
+    float step, life;
+    float angle, radius;
+    s32 color, particle_type;
 
     do {
         step = timers->phase[i] + timers->rate[i];
@@ -55,19 +55,19 @@ void func_PAL_L22_003CD898(char *obj)
         qzero_nc(&spark);
         spark.f[2] = math_random_float_range(g_spark_l22_speed_min, g_spark_l22_speed_max[0]) * 0.020000001f;
         matrix_mul_vec3(&spark, &spark, obj + 0xC0);
-        c = math_random_angle();
-        s = math_random_float_range(g_spark_radius_min, g_spark_radius_max[0]);
-        aim.f[0] = math_fast_sin_or_cos_a(c) * s;
-        aim.f[1] = math_fast_sin_or_cos_b(c) * s;
+        angle = math_random_angle();
+        radius = math_random_float_range(g_spark_radius_min, g_spark_radius_max[0]);
+        aim.f[0] = math_fast_sin_or_cos_a(angle) * radius;
+        aim.f[1] = math_fast_sin_or_cos_b(angle) * radius;
         aim.f[2] = 0.0f;
         matrix_mul_vec3(&aim, &aim, obj + 0xC0);
         FastVecAdd(&aim, &aim, obj + 0x10);
         color = ((s32)(math_random_int_range(g_spark_color_min, g_spark_color_max[0])) * 5 + 2) / 6;
-        t = math_random_float_range(g_spark_life_min, g_spark_life_max[0]);
+        life = math_random_float_range(g_spark_life_min, g_spark_life_max[0]);
         if (math_random_int_below(2) != 0)
-            id = g_spark_particle_type_min;
+            particle_type = g_spark_particle_type_min;
         else
-            id = g_spark_particle_type_max[0];
-        part_spawn_hero_relative(&aim, &spark, id, t, color & 0xFF, math_random_int_below(0xFF) & 0xFF, 0);
+            particle_type = g_spark_particle_type_max[0];
+        part_spawn_hero_relative(&aim, &spark, particle_type, life, color & 0xFF, math_random_int_below(0xFF) & 0xFF, 0);
     }
 }

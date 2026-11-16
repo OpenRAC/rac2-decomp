@@ -36,7 +36,7 @@ extern void matrix_mul_vec3(void *, void *, void *);
 extern void FastVecAdd(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
 extern void mat_get_euler_angles(void *, void *);
-extern void func_PAL_002B15D8(char *, int, void *, u8, float, float, float, float);
+extern void part_spawn_masked_debris_pal(char *, int, void *, u8, float, float, float, float);
 extern void vec_random_direction(void *, float, float);
 extern void trash_can_debris_update_pal(char *);
 extern int math_random_int_below(int), cam_moby_update_pal(char *);
@@ -46,7 +46,7 @@ extern float math_random_signed_float_range(float, float), math_random_float_ran
 
 /* Initializes the triggered motion, sheds debris while moving, and emits the
  * final twenty-object burst when the collision magnitude reaches its threshold. */
-void func_PAL_L03_003D3220(char *obj)
+void collision_triggered_spawner_update_pal(char *obj)
 {
     float target[4] __attribute__((aligned(16)));
     float position[4] __attribute__((aligned(16)));
@@ -145,7 +145,7 @@ void func_PAL_L03_003D3220(char *obj)
         *(int *)(obj + 0x98) = 0;
         *(u16 *)(obj + 0x34) = (*(u16 *)(obj + 0x34) | 0x41) & ~0x1000;
         mat_get_euler_angles(obj + 0xC0, obj + 0xF0);
-        func_PAL_002B15D8(obj, 0x1FF, g_effect_descriptor_default, 255, 3.0f, 5.0f, 5.0f, 10.0f);
+        part_spawn_masked_debris_pal(obj, 0x1FF, g_effect_descriptor_default, 255, 3.0f, 5.0f, 5.0f, 10.0f);
         *(Quad *)target = 0;
         target[2] = 0.5f;
         matrix_mul_vec3(target, target, obj + 0xC0);

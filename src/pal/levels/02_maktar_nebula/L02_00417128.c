@@ -32,8 +32,8 @@ extern float FastAddRotations(float, float);
 extern void *part_find_owned_effect_slot(void *, int, int);
 extern int PlayMobySound(int, int, void *);
 extern void gfx_add_draw_callback_first(void *, void *);
-extern void func_PAL_L02_00417490(u8 *);
-extern void func_PAL_L02_004176A8(u8 *);
+extern void part_throw_front_sparks_pal(u8 *);
+extern void beam_draw_wavy_to_target_pal(u8 *);
 extern int math_random_int_below(int);
 extern s32 g_hovering_object_count __attribute__((sda));
 extern void gfx_add_draw_callback_first(void *, void *);
@@ -53,77 +53,77 @@ extern int PlayMobySound(int, int, void *);
    0.5 * sin(phase) + the base at +8 into the actor's float at +0x18 and runs the counter at +0x10
    down by 1/15, wrapping it into [-1, 1]. The first slot lookup is a separate block-local pointer
    from the one in the state-2 arm (retail keeps them in different registers). */
-void beam_emitter_update_pal(u8 *a0) {
-    u8 *s1 = *(u8 **)(a0 + 0x68);
-    u8 *p;
-    u8 *q;
+void beam_emitter_update_pal(u8 *moby) {
+    u8 *vars = *(u8 **)(moby + 0x68);
+    u8 *contact;
+    u8 *target;
     s32 slot;
-    float f;
+    float value;
 
-    switch (a0[0x20]) {
+    switch (moby[0x20]) {
     case 0:
-        if (g_moby_group_flags[a0[0xB0] + g_current_map_index * 16] & 0x80) {
-            moby_mark_spawned(a0);
+        if (g_moby_group_flags[moby[0xB0] + g_current_map_index * 16] & 0x80) {
+            moby_mark_spawned(moby);
             return;
         }
-        *(float *)(a0 + 0x2C) = *(float *)(*(u8 **)(a0 + 0x24) + 0x24) * 2.0f;
+        *(float *)(moby + 0x2C) = *(float *)(*(u8 **)(moby + 0x24) + 0x24) * 2.0f;
         if (math_random_int_below(2))
-            *(u16 *)(a0 + 0x34) |= 0x8000;
+            *(u16 *)(moby + 0x34) |= 0x8000;
         else
-            *(u16 *)(a0 + 0x34) &= 0x7FFF;
-        moby_set_state(a0, 1, -1);
-        *(float *)(s1 + 8) = *(float *)(a0 + 0x18);
-        *(float *)(s1 + 4) = math_random_angle();
-        *(float *)(s1 + 0x14) = math_random_angle();
+            *(u16 *)(moby + 0x34) &= 0x7FFF;
+        moby_set_state(moby, 1, -1);
+        *(float *)(vars + 8) = *(float *)(moby + 0x18);
+        *(float *)(vars + 4) = math_random_angle();
+        *(float *)(vars + 0x14) = math_random_angle();
         break;
     case 1:
-        if (a0[0x31] != 0)
-            func_PAL_L02_00417490(a0);
+        if (moby[0x31] != 0)
+            part_throw_front_sparks_pal(moby);
         {
-            u8 *r = (u8 *)g_sound_l02_record_table + *(s32 *)(s1 + 0x18) * 0x70;
+            u8 *own_record = (u8 *)g_sound_l02_record_table + *(s32 *)(vars + 0x18) * 0x70;
 
-            if (*(u8 **)(r + 0x88) != a0 || r[0x74] == 0)
-                *(s32 *)(s1 + 0x18) = PlayMobySound(0, 4, a0);
+            if (*(u8 **)(own_record + 0x88) != moby || own_record[0x74] == 0)
+                *(s32 *)(vars + 0x18) = PlayMobySound(0, 4, moby);
         }
-        f = vec_distance_xy(a0 + 0x10, g_camera_l02_position);
-        if (f > 64.0f)
-            ApproachValue((float *)(s1 + 0xC), 0.0f, 0.020000001f);
+        value = vec_distance_xy(moby + 0x10, g_camera_l02_position);
+        if (value > 64.0f)
+            ApproachValue((float *)(vars + 0xC), 0.0f, 0.020000001f);
         else
-            ApproachValue((float *)(s1 + 0xC), 1.0f, 0.020000001f);
-        if (*(float *)(s1 + 0xC) != 0.0f)
-            gfx_add_draw_callback_first((void *)func_PAL_L02_004176A8, a0);
-        p = part_find_owned_effect_slot(a0, 0x10000, 0);
-        if (p != 0) {
-            q = *(u8 **)(p + 0x20);
-            if (q != 0 && *(s16 *)(q + 0xAA) == 0x9C8 &&
-                fast_vec_dist(a0 + 0x10, q + 0x10) < 5.0f) {
+            ApproachValue((float *)(vars + 0xC), 1.0f, 0.020000001f);
+        if (*(float *)(vars + 0xC) != 0.0f)
+            gfx_add_draw_callback_first((void *)beam_draw_wavy_to_target_pal, moby);
+        contact = part_find_owned_effect_slot(moby, 0x10000, 0);
+        if (contact != 0) {
+            target = *(u8 **)(contact + 0x20);
+            if (target != 0 && *(s16 *)(target + 0xAA) == 0x9C8 &&
+                fast_vec_dist(moby + 0x10, target + 0x10) < 5.0f) {
                 g_beam_emitter_id = 0xFFFF;
-                moby_set_state(a0, 2, -1);
-                *(u16 *)(a0 + 0x34) = (*(u16 *)(a0 + 0x34) | 0x41) & 0xEFFF;
-                *(u32 *)(a0 + 0x98) = 0;
-                slot = *(s32 *)(s1 + 0x18);
+                moby_set_state(moby, 2, -1);
+                *(u16 *)(moby + 0x34) = (*(u16 *)(moby + 0x34) | 0x41) & 0xEFFF;
+                *(u32 *)(moby + 0x98) = 0;
+                slot = *(s32 *)(vars + 0x18);
                 if (slot != -1) {
-                    u8 *rec = (u8 *)g_sound_l02_record_table + slot * 0x70;
+                    u8 *sound_record = (u8 *)g_sound_l02_record_table + slot * 0x70;
 
-                    if (*(u8 **)(rec + 0x88) == a0 && rec[0x74] != 0)
+                    if (*(u8 **)(sound_record + 0x88) == moby && sound_record[0x74] != 0)
                         snd_stop_voice(slot);
                 }
-                *(s32 *)(s1 + 0x18) = -1;
+                *(s32 *)(vars + 0x18) = -1;
             }
         }
-        a0[0xA8] = 0xFF;
+        moby[0xA8] = 0xFF;
         break;
     case 2:
         break;
     }
-    *(float *)(s1 + 4) = FastAddRotations(*(float *)(s1 + 4), 0.06981318f);
-    *(float *)(s1 + 0x14) = FastAddRotations(*(float *)(s1 + 0x14), -0.12566373f);
-    *(float *)(a0 + 0x18) = math_fast_sin_or_cos_b(*(float *)(s1 + 4)) * 0.5f + *(float *)(s1 + 8);
-    f = *(float *)(s1 + 0x10) + -0.080000006f;
-    *(float *)(s1 + 0x10) = f;
-    if (f > 1.0f)
-        *(float *)(s1 + 0x10) = f - 1.0f;
-    else if (f < -1.0f)
-        *(float *)(s1 + 0x10) = f + 1.0f;
+    *(float *)(vars + 4) = FastAddRotations(*(float *)(vars + 4), 0.06981318f);
+    *(float *)(vars + 0x14) = FastAddRotations(*(float *)(vars + 0x14), -0.12566373f);
+    *(float *)(moby + 0x18) = math_fast_sin_or_cos_b(*(float *)(vars + 4)) * 0.5f + *(float *)(vars + 8);
+    value = *(float *)(vars + 0x10) + -0.080000006f;
+    *(float *)(vars + 0x10) = value;
+    if (value > 1.0f)
+        *(float *)(vars + 0x10) = value - 1.0f;
+    else if (value < -1.0f)
+        *(float *)(vars + 0x10) = value + 1.0f;
 }
 

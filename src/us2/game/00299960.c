@@ -5,14 +5,16 @@ extern int g_menu_mode __attribute__((sda));
 
 extern int g_pending_request_flag __attribute__((sda));
 
-int func_US2_00299960(void) {
+/* Returns the pending request flag. */
+int pending_request_get_us2(void) {
     return g_pending_request_flag;
 }
 
 
 
 
-int func_US2_00299968(void) {
+/* Returns whether a request was pending and clears the flag. */
+int pending_request_take_us2(void) {
     int value = g_pending_request_flag;
 
     g_pending_request_flag = 0;

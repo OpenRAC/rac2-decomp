@@ -121,42 +121,44 @@ extern s32 math_fast_float_d(void *);
    are const (retail reads them ahead of the stores to the state); the hero block's address and
    the ids 0x23/0x24 each have a variable of their own, as retail rebuilds the address from its
    high half and loads each id next to its store. */
-void func_PAL_L02_00405040(char *a0, s32 a1, float a2, float a3) {
-    char *state = *(char **)(a0 + 0x68);
-    char *g = g_music_state;
+/* Picks an idle announcer message for the actor: timers and counters accumulate, and when they
+   run out, one of the messages not yet played is chosen at random and started (PAL: 50 Hz timings). */
+void actor_pick_idle_message_pal(char *moby, s32 count_step, float time_step, float threshold) {
+    char *state = *(char **)(moby + 0x68);
+    char *music = g_music_state;
     char *hero;
-    char *hero2;
+    char *hero_again;
     s32 id23;
     s32 id24;
     s32 list[12];
-    s32 *lp;
-    s32 n;
+    s32 *list_ptr;
+    s32 candidate_count;
+    s32 i;
     s32 j;
-    s32 k;
     s32 count;
-    float acc;
+    float time_total;
 
-    if (*(s32 *)(g + 0x68) != 0)
+    if (*(s32 *)(music + 0x68) != 0)
         return;
-    if (*(s32 *)(g + 0x24) != -1)
+    if (*(s32 *)(music + 0x24) != -1)
         return;
     if (*(s32 *)(state + 0xE4) != 0)
         return;
-    n = 0;
-    acc = *(float *)(state + 0xE8) + a2;
-    count = *(s32 *)(state + 0xEC) + a1;
+    candidate_count = 0;
+    time_total = *(float *)(state + 0xE8) + time_step;
+    count = *(s32 *)(state + 0xEC) + count_step;
     *(s32 *)(state + 0xEC) = count;
-    *(float *)(state + 0xE8) = acc;
-    if (g_actor_idle_message_time_limit < acc || g_actor_idle_message_count_limit < count) {
-        lp = list;
-        for (j = 0; j < 6; j++) {
+    *(float *)(state + 0xE8) = time_total;
+    if (g_actor_idle_message_time_limit < time_total || g_actor_idle_message_count_limit < count) {
+        list_ptr = list;
+        for (i = 0; i < 6; i++) {
             s32 id;
 
-            if (j == 0 && *(s32 *)(state + 0xD0) != 0)
+            if (i == 0 && *(s32 *)(state + 0xD0) != 0)
                 continue;
-            id = j + 0x1D;
+            id = i + 0x1D;
             if (*(s16 *)(state + 0x1D0 + id * 2) == 0)
-                lp[n++] = id;
+                list_ptr[candidate_count++] = id;
         }
         *(s32 *)(state + 0xEC) = 0;
         *(s32 *)(state + 0xE8) = 0;
@@ -166,29 +168,29 @@ void func_PAL_L02_00405040(char *a0, s32 a1, float a2, float a3) {
         *(s32 *)(state + 0x100) = 250;
         *(s32 *)(state + 0xE8) = 0;
     }
-    if (g_actor_message_threshold < a3) {
-        lp = list;
-        for (k = 0; k < 3; k++) {
-            s32 id = k + 0x1A;
+    if (g_actor_message_threshold < threshold) {
+        list_ptr = list;
+        for (j = 0; j < 3; j++) {
+            s32 id = j + 0x1A;
 
             if (*(s16 *)(state + 0x1D0 + id * 2) == 0)
-                lp[n++] = id;
+                list_ptr[candidate_count++] = id;
         }
     }
     hero = (char *)&g_hero_state;
     if ((float)*(s32 *)(hero + 0x24CC) < (float)g_player_stats * g_actor_message_hero_scale) {
         id23 = 0x23;
         if (*(s16 *)(state + 0x216) == 0)
-            list[n++] = id23;
+            list[candidate_count++] = id23;
     }
-    hero2 = (char *)&g_hero_state;
-    if (*(s32 *)(hero2 + 0x24CC) <= 0) {
+    hero_again = (char *)&g_hero_state;
+    if (*(s32 *)(hero_again + 0x24CC) <= 0) {
         id24 = 0x24;
         if (*(s16 *)(state + 0x218) == 0)
-            list[n++] = id24;
+            list[candidate_count++] = id24;
     }
-    if (n != 0) {
-        arena_start_announcer_message(a0, list[math_random_int_below(n)]);
+    if (candidate_count != 0) {
+        arena_start_announcer_message(moby, list[math_random_int_below(candidate_count)]);
         *(s32 *)(state + 0xE4) = (((int)(g_actor_message_delay_base + math_random_int_below(g_actor_message_delay_base)) * 5 + 2) / 6);
     }
 }

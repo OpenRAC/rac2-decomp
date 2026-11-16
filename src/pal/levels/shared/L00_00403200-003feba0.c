@@ -5,7 +5,7 @@ extern int math_random_int_below(int);
 extern float math_random_float_range(float,float);
 extern int math_random_int_range(int,int);
 extern void vec_random_direction(char *,float,float);
-extern char *func_PAL_002BE9A8(float,float,float,float,char *,int,char *,unsigned int,int);
+extern char *part_spawn_spinning_spark_pal(float,float,float,float,char *,int,char *,unsigned int,int);
 extern float FastVecLength(void *);
 extern void FastVecScale(void *, void *, float);
 extern void FastVecAdd(void *, void *, void *);
@@ -42,7 +42,7 @@ void part_spawn_sparks_along_segment_pal(void *unused, void *pos, void *directio
         color = (shade << 16) | packed;
         shade = color | shade;
         vec_random_direction((char *)local, 2.0000003e-05f, 0.008f);
-        spark = func_PAL_002BE9A8(0.3f, 1.0f, 1.01f, speed, (char *)out, 0, (char *)local, shade, 1);
+        spark = part_spawn_spinning_spark_pal(0.3f, 1.0f, 1.01f, speed, (char *)out, 0, (char *)local, shade, 1);
         if (spark != 0) {
             char *ext = spark + 32;
 

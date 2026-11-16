@@ -8,7 +8,8 @@ extern int math_random_int_below(int);
 extern int math_random_int_range(int, int);
 extern float IntToFloat(int);
 extern unsigned char *g_particle_color_ptr;
-unsigned char *func_PAL_L08_0034C4A8(void *position, void *velocity, int kind, void *owner)
+/* Spawns a short-lived particle at a position with a velocity, a random size and color, linked to an owner (PAL: 50 Hz lifetime). */
+unsigned char *part_spawn_short_lived_pal(void *position, void *velocity, int kind, void *owner)
 {
     unsigned char *particle = part_alloc(0x45);
     if (particle) {

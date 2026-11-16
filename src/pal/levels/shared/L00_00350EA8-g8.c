@@ -6,12 +6,14 @@ typedef struct { char reserved[0x1C4]; int flags; } CallbackMenuState;
 extern char *g_resident_data_base;
 extern SelectionCallback g_pause_menu_state;
 extern CallbackMenuState g_pad_state;
-extern int func_PAL_L00_0030F998(int);
+extern int level_l00_call_module_handler_with_arg_5_pal(int);
 extern char *list_menu_get_selected_record_pal(void *);
-extern void func_PAL_002D6A70(int);
+extern void menu_start_action_pal(int);
 extern int ref_PAL_L00_00350F30_00(int);
 
-int func_PAL_L00_00350F30(void)
+/* Menu selection callback: handles the pad flags and sends the selected record's key and value
+   as a message when the confirm bit is set. */
+int list_menu_selection_callback_pal(void)
 {
     struct { short reserved; unsigned short key; int value; } message;
     CallbackMenuState *state = &g_pad_state;
@@ -38,7 +40,7 @@ int func_PAL_L00_00350F30(void)
             char *data = list_menu_get_selected_record_pal(g_resident_data_base + 0x3E810);
             message.key = *(unsigned short *)(data + 8);
             message.value = *(int *)(data + 0xC);
-            func_PAL_002D6A70((int)&message);
+            menu_start_action_pal((int)&message);
         }
     }
     return result;

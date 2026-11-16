@@ -13,59 +13,60 @@ extern u8 g_item_enabled_flags[] __attribute__((sda));
 
 /* func_002B1350 is defined in 002B00B0-reaction-g8.c. */
 
-int moby_pick_random_matching_pal(u8 *owner, int b, int *outIndex,
-                                       float *o0, float *o1, float *o2, float *o3,
-                                       float *o4, float *o5, float *o6)
+/* Picks one at random of the entries whose first byte matches, and returns its scaled values (PAL). */
+int moby_pick_random_matching_pal(u8 *owner, int match_id, int *out_index,
+                                       float *out0, float *out1, float *out2, float *out3,
+                                       float *out4, float *out5, float *out6)
 {
-    int n;
+    int match_count;
     int count;
     int i;
-    int k;
-    int left;
-    u8 *p;
+    int pick;
+    int remaining;
+    u8 *record;
 
-    n = 0;
+    match_count = 0;
     count = *(u8 *)(*(int *)(owner + 36) + 12);
     if (count != 0) {
-        int *t = (int *)(*(int *)(owner + 36) + 72);
-        u8 *q;
-        left = count;
+        int *table_ptr = (int *)(*(int *)(owner + 36) + 72);
+        u8 *slot_data;
+        remaining = count;
         do {
-            q = *(u8 **)(*t + 20);
-            if (q != 0 && *q == b)
-                n++;
-            t++;
-            left--;
-        } while (left != 0);
+            slot_data = *(u8 **)(*table_ptr + 20);
+            if (slot_data != 0 && *slot_data == match_id)
+                match_count++;
+            table_ptr++;
+            remaining--;
+        } while (remaining != 0);
     }
 
-    if (n != 0)
+    if (match_count != 0)
         goto second;
 
     return 0;
 
 found:
-    *o0 = *(float *)(p + 8) * 0.020000001f;
-    *o1 = *(float *)(p + 12) * 0.020000001f;
-    *o2 = *(float *)(p + 16) * 0.00040000002f;
-    *o3 = *(float *)(p + 20) * 0.00040000002f;
-    *o6 = *(float *)(p + 4) * 0.00040000002f;
-    *o4 = *(float *)(p + 24);
-    *o5 = *(float *)(p + 28);
-    *outIndex = i;
+    *out0 = *(float *)(record + 8) * 0.020000001f;
+    *out1 = *(float *)(record + 12) * 0.020000001f;
+    *out2 = *(float *)(record + 16) * 0.00040000002f;
+    *out3 = *(float *)(record + 20) * 0.00040000002f;
+    *out6 = *(float *)(record + 4) * 0.00040000002f;
+    *out4 = *(float *)(record + 24);
+    *out5 = *(float *)(record + 28);
+    *out_index = i;
     return 1;
 
 second:
-    k = F9a90bcc4_FUN_002A77E0(n);
+    pick = F9a90bcc4_FUN_002A77E0(match_count);
     for (i = 0; i < *(u8 *)(*(int *)(owner + 36) + 12); i++) {
-        char *tbl = (char *)(*(int *)(owner + 36) + 72);
-        char *e = *(char **)(tbl + i * 4);
-        p = *(u8 **)(e + 20);
-        if (p == 0 || *p != b)
+        char *table = (char *)(*(int *)(owner + 36) + 72);
+        char *slot = *(char **)(table + i * 4);
+        record = *(u8 **)(slot + 20);
+        if (record == 0 || *record != match_id)
             continue;
-        if (k == 0)
+        if (pick == 0)
             goto found;
-        k--;
+        pick--;
     }
     return 0;
 }

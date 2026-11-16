@@ -50,7 +50,7 @@ extern char ref_L22_003F54B8_00[];
 extern f32 ref_L22_003F54B8_01 __attribute__((sda));
 extern f32 ref_L22_003F54B8_02 __attribute__((sda));
 
-void func_PAL_L22_003F9948(u8 *obj) {
+void sway_start_pal(u8 *obj) {
     SwayVars *vars = *(SwayVars **)(obj + 0x68);
     f32 delta[4];
 

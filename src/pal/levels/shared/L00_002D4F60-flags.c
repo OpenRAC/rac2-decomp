@@ -23,6 +23,7 @@ extern int FastTweenColor(int, int, float);
 extern void math_store_angle_update_result(int, float *, int, int, float);
 extern int ref_L00_002D4A38_00 __attribute__((sda));
 
+/* Fades the colors of the level glow objects back and forth over time (PAL: 50 Hz step sizes). */
 void level_fade_glow_colors_pal(void)
 {
     Node_F882f1178 *node;

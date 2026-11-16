@@ -3,8 +3,8 @@
 #include "common.h"
 
 extern void moby_set_state(char *, int, int);
-extern void func_PAL_002A7E68(char *, int, int, int);
-extern int func_PAL_002B1A50(char *, char *, int);
+extern void anim_start_blended_pal(char *, int, int, int);
+extern int moby_apply_damage_to_object_pal(char *, char *, int);
 typedef struct {
     char pad00[0x1830]; unsigned char *player;
     char pad1834[0xA60]; int mode;
@@ -42,21 +42,21 @@ extern s32 weapon_select_aim_target(void *, s32, float, float, s32, s32);
 #define I(o) (((int *)v)[(o) / 4])
 #define F(o) (((float *)v)[(o) / 4])
 
-void func_PAL_L06_004485C0(u8 *m)
+void notak_enemy_update_pal(u8 *moby)
 {
-    u8 *v = *(u8 **)(m + 0x68);
+    u8 *v = *(u8 **)(moby + 0x68);
     int hit;
 
-    if (m[0x20] == 0) {
+    if (moby[0x20] == 0) {
         char *rec;
 
-        if (g_moby_l06_group_count < m[0x21]) {
+        if (g_moby_l06_group_count < moby[0x21]) {
             STUB_printf(g_str_notak_debug_a);
             STUB_printf(g_str_notak_debug_b);
             math_trap_always();
         }
-        m[0x30] = 0x40;
-        qcopy(v + 0x2E0, m + 0x10);
+        moby[0x30] = 0x40;
+        qcopy(v + 0x2E0, moby + 0x10);
         F(0x324) = 1.0f;
         B(0x48) = FloatToInt(15.0f);
         B(0x4A) = FloatToInt(4.8f);
@@ -88,33 +88,33 @@ void func_PAL_L06_004485C0(u8 *m)
             I(0x13C) = **(int **)(rec + 0x3C);
         F(0x328) = math_random_angle();
         if (I(0x214) != 0) {
-            *(int *)(m + 0x98) = 0;
-            *(unsigned short *)(m + 0x34) = (*(unsigned short *)(m + 0x34) | 0x41) & 0xEFFF;
-            moby_set_state((char *)m, 9, 4);
-            if (m[0x43] != 10)
-                func_PAL_002A7E68((char *)m, 10, 0, 0);
+            *(int *)(moby + 0x98) = 0;
+            *(unsigned short *)(moby + 0x34) = (*(unsigned short *)(moby + 0x34) | 0x41) & 0xEFFF;
+            moby_set_state((char *)moby, 9, 4);
+            if (moby[0x43] != 10)
+                anim_start_blended_pal((char *)moby, 10, 0, 0);
         } else {
-            moby_set_state((char *)m, 1, 0);
-            if (m[0x43] != 0)
-                func_PAL_002A7E68((char *)m, 0, 0, 0);
+            moby_set_state((char *)moby, 1, 0);
+            if (moby[0x43] != 0)
+                anim_start_blended_pal((char *)moby, 0, 0, 0);
         }
     }
-    if (m[0x31] != 0 && fast_vec_dist(m + 0x10, g_hero_l06_position) < 24.0f) {
-        moby_update_ground_check(m);
-        m[0x6F] = 0x16;
+    if (moby[0x31] != 0 && fast_vec_dist(moby + 0x10, g_hero_l06_position) < 24.0f) {
+        moby_update_ground_check(moby);
+        moby[0x6F] = 0x16;
     }
-    hit = func_PAL_002B1A50((char *)m, (char *)(v + 0x50), 0);
+    hit = moby_apply_damage_to_object_pal((char *)moby, (char *)(v + 0x50), 0);
     if (hit != 0) {
-        actor_alert_group_and_markers(m);
+        actor_alert_group_and_markers(moby);
         if (hit >= 4)
-            moby_l06_explode_and_remove_pal((char *)m);
+            moby_l06_explode_and_remove_pal((char *)moby);
     }
-    if (*(float *)(m + 0x18) < 48.0f) {
-        SetDeathBits_pal(m, 0, 3);
-        part_spawn_explosion_with_sparks_pal(m, m + 0x10, -1, 1.0f, 13.0f);
-        moby_mark_spawned(m);
-    } else if (m[0x95] != 3 && m[0x95] != 4) {
-        H(0x314) = weapon_select_aim_target(m, I(0x210), 16.0f, 0.0f, 0, 0);
+    if (*(float *)(moby + 0x18) < 48.0f) {
+        SetDeathBits_pal(moby, 0, 3);
+        part_spawn_explosion_with_sparks_pal(moby, moby + 0x10, -1, 1.0f, 13.0f);
+        moby_mark_spawned(moby);
+    } else if (moby[0x95] != 3 && moby[0x95] != 4) {
+        H(0x314) = weapon_select_aim_target(moby, I(0x210), 16.0f, 0.0f, 0, 0);
     }
 }
 

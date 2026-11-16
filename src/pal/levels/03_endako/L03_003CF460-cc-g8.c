@@ -47,11 +47,11 @@ typedef struct {
     float velocity[4];
     char pad100[0x23C];
     char *interaction;
-    int interactionActive;
+    int interaction_active;
     char pad344[0x1CDC];
     float scale[3];
     char pad202C[0x28B];
-    unsigned char interactionLock;
+    unsigned char interaction_lock;
     char pad22B8[0x248];
     unsigned short transform;
 } PlayerState;
@@ -76,24 +76,26 @@ extern float g_tube_start_scale_threshold __attribute__((sda));
 #define B(p,o) (*(unsigned char *)((p)+(o)))
 #define F(p,o) (*(float *)((p)+(o)))
 
-void func_PAL_L03_003CF460(char *actor)
+/* Tube start update: sets up the entry, lets Ratchet use it, shrinks him into the tube and out the
+   other end, and spawns sparkle particles while it is idle (PAL: 50 Hz timings). */
+void tube_start_update_pal(char *actor)
 {
     float pos[4], rot[4];
     int r,g,b;
     char *state = *(char **)(actor+0x68);
-    int i, countdown, color, life, random, tint, tintB, tintG;
+    int i, countdown, color, life, random, tint, tint_b, tint_g;
     float one;
-    int packedGreen, packedBlue;
-    unsigned int timer, oldTimer;
-    unsigned char lifeByte;
-    float angle, scale, alpha, speed, step, rate, lifeFloat;
-    char *p, *q, *scalePtr, *velocityPtr;
+    int packed_green, packed_blue;
+    unsigned int timer, old_timer;
+    unsigned char life_byte;
+    float angle, scale, alpha, speed, step, rate, life_float;
+    char *p, *q, *scale_ptr, *velocity_ptr;
     switch (B(actor,0x20)) {
     case 0:
         get_moby_color(actor,&r,&g,&b);
-        packedGreen = (g << 8) | 0x80000000;
-        packedBlue = (b << 16) | packedGreen;
-        I(state,0x20) = packedBlue | r;
+        packed_green = (g << 8) | 0x80000000;
+        packed_blue = (b << 16) | packed_green;
+        I(state,0x20) = packed_blue | r;
         if (I(state,8) && !g_tube_start_flags[0]) {
             I(actor,0x98)=0;
             H(actor,0x34)=(H(actor,0x34)|0x41)&0xEFFF;
@@ -102,7 +104,7 @@ void func_PAL_L03_003CF460(char *actor)
         } else moby_set_state(actor,1,-1);
         break;
     case 1:
-        if (g_hero_state.interaction==actor && g_hero_state.interactionActive
+        if (g_hero_state.interaction==actor && g_hero_state.interaction_active
             && vec_distance_xy(actor+0x10,g_hero_state.position)<2.0f) {
             TryClaimNotice(8,0x12FB,1);
             if (hero_is_allowed_for_mode(8) && (g_pad_held_flags[0]&0x10)) {
@@ -119,15 +121,15 @@ void func_PAL_L03_003CF460(char *actor)
         }
         break;
     case 2:
-        g_hero_state.interactionLock=1;
+        g_hero_state.interaction_lock=1;
         if (hero_get_target_state_kind()==2) {
             moby_set_state(actor,3,-1);
             hero_l03_enter_state(0x6F,1);
         } else {
             timer = H(actor,0x96);
-            oldTimer = timer++;
+            old_timer = timer++;
             H(actor,0x96) = timer;
-            if (oldTimer < 0x97) break;
+            if (old_timer < 0x97) break;
             FastVecSub(pos,g_hero_state.position,actor+0x10);
             if (FastVecDot(pos,g_hero_state.velocity)<0.0f) qzero(g_hero_state.velocity);
             if (H(actor,0x96)>=0x12D) {
@@ -139,7 +141,7 @@ void func_PAL_L03_003CF460(char *actor)
     case 3:
         if (flag_set_first_pending(actor)) { I(state,0x1C)=0; B(actor,0x30)=255; }
         H(actor,0x96)++;
-        g_hero_state.interactionLock=1;
+        g_hero_state.interaction_lock=1;
         ApproachValue(state+0x1C,1.57079649f,0.12566373f);
         g_hero_state.transform=1;
         g_hero_state.scale[0]=g_hero_state.scale[1]=1.0f-math_fast_sin_or_cos_b(F(state,0x1C));
@@ -159,10 +161,10 @@ void func_PAL_L03_003CF460(char *actor)
         g_hero_state.transform=1;
         g_hero_state.scale[0]=g_hero_state.scale[1]=1.0f-math_fast_sin_or_cos_b(F(state,0x1C));
         g_hero_state.scale[2]=2.0f-math_fast_sin_or_cos_a(F(state,0x1C));
-        g_hero_state.interactionLock=1;
+        g_hero_state.interaction_lock=1;
         if (F(state,0x1C)<=0.0f) {
             B(actor,0x30)=B(actor,0x32);
-            g_hero_state.interactionLock=0;
+            g_hero_state.interaction_lock=0;
             moby_set_state(actor,1,-1);
         }
         break;
@@ -186,19 +188,19 @@ void func_PAL_L03_003CF460(char *actor)
         if (flag_set_first_pending(actor)) PlayMobySound(1,0,actor);
         q=state+0x34;
         one=1.0f;
-        i=0; p=actor+0xC0; velocityPtr=state+0x24; scalePtr=q;
-        for (;i<3;i++,p+=16,velocityPtr+=4,scalePtr+=4,q+=4) {
+        i=0; p=actor+0xC0; velocity_ptr=state+0x24; scale_ptr=q;
+        for (;i<3;i++,p+=16,velocity_ptr+=4,scale_ptr+=4,q+=4) {
             if (F(q,0)<one && (!i || F(q,-4)>g_tube_start_scale_threshold)) {
-                math_step_value_toward_target(scalePtr,velocityPtr,1.0f,step,step,rate);
+                math_step_value_toward_target(scale_ptr,velocity_ptr,1.0f,step,step,rate);
                 if (F(q,0)>one) F(q,0)=one;
                 vec_scale_to_length(p,p,F(q,0));
             }
         }
         if (F(state,0x34)>=1.0f && F(state,0x38)>=1.0f && F(state,0x3C)>=1.0f) moby_set_state(actor,1,-1);
         tint=FastTweenColor(g_tube_start_tint_color,I(state,0x20),F(state,0x3C));
-        tintB=(tint>>16)&255;
-        tintG=(tint>>8)&255;
-        set_moby_color(actor,tint&255,tintG,tintB);
+        tint_b=(tint>>16)&255;
+        tint_g=(tint>>8)&255;
+        set_moby_color(actor,tint&255,tint_g,tint_b);
         break;
     }
     if (B(actor,0x20)<5) {
@@ -218,11 +220,11 @@ void func_PAL_L03_003CF460(char *actor)
             life=math_random_int_range(60,180);
             life = (life * 5 + 2) / 6;
             vec_clear_128(rot);
-            lifeFloat=IntToFloat(life);
-            lifeByte = life;
-            rot[2]=speed/lifeFloat;
+            life_float=IntToFloat(life);
+            life_byte = life;
+            rot[2]=speed/life_float;
             random=math_random_int_below(255);
-            part_spawn_hero_relative(pos,rot,color,alpha,lifeByte,random&255,0);
+            part_spawn_hero_relative(pos,rot,color,alpha,life_byte,random&255,0);
         }
         gfx_add_draw_callback_first(tube_start_draw_effect,actor);
     }

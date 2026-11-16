@@ -5,7 +5,8 @@ extern void SetupGifPaging(long);
 extern void level_l00_call_module_handler_7_pal(void);
 extern void DoGifPaging(void);
 
-int func_PAL_L00_00350EA8(void)
+/* Runs GIF paging around module handler 7, then returns zero. */
+int setup_l00_gif_paging_handler_7_pal(void)
 {
   SetupGifPaging(0);
   level_l00_call_module_handler_7_pal();
@@ -17,7 +18,8 @@ int func_PAL_L00_00350EA8(void)
 
 extern void level_l00_call_module_handler_6_pal(void);
 
-int func_PAL_L00_00351000(void)
+/* Runs GIF paging around module handler 6, then returns zero. */
+int setup_l00_gif_paging_handler_6_pal(void)
 {
   SetupGifPaging(0);
   level_l00_call_module_handler_6_pal();
@@ -29,7 +31,7 @@ int func_PAL_L00_00351000(void)
 extern int g_menu_input_flags;
 extern int level_l00_call_module_handler_with_arg_11(int a);
 
-extern int func_PAL_L00_0030F2C8(int a);
+extern int module_l00_call_handler_with_arg_9_pal(int a);
 extern void ref_PAL_L00_00351088_00(int a);
 
 int input_l00_update_return_zero_2_pal(void)
@@ -54,7 +56,8 @@ long long setup_l00_run_three_return_zero_4_pal(void)
 
 extern int g_menu_choice;
 
-int func_PAL_L00_003510E0(void) {
+/* Clears the menu choice to -1 and returns zero. */
+int menu_l00_clear_choice_pal(void) {
     g_menu_choice = -1;
     return 0;
 }

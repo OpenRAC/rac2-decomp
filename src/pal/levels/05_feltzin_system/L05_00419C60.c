@@ -7,11 +7,11 @@ extern int math_random_int_below(int kind);
 extern char *moby_get_motion_data(char *object);
 extern void *state_get_stored_pointer_value(char *object);
 extern void level_append_object(char *object, int a1, int a2, int a3);
-extern void func_PAL_L05_0037E8E0(char *object);
+extern void follower_l05_update_pal(char *object);
 extern int moby_process_collision_hit(char *object, int a1, int a2, int a3);
 extern void moby_check_player_in_view_and_range(char *object, int a1, float a2);
 extern int moby_can_take_next_step(char *object);
-extern void func_PAL_L05_0037DE20(char *object);
+extern void follower_start_wander_pal(char *object);
 extern int math_fast_float_d(char *block);
 extern char *g_feltzin_target_mobys __attribute__((sda));
 extern char g_sound_state[];
@@ -33,8 +33,8 @@ extern void tail_trail_spawn_marks_a_pal(char *obj);
 void feltzin_enemy_a_update_pal(char *object)
 {
     char *state = *(char **)(object + 0x68);
-    Target05 *r;
-    char *rec, *rec2;
+    Target05 *motion;
+    char *sound_rec, *near_sound_rec;
     char buf[0x10];
 
     if (*(unsigned char *)(object + 0x20) == 0) {
@@ -47,39 +47,39 @@ void feltzin_enemy_a_update_pal(char *object)
             level_append_object(object, 0, 0, 0);
         return;
     }
-    r = (Target05 *)moby_get_motion_data(object);
-    if (r->mode == 0)
+    motion = (Target05 *)moby_get_motion_data(object);
+    if (motion->mode == 0)
         return;
     {
         int one = 1;
 
-        func_PAL_L05_0037E8E0(object);
+        follower_l05_update_pal(object);
         moby_process_collision_hit(object, 0, 0, 0);
         moby_check_player_in_view_and_range(object, one, 32.0f);
-        if (r->mode == one) {
+        if (motion->mode == one) {
             if (*(int *)(state + 0x260) != -1) {
-                r->has_target = 1;
-                r->target = g_feltzin_target_mobys + *(int *)(state + 0x260) * 256;
-                if (fast_vec_dist(r->target + 0x10, object + 0x10) < 10.0f) {
-                    rec2 = g_sound_state + *(int *)(state + 0x270) * 0x70;
-                    if (*(char **)(rec2 + 0x88) != object ||
-                        *(unsigned char *)(rec2 + 0x74) == 0) {
+                motion->has_target = 1;
+                motion->target = g_feltzin_target_mobys + *(int *)(state + 0x260) * 256;
+                if (fast_vec_dist(motion->target + 0x10, object + 0x10) < 10.0f) {
+                    near_sound_rec = g_sound_state + *(int *)(state + 0x270) * 0x70;
+                    if (*(char **)(near_sound_rec + 0x88) != object ||
+                        *(unsigned char *)(near_sound_rec + 0x74) == 0) {
                         if (math_random_int_below(0x190) == 0)
                             *(int *)(state + 0x270) =
                                 snd_play_from_class_bank(0xE, 0, object, 0xFBF);
                     }
                 }
             }
-            if (r->x104 != 0)
+            if (motion->x104 != 0)
                 feltzin_enemy_fire_burst_shot_pal(object);
             if (moby_can_take_next_step(object) != 0)
-                func_PAL_L05_0037DE20(object);
+                follower_start_wander_pal(object);
             math_fast_float_d(state + 0x268);
             tail_trail_spawn_marks_a_pal(object);
         }
     }
-    rec = g_sound_state + *(int *)(state + 0x26C) * 0x70;
-    if (*(char **)(rec + 0x88) != object || *(unsigned char *)(rec + 0x74) == 0)
+    sound_rec = g_sound_state + *(int *)(state + 0x26C) * 0x70;
+    if (*(char **)(sound_rec + 0x88) != object || *(unsigned char *)(sound_rec + 0x74) == 0)
         *(int *)(state + 0x26C) = snd_play_from_class_bank(0, 6, object, 0xF73);
 }
 
@@ -94,26 +94,27 @@ extern void func_37AEC0(char *object, int flag);
 extern int g_feltzin_challenge_state[];
 extern char *g_feltzin_enemy_table __attribute__((sda));
 
+/* Sets up a new enemy: starts it at a random spot around its spawn point and resets its timers. */
 void feltzin_enemy_init_position_pal(char *obj)
 {
-    char *sub = *(char **)(obj + 0x68);
+    char *state = *(char **)(obj + 0x68);
     char *table;
-    float a, b, c;
+    float radius, angle_a, angle_b;
 
     *(unsigned char *)(obj + 0x20) = 1;
     *(unsigned short *)(obj + 0x34) = *(unsigned short *)(obj + 0x34) | 0x100;
     *(int *)(func_379CA0(obj) + 0x148) = 0x14;
     func_37AEC0(obj, 1);
     table = g_feltzin_enemy_table + g_feltzin_challenge_state[0] * 128;
-    *(int *)(sub + 0x26C) = -1;
-    *(int *)(sub + 0x270) = -1;
-    *(float *)(sub + 0x180) = 20.0f;
-    *(int *)(sub + 0x268) = 0;
+    *(int *)(state + 0x26C) = -1;
+    *(int *)(state + 0x270) = -1;
+    *(float *)(state + 0x180) = 20.0f;
+    *(int *)(state + 0x268) = 0;
     *(float *)(obj + 0x2C) = 0.02f;
-    a = func_332B50(0.0f, *(float *)table);
-    b = func_332C18();
-    c = func_332C18();
-    func_33B330(obj + 0x10, a, b, c);
+    radius = func_332B50(0.0f, *(float *)table);
+    angle_a = func_332C18();
+    angle_b = func_332C18();
+    func_33B330(obj + 0x10, radius, angle_a, angle_b);
     func_306630(obj + 0x10, table + 0x30, obj + 0x10);
 }
 
@@ -123,19 +124,19 @@ extern void func_379FA0(char *object, int a1, int a2, int a3, float f0, float f1
 /* Runs the object's pending effect when three guards clear, then marks the run. */
 void feltzin_enemy_fire_burst_shot_pal(char *object)
 {
-    char *s1 = *(char **)(object + 0x68);
-    char *r;
+    char *state = *(char **)(object + 0x68);
+    char *effect_rec;
 
-    r = func_379CA0(object);
-    if (r == 0)
+    effect_rec = func_379CA0(object);
+    if (effect_rec == 0)
         return;
-    if (*(int *)(r + 0x120) == 0)
+    if (*(int *)(effect_rec + 0x120) == 0)
         return;
-    if (*(int *)(s1 + 0x268) != 0)
+    if (*(int *)(state + 0x268) != 0)
         return;
     if (*(unsigned char *)(object + 0x20) == 1)
         func_379FA0(object, 0x60800000, 1, 0, 0.75f, 5.0f, 1.0f, 1.0f, 0, -1, 0);
-    *(int *)(s1 + 0x268) = 0x11;
+    *(int *)(state + 0x268) = 0x11;
 }
 
 
@@ -158,8 +159,8 @@ extern char g_beam_records[];
 void feltzin_enemy_b_update_pal(char *object)
 {
     char *state = *(char **)(object + 0x68);
-    Target05 *r;
-    char *rec;
+    Target05 *motion;
+    char *sound_rec;
     char buf[0x10];
 
     if (*(unsigned char *)(object + 0x20) == 0) {
@@ -185,8 +186,8 @@ void feltzin_enemy_b_update_pal(char *object)
         }
         return;
     }
-    r = (Target05 *)moby_get_motion_data(object);
-    if (r->mode == 0)
+    motion = (Target05 *)moby_get_motion_data(object);
+    if (motion->mode == 0)
         return;
     if (*(int *)(state + 0x26C) == 0 && *(int *)(state + 0x270) == 0) {
         *(int *)(state + 0x26C) = (int)feltzin_helper_create(object, 0);
@@ -197,26 +198,25 @@ void feltzin_enemy_b_update_pal(char *object)
     {
         int one = 1;
 
-        func_PAL_L05_0037E8E0(object);
+        follower_l05_update_pal(object);
         moby_process_collision_hit(object, 0, 0, 0);
         moby_check_player_in_view_and_range(object, one, 32.0f);
-        if (r->mode == one) {
+        if (motion->mode == one) {
             if (*(int *)(state + 0x260) != -1) {
-                r->has_target = 1;
-                r->target = g_feltzin_target_mobys + *(int *)(state + 0x260) * 256;
+                motion->has_target = 1;
+                motion->target = g_feltzin_target_mobys + *(int *)(state + 0x260) * 256;
             }
-            if (r->x108 != 0 && r->x104 != 0)
+            if (motion->x108 != 0 && motion->x104 != 0)
                 feltzin_enemy_fire_shot_pal(object);
             if (moby_can_take_next_step(object) != 0)
-                func_PAL_L05_0037DE20(object);
+                follower_start_wander_pal(object);
             math_fast_float_d(state + 0x268);
             tail_trail_spawn_marks_b_pal(object);
         }
     }
-    rec = g_sound_state + *(int *)(state + 0x274) * 0x70;
-    if (*(char **)(rec + 0x88) != object || *(unsigned char *)(rec + 0x74) == 0)
+    sound_rec = g_sound_state + *(int *)(state + 0x274) * 0x70;
+    if (*(char **)(sound_rec + 0x88) != object || *(unsigned char *)(sound_rec + 0x74) == 0)
         *(int *)(state + 0x274) = snd_play_from_class_bank(1, 6, object, 0xF76);
     beam_update_records_pal(object);
     gfx_add_draw_callback_third(heavy_lancer_update, object);
 }
-

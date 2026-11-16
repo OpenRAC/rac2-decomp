@@ -48,13 +48,13 @@ extern float g_mothership_surface_radius;
 extern char *g_mothership_beam_end_handles[8][3];
 extern int g_mothership_beam_handles[8][3];
 extern Quad g_mothership_barrier_points[8][3];
-struct PlayerView {
+struct player_view {
     unsigned char pad[0x80];
     Quad position;
     unsigned char gap[0x2200];
     char *object;
 };
-extern struct PlayerView g_hero_state;
+extern struct player_view g_hero_state;
 extern int math_fast_float_d(int *);
 extern float math_fabs(float);
 extern int PlayMobySound(int, int, char *);
@@ -74,28 +74,28 @@ extern void moby_transform_joint_to_world(char *, int, char *);
 extern void *ribbon_trail_create(unsigned char *, unsigned char *, unsigned char *, unsigned char, unsigned char, short, short, float, float, float, float, int, int, int, int, int);
 extern float fast_vec_dist(char *, char *);
 extern void *SpawnExplosion_pal(void *, int, int, int, int, int, int, int, float, float, int, int, int, void *);
-extern void func_PAL_L23_00423898(unsigned char *, int, int, Quad *, float *, int);
+extern void cam_play_effect_on_target_pal(unsigned char *, int, int, Quad *, float *, int);
 extern int snd_play_from_class_bank(int, int, char *, int);
 extern int math_random_int_range(int, int);
 extern int CollLine(void *, void *, int, void *, void *);
 
 /* Update the radial field, its linked effects and player contact response. */
-void func_PAL_L23_0041F840(char *object) {
+void mothership_update_energy_barrier_pal(char *object) {
     struct {
         Quad vertex[8], scaled[2], axes[3], euler, matrix[3], blast, position;
     } local;
-    struct HitView {
+    struct hit_view {
         Quad result;
         char *owner;
         unsigned int flags;
         unsigned char kind, mode;
-        unsigned short ownerClass;
+        unsigned short owner_class;
         float radius;
         int value;
     } hit;
     char *state = *(char **)(object + 0x68);
     float x, y, z, random;
-    int i, j, contactIndex;
+    int i, j, contact_index;
     if (*(int *)(state + 0x5B0) == 0) {
         g_energy_barrier_level = g_barrier_energy_reset;
         g_barrier_energy_delta = math_fabs(g_barrier_energy_delta);
@@ -183,7 +183,7 @@ void func_PAL_L23_0041F840(char *object) {
             FastVecAdd((char *)&local.blast, (char *)&local.blast, (char *)&g_hero_state.position);
             SpawnExplosion_pal(&local.blast, 1, 35, 20, 20, 15, 25, 1, 2.5f, 20.0f, 0, 1, 0, 0);
             local.position = *(Quad *)(object + 16);
-            func_PAL_L23_00423898((unsigned char *)object, 3, (int)g_barrier_cam_effect_param, &local.position, 0, 1);
+            cam_play_effect_on_target_pal((unsigned char *)object, 3, (int)g_barrier_cam_effect_param, &local.position, 0, 1);
             *(int *)(state + 0x5C4) = 21;
             snd_play_from_class_bank(2, 0, g_hero_state.object, 0xF7F);
         }
@@ -197,11 +197,11 @@ void func_PAL_L23_0041F840(char *object) {
         hit.value = 0;
         hit.kind = 3;
         hit.mode = 3;
-        hit.ownerClass = *(unsigned short *)(object + 0xAA);
-        /* contactIndex + -1, not - 1: the negative index wraps in sizetype, so table-16 stays its own
+        hit.owner_class = *(unsigned short *)(object + 0xAA);
+        /* contact_index + -1, not - 1: the negative index wraps in sizetype, so table-16 stays its own
          * constant and cse does not rebuild it from the table address (use_related_value). */
-        for (contactIndex = 1; contactIndex < 3; contactIndex++) {
-            CollLine(&g_mothership_barrier_points[0][contactIndex + -1], &g_mothership_barrier_points[0][contactIndex], 0, 0, &hit);
+        for (contact_index = 1; contact_index < 3; contact_index++) {
+            CollLine(&g_mothership_barrier_points[0][contact_index + -1], &g_mothership_barrier_points[0][contact_index], 0, 0, &hit);
         }
     }
 }

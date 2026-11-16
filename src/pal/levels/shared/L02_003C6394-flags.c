@@ -9,7 +9,9 @@ extern void FastVecSub(float *, const float *, const float *);
 extern void vec_scale_to_length(float *, const float *, float);
 extern void FastVecAdd(void *, void *, void *);
 
-int func_PAL_L02_003C7D70(char *object) {
+/* Moves a gate along its path points toward the next point. Returns 0 while moving, 1 or 2 when
+   it reaches the last point, and 3 when its controller is already finished. */
+int gate_move_along_path_pal(char *object) {
     float delta[4];
     char *state = *(char **)(object + 0x68);
     char *controller = *(char **)(state + 8);

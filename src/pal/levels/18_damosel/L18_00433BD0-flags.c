@@ -34,75 +34,76 @@ extern u8 g_leader_exhaust_offset_right[] __attribute__((sda));
 extern u8 g_leader_steer_offsets[];
 #define F(p, o) (*(float *)((p) + (o)))
 
-void leader_steer_pal(u8 *a, int turn, int tilt)
+/* Turns and tilts the leader toward its target spot, moves it there, places its attached pieces, and sprays exhaust particles. (PAL: 50 Hz timings) */
+void leader_steer_pal(u8 *moby, int turn, int tilt)
 {
-    u8 *s = *(u8 **)(a + 0x68);
+    u8 *state = *(u8 **)(moby + 0x68);
     int i;
 
     if (turn) {
-        if (a[0x20] == 2)
-            math_update_wrapped_angle_offset(a, s + 0xC8, s + 0xCC, g_leader_roll_blend,
+        if (moby[0x20] == 2)
+            math_update_wrapped_angle_offset(moby, state + 0xC8, state + 0xCC, g_leader_roll_blend,
                           g_leader_yaw_limit * 0.0003490659f, -1.0f);
         else
-            math_update_wrapped_angle_offset(a, s + 0xC8, s + 0xCC, g_leader_yaw_blend,
+            math_update_wrapped_angle_offset(moby, state + 0xC8, state + 0xCC, g_leader_yaw_blend,
                           g_leader_yaw_limit * 0.0003490659f, -1.0f);
     }
     if (tilt) {
-        if (a[0x20] == 2)
-            moby_scale_owner_words_by_angles(a, s + 0xD0, s + 0xD4, g_leader_roll_scale,
+        if (moby[0x20] == 2)
+            moby_scale_owner_words_by_angles(moby, state + 0xD0, state + 0xD4, g_leader_roll_scale,
                           g_leader_pitch_limit * 0.0003490659f,
                           g_leader_pitch_rate * 0.0003490659f);
         else
-            moby_scale_owner_words_by_angles(a, s + 0xD0, s + 0xD4, g_leader_pitch_blend,
+            moby_scale_owner_words_by_angles(moby, state + 0xD0, state + 0xD4, g_leader_pitch_blend,
                           g_leader_pitch_limit * 0.0003490659f,
                           g_leader_pitch_rate * 0.0003490659f);
     } else {
-        ApproachValue(a + 0xF0, 0.0f, 0.062831864f);
-        ApproachValue(a + 0xF4, 0.0f, 0.062831864f);
+        ApproachValue(moby + 0xF0, 0.0f, 0.062831864f);
+        ApproachValue(moby + 0xF4, 0.0f, 0.062831864f);
     }
-    math_step_value_toward_target(a + 0x10, s + 0x80, F(s, 0x70),
+    math_step_value_toward_target(moby + 0x10, state + 0x80, F(state, 0x70),
                   g_leader_spin_rate_x * 0.00040000002f,
                   g_leader_spin_rate_y * 0.00040000002f,
                   g_leader_exhaust_speed * 0.020000001f);
-    math_step_value_toward_target(a + 0x14, s + 0x84, F(s, 0x74),
+    math_step_value_toward_target(moby + 0x14, state + 0x84, F(state, 0x74),
                   g_leader_spin_rate_x * 0.00040000002f,
                   g_leader_spin_rate_y * 0.00040000002f,
                   g_leader_exhaust_speed * 0.020000001f);
-    math_step_value_toward_target(a + 0x18, s + 0x88, F(s, 0x78),
+    math_step_value_toward_target(moby + 0x18, state + 0x88, F(state, 0x78),
                   g_leader_spin_rate_x * 0.00040000002f,
                   g_leader_spin_rate_y * 0.00040000002f,
                   g_leader_exhaust_speed * 0.020000001f);
-    if (vec_distance_xy(a + 0x10, s + 0x70) > 1.0f) {
-        u8 *heading = a + 0xF8;
-        float angle = mat_fast_helper_a(F(s, 0x70) - F(a, 0x10),
-                                    F(s, 0x74) - F(a, 0x14));
-        math_approach_target_with_direction_mode(heading, s + 0xD8, angle,
+    if (vec_distance_xy(moby + 0x10, state + 0x70) > 1.0f) {
+        u8 *heading = moby + 0xF8;
+        float angle = mat_fast_helper_a(F(state, 0x70) - F(moby, 0x10),
+                                    F(state, 0x74) - F(moby, 0x14));
+        math_approach_target_with_direction_mode(heading, state + 0xD8, angle,
                       g_leader_roll_limit * 6.981318e-06f,
                       g_leader_roll_rate * 6.981318e-06f,
                       g_leader_sway_limit * 0.0003490659f, 0);
     }
     {
-        int *ids = (int *)(s + 0x90);
+        int *ids = (int *)(state + 0x90);
         u8 *offset = g_leader_steer_offsets;
 
         for (i = 0; i < 6; i++, offset += 16, ids++) {
             if (*ids != -1) {
-                u8 *e = g_moby_l18_table + (*ids << 8);
-                matrix_mul_vec3(e + 0x10, offset, a + 0xC0);
-                FastVecAdd(e + 0x10, e + 0x10, a + 0x10);
+                u8 *piece = g_moby_l18_table + (*ids << 8);
+                matrix_mul_vec3(piece + 0x10, offset, moby + 0xC0);
+                FastVecAdd(piece + 0x10, piece + 0x10, moby + 0x10);
                 if (i < 3) {
-                    F(e, 0xF0) = F(a, 0xF4);
-                    F(e, 0xF4) = -F(a, 0xF0);
-                    F(e, 0xF8) = FastAddRotations(F(a, 0xF8), g_leader_piece_rotation_table[i]);
+                    F(piece, 0xF0) = F(moby, 0xF4);
+                    F(piece, 0xF4) = -F(moby, 0xF0);
+                    F(piece, 0xF8) = FastAddRotations(F(moby, 0xF8), g_leader_piece_rotation_table[i]);
                 } else {
-                    F(e, 0xF0) = -F(a, 0xF4);
-                    F(e, 0xF4) = F(a, 0xF0);
-                    F(e, 0xF8) = FastAddRotations(F(a, 0xF8), g_leader_piece_rotation_table[i]);
+                    F(piece, 0xF0) = -F(moby, 0xF4);
+                    F(piece, 0xF4) = F(moby, 0xF0);
+                    F(piece, 0xF8) = FastAddRotations(F(moby, 0xF8), g_leader_piece_rotation_table[i]);
                 }
             }
         }
     }
-    part_l18_spawn_exhaust_pal(a, g_leader_exhaust_offset_left);
-    part_l18_spawn_exhaust_pal(a, g_leader_exhaust_offset_right);
-    gfx_add_draw_callback_third(gfx_draw_beams_both_tables, a);
+    part_l18_spawn_exhaust_pal(moby, g_leader_exhaust_offset_left);
+    part_l18_spawn_exhaust_pal(moby, g_leader_exhaust_offset_right);
+    gfx_add_draw_callback_third(gfx_draw_beams_both_tables, moby);
 }

@@ -4,7 +4,7 @@
 extern int ref_L00_0030CDB0_00[] __attribute__((sda));
 extern int g_current_game_mode[] __attribute__((sda));
 extern char *g_resident_data_base[] __attribute__((sda));
-extern int func_PAL_0029C498(void);
+extern int UpdateMissionSelectionMenu_pal(void);
 extern unsigned int level_get_word_a(void);
 extern void module_l00_call_handler_pal(void);
 typedef int (*Fn)(void);
@@ -19,7 +19,8 @@ typedef struct {
     Slot slot2[2];
 } Sub;
 
-void func_PAL_0029C640(void)
+/* Runs the resident menu callbacks and slot handlers, then the level call handler, unless a game mode blocks it. */
+void menu_callbacks_run_pal(void)
 {
     int i;
     int result;
@@ -32,7 +33,7 @@ void func_PAL_0029C640(void)
 
     if (g_resident_data_base[0] == 0)
         goto states;
-    func_PAL_0029C498();
+    UpdateMissionSelectionMenu_pal();
     fn = (Fn)((Sub *)(g_resident_data_base[0] + 0x38000))->cb2;
     if (fn != 0) {
         if (fn() != 0)

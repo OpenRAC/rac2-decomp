@@ -9,6 +9,7 @@ extern void vec_build_spherical_offset(float *out, float a, float b, float c);
 extern unsigned char *part_spawn_ground_effect(float life, void *position, int size, float secondLife, int color, int mode, int flag, float *vector, float third, int counter);
 extern int FloatToInt(float value);
 
+/* Spawns eight pairs of sparks that fly out of a position in random directions (PAL). */
 void part_l00_spawn_spark_pairs_2_pal(void *position, int color)
 {
     float vector[4] __attribute__((aligned(16)));

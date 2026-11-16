@@ -15,7 +15,7 @@ extern void matrix_mul_vec3(void *, void *, void *);
 extern unsigned char *SpawnExplosion_pal(void *, int, int, int, int, int, int, int, float, float, int, int, int, void *);
 extern void vec_transform_and_set_height(char *, void *, void *, float, void *);
 extern int math_random_int_below(int);
-extern void func_PAL_002B15D8(char *, int, float *, unsigned char, float, float, float, float);
+extern void part_spawn_masked_debris_pal(char *, int, float *, unsigned char, float, float, float, float);
 extern void moby_mark_spawned(void *);
 
 /* Spawn the destruction burst and ground impulse, then remove the object. */
@@ -43,7 +43,7 @@ void moby_l02_explode_and_remove_pal(char *object)
         colour = math_random_int_below(255);
     else
         colour = 255;
-    func_PAL_002B15D8(object, colour & 0x1F, impulse, 255, 3.0f, 6.0f, 3.0f, 6.0f);
+    part_spawn_masked_debris_pal(object, colour & 0x1F, impulse, 255, 3.0f, 6.0f, 3.0f, 6.0f);
     moby_mark_spawned(object);
 }
 

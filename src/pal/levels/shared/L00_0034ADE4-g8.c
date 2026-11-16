@@ -13,7 +13,7 @@ extern int ref_PAL_L00_0034ADE4_01[] __attribute__((sda));
  * the string id becomes 0xB60, and the draw call is func_0027F980. Retail reads
  * the first word through $gp and the second through lui, hence the two
  * declaration forms, as in func_PAL_002CE388. */
-int func_PAL_L00_0034ADE4(void)
+int level_l00_draw_text_right_2_pal(void)
 {
     SetupGifPaging(0);
     module_l00_call_handler_13_pal();

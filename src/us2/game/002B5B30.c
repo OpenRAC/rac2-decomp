@@ -5,7 +5,8 @@ extern int g_menu_mode __attribute__((sda));
 
 extern int g_global_int_value_a __attribute__((sda));
 
-int func_US2_002B5B30(void) {
+/* Returns the global integer value read by the pause menu code. */
+int mode_get_global_value_a_us2(void) {
     return g_global_int_value_a;
 }
 

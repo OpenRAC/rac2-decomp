@@ -15,7 +15,7 @@ extern float g_menu_title_text_y_offset;
 
 /* func_PAL_003456B0, the PAL copy of func_00343638: the same C, where the selector field moves, the
    text ids change and each case formats one string through D_001ADBC8 instead of two. */
-void func_PAL_003456B0(char *object)
+void menu_update_title_text_pal(char *object)
 {
     char buffer[256];
     float *position;

@@ -327,7 +327,7 @@ extern void hero_reset_start_aim_speed(void);
 extern void SetupLevelCameras(void);
 extern void cam_update_state(void);
 extern void pad_clear_port_state(void);
-extern void func_US2_L00_0037F858(void);
+extern void level_init_object_tables_us2(void);
 extern void menu_reset_state(void);
 extern void level_clear_slot_table(void);
 extern void level_l00_clear_counter_list(void);
@@ -338,11 +338,11 @@ extern void sheep_clear_active_list(void);
 extern void cam_set_transition_frames(float);
 extern void pickup_update_interactive(unsigned char *);
 
-char *func_US2_L00_003012A0(int reload)
+char *load_level_data_us2(int reload)
 {
     char *hdr = g_level_load_context.data;
     char *heap = g_level_load_context.heap;
-    float *startPos;
+    float *start_pos;
     short *idx = g_moby_index_table; /* moby index by file order, rebuilt at each use */
     int tmp; /* scratch int: section 0x44's data base, a group's offset and end flag in the group loop */
     char *p;
@@ -402,7 +402,7 @@ char *func_US2_L00_003012A0(int reload)
         g_level_float_param_second = *(float *)(p + 0xC);
         g_level_float_param_third = 1.0f;
     }
-    startPos = (float *)(p + 0x10);
+    start_pos = (float *)(p + 0x10);
     p += 0x20;
     g_hero_moby_default.i40 = *(int *)p;
     g_hero_moby_default.i44 = *(int *)(p + 4);
@@ -1466,13 +1466,13 @@ char *func_US2_L00_003012A0(int reload)
 
     if (g_current_map_index >= 0) {
         g_hero_moby_default.hero = 0;
-        if (0.0f < startPos[0]) {
+        if (0.0f < start_pos[0]) {
             Moby00618 *m = CreateMoby(0xD54);
 
-            m->pos.f[0] = startPos[0];
-            m->pos.f[1] = startPos[1];
-            m->pos.f[2] = startPos[2];
-            m->rot[2] = startPos[3];
+            m->pos.f[0] = start_pos[0];
+            m->pos.f[1] = start_pos[1];
+            m->pos.f[2] = start_pos[2];
+            m->rot[2] = start_pos[3];
             m->h32 = 0xFF;
             m->b30 = 0x10;
             m->i64 = (int)pickup_update_interactive;
@@ -1729,7 +1729,7 @@ char *func_US2_L00_003012A0(int reload)
     SetupLevelCameras();
     cam_update_state();
     pad_clear_port_state();
-    func_US2_L00_0037F858();
+    level_init_object_tables_us2();
     menu_reset_state();
     level_clear_slot_table();
     level_l00_clear_counter_list();

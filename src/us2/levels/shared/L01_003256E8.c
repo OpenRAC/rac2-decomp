@@ -7,62 +7,62 @@ extern unsigned char g_display_mode_index MACRO_ADDR;
 
 /* func_US2_L01_003256E8, the USA v2.00 copy of func_L01_00324410: the same C, where the
  * separator index 0 becomes the byte D_US2_001A7BBC. */
-void func_US2_L01_003256E8(char *out, char *src, int *nums)
+void text_expand_number_template_us2(char *out, char *src, int *nums)
 {
-    int tab[10];
-    unsigned char buf[32];
+    int values[10];
+    unsigned char digits[32];
     int i;
-    int *p;
-    int *q;
-    unsigned char *s;
-    char *w;
-    int n;
-    int cnt;
-    int v;
+    int *src_nums;
+    int *value_ptr;
+    unsigned char *text_in;
+    char *text_out;
+    int len;
+    int auto_index;
+    int value;
 
-    p = nums;
+    src_nums = nums;
     i = 0;
     strncpy((char *)0x70000000, src, 0xFF);
 
-    q = tab;
+    value_ptr = values;
     for (;;) {
-        p += 2;
-        v = p[-2];
-        if (v == -1)
+        src_nums += 2;
+        value = src_nums[-2];
+        if (value == -1)
             break;
-        *q++ = v;
+        *value_ptr++ = value;
         i++;
         if (i >= 10)
             break;
     }
 
-    s = (unsigned char *)0x70000000;
-    w = out;
-    cnt = 0;
-    while (*s != 0) {
-        if (*s == '%') {
-            if (s[1] == 'd') {
-                v = cnt++;
-                s += 2;
+    text_in = (unsigned char *)0x70000000;
+    text_out = out;
+    auto_index = 0;
+    while (*text_in != 0) {
+        if (*text_in == '%') {
+            if (text_in[1] == 'd') {
+                value = auto_index++;
+                text_in += 2;
             } else {
-                v = s[1] - '0';
-                s += 3;
+                value = text_in[1] - '0';
+                text_in += 3;
             }
-            text_format_number_separators((char *)buf, tab[v], g_display_mode_index);
-            n = 0;
-            if (*buf != 0) {
-                while (buf[n] != 0 && n < 32) {
-                    *w = buf[n];
-                    n++;
-                    w++;
+            text_format_number_separators((char *)digits, values[value], g_display_mode_index);
+            len = 0;
+            if (*digits != 0) {
+                while (digits[len] != 0 && len < 32) {
+                    *text_out = digits[len];
+                    len++;
+                    text_out++;
                 }
             }
-            *w = 0;
+            *text_out = 0;
         } else {
-            *w = *s;
-            s++;
-            w++;
+            *text_out = *text_in;
+            text_in++;
+            text_out++;
         }
     }
-    *w = 0;
+    *text_out = 0;
 }

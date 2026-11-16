@@ -9,10 +9,11 @@ extern void func_PAL_0029D5E8(int, int, int);
 extern int snd_play_from_class_bank(int, int, char *, int);
 extern void moby_mark_spawned(void *);
 extern int g_target_object __attribute__((sda));
-extern void func_PAL_L05_0042C2E8(char *);
+extern void glow_l05_ring_draw_pal(char *);
 
 /* Same shape as func_L05_004260B8, on its own data slot and with its own tail. */
-void func_PAL_L05_0042C044(char *object)
+/* Pulls an L05 ring towards the target, collects it when it gets within half a unit, and otherwise spins it and draws the glow. */
+void glow_l05_ring_update_pal(char *object)
 {
     char *state = *(char **)(object + 0x68);
     float scale;
@@ -26,14 +27,14 @@ void func_PAL_L05_0042C044(char *object)
             goto check_scale;
         }
         if (scale < 60.0f) {
-            float *p = *(float **)(object + 0x24);
-            float v = p[9] * 0.02222222276031971f * scale;
+            float *params = *(float **)(object + 0x24);
+            float value = params[9] * 0.02222222276031971f * scale;
 
-            *(float *)(object + 0x2C) = v;
+            *(float *)(object + 0x2C) = value;
             {
-                float cap = p[9] * 0.30000001192092896f;
+                float cap = params[9] * 0.30000001192092896f;
 
-                if (v < cap)
+                if (value < cap)
                     *(float *)(object + 0x2C) = cap;
             }
             vec_spring_to_target(object + 0x10, (void *)(g_target_object + 0x10), state + 0x40,
@@ -49,5 +50,5 @@ check_scale:
         }
     }
     *(float *)(object + 0xF8) = FastAddRotations(*(float *)(object + 0xF8), 0.04f);
-    func_PAL_L05_0042C2E8(object);
+    glow_l05_ring_draw_pal(object);
 }

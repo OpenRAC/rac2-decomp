@@ -19,7 +19,8 @@ extern s32 g_feltzin_challenge_state[];
 extern s32 g_feltzin_mission_index;
 extern u8 *g_feltzin_enemy_table;
 
-void feltzin_mission_three_update_us2(u8 *arg0) {
+/* Feltzin mission three: spawns its targets on the first frame, then pays the reward when done. */
+void feltzin_mission_three_update_us2(u8 *actor) {
     s32 n;
     s32 count;
     u8 **p;
@@ -46,5 +47,5 @@ void feltzin_mission_three_update_us2(u8 *arg0) {
         }
     }
     if (g_feltzin_challenge_state[4] == 0 && g_feltzin_mission_index >= 6)
-        UpdateFeltzinMissionReward_us2(arg0, 2);
+        UpdateFeltzinMissionReward_us2(actor, 2);
 }

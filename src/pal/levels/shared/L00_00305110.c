@@ -33,7 +33,8 @@ typedef int s32;
 struct Table2 { char pad[52]; s32 slots[4]; };
 extern struct Table2 Fee2b87d1_D_00152CD0;
 
-void func_PAL_L00_003066C8(void)
+/* Clears the whole chunk table and marks its slots as unused. */
+void level_clear_chunk_table_pal(void)
 {
     extern void mem_clear(unsigned int *, unsigned int, int);
     struct Table2 *table = &Fee2b87d1_D_00152CD0;

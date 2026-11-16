@@ -52,15 +52,15 @@ extern int snd_play_from_class_bank(int index, int value, char *object, int kind
 extern int PlayMobySound(int index, int a1, char *a2);
 extern int moby_is_in_special_class_range(void *);
 extern void math_trap_always(void);
-extern char *func_PAL_002BD400(char *pos, int spin, int color, float spread, float low, float high,
+extern char *part_spawn_flash_pal(char *pos, int spin, int color, float spread, float low, float high,
                            float accel, float size);
 extern void FastVecSub(void *out, void *a, void *b);
 extern float math_step_int_toward_target(int *, int, int);
 extern int moby_transform_point_by_attachment(char *, char *, char *, char *);
-extern void func_PAL_002B15D8(char *self, int mask, float *arg2, float, float, float, float, unsigned char);
+extern void part_spawn_masked_debris_pal(char *self, int mask, float *arg2, float, float, float, float, unsigned char);
 extern void vec_scale_to_length(void *, void *, float);
 extern void FastVecAdd(void *out, void *a, void *b);
-extern char *func_PAL_0032DF28(void *position, int flash, int n0, int n1, int n2, int n3, int n4,
+extern char *part_spawn_explosion_pal(void *position, int flash, int n0, int n1, int n2, int n3, int n4,
                            int orient, float size, float distance, int mode, int extra, int flags,
                            char *owner);
 
@@ -69,13 +69,13 @@ void DestroyCrate_pal(CrateMoby *self, int explode, CrateHit *hit)
 {
     float position[4], direction[4], velocity[4];
     CrateVars *vars = self->vars;
-    CrateMoby *p;
+    CrateMoby *crate;
     int i, amount, kind;
 
     if (subtract_integer_with_clamp(g_game_time - g_death_time_a) >= 2) {
         switch (self->oClass) {
-        case 0x1FA: snd_play_from_class_bank(0, 0, (char *)self, 0x1F4); break;
-        case 0x1FF: snd_play_from_class_bank(1, 0, (char *)self, 0x1FF); break;
+        case 0x1FA: snd_play_from_class_bank(0, 0, (char *)self, MOBY_CLASS_CRATE); break;
+        case MOBY_CLASS_AMMO_CRATE: snd_play_from_class_bank(1, 0, (char *)self, MOBY_CLASS_AMMO_CRATE); break;
         default: PlayMobySound(0, 0, (char *)self); break;
         }
         g_death_time_a = g_game_time;
@@ -92,18 +92,18 @@ void DestroyCrate_pal(CrateMoby *self, int explode, CrateHit *hit)
         vars->below->vars->above = vars->above;
         vars->below->vars->flags |= 0x24;
     }
-    p = self;
+    crate = self;
     do {
-        CrateVars *v = p->vars;
-        v->flags |= 0x20;
-        p = v->above;
-    } while (p);
+        CrateVars *crate_vars = crate->vars;
+        crate_vars->flags |= 0x20;
+        crate = crate_vars->above;
+    } while (crate);
     qcopy(position, self->position);
     position[2] += 0.3f;
-    func_PAL_002BD400((char *)position, 1, 0x40808080, 0.3f, 1.01f, 1.075f, 0.05f, 50000.0f);
+    part_spawn_flash_pal((char *)position, 1, 0x40808080, 0.3f, 1.01f, 1.075f, 0.05f, 50000.0f);
     i = 4;
     do {
-        func_PAL_002BD400((char *)position, 1, 0x40808080, 0.3f, 1.01f, 1.07f, 0.05f, 50000.0f);
+        part_spawn_flash_pal((char *)position, 1, 0x40808080, 0.3f, 1.01f, 1.07f, 0.05f, 50000.0f);
         --i;
     } while (i >= 0);
     if (hit)
@@ -131,14 +131,14 @@ void DestroyCrate_pal(CrateMoby *self, int explode, CrateHit *hit)
         type = self->oClass;
         g_nanotech_cooldown += amount;
         switch (type) {
-        case 0x1F4: case 0x1FF:
+        case MOBY_CLASS_CRATE: case MOBY_CLASS_AMMO_CRATE:
             switch (amount) {
             case 1: kind = 1; break;
             case 2: kind = 5; break;
             case 3: default: kind = 37; break;
             }
             break;
-        case 0x1F5: case 0x200:
+        case MOBY_CLASS_NANOTECH_CRATE: case MOBY_CLASS_PURPLE_NANOTECH_CRATE:
             kind = (1 << (amount - 1)) - 1;
             if (kind > 15)
                 kind = 15;
@@ -148,7 +148,7 @@ void DestroyCrate_pal(CrateMoby *self, int explode, CrateHit *hit)
             qzero_nc(velocity);
             if (vars->attachment && !g_turret_target_moby)
                 moby_transform_point_by_attachment((char *)self, vars->attachment, (char *)self->position, (char *)velocity);
-            func_PAL_002B15D8((char *)self, kind, velocity, 3.0f, 6.0f, 3.0f, 6.0f, 255);
+            part_spawn_masked_debris_pal((char *)self, kind, velocity, 3.0f, 6.0f, 3.0f, 6.0f, 255);
         }
     }
     self->state = 3;
@@ -159,6 +159,6 @@ void DestroyCrate_pal(CrateMoby *self, int explode, CrateHit *hit)
         vars->burstFrame = 1;
         vec_scale_to_length(velocity, self->up, 0.5f);
         FastVecAdd(velocity, velocity, self->position);
-        func_PAL_0032DF28(velocity, 0, 10, 10, 10, 10, 15, 0, 1.0f, 0.0f, 0, 0, 0, 0);
+        part_spawn_explosion_pal(velocity, 0, 10, 10, 10, 10, 15, 0, 1.0f, 0.0f, 0, 0, 0, 0);
     }
 }

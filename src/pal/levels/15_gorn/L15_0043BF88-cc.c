@@ -57,33 +57,33 @@ extern void SpawnSpaceProjectile(void *, int, int, float, int, float, float, flo
 /* The mover's own state decides whether the shot happens: the level's record
    must exist and be ready, and the mover's own counter must be idle.  The two
    shots take the slots after the counter, and the counter wraps at three. */
-void func_PAL_L15_0043BF88(char *a0) {
-    char *s1 = a0;
-    char *s0;
-    char *v0;
-    int v1;
+void gorn_ship_fire_double_shot_pal(char *object) {
+    char *moby = object;
+    char *vars;
+    char *motion;
+    int burst_index;
 
-    s0 = *(char **)(s1 + 0x68);
-    v0 = (char *)moby_get_motion_data(a0);
-    if (v0 == 0) {
+    vars = *(char **)(moby + 0x68);
+    motion = (char *)moby_get_motion_data(object);
+    if (motion == 0) {
         return;
     }
-    if (*(int *)(v0 + 0x120) == 0) {
+    if (*(int *)(motion + 0x120) == 0) {
         return;
     }
-    if (*(int *)(s0 + 0x450) != 0) {
+    if (*(int *)(vars + 0x450) != 0) {
         return;
     }
-    PlayMobySound(2, 0, s1);
-    SpawnSpaceProjectile(s1, 0x600000CF, 1, 1.0f, 0, 2.0f, 1.5f, 1.5f, 0x1E,
-                     *(int *)(s0 + 0x454) * 2 + 4, 0);
-    SpawnSpaceProjectile(s1, 0x600000CF, 1, 1.0f, 0, 2.0f, 1.5f, 1.5f, 0x1E,
-                     *(int *)(s0 + 0x454) * 2 + 5, 0);
-    *(int *)(s0 + 0x450) = (((int)(math_random_int_range(0x14, 0x3C)) * 5 + 2) / 6);
-    v1 = *(int *)(s0 + 0x454) + 1;
-    *(int *)(s0 + 0x454) = v1;
-    if (v1 >= 3) {
-        *(int *)(s0 + 0x454) = 0;
+    PlayMobySound(2, 0, moby);
+    SpawnSpaceProjectile(moby, 0x600000CF, 1, 1.0f, 0, 2.0f, 1.5f, 1.5f, 0x1E,
+                     *(int *)(vars + 0x454) * 2 + 4, 0);
+    SpawnSpaceProjectile(moby, 0x600000CF, 1, 1.0f, 0, 2.0f, 1.5f, 1.5f, 0x1E,
+                     *(int *)(vars + 0x454) * 2 + 5, 0);
+    *(int *)(vars + 0x450) = (((int)(math_random_int_range(0x14, 0x3C)) * 5 + 2) / 6);
+    burst_index = *(int *)(vars + 0x454) + 1;
+    *(int *)(vars + 0x454) = burst_index;
+    if (burst_index >= 3) {
+        *(int *)(vars + 0x454) = 0;
     }
 }
 
@@ -91,7 +91,7 @@ void func_PAL_L15_0043BF88(char *a0) {
 
 /* Advance through the path points, pausing when an odd encoded action supplies
    a duration in seconds. The path has a 16-byte header and 16-byte points. */
-void gorn_path_mover_init(char *a0);
+void gorn_path_mover_init(char *object);
 
 /* func_L15_00438260 is in L15_00438260-g8.c. */
 
@@ -116,7 +116,7 @@ extern void euler_rotation_basis(void *, void *);
    angular speeds (the second gets the sign opposite to the first) and goes to state 1, which
    keeps aiming and turns the two angles at +0x688 and +0x6A8.  Both walks keep the second
    `p != 0` guard before the `p[-1]` read and the second walk has a pointer variable of its own
-   (one shared variable swaps two callee-saved registers).  Measured: a0 + 0xC0 and a0 + 0xF0
+   (one shared variable swaps two callee-saved registers).  Measured: object + 0xC0 and object + 0xF0
    formed in locals ahead of the second walk make loop.c hoist the two class constants out of it
    (two more saved registers); written at their use after the walk, as below, they stay in the
    loop.  The sign test is a store followed by a conditional store, which gives retail's

@@ -31,23 +31,23 @@ void lift_clamp_group_riders_wide_pal(char *self) {
     float mtx[16];
     float off[4];
     char *state = *(char **)(self + 0x68);
-    unsigned short *p;
-    unsigned char *e;
+    unsigned short *list;
+    unsigned char *rider;
     int clamped;
 
     matrix_from_basis_rows(mtx, self + 0xC0);
-    for (p = g_group_entity_lists[*(int *)(state + 0x64)];
+    for (list = g_group_entity_lists[*(int *)(state + 0x64)];
          (*(int *)(state + 0x64) & 0xFF) != 0xFF && *(int *)(state + 0x64) <= g_group_link_limit &&
-         p != 0 && ((p != 0 && (short)p[-1] >= 0) || p == g_group_entity_lists[*(int *)(state + 0x64)]);
-         p++) {
-        e = g_moby_l14_pool + ((*p & 0x7FFF) << 8);
-        if (e == 0)
+         list != 0 && ((list != 0 && (short)list[-1] >= 0) || list == g_group_entity_lists[*(int *)(state + 0x64)]);
+         list++) {
+        rider = g_moby_l14_pool + ((*list & 0x7FFF) << 8);
+        if (rider == 0)
             break;
-        if (e[0x20] != 0xFE) {
-            if (e[0x20] != 0xFD) {
-                if (*(short *)(e + 0xAA) != 0xA59) {
-                    if (entity_is_flag_set((char *)e) != 0) {
-                        FastVecSub(off, e + 0x10, self + 0x10);
+        if (rider[0x20] != 0xFE) {
+            if (rider[0x20] != 0xFD) {
+                if (*(short *)(rider + 0xAA) != 0xA59) {
+                    if (entity_is_flag_set((char *)rider) != 0) {
+                        FastVecSub(off, rider + 0x10, self + 0x10);
                         clamped = 0;
                         vec_transform_by_object_or_given(self, off, off, mtx);
                         if (math_fabs(off[0] + 2.0f) > 0.8f) {
@@ -67,7 +67,7 @@ void lift_clamp_group_riders_wide_pal(char *self) {
                         if (clamped) {
                             matrix_mul_vec3(off, off, self + 0xC0);
                             FastVecAdd(off, off, self + 0x10);
-                            entity_apply_corrected_pos((char *)e, off);
+                            entity_apply_corrected_pos((char *)rider, off);
                         }
                     }
                 }

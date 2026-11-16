@@ -49,8 +49,9 @@ extern BatchA_A18_s32 ref_L18_002E4090_00(BatchA_A18_s32 a0, BatchA_A18_s32 a1);
 extern int text_measure_width_scaled(void *a0, void *a1, const char *a2);
 extern char g_str_font_texture[];
 
-void func_US2_L18_00304470(void *a0, void *a1) {
-    text_measure_width_scaled(a0, a1, g_str_font_texture);
+/* Measures the width of text with the font texture. */
+void text_measure_font_texture_us2(void *draw_ctx, void *font_ctx) {
+    text_measure_width_scaled(draw_ctx, font_ctx, g_str_font_texture);
 }
 
 /* func_L18_003044B8 is defined in L18_003044B8.c. */

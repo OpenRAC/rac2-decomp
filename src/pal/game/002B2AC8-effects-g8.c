@@ -13,6 +13,7 @@ extern void moby_fade_out_update_pal(unsigned char *);
 typedef struct { unsigned char threshold[16];float previous;} DamageThresholds;
 typedef struct {float current;short maximum;} DamageHealth;
 
+/* Spawns debris pieces from a damaged object as its health falls past each threshold (PAL). */
 int part_spawn_damage_debris_pal(char *obj,DamageThresholds *thresholds,DamageHealth *health)
 {
     float v[4];

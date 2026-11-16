@@ -7,10 +7,10 @@ typedef struct {
     u8 reserved000[0x80];
     float position[4];
     u8 reserved090[0x1D00];
-    float positionHistory[32][4];
+    float position_history[32][4];
     u8 reserved1F90[0x3AC];
-    float headingHistory[32];
-    s32 headingIndex, headingCount, positionIndex, positionCount;
+    float heading_history[32];
+    s32 heading_index, heading_count, position_index, position_count;
 } HeroHistory;
 typedef struct {
     u8 reserved000[0x108];
@@ -26,11 +26,11 @@ extern s32 FastDecTimer(void *);
 extern s32 hero_get_movement_mode_pal(void);
 extern float hero_get_stick_magnitude(void);
 extern float vec_length_xy(void *);
-extern void func_PAL_L18_002D7598(void);
+extern void hero_l18_update_state_machine_pal(void);
 extern void euler_to_matrix(void *, void *);
 extern void set_identity_matrix(void *);
 extern void matrix_from_basis_rows(void *, void *);
-extern void func_PAL_L18_002D0738(void);
+extern void hero_l18_update_speed_targets_pal(void);
 extern void hero_probe_ground_and_ledge_pal(void);
 extern void hero_update_timers_reach_pal(void);
 extern s32 CollLine(void *, void *, s32, void *, void *);
@@ -44,6 +44,7 @@ extern s32 GetCollHitMaterial(void);
 
 /* func_L18_002CFF48 is defined in L18_002CFD68-qcopy.c. */
 
+/* Runs once per frame for the hero: reads the controller, saves the hero position and heading history, and updates the hero movement. */
 void hero_update_frame_input_pal(void)
 {
     u8 *base;
@@ -80,8 +81,8 @@ void hero_update_frame_input_pal(void)
         *(float *)(base + 0x1FB4) = (float)vertical;
     }
     *(float *)(base + 0x24B8) = hero_get_stick_magnitude();
-    func_PAL_L18_002D7598();
-    ((HeroHistory *)base)->headingHistory[((HeroHistory *)base)->headingIndex] = *(float *)(base + 0x98);
+    hero_l18_update_state_machine_pal();
+    ((HeroHistory *)base)->heading_history[((HeroHistory *)base)->heading_index] = *(float *)(base + 0x98);
     *(s32 *)(base + 0x23BC) = (*(s32 *)(base + 0x23BC) + 1) % 32;
     if (++*(s32 *)(base + 0x23C0) > 32) *(s32 *)(base + 0x23C0) = 32;
     index = *(s32 *)(base + 0x23C4);
@@ -92,7 +93,7 @@ void hero_update_frame_input_pal(void)
     euler_to_matrix(base, base + 0x90);
     set_identity_matrix(base + 0x40);
     matrix_from_basis_rows(base + 0x40, base);
-    func_PAL_L18_002D0738();
+    hero_l18_update_speed_targets_pal();
     hero_probe_ground_and_ledge_pal();
     hero_update_timers_reach_pal();
 }
@@ -114,9 +115,10 @@ extern void FastVecAdd(void *a0, void *a1, void *a2);
 extern void vec_scale_to_length(void *a0, void *a1, float f12);
 extern void FastVecAdd(void *a0, void *a1, void *a2);
 
+/* Stops the hero's velocity from pushing into a wall in front of it. */
 void ClipHeroVelocityAtWall_pal(s32 force)
 {
-    float start[4], end[4], lowerStart[4], lowerEnd[4];
+    float start[4], end[4], lower_start[4], lower_end[4];
     float height, reach, angle, dot;
     s32 material;
     if (cam_get_view_space_vector_length(g_hero_state + 0xF0) < 0.002f) return;
@@ -131,21 +133,21 @@ void ClipHeroVelocityAtWall_pal(s32 force)
         } else if (hero[0x22B4] == 4) height = 0.35f;
     }
     hero_build_relative_point(start, 0.0f, 0.0f, height, 1);
-    hero_build_relative_point(lowerStart, 0.0f, 0.0f, height * 0.3f, 1);
+    hero_build_relative_point(lower_start, 0.0f, 0.0f, height * 0.3f, 1);
     if (force || vec_length_xy(g_hero_state + 0xF0) < 0.01f) {
         vec_scale_to_length(end, g_hero_state, reach);
-        vec_scale_to_length(lowerEnd, g_hero_state, reach * 1.4f);
+        vec_scale_to_length(lower_end, g_hero_state, reach * 1.4f);
     } else {
         cam_set_view_space_height(end, g_hero_state + 0xF0, 0.0f);
         vec_scale_to_length(end, end, reach);
-        FastVecScale(lowerEnd, end, 1.4f);
+        FastVecScale(lower_end, end, 1.4f);
     }
     FastVecAdd(end, end, start);
     material = -1;
-    FastVecAdd(lowerEnd, lowerEnd, lowerStart);
+    FastVecAdd(lower_end, lower_end, lower_start);
     {
         u8 *hero = g_hero_state;
-        if (CollLine(lowerStart, lowerEnd, 2, *(u8 **)(hero + 0x2290), 0) && g_hero_ground_hit.count > 0) material = GetCollHitMaterial();
+        if (CollLine(lower_start, lower_end, 2, *(u8 **)(hero + 0x2290), 0) && g_hero_ground_hit.count > 0) material = GetCollHitMaterial();
     }
     angle = 0.0f;
     {

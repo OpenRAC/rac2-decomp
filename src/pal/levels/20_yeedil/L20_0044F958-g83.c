@@ -5,7 +5,7 @@ extern int g_group_count[] __attribute__((sda));
 extern char *g_group_l20_member_table[] __attribute__((sda));
 extern char *g_group_l20_id_lists[];
 extern int g_turret_light_color __attribute__((sda));
-extern void func_PAL_002A7E68(void *, int, int, int);
+extern void anim_start_blended_pal(void *, int, int, int);
 extern void moby_set_light_color(void *, int);
 extern int math_random_int_below(int);
 extern void moby_set_state(void *, int, int);
@@ -15,14 +15,15 @@ extern void FastVecAdd(void *, void *, void *);
 extern float mat_fast_helper_a(float, float);
 extern float math_random_angle(void);
 
-char *turret_spawn_from_group_pal(int arg0, int arg1, float *arg2, float *arg3) {
-    char *idp = g_group_l20_id_lists[arg1];
+/* Wakes an idle turret from a group of objects, places it at a position facing a direction, and returns it (or null if none is free). */
+char *turret_spawn_from_group_pal(int parent, int group_index, float *position, float *direction) {
+    char *idp = g_group_l20_id_lists[group_index];
     char *found = 0;
 
-    if ((arg1 & 0xFF) == 0xFF) {
+    if ((group_index & 0xFF) == 0xFF) {
         goto end;
     }
-    if (g_group_count[0] < arg1) {
+    if (g_group_count[0] < group_index) {
         goto end;
     }
     if (idp == 0) {
@@ -39,10 +40,10 @@ char *turret_spawn_from_group_pal(int arg0, int arg1, float *arg2, float *arg3) 
             goto end;
         }
         idp += 2;
-        if ((arg1 & 0xFF) == 0xFF) {
+        if ((group_index & 0xFF) == 0xFF) {
             goto end;
         }
-        if (g_group_count[0] < arg1) {
+        if (g_group_count[0] < group_index) {
             goto end;
         }
         if (idp == 0) {
@@ -51,7 +52,7 @@ char *turret_spawn_from_group_pal(int arg0, int arg1, float *arg2, float *arg3) 
         if (*(s16 *)(idp - 2) >= 0) {
             continue;
         }
-        if (idp == g_group_l20_id_lists[arg1]) {
+        if (idp == g_group_l20_id_lists[group_index]) {
             continue;
         }
         break;
@@ -63,7 +64,7 @@ end:
 
         *(u16 *)(found + 0x34) = (*(u16 *)(found + 0x34) & 0xFFBE) | 0x1000;
         *(int *)(found + 0x98) = *(int *)(*(char **)(found + 0x24) + 0x10);
-        func_PAL_002A7E68(found, 0, 0, 0xC);
+        anim_start_blended_pal(found, 0, 0, 0xC);
         moby_set_light_color(found, g_turret_light_color);
         if (math_random_int_below(2) != 0) {
             *(u16 *)(found + 0x34) |= 0x8000;
@@ -72,16 +73,16 @@ end:
         }
         state = *(char **)(found + 0x68);
         pos = found + 0x10;
-        qcopy(pos, arg2);
-        qcopy(state + 0x180, arg2);
-        qcopy(state + 0x170, arg3);
-        *(int *)(found + 0xB8) = arg0;
+        qcopy(pos, position);
+        qcopy(state + 0x180, position);
+        qcopy(state + 0x170, direction);
+        *(int *)(found + 0xB8) = parent;
         moby_set_state(found, 2, -1);
-        vec_scale_to_length(state + 0x190, arg3, math_random_float_range(20.0f, 30.0f));
+        vec_scale_to_length(state + 0x190, direction, math_random_float_range(20.0f, 30.0f));
         FastVecAdd(state + 0x190, state + 0x190, pos);
-        *(float *)(state + 0x198) = arg2[2];
+        *(float *)(state + 0x198) = position[2];
         *(float *)(state + 0x20) = (float)*(s16 *)(state + 0x24);
-        *(float *)(found + 0xF8) = mat_fast_helper_a(arg3[0], arg3[1]);
+        *(float *)(found + 0xF8) = mat_fast_helper_a(direction[0], direction[1]);
         *(float *)(state + 0x1A0) = math_random_angle();
         *(float *)(state + 0x20) = (float)*(s16 *)(state + 0x24);
     }

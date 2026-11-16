@@ -91,7 +91,7 @@ extern signed char *g_moby_l04_pool __attribute__((sda));
 typedef unsigned int L04Quad __attribute__((mode(TI)));
 /* The EE assigns the point, parameter and mode to a0-a2, and the two
  * float arguments to f12-f13, independently of their C interleaving. */
-void func_PAL_L04_00410678(L04Quad *position, L04Quad *direction, int count, int mode);
+void part_l04_spawn_burst_pal(L04Quad *position, L04Quad *direction, int count, int mode);
 
 extern void racer_emit_exhaust_particles();
 
@@ -125,14 +125,15 @@ static inline void CallL00_00322AC0(void *state, float rate, int level, int slot
     level_append_record_to_table(state, rate, level, slot);
 }
 
-void racer_update_boost_pal(unsigned char *m)
+/* Updates the racer boost each frame: collects nearby boost pickups, charges the boost, and keeps the boost flame, sound and camera zoom going (PAL). */
+void racer_update_boost_pal(unsigned char *moby)
 {
     float delta[4], rotation[16];
     unsigned char *item, *other;
     int red, green, blue;
     int period = 42;
     int alpha = 128;
-    unsigned char *p = *(unsigned char **)(m + 0x68);
+    unsigned char *vars = *(unsigned char **)(moby + 0x68);
     unsigned char *state;
     int *data;
     float wave, active, angle, sine, radius;
@@ -147,78 +148,78 @@ void racer_update_boost_pal(unsigned char *m)
     green = FloatToInt(wave * 64.0f) + 208;
     blue = FloatToInt(wave * 24.0f) + 60;
     if (green > 255) green = 255;
-    if (*(int *)(p + 0x278)) {
-        ApproachValue(p + 0x27c, 0.20000002f, 0.008f);
-        ApproachValue(p + 0x28c, 97.0f, 0.96631575f);
-        if (*(int *)(p + 0x278)) math_fast_float_d(p + 0x278);
-        moby_update_transform_history_followers(p + 0x4e0, 1);
-        state = p + 0x4e0;
+    if (*(int *)(vars + 0x278)) {
+        ApproachValue(vars + 0x27c, 0.20000002f, 0.008f);
+        ApproachValue(vars + 0x28c, 97.0f, 0.96631575f);
+        if (*(int *)(vars + 0x278)) math_fast_float_d(vars + 0x278);
+        moby_update_transform_history_followers(vars + 0x4e0, 1);
+        state = vars + 0x4e0;
     } else {
-        if ((m[0x20] == 3 || (g_pad_pressed_flags & 10)) && *(int *)(p + 0x338) < 25 && *(int *)(p + 0x33c) > 0) {
-            *(int *)(p + 0x338) = 200;
-            --*(int *)(p + 0x33c);
-            if (m[0x20] != 3) snd_play_from_class_bank(0, 0, m, 0x474);
-            if (!snd_is_voice_playing_for_owner(m, *(int *)(p + 0x714))) {
-                if (m[0x20] != 3) *(int *)(p + 0x714) = PlayMobySound(15, 4, m);
+        if ((moby[0x20] == 3 || (g_pad_pressed_flags & 10)) && *(int *)(vars + 0x338) < 25 && *(int *)(vars + 0x33c) > 0) {
+            *(int *)(vars + 0x338) = 200;
+            --*(int *)(vars + 0x33c);
+            if (moby[0x20] != 3) snd_play_from_class_bank(0, 0, moby, 0x474);
+            if (!snd_is_voice_playing_for_owner(moby, *(int *)(vars + 0x714))) {
+                if (moby[0x20] != 3) *(int *)(vars + 0x714) = PlayMobySound(15, 4, moby);
                 else {
-                    *(int *)(p + 0x714) = PlayMobySound(24, 5, m);
-                    snd_set_slot_field(*(int *)(p + 0x714), 0x400);
+                    *(int *)(vars + 0x714) = PlayMobySound(24, 5, moby);
+                    snd_set_slot_field(*(int *)(vars + 0x714), 0x400);
                 }
             }
-            if (*(unsigned char **)(p + 0x4c4)) {
-                unsigned char *child = *(unsigned char **)(p + 0x4c4);
-                unsigned char *childState = *(unsigned char **)(child + 0x68);
-                if (*(float *)(p + 0x27c) <= 0.020000001f) *(int *)(childState + 0x1c0) = 0;
+            if (*(unsigned char **)(vars + 0x4c4)) {
+                unsigned char *child = *(unsigned char **)(vars + 0x4c4);
+                unsigned char *child_state = *(unsigned char **)(child + 0x68);
+                if (*(float *)(vars + 0x27c) <= 0.020000001f) *(int *)(child_state + 0x1c0) = 0;
             }
-            if (!*(int *)(p + 0x640)) {
-                level_init_pending_slot(m, p + 0x4e0);
-                CallL00_00322AC0(p + 0x4e0, -0.7f, 64, 1);
-                CallL00_00322AC0(p + 0x4e0, -0.7f, 48, 2);
-                CallL00_00322AC0(p + 0x4e0, -0.7f, 32, 3);
-                CallL00_00322AC0(p + 0x4e0, -0.7f, 16, 4);
-                *(int *)(p + 0x640) = 1;
+            if (!*(int *)(vars + 0x640)) {
+                level_init_pending_slot(moby, vars + 0x4e0);
+                CallL00_00322AC0(vars + 0x4e0, -0.7f, 64, 1);
+                CallL00_00322AC0(vars + 0x4e0, -0.7f, 48, 2);
+                CallL00_00322AC0(vars + 0x4e0, -0.7f, 32, 3);
+                CallL00_00322AC0(vars + 0x4e0, -0.7f, 16, 4);
+                *(int *)(vars + 0x640) = 1;
             }
         }
-        state = p + 0x4e0;
-        if (math_fast_float_d(p + 0x338)) {
+        state = vars + 0x4e0;
+        if (math_fast_float_d(vars + 0x338)) {
             active = 0.0f;
             level_release_slot_list(state);
-            *(int *)(p + 0x640) = 0;
+            *(int *)(vars + 0x640) = 0;
         } else {
             active = 1.0f;
             moby_update_transform_history_followers(state, 1);
         }
-        ApproachValue(p + 0x27c, active * 0.120000005f, 0.002f);
-        if (*(float *)(p + 0x27c) < 0.0f) *(float *)(p + 0x27c) = 0.0f;
-        if (active > 0.5f) ApproachValue(p + 0x28c, 97.0f, 0.96631575f);
-        else ApproachValue(p + 0x28c, 80.0f, 0.2439867f);
+        ApproachValue(vars + 0x27c, active * 0.120000005f, 0.002f);
+        if (*(float *)(vars + 0x27c) < 0.0f) *(float *)(vars + 0x27c) = 0.0f;
+        if (active > 0.5f) ApproachValue(vars + 0x28c, 97.0f, 0.96631575f);
+        else ApproachValue(vars + 0x28c, 80.0f, 0.2439867f);
     }
-    if (m[0x20] != 3) {
-        float viewAngle = *(float *)(p + 0x28c);
-        viewAngle *= 0.008726647f;
-        sine = math_fast_sin_or_cos_b(viewAngle);
-        sine /= math_fast_sin_or_cos_a(viewAngle);
+    if (moby[0x20] != 3) {
+        float view_angle = *(float *)(vars + 0x28c);
+        view_angle *= 0.008726647f;
+        sine = math_fast_sin_or_cos_b(view_angle);
+        sine /= math_fast_sin_or_cos_a(view_angle);
         g_projection_scale_float = sine;
         UpdateViewContext();
     }
-    if (*(int *)(p + 0x25c) != -1) {
-        GetFirstMobyInGroup(&item, *(int *)(p + 0x25c), 0, 0);
+    if (*(int *)(vars + 0x25c) != -1) {
+        GetFirstMobyInGroup(&item, *(int *)(vars + 0x25c), 0, 0);
         if (item) do {
             if (*(short *)(item + 0xaa) == 0xa99) {
                 data = *(int **)(item + 0x68);
-                FastVecSub(delta, item + 0x10, m + 0x10);
-                if (*data == 0 && *(int *)(p + 0x33c) < 3 && func_L00_002EE290(delta) < 1.0f) {
-                    ++*(int *)(p + 0x33c);
-                    if (m[0x20] != 3) snd_play_from_class_bank(0, 0, m, 0xa99);
-                    func_PAL_L04_00410678((L04Quad *)(item + 0x10), (L04Quad *)(p + 0x290), 8, 0);
+                FastVecSub(delta, item + 0x10, moby + 0x10);
+                if (*data == 0 && *(int *)(vars + 0x33c) < 3 && func_L00_002EE290(delta) < 1.0f) {
+                    ++*(int *)(vars + 0x33c);
+                    if (moby[0x20] != 3) snd_play_from_class_bank(0, 0, moby, 0xa99);
+                    part_l04_spawn_burst_pal((L04Quad *)(item + 0x10), (L04Quad *)(vars + 0x290), 8, 0);
                     *data = 250;
                 }
             }
             GetNextMobyInGroup(&item, item, 0, 0);
         } while (item);
     }
-    if (*(int *)(p + 0x254) != -1) {
-        GetFirstMobyInGroup(&other, *(int *)(p + 0x254), 0, 0);
+    if (*(int *)(vars + 0x254) != -1) {
+        GetFirstMobyInGroup(&other, *(int *)(vars + 0x254), 0, 0);
         if (other) {
             /* One four-term OR would be rebalanced by fold, so the terms join in steps. */
             unsigned int high = (alpha << 24) | (blue << 16);
@@ -238,29 +239,29 @@ void racer_update_boost_pal(unsigned char *m)
                 transform_vector(delta, delta, rotation);
                 if (!(math_fabs(delta[0]) < 2.8f) || !(math_fabs(delta[1]) < radius) || !(math_fabs(delta[2]) < 1.5f)) goto next;
                 data = *(int **)(other + 0x68);
-                *(int *)(p + 0x278) += *data;
-                if (!snd_is_voice_playing_for_owner(m, *(int *)(p + 0x714))) {
-                    if (m[0x20] != 3) *(int *)(p + 0x714) = PlayMobySound(15, 4, m);
+                *(int *)(vars + 0x278) += *data;
+                if (!snd_is_voice_playing_for_owner(moby, *(int *)(vars + 0x714))) {
+                    if (moby[0x20] != 3) *(int *)(vars + 0x714) = PlayMobySound(15, 4, moby);
                     else {
-                        *(int *)(p + 0x714) = PlayMobySound(24, 5, m);
-                        snd_set_slot_field(*(int *)(p + 0x714), 0x400);
+                        *(int *)(vars + 0x714) = PlayMobySound(24, 5, moby);
+                        snd_set_slot_field(*(int *)(vars + 0x714), 0x400);
                     }
                 }
-                if (m[0x20] != 3) PlayMobySound(12, 0, m);
-                *(int *)(p + 0x650) = *data;
+                if (moby[0x20] != 3) PlayMobySound(12, 0, moby);
+                *(int *)(vars + 0x650) = *data;
                 other[0xbc] = 50;
-                if (*(unsigned char **)(p + 0x4c4)) {
-                    unsigned char *child = *(unsigned char **)(p + 0x4c4);
-                    unsigned char *childState = *(unsigned char **)(child + 0x68);
-                    if (*(float *)(p + 0x27c) <= 0.020000001f) *(int *)(childState + 0x1c0) = 0;
+                if (*(unsigned char **)(vars + 0x4c4)) {
+                    unsigned char *child = *(unsigned char **)(vars + 0x4c4);
+                    unsigned char *child_state = *(unsigned char **)(child + 0x68);
+                    if (*(float *)(vars + 0x27c) <= 0.020000001f) *(int *)(child_state + 0x1c0) = 0;
                 }
-                if (!*(int *)(p + 0x640)) {
-                    level_init_pending_slot(m, p + 0x4e0);
-                    CallL00_00322AC0(p + 0x4e0, -0.7f, 64, 1);
-                    CallL00_00322AC0(p + 0x4e0, -0.7f, 48, 2);
-                    CallL00_00322AC0(p + 0x4e0, -0.7f, 32, 3);
-                    CallL00_00322AC0(p + 0x4e0, -0.7f, 16, 4);
-                    *(int *)(p + 0x640) = 1;
+                if (!*(int *)(vars + 0x640)) {
+                    level_init_pending_slot(moby, vars + 0x4e0);
+                    CallL00_00322AC0(vars + 0x4e0, -0.7f, 64, 1);
+                    CallL00_00322AC0(vars + 0x4e0, -0.7f, 48, 2);
+                    CallL00_00322AC0(vars + 0x4e0, -0.7f, 32, 3);
+                    CallL00_00322AC0(vars + 0x4e0, -0.7f, 16, 4);
+                    *(int *)(vars + 0x640) = 1;
                 }
 next:
                 GetNextMobyInGroup(&other, other, 0, 0);

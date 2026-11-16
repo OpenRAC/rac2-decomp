@@ -9,44 +9,44 @@ extern void vec_clear_128(void *);
 extern int moby_spawn_linked(char *, int, float, float);
 
 /* Aims the object's stage, re-arms its effect and stores the new heading. */
-void drone_init_state_pal(char *p, int a1, int a2)
+void drone_init_state_pal(char *moby, int delay, int is_arena_mode)
 {
-    char *q = *(char **)(p + 0x68);
+    char *vars = *(char **)(moby + 0x68);
     char *definition;
     unsigned short flags;
-    int cache;
-    float f;
+    int anim_flags;
+    float value;
 
-    f = (float)*(short *)(q + 0x24);
-    *(short *)(q + 0x1FC) = a2;
-    *(short *)(q + 0x1EC) = 0;
-    *(unsigned char *)(q + 0x2E) = 1;
-    *(float *)(q + 0x20) = f;
-    if (*(unsigned char *)(p + 0x43) != 0)
-        anim_start_blended(p, 0, 0, 8);
-    flags = *(unsigned short *)(p + 0x34);
-    *(unsigned char *)(p + 0x7F) = 0;
-    *(unsigned short *)(p + 0x34) = (flags | 0x1000) & 0xFFB9;
-    definition = *(char **)(p + 0x24);
-    cache = *(int *)(definition + 0x10);
-    *(int *)(p + 0x98) = cache;
-    if (*(short *)(q + 0x1FC) != 0) {
-        moby_set_state(p, 7, 3);
-        *(unsigned short *)(p + 0x34) |= 0x100;
-        moby_spawn_linked(p, 0, 2.0f, 2.0f);
+    value = (float)*(short *)(vars + 0x24);
+    *(short *)(vars + 0x1FC) = is_arena_mode;
+    *(short *)(vars + 0x1EC) = 0;
+    *(unsigned char *)(vars + 0x2E) = 1;
+    *(float *)(vars + 0x20) = value;
+    if (*(unsigned char *)(moby + 0x43) != 0)
+        anim_start_blended(moby, 0, 0, 8);
+    flags = *(unsigned short *)(moby + 0x34);
+    *(unsigned char *)(moby + 0x7F) = 0;
+    *(unsigned short *)(moby + 0x34) = (flags | 0x1000) & 0xFFB9;
+    definition = *(char **)(moby + 0x24);
+    anim_flags = *(int *)(definition + 0x10);
+    *(int *)(moby + 0x98) = anim_flags;
+    if (*(short *)(vars + 0x1FC) != 0) {
+        moby_set_state(moby, 7, 3);
+        *(unsigned short *)(moby + 0x34) |= 0x100;
+        moby_spawn_linked(moby, 0, 2.0f, 2.0f);
     } else {
-        moby_set_state(p, 3, 1);
-        *(unsigned char *)(p + 0x31) = 1;
-        *(unsigned short *)(p + 0x34) &= 0xFEFE;
+        moby_set_state(moby, 3, 1);
+        *(unsigned char *)(moby + 0x31) = 1;
+        *(unsigned short *)(moby + 0x34) &= 0xFEFE;
     }
-    vec_clear_128(q + 0x1B0);
-    f = math_random_float_range(20.0f, 30.0f) * 0.017453294f;
-    *(short *)(q + 0x1EE) = a1;
-    *(float *)(q + 0x1CC) = f;
-    if (*(short *)(q + 0x50) != 0) {
-        *(short *)(q + 0x50) = 0;
-        set_moby_color(p, *(int *)(q + 0x1F0), *(int *)(q + 0x1F4), *(int *)(q + 0x1F8));
-        *(short *)(q + 0x52) = 1;
+    vec_clear_128(vars + 0x1B0);
+    value = math_random_float_range(20.0f, 30.0f) * 0.017453294f;
+    *(short *)(vars + 0x1EE) = delay;
+    *(float *)(vars + 0x1CC) = value;
+    if (*(short *)(vars + 0x50) != 0) {
+        *(short *)(vars + 0x50) = 0;
+        set_moby_color(moby, *(int *)(vars + 0x1F0), *(int *)(vars + 0x1F4), *(int *)(vars + 0x1F8));
+        *(short *)(vars + 0x52) = 1;
     }
 }
 
@@ -59,34 +59,34 @@ extern char *SpawnExplosion(char *, int, int, int, int, int, int, int, float, fl
 extern char g_sound_state[];
 
 /* Releases the object's slot in the shared table and drops it to the idle flag block. */
-void drone_reset_to_idle_pal(char *p)
+void drone_reset_to_idle_pal(char *moby)
 {
-    char *q = *(char **)(p + 0x68);
-    int i = *(int *)(q + 0x1DC);
-    char *entry;
+    char *vars = *(char **)(moby + 0x68);
+    int voice_index = *(int *)(vars + 0x1DC);
+    char *voice;
 
-    if (i != -1) {
-        entry = g_sound_state + i * 0x70;
-        if (*(char **)(entry + 0x88) == p && *(unsigned char *)(entry + 0x74) != 0)
-            snd_stop_voice(i);
+    if (voice_index != -1) {
+        voice = g_sound_state + voice_index * 0x70;
+        if (*(char **)(voice + 0x88) == moby && *(unsigned char *)(voice + 0x74) != 0)
+            snd_stop_voice(voice_index);
     }
-    *(int *)(q + 0x1DC) = -1;
-    if (*(short *)(q + 0x1EC) == 1) {
-        *(short *)(q + 0x1EC) = 0;
-        arena_add_waiting_fighter(*(char **)(p + 0xB8), *(short *)(p + 0xAA));
+    *(int *)(vars + 0x1DC) = -1;
+    if (*(short *)(vars + 0x1EC) == 1) {
+        *(short *)(vars + 0x1EC) = 0;
+        arena_add_waiting_fighter(*(char **)(moby + 0xB8), *(short *)(moby + 0xAA));
     }
-    if (*(unsigned char *)(p + 0x31) != 0) {
-        SpawnExplosion(p + 0x10, 0, 10, 30, 0, 10, 45, 1, 0.3f, 0.0f, 0, 0, 0, 0);
-        snd_play_from_class_bank(0, 0, p, 0xDF7);
+    if (*(unsigned char *)(moby + 0x31) != 0) {
+        SpawnExplosion(moby + 0x10, 0, 10, 30, 0, 10, 45, 1, 0.3f, 0.0f, 0, 0, 0, 0);
+        snd_play_from_class_bank(0, 0, moby, 0xDF7);
     }
-    anim_start_blended(p, 0, 0, 3);
-    func_002A05A8(p);
-    moby_set_state(p, 1, 0);
-    *(unsigned short *)(p + 0x34) = (*(unsigned short *)(p + 0x34) & 0xEFFF) | 0x47;
-    *(int *)(p + 0x98) = 0;
-    *(unsigned char *)(p + 0x31) = 0;
-    *(short *)(q + 0x1EC) = 0;
-    *(int *)(q + 0x1C4) = 0;
+    anim_start_blended(moby, 0, 0, 3);
+    func_002A05A8(moby);
+    moby_set_state(moby, 1, 0);
+    *(unsigned short *)(moby + 0x34) = (*(unsigned short *)(moby + 0x34) & 0xEFFF) | 0x47;
+    *(int *)(moby + 0x98) = 0;
+    *(unsigned char *)(moby + 0x31) = 0;
+    *(short *)(vars + 0x1EC) = 0;
+    *(int *)(vars + 0x1C4) = 0;
 }
 
 
@@ -150,7 +150,7 @@ typedef struct {
 extern JobaObject *g_damage_target_list[];
 extern int FloatToInt(float);
 extern HitRecord *part_find_owned_effect_slot(void *, int, int);
-extern int func_PAL_002B1A50(void *, void *, int);
+extern int moby_apply_damage_to_object_pal(void *, void *, int);
 extern float fast_vec_dist(void *, void *);
 extern void moby_update_ground_check(void *);
 extern char g_hero_l11_position[];
@@ -161,7 +161,7 @@ extern void fighter_update_lock_on(char *);
 
 /* Sets up the actor's tuning on its first stage, handles contacts while active, and runs the
    attack-state update. */
-void func_PAL_L11_0045B9E8(JobaObject *obj)
+void fighter_update_contacts_pal(JobaObject *obj)
 {
     JobaActorState *state = obj->state;
     HitRecord *hit;
@@ -197,7 +197,7 @@ void func_PAL_L11_0045B9E8(JobaObject *obj)
                 if (other->id == 0xDF9 || other->id == 0xB89)
                     hit->f2C = 0;
             }
-            if (func_PAL_002B1A50(obj, state->contact, 0) == 5) {
+            if (moby_apply_damage_to_object_pal(obj, state->contact, 0) == 5) {
                 state->fE0 = 0;
                 state->fE4 = 1.0053098f;
             }

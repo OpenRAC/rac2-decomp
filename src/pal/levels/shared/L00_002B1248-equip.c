@@ -48,7 +48,7 @@ extern u8 g_player_stats[] __attribute__((sda));
 extern u8 g_status_flag_b[] __attribute__((sda));
 extern void synthenoid_spawn_or_kilonoid(Vector *, int);
 extern int weapon_spend_ammo(int, int);
-extern unsigned char *func_PAL_L00_003C77F0(int);
+extern unsigned char *CreateTrailOwnerMoby_pal(int);
 extern int PadPressedWithin(u32, int, int *);
 extern int hero_is_action_allowed(void);
 extern int hero_is_in_special_kind_or_mode(void);
@@ -59,7 +59,7 @@ extern void hero_clear_slot_records(void);
 extern int math_random_int_range(int, int);
 extern void hero_start_timed_state_for_mode_pal(int);
 extern void cancel_hero_item_animation_pal(void);
-extern void func_PAL_002A7E68(void *, int, int, int);
+extern void anim_start_blended_pal(void *, int, int, int);
 
 #define ITEM_ENTRY(id) (*(ItemClass *)(D_00139568[(id)] * sizeof(ItemClass) + (u8 *)D_L00_00262570))
 
@@ -86,7 +86,7 @@ void ApplyHeroEquipmentRequest_pal(int slot) {
             ((HeroState *)g_hero_state)->request[slot] = 0;
         }
         if (((HeroState *)g_hero_state)->request[slot] == 0x2D) {
-            func_PAL_L00_003C77F0(ITEM_ENTRY(0x2D).fancy != 0);
+            CreateTrailOwnerMoby_pal(ITEM_ENTRY(0x2D).fancy != 0);
             ((HeroState *)g_hero_state)->request[slot] = 0;
         }
     }
@@ -201,7 +201,7 @@ void ApplyHeroEquipmentRequest_pal(int slot) {
         ((HeroState *)g_hero_state)->request[slot] = 0;
     }
     if (((HeroState *)g_hero_state)->request[slot] == 0x2D) {
-        func_PAL_L00_003C77F0(ITEM_ENTRY(0x2D).fancy != 0);
+        CreateTrailOwnerMoby_pal(ITEM_ENTRY(0x2D).fancy != 0);
         ((HeroState *)g_hero_state)->request[slot] = 0;
     }
     if (((HeroState *)g_hero_state)->request[slot]) {
@@ -276,10 +276,10 @@ void ApplyHeroEquipmentRequest_pal(int slot) {
             if (((HeroState *)g_hero_state)->panel[1]) ((HeroState *)g_hero_state)->panel[1]->dirty = 1;
         }
         if (((HeroState *)(g_hero_state + slot * sizeof(Slot)))->slots[0].moby && ((HeroState *)(g_hero_state + slot * sizeof(Slot)))->slots[0].moby->cls->rank >= 3)
-            func_PAL_002A7E68(((HeroState *)(g_hero_state + slot * sizeof(Slot)))->slots[0].moby, 2, 0, 2);
+            anim_start_blended_pal(((HeroState *)(g_hero_state + slot * sizeof(Slot)))->slots[0].moby, 2, 0, 2);
         if (((HeroState *)(g_hero_state + slot * sizeof(Slot)))->slots[0].holster && slot != 3 &&
             ((HeroState *)(g_hero_state + slot * sizeof(Slot)))->slots[0].holster->cls->rank >= 3)
-            func_PAL_002A7E68(((HeroState *)(g_hero_state + slot * sizeof(Slot)))->slots[0].holster, 2, 0, 2);
+            anim_start_blended_pal(((HeroState *)(g_hero_state + slot * sizeof(Slot)))->slots[0].holster, 2, 0, 2);
         ((HeroState *)(g_hero_state + slot * sizeof(Slot)))->slots[0].mode = 3;
     }
     if (slot == 2 && !g_menu_choice_table[2] && !((HeroState *)g_hero_state)->slots[2].moby)

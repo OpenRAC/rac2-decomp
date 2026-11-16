@@ -30,10 +30,10 @@ extern void vec_rotate_by_quaternion(void *, void *, void *);
 extern float math_random_signed_float_range(float, float);
 extern int FloatToInt(float);
 extern void FastVecSub(void *, void *, void *);
-extern char *func_PAL_002C23B8(void *, void *, unsigned int, int, int, int, float, float, float, float, float);
+extern char *part_spawn_burst_pal(void *, void *, unsigned int, int, int, int, float, float, float, float, float);
 
 /* Emit a rotating fan of fragments followed by smoke particles. */
-void func_PAL_L00_003A7A68(char *moby)
+void part_spawn_fragment_fan_and_smoke_pal(char *moby)
 {
     Vector rotation, direction, base, origin, velocity, jitter, drift;
     float angle = 0.0f;
@@ -92,7 +92,7 @@ void func_PAL_L00_003A7A68(char *moby)
         jitter[2] = origin[2] + math_random_signed_float_range(0.0f, g_fragment_jitter_range);
         size = math_random_float_range(g_fragment_size_min, g_fragment_size_max) * 210000.0f;
         FastVecSub(jitter, jitter, velocity);
-        func_PAL_002C23B8(jitter, velocity, color, g_fragment_burst_param_a, g_fragment_burst_param_b, spin,
+        part_spawn_burst_pal(jitter, velocity, color, g_fragment_burst_param_a, g_fragment_burst_param_b, spin,
                       size, g_fragment_spawn_param_a, g_fragment_spawn_param_b, 0.0f, 0.0f);
         if (math_fabs(angle) > 0.00001f) {
             math_build_axis_angle_quat(rotation, &g_hero_state.f[460], angle);

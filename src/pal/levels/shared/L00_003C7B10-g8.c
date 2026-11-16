@@ -52,7 +52,7 @@ extern void fade_tick_timer(void);
 extern int snd_is_voice_playing_for_owner(void *,int);
 extern int PlayMobySound(int,int,void *);
 extern void snd_stop_voice(int);
-extern unsigned char *func_PAL_L00_003C77F0(int);
+extern unsigned char *CreateTrailOwnerMoby_pal(int);
 extern float fade_get_value(void);
 extern int weapon_can_use_held(float);
 extern void fade_reset_level(void);
@@ -77,7 +77,7 @@ extern void vec_scale_to_length(void *,void *,float);
 extern void FastVecSub(void *,void *,void *);
 extern void QueueMobyImpact(void *,void *);
 extern void part_l00_spawn_spark_pairs_2_pal(void *,int);
-extern char *func_PAL_L00_00417ED0(void *,int);
+extern char *lightning_arc_spawn_pal(void *,int);
 extern void part_spawn_random_direction_effect(void *,float,float);
 extern float math_random_float_range(float,float);
 extern void math_apply_axis_rotation_to_quat(void *,void *,void *,float);
@@ -103,7 +103,7 @@ static __inline__ void clearSound(Moby *self,EffectContext *ctx)
     }
     ctx->sound=-1;
 }
-void func_PAL_L00_003C7B10(Moby *self)
+void tesla_barrier_update_pal(Moby *self)
 {
     float offset[4],origin[4],position[4];
     EffectContext *ctx=self->ctx;
@@ -119,7 +119,7 @@ void func_PAL_L00_003C7B10(Moby *self)
     if(g_weapon_l00_table[g_item_slot_to_record[0x2d]].active && self->oclass==0xa5c) {
         int saved=g_trail_owner;
         g_trail_owner=0;
-        if(func_PAL_L00_003C77F0(1)) {
+        if(CreateTrailOwnerMoby_pal(1)) {
             clearSound(self,ctx);
             PlayMobySound(2,0,self);
             g_trail_owner=0;
@@ -246,7 +246,7 @@ void func_PAL_L00_003C7B10(Moby *self)
                 if(freeSlot<0) break;
                 object=g_area_hit_targets[j];
                 ((Moby **)((char *)ctx+(freeSlot<<2)))[8]=object;
-                effect=(Particle *)func_PAL_L00_00417ED0(object,g_tesla_arc_param);
+                effect=(Particle *)lightning_arc_spawn_pal(object,g_tesla_arc_param);
                 if(effect) {
                     effect->source=self;
                     g_tesla_hit_counter++;

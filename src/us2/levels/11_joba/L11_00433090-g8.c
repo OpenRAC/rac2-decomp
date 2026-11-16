@@ -23,7 +23,9 @@ extern int hero_check_distance_zones(void *, void *, int, int, float, float, int
 #define I(o) (*(int *)(d+(o)))
 #define F(o) (*(float *)(d+(o)))
 #define B(o) (*(u8 *)(d+(o)))
-void func_US2_L11_00433090(u8 *obj) {
+/* Runs the Saur-Beast's basic setup and per-frame checks: sets its stats on the first frame, keeps it on the ground, and reacts when it is hit. (USA v2.00) */
+/* Runs the Saur-Beast's basic setup and per-frame checks: sets its stats on the first frame, keeps it on the ground, and reacts when it is hit. (USA v2.00) */
+void saur_beast_update_base_us2(u8 *obj) {
  u8 *d=*(u8 **)(obj+0x68); int state; u8 *p;
  if (!obj[0x20]) {
   float height;

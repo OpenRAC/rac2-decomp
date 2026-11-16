@@ -36,7 +36,7 @@ typedef struct {
     float position[4];
     int time;
     float scale;
-    int cameraRelative;
+    int camera_relative;
     float shake;
 } ExplosionSpot;
 
@@ -45,10 +45,10 @@ typedef struct {
     float position[4];
     unsigned char pad150[0x10];
     float shake;
-    int pad164, shakeTime, shakeTimer;
+    int pad164, shake_time, shake_timer;
     unsigned char pad170[0x10];
-    float secondaryShake;
-    int pad184, secondaryShakeTime;
+    float secondary_shake;
+    int pad184, secondary_shake_time;
     unsigned char pad18C[0x370 - 0x18C];
     float matrix[12];
 } SceneCamera;
@@ -67,7 +67,8 @@ extern void matrix_mul_vec3(void *, void *, void *);
 extern void FastVecAdd(void *, void *, void *);
 extern void *SpawnExplosion(void *, int, int, int, int, int, int, int, float, float, int, int, int, int);
 
-void func_US2_L18_00317D10(void)
+/* Per-frame update of the Damosel scene: tweaks a few kinds of objects, then in the final sequence sets off timed explosions with optional camera shake (USA v2.00 copy). */
+void UpdateDamoselTimedExplosions_us2(void)
 {
     float position[4] __attribute__((aligned(16)));
     int i, j, k, timer;
@@ -75,7 +76,7 @@ void func_US2_L18_00317D10(void)
     SceneMoby *moby;
     ExplosionSpot *spot, *spots;
     Scene18 *scene, *timing;
-    int shakeTime, secondaryShakeTime;
+    int shake_time, secondary_shake_time;
 
     anim_start_startup_animations();
     i = 0;
@@ -88,7 +89,7 @@ void func_US2_L18_00317D10(void)
         if (*(short *)(object + 0xAA) == 0xD54) {
             UpdateEquipmentPieces(object);
         }
-        if (object && *(short *)(object + 0xAA) == 0xFA0 && g_current_map_index != 0x33) {
+        if (object && *(short *)(object + 0xAA) == MOBY_CLASS_TV_SCREENS && g_current_map_index != 0x33) {
             state = *(unsigned char **)(object + 0x68);
             if (state) {
                 math_store_angle_update_result(object, state + 0xC, 0x80AAAAD2, 0x80396464, 0.06108653545379639f);
@@ -112,19 +113,19 @@ void func_US2_L18_00317D10(void)
         spot = &spots[j];
         if (timer == spot->time) {
             qcopy(position, spot->position);
-            if (spot->cameraRelative) {
+            if (spot->camera_relative) {
                 matrix_mul_vec3(position, position, g_hero_l18_state_extra.matrix);
                 FastVecAdd(position, position, g_hero_l18_state_extra.position);
             }
             SpawnExplosion(position, 0, 25, 20, 20, 20, 45, 1, spot->scale, 20.0f, 1, 1, 0, 0);
             if (spot->shake > 0.0f) {
-                shakeTime = 55;
-                secondaryShakeTime = 70;
-                g_hero_l18_state_extra.shakeTime = shakeTime;
-                g_hero_l18_state_extra.secondaryShakeTime = secondaryShakeTime;
-                g_hero_l18_state_extra.shakeTimer = 0;
+                shake_time = 55;
+                secondary_shake_time = 70;
+                g_hero_l18_state_extra.shake_time = shake_time;
+                g_hero_l18_state_extra.secondary_shake_time = secondary_shake_time;
+                g_hero_l18_state_extra.shake_timer = 0;
                 g_hero_l18_state_extra.shake = spot->shake * 0.08f;
-                g_hero_l18_state_extra.secondaryShake = spot->shake * 0.07f;
+                g_hero_l18_state_extra.secondary_shake = spot->shake * 0.07f;
             }
         }
     }

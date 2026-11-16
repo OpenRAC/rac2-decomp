@@ -63,7 +63,7 @@ extern Vec g_lightning_ribbon_outer_points[];
 extern Vec g_lightning_ribbon_surface_a[][20];
 
 extern void ResetBeamChainAndPulseState(char *);
-extern void func_PAL_L00_003CB888();
+extern void DrawBeamRingAndRailEffects_pal();
 extern void ref_L00_003C6B98_00(void *, void *);
 extern Particle *part_spawn_ground_effect(void *, int, float, float, int, int, int, void *, float, int);
 extern Particle *part_spawn_owned_particle(float, float, void *, int, int, int, int, void *, int);
@@ -91,39 +91,39 @@ extern float math_fast_sin_or_cos_b(float);
 extern float math_fast_sin_or_cos_a(float);
 extern int CollLine(void *, void *, int, void *, void *);
 
-void func_PAL_L00_003CA9E0(char *arg)
+void lightning_l00_beam_update_pal(char *moby)
 {
-    float v0[4], v10[4], v20[4], v30[4], v40[4];
+    float pull_dir[4], seg_delta[4], spark_local[4], beam_end[4], work_vec[4];
     char *disabled[128];
-    float v250[4], v260[4];
-    char *obj;
-    char *def = 0;
+    float tmp_a[4], tmp_b[4];
+    char *beam_state;
+    char *target_info = 0;
     float dist, t = 0.0f, w, r, ang, f, len = 0.0f, scale;
     int n, tries, j = 0, k = 0, kk = 0, q = 0, sign = 0, seg = 0;
-    Particle *p = 0;
+    Particle *particle = 0;
     int color, count;
     float a, b;
 
-    v20[3] = 1.0f;
-    obj = *(char **)(arg + 0x68);
-    *(int *)v20 = 0;
-    ResetBeamChainAndPulseState(arg);
+    spark_local[3] = 1.0f;
+    beam_state = *(char **)(moby + 0x68);
+    *(int *)spark_local = 0;
+    ResetBeamChainAndPulseState(moby);
     g_lightning_spin_angle = math_wrap_angle_to_pi(g_lightning_spin_angle + g_lightning_beam_angle_step);
-    vec_scale_to_length(v0, arg + 0xD0, -g_lightning_l00_segment_length_2);
-    if (*(char **)(obj + 0x10) != 0 && (def = moby_get_private_value_0(*(char **)(obj + 0x10))) != 0) {
-        FastVecScale(v40, *(char **)(obj + 0x10) + 0xE0, *(float *)(def + 0x10));
-        FastVecAdd(v30, *(char **)(obj + 0x10) + 0x10, v40);
+    vec_scale_to_length(pull_dir, moby + 0xD0, -g_lightning_l00_segment_length_2);
+    if (*(char **)(beam_state + 0x10) != 0 && (target_info = moby_get_private_value_0(*(char **)(beam_state + 0x10))) != 0) {
+        FastVecScale(work_vec, *(char **)(beam_state + 0x10) + 0xE0, *(float *)(target_info + 0x10));
+        FastVecAdd(beam_end, *(char **)(beam_state + 0x10) + 0x10, work_vec);
     } else {
-        float x = *(float *)(obj + 0x48), y = *(float *)(obj + 0x4C);
-        vec_build_spherical_offset(v30, g_aim_target_range, x, y);
-        FastVecAdd(v30, v30, obj);
+        float x = *(float *)(beam_state + 0x48), y = *(float *)(beam_state + 0x4C);
+        vec_build_spherical_offset(beam_end, g_aim_target_range, x, y);
+        FastVecAdd(beam_end, beam_end, beam_state);
     }
     n = 0;
     dist = g_aim_target_range;
     tries = 0;
-    if (*(char **)(obj + 0x10) == 0) {
-        qcopy(v40, obj);
-        while (CollLine(v40, v30, 0x14, g_hero_state.object, 0)) {
+    if (*(char **)(beam_state + 0x10) == 0) {
+        qcopy(work_vec, beam_state);
+        while (CollLine(work_vec, beam_end, 0x14, g_hero_state.object, 0)) {
             Collision *col;
             char *hit;
             if (++tries >= 7) break;
@@ -132,17 +132,17 @@ void func_PAL_L00_003CA9E0(char *arg)
                 disabled[n++] = g_collision_result.hit;
                 *(int *)(g_collision_result.hit + 0x98) = 0;
                 if (n < 128) {
-                    qcopy(v40, &g_collision_result.point);
+                    qcopy(work_vec, &g_collision_result.point);
                     continue;
                 }
             }
             {
-                float v270[4];
-                FastVecSub(v250, obj, &g_collision_result.point);
-                f = FastVecDot(g_hero_state.object + 0xE0, v250);
-                FastVecScale(v260, g_hero_state.object + 0xE0, f);
-                FastVecSub(v270, v250, v260);
-                dist = FastVecLength(v270);
+                float tmp_c[4];
+                FastVecSub(tmp_a, beam_state, &g_collision_result.point);
+                f = FastVecDot(g_hero_state.object + 0xE0, tmp_a);
+                FastVecScale(tmp_b, g_hero_state.object + 0xE0, f);
+                FastVecSub(tmp_c, tmp_a, tmp_b);
+                dist = FastVecLength(tmp_c);
             }
             break;
         }
@@ -150,100 +150,100 @@ void func_PAL_L00_003CA9E0(char *arg)
             *(int *)(disabled[q] + 0x98) = *(int *)(*(char **)(disabled[q] + 0x24) + 0x10);
         }
     } else {
-        FastVecSub(v40, obj, *(char **)(obj + 0x10) + 0x10);
-        f = FastVecDot(g_hero_state.object + 0xE0, v40);
-        FastVecScale(v250, g_hero_state.object + 0xE0, f);
-        FastVecSub(v260, v40, v250);
-        dist = FastVecLength(v260);
+        FastVecSub(work_vec, beam_state, *(char **)(beam_state + 0x10) + 0x10);
+        f = FastVecDot(g_hero_state.object + 0xE0, work_vec);
+        FastVecScale(tmp_a, g_hero_state.object + 0xE0, f);
+        FastVecSub(tmp_b, work_vec, tmp_a);
+        dist = FastVecLength(tmp_b);
     }
     g_lightning_l00_segment_length_2 = dist * g_lightning_beam_step;
-    qcopy(&g_lightning_beam_points[0], obj);
-    qcopy(&g_lightning_ribbon_inner_points[0], obj);
-    qcopy(&g_lightning_ribbon_outer_points[0], obj);
+    qcopy(&g_lightning_beam_points[0], beam_state);
+    qcopy(&g_lightning_ribbon_inner_points[0], beam_state);
+    qcopy(&g_lightning_ribbon_outer_points[0], beam_state);
     {
     int i;
     for (i = 1; i < 12; i++) {
         vec_transform_or_copy(&g_lightning_beam_points[i], &g_lightning_beam_points[i]);
-        FastVecSub(v10, &g_lightning_beam_points[i], &g_lightning_beam_points[i - 1]);
+        FastVecSub(seg_delta, &g_lightning_beam_points[i], &g_lightning_beam_points[i - 1]);
         t = IntToFloat(i) * g_lightning_beam_step;
         w = t * -0.49999997f + 0.9f;
-        if (g_lightning_beam_segment_limit < i && *(char **)(obj + 0x10) != 0) {
-            FastVecSub(v40, *(char **)(obj + 0x10) + 0x10, &g_lightning_beam_points[i]);
-            vec_scale_to_length(v40, v40, g_lightning_l00_segment_length_2);
-            lerp_vector(v0, v0, v40, 0.2f);
+        if (g_lightning_beam_segment_limit < i && *(char **)(beam_state + 0x10) != 0) {
+            FastVecSub(work_vec, *(char **)(beam_state + 0x10) + 0x10, &g_lightning_beam_points[i]);
+            vec_scale_to_length(work_vec, work_vec, g_lightning_l00_segment_length_2);
+            lerp_vector(pull_dir, pull_dir, work_vec, 0.2f);
         }
-        lerp_vector(v40, v10, v0, w);
-        len = FastVecLength(v40);
+        lerp_vector(work_vec, seg_delta, pull_dir, w);
+        len = FastVecLength(work_vec);
         if (len == 0.0f) {
             qcopy(&g_lightning_beam_points[i], &g_lightning_beam_points[i - 1]);
         } else {
-            FastVecScale(v40, v40, g_lightning_l00_segment_length_2 / len);
-            FastVecAdd(&g_lightning_beam_points[i], &g_lightning_beam_points[i - 1], v40);
+            FastVecScale(work_vec, work_vec, g_lightning_l00_segment_length_2 / len);
+            FastVecAdd(&g_lightning_beam_points[i], &g_lightning_beam_points[i - 1], work_vec);
         }
-        FastVecSub(v250, &g_lightning_beam_points[i], &g_lightning_beam_points[i - 1]);
-        FastVecCross(v260, v250, g_hero_state_block);
-        vec_scale_to_length(v260, v260, g_lightning_beam_radius_start + (g_lightning_beam_radius_end - g_lightning_beam_radius_start) * t);
+        FastVecSub(tmp_a, &g_lightning_beam_points[i], &g_lightning_beam_points[i - 1]);
+        FastVecCross(tmp_b, tmp_a, g_hero_state_block);
+        vec_scale_to_length(tmp_b, tmp_b, g_lightning_beam_radius_start + (g_lightning_beam_radius_end - g_lightning_beam_radius_start) * t);
         {
-        float v270[4];
+        float tmp_c[4];
         float m[4][4];
         for (j = 0; j < 20; j++) {
-            math_apply_axis_rotation_to_quat(v270, v260, v250, (float)j * g_lightning_beam_roll_step);
-            FastVecAdd(&g_lightning_ribbon_surface_a[i][j], v270, &g_lightning_beam_points[i]);
+            math_apply_axis_rotation_to_quat(tmp_c, tmp_b, tmp_a, (float)j * g_lightning_beam_roll_step);
+            FastVecAdd(&g_lightning_ribbon_surface_a[i][j], tmp_c, &g_lightning_beam_points[i]);
         }
         qcopy(m[3], &g_lightning_beam_points[i]);
-        vec_scale_to_length(m[0], v250, 1.0f);
-        vec_scale_to_length(m[1], v260, 1.0f);
+        vec_scale_to_length(m[0], tmp_a, 1.0f);
+        vec_scale_to_length(m[1], tmp_b, 1.0f);
         FastVecCross(m[2], m[1], m[0]);
         r = g_lightning_spark_radius_start + (g_lightning_spark_radius_end - g_lightning_spark_radius_start) * t;
         ang = math_wrap_angle_to_pi(g_lightning_spin_angle + g_lightning_beam_segment_angle * IntToFloat(i));
-        v20[1] = r * math_fast_sin_or_cos_b(ang);
-        v20[2] = r * math_fast_sin_or_cos_a(ang);
-        transform_vector(&g_lightning_ribbon_inner_points[i], v20, m);
-        v20[2] = -v20[2];
-        transform_vector(&g_lightning_ribbon_outer_points[i], v20, m);
+        spark_local[1] = r * math_fast_sin_or_cos_b(ang);
+        spark_local[2] = r * math_fast_sin_or_cos_a(ang);
+        transform_vector(&g_lightning_ribbon_inner_points[i], spark_local, m);
+        spark_local[2] = -spark_local[2];
+        transform_vector(&g_lightning_ribbon_outer_points[i], spark_local, m);
         }
     }
     }
-    ref_L00_003C6B98_00(func_PAL_L00_003CB888, arg);
+    ref_L00_003C6B98_00(DrawBeamRingAndRailEffects_pal, moby);
     scale = math_random_float_range(0.1f, 1.7f);
     sign = math_random_int_below(2);
     if (sign == 0) sign = sign - 1;
     if (math_random_int_below(2) == 0) {
-        qcopy_nc(v40, &g_lightning_ribbon_inner_points[11]);
-        p = part_spawn_ground_effect(v40, 0x19, scale * 0.1f, scale, 0x7F10107F, 0, sign, &g_default_vector, 0.003f, 1);
-        if (p) p->b2 = g_lightning_particle_bytes[0][7];
+        qcopy_nc(work_vec, &g_lightning_ribbon_inner_points[11]);
+        particle = part_spawn_ground_effect(work_vec, 0x19, scale * 0.1f, scale, 0x7F10107F, 0, sign, &g_default_vector, 0.003f, 1);
+        if (particle) particle->b2 = g_lightning_particle_bytes[0][7];
         sign = -sign;
-        p = part_spawn_ground_effect(v40, 0x19, scale * 0.07f, scale * 0.7f, 0x7F7F7F7F, 1, sign, &g_default_vector, 0.003f, 1);
-        if (p) p->b2 = g_lightning_particle_bytes[0][7];
+        particle = part_spawn_ground_effect(work_vec, 0x19, scale * 0.07f, scale * 0.7f, 0x7F7F7F7F, 1, sign, &g_default_vector, 0.003f, 1);
+        if (particle) particle->b2 = g_lightning_particle_bytes[0][7];
     }
     if (math_random_int_below(2) == 0) {
-        qcopy_nc(v40, &g_lightning_ribbon_outer_points[11]);
-        p = part_spawn_ground_effect(v40, 0x19, scale * 0.1f, scale, 0x7F104FFF, 0, sign, &g_default_vector, 0.003f, 1);
-        if (p) p->b2 = g_lightning_particle_bytes[0][7];
+        qcopy_nc(work_vec, &g_lightning_ribbon_outer_points[11]);
+        particle = part_spawn_ground_effect(work_vec, 0x19, scale * 0.1f, scale, 0x7F104FFF, 0, sign, &g_default_vector, 0.003f, 1);
+        if (particle) particle->b2 = g_lightning_particle_bytes[0][7];
         sign = -sign;
-        p = part_spawn_ground_effect(v40, 0x19, scale * 0.07f, scale * 0.7f, 0x7F7F7F7F, 1, sign, &g_default_vector, 0.003f, 1);
-        if (p) p->b2 = g_lightning_particle_bytes[0][7];
+        particle = part_spawn_ground_effect(work_vec, 0x19, scale * 0.07f, scale * 0.7f, 0x7F7F7F7F, 1, sign, &g_default_vector, 0.003f, 1);
+        if (particle) particle->b2 = g_lightning_particle_bytes[0][7];
     }
-    FastVecSub(v250, &g_lightning_beam_points[1], &g_lightning_beam_points[0]);
-    vec_scale_to_length(v250, v250, g_lightning_l00_segment_length * 1.2f);
+    FastVecSub(tmp_a, &g_lightning_beam_points[1], &g_lightning_beam_points[0]);
+    vec_scale_to_length(tmp_a, tmp_a, g_lightning_l00_segment_length * 1.2f);
     if (math_random_int_below(2) == 0) {
-        vec_scale_to_length(v260, arg + 0xD0, g_lightning_sideways_length);
-        FastVecAdd(v40, &g_lightning_beam_points[0], v260);
+        vec_scale_to_length(tmp_b, moby + 0xD0, g_lightning_sideways_length);
+        FastVecAdd(work_vec, &g_lightning_beam_points[0], tmp_b);
         {
             Colors colors = g_lightning_beam_colors;
             float up[4], side[4];
         color = colors.c[math_random_int_below(5)];
         a = math_random_signed_float_range(0.0f, g_lightning_jitter_range);
         b = math_random_signed_float_range(0.0f, g_lightning_jitter_range);
-        math_apply_axis_rotation_to_quat(up, v250, g_hero_state_block, b);
-        FastVecCross(side, v250, g_hero_state_block);
+        math_apply_axis_rotation_to_quat(up, tmp_a, g_hero_state_block, b);
+        FastVecCross(side, tmp_a, g_hero_state_block);
         math_apply_axis_rotation_to_quat(up, up, side, a);
         count = FloatToInt(dist * 1.2f / (g_lightning_l00_segment_length * 1.2f));
-        if (*(char **)(obj + 0x10) != 0) count *= 3;
-        p = part_spawn_owned_particle(scale * 0.1f, scale, v40, count, color, 0, sign, up, *(int *)(obj + 0x10));
-        if (p) p->b2 = g_lightning_particle_bytes[0][6];
-        p = part_spawn_owned_particle(scale * 0.07f, scale * 0.7f, v40, count, 0x7F7F7F7F, 1, -sign, up, *(int *)(obj + 0x10));
-        if (p) p->b2 = g_lightning_particle_bytes[0][6];
+        if (*(char **)(beam_state + 0x10) != 0) count *= 3;
+        particle = part_spawn_owned_particle(scale * 0.1f, scale, work_vec, count, color, 0, sign, up, *(int *)(beam_state + 0x10));
+        if (particle) particle->b2 = g_lightning_particle_bytes[0][6];
+        particle = part_spawn_owned_particle(scale * 0.07f, scale * 0.7f, work_vec, count, 0x7F7F7F7F, 1, -sign, up, *(int *)(beam_state + 0x10));
+        if (particle) particle->b2 = g_lightning_particle_bytes[0][6];
         }
     }
     if (math_fast_float_d(&g_lightning_spark_cooldown)) {
@@ -255,9 +255,9 @@ void func_PAL_L00_003CA9E0(char *arg)
                 g_lightning_spark_ages[k] = 0;
                 g_lightning_spark_sizes[k] = g_lightning_spark_size_start;
                 g_lightning_spark_alphas[k] = IntToFloat(g_lightning_spark_alpha);
-                qcopy(&g_lightning_spark_positions[k], obj);
-                FastVecSub(v260, &g_lightning_beam_points[1], &g_lightning_beam_points[0]);
-                vec_scale_to_length(&g_lightning_spark_directions[k], v260, 1.0f);
+                qcopy(&g_lightning_spark_positions[k], beam_state);
+                FastVecSub(tmp_b, &g_lightning_beam_points[1], &g_lightning_beam_points[0]);
+                vec_scale_to_length(&g_lightning_spark_directions[k], tmp_b, 1.0f);
                 break;
             }
         }
@@ -269,7 +269,7 @@ void func_PAL_L00_003CA9E0(char *arg)
                 g_lightning_spark_active[kk] = 0;
             } else {
                 float step, u, rem, inv;
-                float v270[4];
+                float tmp_c[4];
                 if (g_lightning_spark_timers[kk] < g_lightning_spark_fade_time) g_lightning_spark_alphas[kk] -= g_lightning_spark_fade_rate;
                 step = g_lightning_step_speed * 0.020000001f;
                 g_lightning_spark_ages[kk] += step;
@@ -277,21 +277,21 @@ void func_PAL_L00_003CA9E0(char *arg)
                 if (u > 1.0f) u = 1.0f;
                 g_lightning_spark_sizes[kk] = g_lightning_spark_size_start + (g_lightning_spark_size_end - g_lightning_spark_size_start) * u;
                 if (g_lightning_spark_ages[kk] >= g_aim_target_range) {
-                    FastVecScale(v260, &g_lightning_spark_directions[kk], step);
-                    FastVecAdd(&g_lightning_spark_positions[kk], &g_lightning_spark_positions[kk], v260);
+                    FastVecScale(tmp_b, &g_lightning_spark_directions[kk], step);
+                    FastVecAdd(&g_lightning_spark_positions[kk], &g_lightning_spark_positions[kk], tmp_b);
                 } else {
                     seg = FloatToInt(g_lightning_spark_ages[kk] / g_lightning_l00_segment_length_2);
                     rem = g_lightning_spark_ages[kk] - IntToFloat(seg) * g_lightning_l00_segment_length_2;
                     qcopy(&g_lightning_spark_positions[kk], &g_lightning_beam_points[seg]);
-                    if (seg == 11) FastVecSub(v260, &g_lightning_beam_points[seg], &g_lightning_beam_points[seg + -1]);
-                    else FastVecSub(v260, &g_lightning_beam_points[seg + 1], &g_lightning_beam_points[seg]);
-                    inv = FastVecLength(v260);
+                    if (seg == 11) FastVecSub(tmp_b, &g_lightning_beam_points[seg], &g_lightning_beam_points[seg + -1]);
+                    else FastVecSub(tmp_b, &g_lightning_beam_points[seg + 1], &g_lightning_beam_points[seg]);
+                    inv = FastVecLength(tmp_b);
                     if (inv != 0.0f) {
                         inv = 1.0f / inv;
-                        FastVecScale(v270, v260, rem * inv);
-                        FastVecAdd(&g_lightning_spark_positions[kk], &g_lightning_spark_positions[kk], v270);
-                        vec_scale_to_length(v270, v260, inv);
-                        lerp_vector(&g_lightning_spark_directions[kk], &g_lightning_spark_directions[kk], v270, 0.1f);
+                        FastVecScale(tmp_c, tmp_b, rem * inv);
+                        FastVecAdd(&g_lightning_spark_positions[kk], &g_lightning_spark_positions[kk], tmp_c);
+                        vec_scale_to_length(tmp_c, tmp_b, inv);
+                        lerp_vector(&g_lightning_spark_directions[kk], &g_lightning_spark_directions[kk], tmp_c, 0.1f);
                         vec_scale_to_length(&g_lightning_spark_directions[kk], &g_lightning_spark_directions[kk], 1.0f);
                     }
                 }

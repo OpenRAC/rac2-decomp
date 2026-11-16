@@ -49,17 +49,19 @@ extern char D_L03_001B0B00_GP[] SDATA(D_L03_001B0B00);
 extern char g_effect_descriptor_default[] __attribute__((sda));
 extern int g_floater_effect_arg __attribute__((sda));
 
-void func_PAL_L03_003E61B0(char *obj)
+/* Swaying floater: drifts and tilts around its start point, turns to face the hero when near, and
+   when hit flies off, then explodes into pieces (PAL: 50 Hz timings). */
+void swaying_floater_update_pal(char *obj)
 {
-    float v[4] __attribute__((aligned(16)));
+    float vec[4] __attribute__((aligned(16)));
     float angles[4] __attribute__((aligned(16)));
-    char mat[0x30] __attribute__((aligned(16)));
+    char basis[0x30] __attribute__((aligned(16)));
     char *vars = *(char **)(obj + 0x68);
-    float a;
-    int n;
+    float angle;
+    int mode;
 
-    n = *(u8 *)(obj + 0x20);
-    switch (n) {
+    mode = *(u8 *)(obj + 0x20);
+    switch (mode) {
     case 0:
         qcopy(vars, obj + 0x10);
         *(int *)(obj + 0x48) = 0;
@@ -87,31 +89,31 @@ void func_PAL_L03_003E61B0(char *obj)
         *(Quad *)angles = 0;
         angles[0] = *(float *)(vars + 0x10);
         angles[2] = *(float *)(vars + 0x14);
-        *(Quad *)v = *(Quad *)angles;
-        euler_rotation_basis(mat, v);
-        FastVecScale(obj + 0x10, mat + 0x10, g_floater_matrix_scale);
+        *(Quad *)vec = *(Quad *)angles;
+        euler_rotation_basis(basis, vec);
+        FastVecScale(obj + 0x10, basis + 0x10, g_floater_matrix_scale);
         FastVecAdd(obj + 0x10, obj + 0x10, vars);
         if (!*(int *)(vars + 0x30)) {
-            char *p = part_find_owned_effect_slot(obj, 0x4010000, 0);
-            if (p) {
-                qcopy(vars + 0x20, p + 0x10);
+            char *effect = part_find_owned_effect_slot(obj, 0x4010000, 0);
+            if (effect) {
+                qcopy(vars + 0x20, effect + 0x10);
                 moby_set_state(obj, 2, -1);
             }
         }
         if (vec_distance_squared_xy(obj + 0x10, g_hero_position) < 200.0f) {
-            char *hero = g_hero_position - 0x80;
-            a = FastAddRotations(mat_fast_helper_a(*(float *)(hero + 0x80) - *(float *)(obj + 0x10),
-                                            *(float *)(hero + 0x84) - *(float *)(obj + 0x14)),
+            char *hero_base = g_hero_position - 0x80;
+            angle = FastAddRotations(mat_fast_helper_a(*(float *)(hero_base + 0x80) - *(float *)(obj + 0x10),
+                                            *(float *)(hero_base + 0x84) - *(float *)(obj + 0x14)),
                               1.5707964f);
-            math_approach_target_with_direction_mode(obj + 0xF8, vars + 0x34, 0, a, *(float *)(vars + 0x38),
+            math_approach_target_with_direction_mode(obj + 0xF8, vars + 0x34, 0, angle, *(float *)(vars + 0x38),
                           *(float *)(vars + 0x38), *(float *)(vars + 0x3C));
-            a = mat_fast_helper_a(vec_distance_xy(g_hero_position, obj + 0x10),
-                              *(float *)(obj + 0x18) - *(float *)(hero + 0x88)) * 0.63661975f;
-            if (a > 1.0f)
-                a = 1.0f;
-            else if (a < 0.0f)
-                a = 0.0f;
-            *(float *)(obj + 0x44) = 1.0f - a;
+            angle = mat_fast_helper_a(vec_distance_xy(g_hero_position, obj + 0x10),
+                              *(float *)(obj + 0x18) - *(float *)(hero_base + 0x88)) * 0.63661975f;
+            if (angle > 1.0f)
+                angle = 1.0f;
+            else if (angle < 0.0f)
+                angle = 0.0f;
+            *(float *)(obj + 0x44) = 1.0f - angle;
             update_moby_animation_state(obj);
         }
         break;
@@ -123,34 +125,34 @@ void func_PAL_L03_003E61B0(char *obj)
             *(float *)(obj + 0xF4) *= 4.0f;
             vec_scale_to_length(vars + 0x20, vars + 0x20, 0.20000002f);
         }
-        *(Quad *)v = 0;
-        v[2] = 0.080000006f;
+        *(Quad *)vec = 0;
+        vec[2] = 0.080000006f;
         if (!math_random_int_below(2))
-            part_l01_spawn_spark_burst_pal(obj + 0x10, v, 1, 0x40202020, 1, 0.008f, 0.9f, 1.02f);
+            part_l01_spawn_spark_burst_pal(obj + 0x10, vec, 1, 0x40202020, 1, 0.008f, 0.9f, 1.02f);
         *(float *)(obj + 0xF8) = FastAddRotations(*(float *)(obj + 0xF8), 0.25132746f);
         FastVecAdd(obj + 0x10, obj + 0x10, vars + 0x20);
         {
             int timer = *(unsigned short *)(obj + 0x96);
 
-            n = timer - 1;
-            *(unsigned short *)(obj + 0x96) = n;
+            mode = timer - 1;
+            *(unsigned short *)(obj + 0x96) = mode;
             if (!timer)
                 moby_set_state(obj, 3, -1);
         }
         break;
 
     case 3: {
-        char *p;
+        char *child;
 
         PlayMobySound(0, 0, obj);
-        p = moby_l00_spawn_child(obj, 0x113D, *(u8 *)(obj + 0x30));
-        if (p) {
-            part_explode_object_into_pieces_pal(p, D_L03_001B0B10_GP, D_L03_001B0B08_GP, D_L03_001B0B00_GP, 65535, 1,
+        child = moby_l00_spawn_child(obj, 0x113D, *(u8 *)(obj + 0x30));
+        if (child) {
+            part_explode_object_into_pieces_pal(child, D_L03_001B0B10_GP, D_L03_001B0B08_GP, D_L03_001B0B00_GP, 65535, 1,
                               g_floater_effect_arg, 6, 65535, 255, 0);
-            moby_mark_spawned(p);
+            moby_mark_spawned(child);
         }
-        vec_local_offset_to_world(obj, v, g_floater_local_offset, D_L03_001B0B30_1[1], D_L03_001B0B30_1[2]);
-        SpawnExplosionEffects_pal(obj, g_effect_descriptor_default, v, 0.0f, 0.0f, 10, 5, 15, 0.0f, 0.0f, 9.0f,
+        vec_local_offset_to_world(obj, vec, g_floater_local_offset, D_L03_001B0B30_1[1], D_L03_001B0B30_1[2]);
+        SpawnExplosionEffects_pal(obj, g_effect_descriptor_default, vec, 0.0f, 0.0f, 10, 5, 15, 0.0f, 0.0f, 9.0f,
                       *(float *)(obj + 0x2C) * 30.0f, -1, 0.0f, 0, 0, -1, 0, 0x810001);
         moby_mark_spawned(obj);
         break;

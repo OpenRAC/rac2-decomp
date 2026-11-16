@@ -18,8 +18,10 @@ extern float coll_probe_ground_height_below(void *,int,float);
 extern void mat_build_axis_angle_rotation(void *,void *,float);
 extern int moby_transform_point_and_rotation_by_parent(void *,void *,void *,void *,void *,void *);
 
-void func_PAL_L17_003E8D68(char *obj) {
-    float tmp[4] __attribute__((aligned(16)));
+/* Turns the creature toward its target and lets gravity pull it down onto the ground (or
+   onto a moving object it lands on) (PAL: other turn rates). */
+void grulch_turn_and_fall_pal(char *obj) {
+    float rot_out[4] __attribute__((aligned(16)));
     float rot[4] __attribute__((aligned(16)));
     char *state=*(char **)(obj+0x68);
     char *target;
@@ -43,9 +45,9 @@ void func_PAL_L17_003E8D68(char *obj) {
         MobySpringTurn(obj,state+0x410,angle,0.05f,0.3f,0.12566373f);
     }
     if(I(state,0x420)) {
-        *(Quad *)tmp=0;
-        moby_transform_point_and_rotation_by_parent(obj,*(void **)(state+0x420),obj+0x10,obj+0xf0,obj+0x10,tmp);
-        F(obj,0xf8)=tmp[2];
+        *(Quad *)rot_out=0;
+        moby_transform_point_and_rotation_by_parent(obj,*(void **)(state+0x420),obj+0x10,obj+0xf0,obj+0x10,rot_out);
+        F(obj,0xf8)=rot_out[2];
     }
     F(state,0x424)+=0.008f;
     F(obj,0x18)-=F(state,0x424)-2.0f;
@@ -56,8 +58,8 @@ void func_PAL_L17_003E8D68(char *obj) {
         else if(I(state,0x420)) I(state,0x420)=0;
         F(obj,0x18)=ground; F(state,0x424)=0;
         if(I(state,0x420)) {
-            *(Quad *)rot=*(Quad *)(obj+0xf0); *(Quad *)tmp=*(Quad *)(g_rotation_template_quad);
-            mat_build_axis_angle_rotation(tmp,rot,F(obj,0xf8));
+            *(Quad *)rot=*(Quad *)(obj+0xf0); *(Quad *)rot_out=*(Quad *)(g_rotation_template_quad);
+            mat_build_axis_angle_rotation(rot_out,rot,F(obj,0xf8));
         }
     }
 }

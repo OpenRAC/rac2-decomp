@@ -10,14 +10,14 @@ extern float math_random_angle(void);
 extern float math_random_float_range(float, float);
 extern void vec_build_spherical_offset(float *, float, float, float);
 extern void matrix_mul_vec3(void *, void *, void *);
-extern char *func_PAL_L00_0040E0B0(void *, void *, int, int);
+extern char *tumbling_debris_create_pal(void *, void *, int, int);
 extern void table_clear_entry_flag(int);
 extern void *g_active_tether_object MACRO_ADDR;
 extern int g_shot_fragment_count __attribute__((sda));
 
 /* Build a surface-aligned frame, then launch the configured number of fragments. */
 
-void func_PAL_L00_00403E50(char *object) {
+void shot_spawn_fragments_pal(char *object) {
     float basis[3][4];
     float perpendicular[4];
     float direction[4];
@@ -56,7 +56,7 @@ void func_PAL_L00_00403E50(char *object) {
         vec_build_spherical_offset(direction, speed, heading, elevation);
         direction[3] = 0.0f;
         matrix_mul_vec3(direction, direction, basis);
-        fragment = func_PAL_L00_0040E0B0(position, direction, i, *(int *)(state + 0x2C));
+        fragment = tumbling_debris_create_pal(position, direction, i, *(int *)(state + 0x2C));
         if (fragment != 0) *(int *)(fragment + 0xB8) = *(int *)(object + 0xB8);
     }
     table_clear_entry_flag(*(int *)(state + 0x30));

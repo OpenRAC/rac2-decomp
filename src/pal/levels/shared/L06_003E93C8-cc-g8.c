@@ -21,10 +21,11 @@ extern void vec_random_direction(void *, float, float);
 extern void FastVecAdd(void *, void *, void *);
 extern void FastVecScale(void *, void *, float);
 
-void func_PAL_L06_003E93C8(u8 *moby)
+/* Updates the ripple grid: four groups of twenty-by-ten wave points that are started in turn, spread out and fade (PAL: 50 Hz timings). */
+void ripple_grid_update_pal(u8 *moby)
 {
-    L06Grid *st = *(L06Grid **)(moby + 0x68);
-    L06GridVector temporary[20][10];
+    L06Grid *grid = *(L06Grid **)(moby + 0x68);
+    L06GridVector random_dirs[20][10];
 
     switch (moby[0x20]) {
     case 0:
@@ -38,10 +39,10 @@ void func_PAL_L06_003E93C8(u8 *moby)
             int i;
             for (i = 0; i < 10; i++) {
                 int delay = i * g_ripple_grid_duration / 10;
-                st->timer[0][i] = delay;
-                st->timer[1][i] = delay + 11;
-                st->timer[2][i] = delay + 23;
-                st->timer[3][i] = delay + 34;
+                grid->timer[0][i] = delay;
+                grid->timer[1][i] = delay + 11;
+                grid->timer[2][i] = delay + 23;
+                grid->timer[3][i] = delay + 34;
             }
         }
         moby[0x20] = 1;
@@ -49,38 +50,38 @@ void func_PAL_L06_003E93C8(u8 *moby)
     case 1: {
         int group, col, row;
 
-        st->phase += g_ripple_phase_speed * (0.020000001f);
-        if (st->phase > 1.0f) st->phase -= 1.0f;
+        grid->phase += g_ripple_phase_speed * (0.020000001f);
+        if (grid->phase > 1.0f) grid->phase -= 1.0f;
         for (group = 0; group < 4; group++) {
             for (col = 0; col < 10; col++) {
-                int hit = math_fast_float_d(&st->timer[group][col]);
+                int hit = math_fast_float_d(&grid->timer[group][col]);
                 int base = group * 0x2580;
-                L06GridVector (*points)[20] = (L06GridVector (*)[20])((char *)st + base);
-                L06GridVector (*velocities)[20] = (L06GridVector (*)[20])((char *)st + (base + 0x9600));
+                L06GridVector (*points)[20] = (L06GridVector (*)[20])((char *)grid + base);
+                L06GridVector (*velocities)[20] = (L06GridVector (*)[20])((char *)grid + (base + 0x9600));
                 if (hit) {
                     for (row = 0; row < 20; row++) {
                         vec_clear_128(&points[row][col]);
-                        ((L06GridVector *)((char *)st + (row * 0x140 + (col * 16 + base))))->f[1] = row * 0.05f * g_ripple_grid_size - g_ripple_grid_size * 0.5f;
-                        ((L06GridVector *)((char *)st + (row * 0x140 + (col * 16 + base))))->f[3] = 1.0f;
-                        vec_random_direction(&temporary[row][col], 0.0f, g_ripple_random_speed * (0.020000001f));
+                        ((L06GridVector *)((char *)grid + (row * 0x140 + (col * 16 + base))))->f[1] = row * 0.05f * g_ripple_grid_size - g_ripple_grid_size * 0.5f;
+                        ((L06GridVector *)((char *)grid + (row * 0x140 + (col * 16 + base))))->f[3] = 1.0f;
+                        vec_random_direction(&random_dirs[row][col], 0.0f, g_ripple_random_speed * (0.020000001f));
                     }
                     {
                         int k;
-                        /* The three cursors start from separate col * 16 + temporary sums, as
+                        /* The three cursors start from separate col * 16 + random_dirs sums, as
                            retail's do: cse2 must not merge them, combine reduces mirror and
                            offset, and reload_cse joins the two sums with the same operand order. */
                         int mirror = -(col * 16);
                         int offset = col * 16 - 160;
-                        L06GridVector (*column)[10] = (L06GridVector (*)[10])(col * 16 + (int)temporary);
-                        int first = (int)temporary - mirror;
-                        int before = offset + (int)temporary;
+                        L06GridVector (*column)[10] = (L06GridVector (*)[10])(col * 16 + (int)random_dirs);
+                        int first = (int)random_dirs - mirror;
+                        int before = offset + (int)random_dirs;
                         for (k = 1; k < 19; k++) {
                             FastVecAdd(&velocities[k][col], (L06GridVector *)(before + k * 160), (L06GridVector *)(first + k * 160));
                             FastVecAdd(&velocities[k][col], &velocities[k][col], column[k + 1]);
                             FastVecScale(&velocities[k][col], &velocities[k][col], 0.333f);
                         }
                     }
-                    st->timer[group][col] = g_ripple_grid_duration;
+                    grid->timer[group][col] = g_ripple_grid_duration;
                 } else {
                     int k;
                     for (k = 1; k < 19; k++) {

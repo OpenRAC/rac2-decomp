@@ -14,7 +14,7 @@ typedef struct JobObject JobObject;
 
 typedef struct {
     u8 pad00[0x18];
-    float *params;          /* +0x18, points at paramBlock */
+    float *params;          /* +0x18, points at param_block */
     u8 pad1C[4];
     float health;           /* +0x20 */
     u8 pad24[4];
@@ -30,7 +30,7 @@ typedef struct {
     u8 pad49;
     u8 f4A;
     u8 pad4B[5];
-    u8 hitInfo[0x10];       /* +0x50 */
+    u8 hit_info[0x10];       /* +0x50 */
     u8 f60;
     u8 pad61[8];
     u8 f69;
@@ -43,7 +43,7 @@ typedef struct {
     s32 f98;
     u8 pad9C[0xFC - 0x9C];
     float fFC;
-    float paramBlock[5];    /* +0x100 */
+    float param_block[5];    /* +0x100 */
     u8 pad114[0x12C - 0x114];
     float f12C;
     float f130;
@@ -56,15 +56,15 @@ typedef struct {
     u8 f1E8;
     u8 f1E9;
     u8 pad1EA[0x1FC - 0x1EA];
-    u16 spawnTimer;         /* +0x1FC */
+    u16 spawn_timer;         /* +0x1FC */
     u8 pad1FE[0x2F0 - 0x1FE];
     float basis[12];        /* +0x2F0 */
     float anchor[4];        /* +0x320 */
     u8 pad330[0x354 - 0x330];
     JobObject *turret;      /* +0x354 */
-    float turnRate;         /* +0x358 */
+    float turn_rate;         /* +0x358 */
     u8 pad35C[0x364 - 0x35C];
-    s16 fireTimer;          /* +0x364 */
+    s16 fire_timer;          /* +0x364 */
     u8 pad366[0x36E - 0x366];
     s16 f36E;
 } JobState;
@@ -93,7 +93,7 @@ extern s32 FloatToInt(float);
 extern float fast_vec_dist(void *, void *);
 extern void moby_update_ground_check(void *);
 extern void *part_find_owned_effect_slot(void *, s32, s32);
-extern s32 func_PAL_002B1A50(void *, void *, s32);
+extern s32 moby_apply_damage_to_object_pal(void *, void *, s32);
 extern void matrix_from_basis_rows(void *, void *);
 extern void cam_compute_view_direction(void *, void *, s32);
 extern s32 arena_is_point_in_inner_zone(s32, void *);
@@ -113,22 +113,22 @@ extern s32 weapon_select_aim_target(void *, s32, s32, s32, float, float);
    turn rate of 15 to 40 degrees, the 0.5/0.4 constant set) and runs its setup; then it sets the
    proximity flag, rebuilds the frame at state + 0x290 and, from stage 3 on, runs its hit, death
    and tracking checks. */
-void func_PAL_L11_00458020(char *object)
+void turret_enemy_update_b_pal(char *object)
 {
     char *state = *(char **)(object + 0x68);
     char *aim;
     char *hit;
     char *source;
     float matrix[16];
-    float turnRate;
+    float turn_rate;
     s16 kind;
 
     if (*(u8 *)(object + 0x20) == 0) {
         *(char **)(state + 0x18) = state + 0x100;
-        turnRate = math_random_float_range(15.0f, 40.0f) * 0.017453294f;
+        turn_rate = math_random_float_range(15.0f, 40.0f) * 0.017453294f;
         if (math_random_int_below(2) != 0)
-            turnRate = -turnRate;
-        *(f32 *)(state + 0x2C8) = turnRate;
+            turn_rate = -turn_rate;
+        *(f32 *)(state + 0x2C8) = turn_rate;
         if (math_random_int_below(2) == 1)
             *(u16 *)(object + 0x34) |= 0x8000;
         *(u8 *)(state + 0x48) = FloatToInt(15.0f);
@@ -175,7 +175,7 @@ void func_PAL_L11_00458020(char *object)
                     *(s32 *)(hit + 0x2C) = 0;
             }
         }
-        if (func_PAL_002B1A50(object, state + 0x50, 0) == 5) {
+        if (moby_apply_damage_to_object_pal(object, state + 0x50, 0) == 5) {
             *(s32 *)(state + 0xE0) = 0;
             *(f32 *)(state + 0xE4) = 1.0053098f;
         }

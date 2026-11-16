@@ -7,18 +7,18 @@ typedef struct { Vector row[4]; } Matrix;
 typedef void (*DrawCallback)(void *);
 
 typedef struct {
-    int record, unknown04, delayFrames, unknown0C;
-    int linked[2], disabled, restoreMode;
+    int record, unknown04, delay_frames, unknown0C;
+    int linked[2], disabled, restore_mode;
     char *gates[20];
     char *platforms[20];
     char *rotators[20];
-    int gateCount, platformCount, rotatorCount, completed;
+    int gate_count, platform_count, rotator_count, completed;
     u8 *decoration;
     int unknown124;
     float angles[2];
-    int retryTimer;
-    float savedBrightness, savedAlpha;
-    int savedCamera, selector, selectorMode, previousSelector;
+    int retry_timer;
+    float saved_brightness, saved_alpha;
+    int saved_camera, selector, selector_mode, previous_selector;
 } ChallengeState;
 
 typedef struct {
@@ -28,7 +28,7 @@ typedef struct {
     u8 unknown9C[0x100 - 0x9C];
     Vector velocity;
     u8 unknown110[0x222 - 0x110];
-    u16 controlMode;
+    u16 control_mode;
     u8 unknown224[0xC28 - 0x224];
     u32 flags;
     u8 unknownC2C[0x1248 - 0xC2C];
@@ -36,7 +36,7 @@ typedef struct {
     u8 unknown124C[0x2290 - 0x124C];
     u8 *object;
     u8 unknown2294[0x22C8 - 0x2294];
-    int cameraRequest;
+    int camera_request;
 } PlayerView;
 
 typedef struct {
@@ -69,7 +69,7 @@ extern ChallengeGlobals g_challenge_globals;
 typedef struct { Vector from, to; u8 unknown20[0x30]; char *view; } CameraPath;
 extern CameraPath g_camera_l02_position;
 extern float g_screen_brightness, g_screen_alpha;
-typedef struct { u8 unknown00[0xB0]; float fovScale; } CameraTuning;
+typedef struct { u8 unknown00[0xB0]; float fov_scale; } CameraTuning;
 extern CameraTuning g_hud_l02_render_state;
 extern float g_level_saved_fov_scale;
 extern char g_str_l02_challenge_debug_a_2[], g_str_l02_challenge_debug_b_2[], g_str_l02_challenge_debug_c_2[];
@@ -122,18 +122,18 @@ extern void LoadClassIntoFreeCacheSlot(int);
 extern int ForceClaimNotice(int, int, int);
 extern void object_copy_vector_to_selected(const void *), cam_set_state_rotation(const void *);
 extern void SetCamera5Pose(const void *, const void *, int, int, int);
-extern int func_US2_L00_002C4560(int, int);
+extern int hero_l00_change_action_us2(int, int);
 extern void set_hero_animation(int, int, float);
 extern void script_queue_keyed_request(int, int);
 extern void AdvancePathFollower(char *, int);
-extern void func_US2_L02_003C58E0(void *);
+extern void menu_draw_challenge_us2(void *);
 extern void puzzle_reset_linked_part_group(char *);
 extern void part_l02_spawn_spinning_pairs(void *, int);
 extern void part_update_pulsing_glow_tint(char *), spark_emitter_update(char *);
 extern void PulseGroupMobyColors(char *, u32, u32);
 extern void SpawnOpposedParticles(void *, int, u32, int, u32);
 
-void func_US2_L02_003C3B7C(u8 *object)
+void challenge_controller_update_us2(u8 *object)
 {
     ChallengeState *state = *(ChallengeState **)(object + 0x68);
     Vector position, target, rotation;
@@ -164,10 +164,10 @@ void func_US2_L02_003C3B7C(u8 *object)
             if (CollLine(&target, &rotation, 2, object, 0))
                 *(float *)(object + 0x18) += (g_challenge_ground_height - position.f[2]) + g_challenge_height_offset;
         }
-        state->retryTimer = 60;
-        state->gateCount = 0;
-        state->platformCount = 0;
-        state->rotatorCount = 0;
+        state->retry_timer = 60;
+        state->gate_count = 0;
+        state->platform_count = 0;
+        state->rotator_count = 0;
         state->completed = 0;
         state->decoration = 0;
         records = g_matrix_l02_record_table;
@@ -183,35 +183,35 @@ void func_US2_L02_003C3B7C(u8 *object)
                 actor = g_moby_l02_pool + (*list & 0x7FFF) * 0x100;
                 if (*(short *)(actor + 0xAA) != 0x896)
                     gfx_pack_render_command_fields((u64 *)actor, 0x505010, 14, 14, 14);
-                if (*(short *)(actor + 0xAA) == 0xA24 && state->gateCount < 20) {
-                    state->gates[state->gateCount] = actor;
-                    *(float *)(*(char **)(actor + 0x68) + 0x10) = (float)state->delayFrames * 0.016666668f;
+                if (*(short *)(actor + 0xAA) == 0xA24 && state->gate_count < 20) {
+                    state->gates[state->gate_count] = actor;
+                    *(float *)(*(char **)(actor + 0x68) + 0x10) = (float)state->delay_frames * 0.016666668f;
                     *(u16 *)(actor + 0x34) |= 0x41;
-                    state->gateCount++;
+                    state->gate_count++;
                 }
-                if (*(short *)(actor + 0xAA) == 0xA55 && state->platformCount < 20) {
-                    state->platforms[state->platformCount] = actor;
-                    *(float *)(*(char **)(actor + 0x68) + 4) = (float)state->delayFrames * 0.016666668f;
+                if (*(short *)(actor + 0xAA) == 0xA55 && state->platform_count < 20) {
+                    state->platforms[state->platform_count] = actor;
+                    *(float *)(*(char **)(actor + 0x68) + 4) = (float)state->delay_frames * 0.016666668f;
                     *(u16 *)(actor + 0x34) |= 0x41;
-                    state->platformCount++;
+                    state->platform_count++;
                 }
-                if (*(short *)(actor + 0xAA) == 0x873 && state->rotatorCount < 20) {
-                    state->rotators[state->rotatorCount] = actor;
-                    state->rotatorCount++;
+                if (*(short *)(actor + 0xAA) == 0x873 && state->rotator_count < 20) {
+                    state->rotators[state->rotator_count] = actor;
+                    state->rotator_count++;
                 }
             } while (*(short *)list++ >= 0);
         }
-        if (state->gateCount >= 20)
+        if (state->gate_count >= 20)
             STUB_printf(g_str_l02_challenge_debug_a_2, *(short *)(object + 0xB2));
-        if (state->platformCount >= 20)
+        if (state->platform_count >= 20)
             STUB_printf(g_str_l02_challenge_debug_b_2, *(short *)(object + 0xB2));
-        if (state->rotatorCount >= 20)
+        if (state->rotator_count >= 20)
             STUB_printf(g_str_l02_challenge_debug_c_2, *(short *)(object + 0xB2));
-        if (state->rotatorCount == 0)
+        if (state->rotator_count == 0)
             STUB_printf(g_str_l02_challenge_debug_a, *(short *)(object + 0xB2));
-        if (state->gateCount == 0)
+        if (state->gate_count == 0)
             STUB_printf(g_str_l02_challenge_debug_b, *(short *)(object + 0xB2));
-        if (state->platformCount == 0)
+        if (state->platform_count == 0)
             STUB_printf(g_str_l02_challenge_debug_c, *(short *)(object + 0xB2));
         id = *(u16 *)(object + 0xB2);
         if (g_cell_flags.completed[(short)id] != 0
@@ -243,8 +243,8 @@ void func_US2_L02_003C3B7C(u8 *object)
             if (load_is_class_cached(slots[ids[0x26]].sound) == 0) {
                 LoadClassIntoFreeCacheSlot(slots[ids[0x26]].sound);
             } else if (g_pad_state.buttons.word.high & 0x10) {
-                state->savedCamera = g_hero_state.camera;
-                g_hero_state.cameraRequest = 0x26;
+                state->saved_camera = g_hero_state.camera;
+                g_hero_state.camera_request = 0x26;
                 moby_show_angles_debug(object);
                 moby_set_state((u8 *)object, 4, -1);
             }
@@ -258,10 +258,10 @@ void func_US2_L02_003C3B7C(u8 *object)
     case 4: {
         int status;
         ForceClaimNotice(1, 0, 1);
-        g_hero_state.controlMode = 3;
+        g_hero_state.control_mode = 3;
         status = hero_get_target_state_kind();
         if (status == 2 && g_hero_state.object[0x42] == g_hero_state.object[0x43]) {
-            func_US2_L00_002C4560(0x6F, 0);
+            hero_l00_change_action_us2(0x6F, 0);
             set_hero_animation(0x54, 0, 7.0f);
             position.f[0] = math_fast_sin_or_cos_a(*(float *)(object + 0xF8)) * 3.0f;
             position.f[1] = math_fast_sin_or_cos_b(*(float *)(object + 0xF8)) * 3.0f;
@@ -307,7 +307,7 @@ void func_US2_L02_003C3B7C(u8 *object)
         position.f[2] = 0.0f;
         moby_transform_joint_to_world(object, 0, (char *)&target);
         FastVecAdd(&position, &target, &position);
-        g_hero_state.controlMode = 3;
+        g_hero_state.control_mode = 3;
         if (fast_vec_dist(&g_camera_l02_position.from, &position) <= 0.05f) {
             SetCamera5Pose(&g_camera_l02_position.from, &g_camera_l02_position.to, 2, 300, 0);
             object_copy_vector_to_selected(&target);
@@ -324,7 +324,7 @@ void func_US2_L02_003C3B7C(u8 *object)
         s16 *selectors;
         int status;
         ForceClaimNotice(1, 0, 1);
-        g_hero_state.controlMode = 3;
+        g_hero_state.control_mode = 3;
         if (g_hero_state.flags & 2)
             set_hero_animation(0x55, 0, 0.0f);
         moby_transform_joint_to_world(object, 0, (char *)&position);
@@ -350,18 +350,18 @@ void func_US2_L02_003C3B7C(u8 *object)
             } else {
                 STUB_printf(g_str_challenge_debug_d);
             }
-            state->savedBrightness = g_screen_brightness;
-            state->savedAlpha = g_screen_alpha;
+            state->saved_brightness = g_screen_brightness;
+            state->saved_alpha = g_screen_alpha;
             g_screen_brightness = 100.0f;
             g_screen_alpha = 255.0f;
-            state->previousSelector = g_music_state[0x1E] != -1 ? g_music_state[0x1E] : g_music_state[0x24];
-            script_queue_keyed_request(state->selector, state->selectorMode);
+            state->previous_selector = g_music_state[0x1E] != -1 ? g_music_state[0x1E] : g_music_state[0x24];
+            script_queue_keyed_request(state->selector, state->selector_mode);
             {
                 float angle = 0.56217057f;
                 float sine;
-                g_level_saved_fov_scale = g_hud_l02_render_state.fovScale;
+                g_level_saved_fov_scale = g_hud_l02_render_state.fov_scale;
                 sine = math_fast_sin_or_cos_b(angle);
-                g_hud_l02_render_state.fovScale = sine / math_fast_sin_or_cos_a(angle);
+                g_hud_l02_render_state.fov_scale = sine / math_fast_sin_or_cos_a(angle);
                 UpdateViewContext();
             }
             moby_set_state((u8 *)object, 9, -1);
@@ -374,7 +374,7 @@ void func_US2_L02_003C3B7C(u8 *object)
         char *actors;
         u16 *list;
         ForceClaimNotice(1, 0, 1);
-        func_US2_L00_002C4560(0x6F, 1);
+        hero_l00_change_action_us2(0x6F, 1);
         record = g_matrix_l02_record_table + state->record * 0x80;
         if (fast_vec_dist(&g_camera_l02_position.from, record + 0x30) <= 1.0f) {
             if (g_arena_state_words == 7) {
@@ -395,11 +395,11 @@ void func_US2_L02_003C3B7C(u8 *object)
                 if (request_begin_slot(7, 1, (int)object, 1, 0) == 0)
                     break;
                 cam_set_mode_state(3);
-                g_hero_state.cameraRequest = state->savedCamera;
-                func_US2_L00_002C4560(0, 1);
-                g_hero_state.cameraRequest = state->savedCamera;
-                if (state->restoreMode != -1)
-                    cam_reset_entry(state->restoreMode);
+                g_hero_state.camera_request = state->saved_camera;
+                hero_l00_change_action_us2(0, 1);
+                g_hero_state.camera_request = state->saved_camera;
+                if (state->restore_mode != -1)
+                    cam_reset_entry(state->restore_mode);
                 moby_set_state((u8 *)object, 1, -1);
             }
         }
@@ -414,46 +414,46 @@ void func_US2_L02_003C3B7C(u8 *object)
         int i1, i2, i3, i4;
         int status;
         if (g_arena_state_words == 7) {
-            gfx_add_draw_callback_first(func_US2_L02_003C58E0, object);
+            gfx_add_draw_callback_first(menu_draw_challenge_us2, object);
             if (g_pad_state.buttons.all & 0xE000000000ULL) {
                 moby_flip_element_turn_directions(object);
             } else if (g_pad_state.buttons.word.high & 0x10) {
-                g_hero_state.cameraRequest = state->savedCamera;
+                g_hero_state.camera_request = state->saved_camera;
                 cam_set_mode_state(3);
-                g_hero_state.cameraRequest = state->savedCamera;
-                func_US2_L00_002C4560(0, 1);
+                g_hero_state.camera_request = state->saved_camera;
+                hero_l00_change_action_us2(0, 1);
                 object[0x30] = 0x40;
                 if (state->decoration) {
                     moby_mark_spawned(state->decoration);
                     state->decoration = 0;
                 }
                 puzzle_reset_linked_part_group(object);
-                for (i1 = 0; i1 < state->rotatorCount; i1++) {
+                for (i1 = 0; i1 < state->rotator_count; i1++) {
                     *(float *)(state->rotators[i1] + 0xF8) = *(float *)(*(char **)(state->rotators[i1] + 0x68) + 0x10);
                     euler_rotation_basis(state->rotators[i1] + 0xC0, state->rotators[i1] + 0xF0);
                 }
-                g_screen_brightness = state->savedBrightness;
-                g_screen_alpha = state->savedAlpha;
-                g_hud_l02_render_state.fovScale = g_level_saved_fov_scale;
+                g_screen_brightness = state->saved_brightness;
+                g_screen_alpha = state->saved_alpha;
+                g_hud_l02_render_state.fov_scale = g_level_saved_fov_scale;
                 UpdateViewContext();
                 request_end_slot(0, 0);
-                if (state->restoreMode != -1)
-                    cam_reset_entry(state->restoreMode);
-                script_queue_keyed_request(state->previousSelector, state->selectorMode);
+                if (state->restore_mode != -1)
+                    cam_reset_entry(state->restore_mode);
+                script_queue_keyed_request(state->previous_selector, state->selector_mode);
                 moby_set_state((u8 *)object, 1, -1);
             } else if (g_challenge_pad_flags && PadPressedWithin(1, 60, 0)) {
                 if (PadPressedWithin(2, 60, 0)) {
-                    if (state->platformCount > 0)
+                    if (state->platform_count > 0)
                         snd_play_from_class_bank(5, 0, state->platforms[0], 0x896);
                     moby_set_state((u8 *)object, 8, -1);
                 }
             }
-            for (i2 = 0; i2 < state->platformCount; i2++) {
+            for (i2 = 0; i2 < state->platform_count; i2++) {
                 AdvancePathFollower(state->platforms[i2], 0);
                 position.bits = *(Quad *)(state->platforms[i2] + 0x10);
                 SpawnOpposedParticles(&position, 6, 0x88802020, 4, 0x7F6F6FFF);
             }
-            for (i3 = 0; i3 < state->gateCount; i3++) {
+            for (i3 = 0; i3 < state->gate_count; i3++) {
                 status = gate_move_along_path(state->gates[i3]);
                 switch (status) {
                 case 0:
@@ -485,8 +485,8 @@ void func_US2_L02_003C3B7C(u8 *object)
                     break;
                 }
             }
-            if (state->completed == state->gateCount) {
-                if (state->platformCount > 0)
+            if (state->completed == state->gate_count) {
+                if (state->platform_count > 0)
                     snd_play_from_class_bank(5, 0, state->platforms[0], 0x896);
                 moby_set_state((u8 *)object, 8, -1);
             }
@@ -494,21 +494,21 @@ void func_US2_L02_003C3B7C(u8 *object)
             if (*(u16 *)(object + 0x96) < 6)
                 break;
             cam_set_mode_state(3);
-            g_hero_state.cameraRequest = state->savedCamera;
-            func_US2_L00_002C4560(0, 1);
+            g_hero_state.camera_request = state->saved_camera;
+            hero_l00_change_action_us2(0, 1);
             object[0x30] = 0x40;
             if (state->decoration) {
                 moby_mark_spawned(state->decoration);
                 state->decoration = 0;
             }
             puzzle_reset_linked_part_group(object);
-            for (i4 = 0; i4 < state->rotatorCount; i4++) {
+            for (i4 = 0; i4 < state->rotator_count; i4++) {
                 *(float *)(state->rotators[i4] + 0xF8) = *(float *)(*(char **)(state->rotators[i4] + 0x68) + 0x10);
                 euler_rotation_basis(state->rotators[i4] + 0xC0, state->rotators[i4] + 0xF0);
             }
-            g_screen_brightness = state->savedBrightness;
-            g_screen_alpha = state->savedAlpha;
-            script_queue_keyed_request(state->previousSelector, state->selectorMode);
+            g_screen_brightness = state->saved_brightness;
+            g_screen_alpha = state->saved_alpha;
+            script_queue_keyed_request(state->previous_selector, state->selector_mode);
             moby_set_state((u8 *)object, 1, -1);
         }
         break;
@@ -518,8 +518,8 @@ void func_US2_L02_003C3B7C(u8 *object)
         u16 id;
         int i, j, k;
         if (g_arena_state_words == 7) {
-            gfx_add_draw_callback_first(func_US2_L02_003C58E0, object);
-            for (i = 0; i < state->platformCount; i++) {
+            gfx_add_draw_callback_first(menu_draw_challenge_us2, object);
+            for (i = 0; i < state->platform_count; i++) {
                 AdvancePathFollower(state->platforms[i], 1);
                 position.bits = *(Quad *)(state->platforms[i] + 0x10);
                 SpawnOpposedParticles(&position, 60, 0x8800FF00, 4, 0x7F6F6FFF);
@@ -541,19 +541,19 @@ void func_US2_L02_003C3B7C(u8 *object)
                     moby_set_flag_bit((u8 *)(g_moby_l02_pool + state->linked[j] * 0x100), 1);
             }
             cam_set_mode_state(3);
-            g_hero_state.cameraRequest = state->savedCamera;
-            func_US2_L00_002C4560(0, 1);
+            g_hero_state.camera_request = state->saved_camera;
+            hero_l00_change_action_us2(0, 1);
             object[0x30] = 0x40;
             if (state->decoration) {
                 moby_mark_spawned(state->decoration);
                 state->decoration = 0;
             }
-            g_screen_brightness = state->savedBrightness;
-            g_screen_alpha = state->savedAlpha;
+            g_screen_brightness = state->saved_brightness;
+            g_screen_alpha = state->saved_alpha;
             request_end_slot(0, 0);
-            if (state->restoreMode != -1)
-                cam_reset_entry(state->restoreMode);
-            script_queue_keyed_request(state->previousSelector, state->selectorMode);
+            if (state->restore_mode != -1)
+                cam_reset_entry(state->restore_mode);
+            script_queue_keyed_request(state->previous_selector, state->selector_mode);
             moby_set_state((u8 *)object, 5, -1);
         } else {
             if (*(u16 *)(object + 0x96) < 6)
@@ -573,16 +573,16 @@ void func_US2_L02_003C3B7C(u8 *object)
                     moby_set_flag_bit((u8 *)(g_moby_l02_pool + state->linked[k] * 0x100), 1);
             }
             cam_set_mode_state(3);
-            g_hero_state.cameraRequest = state->savedCamera;
-            func_US2_L00_002C4560(0, 1);
+            g_hero_state.camera_request = state->saved_camera;
+            hero_l00_change_action_us2(0, 1);
             object[0x30] = 0x40;
             if (state->decoration) {
                 moby_mark_spawned(state->decoration);
                 state->decoration = 0;
             }
-            g_screen_brightness = state->savedBrightness;
-            g_screen_alpha = state->savedAlpha;
-            script_queue_keyed_request(state->previousSelector, state->selectorMode);
+            g_screen_brightness = state->saved_brightness;
+            g_screen_alpha = state->saved_alpha;
+            script_queue_keyed_request(state->previous_selector, state->selector_mode);
             moby_set_state((u8 *)object, 5, -1);
         }
         break;
@@ -593,33 +593,33 @@ void func_US2_L02_003C3B7C(u8 *object)
         char *vars;
         int i;
         if (g_arena_state_words == 7) {
-            gfx_add_draw_callback_first(func_US2_L02_003C58E0, object);
-            if (state->retryTimer != 0) {
-                state->retryTimer--;
+            gfx_add_draw_callback_first(menu_draw_challenge_us2, object);
+            if (state->retry_timer != 0) {
+                state->retry_timer--;
             } else if (g_pad_state.buttons.word.high & 0x10) {
                 cam_set_mode_state(3);
-                g_hero_state.cameraRequest = state->savedCamera;
-                func_US2_L00_002C4560(0, 1);
+                g_hero_state.camera_request = state->saved_camera;
+                hero_l00_change_action_us2(0, 1);
                 object[0x30] = 0x40;
                 if (state->decoration) {
                     moby_mark_spawned(state->decoration);
                     state->decoration = 0;
                 }
                 puzzle_reset_linked_part_group(object);
-                for (i = 0; i < state->rotatorCount; i++) {
+                for (i = 0; i < state->rotator_count; i++) {
                     *(float *)(state->rotators[i] + 0xF8) = *(float *)(*(char **)(state->rotators[i] + 0x68) + 0x10);
                     euler_rotation_basis(state->rotators[i] + 0xC0, state->rotators[i] + 0xF0);
                 }
-                g_screen_brightness = state->savedBrightness;
-                g_screen_alpha = state->savedAlpha;
-                script_queue_keyed_request(state->previousSelector, state->selectorMode);
+                g_screen_brightness = state->saved_brightness;
+                g_screen_alpha = state->saved_alpha;
+                script_queue_keyed_request(state->previous_selector, state->selector_mode);
                 request_end_slot(0, 0);
                 moby_set_state((u8 *)object, 1, -1);
             } else if (g_pad_state.buttons.all & 0xE000000000ULL) {
                 puzzle_reset_linked_part_group(object);
                 moby_set_state((u8 *)object, 10, -1);
             }
-            for (i = 0; i < state->gateCount; i++) {
+            for (i = 0; i < state->gate_count; i++) {
                 actor = state->gates[i];
                 vars = *(char **)(actor + 0x68);
                 if (*(int *)(*(char **)(vars + 8) + 4) != 1) {
@@ -637,7 +637,7 @@ void func_US2_L02_003C3B7C(u8 *object)
                     }
                 }
             }
-            for (i = 0; i < state->platformCount; i++) {
+            for (i = 0; i < state->platform_count; i++) {
                 position.bits = *(Quad *)(state->platforms[i] + 0x10);
                 SpawnOpposedParticles(&position, 6, 0x88802020, 4, 0x7F6F6FFF);
             }
@@ -645,21 +645,21 @@ void func_US2_L02_003C3B7C(u8 *object)
             if (*(u16 *)(object + 0x96) < 6)
                 break;
             cam_set_mode_state(3);
-            g_hero_state.cameraRequest = state->savedCamera;
-            func_US2_L00_002C4560(0, 1);
+            g_hero_state.camera_request = state->saved_camera;
+            hero_l00_change_action_us2(0, 1);
             object[0x30] = 0x40;
             if (state->decoration) {
                 moby_mark_spawned(state->decoration);
                 state->decoration = 0;
             }
             puzzle_reset_linked_part_group(object);
-            for (i = 0; i < state->rotatorCount; i++) {
+            for (i = 0; i < state->rotator_count; i++) {
                 *(float *)(state->rotators[i] + 0xF8) = *(float *)(*(char **)(state->rotators[i] + 0x68) + 0x10);
                 euler_rotation_basis(state->rotators[i] + 0xC0, state->rotators[i] + 0xF0);
             }
-            g_screen_brightness = state->savedBrightness;
-            g_screen_alpha = state->savedAlpha;
-            script_queue_keyed_request(state->previousSelector, state->selectorMode);
+            g_screen_brightness = state->saved_brightness;
+            g_screen_alpha = state->saved_alpha;
+            script_queue_keyed_request(state->previous_selector, state->selector_mode);
             moby_set_state((u8 *)object, 1, -1);
         }
         break;
@@ -671,9 +671,9 @@ void func_US2_L02_003C3B7C(u8 *object)
         int i1, i2;
         int completed;
         float angle;
-        gfx_add_draw_callback_first(func_US2_L02_003C58E0, object);
+        gfx_add_draw_callback_first(menu_draw_challenge_us2, object);
         completed = 0;
-        for (i1 = 0; i1 < state->rotatorCount; i1++) {
+        for (i1 = 0; i1 < state->rotator_count; i1++) {
             vars = *(char **)(state->rotators[i1] + 0x68);
             angle = FastDiffRots(*(float *)(vars + 0x10), *(float *)(state->rotators[i1] + 0xF8));
             if (math_fabs(angle) >= 0.08f) {
@@ -683,8 +683,8 @@ void func_US2_L02_003C3B7C(u8 *object)
                 completed++;
             }
         }
-        if (completed == state->rotatorCount) {
-            for (i2 = 0; i2 < state->rotatorCount; i2++) {
+        if (completed == state->rotator_count) {
+            for (i2 = 0; i2 < state->rotator_count; i2++) {
                 vars = *(char **)(state->rotators[i2] + 0x68);
                 *(float *)(state->rotators[i2] + 0xF8) = *(float *)(vars + 0x10);
                 euler_rotation_basis(state->rotators[i2] + 0xC0, state->rotators[i2] + 0xF0);

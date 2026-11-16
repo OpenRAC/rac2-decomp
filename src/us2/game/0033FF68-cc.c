@@ -28,11 +28,11 @@ extern void *object_construct_derived_a(void *);
 extern char *hud_construct_widget_base(char *);
 extern void *object_construct_derived_b(void *);
 extern void *object_construct_derived_c(void *);
-char *func_US2_0033FF68(char *object)
+char *radial_menu_construct_us2(char *object)
 {
     char *cursor;
     int i;
-    char *f, *b, *c, *d, *e, *g, *a;
+    char *cell_5, *cell_1, *cell_2, *cell_3, *cell_4, *cell_6, *cell_0;
     object_construct_derived_a(object);
     object_construct_derived_a(object + 0x4C);
     object_construct_derived_a(object + 0x98);
@@ -49,21 +49,21 @@ char *func_US2_0033FF68(char *object)
     object_construct_derived_a(object + 0x5A0);
     cursor = object + 0x5EC;
     i = 7;
-    f = object + 0x988;
-    a = object + 0x7D0;
-    b = object + 0x828;
-    g = object + 0x9e0;
-    c = object + 0x880;
-    d = object + 0x8d8;
-    e = object + 0x930;
+    cell_5 = object + 0x988;
+    cell_0 = object + 0x7D0;
+    cell_1 = object + 0x828;
+    cell_6 = object + 0x9e0;
+    cell_2 = object + 0x880;
+    cell_3 = object + 0x8d8;
+    cell_4 = object + 0x930;
     for (; i != -1; i--, cursor += 0x3C) object_construct_derived_c(cursor);
-    object_construct_derived_c(a);
-    hud_construct_widget_base(b);
-    hud_construct_widget_base(c);
-    hud_construct_widget_base(d);
-    hud_construct_widget_base(e);
-    hud_construct_widget_base(f);
-    hud_construct_widget_base(g);
+    object_construct_derived_c(cell_0);
+    hud_construct_widget_base(cell_1);
+    hud_construct_widget_base(cell_2);
+    hud_construct_widget_base(cell_3);
+    hud_construct_widget_base(cell_4);
+    hud_construct_widget_base(cell_5);
+    hud_construct_widget_base(cell_6);
     return object;
 }
 

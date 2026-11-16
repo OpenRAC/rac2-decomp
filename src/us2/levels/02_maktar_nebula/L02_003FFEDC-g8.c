@@ -79,7 +79,7 @@ extern void UpdateViewContext(void);
 extern void text_draw_window_small(Rect *, u64, char *, s32);
 extern void text_draw_window_large(Rect *, u64, char *, s32);
 extern void text_draw_window_medium(Rect *, u64, char *, s32);
-extern int func_US2_L02_003FF750(void);
+extern int language_at_least_two_us2(void);
 extern void FontSetWindow(Rect *, s32, s32, s32, s32, s32, s32, s32, s32);
 extern f32 IntToFloat(s32);
 extern char *GetLocalizedString(s32);
@@ -163,7 +163,8 @@ static __inline__ int hud_coord(float value, float scale, float half, int active
     return result;
 }
 
-void func_US2_L02_003FFEDC(u8 *moby)
+/* Draws the Maktar challenge HUD: its title, score and status boxes. */
+void arena_draw_challenge_hud_us2(u8 *moby)
 {
     char buf[0x40];
     Rect r50;
@@ -203,9 +204,9 @@ void func_US2_L02_003FFEDC(u8 *moby)
     FontSetWindow(&r50, x, y, g_hud_panel_d_window_left[0], g_hud_panel_d_window_right[0], g_hud_panel_d_window_height, h, 0, three);
     {
     s32 x, y;
-    x = (f32)g_hud_panel_c_pos_x[func_US2_L02_003FF750()][0] * g_hud_label_scale + half;
-    y = label_y(moby, (f32)g_hud_panel_c_pos_y[func_US2_L02_003FF750()][0], g_hud_label_scale, half, 1);
-    FontSetWindow(&r70, x, y, g_hud_panel_c_window_left[func_US2_L02_003FF750()][0], g_hud_panel_c_window_right[func_US2_L02_003FF750()][0], g_hud_panel_c_window_height, hud_coord((f32)g_hud_panel_c_height, g_hud_label_scale, half, 1), 0, three);
+    x = (f32)g_hud_panel_c_pos_x[language_at_least_two_us2()][0] * g_hud_label_scale + half;
+    y = label_y(moby, (f32)g_hud_panel_c_pos_y[language_at_least_two_us2()][0], g_hud_label_scale, half, 1);
+    FontSetWindow(&r70, x, y, g_hud_panel_c_window_left[language_at_least_two_us2()][0], g_hud_panel_c_window_right[language_at_least_two_us2()][0], g_hud_panel_c_window_height, hud_coord((f32)g_hud_panel_c_height, g_hud_label_scale, half, 1), 0, three);
     three2 = 3;
     }
     k2 = 1;
@@ -215,10 +216,10 @@ void func_US2_L02_003FFEDC(u8 *moby)
     FontSetWindow(&r90, x, y, g_hud_window_b_left[0], g_hud_window_b_top[0], g_hud_window_b_height, h, 0, three);
     {
     s32 x, y;
-    x = label_y(&rB0, (f32)g_hud_window_a_x[func_US2_L02_003FF750()][0], g_hud_label_scale, half, 1);
+    x = label_y(&rB0, (f32)g_hud_window_a_x[language_at_least_two_us2()][0], g_hud_label_scale, half, 1);
     do { k3 = 1; } while (0);
-    y = (f32)g_hud_window_a_y[func_US2_L02_003FF750()][0] * g_hud_label_scale + half;
-    FontSetWindow(&rB0, x, y, g_hud_window_a_left[func_US2_L02_003FF750()][0], g_hud_window_a_top[func_US2_L02_003FF750()][0], g_hud_window_a_height, hud_coord((f32)g_hud_window_a_box_height, g_hud_label_scale, half, k3), 0, three);
+    y = (f32)g_hud_window_a_y[language_at_least_two_us2()][0] * g_hud_label_scale + half;
+    FontSetWindow(&rB0, x, y, g_hud_window_a_left[language_at_least_two_us2()][0], g_hud_window_a_top[language_at_least_two_us2()][0], g_hud_window_a_height, hud_coord((f32)g_hud_window_a_box_height, g_hud_label_scale, half, k3), 0, three);
     }
     one = 1;
     x = hud_coord((f32)g_hud_panel_b_pos_x, g_hud_label_scale, half, k2);
@@ -242,7 +243,7 @@ void func_US2_L02_003FFEDC(u8 *moby)
         sprintf(buf, g_str_hud_number_format, 15 * *(s16 *)(data + 0x122) + sum - *(s32 *)(data + 0x60));
         DRAWBUF(text_draw_window_large, &r50);
         str = GetLocalizedString(0x2DF7);
-        if (func_US2_L02_003FF750()) {
+        if (language_at_least_two_us2()) {
             text_draw_window_medium(&r70, g_hud_text_color, str, func_001157AC(str));
         } else {
             text_draw_window_small(&r70, g_hud_text_color, str, func_001157AC(str));
@@ -258,7 +259,7 @@ void func_US2_L02_003FFEDC(u8 *moby)
         sprintf(buf, g_str_hud_number_format, 15 * *(s16 *)(data + 0x122) + sum - *(s32 *)(data + 0x60));
         DRAWBUF(text_draw_window_large, &r50);
         str = GetLocalizedString(0x2DF7);
-        if (func_US2_L02_003FF750()) {
+        if (language_at_least_two_us2()) {
             text_draw_window_medium(&r70, g_hud_text_color, str, func_001157AC(str));
         } else {
             text_draw_window_small(&r70, g_hud_text_color, str, func_001157AC(str));

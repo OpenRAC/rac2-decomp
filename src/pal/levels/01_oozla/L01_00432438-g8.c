@@ -24,27 +24,28 @@ extern float fast_vec_dist(void *, void *);
 extern void cam_set_value_target(int, int, float, float, float, float);
 extern void cam_set_transition_frames(float);
 extern float math_cosine_blend(float, float, float);
-extern s32 func_PAL_L01_002BEC60(int, int);
+extern s32 SetHeroMoveState_pal(int, int);
 
-void func_PAL_L01_00432438(unsigned char *camera)
+/* Moves a spline-path camera along its path each frame, steering it at a target or a look path, and ends the shot when the path is done (PAL: 50 Hz speed). */
+void UpdateSplinePathCamera_pal(unsigned char *camera)
 {
     RouteVector old, up, direction, target;
-    unsigned char *v = *(unsigned char **)(camera + 0x70);
-    CameraPath *c = *(CameraPath **)(g_camera_path_configs + *(short *)(camera + 0x84) * 32 + 0x1c);
-    PathMotion *motion = (PathMotion *)(v + 0x40);
+    unsigned char *vars = *(unsigned char **)(camera + 0x70);
+    CameraPath *path_config = *(CameraPath **)(g_camera_path_configs + *(short *)(camera + 0x84) * 32 + 0x1c);
+    PathMotion *motion = (PathMotion *)(vars + 0x40);
     unsigned char *path;
-    PathKeys *keys = (PathKeys *)(v + 0x58);
+    PathKeys *keys = (PathKeys *)(vars + 0x58);
     int done, i, j, k, target_index, local_segment;
     float along, total, local_distance;
     if (!motion->started) {
-        unsigned char *start = g_path_l01_table[c->path];
-        unsigned char *look = g_path_l01_table[c->look];
-        if (c->lock) g_camera_lock_flag = 1;
+        unsigned char *start = g_path_l01_table[path_config->path];
+        unsigned char *look = g_path_l01_table[path_config->look];
+        if (path_config->lock) g_camera_lock_flag = 1;
         motion->started = 1;
         qcopy(camera + 0x30, start + 0x10);
-        target_index = c->target;
+        target_index = path_config->target;
         if (target_index >= 0) {
-            float *src = c->offset;
+            float *src = path_config->offset;
             unsigned char *entity = g_moby_l01_table + target_index * 256;
             up[0] = src[0]; up[1] = src[1]; up[2] = src[2];
             *(int *)&up[3] = 0;
@@ -59,18 +60,18 @@ void func_PAL_L01_00432438(unsigned char *camera)
         FastVecCross(camera + 0x20, camera + 0x10, camera);
         return;
     }
-    path = g_path_l01_table[c->path];
+    path = g_path_l01_table[path_config->path];
     qcopy(old, camera + 0x30);
-    done = Spline_AdvanceByDistance(path, camera + 0x30, &motion->segment, v + 0x44, 0, c->speed * 0.020000001f);
-    if (motion->stop && FastDecTimer(v + 0x56)) done = 1;
-    if (c->finished) done = 1;
+    done = Spline_AdvanceByDistance(path, camera + 0x30, &motion->segment, vars + 0x44, 0, path_config->speed * 0.020000001f);
+    if (motion->stop && FastDecTimer(vars + 0x56)) done = 1;
+    if (path_config->finished) done = 1;
     if (done) {
-        c->finished = 1;
+        path_config->finished = 1;
         cam_set_value_target(0, 3, keys->roll, 0.005f, 0.2f, 0.0f);
         cam_set_transition_frames(4.0f);
         *(short *)(camera + 0x7e) = 4;
-        if (c->lock) D_L01_001B1FA8_gp = 0;
-        func_PAL_L01_002BEC60(0, 1);
+        if (path_config->lock) D_L01_001B1FA8_gp = 0;
+        SetHeroMoveState_pal(0, 1);
         return;
     }
     for (i = 0; i < 7 && keys->idx[i] >= 0 && keys->idx[i + 1] >= 0; ++i) {
@@ -85,9 +86,9 @@ void func_PAL_L01_00432438(unsigned char *camera)
         }
     }
     motion->travelled += fast_vec_dist(old, camera + 0x30);
-    target_index = c->target;
+    target_index = path_config->target;
     if (target_index >= 0) {
-        float *src = c->offset;
+        float *src = path_config->offset;
         unsigned char *entity = g_moby_l01_table + target_index * 256;
         direction[0] = src[0]; direction[1] = src[1]; direction[2] = src[2];
         *(int *)&direction[3] = 0;
@@ -97,7 +98,7 @@ void func_PAL_L01_00432438(unsigned char *camera)
     } else {
         float progress = motion->travelled / motion->length * motion->scale;
         local_segment = 0; local_distance = 0;
-        Spline_AdvanceByDistance(g_path_l01_table[c->look], direction, &local_segment, &local_distance, 0, progress);
+        Spline_AdvanceByDistance(g_path_l01_table[path_config->look], direction, &local_segment, &local_distance, 0, progress);
         FastVecSub(up, direction, camera + 0x30);
     }
     FastVecScale(direction, g_hero_state_block, -1.0f);

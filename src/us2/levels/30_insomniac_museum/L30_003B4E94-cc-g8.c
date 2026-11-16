@@ -46,7 +46,7 @@ typedef struct { char pad[0x183C]; float health, maxHealth; } HudHero;
 extern HudHero g_hero_state;
 extern int sprintf(char *, const char *, ...);
 extern double __extendsfdf2(float);
-extern unsigned long func_US2_0027CED8(int);
+extern unsigned long tex_get_effect_descriptor_us2(int);
 extern void DrawTexturedQuad(int, int, int, int, int, int, int, int, unsigned long long, unsigned long long);
 extern void AppendRotatedSpriteQuad(float, float, float, float, float, int, int, u64, unsigned, unsigned, int, int, float, float);
 extern int text_draw_centered_medium(int, int, unsigned long, char *, int);
@@ -72,7 +72,7 @@ static __inline__ unsigned long PackGaugeFlag(unsigned long flags, unsigned char
 }
 
 /* Draws the status gauge and updates its swizzled palette. */
-void func_US2_L30_003B4E94(char *object)
+void hud_draw_health_gauge_l30_us2(char *object)
 {
     char text[16];
     Hud *state = *(Hud **)(object + 0x68);
@@ -141,12 +141,12 @@ void func_US2_L30_003B4E94(char *object)
             angleB = math_wrap_angle_to_pi(IntToFloat(g_frame_l08_counter) * 0.033333335f);
             a = math_fast_sin_or_cos_b(angleA) * 2.0f * state->shake;
             b = math_fast_sin_or_cos_a(angleB) * 2.0f * state->shake;
-            tex = func_US2_0027CED8(g_gauge_tex_base_d + state->texture);
+            tex = tex_get_effect_descriptor_us2(g_gauge_tex_base_d + state->texture);
             color = fade | 0x808080;
             AppendSubpixelTexturedScreenQuad(x + a, g_gauge_screen_y + b + (1.0f - state->shake) * 4.0f + y, size, size, 0, 0, 0x20, 0x20, color, tex);
-            tex = func_US2_0027CED8(g_gauge_tex_base_f + state->texture);
+            tex = tex_get_effect_descriptor_us2(g_gauge_tex_base_f + state->texture);
             AppendSubpixelTexturedScreenQuad(x, g_gauge_screen_y + 32.0f, size, 32.0f, 0, 0, 0x20, 0x20, color, tex);
-            tex = func_US2_0027CED8(g_gauge_tex_base_g + state->texture);
+            tex = tex_get_effect_descriptor_us2(g_gauge_tex_base_g + state->texture);
             do {
                 float z = IntToFloat(offset);
                 i--;
@@ -155,16 +155,16 @@ void func_US2_L30_003B4E94(char *object)
                 colors++;
             } while (i >= 0);
             if (state->hitCount < 3) {
-                tex = func_US2_0027CED8(g_gauge_tex_base_e + state->texture);
+                tex = tex_get_effect_descriptor_us2(g_gauge_tex_base_e + state->texture);
                 AppendSubpixelTexturedScreenQuad(x, g_gauge_screen_y + (float)state->extra + 32.0f + y, size, size, 0, 0, 0x20, 0x20, fade | 0x808080, tex);
             }
         }
     }
-    tex = func_US2_0027CED8(g_gauge_tex_base_a + state->texture);
+    tex = tex_get_effect_descriptor_us2(g_gauge_tex_base_a + state->texture);
     DrawTexturedQuad(FloatToInt(g_gauge_l08_screen_x), g_screen_height - 0x50, 0x40, 0x40, 0, 0, 0x40, 0x40, g_gauge_quad_color, tex);
-    tex = func_US2_0027CED8(g_gauge_tex_base_b + state->texture);
+    tex = tex_get_effect_descriptor_us2(g_gauge_tex_base_b + state->texture);
     DrawTexturedQuad(FloatToInt(g_gauge_l08_screen_x) + 0x40, g_screen_height - 0x50, 0x40, 0x40, 0, 0, 0x40, 0x40, g_gauge_quad_color, tex);
-    tex = func_US2_0027CED8(g_gauge_tex_base_c + state->texture);
+    tex = tex_get_effect_descriptor_us2(g_gauge_tex_base_c + state->texture);
     {
         float distance = g_gauge_distance_scale * (FastVecLength(state) * 0.017453294f);
         float frame = g_hover_cruise_speed * 0.016666668f;
@@ -200,9 +200,9 @@ void func_US2_L30_003B4E94(char *object)
             (*(unsigned **)&g_color_row_ptr)[index] = 0x80000000;
         }
     }
-    tex = func_US2_0027CED8(state->texture + g_gauge_tex_base_h);
+    tex = tex_get_effect_descriptor_us2(state->texture + g_gauge_tex_base_h);
     DrawTexturedQuad(0x170, g_screen_height - 0x90, 0x80, 0x80, 0, 0, 0x80, 0x80, 0x70808080, tex);
-    tex = func_US2_0027CED8(state->texture + g_gauge_tex_base_i);
+    tex = tex_get_effect_descriptor_us2(state->texture + g_gauge_tex_base_i);
     DrawTexturedQuad(0x170, g_screen_height - 0x90, 0x80, 0x80, 0, 0, 0x80, 0x80, 0x70808080, tex);
     state->segments = level;
     if (g_hero_state.health < g_hero_state.maxHealth * 0.1f) {

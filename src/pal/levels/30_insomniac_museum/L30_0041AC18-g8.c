@@ -5,7 +5,7 @@
 #include "common.h"
 typedef unsigned int Quadword __attribute__((mode(TI)));
 typedef struct {
-    short life, initialLife, duration, pad;
+    short life, initial_life, duration, pad;
     float inner, outer, strength, scale;
     int sound, flash, count0, count1, count2, count3, count4, count5, color;
 } ExplosionState;
@@ -36,144 +36,145 @@ extern void SpawnExplosionEffects(void *, void *, void *, float, float, int, int
 extern void vec_build_spherical_offset(void *, float, float, float);
 extern char *SpawnSpinningSparkParticle(void *, float, float, float, int, void *, float, int, int);
 
-void func_PAL_L30_0041AC18(char *obj) {
-    float p[4] __attribute__((aligned(16)));
-    float v[4] __attribute__((aligned(16)));
-    float t[4] __attribute__((aligned(16)));
-    ExplosionState *st = *(ExplosionState **)(obj + 0x68);
-    float a;
+/* Spawns the particles of a museum explosion: a flash, smoke puffs, sparks, trails, a shockwave ring and spinning embers, sized by the explosion's scale (PAL version). */
+void EmitMuseumExplosionParticles_pal(char *obj) {
+    float position[4] __attribute__((aligned(16)));
+    float velocity[4] __attribute__((aligned(16)));
+    float rotation[4] __attribute__((aligned(16)));
+    ExplosionState *state = *(ExplosionState **)(obj + 0x68);
+    float angle_to_camera;
     int i, sign;
     {
-        float burstSize, burstSpeed;
+        float burst_size, burst_speed;
         int i;
         char *particle;
-        burstSize = g_burst_size_scale * st->scale * 210000.0f;
-        burstSpeed = g_burst_l30_speed_scale * st->scale * 210000.0f;
-        particle = part_spawn_gravity_fade(obj + 0x10, g_particle_spawn_template, (g_burst_particle_texture * 5 + 2) / 6, st->color | 0x7F000000, 0, 100, 0, burstSize, burstSpeed, 0.0f, 0);
+        burst_size = g_burst_size_scale * state->scale * 210000.0f;
+        burst_speed = g_burst_l30_speed_scale * state->scale * 210000.0f;
+        particle = part_spawn_gravity_fade(obj + 0x10, g_particle_spawn_template, (g_burst_particle_texture * 5 + 2) / 6, state->color | 0x7F000000, 0, 100, 0, burst_size, burst_speed, 0.0f, 0);
         if (particle) particle[2] = g_particle_sprite_table[0][0];
-        particle = part_spawn_gravity_fade(obj + 0x10, g_particle_spawn_template, (g_burst_particle_texture * 5 + 2) / 6, st->color, 0, 100, 0, burstSize, burstSpeed, 0.0f, 0);
+        particle = part_spawn_gravity_fade(obj + 0x10, g_particle_spawn_template, (g_burst_particle_texture * 5 + 2) / 6, state->color, 0, 100, 0, burst_size, burst_speed, 0.0f, 0);
         if (particle) particle[2] = g_particle_sprite_table[0][0];
         for (i = 0; i < 2; i++) {
-            particle = part_spawn_gravity_fade(obj + 0x10, g_particle_spawn_template, (g_burst_particle_texture * 5 + 2) / 6, st->color | 0x7F000000, 0, 127, 0, burstSize, burstSpeed, 0.0f, 0);
+            particle = part_spawn_gravity_fade(obj + 0x10, g_particle_spawn_template, (g_burst_particle_texture * 5 + 2) / 6, state->color | 0x7F000000, 0, 127, 0, burst_size, burst_speed, 0.0f, 0);
             if (particle) particle[2] = g_particle_l30_texture_table[0x170/4][5];
         }
         for (i = 0; i < 2; i++) {
-            particle = part_spawn_gravity_fade(obj + 0x10, g_particle_spawn_template, (g_burst_particle_texture * 5 + 2) / 6, st->color | 0x7F000000, 0, 127, 0, burstSize, burstSpeed, 0.0f, 0);
+            particle = part_spawn_gravity_fade(obj + 0x10, g_particle_spawn_template, (g_burst_particle_texture * 5 + 2) / 6, state->color | 0x7F000000, 0, 127, 0, burst_size, burst_speed, 0.0f, 0);
             if (particle) particle[2] = g_particle_l30_texture_table[0x170/4][6];
         }
     }
     {
         int i;
-        for (i = 0; i < st->count0; i++) {
-            float a, direction, size, speed;
-            int n, life;
+        for (i = 0; i < state->count0; i++) {
+            float angle_to_camera, direction, size, speed;
+            int puff_count, life;
             char *particle;
-            a = mat_fast_helper_a(g_camera_l30_state.position[0] - *(float *)(obj+0x10), g_camera_l30_state.position[1] - *(float *)(obj+0x14));
-            n = FloatToInt(math_random_signed_float_range(2.0f, 5.0f));
+            angle_to_camera = mat_fast_helper_a(g_camera_l30_state.position[0] - *(float *)(obj+0x10), g_camera_l30_state.position[1] - *(float *)(obj+0x14));
+            puff_count = FloatToInt(math_random_signed_float_range(2.0f, 5.0f));
             life = math_random_int_range(30, 50);
-            p[0] = *(float *)(obj+0x10) + math_random_signed_float_range(0.0f, 0.1f)*st->scale;
-            p[1] = *(float *)(obj+0x14) + math_random_signed_float_range(0.0f, 0.1f)*st->scale;
-            p[2] = *(float *)(obj+0x18) + math_random_signed_float_range(0.0f, 0.1f)*st->scale;
-            size = math_random_float_range(0.6f, 1.0f)*st->scale;
-            speed = math_random_float_range(9.0f, 12.0f)*st->scale;
-            direction = FastAddRotations(a, math_random_signed_float_range(0.0f, 1.396263599395752f));
-            v[0] = math_fast_sin_or_cos_a(direction)*0.020000001f*speed;
-            v[1] = math_fast_sin_or_cos_b(direction)*0.020000001f*speed;
-            v[2] = 0.0f;
-            speed = math_random_float_range(0.0f, 12.0f)*st->scale;
-            v[2] = speed*0.020000001f;
-            part_spawn_fading_drift(p,v,(life * 5 + 2) / 6,st->color,n,127,127,size*210000.0f,st->scale*2100.0f,0.00584f,1);
-            n *= 2;
-            particle = part_spawn_fading_drift(p,v,(life * 5 + 2) / 6,st->color&0xFFFFFF,-n,48,48,size*1260000.0f,st->scale*4200.0f,0.00584f,0);
+            position[0] = *(float *)(obj+0x10) + math_random_signed_float_range(0.0f, 0.1f)*state->scale;
+            position[1] = *(float *)(obj+0x14) + math_random_signed_float_range(0.0f, 0.1f)*state->scale;
+            position[2] = *(float *)(obj+0x18) + math_random_signed_float_range(0.0f, 0.1f)*state->scale;
+            size = math_random_float_range(0.6f, 1.0f)*state->scale;
+            speed = math_random_float_range(9.0f, 12.0f)*state->scale;
+            direction = FastAddRotations(angle_to_camera, math_random_signed_float_range(0.0f, 1.396263599395752f));
+            velocity[0] = math_fast_sin_or_cos_a(direction)*0.020000001f*speed;
+            velocity[1] = math_fast_sin_or_cos_b(direction)*0.020000001f*speed;
+            velocity[2] = 0.0f;
+            speed = math_random_float_range(0.0f, 12.0f)*state->scale;
+            velocity[2] = speed*0.020000001f;
+            part_spawn_fading_drift(position,velocity,(life * 5 + 2) / 6,state->color,puff_count,127,127,size*210000.0f,state->scale*2100.0f,0.00584f,1);
+            puff_count *= 2;
+            particle = part_spawn_fading_drift(position,velocity,(life * 5 + 2) / 6,state->color&0xFFFFFF,-puff_count,48,48,size*1260000.0f,state->scale*4200.0f,0.00584f,0);
             if (particle) particle[2] = g_particle_l30_texture_table[0xD4/4][0];
         }
     }
     {
         int i;
-        for (i = 0; i < st->count1; i++) {
-            float a, direction, size, speed;
-            int n, life;
+        for (i = 0; i < state->count1; i++) {
+            float angle_to_camera, direction, size, speed;
+            int puff_count, life;
             char *particle;
-            a = mat_fast_helper_a(g_camera_l30_state.position[0] - *(float *)(obj+0x10), g_camera_l30_state.position[1] - *(float *)(obj+0x14));
-            n = FloatToInt(math_random_signed_float_range(2.0f, 5.0f));
+            angle_to_camera = mat_fast_helper_a(g_camera_l30_state.position[0] - *(float *)(obj+0x10), g_camera_l30_state.position[1] - *(float *)(obj+0x14));
+            puff_count = FloatToInt(math_random_signed_float_range(2.0f, 5.0f));
             life = math_random_int_range(30, 50);
-            p[0] = *(float *)(obj+0x10) + math_random_signed_float_range(0.0f, 0.1f)*st->scale;
-            p[1] = *(float *)(obj+0x14) + math_random_signed_float_range(0.0f, 0.1f)*st->scale;
-            p[2] = *(float *)(obj+0x18) + math_random_signed_float_range(0.0f, 0.1f)*st->scale;
-            size = math_random_float_range(0.75f, 1.5f)*st->scale;
-            speed = math_random_float_range(9.0f, 12.0f)*st->scale;
-            direction = FastAddRotations(a, math_random_signed_float_range(0.0f, 1.396263599395752f));
-            v[0] = math_fast_sin_or_cos_a(direction)*0.020000001f*speed;
-            v[1] = math_fast_sin_or_cos_b(direction)*0.020000001f*speed;
-            v[2] = 0.0f;
-            speed = math_random_float_range(0.0f, 12.0f)*st->scale;
-            v[2] = speed*0.020000001f;
-            part_spawn_fading_drift(p,v,(life * 5 + 2) / 6,st->color&0xFFFFFF,n,127,127,size*210000.0f,st->scale*2100.0f,0.00584f,5);
+            position[0] = *(float *)(obj+0x10) + math_random_signed_float_range(0.0f, 0.1f)*state->scale;
+            position[1] = *(float *)(obj+0x14) + math_random_signed_float_range(0.0f, 0.1f)*state->scale;
+            position[2] = *(float *)(obj+0x18) + math_random_signed_float_range(0.0f, 0.1f)*state->scale;
+            size = math_random_float_range(0.75f, 1.5f)*state->scale;
+            speed = math_random_float_range(9.0f, 12.0f)*state->scale;
+            direction = FastAddRotations(angle_to_camera, math_random_signed_float_range(0.0f, 1.396263599395752f));
+            velocity[0] = math_fast_sin_or_cos_a(direction)*0.020000001f*speed;
+            velocity[1] = math_fast_sin_or_cos_b(direction)*0.020000001f*speed;
+            velocity[2] = 0.0f;
+            speed = math_random_float_range(0.0f, 12.0f)*state->scale;
+            velocity[2] = speed*0.020000001f;
+            part_spawn_fading_drift(position,velocity,(life * 5 + 2) / 6,state->color&0xFFFFFF,puff_count,127,127,size*210000.0f,state->scale*2100.0f,0.00584f,5);
         }
     }
     {
         int i;
-        for (i = 0; i < st->count2; i++) {
-            float a, direction, size, speed;
-            int n, life;
+        for (i = 0; i < state->count2; i++) {
+            float angle_to_camera, direction, size, speed;
+            int puff_count, life;
             char *particle;
-            a = mat_fast_helper_a(g_camera_l30_state.position[0] - *(float *)(obj+0x10), g_camera_l30_state.position[1] - *(float *)(obj+0x14));
-            n = FloatToInt(math_random_signed_float_range(2.0f, 5.0f));
+            angle_to_camera = mat_fast_helper_a(g_camera_l30_state.position[0] - *(float *)(obj+0x10), g_camera_l30_state.position[1] - *(float *)(obj+0x14));
+            puff_count = FloatToInt(math_random_signed_float_range(2.0f, 5.0f));
             life = math_random_int_range(30, 50);
-            p[0] = *(float *)(obj+0x10) + math_random_signed_float_range(0.0f, 0.1f)*st->scale;
-            p[1] = *(float *)(obj+0x14) + math_random_signed_float_range(0.0f, 0.1f)*st->scale;
-            p[2] = *(float *)(obj+0x18) + math_random_signed_float_range(0.0f, 0.1f)*st->scale;
-            size = math_random_float_range(0.6f, 1.0f)*st->scale;
-            speed = math_random_float_range(9.0f, 12.0f)*st->scale;
-            direction = FastAddRotations(a, math_random_signed_float_range(0.0f, 1.396263599395752f));
-            v[0] = math_fast_sin_or_cos_a(direction)*0.020000001f*speed;
-            v[1] = math_fast_sin_or_cos_b(direction)*0.020000001f*speed;
-            v[2] = 0.0f;
-            speed = math_random_float_range(0.0f, 12.0f)*st->scale;
-            v[2] = speed*0.020000001f;
-            part_spawn_fading_drift(p,v,(life * 5 + 2) / 6,st->color&0xFFFFFF,n,127,127,size*210000.0f,st->scale*2100.0f,0.00584f,3);
+            position[0] = *(float *)(obj+0x10) + math_random_signed_float_range(0.0f, 0.1f)*state->scale;
+            position[1] = *(float *)(obj+0x14) + math_random_signed_float_range(0.0f, 0.1f)*state->scale;
+            position[2] = *(float *)(obj+0x18) + math_random_signed_float_range(0.0f, 0.1f)*state->scale;
+            size = math_random_float_range(0.6f, 1.0f)*state->scale;
+            speed = math_random_float_range(9.0f, 12.0f)*state->scale;
+            direction = FastAddRotations(angle_to_camera, math_random_signed_float_range(0.0f, 1.396263599395752f));
+            velocity[0] = math_fast_sin_or_cos_a(direction)*0.020000001f*speed;
+            velocity[1] = math_fast_sin_or_cos_b(direction)*0.020000001f*speed;
+            velocity[2] = 0.0f;
+            speed = math_random_float_range(0.0f, 12.0f)*state->scale;
+            velocity[2] = speed*0.020000001f;
+            part_spawn_fading_drift(position,velocity,(life * 5 + 2) / 6,state->color&0xFFFFFF,puff_count,127,127,size*210000.0f,state->scale*2100.0f,0.00584f,3);
         }
     }
     {
         int i;
-        for (i = 0; i < st->count4; i++) {
+        for (i = 0; i < state->count4; i++) {
             float x, y;
             char *particle;
-            FastVecScale(p,obj+0xC0,math_random_float_range(15.0f,20.0f)*st->scale*0.020000001f);
+            FastVecScale(position,obj+0xC0,math_random_float_range(15.0f,20.0f)*state->scale*0.020000001f);
             x = math_random_signed_float_range(0.2617994248867035f,1.396263599395752f);
             y = math_random_signed_float_range(0.2617994248867035f,1.396263599395752f);
-            math_build_axis_angle_quat(t,obj+0xD0,x);
-            vec_rotate_by_quaternion(v,p,t);
-            math_build_axis_angle_quat(t,obj+0xC0,y);
-            vec_rotate_by_quaternion(v,v,t);
-            particle = part_spawn_trail_2(obj+0x10,v,(math_random_int_range(20,35) * 5 + 2) / 6,0.00584f);
+            math_build_axis_angle_quat(rotation,obj+0xD0,x);
+            vec_rotate_by_quaternion(velocity,position,rotation);
+            math_build_axis_angle_quat(rotation,obj+0xC0,y);
+            vec_rotate_by_quaternion(velocity,velocity,rotation);
+            particle = part_spawn_trail_2(obj+0x10,velocity,(math_random_int_range(20,35) * 5 + 2) / 6,0.00584f);
             if (particle) {
                 int alpha = 0x7F000000;
-                *(int *)(particle+12) = *(int *)(particle+4) = st->color|alpha;
+                *(int *)(particle+12) = *(int *)(particle+4) = state->color|alpha;
             }
         }
     }
-    if (st->count5) {
-        *(Quadword *)v = 0;
-        v[2] = st->scale*0.16000001f;
-        *(Quadword *)p = *(Quadword *)v;
-        part_spawn_shockwave_ring(obj,obj+0x10,p,13,st->scale*3.5f,(unsigned char)st->color,(unsigned char)(st->color>>8),(unsigned char)(st->color>>16),45);
+    if (state->count5) {
+        *(Quadword *)velocity = 0;
+        velocity[2] = state->scale*0.16000001f;
+        *(Quadword *)position = *(Quadword *)velocity;
+        part_spawn_shockwave_ring(obj,obj+0x10,position,13,state->scale*3.5f,(unsigned char)state->color,(unsigned char)(state->color>>8),(unsigned char)(state->color>>16),45);
     }
-    SpawnExplosionEffects(obj,g_particle_spawn_template,obj+0x10,0.0f,0.0f,0,0,0,0.0f,0.0f,9.0f,0.0f,-1,st->scale*20.0f,0,0,-1,0,0x810001);
+    SpawnExplosionEffects(obj,g_particle_spawn_template,obj+0x10,0.0f,0.0f,0,0,0,0.0f,0.0f,9.0f,0.0f,-1,state->scale*20.0f,0,0,-1,0,0x810001);
     sign = 1;
-    a = mat_fast_helper_a(g_camera_l30_state.position[0] - *(float *)(obj+0x10), g_camera_l30_state.position[1] - *(float *)(obj+0x14));
-    for (i = 0; i < st->count3; i++) {
+    angle_to_camera = mat_fast_helper_a(g_camera_l30_state.position[0] - *(float *)(obj+0x10), g_camera_l30_state.position[1] - *(float *)(obj+0x14));
+    for (i = 0; i < state->count3; i++) {
         float size, x, y;
         char *particle;
-        p[0] = *(float *)(obj+0x10) + math_random_signed_float_range(0.0f,1.0f)*st->scale;
+        position[0] = *(float *)(obj+0x10) + math_random_signed_float_range(0.0f,1.0f)*state->scale;
         sign = -sign;
-        p[1] = *(float *)(obj+0x14) + math_random_signed_float_range(0.0f,1.0f)*st->scale;
-        p[2] = *(float *)(obj+0x18) + math_random_signed_float_range(0.0f,1.0f)*st->scale;
-        size = math_random_float_range(0.020000001f,0.040000003f)*st->scale;
+        position[1] = *(float *)(obj+0x14) + math_random_signed_float_range(0.0f,1.0f)*state->scale;
+        position[2] = *(float *)(obj+0x18) + math_random_signed_float_range(0.0f,1.0f)*state->scale;
+        size = math_random_float_range(0.020000001f,0.040000003f)*state->scale;
         x = math_random_signed_float_range(0.0f,1.396263599395752f);
         y = math_random_signed_float_range(0.0f,1.5707964897155762f);
-        vec_build_spherical_offset(v,size,FastAddRotations(a,y),x);
-        particle = SpawnSpinningSparkParticle(p,0.0f,1.0f,1.01f,sign,v,st->scale*315000.0f,st->color|0x7F0000,0);
+        vec_build_spherical_offset(velocity,size,FastAddRotations(angle_to_camera,y),x);
+        particle = SpawnSpinningSparkParticle(position,0.0f,1.0f,1.01f,sign,velocity,state->scale*315000.0f,state->color|0x7F0000,0);
         if (particle) {
             char *sub = particle + 0x20;
             *(short *)(particle+10) = (math_random_int_range(40,70) * 5 + 2) / 6;

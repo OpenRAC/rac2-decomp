@@ -21,12 +21,13 @@ extern int PlayMobySound(int, int, char *);
 extern void yeedil_wake_group_troopers(char *);
 extern void *jtbl_002B5940[];
 
+/* Runs the swinging arm (moby class 4584). It goes through its raise, drop and settle steps and keeps its linked object attached to it. (PAL) */
 void swinging_l20_arm_update_pal(char *obj) {
     /* Keep all eight destinations represented by the level's dispatch table. */
     static void *volatile states[] = {
         &&c0, &&c1, &&c2, &&c3, &&c4, &&c5, &&c6, &&c7
     };
-    Vec4 v, w;
+    Vec4 forward, side;
     unsigned int sel;
     char *state = *(char **)(obj + 0x68);
     char *target = g_group_l20_member_table + (*(int *)state << 8);
@@ -52,7 +53,7 @@ void swinging_l20_arm_update_pal(char *obj) {
         math_step_value_toward_target(obj + 0xF0, state + 4, -1.5707965f, 0.000767945f, 251.32744f, 349.06592f);
         if (*(float *)(obj + 0xF0)<=-0.785398245f) {
             char *other=*(char **)(state + 0x10);
-            if (other && *(short *)(other + 0xAA)==0xCBC && (unsigned char)other[0x20]!=0xFE && (unsigned char)other[0x20]!=0xFD)
+            if (other && *(short *)(other + 0xAA)==MOBY_CLASS_MEGACORP_HOVER_TANK && (unsigned char)other[0x20]!=0xFE && (unsigned char)other[0x20]!=0xFD)
                 moby_destroy_with_explosion_pal(other);
         }
         if (*(float *)(obj + 0xF0)<=-1.5707965f) { *(int *)(state + 4)=0; moby_set_state(obj, 3, -1); PlayMobySound(1, 0, obj); }
@@ -79,10 +80,10 @@ void swinging_l20_arm_update_pal(char *obj) {
         char *pos = target + 0x10;
 
         qcopy(pos, obj + 0x10);
-        vec_scale_to_length(&v, obj + 0xE0, 5.7f);
-        FastVecAdd(pos, pos, (char *)&v);
-        vec_scale_to_length(&w, obj + 0xD0, 0.35f);
-        FastVecAdd(pos, pos, (char *)&w);
+        vec_scale_to_length(&forward, obj + 0xE0, 5.7f);
+        FastVecAdd(pos, pos, (char *)&forward);
+        vec_scale_to_length(&side, obj + 0xD0, 0.35f);
+        FastVecAdd(pos, pos, (char *)&side);
     }
 }
 

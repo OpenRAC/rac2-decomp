@@ -116,7 +116,7 @@ static __inline__ void set_edge(f32 *v, s32 i, f32 t, f32 half)
 /* Draws a moby's glow: eight camera-facing quads, the screen-edge flare set, then the pvars 0x34 and 0x40 quads.
  * moby is a late copy of the argument, so it has a high pseudo: moby + 0xC0 hashes after the frame addresses and
  * takes the last spill slot. It has to stay the first assignment in the function, or cprop folds it back. */
-void func_PAL_L00_003FF050(u8 *self)
+void draw_moby_glow_sprites_pal(u8 *self)
 {
     Quad q;
     V4 m[4];

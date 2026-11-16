@@ -119,15 +119,15 @@ extern int request_begin_slot(int, int, int, int, unsigned char *);
 extern void FadeToBlack(int);
 extern int flag_get_word(void);
 extern void flag_clear_word(void);
-extern int func_US2_00299960(void);
-extern int func_US2_00299968(void);
+extern int pending_request_get_us2(void);
+extern int pending_request_take_us2(void);
 extern void menu_clear_counter(void);
 extern int menu_is_known_screen_active(void);
 extern int menu_get_saved_value(void);
 extern void save_load_packet(int *);
 extern void menu_clear_confirm_pending(void);
 extern int request_end_slot(int, int);
-extern void func_US2_00287108(void);
+extern void menu_exit_overlay_us2(void);
 extern void save_load_game_data_reset_menu(void);
 extern void load_data_and_setup_callback(void);
 extern void level_restart_keep_progress(int);
@@ -168,7 +168,7 @@ extern int snd_play_from_global_bank(int, int, void *);
 extern void gfx_apply_screen_aspect_mode(void);
 
 /* Run the active modal dialog, camera return, or display-confirmation phase. */
-void func_US2_00287140(void)
+void UpdateModalState_us2(void)
 {
     float delta[4], target[4], transform[16];
     float distance;
@@ -257,21 +257,21 @@ void func_US2_00287140(void)
         ++g_modal_state.elapsed;
         if (g_modal_state.elapsed > 30 && g_modal_state.inputDelay)
             --g_modal_state.inputDelay;
-        if (flag_get_word() || ((g_save_menu_flags & 0x600) && func_US2_00299960())) {
+        if (flag_get_word() || ((g_save_menu_flags & 0x600) && pending_request_get_us2())) {
             if (!(g_pad_state.buttons & 0x40))
                 break;
             flag_clear_word();
             g_save_menu_flags &= ~0x640;
-            func_US2_00299968();
+            pending_request_take_us2();
             menu_clear_counter();
-            { func_US2_00287108(); break; }
+            { menu_exit_overlay_us2(); break; }
         }
         switch (g_save_menu_screen) {
         case 2:
             if (!g_modal_state.inputDelay && (g_pad_state.buttons & 0x40)) {
                 g_modal_state.result = 2;
                 g_save_menu_flags &= ~1;
-                { func_US2_00287108(); break; }
+                { menu_exit_overlay_us2(); break; }
             }
             break;
         case 6:
@@ -292,7 +292,7 @@ void func_US2_00287140(void)
             g_save_menu_flags &= ~4;
             g_modal_state.result = 1;
             if (!g_menu_panel_active) {
-                func_US2_00287108();
+                menu_exit_overlay_us2();
                 break;
             }
             break;
@@ -313,7 +313,7 @@ void func_US2_00287140(void)
                 g_save_menu_flags &= ~4;
             g_modal_state.result = 1;
             if (!g_menu_panel_active)
-                { func_US2_00287108(); break; }
+                { menu_exit_overlay_us2(); break; }
             break;
         case 20:
             if (g_modal_state.inputDelay || !(g_pad_state.buttons & 0x40))
@@ -326,7 +326,7 @@ void func_US2_00287140(void)
             if (!g_menu_panel_active) {
                 if (menu_get_saved_value()) {
                     save_load_packet(g_save_packet_buffer);
-                    func_US2_00287108();
+                    menu_exit_overlay_us2();
                 } else {
                     g_modal_state_word[0] = 0;
                     g_small_data_value[0] = -1;
@@ -352,7 +352,7 @@ void func_US2_00287140(void)
                         } else {
                             g_save_menu_screen = 12;
                         }
-                        func_US2_00287108();
+                        menu_exit_overlay_us2();
                     } else {
                         g_modal_state.result = 2;
                         menu_clear_confirm_pending();
@@ -373,13 +373,13 @@ void func_US2_00287140(void)
                     g_save_menu_flags &= ~0x400;
                     g_save_menu_flags &= ~2;
                     g_save_menu_flags &= ~4;
-                    func_US2_00287108();
+                    menu_exit_overlay_us2();
                 }
             }
             break;
         case 1:
         case 16:
-            func_US2_00287108();
+            menu_exit_overlay_us2();
             g_pause_menu_state.selection = g_modal_state.selection;
             g_pause_menu_state.savedSelection = g_modal_state.selection;
             break;
@@ -392,7 +392,7 @@ void func_US2_00287140(void)
                 g_modal_state.result = 1;
                 g_save_menu_flags &= ~2;
                 g_save_menu_flags &= ~4;
-                { func_US2_00287108(); break; }
+                { menu_exit_overlay_us2(); break; }
             }
             break;
         case 19:
@@ -417,7 +417,7 @@ void func_US2_00287140(void)
                 pickDialog->result = 1;
                 g_save_menu_flags &= ~2;
                 g_save_menu_flags &= ~4;
-                { func_US2_00287108(); break; }
+                { menu_exit_overlay_us2(); break; }
             }
             if (g_menu_panel_flag)
                 goto acceptReload;
@@ -431,7 +431,7 @@ void func_US2_00287140(void)
                 g_save_menu_flags &= ~2;
                 g_save_menu_flags &= ~4;
                 g_modal_state.result = 1;
-                { func_US2_00287108(); break; }
+                { menu_exit_overlay_us2(); break; }
             }
         case 23:
         case 24:
@@ -450,7 +450,7 @@ void func_US2_00287140(void)
             if (g_pad_state.buttons & 0x10) {
                 loadDialog->result = 1;
                 g_save_menu_flags |= 0x20;
-                { func_US2_00287108(); break; }
+                { menu_exit_overlay_us2(); break; }
             }
             break;
         case 4:
@@ -472,7 +472,7 @@ void func_US2_00287140(void)
                         g_save_menu_flags |= 0x20;
                         g_save_menu_flags &= ~2;
                         g_save_menu_flags &= ~4;
-                        func_US2_00287108();
+                        menu_exit_overlay_us2();
                     }
                     break;
                 }
@@ -490,12 +490,12 @@ acceptReload:
                 g_save_menu_flags |= 0x20;
                 g_save_menu_flags &= ~2;
                 g_save_menu_flags &= ~4;
-                func_US2_00287108();
+                menu_exit_overlay_us2();
             }
             break;
         case 9:
             if (!(g_save_menu_flags & 6))
-                { func_US2_00287108(); break; }
+                { menu_exit_overlay_us2(); break; }
             break;
         }
         break;
@@ -687,10 +687,10 @@ acceptReload:
         case 1:
             if (g_pad_state.pressed & phaseDialog->acceptMask) {
                 phaseDialog->result = 2;
-                func_US2_00287108();
+                menu_exit_overlay_us2();
             } else if (g_pad_state.held & phaseDialog->cancelMask) {
                 phaseDialog->result = 1;
-                func_US2_00287108();
+                menu_exit_overlay_us2();
             }
             break;
         case 0:
@@ -710,7 +710,7 @@ advanceModalPhase:
             if (g_pad_state.pressed & phaseDialog->acceptMask) {
                 phaseDialog->result = 2;
                 snd_play_from_global_bank(0x12, 0, 0);
-                func_US2_00287108();
+                menu_exit_overlay_us2();
             }
             break;
         default:

@@ -12,6 +12,7 @@ extern int g_menu_input_flags;
 extern void weapon_menu_sync_slots(void);
 extern int func_0029CBE0(int);
 
+/* Handles menu input: back selects the fallback entry, accept returns 1 (PAL). */
 int menu_handle_input_with_fallback_pal(void) {
     int result = 0;
     int flags = g_menu_input_flags;

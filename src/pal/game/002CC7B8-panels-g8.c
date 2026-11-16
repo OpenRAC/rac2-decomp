@@ -44,15 +44,15 @@ extern void gfx_upload_image_to_gs_packets(void *, int, int);
 extern void gfx_write_clear_color_packets(void);
 extern void gfx_set_clear_color_packet(int,int,int,int);
 extern void SetupGifPaging(int), DoGifPaging(void);
-extern void hud_update_record_handlers_pal(void), level_run_callbacks_and_draw_pal(void), func_PAL_0029CC68(void), func_PAL_0029CCD8(void);
+extern void hud_update_record_handlers_pal(void), level_run_callbacks_and_draw_pal(void), menu_draw_mission_screen_pal(void), menu_draw_list_screen_pal(void);
 extern void VU1_addGSregister(int, long);
 extern void DrawMobysSetup(void), mem_fill_scratch_area(void), mem_save_scratch_area(void);
 extern void STUB_printf(void *);
 extern int menu_set_clip_rect(PanelCCAC8 *), menu_fading_image_draw(PanelCCAC8 *);
-extern int func_PAL_002D9108(PanelCCAC8 *), func_PAL_002DB6C8(PanelCCAC8 *);
+extern int menu_text_list_draw_checkboxes_pal(PanelCCAC8 *), menu_panel_draw_pal(PanelCCAC8 *);
 extern void gfx_setup_screen_copy_draw_state(int,int,int,float);
 extern void gfx_draw_screen_rect_with_depth(int,int,int,int,long,int,int);
-extern void func_PAL_00280EC8(void);
+extern void gfx_refresh_engine_and_view_pal(void);
 extern void DrawTexturedQuad(int,int,int,int,int,int,int,int,long,long);
 extern void mem_restore_scratch_area(void),PatchMobyGifs(void);
 extern int tex_run_upload_and_setup(void);
@@ -82,9 +82,9 @@ void menu_draw_pause_panels_pal(int mode)
             SetupGifPaging(0); hud_update_record_handlers_pal(); level_run_callbacks_and_draw_pal(); DoGifPaging(); return;
         }
         if (page == g_pause_page_fifth && !g_pause_menu_busy_flag) {
-            SetupGifPaging(0); func_PAL_0029CC68(); DoGifPaging();
+            SetupGifPaging(0); menu_draw_mission_screen_pal(); DoGifPaging();
         } else if (g_pause_menu_state.page == (void *)g_pause_page_fourth && !g_pause_menu_busy_flag) {
-            SetupGifPaging(0); func_PAL_0029CCD8(); DoGifPaging(); return;
+            SetupGifPaging(0); menu_draw_list_screen_pal(); DoGifPaging(); return;
         } else if (g_pause_menu_state.page == (void *)g_pause_page_third && !g_pause_menu_busy_flag) {
             ;
         }
@@ -100,14 +100,14 @@ void menu_draw_pause_panels_pal(int mode)
     if ((g_pad_combo_state.flags&15)==15 && (g_pad_combo_state.pressed&15))
         STUB_printf(g_str_pause_debug_a);
     for (j=0;j<14;j++) {
-        StateCCAC8 *st = &g_pause_menu_state;
+        StateCCAC8 *pause_state = &g_pause_menu_state;
         if (g_pause_panel_enabled_flags[j]) {
-            PageCCAC8 *pg = st->page;
+            PageCCAC8 *cur_page = pause_state->page;
             if (panels && panels[j]) {
-                panels[j]->x = pg->bounds[j].x - pg->bounds[j].width/2;
-                panels[j]->y = st->page->bounds[j].y - st->page->bounds[j].height/2;
-                panels[j]->width = st->page->bounds[j].width;
-                panels[j]->height = st->page->bounds[j].height;
+                panels[j]->x = cur_page->bounds[j].x - cur_page->bounds[j].width/2;
+                panels[j]->y = pause_state->page->bounds[j].y - pause_state->page->bounds[j].height/2;
+                panels[j]->width = pause_state->page->bounds[j].width;
+                panels[j]->height = pause_state->page->bounds[j].height;
                 if (panels[j] == &g_pause_panel_special) panels[j]->height=256;
             }
         }
@@ -116,21 +116,21 @@ void menu_draw_pause_panels_pal(int mode)
         STUB_printf(g_str_pause_debug_b);
     for (pass=0;pass<2;pass++) {
         for (i=0;i<14;i++) {
-            PanelCCAC8 *p;
-            if (!panels || !(p=panels[i]) || (p->flags&4) || !g_pause_panel_enabled_flags[i] || !p->draw) continue;
-            if (!pass && !(p->flags&2)) continue;
-            if (pass==1 && (p->flags&2)) continue;
-            if (p->flags&1) { p->draw(p); continue; }
-            x=p->x; y=p->y; w=p->width; h=p->height;
+            PanelCCAC8 *panel;
+            if (!panels || !(panel=panels[i]) || (panel->flags&4) || !g_pause_panel_enabled_flags[i] || !panel->draw) continue;
+            if (!pass && !(panel->flags&2)) continue;
+            if (pass==1 && (panel->flags&2)) continue;
+            if (panel->flags&1) { panel->draw(panel); continue; }
+            x=panel->x; y=panel->y; w=panel->width; h=panel->height;
             lw=7; while ((1<<lw)<w) lw++;
             lh=7; while ((1<<lh)<h) lh++;
             while (lw+lh>=18) lh--;
             if ((panels[i]->draw == menu_set_clip_rect || panels[i]->draw == menu_fading_image_draw ||
-                 panels[i]->draw == func_PAL_002D9108 || panels[i]->draw == func_PAL_002DB6C8) && !(panels[i]->flags&8)) {
+                 panels[i]->draw == menu_text_list_draw_checkboxes_pal || panels[i]->draw == menu_panel_draw_pal) && !(panels[i]->flags&8)) {
                 gfx_setup_screen_copy_draw_state(lw,lh,0,1.0f);
                 gfx_draw_screen_rect_with_depth(0,0,1<<lw,1<<lh,g_menu_panel_fill_color,0,0);
                 result=panels[i]->draw(panels[i]);
-                func_PAL_00280EC8();
+                gfx_refresh_engine_and_view_pal();
             } else result=panels[i]->draw(panels[i]);
             VU1_addGSregister(0x42,0x8000000064L);
             VU1_addGSregister(0x47,0x43);

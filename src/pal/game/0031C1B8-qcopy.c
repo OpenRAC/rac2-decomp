@@ -81,7 +81,7 @@ extern void euler_rotation_basis(void *, void *);
 extern float FastDiffRots(float, float);
 extern void moby_mark_spawned(void *);
 extern float moby_get_anim_value(Object *);
-extern void func_PAL_002A7E68(Object *, int, int, int);
+extern void anim_start_blended_pal(Object *, int, int, int);
 extern void moby_set_state(Object *, int, int);
 extern int math_random_int_range(int, int);
 extern float moby_turn_toward_position(Object *, void *, void *, float, float, float);
@@ -96,30 +96,31 @@ extern s32 flag_set_second_pending(Object *);
 extern int moby_turn_toward_target_and_step_pal(Object *, float *, float);
 extern int moby_step_controller_pal(Object *, void *, float);
 extern void moby_set_controller_speed_limits(Object *, float, float, float, float);
-extern void func_PAL_0031D2E8(Object *);
+extern void three_part_turret_init_update_pal(Object *);
 extern void three_part_turret_update_parts_pal(Object *);
 extern void three_part_turret_draw_effects(Object *);
 extern void gfx_record_trail_point(Object *);
 extern void gfx_draw_trail_ribbon(Object *);
 
-void func_PAL_0031C1B8(Object *self)
+/* Updates the three-part turret each frame: its moods, rises, path following and attacks (PAL: 50 Hz timings). */
+void three_part_turret_update_pal(Object *self)
 {
     Vars *vars = self->vars;
     Vector target, delta;
     float ground, frame, drop;
     int result;
 
-    func_PAL_0031D2E8(self);
+    three_part_turret_init_update_pal(self);
     switch (self->mode) {
     case 0:
         if (flag_set_second_pending(self))
             moby_set_controller_speed_limits(self, 0.0032000002f, 0.080000006f, 0.0016755164f, 0.12566373f);
         if (vars->mode == 2 && vars->active) {
             moby_set_state(self, 11, 4);
-            if (self->animNext != 1) func_PAL_002A7E68(self, 1, 0, 3);
+            if (self->animNext != 1) anim_start_blended_pal(self, 1, 0, 3);
             if (vars->path != -1) {
                 moby_set_state(self, 10, 1);
-                if (self->animNext != 26) func_PAL_002A7E68(self, 26, 0, 3);
+                if (self->animNext != 26) anim_start_blended_pal(self, 26, 0, 3);
             }
         } else if (vars->alerted) {
             moby_set_state(self, 9, 3);
@@ -132,11 +133,11 @@ void func_PAL_0031C1B8(Object *self)
             moby_set_controller_speed_limits(self, 0.0032000002f, 0.080000006f, 0.0016755164f, 0.12566373f);
         if (vars->mode == 2 && vars->active) {
             moby_set_state(self, 5, 4);
-            if (self->animNext != 25) func_PAL_002A7E68(self, 25, 0, 3);
+            if (self->animNext != 25) anim_start_blended_pal(self, 25, 0, 3);
         } else if (vars->alerted && vars->active) {
             vars->alerted = 0;
             moby_set_state(self, 5, 4);
-            if (self->animNext != 25) func_PAL_002A7E68(self, 25, 0, 3);
+            if (self->animNext != 25) anim_start_blended_pal(self, 25, 0, 3);
         }
         break;
     case 3:
@@ -144,10 +145,10 @@ void func_PAL_0031C1B8(Object *self)
             moby_set_controller_speed_limits(self, 0.0032000002f, 0.080000006f, 0.0016755164f, 0.12566373f);
         if (vars->mode == 2 && vars->active) {
             moby_set_state(self, 11, 4);
-            if (self->animNext != 1) func_PAL_002A7E68(self, 1, 0, 3);
+            if (self->animNext != 1) anim_start_blended_pal(self, 1, 0, 3);
         } else if (vars->timer == 0) {
             moby_set_state(self, 2, 0);
-            if (self->animNext != 4) func_PAL_002A7E68(self, 4, 0, 8);
+            if (self->animNext != 4) anim_start_blended_pal(self, 4, 0, 8);
         }
         break;
     case 4:
@@ -157,7 +158,7 @@ void func_PAL_0031C1B8(Object *self)
             if (self->state != 5) {
                 if (self->state != 4) {
                     moby_set_state(self, 9, 3);
-                    if (self->animNext != 7) func_PAL_002A7E68(self, 7, 0, 8);
+                    if (self->animNext != 7) anim_start_blended_pal(self, 7, 0, 8);
                     vars->timer = ((s32)(math_random_int_range(580, 600)) * 5 + 2) / 6;
                 }
             }
@@ -175,10 +176,10 @@ void func_PAL_0031C1B8(Object *self)
         if (result & 2) {
             if (vars->mode == 1 || vars->mode == 2) {
                 moby_set_state(self, 12, 4);
-                if (self->animNext != 11) func_PAL_002A7E68(self, 11, 0, 8);
+                if (self->animNext != 11) anim_start_blended_pal(self, 11, 0, 8);
             } else {
                 moby_set_state(self, 9, 3);
-                if (self->animNext != 7) func_PAL_002A7E68(self, 7, 0, 8);
+                if (self->animNext != 7) anim_start_blended_pal(self, 7, 0, 8);
                 vars->timer = ((s32)(math_random_int_range(580, 600)) * 5 + 2) / 6;
             }
             if (vars->active != 1) vars->active = 1;
@@ -203,12 +204,12 @@ void func_PAL_0031C1B8(Object *self)
             self->pos[2] = self->pos[2] - level * 0.00025f;
         } else {
             moby_set_state(self, 8, -1);
-            if (self->animNext != 15) func_PAL_002A7E68(self, 15, 0, 2);
+            if (self->animNext != 15) anim_start_blended_pal(self, 15, 0, 2);
         }
         }
         if (self->flags & 2) {
             moby_set_state(self, 4, -1);
-            if (self->animNext != 26) func_PAL_002A7E68(self, 26, 0, 12);
+            if (self->animNext != 26) anim_start_blended_pal(self, 26, 0, 12);
         }
         break;
     case 4:
@@ -223,13 +224,13 @@ void func_PAL_0031C1B8(Object *self)
         } else {
             STUB_printf(g_str_turret_ticks_debug, vars->ticks);
             moby_set_state(self, 8, -1);
-            if (self->animNext != 15) func_PAL_002A7E68(self, 15, 0, 2);
+            if (self->animNext != 15) anim_start_blended_pal(self, 15, 0, 2);
         }
         break;
     case 6:
         if (self->flags & 2) {
             moby_set_state(self, 7, -1);
-            if (self->animNext != 14) func_PAL_002A7E68(self, 14, 0, 12);
+            if (self->animNext != 14) anim_start_blended_pal(self, 14, 0, 12);
         }
         break;
     case 7:
@@ -242,13 +243,13 @@ void func_PAL_0031C1B8(Object *self)
             math_step_value_toward_target(&self->pos[2], vars->height, drop, 0.030000001f, 0.19600002f, 0.3f);
         } else {
             moby_set_state(self, 8, -1);
-            if (self->animNext != 15) func_PAL_002A7E68(self, 15, 0, 2);
+            if (self->animNext != 15) anim_start_blended_pal(self, 15, 0, 2);
         }
         break;
     case 8:
         if (self->flags & 2) {
             moby_set_state(self, 12, 4);
-            if (self->animNext != 8) func_PAL_002A7E68(self, 8, 0, 12);
+            if (self->animNext != 8) anim_start_blended_pal(self, 8, 0, 12);
             self->pos[2] = coll_probe_ground_height_below(self->pos, 0, 0.5f);
         }
         break;
@@ -261,7 +262,7 @@ void func_PAL_0031C1B8(Object *self)
         euler_rotation_basis(self->basis, self->rot);
         vec_spring_to_target((s32)self->pos, (s32)&target, (s32)vars->height, 0.020000001f, 0.0f, 0.40000004f);
         if (fast_vec_dist(self->pos, &target) < 0.4f) {
-            if (self->animNext != 14) func_PAL_002A7E68(self, 14, 0, 8);
+            if (self->animNext != 14) anim_start_blended_pal(self, 14, 0, 8);
             moby_set_state(self, 7, -1);
         }
         break;
@@ -269,14 +270,14 @@ void func_PAL_0031C1B8(Object *self)
         if (self->flags & 2) {
             moby_set_controller_speed_limits(self, 0.0064000003f, 0.16000001f, 0.0016755164f, 0.12566373f);
             moby_set_state(self, 12, -1);
-            if (self->animNext != 11) func_PAL_002A7E68(self, 11, 0, 12);
+            if (self->animNext != 11) anim_start_blended_pal(self, 11, 0, 12);
         }
         break;
     case 12:
         if (vec_distance_xy(self->pos, g_hero_state.pos) < 2.8f
             && FastDiffRots(self->rot[2], mat_fast_helper_a(g_hero_state.pos[0] - self->pos[0], g_hero_state.pos[1] - self->pos[1])) < 0.38397247f) {
             moby_set_state(self, 13, -1);
-            if (self->animNext != 16) func_PAL_002A7E68(self, 16, 4, 2);
+            if (self->animNext != 16) anim_start_blended_pal(self, 16, 4, 2);
             vars->hold = 0;
         } else if (vec_distance_xy(self->pos, g_hero_state.pos) > 2.8f) {
             moby_turn_toward_target_and_step_pal(self, g_hero_state.pos, vars->range);
@@ -284,7 +285,7 @@ void func_PAL_0031C1B8(Object *self)
             moby_step_controller_pal(self, self->pos, mat_fast_helper_a(g_hero_state.pos[0] - self->pos[0], g_hero_state.pos[1] - self->pos[1]));
         }
         if (vec_distance_xy(self->pos, g_hero_state.pos) > 5.0f && self->anim == 8) {
-            if (self->animNext != 11) func_PAL_002A7E68(self, 11, 0, 3);
+            if (self->animNext != 11) anim_start_blended_pal(self, 11, 0, 3);
             moby_set_controller_speed_limits(self, 0.0064000003f, 0.16000001f, 0.0016755164f, 0.12566373f);
         }
         break;
@@ -292,15 +293,15 @@ void func_PAL_0031C1B8(Object *self)
         if (self->flags & 2) {
             if (g_hero_state.target == self) {
                 moby_set_state(self, 14, -1);
-                if (self->animNext != 17) func_PAL_002A7E68(self, 17, 0, 6);
+                if (self->animNext != 17) anim_start_blended_pal(self, 17, 0, 6);
             } else if (vec_distance_xy(self->pos, g_hero_state.pos) > 4.0f) {
                 moby_set_controller_speed_limits(self, 0.0064000003f, 0.16000001f, 0.0016755164f, 0.12566373f);
                 moby_set_state(self, 12, -1);
-                if (self->animNext != 11) func_PAL_002A7E68(self, 11, 0, 8);
+                if (self->animNext != 11) anim_start_blended_pal(self, 11, 0, 8);
             } else {
                 moby_set_controller_speed_limits(self, 0.0032000002f, 0.080000006f, 0.0016755164f, 0.12566373f);
                 moby_set_state(self, 12, -1);
-                if (self->animNext != 8) func_PAL_002A7E68(self, 8, 0, 8);
+                if (self->animNext != 8) anim_start_blended_pal(self, 8, 0, 8);
             }
         }
         frame = moby_get_anim_value(self);
@@ -322,11 +323,11 @@ void func_PAL_0031C1B8(Object *self)
             if (vec_distance_xy(self->pos, g_hero_state.pos) > 4.0f) {
                 moby_set_controller_speed_limits(self, 0.0064000003f, 0.16000001f, 0.0016755164f, 0.12566373f);
                 moby_set_state(self, 12, -1);
-                if (self->animNext != 11) func_PAL_002A7E68(self, 11, 0, 8);
+                if (self->animNext != 11) anim_start_blended_pal(self, 11, 0, 8);
             } else {
                 moby_set_controller_speed_limits(self, 0.0032000002f, 0.080000006f, 0.0016755164f, 0.12566373f);
                 moby_set_state(self, 12, -1);
-                if (self->animNext != 8) func_PAL_002A7E68(self, 8, 0, 8);
+                if (self->animNext != 8) anim_start_blended_pal(self, 8, 0, 8);
             }
         }
         {

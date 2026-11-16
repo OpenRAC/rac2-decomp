@@ -21,7 +21,7 @@ extern s32 g_game_mode[];
 extern u8 g_map_overlay_flag[] __attribute__((sda));
 extern u8 g_trigger_event_flags[] __attribute__((sda));
 extern int math_random_int_below(int);
-extern void func_PAL_L18_003FCE00(void *, void *);
+extern void owner_set_word_pal(void *, void *);
 extern void protopet_reset_group_members(void *);
 extern void state_set_flag_one(void);
 extern void hero_reset_position_and_direction_pal(void *, void *, int, int);
@@ -43,7 +43,7 @@ extern void script_queue_keyed_request(int, int);
 extern void L18_DisableModeGroups(void *, int);
 extern void moby_set_color_effect_pal(void *, int);
 extern void part_update_timed_sequence(void *);
-extern void func_PAL_L18_003FDF30(void *);
+extern void part_start_timed_sequence_pal(void *);
 extern void DrawSegmentedBeams(void *);
 extern void gfx_queue_draw_callback(void *, void *);
 extern void protopet_clear_link_minus_one(void *);
@@ -82,18 +82,19 @@ static __inline__ int StreamGroup(u8 *state, int i, int base)
  * reduces the rereads to one load and a copy. D_L18_001B2568 and D_001A7A7B are
  * written as a base plus offset, which keeps those stores out of delay slots.
  */
-void func_PAL_L19_003E1C98(u8 *object)
+/* Runs the group encounter: starts the enemy waves when the hero reaches each trigger point, advances through the stages, and opens or closes the linked gates and doors (PAL). */
+void group_encounter_controller_update_pal(u8 *moby)
 {
-    u8 *state = *(u8 **)(object + 0x68);
+    u8 *state = *(u8 **)(moby + 0x68);
     int mode;
     int i;
 
-    if (!object[0x20]) {
+    if (!moby[0x20]) {
         int i;
         u16 *entry;
         u8 *entity;
-        HALF(object, 0x32) = 0;
-        object[0x30] = 255;
+        HALF(moby, 0x32) = 0;
+        moby[0x30] = 255;
         for (i = 0; i < 4; i++) {
             *StreamFlag(state, i) = 0;
             for (entry = g_condition_target_lists[StreamGroup(state, i, 0)];
@@ -103,16 +104,16 @@ void func_PAL_L19_003E1C98(u8 *object)
                  entry++) {
                 entity = g_moby_l18_table[0] + ((*entry & 0x7FFF) << 8);
                 if (!entity) break;
-                func_PAL_L18_003FCE00(entity, object);
+                owner_set_word_pal(entity, moby);
             }
         }
         HALF(state, 0xA8) = 1;
-        object[0x20] = 1;
+        moby[0x20] = 1;
         WORD(state, 0x88) = -1;
         HALF(state, 0xAA) = math_random_int_below(g_state_random_range);
         HALF(state, 0xAE) = -1;
         HALF(state, 0xAC) = 0;
-        protopet_reset_group_members(object);
+        protopet_reset_group_members(moby);
         if (WORD(state, 0xC4) != -1) {
             u8 *base = g_moby_l18_table[0];
             FLAGS(LOCAL_ENTITY(0xC4)) |= 2;
@@ -148,8 +149,8 @@ void func_PAL_L19_003E1C98(u8 *object)
             if (game_is_either_mode_two()) {
                 g_door_trigger_flags[1] = 1;
                 if (g_game_l18_mode_state[0] == 2) {
-                    object[0x31] = 0;
-                    FLAGS(object) |= 1;
+                    moby[0x31] = 0;
+                    FLAGS(moby) |= 1;
                 }
             } else {
                 g_door_trigger_flags[1] = 0;
@@ -171,7 +172,7 @@ void func_PAL_L19_003E1C98(u8 *object)
                         *StreamFlag(state, i) = 1;
                 } else if (*StreamFlag(state, i) > 0) {
                     if (FastDecTimer((s16 *)(state + 0xAA)) &&
-                        SelectGroupMembersAndTarget_pal(object, i))
+                        SelectGroupMembersAndTarget_pal(moby, i))
                         HALF(state, 0xAA) = math_random_int_below(g_state_random_range);
                 }
             }
@@ -179,18 +180,18 @@ void func_PAL_L19_003E1C98(u8 *object)
         if (IsPointInCuboid(g_hero_position, *StateSlot(state, WORD(state, 0x88) + 1, 0x40))) {
             WORD(state, 0x88)++;
             if (WORD(state, 0x88) == 6) {
-                protopet_wake_group_members(object);
+                protopet_wake_group_members(moby);
                 script_queue_keyed_request(WORD(state, 0x104), -1);
             } else {
                 if (!WORD(state, 0x88))
                     script_queue_keyed_request(WORD(state, 0x100), -1);
-                L18_DisableModeGroups(object, WORD(state, 0x88));
+                L18_DisableModeGroups(moby, WORD(state, 0x88));
             }
         }
         if (WORD(state, 0x88) == 5 && IsPointInCuboid(g_hero_position, WORD(state, 0x44))) {
-            protopet_wake_group_members(object);
+            protopet_wake_group_members(moby);
             WORD(state, 0x88) = 1;
-            L18_DisableModeGroups(object, 1);
+            L18_DisableModeGroups(moby, 1);
         }
         mode = 0;
         switch (WORD(state, 0x88)) {
@@ -201,9 +202,9 @@ void func_PAL_L19_003E1C98(u8 *object)
             mode = 1;
             break;
         }
-        moby_set_color_effect_pal(object, mode);
+        moby_set_color_effect_pal(moby, mode);
         if (HALF(state, 0xAC)) {
-            part_update_timed_sequence(object);
+            part_update_timed_sequence(moby);
         } else {
             int i;
             for (i = 0; i < 4; i++) {
@@ -212,13 +213,13 @@ void func_PAL_L19_003E1C98(u8 *object)
                     IsPointInCuboid(g_hero_position, *StateSlot(state, i, 0x90))) {
                     *StateSlot(state, i, 0x90) = -1;
                     HALF(state, 0xAE) = i;
-                    func_PAL_L18_003FDF30(object);
+                    part_start_timed_sequence_pal(moby);
                     if ((u32)i < 8) g_game_flag_table[0x94] |= 1 << i;
                 }
             }
         }
     }
-    gfx_queue_draw_callback(DrawSegmentedBeams, object);
+    gfx_queue_draw_callback(DrawSegmentedBeams, moby);
     if (TRIGGER(0xBC) || (TRIGGER(0xB0) && !TRIGGER(0xB4))) {
         if (WORD(state, 0xC8) != -1 && WORD(state, 0xCC) != -1) {
             u8 *base = g_moby_l18_table[0];
@@ -228,9 +229,9 @@ void func_PAL_L19_003E1C98(u8 *object)
                 WORD(LOCAL_ENTITY(0xC8), 0x98) = WORD(*(u8 **)(LOCAL_ENTITY(0xC8) + 0x24), 0x10);
                 if (WORD(state, 0xCC) != -1) FLAGS(LOCAL_ENTITY(0xCC)) |= 2;
                 {
-                    u8 *nextBase = g_moby_l18_table[0];
-                    FLAGS((u8 *)((WORD(state, 0xCC) << 8) + (s32)nextBase)) |= 1;
-                    WORD((u8 *)((WORD(state, 0xCC) << 8) + (s32)nextBase), 0x98) = 0;
+                    u8 *next_base = g_moby_l18_table[0];
+                    FLAGS((u8 *)((WORD(state, 0xCC) << 8) + (s32)next_base)) |= 1;
+                    WORD((u8 *)((WORD(state, 0xCC) << 8) + (s32)next_base), 0x98) = 0;
                 }
             }
         }
@@ -245,9 +246,9 @@ void func_PAL_L19_003E1C98(u8 *object)
             protopet_clear_link_minus_one(ENTITY(0xDC));
         }
     }
-    if (!TRIGGER(0xB8) && flag_is_third_pending_set(object)) {
-        object[0xBC] = 1;
-        object[0xBE] &= 0xFB;
+    if (!TRIGGER(0xB8) && flag_is_third_pending_set(moby)) {
+        moby[0xBC] = 1;
+        moby[0xBE] &= 0xFB;
         moby_mark_table_entry_flagged(WORD(state, 0xB8));
         hero_detach_from_object_pal(0);
         if (WORD(state, 0xC4) != -1) {
@@ -262,8 +263,8 @@ void func_PAL_L19_003E1C98(u8 *object)
             ((u8 *)((WORD(state, 0xC0) << 8) + (s32)g_moby_l18_table[0]))[0xBC] = 1;
         }
     }
-    if (object[0xBC] && TRIGGER(0xBC)) {
-        object[0xBC] = 0;
+    if (moby[0xBC] && TRIGGER(0xBC)) {
+        moby[0xBC] = 0;
         if (WORD(state, 0xC8) != -1) {
             u8 *base = g_moby_l18_table[0];
             FLAGS(LOCAL_ENTITY(0xC8)) &= 0xFFFD;
@@ -301,10 +302,10 @@ void func_PAL_L19_003E1C98(u8 *object)
                 break;
             }
             if (ready) {
-                int allReady = 1;
+                int all_ready = 1;
                 u16 *entry;
                 u8 *entity;
-                for (i = 0; i < 4 && allReady; i++) {
+                for (i = 0; i < 4 && all_ready; i++) {
                     for (entry = g_condition_target_lists[StreamGroup(state, i, 0xF0)];
                     (StreamGroup(state, i, 0xF0) & 255) != 255 &&
                     StreamGroup(state, i, 0xF0) <= g_max_l18_group_index[0] && entry &&
@@ -315,14 +316,14 @@ void func_PAL_L19_003E1C98(u8 *object)
                         if (entity[0x20] != 0xFE) {
                             if (entity[0x20] != 0xFD) {
                                 if ((FLAGS(entity) ^ 1) & 1) {
-                                    allReady = 0;
+                                    all_ready = 0;
                                     break;
                                 }
                             }
                         }
                     }
                 }
-                if (allReady) {
+                if (all_ready) {
                     if (!g_trigger_event_flags[3]) {
                         g_trigger_event_flags[3] = 1;
                         snd_play_from_global_bank(1, 0, 0);

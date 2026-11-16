@@ -30,16 +30,16 @@ extern s32 moby_get_busy_flag(char *);
    opposite sign. The angle is then the third word of a vector func_002833F0 turns into a matrix,
    which multiplies the 64-byte records of D_L02_001B3B00 that the entries of the list at +0x40 name,
    for each bit set in the mask at +0x84. */
-void func_PAL_L02_003F9B50(char *a0) {
-    char *state = *(char **)(a0 + 0x68);
-    float m[12];
-    float b[4];
-    float a[4];
+void sway_update_pieces_pal(char *moby) {
+    char *state = *(char **)(moby + 0x68);
+    float matrix[12];
+    float angle_copy[4];
+    float angle_vec[4];
     s32 i;
-    s16 *s2;
+    s16 *piece_index_ptr;
 
     if (g_frame_l02_counter & 1)
-        sway_update_piece_mask(a0);
+        sway_update_piece_mask(moby);
     if (math_fast_float_d(state + 0x90) != 0) {
         ApproachValue((float *)(state + 0x88), *(float *)(state + 0x8C), 0.0012566373f);
         if ((*(float *)(state + 0x88) >= *(float *)(state + 0x8C) && *(float *)(state + 0x8C) >= 0.0f) ||
@@ -55,20 +55,20 @@ void func_PAL_L02_003F9B50(char *a0) {
     } else {
         ApproachValue((float *)(state + 0x88), 0.0f, 0.0012566373f);
     }
-    *(TI128 *)a = 0;
-    a[2] = *(float *)(state + 0x88);
-    *(TI128 *)b = *(TI128 *)a;
-    euler_rotation_basis(m, b);
+    *(TI128 *)angle_vec = 0;
+    angle_vec[2] = *(float *)(state + 0x88);
+    *(TI128 *)angle_copy = *(TI128 *)angle_vec;
+    euler_rotation_basis(matrix, angle_copy);
     for (i = 0; i < *(s32 *)(state + 0x80); i++) {
-        char *rec;
-        s32 skip;
+        char *piece_record;
+        s32 is_skipped;
 
-        s2 = (s16 *)(state + 0x40 + i * 2);
-        skip = ((*(s32 *)(state + 0x84) >> i) & 1) == 0;
-        if (skip)
+        piece_index_ptr = (s16 *)(state + 0x40 + i * 2);
+        is_skipped = ((*(s32 *)(state + 0x84) >> i) & 1) == 0;
+        if (is_skipped)
             continue;
-        rec = g_sway_piece_table + *s2 * 64;
-        mat_multiply_rotation(rec, rec, m);
+        piece_record = g_sway_piece_table + *piece_index_ptr * 64;
+        mat_multiply_rotation(piece_record, piece_record, matrix);
     }
 }
 

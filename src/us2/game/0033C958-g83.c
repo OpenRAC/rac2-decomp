@@ -3,17 +3,18 @@
 
 extern void prompt_bar_draw_us2(char *);
 extern void func_US2_00348E58(char *, int);
-extern void func_US2_00348E70(char *);
+extern void option_list_draw_rows_us2(char *);
 extern unsigned char g_language;
 extern int g_list_page_field_table[2] __attribute__((sda));
 
-void func_US2_0033F478(char *object)
+/* Draws a list page: its prompt bar and the language dependent list widget. */
+void list_page_draw_us2(char *object)
 {
-    char *p;
+    char *widget;
     prompt_bar_draw_us2(object + 8);
-    p = object + 0x2E0;
-    func_US2_00348E58(p, g_list_page_field_table[g_language]);
-    func_US2_00348E70(p);
+    widget = object + 0x2E0;
+    func_US2_00348E58(widget, g_list_page_field_table[g_language]);
+    option_list_draw_rows_us2(widget);
 }
 
 extern void *pool_alloc_cell(void *);
@@ -22,10 +23,11 @@ extern void prompt_bar_init_us2(void *, void *, void *);
 extern char *GetLocalizedString(int);
 extern void prompt_bar_set_texts_us2(void *, int, int, int);
 extern void prompt_bar_set_text_offsets_us2(void *, float, float, float, float, float, float);
-extern int func_US2_0033F610(void *, int);
+extern int simple_page_update_us2(void *, int);
 extern int g_simple_page_prompt_ids[2] __attribute__((sda));
 
-void func_US2_0033F510(char *object, void *argument)
+/* Sets up a simple page: prompt bar and texts. */
+void simple_page_init_us2(char *object, void *argument)
 {
     int *allocation;
     char *child;
@@ -46,17 +48,18 @@ void func_US2_0033F510(char *object, void *argument)
     text = GetLocalizedString(0x2CB7);
     prompt_bar_set_texts_us2(child, text, 0, GetLocalizedString(0x2BE5));
     prompt_bar_set_text_offsets_us2(child, -128.0f, -183.0f, 112.0f, 110.0f, 102.0f, 110.0f);
-    func_US2_0033F610(object, 0);
+    simple_page_update_us2(object, 0);
 }
 
 extern void prompt_bar_set_spacing_us2(void *, float);
-extern int func_US2_0033F3F0(void *, int);
+extern int list_page_update_us2(void *, int);
 extern int g_list_page_prompt_ids[2] __attribute__((sda));
-extern void func_US2_00348BF8(void *, void *);
+extern void list_menu_reset_attach_items_us2(void *, void *);
 extern void func_US2_00348E10(void *, int, int);
-extern void func_US2_00348E20(void *, int);
+extern void option_list_set_highlight_us2(void *, int);
 
-void func_US2_0033F200(char *object, void *argument)
+/* Sets up a list page: prompt bar, texts and list widget. */
+void list_page_init_us2(char *object, void *argument)
 {
     int *allocation;
     char *child, *widget;
@@ -81,18 +84,19 @@ void func_US2_0033F200(char *object, void *argument)
     prompt_bar_set_text_offsets_us2(child, 0.0f, -143.0f, 0.0f, 114.0f, 0.0f, 140.0f);
     prompt_bar_set_spacing_us2(child, 0.4f);
     *(int *)(object + 0x2D8) = 0;
-    func_US2_00348BF8(widget, argument);
+    list_menu_reset_attach_items_us2(widget, argument);
     func_US2_00348E10(widget, -83, 32);
-    func_US2_00348E20(widget, 1);
-    func_US2_0033F3F0(object, 0);
+    option_list_set_highlight_us2(widget, 1);
+    list_page_update_us2(object, 0);
 }
 
-extern int func_US2_0033E8B0(void *, int);
+extern int two_toggle_b_update_us2(void *, int);
 extern int g_onoff_menu_prompt_ids[2] __attribute__((sda));
 
 extern int g_child_param_pair_a[2] __attribute__((sda));
 
-void func_US2_0033E788(char *object, void *argument)
+/* Sets up a two-option menu: prompt bar and texts. */
+void two_toggle_b_init_us2(char *object, void *argument)
 {
     int *allocation;
     char *child;
@@ -116,16 +120,17 @@ void func_US2_0033E788(char *object, void *argument)
     prompt_bar_set_text_offsets_us2(child, 0.0f, -143.0f, 0.0f, 114.0f, 0.0f, 140.0f);
     prompt_bar_set_spacing_us2(child, 0.4f);
     *(int *)(object + 0x2D8) = 0;
-    func_US2_0033E8B0(object, 0);
+    two_toggle_b_update_us2(object, 0);
 }
 
 
 
-extern int func_US2_0033EC80(void *, int);
+extern int single_toggle_c_update_us2(void *, int);
 
 extern int g_child_param_pair_b[2] __attribute__((sda));
 
-void func_US2_0033EB58(char *object, void *argument)
+/* Sets up a one-option menu: prompt bar and texts. */
+void single_toggle_c_init_us2(char *object, void *argument)
 {
     int *allocation;
     char *child;
@@ -149,16 +154,17 @@ void func_US2_0033EB58(char *object, void *argument)
     prompt_bar_set_text_offsets_us2(child, 0.0f, -143.0f, 0.0f, 114.0f, 0.0f, 140.0f);
     prompt_bar_set_spacing_us2(child, 0.3f);
     *(int *)(object + 0x2D8) = 0;
-    func_US2_0033EC80(object, 0);
+    single_toggle_c_update_us2(object, 0);
 }
 
 
 
-extern int func_US2_0033EF30(void *, int);
+extern int single_toggle_d_update_us2(void *, int);
 
 extern int g_child_param_pair_c[2] __attribute__((sda));
 
-void func_US2_0033EE08(char *object, void *argument)
+/* Sets up a one-option menu: prompt bar and texts. */
+void single_toggle_d_init_us2(char *object, void *argument)
 {
     int *allocation;
     char *child;
@@ -182,16 +188,17 @@ void func_US2_0033EE08(char *object, void *argument)
     prompt_bar_set_text_offsets_us2(child, 0.0f, -143.0f, 0.0f, 114.0f, 0.0f, 140.0f);
     prompt_bar_set_spacing_us2(child, 0.4f);
     *(int *)(object + 0x2D8) = 0;
-    func_US2_0033EF30(object, 0);
+    single_toggle_d_update_us2(object, 0);
 }
 
 
 
-extern int func_US2_0033F128(void *, int);
+extern int single_toggle_e_update_us2(void *, int);
 
 extern int g_child_param_pair_d[2] __attribute__((sda));
 
-void func_US2_0033F000(char *object, void *argument)
+/* Sets up a one-option menu: prompt bar and texts. */
+void single_toggle_e_init_us2(char *object, void *argument)
 {
     int *allocation;
     char *child;
@@ -215,7 +222,7 @@ void func_US2_0033F000(char *object, void *argument)
     prompt_bar_set_text_offsets_us2(child, 0.0f, -143.0f, 0.0f, 114.0f, 0.0f, 140.0f);
     prompt_bar_set_spacing_us2(child, 0.4f);
     *(int *)(object + 0x2D8) = 0;
-    func_US2_0033F128(object, 0);
+    single_toggle_e_update_us2(object, 0);
 }
 
 
@@ -233,6 +240,7 @@ extern float g_audio_menu_offset_a __attribute__((sda));
 extern float g_audio_menu_offset_c __attribute__((sda));
 extern float g_audio_menu_offset_b, g_audio_menu_offset_d;
 
+/* Handles input for the audio menu: moves the selection and changes the volumes. */
 int audio_menu_update_us2(char *object, int flags)
 {
     char *p = object + 8;

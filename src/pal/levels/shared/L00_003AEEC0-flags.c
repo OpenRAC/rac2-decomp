@@ -22,25 +22,26 @@ typedef struct {
     int arg;
 } Trail_3AC8E8;
 
-void homing_shot_spawn_explosion_pal(char *a0, void *a1, int a2)
+/* Damages everything around a homing shot's explosion, starts an effect on each and knocks them back. */
+void homing_shot_spawn_explosion_pal(char *moby, void *direction, int node_arg)
 {
-    Trail_3AC8E8 s;
-    Entry262570b *e;
+    Trail_3AC8E8 knockback;
+    Entry262570b *entry;
     float scale;
     int count;
     int i;
 
-    s.arg = a2;
-    FastVecScale(s.head, a1, -3.0f);
-    e = &g_weapon_l00_table[g_item_slot_to_record[0x1B]];
-    scale = e->scale;
-    count = coll_process_hit(e->flag != 0 ? 3.0f : 4.0f, (int)(a0 + 0x10), 0x10, (int)a0, 0);
+    knockback.arg = node_arg;
+    FastVecScale(knockback.head, direction, -3.0f);
+    entry = &g_weapon_l00_table[g_item_slot_to_record[0x1B]];
+    scale = entry->scale;
+    count = coll_process_hit(entry->flag != 0 ? 3.0f : 4.0f, (int)(moby + 0x10), 0x10, (int)moby, 0);
     for (i = 0; i < count; i++) {
         if ((g_weapon_l00_table + g_item_slot_to_record[0x1B])->flag != 0)
-            StartAttachedEffect_pal(g_area_hit_targets[i], 0x45, *(int *)(a0 + 0xB8));
+            StartAttachedEffect_pal(g_area_hit_targets[i], 0x45, *(int *)(moby + 0xB8));
         else
-            StartAttachedEffect_pal(g_area_hit_targets[i], 0x1B, *(int *)(a0 + 0xB8));
+            StartAttachedEffect_pal(g_area_hit_targets[i], 0x1B, *(int *)(moby + 0xB8));
     }
-    *(TI128 *)s.vec = *(TI128 *)(a0 + 0x10);
-    moby_queue_knockback_for_nodes(a0, s.vec, g_area_hit_targets, count, s.arg, 0x810000, 3, 1, scale, 1.0f, 1.0f);
+    *(TI128 *)knockback.vec = *(TI128 *)(moby + 0x10);
+    moby_queue_knockback_for_nodes(moby, knockback.vec, g_area_hit_targets, count, knockback.arg, 0x810000, 3, 1, scale, 1.0f, 1.0f);
 }

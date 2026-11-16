@@ -8,36 +8,36 @@ extern float FastVecLength(float *buf);
 
 /* func_PAL_00328438, the PAL copy of func_00326CB8: the same C, where the first value is negated
    only when the byte D_PAL_001A7ACC is zero. */
-void func_PAL_00328438(char *obj)
+void pad_clamp_stick_to_vars_pal(char *object)
 {
     float buf[2];
-    char *d;
-    char *h;
-    char *e = *(char **)(obj + 104);
+    char *hero_a;
+    char *hero_b;
+    char *data = *(char **)(object + 104);
 
     if (g_pal_enable_flag != 0) {
-        d = D_00189E20_9;
-        *(float *)(e + 20) = *(float *)(d + 8112);
+        hero_a = D_00189E20_9;
+        *(float *)(data + 20) = *(float *)(hero_a + 8112);
     } else {
-        d = D_00189E20_9;
-        *(float *)(e + 20) = -*(float *)(d + 8112);
+        hero_a = D_00189E20_9;
+        *(float *)(data + 20) = -*(float *)(hero_a + 8112);
     }
-    h = D_00189E20_9;
-    *(float *)(e + 16) = -*(float *)(h + 8116);
+    hero_b = D_00189E20_9;
+    *(float *)(data + 16) = -*(float *)(hero_b + 8116);
 
-    if (*(float *)(e + 20) > 1.0f) {
-        *(float *)(e + 20) = 1.0f;
-    } else if (*(float *)(e + 20) < -1.0f) {
-        *(float *)(e + 20) = -1.0f;
+    if (*(float *)(data + 20) > 1.0f) {
+        *(float *)(data + 20) = 1.0f;
+    } else if (*(float *)(data + 20) < -1.0f) {
+        *(float *)(data + 20) = -1.0f;
     }
 
-    if (*(float *)(e + 16) > 1.0f) {
-        *(float *)(e + 16) = 1.0f;
-    } else if (*(float *)(e + 16) < -1.0f) {
-        *(float *)(e + 16) = -1.0f;
+    if (*(float *)(data + 16) > 1.0f) {
+        *(float *)(data + 16) = 1.0f;
+    } else if (*(float *)(data + 16) < -1.0f) {
+        *(float *)(data + 16) = -1.0f;
     }
     func_00282C88_1(buf);
-    buf[0] = *(float *)(e + 16);
-    buf[1] = *(float *)(e + 20);
-    *(float *)(e + 48) = FastVecLength(buf);
+    buf[0] = *(float *)(data + 16);
+    buf[1] = *(float *)(data + 20);
+    *(float *)(data + 48) = FastVecLength(buf);
 }

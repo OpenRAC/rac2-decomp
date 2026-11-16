@@ -15,28 +15,28 @@ extern Entry_29DB28 *g_menu_active_entries[] __attribute__((sda));
 /* List the live entries: their ids (or display names), a mask of the kind-2 ones and their values. */
 int menu_list_active_entries_us2(int *ids, unsigned int *mask, int *values, int names)
 {
-    Entry_29DB28 *e = g_menu_active_entries[0];
-    int n = 0;
+    Entry_29DB28 *entry = g_menu_active_entries[0];
+    int count = 0;
     int all = 1;
     *ids = 0;
     if (mask) *mask = 0;
     if (values) *values = -1;
-    if (e == 0) return 0;
-    for (; e->id != 0; e++) {
-        if (e->kind != 2 && !(e->flags & 2)) all = 0;
-        if (e->flags & 2) continue;
-        if (e->kind == 0) continue;
-        if ((e->flags & 1) && e->kind == 2) continue;
-        ids[n] = e->id;
-        if (names) ids[n] = e->kind == 2 ? 0x31B9 : e->names[e->index];
-        if (mask && e->kind == 2) *mask |= 1 << n;
+    if (entry == 0) return 0;
+    for (; entry->id != 0; entry++) {
+        if (entry->kind != 2 && !(entry->flags & 2)) all = 0;
+        if (entry->flags & 2) continue;
+        if (entry->kind == 0) continue;
+        if ((entry->flags & 1) && entry->kind == 2) continue;
+        ids[count] = entry->id;
+        if (names) ids[count] = entry->kind == 2 ? 0x31B9 : entry->names[entry->index];
+        if (mask && entry->kind == 2) *mask |= 1 << count;
         if (values) {
-            *values = e->base + e->index;
+            *values = entry->base + entry->index;
             values++;
         }
-        n++;
+        count++;
     }
     if (mask && all) *mask |= 0x80000000;
-    return n;
+    return count;
 }
 

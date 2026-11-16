@@ -8,27 +8,27 @@ extern unsigned char *g_color_blend_textures;
 
 /* blends a sub-object into a position, adds a float field, stores an interpolated value in the
    word at +4 and scales the frame count into a byte table at +2 */
-void func_PAL_002BC58C(char *a0)
+void part_update_color_blend_pal(char *particle)
 {
-    char *s0 = a0;
-    char *s1 = a0 + 32;
-    unsigned int r;
-    float f;
+    char *p = particle;
+    char *state = particle + 32;
+    unsigned int color;
+    float duration;
 
-    FastVecAdd(s0 + 16, s0 + 16, s1);
-    if (FastDecTimer(s0 + 10) != 0) {
-        part_kill(s0);
+    FastVecAdd(p + 16, p + 16, state);
+    if (FastDecTimer(p + 10) != 0) {
+        part_kill(p);
         return;
     }
-    *(float *)(s0 + 12) = *(float *)(s0 + 12) + *(float *)(s1 + 0x1C);
-    f = IntToFloat(*(int *)(s1 + 0x18));
-    r = FastTweenColor(*(int *)(s1 + 0x14), *(int *)(s1 + 0x10),
-                      (float)*(short *)(s0 + 0xA) / f);
-    *(int *)(s0 + 4) = r;
-    if (*(short *)(s0 + 0xA) < 5) {
-        *(int *)(s0 + 4) = (r & 0xFFFFFF) | (((int)(*(short *)(s0 + 0xA) * (r >> 24))) / 5 << 24);
+    *(float *)(p + 12) = *(float *)(p + 12) + *(float *)(state + 0x1C);
+    duration = IntToFloat(*(int *)(state + 0x18));
+    color = FastTweenColor(*(int *)(state + 0x14), *(int *)(state + 0x10),
+                      (float)*(short *)(p + 0xA) / duration);
+    *(int *)(p + 4) = color;
+    if (*(short *)(p + 0xA) < 5) {
+        *(int *)(p + 4) = (color & 0xFFFFFF) | (((int)(*(short *)(p + 0xA) * (color >> 24))) / 5 << 24);
     }
-    *(unsigned char *)(s0 + 2) = g_color_blend_textures[((*(int *)(s1 + 0x18) - *(short *)(s0 + 0xA)) * 10) / *(int *)(s1 + 0x18)];
+    *(unsigned char *)(p + 2) = g_color_blend_textures[((*(int *)(state + 0x18) - *(short *)(p + 0xA)) * 10) / *(int *)(state + 0x18)];
 }
 
 
@@ -41,7 +41,7 @@ extern void FastVecAdd(char *a, char *b, char *c);
 extern void FastVecScale(char *a, char *b, float f);
 
 /* decays a float field by 0.04 with a saturating early-out that consults a helper and returns; otherwise adds 12000 to a second field, nudges a third by 0.0484 while it stays below 0.225, merges two 255-scaled byte lanes into a header word, hands a sub-object to two helpers and decrements a byte counter */
-void func_PAL_002BC808(char *p)
+void part_update_sparkle_pal(char *p)
 {
     char *q = p + 32;
     float v;

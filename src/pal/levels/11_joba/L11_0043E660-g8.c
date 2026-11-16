@@ -47,38 +47,38 @@ void rotor_aim_at_entry_pal(char *obj, int index, int flag)
     char *base3;
     int offset = index * 4;
     char *entry;
-    float v[3];
-    float t;
-    int r;
-    int rec;
+    float direction[3];
+    float strength;
+    int random_value;
+    int record;
 
     entry = arena_get_center_point(*(char **)(obj + 0xB8));
 
     base1 = g_moby_l11_table;
-    FastVecSub(v, entry, ((char *)(base1 + (*(int *)(*(char **)(obj + 0x68) + offset + 0x330) << 8))) + 0x10);
-    r = math_random_int_below(10) + 15;
-    vec_scale_to_length(v, v, (float)r * (0.020000001f));
-    vec_add_random_offset(v, 0.020000001f);
-    r = math_random_int_below(5) + 5;
-    v[2] = (float)r * (0.020000001f);
+    FastVecSub(direction, entry, ((char *)(base1 + (*(int *)(*(char **)(obj + 0x68) + offset + 0x330) << 8))) + 0x10);
+    random_value = math_random_int_below(10) + 15;
+    vec_scale_to_length(direction, direction, (float)random_value * (0.020000001f));
+    vec_add_random_offset(direction, 0.020000001f);
+    random_value = math_random_int_below(5) + 5;
+    direction[2] = (float)random_value * (0.020000001f);
 
-    t = 1.0f - ((float)*(short *)(state + 0x378) - 4.0f) * (1.0f / 6.0f);
-    if (t > 1.0f)
-        t = 1.0f;
-    if (t < 0.0f)
-        t = 0.0f;
+    strength = 1.0f - ((float)*(short *)(state + 0x378) - 4.0f) * (1.0f / 6.0f);
+    if (strength > 1.0f)
+        strength = 1.0f;
+    if (strength < 0.0f)
+        strength = 0.0f;
 
     base2 = g_moby_l11_table;
-    InitializeRandomizedObjectMotion(((char *)(base2 + (*(int *)(*(char **)(obj + 0x68) + offset + 0x330) << 8))), v, g_rotor_aim_motion_speed * (0.00040000002f), t);
+    InitializeRandomizedObjectMotion(((char *)(base2 + (*(int *)(*(char **)(obj + 0x68) + offset + 0x330) << 8))), direction, g_rotor_aim_motion_speed * (0.00040000002f), strength);
 
     base3 = g_moby_l11_table;
     /* The record's field at 0xB8 takes the object's own handle. */
     *(int *)((char *)((*(int *)(*(char **)(obj + 0x68) + offset + 0x330) << 8) + (int)base3)
             + 0xB8) = *(int *)(obj + 0xB8);
-    rec = (int)((char *)(base3 + (*(int *)(*(char **)(obj + 0x68) + offset + 0x330) << 8)));
-    *(int *)(state + 0x364) = rec;
+    record = (int)((char *)(base3 + (*(int *)(*(char **)(obj + 0x68) + offset + 0x330) << 8)));
+    *(int *)(state + 0x364) = record;
     if (flag != 0)
-        arena_set_boss_owner(*(char **)(obj + 0xB8), rec);
+        arena_set_boss_owner(*(char **)(obj + 0xB8), record);
     else
         arena_set_boss_owner(*(char **)(obj + 0xB8), 0);
 

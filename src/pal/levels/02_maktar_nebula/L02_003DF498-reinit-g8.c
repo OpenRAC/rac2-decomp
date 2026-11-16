@@ -24,7 +24,7 @@ extern void set_moby_color(void *, int, int, int);
 typedef struct { char pad[0x34]; unsigned short flags; char pad36[0xC2]; float heading; } ActorFlags;
 
 /* Reinitializes an actor and its child, attaching the three active effect slots. */
-void func_PAL_L02_003DF498(char *actor, int alternate) {
+void ReinitializeActorAndChild_pal(char *actor, int alternate) {
     char *state = PRIVATE;
     Quad transform[4];
     int health;

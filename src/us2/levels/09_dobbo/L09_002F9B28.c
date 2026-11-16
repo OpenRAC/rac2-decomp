@@ -25,7 +25,7 @@ extern int g_current_map_index __attribute__((sda));
 
 extern void anim_start_startup_animations(void);
 
-extern void func_US2_002E72D8(void *);
+extern void UpdateEquipmentPieces_us2(void *);
 
 extern void math_store_angle_update_result(void *, void *, int, int, float);
 
@@ -36,7 +36,7 @@ extern void gfx_draw_state_nine_pulsing_quad(void *);
 /* func_US2_L09_002F9B28, the USA v2.00 copy of func_L09_002F8FD8: the same C, where the 0xFA0 mobs' call
    is skipped in game state 0x33, func_002E64A0 becomes func_US2_002E72D8, and the mob pointer is read as
    base + i * 4 + 0x18C rather than ref_L09_002F8FD8_00.mobs[i], as in func_US2_L14_00305238. */
-void func_US2_L09_002F9B28(void) {
+void mob_list_update_flags_us2(void) {
     int i;
 
     anim_start_startup_animations();
@@ -46,8 +46,8 @@ void func_US2_L09_002F9B28(void) {
         if (mob != 0 && mob->type == 0xE29)
             mob->flags |= 0x800;
         if (mob->type == 0xD54)
-            func_US2_002E72D8(mob);
-        if (mob != 0 && mob->type == 0xFA0 && g_current_map_index != 0x33 && mob->p68 != 0)
+            UpdateEquipmentPieces_us2(mob);
+        if (mob != 0 && mob->type == MOBY_CLASS_TV_SCREENS && g_current_map_index != 0x33 && mob->p68 != 0)
             math_store_angle_update_result(mob, (u8 *)mob->p68 + 0xC, 0x80AAAAD2, 0x80396464, 0.061086535f);
     }
     if (g_current_map_index == 9 && ref_L09_002F8FD8_00.mode == 1)

@@ -20,16 +20,16 @@ extern void vec_compute_object_to_target(char *, char *, char *, float);
 extern void FastVecSub(void *, void *, void *);
 extern float FastVecDot(void *, void *);
 extern void FastVecScale(void *, void *, float);
-extern char *func_PAL_L00_003AB368(void *, void *, int, int);
+extern char *beam_spawn_moving_pal(void *, void *, int, int);
 extern int coll_process_hit(void *, int, void *, void *, float);
 extern int moby_is_in_special_class_range(char *);
 extern int beam_test_segment_hit_pal(char *, void *);
 extern char *part_spawn_ground_effect(void *, int, unsigned int, int, int, float, float, void *, float, int);
 
 /* Aim and spawn a beam, then flash four layers around its muzzle. */
-void func_PAL_L00_003A7140(char *moby)
+void beam_fire_with_muzzle_flash_pal(char *moby)
 {
-    Vector origin, velocity, targetPosition, delta, unit;
+    Vector origin, velocity, target_position, delta, unit;
     char *state = *(char **)(moby + 0x68);
     char *beam;
     float speed = (g_weapon_l00_table + g_item_slot_to_record[0x17])->speed * 0.020000001f;
@@ -54,17 +54,17 @@ void func_PAL_L00_003A7140(char *moby)
         char *target = *(char **)(state + 0x30);
         if ((target && H->i[1344]) || (H->ptr[766] && !H->i[1344])) {
             if (target)
-                qcopy(targetPosition, (target + 0x10));
+                qcopy(target_position, (target + 0x10));
             else
                 /* lq ignores the low four address bits: this reads the quadword holding +0xBF8. */
-                qcopy(targetPosition, &H->ptr[766]);
-            FastVecSub(delta, targetPosition, origin);
+                qcopy(target_position, &H->ptr[766]);
+            FastVecSub(delta, target_position, origin);
             mode = 2;
             vec_scale_to_length(unit, velocity, 1.0f);
             FastVecScale(velocity, unit, FastVecDot(unit, delta) + 3.0f);
         }
     }
-    beam = func_PAL_L00_003AB368(origin, velocity, *(int *)(state + 0x18), mode);
+    beam = beam_spawn_moving_pal(origin, velocity, *(int *)(state + 0x18), mode);
     if (beam)
         *(char **)(beam + 0xB8) = moby;
     if (coll_process_hit(origin, 1, H->ptr[2212], 0, 1.0f) && g_collision_result[6]) {
@@ -72,9 +72,9 @@ void func_PAL_L00_003A7140(char *moby)
         if ((model && *(short *)(model + 0x46) == 5) || moby_is_in_special_class_range(g_collision_result[6]))
             beam_test_segment_hit_pal(beam, g_collision_result[6] + 0x10);
     }
-    *(VectorBits *)targetPosition = 0;
-    part_spawn_ground_effect(origin, 8, 0x4010FF10, 2, 1, 7.0f, 0.1f, targetPosition, 0.0f, 1);
-    part_spawn_ground_effect(origin, 8, 0x4010FF10, 2, -1, 5.0f, 0.1f, targetPosition, 0.0f, 1);
-    part_spawn_ground_effect(origin, 8, 0xC0FFFFFF, 2, 1, 3.5f, 0.1f, targetPosition, 0.0f, 1);
-    part_spawn_ground_effect(origin, 8, 0xB0FFFFFF, 2, -1, 2.5f, 0.1f, targetPosition, 0.0f, 1);
+    *(VectorBits *)target_position = 0;
+    part_spawn_ground_effect(origin, 8, 0x4010FF10, 2, 1, 7.0f, 0.1f, target_position, 0.0f, 1);
+    part_spawn_ground_effect(origin, 8, 0x4010FF10, 2, -1, 5.0f, 0.1f, target_position, 0.0f, 1);
+    part_spawn_ground_effect(origin, 8, 0xC0FFFFFF, 2, 1, 3.5f, 0.1f, target_position, 0.0f, 1);
+    part_spawn_ground_effect(origin, 8, 0xB0FFFFFF, 2, -1, 2.5f, 0.1f, target_position, 0.0f, 1);
 }

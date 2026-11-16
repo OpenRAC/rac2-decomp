@@ -5,11 +5,12 @@ extern float g_path_enemy_rate __attribute__((sda));
 extern float g_path_enemy_scale_factor __attribute__((sda));
 extern u8 g_hero_prev_position[];
 extern void moby_set_state(char *, int, int);
-extern void func_PAL_002A7E68(char *, int, int, int);
+extern void anim_start_blended_pal(char *, int, int, int);
 extern void moby_set_controller_speed_limits(char *, float, float, float, float);
 extern float fast_vec_dist(void *, void *);
 extern void moby_update_ground_check(char *);
 
+/* Sets up the path enemy on its first frame and every frame scales it and hides it if the hero is close (PAL: 50 Hz rates). */
 void path_enemy_init_scale_pal(char *self) {
     char *state = *(char **)(self + 0x68);
     float rate;
@@ -23,7 +24,7 @@ void path_enemy_init_scale_pal(char *self) {
         *(u16 *)(self + 0x34) = (*(u16 *)(self + 0x34) | 0x41) & 0xEFFF;
         moby_set_state(self, 1, 0);
         if (*(u8 *)(self + 0x43) != 0) {
-            func_PAL_002A7E68(self, 0, 0, 0);
+            anim_start_blended_pal(self, 0, 0, 0);
         }
         {
             float half = 0.5f;

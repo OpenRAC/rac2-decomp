@@ -47,7 +47,7 @@ extern DriveSettings g_drive_settings;
 extern void hero_build_move_impulse(float, float);
 extern void hero_approach_speed(float, float);
 extern void hero_steer_heading(int, float, float, float);
-extern void func_PAL_L01_002B6870(float);
+extern void hero_approach_velocity_pal(float);
 extern void cam_offset_point_by_side_direction(DriveVector *, DriveVector *, float);
 extern void cam_set_view_space_height(DriveVector *, DriveVector *, float);
 extern void cam_set_view_space_vector_length(void *, const void *, float);
@@ -62,11 +62,11 @@ extern void FastVecAdd(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
 
 /* Update directional movement for the active player locomotion state. */
-void func_PAL_L01_002B72D0(void)
+void UpdateHeroVelocityForState_pal(void)
 {
     union { DriveVector q; float f[3]; } local;
     float smoothed;
-    float oldHeading;
+    float old_heading;
     int state = g_hero_state.state;
 
     if (state == 10) {
@@ -88,7 +88,7 @@ void func_PAL_L01_002B72D0(void)
     } else if (state == 27) {
         if (g_hero_state.frame > 33) {
             hero_steer_heading(0, 0.057600003f, 0.28800002f, 0.30019668f);
-            func_PAL_L01_002B6870(0.008f);
+            hero_approach_velocity_pal(0.008f);
         }
         if (13.0f <= g_hero_state.plane && g_hero_state.plane <= 3e+01f) {
             if (27.0f < g_hero_state.plane)
@@ -158,7 +158,7 @@ void func_PAL_L01_002B72D0(void)
         hero_steer_heading(0, 0.057600003f, 0.28800002f, g_hero_state.acceleration);
         g_hero_state.targetSpeed = 0.0f;
     } else {
-        oldHeading = g_hero_state.heading;
+        old_heading = g_hero_state.heading;
         qcopy(&local, &g_hero_state.direction);
         if (g_hero_state.overrideDirection != 0) {
             g_hero_state.heading = g_drive_settings.heading;
@@ -166,9 +166,9 @@ void func_PAL_L01_002B72D0(void)
         }
         hero_steer_heading(0, 0.057600003f, 0.28800002f, g_hero_state.acceleration);
         if (g_hero_state.overrideDirection != 0) {
-            g_hero_state.savedHeading = oldHeading;
+            g_hero_state.savedHeading = old_heading;
             qcopy(&g_hero_state.savedDirection, &local);
-            g_hero_state.heading = oldHeading;
+            g_hero_state.heading = old_heading;
             qcopy(&g_hero_state.direction, &g_hero_state.savedDirection);
         }
         hero_build_move_impulse(0.7f, 0.0f);
@@ -187,7 +187,7 @@ void func_PAL_L01_002B72D0(void)
                 else if (g_hero_state.special != 0) damping = 0.00080000004f;
                 else damping = 0.0032000002f;
             }
-            func_PAL_L01_002B6870(damping);
+            hero_approach_velocity_pal(damping);
         }
     }
 }

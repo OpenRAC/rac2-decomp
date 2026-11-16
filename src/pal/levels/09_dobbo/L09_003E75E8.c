@@ -10,22 +10,22 @@ extern float FastAddRotations(float, float);
    State 0 draws a random duration in 150..200 and marks the record active;
    state 1 converts the drawn duration to a signed angle and folds it into the
    record's angle through the resident step body. */
-void func_PAL_L09_003E75E8(unsigned char *a0) {
-    switch (a0[0x20]) {
+void random_turn_update_pal(unsigned char *moby) {
+    switch (moby[0x20]) {
     case 0:
-        a0[0xBC] = math_random_int_range(0x96, 0xC8);
+        moby[0xBC] = math_random_int_range(0x96, 0xC8);
         if (math_random_int_below(2) != 0) {
-            a0[0x95] = 1;
+            moby[0x95] = 1;
         }
-        a0[0x20] = 1;
+        moby[0x20] = 1;
         break;
     case 1:
-        if (a0[0x95] != 0) {
-            *(float *)(a0 + 0xF4) = FastAddRotations(
-                *(float *)(a0 + 0xF4), -((float)a0[0xBC] * 0.0003490659f));
+        if (moby[0x95] != 0) {
+            *(float *)(moby + 0xF4) = FastAddRotations(
+                *(float *)(moby + 0xF4), -((float)moby[0xBC] * 0.0003490659f));
         } else {
-            *(float *)(a0 + 0xF4) = FastAddRotations(
-                *(float *)(a0 + 0xF4), (float)a0[0xBC] * 0.0003490659f);
+            *(float *)(moby + 0xF4) = FastAddRotations(
+                *(float *)(moby + 0xF4), (float)moby[0xBC] * 0.0003490659f);
         }
         break;
     }

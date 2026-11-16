@@ -46,22 +46,23 @@ extern void request_set_setting_b(s32);
 extern s32 request_begin_slot(s32, s32, s32, s32, s32);
 extern s32 menu_send_request(s32, s8 *);
 
-s32 func_US2_002CC908(s32 arg0) {
-    s32 r;
+/* Handles one of five menu commands by number. Some call an optional callback, others open a sub screen (USA v2.00: command 4 also sets a flag). */
+s32 menu_handle_command_us2(s32 command) {
+    s32 result;
 
-    r = 0;
+    result = 0;
     {
     static void *rc2_labels[] = {&&rc2_case_0, &&rc2_case_1, &&rc2_case_2, &&rc2_case_3, &&rc2_case_4};
-    u32 rc2_selector = (u32)(arg0);
+    u32 rc2_selector = (u32)(command);
     if (rc2_selector > 4U) goto rc2_switch_end;
 goto *D_0026CCE0[rc2_selector];
 
     rc2_case_0:
         g_menu_command_flag.a = 10;
-        r = 1;
+        result = 1;
         goto rc2_switch_end;
     rc2_case_1:
-        r = 1;
+        result = 1;
         g_menu_command_flag.a = 10;
         if (g_menu_action_callback_a != 0) {
             select_moby_context(0);
@@ -70,7 +71,7 @@ goto *D_0026CCE0[rc2_selector];
         }
         goto rc2_switch_end;
     rc2_case_2:
-        r = 1;
+        result = 1;
         g_menu_command_flag.a = 10;
         if (g_menu_action_callback_b != 0) {
             select_moby_context(0);
@@ -79,17 +80,17 @@ goto *D_0026CCE0[rc2_selector];
         }
         goto rc2_switch_end;
     rc2_case_3:
-        r = menu_send_request(3, g_menu_request_screen_data);
+        result = menu_send_request(3, g_menu_request_screen_data);
         goto rc2_switch_end;
     rc2_case_4:
         if (request_begin_slot(4, 2, 8, 4, 0) == 0) {
             request_set_setting_b(3);
             g_menu_flags[0] = 1;
-            r = 1;
+            result = 1;
         }
         goto rc2_switch_end;
     
 rc2_switch_end: ;
 }
-    return r;
+    return result;
 }

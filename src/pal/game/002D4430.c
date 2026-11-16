@@ -11,6 +11,7 @@ extern char g_menu_item_table_first[];
 extern char g_preview_extra_value_first[];
 extern char *g_resident_data_base[] __attribute__((sda));
 
+/* Sets up the first preview item menu: title mode 0, its item table and extra value (PAL). */
 int menu_preview_object_init_first_pal(void)
 {
     if (g_resident_data_base[0] != 0) {
@@ -25,6 +26,7 @@ int menu_preview_object_init_first_pal(void)
 extern char g_menu_item_table_second[];
 extern char g_preview_extra_value_second[];
 
+/* Sets up the second preview item menu: title mode 1, its item table and extra value (PAL). */
 int menu_preview_object_init_second_pal(void)
 {
     if (g_resident_data_base[0] != 0) {

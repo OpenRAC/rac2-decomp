@@ -23,12 +23,12 @@ extern void FastVecSub(void *,void *,void *),vec_fast_normalize(void *,void *,vo
 extern void FastVecScale(void *,void *,float);
 extern void SpawnExplosionEffects_pal(void *,void *,void *,float,float,int,int,int,float,float,float,float,int,float,int,int,int,int,int);
 extern int snd_play_from_class_bank(int,int,void *,int),GetCollHitMaterial(void);
-extern int func_PAL_L08_002D3078(int,int);
-extern void func_PAL_002A7E68(void *,int,int,int),moby_set_state(void *,int,int);
+extern int hero_l08_enter_state_pal(int,int);
+extern void anim_start_blended_pal(void *,int,int,int),moby_set_state(void *,int,int);
 extern void moby_place_at_stored_transform(void *),set_hero_animation_pal(int,int,float);
 
 /* Resolve the movement probes and update the D_L08_001BFF60 response. */
-int func_PAL_L08_003D1A30(char *object, void *previous)
+int vehicle_handle_collision_pal(char *object, void *previous)
 {
     ContactVector temporary, point;
     char *state=*(char **)(object+0x68);
@@ -73,8 +73,8 @@ int func_PAL_L08_003D1A30(char *object, void *previous)
             g_vehicle_collision_x=g_vehicle_saved_x;
             g_vehicle_collision_y=g_vehicle_saved_y;
             *(int *)(state+0x50)=0;
-            func_PAL_L08_002D3078(0,1);
-            if (*(unsigned char *)(object+0x43)) func_PAL_002A7E68(object,0,0,10);
+            hero_l08_enter_state_pal(0,1);
+            if (*(unsigned char *)(object+0x43)) anim_start_blended_pal(object,0,0,10);
             index=*(int *)(state+0x6C);
             if (index>0) {
                 qcopy(state,&g_moby_array[index].position);

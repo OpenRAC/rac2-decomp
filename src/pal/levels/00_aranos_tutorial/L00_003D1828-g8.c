@@ -62,6 +62,7 @@ typedef struct {
     I(ctx->child, 0x78) = 0x808C8C8C;                                                   \
     I(ctx->child, 0x98) = I(P(ctx->child, 0x24), 0x10)
 
+/* Moves the lift between its two heights and updates its child object and looping sound (PAL). */
 void UpdateAranosVerticalLift_pal(LiftMoby *moby) {
     char *obj = (char *)moby;
     struct { Vec old, rotation, delta, camera; } frame;

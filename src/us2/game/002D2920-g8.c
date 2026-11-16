@@ -16,21 +16,22 @@ extern char *GetLocalizedString(int);
 extern int text_draw_centered_small(int, int, unsigned long, char *, int);
 extern void AppendScreenRectPacket(int, int, int, int, unsigned long, int);
 
+/* Draws the extras menu: five options, the selected one highlighted and locked ones as question text. */
 int extras_menu_draw_us2(void)
 {
     int i, y = 125;
     int *keys = g_extras_menu_text_ids;
     int *enabled = g_extras_menu_enabled_flags;
-    float z;
+    float depth;
 
     SetupGifPaging(0);
-    z = 0.775f;
+    depth = 0.775f;
     gfx_draw_scaled_object_two_axes((char *)table_find_by_id(g_resident_data_base + 0x8710, 0x8B), 0x60442D00,
-                 (float)(g_screen_width / 2), (float)g_extras_menu_title_y, 1.0f, g_menu_alpha_scale, z);
+                 (float)(g_screen_width / 2), (float)g_extras_menu_title_y, 1.0f, g_menu_alpha_scale, depth);
     gfx_draw_scaled_object_two_axes((char *)table_find_by_id(g_resident_data_base + 0x8710, 0x8C), 0x55F0C070,
-                 (float)(g_screen_width / 2), (float)g_extras_menu_title_y, 1.0f, g_menu_alpha_scale, z);
+                 (float)(g_screen_width / 2), (float)g_extras_menu_title_y, 1.0f, g_menu_alpha_scale, depth);
     gfx_draw_scaled_object_two_axes((char *)table_find_by_id(g_resident_data_base + 0x8710, 0x8D), 0x55F0C070,
-                 (float)(g_screen_width / 2), (float)g_extras_menu_title_y, 1.0f, g_menu_alpha_scale, z);
+                 (float)(g_screen_width / 2), (float)g_extras_menu_title_y, 1.0f, g_menu_alpha_scale, depth);
     text_draw_centered_small(g_screen_width / 2, 65, 0x80F0F0F0UL, GetLocalizedString(0x30A2), -1);
     text_draw_centered_small(g_screen_width / 2, 321, 0x80F0F0F0UL, GetLocalizedString(0x2C0B), -1);
     text_draw_centered_small(g_screen_width / 2, 346, 0x80F0F0F0UL, GetLocalizedString(0x2BE5), -1);

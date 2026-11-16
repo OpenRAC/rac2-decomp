@@ -31,88 +31,89 @@ typedef struct {
     int level;
     float angles[3];
     int mode;
-    float firstAngle;
-    float firstVelocity;
-    float secondAngle;
-    float secondVelocity;
-    float firstSpeed;
-    float firstStep;
-    float secondSpeed;
-    float secondStep;
+    float first_angle;
+    float first_velocity;
+    float second_angle;
+    float second_velocity;
+    float first_speed;
+    float first_step;
+    float second_speed;
+    float second_step;
     char entries[0x4A];
     unsigned char present;
     char pad_8B[2];
     unsigned char update;
     char pad_8E[0x1862];
-    float startZ;
+    float start_z;
 } L00_003EC540_State;
 
-void rotating_parts_update_us2(char *self)
+/* Spins a set of attached parts around one or two axes, driven by the tutorial point counter (US2: 79 parts). */
+void rotating_parts_update_us2(char *moby)
 {
     float angles[4];
-    char mat[48];
-    L00_003EC540_State *st = *(L00_003EC540_State **)(self + 0x68);
+    char matrix[48];
+    L00_003EC540_State *vars = *(L00_003EC540_State **)(moby + 0x68);
     int i;
-    int last;
+    int last_flag;
 
-    switch (*(unsigned char *)(self + 0x20)) {
+    switch (*(unsigned char *)(moby + 0x20)) {
     case 0:
-        if (st->id == -1)
+        if (vars->id == -1)
             break;
         {
             /* An int, not a byte constant: reload would otherwise reuse the -1 still in $v0. */
             int alpha = 255;
-            *(unsigned char *)(self + 0x30) = alpha;
+            *(unsigned char *)(moby + 0x30) = alpha;
         }
-        BuildObjectAttachmentTransforms(self, st->entries, 0x4F, *((int *)&st->id + 1), *(int *)&st->id, st->flags, 7, 0);
-        if (!st->present) {
-            moby_mark_spawned(self);
+        BuildObjectAttachmentTransforms(moby, vars->entries, 0x4F, *((int *)&vars->id + 1), *(int *)&vars->id, vars->flags, 7, 0);
+        if (!vars->present) {
+            moby_mark_spawned(moby);
             break;
         }
-        if (!st->mode) {
-            st->update = 1;
-            *(unsigned short *)(self + 0x34) |= 0x104;
-            euler_rotation_basis(self + 0xC0, self + 0xF0);
+        if (!vars->mode) {
+            vars->update = 1;
+            *(unsigned short *)(moby + 0x34) |= 0x104;
+            euler_rotation_basis(moby + 0xC0, moby + 0xF0);
         }
-        st->startZ = *(float *)(self + 0x18);
-        if (st->firstAngle != 0.0f)
-            st->firstAngle *= 0.01745329424738884f;
-        st->firstVelocity = math_fast_sin_or_cos_b(st->firstAngle) * st->firstSpeed;
-        self[0x20] = 1;
+        vars->start_z = *(float *)(moby + 0x18);
+        if (vars->first_angle != 0.0f)
+            vars->first_angle *= 0.01745329424738884f;
+        vars->first_velocity = math_fast_sin_or_cos_b(vars->first_angle) * vars->first_speed;
+        moby[0x20] = 1;
         break;
     case 1:
-        if (g_tutorial_points != st->level)
+        if (g_tutorial_points != vars->level)
             break;
-        if (st->firstStep > 0.0f)
-            math_update_wrapped_angle_offset(self, &st->firstAngle, &st->firstVelocity, st->firstSpeed,
-                          st->firstStep * 0.0002908882452175021f, st->startZ);
-        if (st->secondStep > 0.0f) {
-            moby_scale_owner_words_by_angles(self, st->secondSpeed * 0.01745329424738884f, &st->secondAngle,
-                          st->secondStep * 0.0002908882452175021f, &st->secondVelocity, 0.00581776537001133f);
-            if (st->update)
-                euler_rotation_basis(self + 0xC0, self + 0xF0);
+        if (vars->first_step > 0.0f)
+            math_update_wrapped_angle_offset(moby, &vars->first_angle, &vars->first_velocity, vars->first_speed,
+                          vars->first_step * 0.0002908882452175021f, vars->start_z);
+        if (vars->second_step > 0.0f) {
+            moby_scale_owner_words_by_angles(moby, vars->second_speed * 0.01745329424738884f, &vars->second_angle,
+                          vars->second_step * 0.0002908882452175021f, &vars->second_velocity, 0.00581776537001133f);
+            if (vars->update)
+                euler_rotation_basis(moby + 0xC0, moby + 0xF0);
         }
-        if (!st->mode) {
-            angles[0] = st->angles[0] * 0.0002908882452175021f;
-            angles[1] = st->angles[1] * 0.0002908882452175021f;
-            angles[2] = st->angles[2] * 0.0002908882452175021f;
-            euler_rotation_basis(mat, angles);
-            multiply_matrix3x3(self + 0xC0, self + 0xC0, mat);
-            if (st->secondStep > 0.0f)
-                mat_get_euler_angles(self + 0xC0, self + 0xF0);
+        if (!vars->mode) {
+            angles[0] = vars->angles[0] * 0.0002908882452175021f;
+            angles[1] = vars->angles[1] * 0.0002908882452175021f;
+            angles[2] = vars->angles[2] * 0.0002908882452175021f;
+            euler_rotation_basis(matrix, angles);
+            multiply_matrix3x3(moby + 0xC0, moby + 0xC0, matrix);
+            if (vars->second_step > 0.0f)
+                mat_get_euler_angles(moby + 0xC0, moby + 0xF0);
         } else {
             i = 0;
             do {
-                angles[0] = st->angles[0] * 0.0002908882452175021f;
-                angles[1] = st->angles[1] * 0.0002908882452175021f;
-                angles[2] = st->angles[2] * 0.0002908882452175021f;
-                euler_rotation_basis(mat, angles);
-                multiply_matrix3x3(st->entries + i * 0x50, st->entries + i * 0x50, mat);
-                last = *(unsigned char *)(st->entries + i * 0x50 + 0x4A);
+                angles[0] = vars->angles[0] * 0.0002908882452175021f;
+                angles[1] = vars->angles[1] * 0.0002908882452175021f;
+                angles[2] = vars->angles[2] * 0.0002908882452175021f;
+                euler_rotation_basis(matrix, angles);
+                multiply_matrix3x3(vars->entries + i * 0x50, vars->entries + i * 0x50, matrix);
+                last_flag = *(unsigned char *)(vars->entries + i * 0x50 + 0x4A);
                 i++;
-            } while (last != 1);
+            } while (last_flag != 1);
         }
-        moby_update_attached_transforms(self, st->entries);
+        moby_update_attached_transforms(moby, vars->entries);
         break;
     }
 }

@@ -3,7 +3,8 @@
 extern char *g_resident_data_base;
 extern int map_screen_update_layout(void *, int);
 
-int func_PAL_0029CD38(int value) {
+/* Updates the map screen menu panel and returns its answer; returns 0 if the menu system does not exist. */
+int menu_update_map_screen_pal(int value) {
     if (g_resident_data_base != 0)
         return map_screen_update_layout(g_resident_data_base + 0x3B7A8, value);
     return 0;
@@ -11,7 +12,8 @@ int func_PAL_0029CD38(int value) {
 
 extern void radial_menu_destroy(void *);
 
-void func_PAL_0029CD78(void) {
+/* Tears down the radial menu menu panel, if the menu system exists. */
+void menu_radial_menu_destroy_pal(void) {
     if (g_resident_data_base != 0)
         radial_menu_destroy(g_resident_data_base + 0x3BB08);
 }

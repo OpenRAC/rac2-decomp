@@ -15,30 +15,30 @@ extern int FastTweenColor(int, int, float), FloatToInt(float);
 extern void gravity_offset_position(void *, float *, float *, float);
 extern void *part_spawn_trail(void *, void *, void *, int, int, int, int, int, int);
 /* func_PAL_L00_00392250, the PAL copy of func_L00_0038F178: the same C, where the kind, duration and size take the 50 Hz scale, 0.016666668f becomes 0.020000001f and 0.0011111111f becomes 0.0016000001f. */
-void func_PAL_L00_00392250(char *actor) {
+void part_emit_sparkle_pal(char *actor) {
     char *state = *(char **)(actor + 0x68);
     float offset[4], velocity[4], jitter[4];
-    float *jitterPoint, *velocityPoint;
-    int firstColor, lastColor, kind, duration, size, count;
+    float *jitter_point, *velocity_point;
+    int first_color, last_color, kind, duration, size, count;
     if (g_frame_l00_counter & 7) return;
-    jitterPoint = jitter;
-    velocityPoint = velocity;
+    jitter_point = jitter;
+    velocity_point = velocity;
     count = 0;
     do {
         count--;
         FastVecScale(offset, state, 0.5f);
-        vec_random_direction(jitterPoint, 0.0f, 0.020000001f);
-        FastVecAdd(offset, jitterPoint, offset);
-        vec_clear_128((Quad *)velocityPoint);
+        vec_random_direction(jitter_point, 0.0f, 0.020000001f);
+        FastVecAdd(offset, jitter_point, offset);
+        vec_clear_128((Quad *)velocity_point);
         offset[3] = math_random_float_range(0.25f, 0.15f);
         velocity[3] = math_random_float_range(0.15f, 0.05f);
-        firstColor = FastTweenColor(0x804080FF, 0x8040FFFF, math_random_float_range(0.0f, 1.0f));
-        lastColor = FastTweenColor(0x80104040, 0x80002080, math_random_float_range(0.0f, 1.0f));
+        first_color = FastTweenColor(0x804080FF, 0x8040FFFF, math_random_float_range(0.0f, 1.0f));
+        last_color = FastTweenColor(0x80104040, 0x80002080, math_random_float_range(0.0f, 1.0f));
         kind = FloatToInt(((math_random_float_range(0.0f, 1.0f) + 1.0f) * 5.0f + 2.0f) * 0.16666667f);
         duration = FloatToInt(((math_random_float_range(-0.5f, 0.5f) + 1.0f) * 150.0f + 2.0f) * 0.16666667f);
         size = FloatToInt(((math_random_float_range(-0.5f, 0.5f) + 1.0f) * 50.0f + 2.0f) * 0.16666667f);
-        gravity_offset_position(actor + 0x10, velocityPoint, velocityPoint, (float)duration * 0.0016000001f);
-        part_spawn_trail(actor + 0x10, offset, velocityPoint, firstColor, lastColor, kind, duration, size, 0x10019);
+        gravity_offset_position(actor + 0x10, velocity_point, velocity_point, (float)duration * 0.0016000001f);
+        part_spawn_trail(actor + 0x10, offset, velocity_point, first_color, last_color, kind, duration, size, 0x10019);
     } while (count >= 0);
 }
 
@@ -61,7 +61,8 @@ extern void *F6eb4f363_FUN_002BF728(char *object, char *local, float amount, flo
 
 /* func_00304AD0 uses the profile in 00304AD0-g8-qcopy.c. */
 
-void func_PAL_L00_00392500(char *object)
+/* Sometimes spawns a small puff of bubbles on the ground under the object. */
+void part_spawn_spark_puff_pal(char *object)
 {
     char local[16];
     float base;
@@ -99,7 +100,8 @@ extern void moby_mix_on_inner_data(void *, void *, void *, float);
 extern float IntToFloat(int);
 extern int FastDecTimer(short *);
 
-void func_PAL_L00_00392718(char *object)
+/* Per-frame update of a drifting spark particle: sheds colored sparks, slows down, and removes itself when it fades or leaves the map (PAL). */
+void spark_particle_update_pal(char *object)
 {
     ParticleUpdateColors colors;
     ParticleUpdateVector direction, random;
@@ -168,11 +170,11 @@ extern char *g_follow_camera_object;
 extern int math_fast_float_d(int *), weapon_spend_ammo(int, int);
 extern float vec_length_xy(void *), mat_fast_helper_a(float, float);
 extern void vec_build_spherical_offset(float *, float, float, float), FastVecAdd(void *, void *, void *);
-extern void func_PAL_002A7E68(void *, int, int, int), level_start_timed_object_once_pal(void);
+extern void anim_start_blended_pal(void *, int, int, int), level_start_timed_object_once_pal(void);
 extern char *visibomb_create_missile_pal(char *, char *, float, float);
 extern int PlayMobySound(int, int, char *);
 /* Starts the tether when the shared input and movement gates permit it. */
-void func_PAL_L00_003929E0(char *actor) {
+void visibomb_gun_update_pal(char *actor) {
     int *state;
     int ready;
     float point[4];
@@ -198,7 +200,7 @@ void func_PAL_L00_003929E0(char *actor) {
         vec_build_spherical_offset(point, 0.6f, heading, -pitch);
         FastVecAdd(point, point, actor + 0x10);
     }
-    if (*(unsigned char *)(actor + 0x43) != 3) func_PAL_002A7E68(actor, 3, 0, 0);
+    if (*(unsigned char *)(actor + 0x43) != 3) anim_start_blended_pal(actor, 3, 0, 0);
     level_start_timed_object_once_pal();
     *(char **)(state + 1) = visibomb_create_missile_pal(actor, (char *)point, heading, pitch);
     if (g_statistics_table.launches < 0xFFFF) g_statistics_table.launches++;
@@ -210,6 +212,6 @@ void func_PAL_L00_003929E0(char *actor) {
 denied:
     if (g_pad_state.buttons & g_hero_state.buttons) PlayMobySound(0, 0, actor);
 finish:
-    if ((*(unsigned char *)(actor + 0x60) & 2) && *(u8 *)(actor + 0x43) != 1) func_PAL_002A7E68(actor, 1, 0, 0);
+    if ((*(unsigned char *)(actor + 0x60) & 2) && *(u8 *)(actor + 0x43) != 1) anim_start_blended_pal(actor, 1, 0, 0);
     *(unsigned short *)(actor + 0x34) |= 4;
 }

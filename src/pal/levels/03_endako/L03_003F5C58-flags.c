@@ -11,10 +11,12 @@ extern void moby_init_child_from_parent(void *, void *);
 extern float mat_fast_helper_a(float, float);
 extern float fast_subtract_rotations(float, float);
 extern void moby_update_eased_node(void *, void *, int, float, float);
-extern void func_PAL_002B14F8(void *, void *, int, int, float);
-extern void func_PAL_002A7E68(void *, int, int, int);
+extern void value_set_and_smooth_pal(void *, void *, int, int, float);
+extern void anim_start_blended_pal(void *, int, int, int);
 
-void func_PAL_L03_003FA9B0(char *entity) {
+/* Keeps the boss attachment object spawned and following the boss, hides it when the boss is
+   hidden, and turns it toward the hero. */
+void endako_boss_update_attachment_pal(char *entity) {
     char *state = *(char **)(entity + 0x68);
     char *obj = *(char **)(state + 0x2C4);
 
@@ -41,12 +43,12 @@ void func_PAL_L03_003FA9B0(char *entity) {
                           ((Hero *)g_hero_state)->f[0x84 / 4] - *(float *)(cur + 0x14)),
             *(float *)(entity + 0xF8));
         moby_update_eased_node(*(char **)(state + 0x2C4), state + 0x210, 0, 0.0432f, 0.43200004f);
-        func_PAL_002B14F8(*(char **)(state + 0x2C4), state + 0x210, 0, 1, 2.5f);
+        value_set_and_smooth_pal(*(char **)(state + 0x2C4), state + 0x210, 0, 1, 2.5f);
     }
     {
         u8 *last = *(u8 **)(state + 0x2C4);
         if ((last[0x60] & 2) && last[0x43] == 1) {
-            func_PAL_002A7E68(last, 0, 0, 8);
+            anim_start_blended_pal(last, 0, 0, 8);
         }
     }
 }

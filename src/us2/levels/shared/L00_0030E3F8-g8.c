@@ -2,18 +2,20 @@
 #include "names.h"
 
 extern char *g_resident_data_base;
-extern int func_US2_00349728(void *, int);
+extern int menu_choice_list_update_widgets_us2(void *, int);
 
-int func_US2_L00_0030E488(int value) {
+/* Calls the resident-data sub-object routine at +0x39160 with a value, or returns 0 when no resident data is loaded. */
+int resident_sub_39160_query_us2(int value) {
     if (g_resident_data_base != 0)
-        return func_US2_00349728(g_resident_data_base + 0x39160, value);
+        return menu_choice_list_update_widgets_us2(g_resident_data_base + 0x39160, value);
     return 0;
 }
 
-extern int func_US2_00347B88(void *, int);
+extern int UpdateItemGridMenu_us2(void *, int);
 
-int func_US2_L00_0030E528(int value) {
+/* Calls the resident-data sub-object routine at +0x39620 with a value, or returns 0 when no resident data is loaded. */
+int resident_sub_39620_query_us2(int value) {
     if (g_resident_data_base != 0)
-        return func_US2_00347B88(g_resident_data_base + 0x39620, value);
+        return UpdateItemGridMenu_us2(g_resident_data_base + 0x39620, value);
     return 0;
 }

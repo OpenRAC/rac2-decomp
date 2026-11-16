@@ -42,44 +42,45 @@ extern char *g_resident_data_base __attribute__((sda));
 extern void object_set_helper_result(void *, void *, int);
 extern void DrawItemGrid(int *);
 
-static __inline__ void initDescriptor_340498(int *f) { f[20] = 0; f[21] = 1; }
+static __inline__ void initDescriptor_340498(int *desc) { desc[20] = 0; desc[21] = 1; }
 
-void radial_menu_draw_info_left_us2(char *o)
+/* Draws the left info grid of the radial menu (USA v2.00 layout). */
+void radial_menu_draw_info_left_us2(char *menu)
 {
     Word2_340498 q0 = g_radial_info_left_word_pair_a;
     Word2_340498 q1 = g_radial_info_left_word_pair_b;
     Word2_340498 q2 = g_radial_info_left_word_pair_a;
     Word2_340498 q3 = g_radial_info_left_word_pair_c;
     Word2_340498 q4 = g_radial_info_shared_word_pair;
-    int f[23];
+    int desc[23];
     char *child;
 
-    initDescriptor_340498(f);
-    f[19] = *(int *)(o + 0x820);
-    f[21] = *(int *)(o + 0x81C) == 0;
-    f[3] = *(int *)(o + 0x814);
-    f[4] = *(int *)(o + 0x818);
-    f[16] = (int)(o + 0xa78);
-    f[9] = (int)&q4;
-    f[1] = 4;
-    f[2] = 6;
-    f[0] = (int)g_menu_item_table_first;
-    f[17] = (int)(o + 0x880);
-    f[13] = (int)(o + 0x260);
-    f[14] = 0;
-    child = o + 0x17C;
+    initDescriptor_340498(desc);
+    desc[19] = *(int *)(menu + 0x820);
+    desc[21] = *(int *)(menu + 0x81C) == 0;
+    desc[3] = *(int *)(menu + 0x814);
+    desc[4] = *(int *)(menu + 0x818);
+    desc[16] = (int)(menu + 0xa78);
+    desc[9] = (int)&q4;
+    desc[1] = 4;
+    desc[2] = 6;
+    desc[0] = (int)g_menu_item_table_first;
+    desc[17] = (int)(menu + 0x880);
+    desc[13] = (int)(menu + 0x260);
+    desc[14] = 0;
+    child = menu + 0x17C;
     object_set_helper_result(child, g_resident_data_base + 0x8710, 0x23);
-    f[10] = (int)child;
-    f[12] = (int)(o + 0x214);
-    f[11] = (int)(o + 0x98);
-    f[15] = (int)(o + 0x7D0);
-    f[18] = *(int *)(o + 0x80C);
-    f[8] = (int)&q3;
-    f[7] = (int)&q2;
-    f[6] = (int)&q1;
-    f[5] = (int)&q0;
-    f[22] = 0;
-    DrawItemGrid(f);
+    desc[10] = (int)child;
+    desc[12] = (int)(menu + 0x214);
+    desc[11] = (int)(menu + 0x98);
+    desc[15] = (int)(menu + 0x7D0);
+    desc[18] = *(int *)(menu + 0x80C);
+    desc[8] = (int)&q3;
+    desc[7] = (int)&q2;
+    desc[6] = (int)&q1;
+    desc[5] = (int)&q0;
+    desc[22] = 0;
+    DrawItemGrid(desc);
 }
 
 /* func_003407F8 follows the menu types below. */

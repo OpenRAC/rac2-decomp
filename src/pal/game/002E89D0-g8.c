@@ -26,11 +26,12 @@ typedef struct {
  int unknown, life, unknown2, flags, first, last, unknown3, type;
 } Effect7B;
 
-void func_PAL_002E89D0(void *object)
+/* Spawns fire, glow and spark particles on the ship for its current scene. */
+void ship_spawn_thruster_particles_pal(void *object)
 {
  float pos[4], other[4], matrix[12], first[4], second[4], combined[4];
  Effect7B effect, spark;
- char *o = object;
+ char *ship = object;
  unsigned long long next;
  unsigned int color;
 #ifdef OPENRAC_HOSTGEN
@@ -41,30 +42,30 @@ void func_PAL_002E89D0(void *object)
  spark.unknown = 0x001A0000;
  spark.unknown2 = 0x001C0000;
 #endif
- next = *(unsigned long long *)(*(char **)(o + 0x5c) + 0x10);
- vec_fast_helper_e(first, *(unsigned long long *)(*(char **)(o + 0x58) + 0x10));
+ next = *(unsigned long long *)(*(char **)(ship + 0x5c) + 0x10);
+ vec_fast_helper_e(first, *(unsigned long long *)(*(char **)(ship + 0x58) + 0x10));
  vec_fast_helper_e(second, next);
- scale_vector(first, first, (1.0f - *(float *)(o + 0x44)) * (1.0f / 32768.0f));
- scale_vector(second, second, *(float *)(o + 0x44) * (1.0f / 32768.0f));
+ scale_vector(first, first, (1.0f - *(float *)(ship + 0x44)) * (1.0f / 32768.0f));
+ scale_vector(second, second, *(float *)(ship + 0x44) * (1.0f / 32768.0f));
  vec_copy_helper_b(combined, first, second);
  quaternion_to_rotation_basis(combined, matrix);
- multiply_matrix3x3(matrix, o + 0xc0, matrix);
+ multiply_matrix3x3(matrix, ship + 0xc0, matrix);
  matrix_mul_vec3(pos, &g_thruster_offset_a, matrix);
  matrix_mul_vec3(other, &g_thruster_offset_b, matrix);
- FastVecAdd(pos, pos, o + 0x10);
- FastVecAdd(other, other, o + 0x10);
+ FastVecAdd(pos, pos, ship + 0x10);
+ FastVecAdd(other, other, ship + 0x10);
  part_update_effect_records(object);
  effect.life = math_random_int_range(95, 127);
- if (*(short *)(o + 0xaa) == 0x128c)
+ if (*(short *)(ship + 0xaa) == 0x128c)
   effect.color = FastTweenColor(0xff0f0f, 0xff3f3f, math_random_float_range(0.0f, 1.0f));
- else if (*(short *)(o + 0xaa) == 0x128d)
+ else if (*(short *)(ship + 0xaa) == 0x128d)
   effect.color = FastTweenColor(0xf6fcf, 0x3fcfef, math_random_float_range(0.0f, 1.0f));
  else
   effect.color = FastTweenColor(0xf4fdf, 0x1f8fff, math_random_float_range(0.0f, 1.0f));
  effect.size = math_random_float_range(1.0f, 2.0f);
- if (*(short *)(o + 0xaa) == 0x128c) qcopy(effect.pos, pos);
- else qcopy(effect.pos, o + 0x10);
- if (*(short *)(o + 0xaa) != 0x128c) {
+ if (*(short *)(ship + 0xaa) == 0x128c) qcopy(effect.pos, pos);
+ else qcopy(effect.pos, ship + 0x10);
+ if (*(short *)(ship + 0xaa) != 0x128c) {
   effect.pos[0] += math_random_float_range(-0.25f, 0.25f);
   effect.pos[1] += math_random_float_range(-0.25f, 0.25f);
   effect.pos[2] += math_random_float_range(-0.25f, 0.25f);
@@ -76,15 +77,15 @@ void func_PAL_002E89D0(void *object)
  effect.type = 5;
  effect.flags = ((g_scene_playback_state.frame % 2 + 1) << 1) | 1;
  part_add_effect_record(object, &effect);
- if (*(short *)(o + 0xaa) == 0x128c) {
+ if (*(short *)(ship + 0xaa) == 0x128c) {
   qcopy(effect.pos, other);
   part_add_effect_record(object, &effect);
-  if (*(short *)(o + 0xaa) == 0x128c) {
+  if (*(short *)(ship + 0xaa) == 0x128c) {
    if (!(g_scene_playback_state.frame & 1)) {
    spark.life = math_random_int_range(127, 255);
    spark.color = 0x3fff;
    spark.size = math_random_float_range(0.0625f, 0.125f);
-   qcopy(spark.pos, o + 0x10);
+   qcopy(spark.pos, ship + 0x10);
    spark.pos[0] += math_random_float_range(-1.5f, 1.5f);
    spark.pos[1] += math_random_float_range(-1.5f, 1.5f);
    spark.pos[2] += math_random_float_range(-1.5f, 1.5f);
@@ -100,7 +101,7 @@ void func_PAL_002E89D0(void *object)
    part_add_effect_record(object, &spark);
    }
    color = (math_random_int_range(32, 80) << 24) | 0xff1f1f;
-   gfx_draw_billboard_quad(o + 0x10, 5, color, 1, 5.0f, 1.0f, math_random_angle());
+   gfx_draw_billboard_quad(ship + 0x10, 5, color, 1, 5.0f, 1.0f, math_random_angle());
   }
  }
 }

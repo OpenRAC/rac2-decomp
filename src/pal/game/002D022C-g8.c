@@ -31,9 +31,10 @@ extern Menu g_extras_tab_table_c;
 extern char g_extras_tab_table_a[], g_extras_tab_table_b[];
 extern char g_extras_unlock_entry_a[], g_extras_unlock_entry_b[], g_extras_unlock_entry_c[];
 extern void tab_menu_set_tables_pal(char *, char *, char *, char *);
-extern void func_PAL_00343690(char *, int);
+extern void tab_menu_switch_tab_pal(char *, int);
 
-int func_PAL_002D0290(void)
+/* Works out which extras are unlocked from the items owned and movies seen, then fills the Extras tab menu with its entries, or locked placeholders. */
+int menu_update_extras_unlocks_pal(void)
 {
     int i, j;
 
@@ -94,7 +95,7 @@ int func_PAL_002D0290(void)
             menu->entries[2].data = g_extras_unlock_entry_c;
         }
         tab_menu_set_tables_pal(g_resident_data_base + 0x3C210, g_extras_tab_table_a, g_extras_tab_table_b, (char *)&g_extras_tab_table_c);
-        func_PAL_00343690(g_resident_data_base + 0x3C210, 2);
+        tab_menu_switch_tab_pal(g_resident_data_base + 0x3C210, 2);
     }
     return 0;
 }

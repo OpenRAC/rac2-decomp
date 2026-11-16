@@ -19,7 +19,7 @@ extern void ref_L04_00418A58_10(char *);
 extern float ref_L04_00418A58_12(char *, char *, char *, char *, int, int);
 
 /* Retargets the hero's entry state (clears its cached pointer record, scales both position records by a quarter), then refreshes each of the 21 linked object slots. */
-void func_PAL_L04_0041D5F0(char *obj, char *aux) {
+void hoverbike_update_rider_entry_state_pal(char *obj, char *aux) {
     char *rec;
     char *e;
     int *slot;

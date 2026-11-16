@@ -45,6 +45,7 @@ extern s32 subtract_integer_with_clamp(s32);
 #define EI(p, n) (*(s32 *)((u8 *)(p) + (n)))
 extern u32 ref_US2_0030FAC0_00(s32, s32);
 
+/* Updates an ammo pickup: it falls and settles, waits for the hero to be in reach, then flies to the hero and adds the ammo (v2.00 copy). */
 void ammo_pickup_update_us2(u8 *object)
 {
     VecE start, next;
@@ -127,7 +128,7 @@ void ammo_pickup_update_us2(u8 *object)
         break;
     }
     case 2: {
-        f32 speed, f;
+        f32 speed, scale;
         ApproachValue((f32 *)(state+0x24),0.0f,0.006666667f);
         EF(object,0x18)+=EF(state,0x24);
         speed=FastVecLength(state+0x10);
@@ -136,22 +137,22 @@ void ammo_pickup_update_us2(u8 *object)
         if (EF(object,0x2C)==0.0f || FastVecLength(state+0x10)<speed) { moby_mark_spawned(object); break; }
         vec_scale_to_length(state+0x10,state+0x10,speed);
         FastVecAdd(object+0x10,object+0x10,state+0x10);
-        f=fast_vec_dist(object+0x10,g_hero_state.pickup_target)/(speed*30.0f+0.01f);
-        if (f>1.0f) f=1.0f;
-        else if (f<0.3f) f=0.3f;
-        ApproachValue((f32 *)(object+0x2C),EF(*(u8 **)(object+0x24),0x24)*f,EF(*(u8 **)(object+0x24),0x24)*0.1f);
+        scale=fast_vec_dist(object+0x10,g_hero_state.pickup_target)/(speed*30.0f+0.01f);
+        if (scale>1.0f) scale=1.0f;
+        else if (scale<0.3f) scale=0.3f;
+        ApproachValue((f32 *)(object+0x2C),EF(*(u8 **)(object+0x24),0x24)*scale,EF(*(u8 **)(object+0x24),0x24)*0.1f);
         break;
     }
     case 3: {
-        f32 f;
+        f32 wave;
         s32 item, phase, pulse;
         AmmoDef *entry, *defs;
         u8 *mapping;
         s32 *counts;
         phase = g_game_time[0]%60;
         alpha=(f32)object[0x23];
-        f=math_fast_sin_or_cos_a((f32)phase*0.104719676f-3.1415901f);
-        pulse=FloatToInt(f*5.0f+5.0f)+10;
+        wave=math_fast_sin_or_cos_a((f32)phase*0.104719676f-3.1415901f);
+        pulse=FloatToInt(wave*5.0f+5.0f)+10;
         ApproachValue(&alpha,(f32)pulse,4.0f);
         object[0x23]=FloatToInt(alpha);
         if (func_002A0558(object,g_hero_moby)>=0.0f) goto reactivate;

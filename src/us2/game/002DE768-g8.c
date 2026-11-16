@@ -72,13 +72,13 @@ extern char g_str_score_comma_format_2[] NOT_SDA;               /* "," */
 extern char g_str_score_plain_format_2[] NOT_SDA;               /* "." */
 extern void text_draw_right_aligned_medium(int, int, long, char *, int);
 
-int func_US2_002DE768(char *menu)
+int save_slot_list_draw_us2(char *menu)
 {
     char text[80];
     SaveRow *record;
     SaveData *context;
     int y, hours, minutes, score, extra, color, i;
-    int digits, rest, comma, language, offsetX, offsetY;
+    int digits, rest, comma, language, offset_x, offset_y;
     float place;
 
     if (g_save_menu_screen == 10)
@@ -114,7 +114,7 @@ int func_US2_002DE768(char *menu)
             text_draw_medium(g_save_slot_text_x + (long)(g_save_slot_icon_height + 6), y + g_save_slot_text_y_offset, color, text, -1);
 
             if (record->extra) {
-                int iconRight, extraX;
+                int icon_right, extra_x;
 
                 hud_draw_sprite(GetIconFrame(0xE99D, 4), g_save_slot_text_x + g_save_slot_extra_icon_offset, y + g_save_slot_text_y_offset, g_save_slot_icon_width,
                               g_save_slot_icon_height, 128);
@@ -122,9 +122,9 @@ int func_US2_002DE768(char *menu)
                 if (extra > 99)
                     extra = 99;
                 sprintf(text, g_str_save_slot_score_fmt, extra);
-                iconRight = g_save_slot_icon_height + 2;
-                extraX = g_save_slot_text_x + iconRight;
-                text_draw_medium((long)extraX + g_save_slot_extra_icon_offset, y + g_save_slot_text_y_offset, color, text, -1);
+                icon_right = g_save_slot_icon_height + 2;
+                extra_x = g_save_slot_text_x + icon_right;
+                text_draw_medium((long)extra_x + g_save_slot_extra_icon_offset, y + g_save_slot_text_y_offset, color, text, -1);
             }
 
             score = record->score;
@@ -134,11 +134,11 @@ int func_US2_002DE768(char *menu)
             sprintf(text, g_str_save_slot_score_fmt, score);
             hud_draw_sprite(GetIconFrame(0x7567, 0), g_save_slot_text_x + 4, y + g_save_slot_text_y_offset, g_save_slot_icon_width, g_save_slot_icon_height, 128);
             {
-                int iconRight, scoreX;
+                int icon_right, score_x;
 
-                iconRight = g_save_slot_icon_height + 6;
-                scoreX = g_save_slot_text_x + iconRight;
-                text_draw_right_aligned_medium((long)scoreX + g_score_x_offset_2, y + g_save_slot_text_y_offset, color, text, -1);
+                icon_right = g_save_slot_icon_height + 6;
+                score_x = g_save_slot_text_x + icon_right;
+                text_draw_right_aligned_medium((long)score_x + g_score_x_offset_2, y + g_save_slot_text_y_offset, color, text, -1);
             }
             digits = 1;
             for (rest = score; rest >= 10; rest /= 10)
@@ -146,11 +146,11 @@ int func_US2_002DE768(char *menu)
             language = g_language_settings[4];
             comma = language != 3 && language != 5 && language != 4;
             sprintf(text, comma ? g_str_score_comma_format_2 : g_str_score_plain_format_2);
-            offsetY = comma ? g_score_comma_offset_y : g_score_plain_offset_y;
-            offsetX = comma ? g_score_comma_offset_x : g_score_plain_offset_x;
+            offset_y = comma ? g_score_comma_offset_y : g_score_plain_offset_y;
+            offset_x = comma ? g_score_comma_offset_x : g_score_plain_offset_x;
             for (place = 3.0f; place < (float)digits; place += 3.0f) {
-                text_draw_right_aligned_medium(g_save_slot_text_x + offsetX + (long)(g_save_slot_icon_height + 6) + g_score_x_offset_2 - (int)(g_score_digit_spacing_2 * place),
-                              y + g_save_slot_text_y_offset + offsetY, color, text, -1);
+                text_draw_right_aligned_medium(g_save_slot_text_x + offset_x + (long)(g_save_slot_icon_height + 6) + g_score_x_offset_2 - (int)(g_score_digit_spacing_2 * place),
+                              y + g_save_slot_text_y_offset + offset_y, color, text, -1);
             }
             y += g_save_slot_line_height;
 

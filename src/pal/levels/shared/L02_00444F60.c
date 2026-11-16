@@ -13,7 +13,7 @@ extern int math_fast_helper_a(void *, float);
 extern float fast_vec_dist(void *, void *);
 extern float FastVecDot(void *, void *);
 extern float math_fast_angle_helper(float);
-extern void func_PAL_L00_00419448(char *, char *, char *);
+extern void part_spawn_explosion_burst_with_drift_pal(char *, char *, char *);
 extern int moby_transform_point_by_attachment(char *, char *, char *, char *);
 extern char g_scalar_transition_state[];
 typedef struct SpawnState {
@@ -48,20 +48,21 @@ typedef struct SpawnObject {
 } SpawnObject;
 extern Vector128 g_hero_l00_position;
 
-char *func_PAL_L02_00445660(float size, char *position, int trigger, int kind, int red, int green,
+/* Creates an explosion effect (moby class 5020) that can be attached to a parent. It sets up the sizes and timers and shakes the camera when close. (PAL copy used by the shared level code) */
+char *parented_explosion_spawn_l02_pal(float size, char *position, int trigger, int kind, int red, int green,
                         int blue, int enabled, int flags, int extra, int control, int extra2,
                         char *parent)
 {
     Vector128 direction[1], up[1], attachment[1], sphere[1], difference[1];
     char *object = CreateMoby(0x139c);
     ParentedSpawnState *state;
-    SpawnObject *m;
+    SpawnObject *self;
     if (object != 0) {
-        m = (SpawnObject *)object;
+        self = (SpawnObject *)object;
         *(unsigned char *)(object + 0x30) = 0xff;
         object[0x20] = 0;
         *(short *)(object + 0x32) = 0xff;
-        state = (ParentedSpawnState *)m->state;
+        state = (ParentedSpawnState *)self->state;
         qcopy(object + 0x10, position);
         *(float *)(object + 0x1c) = 1.0f;
         FastVecSub(direction, g_scalar_transition_state + 0x140, object + 0x10);
@@ -71,7 +72,7 @@ char *func_PAL_L02_00445660(float size, char *position, int trigger, int kind, i
         FastVecCross(object + 0xd0, object + 0xc0, up);
         vec_scale_to_length(object + 0xd0, object + 0xd0, 1.0f);
         FastVecCross(object + 0xe0, object + 0xd0, object + 0xc0);
-        m->forward[3] = m->right[3] = m->up[3] = 0.0f;
+        self->forward[3] = self->right[3] = self->up[3] = 0.0f;
         state->size = size;
         state->kind = kind;
         state->red = red;
@@ -113,7 +114,7 @@ char *func_PAL_L02_00445660(float size, char *position, int trigger, int kind, i
             state->delay = 0;
             state->flags = 0;
         }
-        func_PAL_L00_00419448(object, (char *)up, (char *)attachment);
+        part_spawn_explosion_burst_with_drift_pal(object, (char *)up, (char *)attachment);
     }
     return object;
 }

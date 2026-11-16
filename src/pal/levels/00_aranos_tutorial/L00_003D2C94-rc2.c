@@ -10,7 +10,8 @@ extern void ref_L00_003CF438_04(void *, void *, void *);
 extern void ref_L00_003CF438_05(void *);
 typedef struct { f32 first; f32 second; s32 flag; s32 pad; } StackArgs;
 
-void func_PAL_L00_003D3380(void *object) {
+/* Waits for a trigger, then pushes the object along its heading for about 100 frames and removes it (PAL: 50 Hz speed). */
+void triggered_push_update_pal(void *object) {
     s32 *state  = *(s32 **)((s8 *)object + 0x68);
     f32 angle ;
     f32 pi ;

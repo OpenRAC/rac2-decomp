@@ -100,7 +100,7 @@ extern void add_vectors(void *, void *, void *);
 extern float FastVecDot(void *, void *);
 extern float vec_length_xy(void *);
 extern float mat_fast_helper_a(float, float);
-extern void func_PAL_L04_00410678(void *, void *, int, int);
+extern void part_l04_spawn_burst_pal(void *, void *, int, int);
 extern Collision g_probe_hit;
 extern CollisionHit g_spark_origin_quad;
 extern void FastVecSub(void *, void *, void *);
@@ -114,23 +114,23 @@ extern float FastVecDot(void *, void *);
    marks the hit point; any other surface hit sets fBC to 1 and moves to the hit point.
    Moby and stopping surface hits fill response, hitNormal and hitDelta. The final
    position is written back to *position; the result is 0 unless a moby was hit. */
-Moby *func_PAL_L04_003FE0D8(Moby *projectile, ProjectileVars *vars, float *position,
-    float *direction, float *response, float *hitNormal, float *hitDelta)
+Moby *SweepProjectileCollision_pal(Moby *projectile, ProjectileVars *vars, float *position,
+    float *direction, float *response, float *hit_normal, float *hit_delta)
 {
     float pos[4];
     float unit[4];
     float step[4];
     CollisionProbe probe;
     float forward[4];
-    float hitPoint[4];
+    float hit_point[4];
     float target[4];
     Collision *collision;
-    Moby *hitMoby;
+    Moby *hit_moby;
     Moby *result = 0;
     float remaining;
     float stride = 0;
     float dot;
-    int lineHit;
+    int line_hit;
     int collided = 0;
 
     *(Q16_B0e5d8f83 *)pos = *(Q16_B0e5d8f83 *)position;
@@ -147,8 +147,8 @@ Moby *func_PAL_L04_003FE0D8(Moby *projectile, ProjectileVars *vars, float *posit
     probe.v[2] = 1;
 
     FastVecAdd(step, pos, direction);
-    lineHit = CollLine(pos, step, 0, vars->ignored, &probe);
-    if (lineHit) {
+    line_hit = CollLine(pos, step, 0, vars->ignored, &probe);
+    if (line_hit) {
         collided = 1;
         remaining = 0;
     } else {
@@ -178,17 +178,17 @@ Moby *func_PAL_L04_003FE0D8(Moby *projectile, ProjectileVars *vars, float *posit
             if (collision->moby == vars->ignored)
                 goto done;
             projectile->fBC = 2;
-            hitMoby = collision->moby;
-            if (hitMoby->oClass == 0xA1F)
+            hit_moby = collision->moby;
+            if (hit_moby->oClass == 0xA1F)
                 qcopy(pos, &projectile->position);
             else
-                qcopy(pos, &hitMoby->position);
-            FastVecSub(hitDelta, &g_spark_origin_quad.f30, &g_spark_origin_quad.f40);
-            vec_scale_to_length((char *)hitDelta, (char *)hitDelta, 1);
+                qcopy(pos, &hit_moby->position);
+            FastVecSub(hit_delta, &g_spark_origin_quad.f30, &g_spark_origin_quad.f40);
+            vec_scale_to_length((char *)hit_delta, (char *)hit_delta, 1);
             result = projectile;
             vec_fast_normalize(response, direction, &g_spark_origin_quad.normal);
             vec_scale_to_length((char *)response, (char *)response, 0.040000003f);
-            vec_scale_to_length((char *)hitNormal, (char *)&g_spark_origin_quad.normal, 1);
+            vec_scale_to_length((char *)hit_normal, (char *)&g_spark_origin_quad.normal, 1);
         } else if (collision->count > 0) {
             *(Q16_B0e5d8f83 *)forward = *(Q16_B0e5d8f83 *)direction;
             func_001290E0(&collision->hit.normal, &collision->hit.normal);
@@ -200,16 +200,16 @@ Moby *func_PAL_L04_003FE0D8(Moby *projectile, ProjectileVars *vars, float *posit
                 add_vectors(target, pos, direction);
                 projectile->rotation.f[2] = mat_fast_helper_a(direction[0], direction[1]);
                 projectile->rotation.f[1] = -mat_fast_helper_a(vec_length_xy(direction), direction[2]);
-                *(Q16_B0e5d8f83 *)hitPoint = collision->hit.point.q;
-                func_PAL_L04_00410678(hitPoint, direction, 4, 0);
+                *(Q16_B0e5d8f83 *)hit_point = collision->hit.point.q;
+                part_l04_spawn_burst_pal(hit_point, direction, 4, 0);
             } else {
                 projectile->fBC = 1;
                 qcopy(pos, &g_spark_origin_quad.point);
-                FastVecSub(hitDelta, &g_spark_origin_quad.f30, &g_spark_origin_quad.f40);
-                vec_scale_to_length((char *)hitDelta, (char *)hitDelta, 1);
+                FastVecSub(hit_delta, &g_spark_origin_quad.f30, &g_spark_origin_quad.f40);
+                vec_scale_to_length((char *)hit_delta, (char *)hit_delta, 1);
                 vec_fast_normalize(response, direction, &g_spark_origin_quad.normal);
                 vec_scale_to_length((char *)response, (char *)response, 0.040000003f);
-                vec_scale_to_length((char *)hitNormal, (char *)&g_spark_origin_quad.normal, 1);
+                vec_scale_to_length((char *)hit_normal, (char *)&g_spark_origin_quad.normal, 1);
             }
         }
     }
@@ -227,31 +227,32 @@ extern unsigned char *ref_L04_003FA5A8_01(void *, void *, void *, float *, float
 extern void ref_L04_003FA5A8_02(void *, void *, void *);
 extern void ref_L04_003FA5A8_03(void *, void *, void *, void *, void *, void *, void *);
 
-unsigned char *func_PAL_L04_003FE7B0(unsigned char *owner, float *pos,
+/* Spawns a homing rocket for an owner: picks a target if none is given, sets its speed, turning and lifetime values and starts it moving. */
+unsigned char *homing_rocket_spawn_pal(unsigned char *owner, float *pos,
     unsigned char *target, float x, float y, float z, float angle, float tilt)
 {
     float origin[4], matrix[16], position[4];
-    unsigned char *m = CreateMoby((void *)0xABD);
+    unsigned char *moby = CreateMoby((void *)0xABD);
     unsigned char *state;
 
-    if (m != 0) {
-        m[0x30] = 255;
-        *(short *)(m + 0x32) = 255;
-        m[0x31] = 1;
-        m[0x20] = 0;
-        *(float *)(m + 0xF8) = angle;
-        *(float *)(m + 0xF4) = tilt;
-        *(float *)(m + 0x2C) =
-            *(float *)(*(unsigned char **)(m + 0x24) + 0x24) * 3.0f;
-        state = *(unsigned char **)(m + 0x68);
+    if (moby != 0) {
+        moby[0x30] = 255;
+        *(short *)(moby + 0x32) = 255;
+        moby[0x31] = 1;
+        moby[0x20] = 0;
+        *(float *)(moby + 0xF8) = angle;
+        *(float *)(moby + 0xF4) = tilt;
+        *(float *)(moby + 0x2C) =
+            *(float *)(*(unsigned char **)(moby + 0x24) + 0x24) * 3.0f;
+        state = *(unsigned char **)(moby + 0x68);
         if (target == 0) {
             ref_L04_003FA5A8_00(matrix, 0.40000004f, angle, tilt);
             *(Q16_B0e5d8f83 *)position = *(Q16_B0e5d8f83 *)pos;
-            target = ref_L04_003FA5A8_01(m, position, matrix, &x, &y, &z,
+            target = ref_L04_003FA5A8_01(moby, position, matrix, &x, &y, &z,
                 0.349065899848938f, 30.0f);
         }
         *(void **)(state + 0x20) = owner;
-        qcopy(m + 0x10, pos);
+        qcopy(moby + 0x10, pos);
         *(int *)(state + 0x48) = 1;
         *(float *)(state + 0x44) = 1.0000001f;
         *(int *)(state + 0x34) = 0;
@@ -279,13 +280,13 @@ unsigned char *func_PAL_L04_003FE7B0(unsigned char *owner, float *pos,
         origin[2] = pos[2];
         ref_L04_003FA5A8_02(matrix, pos, origin);
         if (target != 0 && *(short *)(target + 0xAA) != 0xBBC) {
-            ref_L04_003FA5A8_03(m, state, origin, matrix,
+            ref_L04_003FA5A8_03(moby, state, origin, matrix,
                 matrix + 12, matrix + 4, matrix + 8);
         }
-        func_002A0F48(m);
-        *(float *)(m + 0x2C) += *(float *)(m + 0x2C);
+        func_002A0F48(moby);
+        *(float *)(moby + 0x2C) += *(float *)(moby + 0x2C);
     }
-    return m;
+    return moby;
 }
 
 
@@ -311,37 +312,38 @@ extern void moby_mark_spawned(void *);
 extern float StepAngleTowardTarget(void *, int, float, float);
 extern void snd_stop_voice(int);
 extern void gfx_add_draw_callback_second(void *, void *);
-extern void func_PAL_L04_003FFB98(unsigned char *, L04_C678Vars *);
-extern void func_PAL_L04_00400108(void);
+extern void moby_damage_in_firing_cone_pal(unsigned char *, L04_C678Vars *);
+extern void DrawDomeEffect_pal(void);
 extern unsigned char g_sound_state[];
 extern int g_shield_dome_sound_handle __attribute__((sda));
 
-void func_PAL_L04_00400888(unsigned char *m)
+/* Updates the shield dome: follows its owner, ages, fades out and frees itself when its timer ends, and otherwise damages what is inside. */
+void blast_effect_update_pal(unsigned char *moby)
 {
-    L04_C678Vars *v = *(L04_C678Vars **)(m + 0x68);
-    int s;
-    L04_C678Slot *e;
+    L04_C678Vars *vars = *(L04_C678Vars **)(moby + 0x68);
+    int sound_handle;
+    L04_C678Slot *slot;
 
-    *(L04_C678Quad *)(m + 0x10) = *(L04_C678Quad *)(v->owner + 0x10);
-    StepAngleTowardTarget(m + 0xF8, 0, *(float *)(v->owner + 0xF8), 0.031415932f);
-    v->age = v->age + 1.0f;
-    if (v->timer != 0 && math_fast_float_d(&v->timer) != 0) {
-        s = g_shield_dome_sound_handle;
-        if (s != -1) {
-            e = (L04_C678Slot *)(g_sound_state + s * 0x70);
-            if (e->owner == v->owner && e->active != 0) {
-                snd_stop_voice(s);
+    *(L04_C678Quad *)(moby + 0x10) = *(L04_C678Quad *)(vars->owner + 0x10);
+    StepAngleTowardTarget(moby + 0xF8, 0, *(float *)(vars->owner + 0xF8), 0.031415932f);
+    vars->age = vars->age + 1.0f;
+    if (vars->timer != 0 && math_fast_float_d(&vars->timer) != 0) {
+        sound_handle = g_shield_dome_sound_handle;
+        if (sound_handle != -1) {
+            slot = (L04_C678Slot *)(g_sound_state + sound_handle * 0x70);
+            if (slot->owner == vars->owner && slot->active != 0) {
+                snd_stop_voice(sound_handle);
             }
         }
         g_shield_dome_sound_handle = -1;
-        moby_mark_spawned(m);
+        moby_mark_spawned(moby);
         return;
     }
-    if (25.0f < v->age && v->timer == 0) {
-        v->timer = FloatToInt(12.833334f);
+    if (25.0f < vars->age && vars->timer == 0) {
+        vars->timer = FloatToInt(12.833334f);
     } else {
-        func_PAL_L04_003FFB98(m, v);
+        moby_damage_in_firing_cone_pal(moby, vars);
     }
-    gfx_add_draw_callback_second(func_PAL_L04_00400108, m);
+    gfx_add_draw_callback_second(DrawDomeEffect_pal, moby);
 }
 

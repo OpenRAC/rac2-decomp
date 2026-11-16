@@ -116,7 +116,7 @@ static __inline__ s32 sprite_y(void *handle, f32 y, f32 adjustment)
     return result;
 }
 
-s32 func_US2_L05_00420420(void) {
+s32 menu_draw_feltzin_mission_result_us2(void) {
     char buf[128];
     f32 center, fade, image_y;
     void *sprite;

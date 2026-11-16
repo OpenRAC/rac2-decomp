@@ -49,19 +49,20 @@ extern void moby_update_eased_node(char *, void *, int, float, float);
 #define S16(p, o) (*(s16 *)((p) + (o)))
 #define I32(p, o) (*(int *)((p) + (o)))
 #define F32(p, o) (*(float *)((p) + (o)))
-static inline float yawToHero(char *obj) {
+static inline float yaw_to_hero(char *obj) {
     char *hero = g_hero_state;
     return mat_fast_helper_a(F32(hero, 0xE0) - F32(obj, 0x10), F32(hero, 0xE4) - F32(obj, 0x14));
 }
-static inline void updateJoint(char *obj, char *joint, int index, float speed, float rate) {
+static inline void update_joint(char *obj, char *joint, int index, float speed, float rate) {
     moby_update_eased_node(obj, joint, index, speed, rate);
 }
 
+/* Per-frame update of the talking character (moby class 3678): it offers dialogue and rewards, then watches the hero with its head and eyes. (USA v2.00) */
 void talking_npc_update_us2(char *obj) {
     float target[4], pos[4], delta[4];
     char *data = *(char **)(obj + 0x68);
     char *player;
-    float speed, yaw, pitch, randomYaw;
+    float speed, yaw, pitch, random_yaw;
     int active;
     u64 status;
 
@@ -216,7 +217,7 @@ void talking_npc_update_us2(char *obj) {
         player = HERO_POS;
         active = 1;
         if (vec_distance_xy(obj + 0x10, player) < 8.0f
-            && FastDiffRots(F32(obj, 0xF8), yawToHero(obj)) < 1.57079649f) {
+            && FastDiffRots(F32(obj, 0xF8), yaw_to_hero(obj)) < 1.57079649f) {
             if (FastVecLength(player + 0x90) > 0.01f) {
                 S16(data, 0x110) = 120;
             } else {
@@ -228,9 +229,9 @@ void talking_npc_update_us2(char *obj) {
         }
         if (FastDecTimer(data + 0x112)) {
             S16(data, 0x112) = FloatToInt(math_random_float_range(180.0f, 300.0f));
-            randomYaw = FastAddRotations(F32(obj, 0xF8), math_random_float_range(-90.0f, 90.0f) * 0.017453294f);
+            random_yaw = FastAddRotations(F32(obj, 0xF8), math_random_float_range(-90.0f, 90.0f) * 0.017453294f);
             pitch = math_random_float_range(0.0f, 30.0f) * 0.017453294f;
-            vec_build_spherical_offset(data + 0x100, 6.0f, randomYaw, pitch);
+            vec_build_spherical_offset(data + 0x100, 6.0f, random_yaw, pitch);
             FastVecAdd(data + 0x100, data + 0x100, obj + 0x10);
         }
         if (S16(data, 0x110)) {
@@ -263,6 +264,6 @@ void talking_npc_update_us2(char *obj) {
     if (g_unlocked_item_flags) {
         F32(data, 0x70) = 2.75f;
     }
-    updateJoint(obj, data, 0, speed, 0.3f);
-    updateJoint(obj, data + 0x80, 1, speed, 0.3f);
+    update_joint(obj, data, 0, speed, 0.3f);
+    update_joint(obj, data + 0x80, 1, speed, 0.3f);
 }

@@ -60,61 +60,62 @@ extern float g_lightning_strand_step_length __attribute__((sda));
 extern float g_lightning_strand_jitter __attribute__((sda));
 extern Vector g_lightning_strand_points[][10];
 
-void func_PAL_L00_0040FF58(char *object)
+/* Updates four jagged lightning strands: when a strand timer ends it makes a new curve, otherwise it jitters the points a little. (PAL: 50 Hz timings) */
+void lightning_strands_update_pal(char *object)
 {
-    Vector p, delta, out, diffs[10];
+    Vector point, delta, out, diffs[10];
     char *state = *(char **)(object + 0x68);
-    int g, i, j, k, l, n;
+    int strand, i, j, k, l, n;
 
-    for (g = 0; g < 4; g++) {
-        if (FastDecTimer(&g_strand_timers[g])) {
-            g_strand_alphas[g] = 0;
-            g_strand_timers[g] = (((int)(g_strand_periods[g]) * 5 + 2) / 6);
-            qcopy(p, state + 0x30);
-            p[0] += math_random_float_range(-0.5f, 0.5f);
-            p[1] += math_random_float_range(-0.5f, 0.5f);
-            p[2] += math_random_float_range(-0.5f, 0.5f);
-            FastVecSub(delta, p, g_hero_aim_vector);
+    for (strand = 0; strand < 4; strand++) {
+        if (FastDecTimer(&g_strand_timers[strand])) {
+            g_strand_alphas[strand] = 0;
+            g_strand_timers[strand] = (((int)(g_strand_periods[strand]) * 5 + 2) / 6);
+            qcopy(point, state + 0x30);
+            point[0] += math_random_float_range(-0.5f, 0.5f);
+            point[1] += math_random_float_range(-0.5f, 0.5f);
+            point[2] += math_random_float_range(-0.5f, 0.5f);
+            FastVecSub(delta, point, g_hero_aim_vector);
             vec_scale_to_length(delta, delta, g_lightning_strand_step_length);
-            FastVecAdd(delta, p, delta);
+            FastVecAdd(delta, point, delta);
             for (i = 0; i < 10; i++) {
                 float t = i * 0.1f;
                 if (i == 9)
                     t = 1.0f;
-                math_l00_interpolate_cubic_vector(out, g_hero_aim_vector, p, state + 0x40, delta, t);
-                qcopy(g_lightning_strand_points[g][i], out);
+                math_l00_interpolate_cubic_vector(out, g_hero_aim_vector, point, state + 0x40, delta, t);
+                qcopy(g_lightning_strand_points[strand][i], out);
             }
         } else {
             for (j = 1; j < 10; j++) {
-                FastVecSub(diffs[j], g_lightning_strand_points[g][j], (&((Vector *)g_lightning_strand_points)[g * 10 + j])[-1]);
+                FastVecSub(diffs[j], g_lightning_strand_points[strand][j], (&((Vector *)g_lightning_strand_points)[strand * 10 + j])[-1]);
                 diffs[j][0] += math_random_signed_float_range(0.0f, 0.05f);
                 diffs[j][1] += math_random_signed_float_range(0.0f, 0.05f);
                 diffs[j][2] += math_random_signed_float_range(0.0f, 0.05f);
             }
-            qcopy(g_lightning_strand_points[g][0], g_hero_aim_vector);
+            qcopy(g_lightning_strand_points[strand][0], g_hero_aim_vector);
             for (k = 1; k < 10; k++)
-                FastVecAdd(g_lightning_strand_points[g][k], (&((Vector *)g_lightning_strand_points)[g * 10 + k])[-1], diffs[k]);
+                FastVecAdd(g_lightning_strand_points[strand][k], (&((Vector *)g_lightning_strand_points)[strand * 10 + k])[-1], diffs[k]);
         }
         for (l = 2; l < 9; l++) {
-            qcopy(p, g_lightning_strand_points[0][l]);
-            p[0] += math_random_signed_float_range(0.0f, g_lightning_strand_jitter);
-            p[1] += math_random_signed_float_range(0.0f, g_lightning_strand_jitter);
-            p[2] += math_random_signed_float_range(0.0f, g_lightning_strand_jitter);
-            qcopy(g_lightning_strand_points[1][l], p);
+            qcopy(point, g_lightning_strand_points[0][l]);
+            point[0] += math_random_signed_float_range(0.0f, g_lightning_strand_jitter);
+            point[1] += math_random_signed_float_range(0.0f, g_lightning_strand_jitter);
+            point[2] += math_random_signed_float_range(0.0f, g_lightning_strand_jitter);
+            qcopy(g_lightning_strand_points[1][l], point);
         }
         for (n = 2; n < 9; n++) {
-            qcopy(p, g_lightning_strand_points[0][n]);
-            p[0] += math_random_signed_float_range(0.0f, g_lightning_strand_jitter);
-            p[1] += math_random_signed_float_range(0.0f, g_lightning_strand_jitter);
-            p[2] += math_random_signed_float_range(0.0f, g_lightning_strand_jitter);
-            qcopy(g_lightning_strand_points[2][n], p);
+            qcopy(point, g_lightning_strand_points[0][n]);
+            point[0] += math_random_signed_float_range(0.0f, g_lightning_strand_jitter);
+            point[1] += math_random_signed_float_range(0.0f, g_lightning_strand_jitter);
+            point[2] += math_random_signed_float_range(0.0f, g_lightning_strand_jitter);
+            qcopy(g_lightning_strand_points[2][n], point);
         }
         for (i = 2; i < 9; i++) {
-            qcopy(p, g_lightning_strand_points[0][i]);
-            p[0] += math_random_signed_float_range(0.0f, g_lightning_strand_jitter);
-            p[1] += math_random_signed_float_range(0.0f, g_lightning_strand_jitter);
-            p[2] += math_random_signed_float_range(0.0f, g_lightning_strand_jitter);
-            qcopy(g_lightning_strand_points[3][i], p);
+            qcopy(point, g_lightning_strand_points[0][i]);
+            point[0] += math_random_signed_float_range(0.0f, g_lightning_strand_jitter);
+            point[1] += math_random_signed_float_range(0.0f, g_lightning_strand_jitter);
+            point[2] += math_random_signed_float_range(0.0f, g_lightning_strand_jitter);
+            qcopy(g_lightning_strand_points[3][i], point);
         }
     }
 }

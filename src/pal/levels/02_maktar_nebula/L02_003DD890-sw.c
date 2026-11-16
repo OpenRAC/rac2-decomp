@@ -24,7 +24,8 @@ extern float math_fast_float_g(float);
 extern void turret_spawn_beam_hits(char *);
 extern float ApproachValue(float *, float, float);
 
-void func_PAL_L02_003DD890(char *self) {
+/* Makes the walker move and shake the camera with its footsteps and impacts, based on its current walking mode. */
+void walker_boss_update_movement_shake_pal(char *self) {
     float before[4];
     float after[4];
     float delta[4];

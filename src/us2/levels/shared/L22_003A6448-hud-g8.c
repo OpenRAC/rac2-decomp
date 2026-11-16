@@ -14,11 +14,11 @@ extern int g_space_ship_max_health MACRO_ADDR;
 extern int g_screen_width MACRO_ADDR;
 typedef struct HudCounters {
     int unknown[2];
-    int rightCount;
-    int rightIcons;
+    int right_count;
+    int right_icons;
     int unknown10[2];
-    int leftCount;
-    int leftIcons;
+    int left_count;
+    int left_icons;
 } HudCounters;
 extern HudCounters g_ship_pickup_table NOT_SDA;
 extern char g_str_hud_count_format[] NOT_SDA;
@@ -114,8 +114,9 @@ static __inline__ int screen_coord(int mode, float value, float offset)
     return (int)scaled;
 }
 
+/* Draws the space combat HUD: the side gauges, health and shield bars, the two counters with their icons, and the hint box (USA v2.00 copy). */
 int DrawSpaceCombatHud_us2(void) {
-    char textBuffer[64];
+    char text_buffer[64];
     char *text;
     union { u64 d[2]; u32 w[4]; } colours;
     u8 box[32];
@@ -195,33 +196,33 @@ int DrawSpaceCombatHud_us2(void) {
         hud_draw_sprite_gradient(sprite, ref_L22_003A5018_26, screen_coord(g_hud_label_mode, (float)ref_L22_003A5018_27, 1.0f), ref_L22_003A5018_28, ref_L22_003A5018_29, ref_L22_003A5018_42);
     }
     one2 = 1;
-    sprintf(textBuffer, g_str_hud_count_format, g_ship_pickup_table.leftCount);
-    text = textBuffer;
+    sprintf(text_buffer, g_str_hud_count_format, g_ship_pickup_table.left_count);
+    text = text_buffer;
     {
     int value = label_y(obj, (float)ref_L22_003A5018_33, g_hud_l22_scale, 0.5f, 1);
     colour = ref_L22_003A5018_30;
     text_draw_centered_medium(ref_L22_003A5018_32, value, colour, text, func_001157AC(text));
     }
-    sprintf(text, g_str_hud_count_format, g_ship_pickup_table.rightCount);
+    sprintf(text, g_str_hud_count_format, g_ship_pickup_table.right_count);
     {
     int value = label_y((void *)colour, (float)ref_L22_003A5018_35, g_hud_l22_scale, 0.5f, 1);
     colour = ref_L22_003A5018_30;
     text_draw_centered_medium(ref_L22_003A5018_34, value, colour, text, func_001157AC(text));
     }
-    if (g_ship_pickup_table.leftIcons) {
+    if (g_ship_pickup_table.left_icons) {
         void *sprite = (void *)(u32)GetIconFrame(0xEAA5, one2);
         hud_draw_sprite_gradient(sprite, ref_L22_003A5018_36, screen_coord(g_hud_label_mode, (float)ref_L22_003A5018_37, 1.0f), ref_L22_003A5018_40, ref_L22_003A5018_41, ref_L22_003A5018_42);
     }
-    if (g_ship_pickup_table.leftIcons >= 2) {
+    if (g_ship_pickup_table.left_icons >= 2) {
         void *sprite = (void *)(u32)GetIconFrame(0xEAA5, 1);
         int x = ref_L22_003A5018_36 + ref_L22_003A5018_44;
         hud_draw_sprite_gradient(sprite, x, screen_coord(g_hud_label_mode, (float)ref_L22_003A5018_37, 1.0f), ref_L22_003A5018_40, ref_L22_003A5018_41, ref_L22_003A5018_42);
     }
-    if (g_ship_pickup_table.rightIcons) {
+    if (g_ship_pickup_table.right_icons) {
         void *sprite = (void *)(u32)GetIconFrame(0xEAA5, 1);
         hud_draw_sprite_gradient(sprite, ref_L22_003A5018_38, screen_coord(g_hud_label_mode, (float)ref_L22_003A5018_39, 1.0f), ref_L22_003A5018_40, ref_L22_003A5018_41, ref_L22_003A5018_42);
     }
-    if (g_ship_pickup_table.rightIcons >= 2) {
+    if (g_ship_pickup_table.right_icons >= 2) {
         void *sprite = (void *)(u32)GetIconFrame(0xEAA5, 1);
         int x = ref_L22_003A5018_38 - ref_L22_003A5018_44;
         hud_draw_sprite_gradient(sprite, x, screen_coord(g_hud_label_mode, (float)ref_L22_003A5018_39, 1.0f), ref_L22_003A5018_40, ref_L22_003A5018_41, ref_L22_003A5018_42);

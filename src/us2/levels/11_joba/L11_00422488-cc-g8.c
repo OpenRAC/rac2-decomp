@@ -41,7 +41,7 @@ extern void moby_mark_spawned(void *);
 extern void part_spawn_explosion_with_sparks(void *, void *, int, float, float);
 extern void moby_transform_joint_to_world(char *, int, char *);
 extern int moby_count_group_not_in_state(int, int);
-extern void func_US2_002A7AA8(void *, int, int);
+extern void SetDeathBits_us2(void *, int, int);
 
 struct family_27f9_object;
 extern int g_enemy_freeze_flag __attribute__((nosda));
@@ -60,7 +60,7 @@ typedef struct {
 extern Hero20C88 g_hero_state;
 extern char *g_path_l11_table[];
 extern char g_str_tribesman_debug[];
-extern int func_US2_L11_00426260(unsigned char *);
+extern int joba_rider_update_us2(unsigned char *);
 extern float vec_distance_xy(void *, void *);
 extern float mat_fast_helper_a(float, float);
 extern float fast_subtract_rotations(float, float);
@@ -133,6 +133,7 @@ static inline int rider_kind(char *moby)
 #define PLAY(p, animation, start, blend) \
     (BYTE((p), 0x43) != (animation) ? func_002A7470((p), (animation), (start), (blend)) : (void)0)
 
+/* Updates a Joba Tribesman. It follows its paths, turns to face the hero, picks fight or idle animations and removes itself when its health object says it is dead. (USA v2.00) */
 void tribesman_l11_update_us2(unsigned char *object)
 {
     Vector offset, side, point;
@@ -145,7 +146,7 @@ void tribesman_l11_update_us2(unsigned char *object)
     if (g_hero_state.mode == 0x6f && BYTE(object, 0x95) != 4) return;
     old_z = REAL(object, 0x18);
     state = POINTER(object, 0x68);
-    if (func_US2_L11_00426260(object) != 0) {
+    if (joba_rider_update_us2(object) != 0) {
         moby_mark_spawned(object);
         return;
     }
@@ -396,7 +397,7 @@ void tribesman_l11_update_us2(unsigned char *object)
         flags = moby_dispatch_action_by_kind(object, state + 0x60);
         if ((flags & 1) != 0) {
             --g_active_rider_count;
-            func_US2_002A7AA8(object, 0, 3);
+            SetDeathBits_us2(object, 0, 3);
             part_queue_moby_for_glow(object, 0, 0);
             return;
         }

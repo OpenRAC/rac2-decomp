@@ -11,14 +11,15 @@ extern int g_surface_height_tiles[] __attribute__((sda));
 extern int g_surface_box_count[] __attribute__((sda));
 extern int SampleSurfaceHeightMap(float *, float *, float, float, float);
 extern void RippleDisturb(int, int, int, float, float, float, float);
-extern int func_US2_0026F810(void);
+extern int actuator_calc_power_us2(void);
 
-void hero_check_under_falling_object_us2(char *self)
+/* Checks whether a falling object is above a surface-grid object and records on it whether it landed, sinking or was over water (v2.00 copy). */
+void hero_check_under_falling_object_us2(char *moby)
 {
     unsigned char *target = g_hit_result[0];
-    char *state = *(char **)(self + 0x68);
+    char *state = *(char **)(moby + 0x68);
     unsigned char *object;
-    unsigned char *obj_state;
+    unsigned char *object_vars;
     char *probe;
     float aux[4];
     float result[4];
@@ -34,23 +35,23 @@ void hero_check_under_falling_object_us2(char *self)
     if (mode == 2)
         object = *(unsigned char **)(state + 0x48);
     if (*(short *)(*(char **)(object + 0x24) + 0x46) == 18) {
-        obj_state = *(unsigned char **)(object + 0x68);
-        if (obj_state != 0) {
-            if (*(short *)(obj_state + 0x16) == 0) {
+        object_vars = *(unsigned char **)(object + 0x68);
+        if (object_vars != 0) {
+            if (*(short *)(object_vars + 0x16) == 0) {
                 *(int *)&result[0] = 0;
                 if (mode != 2)
-                    SampleSurfaceHeightMap(result, aux, *(float *)(self + 0x10), *(float *)(self + 0x14), *(float *)(self + 0x18));
+                    SampleSurfaceHeightMap(result, aux, *(float *)(moby + 0x10), *(float *)(moby + 0x14), *(float *)(moby + 0x18));
                 else
                     SampleSurfaceHeightMap(result, aux, *(float *)(state + 0x20), *(float *)(state + 0x24), *(float *)(state + 0x28));
                 probe = *(char **)(object + 0x68);
-                if (*(float *)(self + 0x18) > result[0] && *(float *)(probe + 0xC) == 0.0f) {
+                if (*(float *)(moby + 0x18) > result[0] && *(float *)(probe + 0xC) == 0.0f) {
                     *(unsigned char **)(state + 0x48) = object;
                     *(int *)(state + 0x38) = 2;
                     return;
                 }
-                if (obj_state[0x14] == 0) {
-                    RippleDisturb(g_surface_height_tiles[0], g_surface_box_count[0], 1, *(float *)(self + 0x10), *(float *)(self + 0x14), 0.5f, -0.03f);
-                    if (func_US2_0026F810() == 0) {
+                if (object_vars[0x14] == 0) {
+                    RippleDisturb(g_surface_height_tiles[0], g_surface_box_count[0], 1, *(float *)(moby + 0x10), *(float *)(moby + 0x14), 0.5f, -0.03f);
+                    if (actuator_calc_power_us2() == 0) {
                         object[0xBC] += 1;
                         if (object[0xBC] >= 25) {
                             context = g_music_state;

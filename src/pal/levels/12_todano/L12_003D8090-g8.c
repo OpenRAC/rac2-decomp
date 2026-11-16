@@ -22,58 +22,59 @@ typedef struct { char pad[0x78]; int color; } ActorA180;
 typedef int QuadA180 __attribute__((mode(TI)));
 typedef struct { float origin[4]; float position, velocity, angle; } StateA180;
 
-void func_PAL_L12_003D8090(char *actor) {
-    StateA180 *s = *(StateA180 **)(actor + 0x68);
+/* Updates a tether anchor platform: pulses its glow, then when the tether hits it, pushes it out along its axis like a spring until it settles. */
+void todano_tether_anchor_update(char *moby) {
+    StateA180 *anchor = *(StateA180 **)(moby + 0x68);
     QuadA180 vector;
     int color;
     float direction;
 
-    switch (*(u8 *)(actor + 0x20)) {
+    switch (*(u8 *)(moby + 0x20)) {
     case 0:
-        s->angle = math_random_angle();
-        qcopy(s, actor + 0x10);
-        moby_set_state(actor, 1, -1);
+        anchor->angle = math_random_angle();
+        qcopy(anchor, moby + 0x10);
+        moby_set_state(moby, 1, -1);
         break;
     case 1:
         vector = 0;
         ((float *)&vector)[1] = -1.25f;
         ((float *)&vector)[2] = -2.0f;
-        s->angle = FastAddRotations(s->angle, 0.062831864f);
-        color = FloatToInt((math_fast_sin_or_cos_b(s->angle) * 4.0f - 3.0f) * 208.0f);
+        anchor->angle = FastAddRotations(anchor->angle, 0.062831864f);
+        color = FloatToInt((math_fast_sin_or_cos_b(anchor->angle) * 4.0f - 3.0f) * 208.0f);
         if (color > 208) color = 208;
         else if (color < 80) color = 80;
         if (g_platform_actor_ref[0] != 0 && *(short *)(g_platform_actor_ref[0] + 0xAA) == 0xA61 && color >= 101) {
-            part_spawn_object_following_effect(&vector, actor, 0x20000012, 3.15e+05f, -1, 0, 0.0f, 12, 0, -1);
-            part_spawn_object_following_effect(&vector, actor, 0x20000012, 3.15e+05f, -1, 1, 0.0f, 12, 0, -1);
+            part_spawn_object_following_effect(&vector, moby, 0x20000012, 3.15e+05f, -1, 0, 0.0f, 12, 0, -1);
+            part_spawn_object_following_effect(&vector, moby, 0x20000012, 3.15e+05f, -1, 1, 0.0f, 12, 0, -1);
         }
-        ((ActorA180 *)actor)->color = color | 0x800C0C00;
-        if (flag_is_third_pending_set(actor)) {
-            PlayMobySound(0, 0, actor);
-            moby_set_state(actor, 2, -1);
+        ((ActorA180 *)moby)->color = color | 0x800C0C00;
+        if (flag_is_third_pending_set(moby)) {
+            PlayMobySound(0, 0, moby);
+            moby_set_state(moby, 2, -1);
         }
         break;
     case 2: {
         float force, spring;
-        ((ActorA180 *)actor)->color = 0xFF0CFF0C;
+        ((ActorA180 *)moby)->color = 0xFF0CFF0C;
         force = g_tether_anchor_force * 0.00040000002f;
-        spring = s->position * 0.00040000002f * g_tether_anchor_spring;
+        spring = anchor->position * 0.00040000002f * g_tether_anchor_spring;
         force += spring;
-        s->velocity += force;
-        s->position += s->velocity;
+        anchor->velocity += force;
+        anchor->position += anchor->velocity;
         g_tether_flag_state.value = -1;
-        if (s->position > g_tether_anchor_max_position) {
-            s->position = g_tether_anchor_max_position;
-            if (s->velocity > 0.020000001f) {
-                s->velocity *= g_tether_anchor_damping;
+        if (anchor->position > g_tether_anchor_max_position) {
+            anchor->position = g_tether_anchor_max_position;
+            if (anchor->velocity > 0.020000001f) {
+                anchor->velocity *= g_tether_anchor_damping;
             } else {
-                s->velocity = 0;
-                moby_set_state(actor, 3, -1);
+                anchor->velocity = 0;
+                moby_set_state(moby, 3, -1);
             }
         }
         direction = -1.0f;
-        if (*(short *)(actor + 0xAA) == 0xAAC) direction = 1.0f;
-        vec_scale_to_length(actor + 0x10, actor + 0xC0, direction * s->position);
-        FastVecAdd(actor + 0x10, actor + 0x10, s);
+        if (*(short *)(moby + 0xAA) == 0xAAC) direction = 1.0f;
+        vec_scale_to_length(moby + 0x10, moby + 0xC0, direction * anchor->position);
+        FastVecAdd(moby + 0x10, moby + 0x10, anchor);
         break;
     }
     }

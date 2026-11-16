@@ -14,66 +14,67 @@ extern s32 IsPointInCuboid(void *, s32);
 extern f32 IntToFloat(s32);
 extern s32 math_fast_float_d(void *);
 
-void func_PAL_L11_003FC670(u8 *arg0) {
-    f32 tmp[4];
+/* Slides the object one way while its trigger object is active, then back the other way when it stops, playing a sound while it moves (PAL: 37 frame slide). */
+void joba_sliding_door_update_pal(u8 *moby) {
+    f32 step[4];
     f32 duration;
-    u8 *s0 = arg0;
-    u8 *s1 = *(u8 **)(s0 + 0x68);
-    u8 *s2 = g_moby_l11_table[0] + *(s32 *)(s1 + 0x6C) * 256;
-    if (g_moby_group_flags[g_current_map_index[0]][*(u8 *)(s0 + 0xB0)] & 0x80) return;
-    if (*(u8 *)(s0 + 0x20) == 0) {
-        if (*(s16 *)(s0 + 0xAA) == 0xB71) *(u32 *)(s1 + 0x5C) |= 1;
-        *(u8 *)(s0 + 0x20) = 1;
+    u8 *self = moby;
+    u8 *vars = *(u8 **)(self + 0x68);
+    u8 *trigger = g_moby_l11_table[0] + *(s32 *)(vars + 0x6C) * 256;
+    if (g_moby_group_flags[g_current_map_index[0]][*(u8 *)(self + 0xB0)] & 0x80) return;
+    if (*(u8 *)(self + 0x20) == 0) {
+        if (*(s16 *)(self + 0xAA) == 0xB71) *(u32 *)(vars + 0x5C) |= 1;
+        *(u8 *)(self + 0x20) = 1;
     }
-    if (*(u8 *)(s0 + 0x20) == 1) {
-        if (IsPointInCuboid(s2 + 0x10, *(s32 *)(s1 + 0x60))) {
-            u8 *v;
-            *(u8 *)(s0 + 0x20) = 2;
-            v = g_sound_l11_slot_table + *(s32 *)(s1 + 0x70) * 0x70;
-            if (*(u8 **)(v + 0x88) != s0 || *(u8 *)(v + 0x74) == 0)
-                *(s32 *)(s1 + 0x70) = PlayMobySound(0, 4, s0);
-            *(s32 *)(s1 + 0x64) = 37;
+    if (*(u8 *)(self + 0x20) == 1) {
+        if (IsPointInCuboid(trigger + 0x10, *(s32 *)(vars + 0x60))) {
+            u8 *sound_slot;
+            *(u8 *)(self + 0x20) = 2;
+            sound_slot = g_sound_l11_slot_table + *(s32 *)(vars + 0x70) * 0x70;
+            if (*(u8 **)(sound_slot + 0x88) != self || *(u8 *)(sound_slot + 0x74) == 0)
+                *(s32 *)(vars + 0x70) = PlayMobySound(0, 4, self);
+            *(s32 *)(vars + 0x64) = 37;
         }
     }
-    if (*(u8 *)(s0 + 0x20) == 2) {
-        qcopy(tmp, s0 + 0xC0);
+    if (*(u8 *)(self + 0x20) == 2) {
+        qcopy(step, self + 0xC0);
         duration = IntToFloat(37);
-        duration = *(f32 *)(s1 + 0x68) / duration;
-        vec_scale_to_length(tmp, tmp, duration);
-        FastVecAdd(s0 + 0x10, s0 + 0x10, tmp);
-        if (math_fast_float_d(s1 + 0x64)) {
-            s32 sound = *(s32 *)(s1 + 0x70);
+        duration = *(f32 *)(vars + 0x68) / duration;
+        vec_scale_to_length(step, step, duration);
+        FastVecAdd(self + 0x10, self + 0x10, step);
+        if (math_fast_float_d(vars + 0x64)) {
+            s32 sound = *(s32 *)(vars + 0x70);
             if (sound != -1) {
-                u8 *v = g_sound_l11_slot_table + sound * 0x70;
-                if (*(u8 **)(v + 0x88) == s0 && *(u8 *)(v + 0x74)) snd_stop_voice(sound);
+                u8 *sound_slot = g_sound_l11_slot_table + sound * 0x70;
+                if (*(u8 **)(sound_slot + 0x88) == self && *(u8 *)(sound_slot + 0x74)) snd_stop_voice(sound);
             }
-            *(s32 *)(s1 + 0x70) = -1;
-            *(u8 *)(s0 + 0x20) = 3;
+            *(s32 *)(vars + 0x70) = -1;
+            *(u8 *)(self + 0x20) = 3;
         }
     }
-    if (*(u8 *)(s0 + 0x20) == 3) {
-        if (!IsPointInCuboid(s2 + 0x10, *(s32 *)(s1 + 0x60))) {
-            u8 *v = g_sound_l11_slot_table + *(s32 *)(s1 + 0x70) * 0x70;
-            if (*(u8 **)(v + 0x88) != s0 || *(u8 *)(v + 0x74) == 0)
-                *(s32 *)(s1 + 0x70) = PlayMobySound(0, 4, s0);
-            *(u8 *)(s0 + 0x20) = 4;
-            *(s32 *)(s1 + 0x64) = 37;
+    if (*(u8 *)(self + 0x20) == 3) {
+        if (!IsPointInCuboid(trigger + 0x10, *(s32 *)(vars + 0x60))) {
+            u8 *sound_slot = g_sound_l11_slot_table + *(s32 *)(vars + 0x70) * 0x70;
+            if (*(u8 **)(sound_slot + 0x88) != self || *(u8 *)(sound_slot + 0x74) == 0)
+                *(s32 *)(vars + 0x70) = PlayMobySound(0, 4, self);
+            *(u8 *)(self + 0x20) = 4;
+            *(s32 *)(vars + 0x64) = 37;
         }
     }
-    if (*(u8 *)(s0 + 0x20) == 4) {
-        qcopy(tmp, s0 + 0xC0);
+    if (*(u8 *)(self + 0x20) == 4) {
+        qcopy(step, self + 0xC0);
         duration = IntToFloat(37);
-        duration = *(f32 *)(s1 + 0x68) / duration;
-        vec_scale_to_length(tmp, tmp, duration);
-        FastVecSub((f32 *)(s0 + 0x10), (f32 *)(s0 + 0x10), tmp);
-        if (math_fast_float_d(s1 + 0x64)) {
-            s32 sound = *(s32 *)(s1 + 0x70);
+        duration = *(f32 *)(vars + 0x68) / duration;
+        vec_scale_to_length(step, step, duration);
+        FastVecSub((f32 *)(self + 0x10), (f32 *)(self + 0x10), step);
+        if (math_fast_float_d(vars + 0x64)) {
+            s32 sound = *(s32 *)(vars + 0x70);
             if (sound != -1) {
-                u8 *v = g_sound_l11_slot_table + sound * 0x70;
-                if (*(u8 **)(v + 0x88) == s0 && *(u8 *)(v + 0x74)) snd_stop_voice(sound);
+                u8 *sound_slot = g_sound_l11_slot_table + sound * 0x70;
+                if (*(u8 **)(sound_slot + 0x88) == self && *(u8 *)(sound_slot + 0x74)) snd_stop_voice(sound);
             }
-            *(s32 *)(s1 + 0x70) = -1;
-            *(u8 *)(s0 + 0x20) = 1;
+            *(s32 *)(vars + 0x70) = -1;
+            *(u8 *)(self + 0x20) = 1;
         }
     }
 }

@@ -29,7 +29,7 @@ extern unsigned int g_frame_counter __attribute__((section(".sdata")));
 extern int g_current_map_index __attribute__((section(".sdata")));
 extern int math_l00_return_argument_2(int);
 
-void func_PAL_L00_002CB6A8(void)
+void hero_apply_pending_change_pal(void)
 {
     int v;
     int alt;

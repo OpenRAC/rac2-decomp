@@ -7,6 +7,7 @@ extern int func_0029C920(int);
 extern int list_page_get_selected_record(int);
 extern void menu_start_action(int);
 
+/* Handles input for a menu page with a preview: confirms or closes, passes buttons on, and starts the action of the selected record on X (PAL). */
 int menu_page_update_with_preview_pal(void)
 {
     int result = 0;

@@ -90,20 +90,21 @@ extern float fade_reset_amount(void *);
 extern int fade_swap_field_28(void *, int);
 #define ITEM(n) (&D_00239BA0[D_00139568[n]])
 
-void func_PAL_0034F068(Hud *self)
+/* Refreshes the weapon quick-select HUD every frame: slot icons and colors, ammo and bolt counts, fades and the auto-hide timers (PAL: 50 Hz fade speed). */
+void update_item_status_hud_pal(Hud *self)
 {
     int x, y, color, rgb;
-    int selX, selY, selColor;
-    Ui3C *slotWidget;
-    Ui3C *slotAlphaWidget;
+    int sel_x, sel_y, sel_color;
+    Ui3C *slot_widget;
+    Ui3C *slot_alpha_widget;
     int selected, present;
     int previous, item, threshold, low;
     UIWord limit;
     Ui48 *widget;
     float scale, width;
-    Ui94 *a0;
+    Ui94 *first_ammo;
     Ui94 *bolt;
-    UIWord slotWord;
+    UIWord slot_word;
     self->alternateBolts = save_count_items_above_baseline();
     if (g_radial_menu_pages[0]) {
         int i;
@@ -144,10 +145,10 @@ void func_PAL_0034F068(Hud *self)
     }
     if (self->selectionMode) selected = self->selected;
     else selected = weapon_get_usable_selected();
-    selX = 0; selY = 0; selColor = 0;
+    sel_x = 0; sel_y = 0; sel_color = 0;
     present = ITEM(selected)->present;
-    shop_choose_item_colors(selected, &selX, &selY, &selColor);
-    object_get_fourth_field(&self->selectedIcon)->word = selColor;
+    shop_choose_item_colors(selected, &sel_x, &sel_y, &sel_color);
+    object_get_fourth_field(&self->selectedIcon)->word = sel_color;
     if (selected && present) {
         hud_set_widget_value_pair(&self->selectedIcon, ITEM(selected)->icon, 0);
         if (!self->selectionMode)
@@ -161,11 +162,11 @@ void func_PAL_0034F068(Hud *self)
     menu_set_first_field(self->meter, g_hero_state.value);
     {
         unsigned char state = g_hero_state.state;
-        if (!state) goto heroFallback;
+        if (!state) goto hero_fallback;
         if (state == 1)
         meter_set_value_start_timers(self->meter, 4);
         else {
-heroFallback:
+hero_fallback:
             meter_set_value_start_timers(self->meter, g_player_stats[0]);
         }
     }
@@ -186,7 +187,7 @@ heroFallback:
         }
     }
     anim_update_keyframe(&self->hideWidgets[5], 1);
-    slotWord = object_get_fourth_field(&self->slotColors[0])->word;
+    slot_word = object_get_fourth_field(&self->slotColors[0])->word;
     {
         int i;
         for (i = 0; i < 8; i++) {
@@ -210,35 +211,35 @@ heroFallback:
             }
             {
                 UIColor *c = object_get_fourth_field(&self->slotColors[previous]);
-                c->word = (c->word & 0xFFFFFF) | ((slotWord >> 24) << 24);
+                c->word = (c->word & 0xFFFFFF) | ((slot_word >> 24) << 24);
             }
         }
     }
     {
         UIColor *c = object_get_fourth_field(&self->background);
-        c->word = (c->word & 0xFFFFFF) | ((slotWord >> 24) << 24);
+        c->word = (c->word & 0xFFFFFF) | ((slot_word >> 24) << 24);
     }
     {
-        UIWord promptAlpha = object_get_fourth_field(&self->alphaSource)->word & 0xFF000000;
+        UIWord prompt_alpha = object_get_fourth_field(&self->alphaSource)->word & 0xFF000000;
         {
             UIColor *c = object_get_fourth_field(&self->prompt);
-            c->word = (c->word & 0xFFFFFF) | promptAlpha;
+            c->word = (c->word & 0xFFFFFF) | prompt_alpha;
         }
     }
     {
-        UIWord alpha, alpha2;
+        UIWord alpha, alpha_2;
         alpha = object_get_fourth_field(&self->ammoIcon)->word & 0xFF000000;
-        alpha2 = object_get_fourth_field(&self->selectedIcon)->word & 0xFF000000;
+        alpha_2 = object_get_fourth_field(&self->selectedIcon)->word & 0xFF000000;
         limit = object_get_fourth_field(self)->word & 0xFF000000;
         if (limit < alpha) alpha = limit;
         {
             UIColor *c = object_get_fourth_field(&self->ammoIcon);
-            if (limit < alpha2) alpha2 = limit;
+            if (limit < alpha_2) alpha_2 = limit;
             c->word = (c->word & 0xFFFFFF) | alpha;
         }
         {
             UIColor *c = object_get_fourth_field(&self->selectedIcon);
-            c->word = (c->word & 0xFFFFFF) | alpha2;
+            c->word = (c->word & 0xFFFFFF) | alpha_2;
         }
     }
     bolt = &self->boltWidgets[0];
@@ -246,8 +247,8 @@ heroFallback:
     anim_step_morph(&self->boltWidgets[1]);
     anim_step_morph(&self->boltWidgets[2]);
     anim_step_morph(&self->boltWidgets[3]);
-    if (self->ammoTimer && --self->ammoTimer == 0) { Ui94 *w1; if (!((w1 = &self->ammoWidgets[0])->state)) {
-        fade_start_backward(w1, 0);
+    if (self->ammoTimer && --self->ammoTimer == 0) { Ui94 *ammo_widget_0; if (!((ammo_widget_0 = &self->ammoWidgets[0])->state)) {
+        fade_start_backward(ammo_widget_0, 0);
         fade_start_backward(&self->ammoWidgets[1], 0);
         fade_start_backward(&self->ammoWidgets[2], 0);
         fade_start_direction(&self->middleWidget, -1);
@@ -317,34 +318,34 @@ heroFallback:
         } else {
             fade_swap_field_28(&self->warningWidgets[0], 0);
             fade_swap_field_28(&self->warningWidgets[1], 0);
-            a0 = &self->ammoWidgets[0];
-            if (!a0->state) {
-                Ui94 *a1 = &self->ammoWidgets[1];
-                a0->value = 1.0f;
-                a1->value = 1.0f;
-                a0->state = 1;
-                a1->state = 1;
-                anim_step_morph(a0);
-                anim_step_morph(a1);
+            first_ammo = &self->ammoWidgets[0];
+            if (!first_ammo->state) {
+                Ui94 *second_ammo = &self->ammoWidgets[1];
+                first_ammo->value = 1.0f;
+                second_ammo->value = 1.0f;
+                first_ammo->state = 1;
+                second_ammo->state = 1;
+                anim_step_morph(first_ammo);
+                anim_step_morph(second_ammo);
             }
         }
     }
     anim_update_keyframe(&self->warningWidgets[0], 1);
     anim_update_keyframe(&self->warningWidgets[1], 1);
-    {Ui94 *w3 = &self->ammoWidgets[0];
-    if (w3->state || !present) {
-        UIWord alpha, alpha2;
+    {Ui94 *ammo_widget_first = &self->ammoWidgets[0];
+    if (ammo_widget_first->state || !present) {
+        UIWord alpha, alpha_2;
         alpha = object_get_fourth_field(self)->word & 0xFF000000;
-        alpha2 = object_get_fourth_field(&self->ammoDigits[1])->word & 0xFF000000;
+        alpha_2 = object_get_fourth_field(&self->ammoDigits[1])->word & 0xFF000000;
         if (limit < alpha) alpha = limit;
         {
             UIColor *c = object_get_fourth_field(self);
-            if (limit < alpha2) alpha2 = limit;
+            if (limit < alpha_2) alpha_2 = limit;
             c->word = (c->word & 0xFFFFFF) | alpha;
         }
         {
             UIColor *c = object_get_fourth_field(&self->ammoDigits[1]);
-            c->word = (c->word & 0xFFFFFF) | alpha2;
+            c->word = (c->word & 0xFFFFFF) | alpha_2;
         }
     }}
     rgb = *(self->boltMode ? &self->alternateBolts : self->boltCount);

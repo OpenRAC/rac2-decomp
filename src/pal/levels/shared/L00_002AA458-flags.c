@@ -12,7 +12,7 @@ extern int math_random_int_below(int);
 extern int math_random_int_range(int, int);
 extern unsigned char *moby_spawn_scaled_effect(Vector *, float);
 extern unsigned char *part_spawn_drifting(Vector *, float *, int, float, float);
-extern unsigned char *func_PAL_002C0838(Vector *, Vector *, int, int);
+extern unsigned char *part_spawn_spark_2_pal(Vector *, Vector *, int, int);
 
 /* Emit ground dust and scattered debris around the resident player's position. */
 void part_emit_hero_dust_and_debris_pal(int dust, int debris, int model) {
@@ -52,7 +52,7 @@ void part_emit_hero_dust_and_debris_pal(int dust, int debris, int model) {
             position.f[2] = *(float *)(player + 0x330) - math_random_float_range(0.0f, 0.2f);
             kind = math_random_int_below(2);
             life = math_random_int_range(90, 120);
-            func_PAL_002C0838(&position, &velocity, kind, life);
+            part_spawn_spark_2_pal(&position, &velocity, kind, life);
         } while (remaining);
     }
 }

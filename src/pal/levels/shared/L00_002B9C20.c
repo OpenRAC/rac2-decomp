@@ -44,12 +44,12 @@ extern void hero_reset_speeds_and_vectors(void);
 extern void level_release_slot_list(void *p);
 extern void cancel_hero_item_animation_pal(void);
 extern void attachment_reset_all(void);
-extern s32 func_PAL_L00_002C4480(int a0, int a1);
+extern s32 hero_l00_set_action_pal(int a0, int a1);
 extern void anim_start_object_at_frame(int a0, int a1);
 extern void hero_l00_update_ground_contact(void);
 extern float fast_vec_dist(void *a, void *b);
-extern void func_PAL_L00_003E38E8(int a0, int a1);
-extern void func_PAL_L00_004071F0(void *a, int b);
+extern void tracked_moby_set_state_pal(int a0, int a1);
+extern void global_object_start_pal(void *a, int b);
 extern void cam_reset_default(void);
 extern void level_apply_nearest_env_preset(void *p);
 typedef struct {
@@ -93,7 +93,7 @@ void hero_reset_position_and_direction_pal(void *position, void *direction, int 
     attachment_reset_all();
 
     if (sound != -1)
-        func_PAL_L00_002C4480(sound, 2);
+        hero_l00_set_action_pal(sound, 2);
 
     anim_start_object_at_frame(*(u8 *)(res->object + 0x43), *(u8 *)(res->object + 0x41));
 
@@ -107,8 +107,8 @@ void hero_reset_position_and_direction_pal(void *position, void *direction, int 
     if (fast_vec_dist(g_hero_position, g_hero_position + 0x250) < 1.0f)
         qcopy(g_hero_position, g_hero_position + 0x250);
 
-    func_PAL_L00_003E38E8(0, 0);
-    func_PAL_L00_004071F0(0, 0);
+    tracked_moby_set_state_pal(0, 0);
+    global_object_start_pal(0, 0);
 
     if (refresh != 0)
         cam_reset_default();

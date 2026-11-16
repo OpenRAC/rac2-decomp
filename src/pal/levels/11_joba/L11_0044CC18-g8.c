@@ -31,7 +31,7 @@ typedef struct {
     u8 pad24[0x34 - 0x24];
     u8 f34;
     u8 pad35[0x1FC - 0x35];
-    u16 spawnTimer;         /* +0x1FC */
+    u16 spawn_timer;         /* +0x1FC */
 } JobState;
 
 struct JobObject {
@@ -40,7 +40,7 @@ struct JobObject {
 };
 
 /* Spawns the effect at a random point around the object's anchor when its timer runs out. */
-void func_PAL_L11_0044CC18(JobObject *object)
+void part_spawn_timed_effect_near_anchor_pal(JobObject *object)
 {
     float position[4], velocity[4], acceleration[4];
     JobState *state = object->state;
@@ -49,10 +49,10 @@ void func_PAL_L11_0044CC18(JobObject *object)
     int chance;
     u16 timer;
 
-    if (FastDecTimer(&state->spawnTimer)) {
+    if (FastDecTimer(&state->spawn_timer)) {
         timer = (g_timed_effect_duration * 5 + 2) / 6;
         chance = g_timed_effect_chance;
-        state->spawnTimer = timer;
+        state->spawn_timer = timer;
         if (!math_random_int_below(chance)) {
             qcopy(position, &g_hero_position);
             FastVecSub(velocity, position, arena_get_center_point(object));

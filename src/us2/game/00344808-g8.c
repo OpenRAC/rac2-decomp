@@ -9,10 +9,11 @@ extern void hud_set_widget_field_b(void *a0, int a1);
 extern unsigned char g_item_slot_to_record[];
 extern char g_weapon_table[];
 
+/* Draws the item menu: its frame, title, the item list, and the name of the selected item (USA v2.00 copy). */
 void item_menu_draw_us2(char *self)
 {
-    int r;
-    char *rec;
+    int slot;
+    char *record;
 
     if (*(int *)(self + 0x2C0) != 0) {
         gfx_draw_screen_element_stored(self);
@@ -20,9 +21,9 @@ void item_menu_draw_us2(char *self)
         gfx_draw_screen_element_stored(self + 0x98);
         text_label_draw(self + 0x1B0);
         menu_list_draw_entries(self + 0x2C8);
-        r = menu_list_get_selected_id(self + 0x2C8);
-        rec = g_weapon_table + g_item_slot_to_record[r] * 224;
-        hud_set_widget_field_b(self + 0x208, GetLocalizedString(*(int *)(rec + 8)));
+        slot = menu_list_get_selected_id(self + 0x2C8);
+        record = g_weapon_table + g_item_slot_to_record[slot] * 224;
+        hud_set_widget_field_b(self + 0x208, GetLocalizedString(*(int *)(record + 8)));
         text_label_draw(self + 0x208);
         text_label_draw(self + 0x260);
     }

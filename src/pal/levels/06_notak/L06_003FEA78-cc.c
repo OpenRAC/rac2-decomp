@@ -17,15 +17,15 @@ extern void FastVecSub(void *, void *, void *);
 extern void mat_combine_and_store(void *, void *, void *, void *);
 
 /* Raise and lower a platform while maintaining its motion sound. */
-void func_PAL_L06_003FEA78(char *moby)
+void rising_l06_platform_update_pal(char *moby)
 {
-    Vector oldPosition, oldRotation, delta;
+    Vector old_position, old_rotation, delta;
     char *state = *(char **)(moby + 0x68);
     int handle, phase, brightness;
     float time, wave;
     unsigned int selection;
-    qcopy(oldPosition, (moby + 0x10));
-    qcopy(oldRotation, (moby + 0xF0));
+    qcopy(old_position, (moby + 0x10));
+    qcopy(old_rotation, (moby + 0xF0));
     selection = *(unsigned char *)(moby + 0x20);
     switch (selection) {
     case 0:
@@ -129,6 +129,6 @@ done:
         int mid = (brightness << 16) | hi;
         *(int *)(moby + 0x78) = mid | brightness;
     }
-    FastVecSub(delta, moby + 0x10, oldPosition);
-    mat_combine_and_store(state + 0x20, delta, oldRotation, moby + 0xF0);
+    FastVecSub(delta, moby + 0x10, old_position);
+    mat_combine_and_store(state + 0x20, delta, old_rotation, moby + 0xF0);
 }

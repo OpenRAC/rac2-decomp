@@ -9,16 +9,16 @@ extern int CollLine(void *a, void *b, int c, void *d, int e);
 
 /* Copies the owner's position, asks the vector unit whether it is inside the
    field, and marks the object when it is. */
-void func_PAL_L00_0038CE98(void *obj)
+void projectile_l00_move_check_hit_2_pal(void *obj)
 {
-    void *s2 = obj;
-    void *s0 = (char *)s2 + 0x10;
-    void *s1 = *(void **)((char *)s2 + 0x68);
+    void *owner = obj;
+    void *target = (char *)owner + 0x10;
+    void *source = *(void **)((char *)owner + 0x68);
     TI128 local;
 
-    *(TI128 *)&local = *(TI128 *)s0;
-    FastVecAdd(s0, s0, s1);
-    vec_add_object_direction_scaled(s0, s1, g_projectile_speed * 4.0000003e-05f);
-    if (CollLine(&local, s0, 0x10, s2, 0) != 0)
-        *(unsigned char *)((char *)s2 + 0x20) = 8;
+    *(TI128 *)&local = *(TI128 *)target;
+    FastVecAdd(target, target, source);
+    vec_add_object_direction_scaled(target, source, g_projectile_speed * 4.0000003e-05f);
+    if (CollLine(&local, target, 0x10, owner, 0) != 0)
+        *(unsigned char *)((char *)owner + 0x20) = 8;
 }

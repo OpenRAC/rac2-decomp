@@ -18,7 +18,7 @@ extern void vec_build_spherical_offset(float *, float, float, float);
 extern char *part_spawn_trailing_spark(char *, char *, unsigned int, unsigned int, int, int, float);
 
 /* Move a directed effect, resolve contact and leave paired trail particles. */
-void func_PAL_L05_0042D570(char *object) {
+void projectile_l05_update_red_pal(char *object) {
     struct { Quad previous, point, step, velocity; } local;
     char *state = *(char **)(object + 0x68);
     char *particle;

@@ -40,7 +40,7 @@ extern float moby_get_anim_value(void *);
 extern float math_fast_sin_or_cos_b(float);
 extern float IntToFloat(int);
 extern f32 math_approach_target_with_direction_mode(void *, float, void *, float, float, float, int);
-extern void func_PAL_002A7E68(void *, int, int, int);
+extern void anim_start_blended_pal(void *, int, int, int);
 extern void moby_set_state(void *, int, int);
 extern int PlayMobySound(int, int, void *);
 extern void euler_rotation_basis(void *, void *);
@@ -51,11 +51,12 @@ extern void snd_stop_voice(int);
 extern int math_fast_float_d(void *);
 extern void STUB_printf(void *);
 
-void func_PAL_L04_003EBF44(char *o)
+/* Turns a ring of four linked objects a quarter turn at a time, pausing between turns and playing a sound while they turn (PAL build). */
+void rotating_object_group_update_pal(char *moby)
 {
-    Object8010 *obj = (Object8010 *)o;
-    Private8010 *p = *(Private8010 **)(o + 0x68);
-    unsigned char v[16] __attribute__((aligned(16))),
+    Object8010 *obj = (Object8010 *)moby;
+    Private8010 *vars = *(Private8010 **)(moby + 0x68);
+    unsigned char joint_pos[16] __attribute__((aligned(16))),
         old[16] __attribute__((aligned(16))),
         delta[16] __attribute__((aligned(16))),
         rot[16] __attribute__((aligned(16)));
@@ -66,115 +67,115 @@ void func_PAL_L04_003EBF44(char *o)
 
         obj->alpha = 128;
         obj->flags = 128;
-        p->initialHeight = initialZ;
-        p->stopFrame = 30;
-        p->selected = 2;
-        p->sound = -1;
-        p->targetAngle = FastAddRotations(obj->angle, 1.5707964897155762f);
-        if (p->direction)
-            p->targetAngle = fast_subtract_rotations(obj->angle, 1.5707964897155762f);
-        func_PAL_002A7E68(o, 1, 0, 0);
-        moby_set_state(o, 1, -1);
+        vars->initialHeight = initialZ;
+        vars->stopFrame = 30;
+        vars->selected = 2;
+        vars->sound = -1;
+        vars->targetAngle = FastAddRotations(obj->angle, 1.5707964897155762f);
+        if (vars->direction)
+            vars->targetAngle = fast_subtract_rotations(obj->angle, 1.5707964897155762f);
+        anim_start_blended_pal(moby, 1, 0, 0);
+        moby_set_state(moby, 1, -1);
         {
             int i;
             for (i = 0; i < 4; i++) {
-                char *m, *d;
-                m = g_moby_l04_pool + (p->ids[i] << 8);
-                d = *(char **)(m + 0x68);
-                *(int *)(d + 0x5C) |= 1;
-                ((Object8010 *)m)->alpha = 128;
-                ((Object8010 *)m)->flags = 128;
+                char *part, *part_vars;
+                part = g_moby_l04_pool + (vars->ids[i] << 8);
+                part_vars = *(char **)(part + 0x68);
+                *(int *)(part_vars + 0x5C) |= 1;
+                ((Object8010 *)part)->alpha = 128;
+                ((Object8010 *)part)->flags = 128;
             }
         }
-        if (p->direction)
-            func_PAL_002A7E68(o, 2, 0, 0);
+        if (vars->direction)
+            anim_start_blended_pal(moby, 2, 0, 0);
         obj->speed = 1.0f / 3;
         break;
     }
     case 1: {
-        char *m;
+        char *part;
         float frame;
 
-        frame = moby_get_anim_value(o);
-        m = (char *)g_sound_state + p->sound * 0x70;
-        if (*(char **)(m + 0x88) != o || !*(u8 *)(m + 0x74))
-            p->sound = PlayMobySound(0, 4, o);
-        if (!p->direction)
-            math_approach_target_with_direction_mode(o + 0xF8, p->targetAngle, &p->turnSpeed,
+        frame = moby_get_anim_value(moby);
+        part = (char *)g_sound_state + vars->sound * 0x70;
+        if (*(char **)(part + 0x88) != moby || !*(u8 *)(part + 0x74))
+            vars->sound = PlayMobySound(0, 4, moby);
+        if (!vars->direction)
+            math_approach_target_with_direction_mode(moby + 0xF8, vars->targetAngle, &vars->turnSpeed,
                          0.00027925274f, 0.00027925274f, 0.08377582f, 0);
         else
-            math_approach_target_with_direction_mode(o + 0xF8, p->targetAngle, &p->turnSpeed,
+            math_approach_target_with_direction_mode(moby + 0xF8, vars->targetAngle, &vars->turnSpeed,
                          0.00027925274f, 0.00027925274f, 0.08377582f, 0);
-        euler_rotation_basis(o + 0xC0, o + 0xF0);
+        euler_rotation_basis(moby + 0xC0, moby + 0xF0);
         {
             int i;
             for (i = 0; i < 4; i++) {
-                char *m, *d;
-                m = g_moby_l04_pool + (p->ids[i] << 8);
-                d = *(char **)(m + 0x68);
-                /* old is a separate stack vector; subsequent accesses use m. */
-                qcopy_nc(old, m + 0x10);
-                moby_transform_joint_to_world(o, i, v);
-                *(Quad8010 *)(m + 0x10) = *(Quad8010 *)v;
-                *(Quad8010 *)rot = *(Quad8010 *)(m + 0xF0);
-                if (p->direction)
-                    *(float *)(m + 0xF8) = FastAddRotations(obj->angle, 0.00872664712369442f);
-                FastVecSub(delta, m + 0x10, old);
-                if (p->selected == i && p->direction)
-                    mat_combine_and_store(d + 0x20, delta, rot, m + 0xF0);
+                char *part, *part_vars;
+                part = g_moby_l04_pool + (vars->ids[i] << 8);
+                part_vars = *(char **)(part + 0x68);
+                /* old is a separate stack vector; subsequent accesses use part. */
+                qcopy_nc(old, part + 0x10);
+                moby_transform_joint_to_world(moby, i, joint_pos);
+                *(Quad8010 *)(part + 0x10) = *(Quad8010 *)joint_pos;
+                *(Quad8010 *)rot = *(Quad8010 *)(part + 0xF0);
+                if (vars->direction)
+                    *(float *)(part + 0xF8) = FastAddRotations(obj->angle, 0.00872664712369442f);
+                FastVecSub(delta, part + 0x10, old);
+                if (vars->selected == i && vars->direction)
+                    mat_combine_and_store(part_vars + 0x20, delta, rot, part + 0xF0);
                 else
-                    mat_combine_and_store(d + 0x20, delta, rot, rot);
+                    mat_combine_and_store(part_vars + 0x20, delta, rot, rot);
             }
         }
-        if (frame == p->stopFrame) {
-            p->timer = ((s32)(p->duration) * 5 + 2) / 6;
+        if (frame == vars->stopFrame) {
+            vars->timer = ((s32)(vars->duration) * 5 + 2) / 6;
             obj->speed = 0;
-            p->stopFrame += 30;
-            if (p->stopFrame >= 120)
-                p->stopFrame = 0;
-            moby_set_state(o, 2, -1);
-            p->turnSpeed = 0;
+            vars->stopFrame += 30;
+            if (vars->stopFrame >= 120)
+                vars->stopFrame = 0;
+            moby_set_state(moby, 2, -1);
+            vars->turnSpeed = 0;
         }
         break;
     }
     case 2: {
         {
-            int i = p->sound;
-            char *m;
+            int i = vars->sound;
+            char *part;
 
             if (i != -1) {
-                m = (char *)g_sound_state + i * 0x70;
-                if (*(char **)(m + 0x88) == o && *(u8 *)(m + 0x74))
+                part = (char *)g_sound_state + i * 0x70;
+                if (*(char **)(part + 0x88) == moby && *(u8 *)(part + 0x74))
                     snd_stop_voice(i);
             }
-            p->sound = -1;
+            vars->sound = -1;
         }
-        if (math_fast_float_d(&p->timer)) {
-            if (++p->selected >= 4) {
+        if (math_fast_float_d(&vars->timer)) {
+            if (++vars->selected >= 4) {
                 STUB_printf(g_str_debug_stub_message);
-                p->selected = 0;
+                vars->selected = 0;
             }
-            p->targetAngle = FastAddRotations(obj->angle, 1.5707964897155762f);
-            if (p->direction)
-                p->targetAngle = fast_subtract_rotations(obj->angle, 1.5707964897155762f);
-            moby_set_state(o, 1, -1);
-            obj->z = p->initialHeight;
+            vars->targetAngle = FastAddRotations(obj->angle, 1.5707964897155762f);
+            if (vars->direction)
+                vars->targetAngle = fast_subtract_rotations(obj->angle, 1.5707964897155762f);
+            moby_set_state(moby, 1, -1);
+            obj->z = vars->initialHeight;
             obj->speed = 1.0f / 3;
-        } else if (p->timer < 21) {
-            obj->z = p->initialHeight;
-            obj->z += -math_fast_sin_or_cos_b(IntToFloat(p->timer) * 0.14842157f) * 0.25f;
+        } else if (vars->timer < 21) {
+            obj->z = vars->initialHeight;
+            obj->z += -math_fast_sin_or_cos_b(IntToFloat(vars->timer) * 0.14842157f) * 0.25f;
         }
         {
             int i;
             for (i = 0; i < 4; i++) {
-                char *m, *d;
-                m = g_moby_l04_pool + (p->ids[i] << 8);
-                d = *(char **)(m + 0x68);
-                qcopy_nc(old, m + 0x10);
-                moby_transform_joint_to_world(o, i, v);
-                *(Quad8010 *)(m + 0x10) = *(Quad8010 *)v;
-                FastVecSub(delta, m + 0x10, old);
-                mat_combine_and_store(d + 0x20, delta, m + 0xF0, m + 0xF0);
+                char *part, *part_vars;
+                part = g_moby_l04_pool + (vars->ids[i] << 8);
+                part_vars = *(char **)(part + 0x68);
+                qcopy_nc(old, part + 0x10);
+                moby_transform_joint_to_world(moby, i, joint_pos);
+                *(Quad8010 *)(part + 0x10) = *(Quad8010 *)joint_pos;
+                FastVecSub(delta, part + 0x10, old);
+                mat_combine_and_store(part_vars + 0x20, delta, part + 0xF0, part + 0xF0);
             }
         }
         break;

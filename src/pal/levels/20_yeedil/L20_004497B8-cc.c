@@ -70,19 +70,20 @@ typedef int TI128 __attribute__((mode(TI)));
 extern void yeedil_boss_compute_shot_launch_pal(char *, char *, char *, float *);
 extern char *yeedil_projectile_spawn_pal(char *, char *, char *, float, int, float);
 
-char *func_PAL_L20_004497B8(char *arg0) {
-    char *state = *(char **)(arg0 + 0x68);
-    TI128 a;
-    TI128 b;
-    float f;
-    float g;
-    int r;
+/* Fires a new projectile along the enemy aim with a random lifetime. (PAL: 50 Hz timings) */
+char *enemy_fire_projectile_along_aim_pal(char *moby) {
+    char *state = *(char **)(moby + 0x68);
+    TI128 position;
+    TI128 velocity;
+    float aim_angle;
+    float spread;
+    int frames;
 
-    f = 1.0471977f;
-    yeedil_boss_compute_shot_launch_pal(arg0, (char *)&a, (char *)&b, &f);
-    g = f;
-    r = (((int)(math_random_int_range(0x12C, 0x258)) * 5 + 2) / 6);
-    return yeedil_projectile_spawn_pal(arg0, (char *)&a, (char *)&b, g, r, (float)*(unsigned char *)(state + 0x36));
+    aim_angle = 1.0471977f;
+    yeedil_boss_compute_shot_launch_pal(moby, (char *)&position, (char *)&velocity, &aim_angle);
+    spread = aim_angle;
+    frames = (((int)(math_random_int_range(0x12C, 0x258)) * 5 + 2) / 6);
+    return yeedil_projectile_spawn_pal(moby, (char *)&position, (char *)&velocity, spread, frames, (float)*(unsigned char *)(state + 0x36));
 }
 
 /* func_L20_00443DF0 is defined in L20_00443DF0.c (it needs -frac2-hazard-labels). */

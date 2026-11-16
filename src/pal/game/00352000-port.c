@@ -20,37 +20,37 @@ extern volatile int g_paths_idle_result[] __attribute__((sda));
 /* Submit a ready movie frame on the active GS field, then restore EE interrupts.
  * The 0xD9168 and 0x1C81C0 values are offsets inside decoder allocations. */
 int vblankHandler_pal(void) {
-    int *h = (int *)sceDmaGetChan(2);
-    int *buf;
+    int *dma_chan = (int *)sceDmaGetChan(2);
+    int *frame;
 
     g_gs_field_parity[0] = g_widescreen_flag ? g_gs_field_parity[0] ^ 1 : (int)((GS_CSR >> 13) & 1);
     if (g_mpeg_field_wait_flag[0] != 0) {
         g_mpeg_vblank_count[0] = g_mpeg_vblank_count[0] + 1;
         g_paths_idle_result[0] = gfx_wait_paths_idle(1, 0);
         if (g_paths_idle_result[0] == 0) {
-            buf = (int *)mpeg_get_ring_buffer_position((volatile int *)(g_movie_player_state[0] + 0xD9168));
-            if (buf == 0) {
+            frame = (int *)mpeg_get_ring_buffer_position((volatile int *)(g_movie_player_state[0] + 0xD9168));
+            if (frame == 0) {
                 CpuSync();
                 CpuEnableInt();
                 return 0;
             }
-            if (g_gs_field_parity[0] == 0 && buf[0] == 2) {
-                int off;
+            if (g_gs_field_parity[0] == 0 && frame[0] == 2) {
+                int buffer_offset;
                 gfx_wait_paths_idle(0, 0);
-                off = (buf[1] << 14) + 0x1C81C0;
-                BuildFrameDmaChain((void *)(g_movie_buffer_base[0] + off), 0);
-                dma_reset_channel_state(h, (int)buf + 0x40);
-                buf[0] = 1;
+                buffer_offset = (frame[1] << 14) + 0x1C81C0;
+                BuildFrameDmaChain((void *)(g_movie_buffer_base[0] + buffer_offset), 0);
+                dma_reset_channel_state(dma_chan, (int)frame + 0x40);
+                frame[0] = 1;
             } else if (g_gs_field_parity[0] == 1) {
-                int st = buf[0];
-                if (st == 1) {
-                    int off;
+                int state = frame[0];
+                if (state == 1) {
+                    int buffer_offset;
                     gfx_wait_paths_idle(0, 0);
-                    off = (buf[1] << 14) + 0x1C81C0;
-                    BuildFrameDmaChain((void *)(g_movie_buffer_base[0] + off), 0);
-                    dma_reset_channel_state(h, (int)buf + 0x13880);
-                    buf[0] = 0;
-                    g_mpeg_video_frame_state[0] = st;
+                    buffer_offset = (frame[1] << 14) + 0x1C81C0;
+                    BuildFrameDmaChain((void *)(g_movie_buffer_base[0] + buffer_offset), 0);
+                    dma_reset_channel_state(dma_chan, (int)frame + 0x13880);
+                    frame[0] = 0;
+                    g_mpeg_video_frame_state[0] = state;
                 }
             }
         }

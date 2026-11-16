@@ -27,7 +27,7 @@ extern void water_advance_controller_state(u8 *);
 extern void water_update_ripple_patches(u8 *);
 extern void moby_set_flag_bit(void *, int);
 typedef struct {
-    int count, activeCount;
+    int count, active_count;
     u8 *tiles;
     u8 *parameters;
     u16 *masks;
@@ -40,6 +40,7 @@ typedef struct {
     void (*enqueue)(void (*)(void *), void *);
 } WaterContext;
 
+/* Runs a patch of water (moby class 4685). It builds and draws the water tiles and turns on the objects linked to it. (PAL) */
 void water_patch_update_pal(u8 *object)
 {
     WaterContext context;
@@ -62,7 +63,7 @@ void water_patch_update_pal(u8 *object)
         count = g_water_patch_slot_counts[*(int *)(state + 0x18)];
     count += *(int *)(state + 0x10);
     context.count = 6;
-    context.activeCount = count;
+    context.active_count = count;
     context.slotCount = &g_water_patch_slot_count;
     context.used = &g_water_patch_used;
     context.tiles = g_water_tile_grid;

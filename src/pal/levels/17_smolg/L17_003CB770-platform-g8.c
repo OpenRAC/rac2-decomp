@@ -42,7 +42,7 @@ extern float g_platform_speed_step __attribute__((sda));
 extern float g_platform_height NOT_SDA;
 extern float math_fast_sin_or_cos_b(float);
 extern u32 FastTweenColor(u32, u32, float);
-extern void func_PAL_L17_003CB570(void *, void *, void *, float);
+extern void platform_move_along_path_by_timer_pal(void *, void *, void *, float);
 extern int IsPointInCuboid(void *, int);
 extern int snd_play_from_class_bank(int, int, void *, int);
 extern int PlayMobySound(int, int, void *);
@@ -52,7 +52,7 @@ extern void mat_combine_and_store(void *, void *, void *, void *);
 
 /* Pulses the colour, then runs the two controllers: timed travel along each path, and for the
  * second one a hold, a fall and a landing. */
-void func_PAL_L17_003CB770(char *object)
+void update_two_trigger_path_platform_pal(char *object)
 {
     Vec old, delta, lower, upper;
     PlatformVars *state = (PlatformVars *)P(object, 0x68);
@@ -85,7 +85,7 @@ void func_PAL_L17_003CB770(char *object)
             state->timer += 1.0f;
             if (state->timer >= (g_platform_move_seconds_a * 300.0f + 2.0f) * 0.16666667f)
                 state->timer = (g_platform_move_seconds_a * 300.0f + 2.0f) * 0.16666667f;
-            func_PAL_L17_003CB570(object, path, &old, g_platform_move_seconds_a);
+            platform_move_along_path_by_timer_pal(object, path, &old, g_platform_move_seconds_a);
             if (state->timer >= (g_platform_move_seconds_a * 300.0f + 2.0f) * 0.16666667f) {
                 state->wait = 0;
                 state->state1 = 2;
@@ -105,7 +105,7 @@ void func_PAL_L17_003CB770(char *object)
             state->timer -= 1.0f;
             if (state->timer <= 0.0f)
                 state->timer = 0;
-            func_PAL_L17_003CB570(object, path, &old, g_platform_move_seconds_a);
+            platform_move_along_path_by_timer_pal(object, path, &old, g_platform_move_seconds_a);
             if (state->timer <= 0.0f)
                 state->state1 = 0;
             break;
@@ -138,7 +138,7 @@ void func_PAL_L17_003CB770(char *object)
             state->timer += 1.0f;
             if (state->timer >= (g_platform_move_seconds_b * 300.0f + 2.0f) * 0.16666667f)
                 state->timer = (g_platform_move_seconds_b * 300.0f + 2.0f) * 0.16666667f;
-            func_PAL_L17_003CB570(object, path, &old, g_platform_move_seconds_b);
+            platform_move_along_path_by_timer_pal(object, path, &old, g_platform_move_seconds_b);
             if (state->timer >= (g_platform_move_seconds_b * 300.0f + 2.0f) * 0.16666667f) {
                 state->wait = 0;
                 state->state2 = 2;

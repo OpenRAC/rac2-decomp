@@ -122,7 +122,7 @@ static __inline__ s32 sprite_y(void *handle, f32 y, f32 adjustment)
     return result;
 }
 
-s32 func_PAL_L10_00427628(void) {
+s32 menu_draw_mission_reward_pal(void) {
     char buf[128];
     f32 center, fade, image_y;
     void *sprite;

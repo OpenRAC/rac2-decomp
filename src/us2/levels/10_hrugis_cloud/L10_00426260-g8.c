@@ -41,16 +41,16 @@ extern int g_gate_frame_counter __attribute__((sda));
 extern int g_gate_search_flag __attribute__((sda));
 /* Retail reads this counter absolutely and writes the same address via $gp: D_L10_001B3550 through a second small-data declaration. */
 extern int D_L10_001B3550_1 __attribute__((sda));
-void func_US2_L10_00426260(char *self)
+void gate_course_update_us2(char *self)
 {
-    PathVector up, camera, fromHero, fromCamera;
+    PathVector up, camera, from_hero, from_camera;
     char *state = *(char **)(self + 0x68), *object, *hero;
     PathRoute *path;
     char **list;
-    float heroDot, cameraDot;
+    float hero_dot, camera_dot;
     int n, i;
-    unsigned short objectFlags;
-    char *oldFirst;
+    unsigned short object_flags;
+    char *old_first;
     up.q = 0;
     up.f[2] = 1;
     if (!g_mission_initialized) {
@@ -73,11 +73,11 @@ void func_US2_L10_00426260(char *self)
             if (path->point[g_gate_l10_path_index].f[3] != -1) {
             object = CreateMoby(0x114A);
             ((unsigned char *)object)[0x30] = 0xFF;
-            objectFlags = *(unsigned short *)(object + 0x34);
-            oldFirst = g_gate_first;
+            object_flags = *(unsigned short *)(object + 0x34);
+            old_first = g_gate_first;
             *(short *)(object + 0x32) = 0x1FF;
-            *(unsigned short *)(object + 0x34) = objectFlags | 0x100;
-            if (!oldFirst) g_gate_first = object; else g_gate_second = object;
+            *(unsigned short *)(object + 0x34) = object_flags | 0x100;
+            if (!old_first) g_gate_first = object; else g_gate_second = object;
             if (g_gate_l10_path_index == path->pointCount - 1) {
                 FastVecSub(object + 0xC0, &path->point[g_gate_l10_path_index - 1], &path->point[g_gate_l10_path_index]);
                 *(int *)(object + 0xCC) = 0;
@@ -111,13 +111,13 @@ void func_US2_L10_00426260(char *self)
     if (D_L10_001B3550_1 < 2) return;
     hero = g_moby_base_table + (*(int *)(state + 0x24) << 8);
     qcopy(&camera, &g_view_origin_vec);
-    FastVecSub(&fromCamera, &camera, g_gate_first + 0x10);
-    vec_scale_to_length(&fromCamera, &fromCamera, 1);
-    FastVecSub(&fromHero, hero + 0x10, g_gate_first + 0x10);
-    vec_scale_to_length(&fromHero, &fromHero, 1);
-    heroDot = FastVecDot(g_gate_first + 0xC0, &fromHero);
-    cameraDot = FastVecDot(g_gate_first + 0xC0, &fromCamera);
-    if ((heroDot != g_gate_best_player_dot && heroDot > 0) || (cameraDot != g_gate_best_view_dot && cameraDot > 0)) {
+    FastVecSub(&from_camera, &camera, g_gate_first + 0x10);
+    vec_scale_to_length(&from_camera, &from_camera, 1);
+    FastVecSub(&from_hero, hero + 0x10, g_gate_first + 0x10);
+    vec_scale_to_length(&from_hero, &from_hero, 1);
+    hero_dot = FastVecDot(g_gate_first + 0xC0, &from_hero);
+    camera_dot = FastVecDot(g_gate_first + 0xC0, &from_camera);
+    if ((hero_dot != g_gate_best_player_dot && hero_dot > 0) || (camera_dot != g_gate_best_view_dot && camera_dot > 0)) {
         path = g_gate_l10_path_table[*(int *)(state + 0x20)];
         if (fast_vec_dist(&camera, g_gate_first + 0x10) <= 1.25f || fast_vec_dist(hero + 0x10, g_gate_first + 0x10) <= 1.25f) {
             snd_play_from_class_bank(15, 0, self, 0xFBF); hero_add_clamped_stat(0.5f);
@@ -146,7 +146,7 @@ void func_US2_L10_00426260(char *self)
             g_gate_l10_path_index++;
         }
     }
-    g_gate_best_player_dot = heroDot; g_gate_best_view_dot = cameraDot;
+    g_gate_best_player_dot = hero_dot; g_gate_best_view_dot = camera_dot;
     if (g_gate_first) {
         effect_set_enabled(g_gate_first, 1);
         if (g_gate_second) effect_set_color(g_gate_first, 0x40008000);

@@ -25,7 +25,7 @@ extern int GetCollHitMaterial(void);
 extern int coll_test_point(void *, int, void *, float);
 extern int CollLine(void *, void *, int, void *, int);
 extern void moby_build_timer_vectors_from_matrix(void *,void *,void *,void *,float,float,float);
-extern void func_PAL_L05_003D50B0(void *,void *,void *);
+extern void feltzin_shot_hit_pal(void *,void *,void *);
 extern int snd_play_from_class_bank(int,int,void *,int);
 extern void moby_mark_spawned(void *);
 extern float math_random_angle(void);
@@ -33,7 +33,7 @@ extern void vec_build_spherical_offset(void *,float,float,float);
 extern char *part_spawn_trailing_spark(void *,void *,int,int,int,int,float);
 
 /* Steers the projectile, tests its lifetime and collisions, and emits its trail. */
-void func_PAL_L05_003D4868(char *obj)
+void feltzin_shot_update_pal(char *obj)
 {
     ProjectileVector old, temp, delta, velocity;
     char *data = *(char **)(obj+0x68);
@@ -90,7 +90,7 @@ void func_PAL_L05_003D4868(char *obj)
     goto emit;
 impact:
     {
-        func_PAL_L05_003D50B0(obj,data,obj+0x10);
+        feltzin_shot_hit_pal(obj,data,obj+0x10);
         snd_play_from_class_bank(7,0,obj,0xfbf);
         qcopy(obj+0x10,g_projectile_target_pos);
 destroy:

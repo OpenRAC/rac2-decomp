@@ -20,14 +20,14 @@ typedef struct L01_003C06E8_OBJ {
 
 /* func_PAL_L01_003C4530, the PAL copy of func_L01_003C06E8: the same C, with the stored time
  * scaled for 50 Hz. */
-void func_PAL_L01_003C4530(L01_003C06E8_OBJ *a0)
+void swamp_monster_start_claw_attack_pal(L01_003C06E8_OBJ *moby)
 {
-    L01_003C06E8_OBJ *p = a0;
-    L01_003C06E8_OWNED *q = p->f68;
-    int v = (func_001163B0() & 1) + 6;
-    int r = math_random_int_range(10, 15);
+    L01_003C06E8_OBJ *self = moby;
+    L01_003C06E8_OWNED *vars = self->f68;
+    int anim = (func_001163B0() & 1) + 6;
+    int blend_frames = math_random_int_range(10, 15);
 
-    moby_set_animation_and_speed(p, v, 0, r);
-    moby_set_state(p, 1, 3);
-    q->f2DC = (g_swamp_monster_attack_b_value * 5 + 2) / 6;
+    moby_set_animation_and_speed(self, anim, 0, blend_frames);
+    moby_set_state(self, 1, 3);
+    vars->f2DC = (g_swamp_monster_attack_b_value * 5 + 2) / 6;
 }

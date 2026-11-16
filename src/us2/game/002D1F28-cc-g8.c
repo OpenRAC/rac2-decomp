@@ -26,7 +26,7 @@ extern FlagTarget *g_eight_entry_flag_targets[];
 extern MenuFields g_eight_entry_menu_fields;
 extern int D_0026CD20[];
 
-int func_US2_002D1F28(void)
+int menu_handle_eight_entry_input_us2(void)
 {
     static void *cases[8] = {&&c0, &&c1, &&c2, &&c3, &&c4, &&c5, &&c6, &&c7};
     int flags = ((CallbackMenuState *)&g_pad_state)->flags;

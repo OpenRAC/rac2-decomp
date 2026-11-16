@@ -12,7 +12,7 @@ extern float FastAddRotations(float, float);
 extern int snd_play_from_class_bank(int, int, char *, int);
 extern void moby_mark_spawned(void *);
 extern void glow_l05_ring_draw_2(char *);
-extern int func_US2_00289840(int, int);
+extern int subtitle_request_voice_line_us2(int, int);
 extern char *GetLocalizedString(int);
 extern int level_l00_call_module_handler_with_arg_9_us2(int, int);
 
@@ -30,14 +30,14 @@ void UpdateHomingPickup_us2(char *object)
             vec_spring_to_target(object + 0x10, (void *)(g_homing_pickup_target + 0x10), state + 0x40,
                          0.008888889104127884f, 0.0033333334140479565f, 1.0666667222976685f);
         } else if (scale < 60.0f) {
-            float *p = *(float **)(object + 0x24);
-            float v = p[9] * 0.02222222276031971f * scale;
+            float *class_data = *(float **)(object + 0x24);
+            float scaled = class_data[9] * 0.02222222276031971f * scale;
 
-            *(float *)(object + 0x2C) = v;
+            *(float *)(object + 0x2C) = scaled;
             {
-                float cap = p[9] * 0.30000001192092896f;
+                float cap = class_data[9] * 0.30000001192092896f;
 
-                if (v < cap)
+                if (scaled < cap)
                     *(float *)(object + 0x2C) = cap;
             }
             vec_spring_to_target(object + 0x10, (void *)(g_homing_pickup_target + 0x10), state + 0x40,
@@ -46,7 +46,7 @@ void UpdateHomingPickup_us2(char *object)
         if (scale < 0.5f) {
             if (g_player_bolts.counter == 0) {
                 if (g_map_flag_word == 0 && g_current_map_index[0] == 0x19)
-                    func_US2_00289840(0xA3B, 0x92);
+                    subtitle_request_voice_line_us2(0xA3B, 0x92);
             } else {
                 level_l00_call_module_handler_with_arg_9_us2(GetLocalizedString(0x1282), -1);
             }

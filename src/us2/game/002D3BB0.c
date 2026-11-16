@@ -9,6 +9,7 @@ extern void func_0029C610(void);
 void SetupGifPaging(long);
 void DoGifPaging(void);
 
+/* Draws a menu screen through a helper between the paging calls. */
 int menu_draw_screen_via_helper_b_us2(void) {
     SetupGifPaging(0);
     func_0029C610();

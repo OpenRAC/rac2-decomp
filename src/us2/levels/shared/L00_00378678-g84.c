@@ -36,7 +36,8 @@ extern int text_measure_width_second_set(unsigned char *, int);
 extern void hud_draw_sprite_gradient(int, int, int, int, int, unsigned int *);
 extern int save_count_items_above_baseline(void);
 
-void func_US2_L00_003788C8(void) {
+/* Draws the upgrade name, its price and the player's current amount, each with a bolt icon, unless the upgrade is already owned. */
+void shop_draw_upgrade_price_lines_us2(void) {
     char first[256];
     char second[256];
     unsigned int colors[4];

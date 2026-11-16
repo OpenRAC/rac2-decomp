@@ -3,7 +3,7 @@
 
 typedef int TI128 __attribute__((mode(TI)));
 extern int math_fast_float_d(char *);
-extern void func_PAL_002B14F8(char *, char *, int, int, float);
+extern void value_set_and_smooth_pal(char *, char *, int, int, float);
 extern int g_cutscene_l07_active_flag;
 extern void RideMobyBelow(char *);
 extern void group_sync_counter(char *, char *);
@@ -13,36 +13,36 @@ extern void enemy_attach_turn_child_parts_pal(char *, char *, int, void *, float
 
 /* Clear the two resource slots, step the state counter, refresh the object's
    transform and hand the entity to the shared launcher. */
-void func_PAL_L07_003EB0C8(char *arg)
+void entity_finish_update_pal(char *moby)
 {
-    char *o;
-    char *src;
-    char *dst;
-    TI128 v;
-    unsigned short c;
-    float f;
+    char *vars;
+    char *src_pos;
+    char *dst_pos;
+    TI128 delta;
+    unsigned short frame_count;
+    float angle;
 
-    o = *(char **)(arg + 0x68);
-    math_fast_float_d(o + 0x344);
-    math_fast_float_d(o + 0x348);
-    c = *(unsigned short *)(arg + 0x96);
-    if (c <= 0xFFFE)
-        *(unsigned short *)(arg + 0x96) = c + 1;
-    group_sync_counter(arg, o + 0x340);
-    src = arg + 0x10;
-    dst = o + 0x2E0;
-    FastVecSub(&v, src, dst);
-    *(TI128 *)dst = *(TI128 *)src;
+    vars = *(char **)(moby + 0x68);
+    math_fast_float_d(vars + 0x344);
+    math_fast_float_d(vars + 0x348);
+    frame_count = *(unsigned short *)(moby + 0x96);
+    if (frame_count <= 0xFFFE)
+        *(unsigned short *)(moby + 0x96) = frame_count + 1;
+    group_sync_counter(moby, vars + 0x340);
+    src_pos = moby + 0x10;
+    dst_pos = vars + 0x2E0;
+    FastVecSub(&delta, src_pos, dst_pos);
+    *(TI128 *)dst_pos = *(TI128 *)src_pos;
     if (g_cutscene_l07_active_flag != 0)
-        RideMobyBelow(arg);
-    if (*(unsigned char *)(arg + 0x95) == 2) {
-        f = FastAddRotations(*(float *)(o + 0x2DC), 0.25132746f);
-        *(float *)(o + 0x2DC) = f;
-        enemy_attach_turn_child_parts_pal(arg, o + 0x330, 1, &v, f);
+        RideMobyBelow(moby);
+    if (*(unsigned char *)(moby + 0x95) == 2) {
+        angle = FastAddRotations(*(float *)(vars + 0x2DC), 0.25132746f);
+        *(float *)(vars + 0x2DC) = angle;
+        enemy_attach_turn_child_parts_pal(moby, vars + 0x330, 1, &delta, angle);
     } else {
-        f = FastAddRotations(*(float *)(o + 0x2DC), 0.013962637f);
-        *(float *)(o + 0x2DC) = f;
-        enemy_attach_turn_child_parts_pal(arg, o + 0x330, 0, &v, f);
+        angle = FastAddRotations(*(float *)(vars + 0x2DC), 0.013962637f);
+        *(float *)(vars + 0x2DC) = angle;
+        enemy_attach_turn_child_parts_pal(moby, vars + 0x330, 0, &delta, angle);
     }
-    func_PAL_002B14F8(arg, o + 0x230, 7, 1, 2.5f);
+    value_set_and_smooth_pal(moby, vars + 0x230, 7, 1, 2.5f);
 }

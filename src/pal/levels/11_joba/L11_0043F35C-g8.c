@@ -4,11 +4,11 @@
 #define F(p, o) (*(float *)((p) + (o)))
 #define I(p, o) (*(int *)((p) + (o)))
 #define B(p, o) (*(unsigned char *)((p) + (o)))
-extern void func_PAL_L11_0043F9A8(char *);
+extern void drone_setup_and_hits_pal(char *);
 extern void drone_count_frames_draw_glow(char *);
 extern void drone_kill_with_effects_pal(char *);
 extern void drone_aim_head_at_hero_pal(char *);
-extern u8 *func_PAL_L11_0045EBA0(void *, void *, void *, float);
+extern u8 *joba_spark_create_pal(void *, void *, void *, float);
 extern void PlacePointWithPolarJitterFlat(float, void *, void *, float, float);
 extern int projectile_compute_flight_time(float, float, float, float);
 extern char *arena_get_center_point(void *);
@@ -24,7 +24,7 @@ extern void euler_rotation_basis(void *, void *);
 extern int flag_set_first_pending(void *);
 extern int math_random_int_below(int);
 extern void moby_set_state(void *, int, int);
-extern void func_PAL_002A7E68(void *, int, int, int);
+extern void anim_start_blended_pal(void *, int, int, int);
 extern int moby_turn_toward_target_and_step_pal(void *, void *, float);
 extern int moby_step_at_own_position_pal(void *);
 extern float moby_get_anim_value(void *);
@@ -43,16 +43,16 @@ extern int g_l11_enemy_spin_random_range __attribute__((sda));
 extern char g_l11_enemy_local_offset[16] SDATA(D_L11_001B1360) __attribute__((sda));
 
 /* Updates the airborne tumble, approach, firing and reaction states. */
-void func_PAL_L11_0043F35C(char *object)
+void UpdateTumbleAndFireStates_pal(char *object)
 {
     float target[4], before[4], after[4], delta[4], velocity[16];
     char *state = *(char **)(object + 0x68);
     float distance, angle, height, frames, anim;
-    int result, fireTimer;
+    int result, fire_timer;
     char *pos;
     char *aim;
 
-    func_PAL_L11_0043F9A8(object);
+    drone_setup_and_hits_pal(object);
     qcopy(target, state + 0x50);
     pos = object + 0x10;
     distance = vec_distance_xy(pos, target);
@@ -97,7 +97,7 @@ void func_PAL_L11_0043F35C(char *object)
         aim = state + 0x2C0;
         if (result) {
             if (B(object, 0x43) != 7)
-                func_PAL_002A7E68(object, 7, 0, 2);
+                anim_start_blended_pal(object, 7, 0, 2);
             F(object, 0x48) = g_l11_enemy_state_value;
             qcopy(aim, pos);
             PlacePointWithPolarJitterFlat(g_l11_enemy_aim_jitter_radius, aim, target, 45, 2);
@@ -119,14 +119,14 @@ void func_PAL_L11_0043F35C(char *object)
         if (flag_set_first_pending(object)) {
             B(object, 0xBC) = 0;
             if (B(object, 0x43) != 3)
-                func_PAL_002A7E68(object, 3, 0, 2);
+                anim_start_blended_pal(object, 3, 0, 2);
             I(state, 0x2D0) = 0;
         } else {
             if (B(object, 0xBC) == 0) {
                 if (B(object, 0x60) & 2) {
                     B(object, 0xBC) = 1;
                     if (B(object, 0x43) != 4)
-                        func_PAL_002A7E68(object, 4, 0, 6);
+                        anim_start_blended_pal(object, 4, 0, 6);
                     F(object, 0x48) = I(state, 0x2E4);
                     goto attack;
                 }
@@ -139,12 +139,12 @@ attack:
             anim = moby_get_anim_value(object);
             drone_aim_head_at_hero_pal(object);
             PlayMobySound(2, 0, object);
-            if (!I(state, 0x2D0) && anim < (fireTimer = g_l11_enemy_fire_timer_init) + 1) {
-                I(state, 0x2D0) = ((s32)(fireTimer) * 5 + 2) / 6;
+            if (!I(state, 0x2D0) && anim < (fire_timer = g_l11_enemy_fire_timer_init) + 1) {
+                I(state, 0x2D0) = ((s32)(fire_timer) * 5 + 2) / 6;
                 moby_transform_joint_to_world(object, 1, before);
                 /* This helper writes the complete 64-byte joint matrix. */
                 moby_transform_joint_point(object, 1, velocity);
-                func_PAL_L11_0045EBA0(before, object, velocity, B(state, 0x34));
+                joba_spark_create_pal(before, object, velocity, B(state, 0x34));
                 snd_play_from_class_bank(0, 0, object, 0xD4B);
             }
             math_fast_float_d(state + 0x2D0);
@@ -152,7 +152,7 @@ attack:
                 B(object, 0xBC) = 3;
                 F(object, 0x48) = 1;
                 if (B(object, 0x43) != 5)
-                    func_PAL_002A7E68(object, 5, 0, 2);
+                    anim_start_blended_pal(object, 5, 0, 2);
             }
         }
         F(object, 0x18) -= g_l11_enemy_height_step;

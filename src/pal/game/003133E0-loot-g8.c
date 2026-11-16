@@ -15,7 +15,7 @@ void crate_drop_loot_pal(unsigned char *self)
     int item = *(short *)(data + 0xC6) == 0;
     int n, i;
 
-    if (*(short *)(self + 0xAA) == 0x1F5 || *(short *)(self + 0xAA) == 0x200)
+    if (*(short *)(self + 0xAA) == MOBY_CLASS_NANOTECH_CRATE || *(short *)(self + 0xAA) == MOBY_CLASS_PURPLE_NANOTECH_CRATE)
         item = 0;
     if (item) {
         if (g_nanotech_cooldown >= 21)
@@ -26,7 +26,7 @@ void crate_drop_loot_pal(unsigned char *self)
             i = 2;
         SetDeathBits_pal(self, 256, math_random_int_below(2) + i);
     } else {
-        if (*(short *)(self + 0xAA) != 0x1F5 && *(short *)(self + 0xAA) != 0x200) {
+        if (*(short *)(self + 0xAA) != MOBY_CLASS_NANOTECH_CRATE && *(short *)(self + 0xAA) != MOBY_CLASS_PURPLE_NANOTECH_CRATE) {
             {
                 int kind = data[0xCB];
                 if (kind == 4)

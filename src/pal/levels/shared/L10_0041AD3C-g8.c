@@ -5,14 +5,14 @@
 #include "common.h"
 typedef union { int q __attribute__((mode(TI))); float f[4]; } Vector;
 extern void *state_get_stored_pointer_value(void);
-extern void func_PAL_L05_0041C138(void *);
+extern void moby_init_spawned_effect_pal(void *);
 extern void level_append_object(int, int, int, int);
 extern void func_L05_00417730(void *);
 extern char *moby_get_motion_data(void *);
 extern void follower_set_state(void *, unsigned int);
 extern void follower_set_push_vector(void *, void *);
 extern int follower_has_reached_target(void *);
-extern void func_PAL_L05_0037E8E0(void *);
+extern void follower_l05_update_pal(void *);
 extern void moby_check_player_in_view_and_range(void *, int, float);
 extern float fast_vec_dist(void *, void *);
 extern void FastVecSub(void *, void *, void *);
@@ -22,7 +22,7 @@ extern int math_fast_float_d(void *);
 extern int snd_play_from_class_bank(int, int, void *, int);
 extern float math_random_float_range(float, float);
 extern int FloatToInt(float);
-extern void func_PAL_L05_0041C240(void *);
+extern void moby_spawn_tail_marks_pal(void *);
 extern int g_route_l05_flag __attribute__((sda));
 extern int g_gate_l05_path_index NOT_SDA;
 extern char *g_gate_l05_path_table[];
@@ -30,7 +30,8 @@ extern char *g_feltzin_target_mobys MACRO_ADDR;
 extern u8 g_sound_state[];
 
 typedef struct { u8 pad[0x11C]; int mode; } Movement;
-void func_PAL_L10_0041AD3C(u8 *actor)
+/* Updates the Feltzin gate follower: waits for its start, walks the gate path to the end, then reacts to nearby targets with sounds (PAL: 50 Hz timings). */
+void feltzin_follower_update_pal(u8 *actor)
 {
     Vector direction, facing;
     u8 *state = *(u8 **)(actor + 0x68);
@@ -41,7 +42,7 @@ void func_PAL_L10_0041AD3C(u8 *actor)
         actor[0x30] = 0xFF;
         if (state_get_stored_pointer_value() == 0)
             return;
-        func_PAL_L05_0041C138(actor);
+        moby_init_spawned_effect_pal(actor);
         if (*(int *)(state + 0x1B4) != 0)
             level_append_object((int)actor, (int)func_L05_00417730, 0, 0);
         g_route_l05_flag = 0;
@@ -73,7 +74,7 @@ void func_PAL_L10_0041AD3C(u8 *actor)
         }
     }
     if (g_route_l05_flag == 0) {
-        func_PAL_L05_0037E8E0(actor);
+        follower_l05_update_pal(actor);
         moby_check_player_in_view_and_range(actor, 1, 32.0f);
     }
     mode = *(int *)(movement + 0x110);
@@ -100,7 +101,7 @@ void func_PAL_L10_0041AD3C(u8 *actor)
                 }
             }
         }
-        func_PAL_L05_0041C240(actor);
+        moby_spawn_tail_marks_pal(actor);
     }
     {
         u8 *sound = g_sound_state + *(int *)(state + 0x1C0) * 0x70;

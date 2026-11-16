@@ -78,9 +78,10 @@ extern int UpdateSoundVoices_pal(void);
 extern int sceGsSyncV(int);
 extern int snd_resume_music_stream(void);
 
-void func_PAL_002E7B78(int mode)
+/* Sets up the scene for a screen transition: clears work areas, hides some objects, chooses the music and starting state, then waits until the scene is ready (PAL). */
+void level_transition_scene_start_pal(int mode)
 {
-    TransitionMoby *p;
+    TransitionMoby *pool_moby;
     TransitionMoby *object;
     int offset;
     int state;
@@ -109,11 +110,11 @@ void func_PAL_002E7B78(int mode)
     stub_empty_4();
 
     object = g_hero_moby_default.object;
-    p = g_moby_pool_end;
+    pool_moby = g_moby_pool_end;
     object->flags |= 1;
-    for (; p->status != 255; p++) {
-        if (!(p->status & 0x80) && (p->type == 0x4A || p->type == 0xCB))
-            p->flags |= 0x80;
+    for (; pool_moby->status != 255; pool_moby++) {
+        if (!(pool_moby->status & 0x80) && (pool_moby->type == 0x4A || pool_moby->type == 0xCB))
+            pool_moby->flags |= 0x80;
     }
 
     if (mode == 0) {

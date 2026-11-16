@@ -12,32 +12,33 @@ extern void prompt_bar_set_spacing (s32_F09f721e0, f32_F09f721e0);
 extern int screen_adjust_menu_update (s32_F09f721e0, s32_F09f721e0);
 extern s32_F09f721e0 g_screen_adjust_prompt_data __attribute__ ((sda));
 
+/* Sets up the screen adjust menu: prompt bar and texts. */
 void screen_adjust_menu_init_us2 (s32_F09f721e0 self, s32_F09f721e0 arg)
 {
-  s32_F09f721e0 q;
-  s32_F09f721e0 p;
-  s32_F09f721e0 a, b;
+  s32_F09f721e0 bar;
+  s32_F09f721e0 state;
+  s32_F09f721e0 text, second_text;
   *(s32_F09f721e0 *) self = arg;
   if (arg != 0)
     {
-      p = ui_return_second_arg (16, pool_alloc_cell (arg, arg));
-      *(s32_F09f721e0 *) (self + 732) = p;
-      ((s32_F09f721e0 *) p)[1] = 0;
-      ((s32_F09f721e0 *) p)[2] = 0;
-      ((s32_F09f721e0 *) p)[3] = 0;
-      ((s32_F09f721e0 *) p)[0] = 0;
+      state = ui_return_second_arg (16, pool_alloc_cell (arg, arg));
+      *(s32_F09f721e0 *) (self + 732) = state;
+      ((s32_F09f721e0 *) state)[1] = 0;
+      ((s32_F09f721e0 *) state)[2] = 0;
+      ((s32_F09f721e0 *) state)[3] = 0;
+      ((s32_F09f721e0 *) state)[0] = 0;
     }
-  q = self + 8;
+  bar = self + 8;
   ((f32_F09f721e0 *) *(s32_F09f721e0 *) (self + 732))[0] = 255.0f;
   ((f32_F09f721e0 *) *(s32_F09f721e0 *) (self + 732))[1] = 195.0f;
-  prompt_bar_init (q, arg, &g_screen_adjust_prompt_data);
-  a = GetLocalizedString (12411);
-  b = GetLocalizedString (11236);
-  prompt_bar_set_texts (q, a, b, GetLocalizedString (11237));
-  prompt_bar_set_text_offsets (q, 0.0f, -143.0f, 0.0f, 114.0f, 0.0f, 125.0f);
-  prompt_bar_set_spacing (q, 0.65f);
+  prompt_bar_init (bar, arg, &g_screen_adjust_prompt_data);
+  text = GetLocalizedString (12411);
+  second_text = GetLocalizedString (11236);
+  prompt_bar_set_texts (bar, text, second_text, GetLocalizedString (11237));
+  prompt_bar_set_text_offsets (bar, 0.0f, -143.0f, 0.0f, 114.0f, 0.0f, 125.0f);
+  prompt_bar_set_spacing (bar, 0.65f);
   *(s32_F09f721e0 *) (self + 728) = 0;
-  *(s32_F09f721e0 *) (q + 716) = 0;
+  *(s32_F09f721e0 *) (bar + 716) = 0;
   screen_adjust_menu_update (self, 0);
 }
 
@@ -54,6 +55,7 @@ extern void func_0033B030_3(u8_Ff4eb83c9 *, f32_Ff4eb83c9, f32_Ff4eb83c9, f32_Ff
 extern void func_0033B0A8_2(u8_Ff4eb83c9 *, f32_Ff4eb83c9);
 extern int UpdateFourOptionMenuInput(u8_Ff4eb83c9 *, s32_Ff4eb83c9);
 
+/* Sets up the four option menu: prompt bar, texts and widgets. */
 void four_option_menu_init_us2(u8_Ff4eb83c9 *self, void *arg) {
     u8_Ff4eb83c9 *sub;
     void *first, *second, *third;
@@ -94,6 +96,7 @@ extern void func_0033B030_1(u8_Fe9770b1e *, f32_Fe9770b1e, f32_Fe9770b1e, f32_Fe
 extern void func_0033B0A8_1(u8_Fe9770b1e *, f32_Fe9770b1e);
 extern int menu_handle_page_input_a(u8_Fe9770b1e *, s32_Fe9770b1e);
 
+/* Sets up the prompt menu: prompt bar and texts. */
 void prompt_menu_init_us2(u8_Fe9770b1e *self, void *arg) {
     u8_Fe9770b1e *sub;
     void *first, *second, *third;

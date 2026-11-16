@@ -12,6 +12,7 @@ extern CallbackState g_pause_menu_state;
 extern int g_menu_input_flags;
 extern int func_0029C8B0(int);
 
+/* Handles input for a menu page: confirms the selection, closes on a button press, otherwise passes the buttons on (PAL). */
 int menu_page_update_5_pal(void) {
     int result = 0;
     int flags = g_menu_input_flags;
@@ -43,6 +44,7 @@ extern void func_0029C8F0(void);
 extern void SetupGifPaging(long param_1);
 
 /* Implementation matching decompiled output */
+/* Draws a menu page between the start and end of screen drawing (PAL). */
 long menu_page_draw_8_pal(void)
 {
   SetupGifPaging(0);
@@ -54,6 +56,7 @@ long menu_page_draw_8_pal(void)
 extern void func_0029C960(void);
 
 /* Candidate function: FUN_002d3390 */
+/* Draws a menu page between the start and end of screen drawing (PAL). */
 unsigned long long menu_page_draw_9_pal(void)
 {
     SetupGifPaging(0);
@@ -68,6 +71,7 @@ extern void ref_L00_002D33C0_01(unsigned char *, float *);
 extern char *g_resident_data_base[] __attribute__((sda));
 extern char *g_resident_data_base[] __attribute__((sda));
 
+/* Initialises the preview helper object once the resident data is loaded (PAL). */
 int menu_preview_helper_init_pal(void)
 {
     if (g_resident_data_base[0] != 0)
@@ -83,6 +87,7 @@ typedef struct {
 extern MenuGameState g_pad_state;
 extern int func_0029C5D0(int);
 
+/* Handles input for a menu page: confirms or closes, otherwise passes the buttons and message on (PAL). */
 int menu_page_update_pass_message_pal(void)
 {
     int flags = g_pad_state.flags;
@@ -108,6 +113,7 @@ return_value:
 
 extern void func_0029C5A0(void);
 
+/* Draws a menu page between the start and end of screen drawing (PAL). */
 int menu_page_draw_10_pal(void) {
     SetupGifPaging(0);
     func_0029C5A0();

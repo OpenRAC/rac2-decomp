@@ -32,18 +32,18 @@ static inline int pulse_colour(int *vars) {
  * group member whose +0x31 flag is set; states 1 and 2 set it on the counted targets. The colour
  * comes from func_L01_0031BC68 with words 10 and 11 and a phase angle of D_L12_001B29C8 modulo
  * the period in word 8. */
-void func_PAL_L12_004294CC(u8 *obj) {
-    int *vars = *(int **)(obj + 0x68);
+void pulsing_l12_light_group_update_pal(u8 *moby) {
+    int *vars = *(int **)(moby + 0x68);
     int i;
-    int n;
+    int target_count;
     int first;
     int second;
     s16 *ids;
     u8 *member;
 
-    switch (obj[0x20]) {
+    switch (moby[0x20]) {
     case 0:
-        n = 0;
+        target_count = 0;
         first = vars[3] << 24; first |= vars[2] << 16; first |= vars[1] << 8; first |= vars[0];
         vars[10] = first;
         second = vars[7] << 24; second |= vars[6] << 16; second |= vars[5] << 8; second |= vars[4];
@@ -52,22 +52,22 @@ void func_PAL_L12_004294CC(u8 *obj) {
         if (vars[12] != -1) {
             vars[9] = 1;
             do {
-                if (++n >= 4) break;
-                if (vars[12 + n] == -1) break;
+                if (++target_count >= 4) break;
+                if (vars[12 + target_count] == -1) break;
                 vars[9]++;
             } while (1);
         }
         if (vars[9]) {
-            STUB_printf(g_str_pulsing_light_debug_a, *(s16 *)(obj + 0xB2));
-            func_L12_0031E1D0(obj, 2, -1);
+            STUB_printf(g_str_pulsing_light_debug_a, *(s16 *)(moby + 0xB2));
+            func_L12_0031E1D0(moby, 2, -1);
         } else {
-            STUB_printf(g_str_pulsing_light_debug_b, *(s16 *)(obj + 0xB2));
-            func_L12_0031E1D0(obj, 1, -1);
+            STUB_printf(g_str_pulsing_light_debug_b, *(s16 *)(moby + 0xB2));
+            func_L12_0031E1D0(moby, 1, -1);
         }
         break;
     case 1:
-        if (moby_count_group_not_in_state(obj[0x21], -1) >= 2) {
-            ids = g_moby_l12_group_lists[obj[0x21]];
+        if (moby_count_group_not_in_state(moby[0x21], -1) >= 2) {
+            ids = g_moby_l12_group_lists[moby[0x21]];
             do {
                 member = g_moby_list_start[0] + ((*(u16 *)ids & 0x7FFF) << 8);
                 if (member[0x31]) {

@@ -48,7 +48,7 @@ extern float g_burst_scale __attribute__((sda));
 extern float g_burst_speed __attribute__((sda));
 
 /* Emit two groups of particles around the object, rotating each emission direction. */
-void func_PAL_L00_00415690(char *object, int mode)
+void particle_burst_around_object_pal(char *object, int mode)
 {
     float rotation[4], direction[4], basis[4], position[4], point[4], velocity[4], offset[4];
     float angle, jitter, scale, speed, spread;

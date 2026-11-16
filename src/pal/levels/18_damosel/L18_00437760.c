@@ -15,14 +15,15 @@ extern u8 *g_moby_l18_table[] __attribute__((sda));
 extern s32 g_max_l18_group_index[] __attribute__((sda));
 extern u8 g_data_block_base[];
 
-s32 extermibot_is_cooldown_finished_pal(s32 a0) {
-    u8 *v1 = (u8 *)*(s32 *)(a0 + 0x68);
-    s32 r = 0;
-    if (*(s16 *)(v1 + 0x7FC) != 0) {
-        if (*(s16 *)(v1 + 0x804) < 0x7E) goto done;
+/* Returns 1 unless the flag is set and its counter is still below 0x7E (PAL: 50 Hz timings). */
+s32 extermibot_is_cooldown_finished_pal(s32 moby) {
+    u8 *vars = (u8 *)*(s32 *)(moby + 0x68);
+    s32 result = 0;
+    if (*(s16 *)(vars + 0x7FC) != 0) {
+        if (*(s16 *)(vars + 0x804) < 0x7E) goto done;
     }
-    r = 1;
+    result = 1;
 done:
-    return r;
+    return result;
 }
 

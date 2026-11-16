@@ -12,18 +12,18 @@ typedef struct {
     u8 pad00[0x50];
     u8 motion[0x40];             
     u8 pad90[0x98 - 0x90];
-    float verticalSpeed;         
+    float vertical_speed;         
     u8 pad9C[0xA4 - 0x9C];
     int path;                    
     u8 padA8[0xAC - 0xA8];
-    s16 atLast;                  
+    s16 at_last;                  
     u8 padAE[0xB4 - 0xAE];
     int sound;                   
     u8 padB8[0xC8 - 0xB8];
     int point;                   
-    int needsTrigger;            
+    int needs_trigger;            
     int f0D0;                    
-    int hasRecord;               
+    int has_record;               
     float *record;               
     u8 padDC[0xE0 - 0xDC];
     Vec velocity;                
@@ -42,8 +42,8 @@ typedef struct {
     s16 f212;                    
     s16 f214;                    
     u8 pad0216[0x33C - 0x216];
-    Moby *groundMoby;            
-    int groundedFrames;          
+    Moby *ground_moby;            
+    int grounded_frames;          
     u8 pad0344[0x2290 - 0x344];
     Moby *moby;                  
 } Hero;
@@ -103,12 +103,12 @@ void UpdateSmolgPathLift_us2(Moby *moby)
     case 0:
         /* Waiting at one end. */
         vars->sound = -1;
-        if (g_hero_state.groundMoby == moby && g_hero_state.groundedFrames) {
-            if (vars->needsTrigger && !flag_is_third_pending_set(moby))
+        if (g_hero_state.ground_moby == moby && g_hero_state.grounded_frames) {
+            if (vars->needs_trigger && !flag_is_third_pending_set(moby))
                 goto finish;
             TryClaimNotice(8, 0x12EC, 1);
             if (g_pad_held_flags[0] & 0x10) {
-                if (!vars->atLast) {
+                if (!vars->at_last) {
                     moby_set_state(moby, 4, -1);
                     velocity = &vars->velocity;
                     vars->point = 1;
@@ -125,12 +125,12 @@ void UpdateSmolgPathLift_us2(Moby *moby)
                 break;
             }
         }
-        if (moby->position.f[2] + 10.0f < g_hero_state.moby->position.f[2] && vars->atLast) {
+        if (moby->position.f[2] + 10.0f < g_hero_state.moby->position.f[2] && vars->at_last) {
             qcopy(&moby->position, &path->points[0]);
-            vars->atLast = 0;
-        } else if (g_hero_state.moby->position.f[2] < moby->position.f[2] - 10.0f && !vars->atLast) {
+            vars->at_last = 0;
+        } else if (g_hero_state.moby->position.f[2] < moby->position.f[2] - 10.0f && !vars->at_last) {
             qcopy(&moby->position, &path->points[path->count - 1]);
-            vars->atLast = 1;
+            vars->at_last = 1;
             moby->position.f[2] += 0.2f;
         }
         break;
@@ -156,7 +156,7 @@ void UpdateSmolgPathLift_us2(Moby *moby)
     case 1:
         /* Travelling to the last point. */
         if (flag_set_first_pending(moby))
-            vars->verticalSpeed = 0.0f;
+            vars->vertical_speed = 0.0f;
         {
             SoundVoice *voice = (SoundVoice *)&g_sound_state[vars->sound];
 
@@ -167,13 +167,13 @@ void UpdateSmolgPathLift_us2(Moby *moby)
             g_hero_state.f212 = 4;
             g_hero_state.f214 = 4;
             platform_attach_path_to_lift(moby);
-            if (!vars->hasRecord) {
+            if (!vars->has_record) {
                 float *record = cam_alloc_override_slot(5);
                 float value;
 
                 vars->record = record;
                 if (record) {
-                    vars->hasRecord = 1;
+                    vars->has_record = 1;
                     record[0] = g_lift_record_value_a;
                     value = g_lift_record_value_b;
                     vars->record[1] = value;
@@ -181,7 +181,7 @@ void UpdateSmolgPathLift_us2(Moby *moby)
                 }
             }
         }
-        math_step_value_toward_target(&moby->position.f[2], &vars->verticalSpeed,
+        math_step_value_toward_target(&moby->position.f[2], &vars->vertical_speed,
                       path->points[path->count - 1].f[2], 0.0019444445f, 0.003888889f, 0.5f);
         if (math_fabs(moby->position.f[2] - path->points[path->count - 1].f[2]) < 0.2f) {
             moby_set_state(moby, 0, -1);
@@ -193,11 +193,11 @@ void UpdateSmolgPathLift_us2(Moby *moby)
                     snd_stop_voice(sound);
             }
             vars->sound = -1;
-            if (vars->hasRecord) {
+            if (vars->has_record) {
                 cam_end_override(vars->record);
-                vars->hasRecord = 0;
+                vars->has_record = 0;
             }
-            vars->atLast = !vars->atLast;
+            vars->at_last = !vars->at_last;
         }
         break;
 
@@ -211,7 +211,7 @@ void UpdateSmolgPathLift_us2(Moby *moby)
                 snd_stop_voice(sound);
         }
         vars->sound = -1;
-        if (FastDecTimer(&vars->atLast)) {
+        if (FastDecTimer(&vars->at_last)) {
             moby_set_state(moby, 5, -1);
             velocity = &vars->velocity;
             point = vars->point - 1;
@@ -224,7 +224,7 @@ void UpdateSmolgPathLift_us2(Moby *moby)
     case 3:
         /* Travelling to the first point. */
         if (flag_set_first_pending(moby))
-            vars->verticalSpeed = 0.0f;
+            vars->vertical_speed = 0.0f;
         {
             SoundVoice *voice = (SoundVoice *)&g_sound_state[vars->sound];
 
@@ -235,13 +235,13 @@ void UpdateSmolgPathLift_us2(Moby *moby)
             g_hero_state.f212 = 4;
             g_hero_state.f214 = 4;
             platform_attach_path_to_lift(moby);
-            if (!vars->hasRecord) {
+            if (!vars->has_record) {
                 float *record = cam_alloc_override_slot(5);
                 float value;
 
                 vars->record = record;
                 if (record) {
-                    vars->hasRecord = 1;
+                    vars->has_record = 1;
                     record[0] = g_lift_record_value_a;
                     value = g_lift_record_value_b;
                     vars->record[1] = value;
@@ -249,14 +249,14 @@ void UpdateSmolgPathLift_us2(Moby *moby)
                 }
             }
         }
-        math_step_value_toward_target(&moby->position.f[2], &vars->verticalSpeed,
+        math_step_value_toward_target(&moby->position.f[2], &vars->vertical_speed,
                       path->points[0].f[2], 0.0019444445f, 0.003888889f, 0.5f);
         if (math_fabs(moby->position.f[2] - path->points[0].f[2]) < 0.2f) {
-            vars->atLast = 0;
+            vars->at_last = 0;
             moby_set_state(moby, 0, -1);
-            if (vars->hasRecord) {
+            if (vars->has_record) {
                 cam_end_override(vars->record);
-                vars->hasRecord = 0;
+                vars->has_record = 0;
             }
             sound = vars->sound;
             if (sound != -1) {
@@ -271,9 +271,9 @@ void UpdateSmolgPathLift_us2(Moby *moby)
     }
 
 finish:
-    if (!hero_is_on_moby(moby) && vars->hasRecord) {
+    if (!hero_is_on_moby(moby) && vars->has_record) {
         cam_end_override(vars->record);
-        vars->hasRecord = 0;
+        vars->has_record = 0;
     }
     FastVecSub(&delta, &moby->position, &old);
     mat_combine_and_store(vars->motion, &delta, &moby->rotation, &moby->rotation);

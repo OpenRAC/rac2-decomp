@@ -61,7 +61,7 @@ typedef struct {
     char gap60[8];
     float control;
     char gap6c[0x30];
-    int jumpTimer;
+    int jump_timer;
 } Motion;
 typedef struct {
     char header[0x10];
@@ -82,7 +82,7 @@ typedef struct {
 } MoveCollision;
 extern MoveCollision g_collision_l30_result;
 extern void hover_read_inputs_full(float *,float *,float *,float *,float *,float *);
-extern void func_PAL_L30_004106D0(void *,void *,int,float,float,float,float,float,float);
+extern void part_spawn_museum_dust_burst_pal(void *,void *,int,float,float,float,float,float,float);
 extern float FastVecLength(void *);
 extern float FastVecDot(void *,void *);
 extern float math_fabs(float);
@@ -108,7 +108,8 @@ extern int coll_process_triangles(void *,float);
 extern int coll_test_point(void *,int,void *,float);
 extern int coll_process_hit(void *,int,void *,void *,float);
 
-void func_PAL_L30_00411310(MoveObject *object,int input)
+/* Moves the hover vehicle for one frame from the player's steering, speed, height and what it bumps into (PAL version). */
+void UpdateHoverVehicleMotion_pal(MoveObject *object,int input)
 {
     struct {
         MoveVec dir, accel, old;
@@ -118,8 +119,8 @@ void func_PAL_L30_00411310(MoveObject *object,int input)
     } frame;
     Motion *motion=object->motion;
     struct { float steer, throttle, yaw, brake, strafe, jump; } in;
-    float control, height, speed, turnSpeed, lift, sign, amplitude, desiredHeight, acceleration, brakeScale;
-    float speedLimit, steeringDelta, driveRatio, drive, angleDelta, targetAngle, projection, steerRadians, rollSpeed, targetRoll, steeringBoost, strafeDelta, strafeScale, yawHalf;
+    float control, height, speed, turn_speed, lift, sign, amplitude, desired_height, acceleration, brake_scale;
+    float speed_limit, steering_delta, drive_ratio, drive, angle_delta, target_angle, projection, steer_radians, roll_speed, target_roll, steering_boost, strafe_delta, strafe_scale, yaw_half;
     int special, apply;
     in.jump=in.strafe=in.brake=in.yaw=in.throttle=in.steer=0.0f;
     if(input) hover_read_inputs_full(&in.steer,&in.throttle,&in.yaw,&in.brake,&in.strafe,&in.jump);
@@ -133,53 +134,53 @@ void func_PAL_L30_00411310(MoveObject *object,int input)
     in.yaw*=0.017453294f;
     in.yaw*=g_vehicle_input_yaw_scale;
     speed=FastVecLength(motion)*motion->control;
-    turnSpeed=g_vehicle_turn_speed*0.020000001f;
-    speedLimit=g_vehicle_l30_speed_limit_2*0.020000001f;
-    steeringDelta=in.steer*((speed<speedLimit?speed:speedLimit)/speedLimit*g_vehicle_steer_speed_blend+(1.0f-g_vehicle_steer_speed_blend)+g_vehicle_steer_uncontrolled_bonus*(1.0f-motion->control));
-    steeringDelta*=0.0003490659f;
-    motion->yaw=FastAddRotations(motion->yaw,g_vehicle_steer_yaw_scale*steeringDelta);
-    steerRadians=in.steer*0.017453294f;
-    rollSpeed=g_vehicle_roll_speed_scale*steerRadians;
-    rollSpeed*=motion->control;
-    targetRoll=rollSpeed*(g_vehicle_roll_throttle_blend*in.throttle+(1.0f-g_vehicle_roll_throttle_blend));
-    motion->roll+=(targetRoll-object->basis[3].x)*g_vehicle_roll_follow;
+    turn_speed=g_vehicle_turn_speed*0.020000001f;
+    speed_limit=g_vehicle_l30_speed_limit_2*0.020000001f;
+    steering_delta=in.steer*((speed<speed_limit?speed:speed_limit)/speed_limit*g_vehicle_steer_speed_blend+(1.0f-g_vehicle_steer_speed_blend)+g_vehicle_steer_uncontrolled_bonus*(1.0f-motion->control));
+    steering_delta*=0.0003490659f;
+    motion->yaw=FastAddRotations(motion->yaw,g_vehicle_steer_yaw_scale*steering_delta);
+    steer_radians=in.steer*0.017453294f;
+    roll_speed=g_vehicle_roll_speed_scale*steer_radians;
+    roll_speed*=motion->control;
+    target_roll=roll_speed*(g_vehicle_roll_throttle_blend*in.throttle+(1.0f-g_vehicle_roll_throttle_blend));
+    motion->roll+=(target_roll-object->basis[3].x)*g_vehicle_roll_follow;
     frame.dir.x=math_fast_sin_or_cos_a(motion->yaw);
     frame.dir.y=math_fast_sin_or_cos_b(motion->yaw); frame.dir.z=0;
     if(in.throttle<0) in.throttle*=g_vehicle_reverse_throttle_scale;
     sign=1.0f;
     if(in.throttle<0) sign=-1.0f;
-    amplitude=math_fabs(in.steer); driveRatio=IntegerPower(2,(turnSpeed-speed)/turnSpeed);
-    steeringBoost=g_vehicle_steer_boost_scale*amplitude;
-    steeringBoost*=sign;
-    drive=in.throttle+steeringBoost;
+    amplitude=math_fabs(in.steer); drive_ratio=IntegerPower(2,(turn_speed-speed)/turn_speed);
+    steering_boost=g_vehicle_steer_boost_scale*amplitude;
+    steering_boost*=sign;
+    drive=in.throttle+steering_boost;
     drive*=0.00040000002f;
     object->speed+=(in.throttle*g_vehicle_throttle_speed_scale-object->speed)*0.02f;
     drive*=g_vehicle_drive_scale;
-    acceleration=drive*driveRatio;
+    acceleration=drive*drive_ratio;
     FastVecAdd(&frame.old,&object->position,motion);
     height=coll_probe_ground_height_below(&frame.old,0,0.5f);
     special=0;
     if(GetCollHitMaterial()==1 || GetCollHitMaterial()==11) special=1;
     if(object->position.z<height+lift+0.3f && special) object->state=5;
-    desiredHeight=height+lift;
-    if(g_vehicle_jump_timer_max-g_vehicle_jump_boost_window<motion->jumpTimer) motion->velocity.z+=g_vehicle_jump_boost*0.00040000002f;
+    desired_height=height+lift;
+    if(g_vehicle_jump_timer_max-g_vehicle_jump_boost_window<motion->jump_timer) motion->velocity.z+=g_vehicle_jump_boost*0.00040000002f;
     else motion->velocity.z-=g_vehicle_l30_gravity_2*0.00040000002f;
     if(height!=0) {
         apply=1;
-        if(desiredHeight<frame.old.z) {
-            angleDelta=fast_subtract_rotations(in.yaw,motion->pitch);
-            motion->pitch=FastAddRotations(motion->pitch,angleDelta*g_vehicle_pitch_follow_b);
+        if(desired_height<frame.old.z) {
+            angle_delta=fast_subtract_rotations(in.yaw,motion->pitch);
+            motion->pitch=FastAddRotations(motion->pitch,angle_delta*g_vehicle_pitch_follow_b);
             if(g_current_map_index==8) apply=0;
         } else {
-            if(motion->jumpTimer==0 && in.jump>0.2f) motion->jumpTimer=((s32)(g_vehicle_jump_timer_max) * 5 + 2) / 6;
+            if(motion->jump_timer==0 && in.jump>0.2f) motion->jump_timer=((s32)(g_vehicle_jump_timer_max) * 5 + 2) / 6;
             if(height>frame.old.z+0.1f || special) {
                 frame.old.z=height;
                 FastVecScale(motion,motion,g_vehicle_drag_scale_b);
             }
-            motion->velocity.z+=((desiredHeight-frame.old.z)*g_vehicle_l30_hover_spring_2-motion->velocity.z)*g_vehicle_l30_hover_spring_2;
+            motion->velocity.z+=((desired_height-frame.old.z)*g_vehicle_l30_hover_spring_2-motion->velocity.z)*g_vehicle_l30_hover_spring_2;
             if(in.brake>0) {
-                brakeScale=1.0f-g_vehicle_brake_strength*in.brake;
-                motion->velocity.x*=brakeScale; motion->velocity.y*=brakeScale;
+                brake_scale=1.0f-g_vehicle_brake_strength*in.brake;
+                motion->velocity.x*=brake_scale; motion->velocity.y*=brake_scale;
             }
             {
                 MoveVec *right=&frame.matrix[0], *up, *ahead=&frame.matrix[2];
@@ -190,10 +191,10 @@ void func_PAL_L30_00411310(MoveObject *object,int input)
             }
             qzero_nc(&frame.matrix[3]);
             mat_get_euler_angles(&frame.matrix[0],&frame.pos);
-            yawHalf=in.yaw*0.5f;
-            targetAngle=FastAddRotations(-frame.pos.y,yawHalf*(g_vehicle_yaw_target_scale*(motion->control+1.0f)));
-            angleDelta=fast_subtract_rotations(targetAngle,motion->pitch);
-            motion->pitch=FastAddRotations(motion->pitch,angleDelta*g_vehicle_pitch_follow_a);
+            yaw_half=in.yaw*0.5f;
+            target_angle=FastAddRotations(-frame.pos.y,yaw_half*(g_vehicle_yaw_target_scale*(motion->control+1.0f)));
+            angle_delta=fast_subtract_rotations(target_angle,motion->pitch);
+            motion->pitch=FastAddRotations(motion->pitch,angle_delta*g_vehicle_pitch_follow_a);
             FastVecScale(motion,motion,g_vehicle_drag_scale);
             matrix_from_basis_rows(frame.scratch.inverse,&object->basis[0]);
             transform_vector(motion,motion,frame.scratch.inverse);
@@ -202,9 +203,9 @@ void func_PAL_L30_00411310(MoveObject *object,int input)
         }
         if(apply) {
             vec_scale_to_length(&frame.accel,&object->basis[0],acceleration);
-            strafeDelta=in.strafe*0.00040000002f;
-            strafeScale=g_vehicle_strafe_scale*strafeDelta;
-            vec_scale_to_length(&frame.matrix[0],&object->basis[1],strafeScale*motion->control);
+            strafe_delta=in.strafe*0.00040000002f;
+            strafe_scale=g_vehicle_strafe_scale*strafe_delta;
+            vec_scale_to_length(&frame.matrix[0],&object->basis[1],strafe_scale*motion->control);
             FastVecAdd(&frame.accel,&frame.accel,&frame.matrix[0]);
             FastVecAdd(motion,motion,&frame.accel);
         }
@@ -231,8 +232,8 @@ void func_PAL_L30_00411310(MoveObject *object,int input)
     }
     if(object->state==3) {
         if(motion->control<0.98f && (g_pad_pressed_flags&4))
-            func_PAL_L30_004106D0(object,&g_collision_l30_result.point,g_museum_dust_big_param_a,g_museum_dust_big_param_b,g_museum_dust_big_param_c,g_museum_dust_big_param_d,g_museum_dust_big_param_d,g_museum_dust_big_param_e,g_museum_dust_big_param_f);
-        func_PAL_L30_004106D0(object,&g_collision_l30_result.point,g_museum_dust_param_a,g_museum_dust_param_b,g_museum_dust_param_c,g_museum_dust_param_d,g_museum_dust_param_e,g_museum_dust_param_f,1.0f);
+            part_spawn_museum_dust_burst_pal(object,&g_collision_l30_result.point,g_museum_dust_big_param_a,g_museum_dust_big_param_b,g_museum_dust_big_param_c,g_museum_dust_big_param_d,g_museum_dust_big_param_d,g_museum_dust_big_param_e,g_museum_dust_big_param_f);
+        part_spawn_museum_dust_burst_pal(object,&g_collision_l30_result.point,g_museum_dust_param_a,g_museum_dust_param_b,g_museum_dust_param_c,g_museum_dust_param_d,g_museum_dust_param_e,g_museum_dust_param_f,1.0f);
     }
     moby_transform_joint_to_world(object,0,&frame.matrix[3]);
     frame.matrix[3].z+=g_vehicle_l30_ground_offset_2;

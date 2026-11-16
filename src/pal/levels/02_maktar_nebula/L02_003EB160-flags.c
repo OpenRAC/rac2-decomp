@@ -25,15 +25,15 @@ extern int FloatToInt(float);
    entry D_L02_002A53B0[track][(int)(position + 9) % 9] is the wanted one and the position is less
    than 0.2 above a whole number: the mode is then 0. Once all three modes are 0 the actor changes
    state (func_002A7750 with 4). */
-void func_PAL_L02_003EB998(char *arg0) {
-    State003E75A8 *st = *(State003E75A8 **)(arg0 + 0x68);
+void slot_machine_update_reels_pal(char *moby) {
+    State003E75A8 *st = *(State003E75A8 **)(moby + 0x68);
     int i;
 
-    if (flag_set_first_pending(arg0)) {
+    if (flag_set_first_pending(moby)) {
         st->timer[1] = 83;
         st->timer[0] = 42;
         st->timer[2] = 150;
-        if (*(u16 *)(arg0 + 0x34) & 0x8000) {
+        if (*(u16 *)(moby + 0x34) & 0x8000) {
             st->timer[0] = 150;
             st->timer[2] = 42;
         }
@@ -63,6 +63,6 @@ void func_PAL_L02_003EB998(char *arg0) {
             break;
         }
         if (st->mode[0] == 0 && st->mode[1] == 0 && st->mode[2] == 0)
-            moby_set_state(arg0, 4, -1);
+            moby_set_state(moby, 4, -1);
     }
 }

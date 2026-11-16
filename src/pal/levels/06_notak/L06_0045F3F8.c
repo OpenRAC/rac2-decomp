@@ -4,7 +4,7 @@
 extern u8 *g_moby_l06_table MACRO_ADDR;
 extern void moby_transform_joint_to_world(void *, int, void *);
 extern void vec_scale_to_length(char *, char *, float);
-extern void func_PAL_002A7E68(char *, int, int, int);
+extern void anim_start_blended_pal(char *, int, int, int);
 extern void FastVecScale(char *, char *, float);
 extern float moby_get_anim_value(char *);
 extern void make_hit_descriptor(void *, char *, int, void *, float);
@@ -33,7 +33,7 @@ void actor_try_pickup_transition_pal(char *obj, float lo, char *self, float hi, 
             FastVecScale(vec, vec, -1.0f);
             *(float *)(self + 0xC8) = -0.060000002f;
             if (*(u8 *)(obj + 0x43) != anim)
-                func_PAL_002A7E68(obj, anim, link, 5);
+                anim_start_blended_pal(obj, anim, link, 5);
             *(u8 *)(obj + 0x20) = next;
         }
     }

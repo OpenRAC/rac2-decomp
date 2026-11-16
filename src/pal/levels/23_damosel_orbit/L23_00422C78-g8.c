@@ -12,16 +12,16 @@ extern void moby_mark_spawned(void *);
  * 0xA1 displacements; written as D_001395B8[0xA1] and [0x88], the high half is hoisted into a
  * saved register (160 bytes). */
 void mothership_destroy_parts_pal(void) {
-    char **p = (char **)(*(char **)(g_mothership_boss_moby + 0x68) + 0x358);
+    char **part_slot = (char **)(*(char **)(g_mothership_boss_moby + 0x68) + 0x358);
     unsigned char *flags;
     int i;
 
     for (i = 4; i >= 0; i--) {
-        if (*p != 0) {
-            moby_mark_spawned(*p);
-            *p = 0;
+        if (*part_slot != 0) {
+            moby_mark_spawned(*part_slot);
+            *part_slot = 0;
         }
-        p++;
+        part_slot++;
     }
     if (g_mothership_boss_moby != 0) {
         level_store_value_pair(0, 0);

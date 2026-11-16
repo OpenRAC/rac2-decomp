@@ -12,42 +12,42 @@ extern unsigned int g_effect_moby_count __attribute__((sda));
 /* Creates the level's own object, fills the header the object carries, copies the two
    16-byte records it is given into it, and lets the shared helpers set the rest up.
    The object is returned; a null one is returned unchanged. */
-void *func_PAL_L00_003BECF0(char *a0, char *a1, char *a2, char *a3)
+void *effect_spawn_moby_pal(char *owner, char *param, char *position, char *vector)
 {
-    char *node;
-    char *sub;
-    char *p1;
-    unsigned short v0;
+    char *new_moby;
+    char *vars;
+    char *position_ptr;
+    unsigned short flags;
 
-    node = (char *)CreateMoby(0x9A9);
-    if (node != 0) {
-        v0 = *(unsigned short *)(node + 0x34);
-        *(unsigned char *)(node + 0x30) = 0xFF;
-        *(unsigned short *)(node + 0x32) = 0x1FF;
-        *(unsigned short *)(node + 0x34) = v0 | 0x100;
+    new_moby = (char *)CreateMoby(0x9A9 /* moby class 2473 */);
+    if (new_moby != 0) {
+        flags = *(unsigned short *)(new_moby + 0x34);
+        *(unsigned char *)(new_moby + 0x30) = 0xFF;
+        *(unsigned short *)(new_moby + 0x32) = 0x1FF;
+        *(unsigned short *)(new_moby + 0x34) = flags | 0x100;
 
-        sub = *(char **)(node + 0x68);
-        p1 = node + 0x10;
-        *(int *)(sub + 0x44) = *(short *)(a0 + 0xAA);
-        *(int *)(sub + 0x34) = 0x64;
-        *(float *)(sub + 0x4C) = 0.01f;
-        *(int *)(sub + 0x40) = (int)a1;
+        vars = *(char **)(new_moby + 0x68);
+        position_ptr = new_moby + 0x10;
+        *(int *)(vars + 0x44) = *(short *)(owner + 0xAA);
+        *(int *)(vars + 0x34) = 0x64;
+        *(float *)(vars + 0x4C) = 0.01f;
+        *(int *)(vars + 0x40) = (int)param;
 
-        *(Rac2TI128 *)p1 = *(Rac2TI128 *)a2;
-        *(Rac2TI128 *)sub = *(Rac2TI128 *)a3;
-        *(Rac2TI128 *)(sub + 0x20) = *(Rac2TI128 *)a3;
+        *(Rac2TI128 *)position_ptr = *(Rac2TI128 *)position;
+        *(Rac2TI128 *)vars = *(Rac2TI128 *)vector;
+        *(Rac2TI128 *)(vars + 0x20) = *(Rac2TI128 *)vector;
 
-        *(int *)(sub + 0x50) = part_alloc_effect_slot(node, 0, 1.0f, 1.0f, 1.0f);
-        *(int *)(sub + 0x54) = 0;
-        *(int *)(sub + 0x58) = 0;
-        *(unsigned char *)(node + 0x20) = 0;
+        *(int *)(vars + 0x50) = part_alloc_effect_slot(new_moby, 0, 1.0f, 1.0f, 1.0f);
+        *(int *)(vars + 0x54) = 0;
+        *(int *)(vars + 0x58) = 0;
+        *(unsigned char *)(new_moby + 0x20) = 0;
         g_effect_moby_count = g_effect_moby_count + 1;
-        *(int *)(sub + 0x5C) = part_l00_alloc_effect_slot_2(p1, 0.0f, 0.0f, 0.25f, 0.14f, 1.0f);
-        *(float *)(node + 0xF0) = math_random_angle();
-        *(float *)(node + 0xF4) = math_random_angle();
-        *(float *)(node + 0xF8) = math_random_angle();
-        *(float *)(node + 0xFC) = 0.0f;
-        euler_rotation_basis(node + 0xC0, node + 0xF0);
+        *(int *)(vars + 0x5C) = part_l00_alloc_effect_slot_2(position_ptr, 0.0f, 0.0f, 0.25f, 0.14f, 1.0f);
+        *(float *)(new_moby + 0xF0) = math_random_angle();
+        *(float *)(new_moby + 0xF4) = math_random_angle();
+        *(float *)(new_moby + 0xF8) = math_random_angle();
+        *(float *)(new_moby + 0xFC) = 0.0f;
+        euler_rotation_basis(new_moby + 0xC0, new_moby + 0xF0);
     }
-    return node;
+    return new_moby;
 }

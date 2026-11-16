@@ -47,7 +47,7 @@ extern int coll_process_triangles(void *, float);
    in use beyond the block, and the copies must not be adjacent, or cse
    collapses them. moby's number follows the declarations before it, so the
    function's named scalars are what bring it to that pseudo. */
-void func_PAL_00331CF0(char *object)
+void SweepMobyArcProbe_pal(char *object)
 {
     float base[4], sum[4], axis[4], first[4], rotated[4], temporary[4], inverse[4];
     float endpoint[4], opposite[4], normal[4], correction[4];

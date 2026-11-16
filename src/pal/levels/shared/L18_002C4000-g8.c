@@ -16,12 +16,12 @@ extern int g_hero_frozen_flag;
 extern int D_L18_001AFBB0_sda __attribute__((sda));
 extern int D_001A7390_sda __attribute__((sda));
 
-extern void func_PAL_L00_002D29E8(void);
+extern void AdvanceHeroAnimation_pal(void);
 extern void hero_update_frame_input_pal(void);
 extern void ref_L18_002C41F0_00(void);
 extern int FastDecTimer(int a0);
 extern void ref_L18_002C41F0_01(int a0, int a1);
-extern int func_PAL_00289730(int a0, int a1);
+extern int subtitle_request_voice_line_pal(int a0, int a1);
 extern void ref_L18_002C41F0_02(void);
 extern void RebuildRegionObjectMembership(void);
 extern void UpdateDelayedSounds_pal(void);
@@ -34,13 +34,14 @@ extern s32 receiver_bot_start_sequence(void *a0);
 extern void UpdateHeroMobyProbedHeightBounds(void);
 extern void func_002A677C(int a0);
 
-void func_PAL_L18_002C4000(void)
+/* Runs once per frame for the hero: handles the frame input, the held-object timer, sounds, attachments and the collision cleanup (PAL: 50 Hz timings). */
+void hero_l18_update_frame_pal(void)
 {
     char *base;
     char *hero;
     char *blk;
 
-    func_PAL_L00_002D29E8();
+    AdvanceHeroAnimation_pal();
     hero_update_frame_input_pal();
     ref_L18_002C41F0_00();
 
@@ -57,7 +58,7 @@ void func_PAL_L18_002C4000(void)
                         if (g_hero_frame_flag == 0) {
                             blk = g_subtitle_history;
                             if (((s32)D_001A7390_sda * 5 + 2) / 6 - *(unsigned int *)(blk + 0x7900) >= 0x97) {
-                                if (func_PAL_00289730(0xA15, 0x6C) != 0) {
+                                if (subtitle_request_voice_line_pal(0xA15, 0x6C) != 0) {
                                     if (*(unsigned int *)(blk + 0x7900) < ((s32)D_001A7390_sda * 5 + 2) / 6) {
                                         *(unsigned int *)(blk + 0x7900) = ((s32)D_001A7390_sda * 5 + 2) / 6;
                                     }

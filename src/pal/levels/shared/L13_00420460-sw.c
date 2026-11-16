@@ -7,10 +7,10 @@ extern int TryClaimNotice(int, int, int);
 /* The func_L02_004114A0 message pick for the five level-13 states. Each case calls on
    its own: with one shared body the five labels would collapse into three ranges and
    the switch would become a compare tree. */
-void func_PAL_L13_00420888(u8 *a0) {
-    int v = *(int *)(*(void **)(a0 + 0x68) + 0x10);
+void warp_ring_show_message_pal(u8 *moby) {
+    int ring_kind = *(int *)(*(void **)(moby + 0x68) + 0x10);
 
-    switch (v) {
+    switch (ring_kind) {
     case 0:
         TryClaimNotice(0xB, 0x1BC6, 1);
         break;

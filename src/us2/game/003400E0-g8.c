@@ -3,7 +3,7 @@
 extern void *pool_alloc_cell(void *);
 extern int *ui_return_second_arg(int, int);
 extern void object_init_derived_arrays(void *, char *, void *);
-extern void func_US2_003377B0(void *, char *, void *);
+extern void hud_init_widget_defaults_us2(void *, char *, void *);
 extern void object_init_derived_c(void *, char *, void *);
 extern void object_set_second_float4(void *, float, float, float, float);
 extern void object_set_first_float4(void *, float, float, float, float);
@@ -26,7 +26,7 @@ extern void object_set_first_pair(void *, unsigned int, unsigned int);
 extern void object_set_second_pair(void *, unsigned int, unsigned int);
 extern void text_set_alignment(void *, unsigned int);
 extern void widget_store_field(void *, int);
-extern int func_US2_00340AA8(void *, int);
+extern int radial_menu_update_us2(void *, int);
 extern char *g_resident_data_base;
 extern char g_menu_widget_desc_first[], g_menu_widget_desc_second[], g_menu_widget_desc_third[], g_menu_widget_desc_fourth[];
 extern char g_menu_backdrop_desc[], g_radial_menu_hud_desc_first[], g_menu_hud_desc_body[], g_radial_menu_hud_desc_second[], g_radial_menu_hud_desc_third[];
@@ -37,7 +37,7 @@ extern unsigned int g_radial_menu_field_data_first __attribute__((sda));
 extern unsigned int g_radial_menu_field_data_second __attribute__((sda));
 
 /* Initializes the menu's named widgets, resource IDs, colors and radial entries. */
-void func_US2_003400E0(char *self, void *owner)
+void radial_menu_init_us2(char *self, void *owner)
 {
     char name[16];
     int i;
@@ -65,10 +65,10 @@ void func_US2_003400E0(char *self, void *owner)
     object_init_derived_arrays((self + 0xE4), g_menu_widget_desc_third, owner);
     object_init_derived_arrays((self + 0x130), g_menu_widget_desc_fourth, owner);
     object_init_derived_arrays((self + 0x98), g_menu_backdrop_desc, owner);
-    func_US2_003377B0(self + 0x8D8, g_radial_menu_hud_desc_first, owner);
-    func_US2_003377B0((self + 0x930), g_menu_hud_desc_body, owner);
-    func_US2_003377B0((self + 0x988), g_radial_menu_hud_desc_second, owner);
-    func_US2_003377B0((self + 0x9E0), g_radial_menu_hud_desc_third, owner);
+    hud_init_widget_defaults_us2(self + 0x8D8, g_radial_menu_hud_desc_first, owner);
+    hud_init_widget_defaults_us2((self + 0x930), g_menu_hud_desc_body, owner);
+    hud_init_widget_defaults_us2((self + 0x988), g_radial_menu_hud_desc_second, owner);
+    hud_init_widget_defaults_us2((self + 0x9E0), g_radial_menu_hud_desc_third, owner);
     object_init_derived_arrays((self + 0x17C), g_menu_frame_desc, owner);
     object_init_derived_arrays((self + 0x1C8), g_menu_panel_desc, owner);
     object_init_derived_arrays((self + 0x214), g_menu_extra_widget_desc, owner);
@@ -114,8 +114,8 @@ void func_US2_003400E0(char *self, void *owner)
     for (i = 0; i < 8; i++) {
         float angle, x;
         char *entry, *icon;
-        unsigned int panelColor = 0x60442D00;
-        unsigned int iconColor = 0x60F0F0B0;
+        unsigned int panel_color = 0x60442D00;
+        unsigned int icon_color = 0x60F0F0B0;
         sprintf(name, g_str_ammo_bolt_name_format_first, i);
         entry = self + (i * 0x4C + 0x340);
         object_init_derived_arrays(entry, name, owner);
@@ -123,7 +123,7 @@ void func_US2_003400E0(char *self, void *owner)
         object_set_second_float4(entry, 1.0f, 1.0f, 0.0f, 0.0f);
         object_set_first_float4(entry, (*(float **)(self + 0x80C))[0] + 113.0f,
             (*(float **)(self + 0x80C))[1] + -72.0f, 0.0f, 0.0f);
-        *object_get_fourth_field(entry) = panelColor;
+        *object_get_fourth_field(entry) = panel_color;
         sprintf(name, g_str_ammo_bolt_name_format_second, i);
         icon = self + (i * 0x3C + 0x5EC);
         object_init_derived_c(icon, name, owner);
@@ -133,7 +133,7 @@ void func_US2_003400E0(char *self, void *owner)
         object_set_first_float4(icon, x,
             (float)((int)(math_fast_sin_or_cos_b(angle) * 76.44200134f) + 109), 0.0f, 0.0f);
         object_set_second_float4(icon, 32.0f, 32.0f, 0.0f, 0.0f);
-        *object_get_fourth_field(icon) = iconColor;
+        *object_get_fourth_field(icon) = icon_color;
     }
     for (j = 1; j < 8; j++) {
         object_change_first_value(self + (j * 0x4C + 0x340), object_get_second_field(base + (0x340 - 0x3B0)));
@@ -141,9 +141,9 @@ void func_US2_003400E0(char *self, void *owner)
     }
     object_change_first_value((base + (0x2A8 - 0x3B0)), object_get_second_field(base + (0x340 - 0x3B0)));
     widget = base + (0x828 - 0x3B0);
-    func_US2_003377B0(widget, g_menu_hud_desc_title, owner);
+    hud_init_widget_defaults_us2(widget, g_menu_hud_desc_title, owner);
     *(int *)(widget + 0x54) = 0;
-    func_US2_003377B0(base + (0x880 - 0x3B0), g_menu_hud_label_desc_alt, owner);
+    hud_init_widget_defaults_us2(base + (0x880 - 0x3B0), g_menu_hud_label_desc_alt, owner);
     *object_get_fourth_field(base + (0x828 - 0x3B0)) = 0x80F0F0F0;
     *object_get_fourth_field(base + (0x880 - 0x3B0)) = 0x80F0F0F0;
     hud_set_widget_field_b(base + (0x828 - 0x3B0), GetLocalizedString(0x2BE9));
@@ -163,5 +163,5 @@ void func_US2_003400E0(char *self, void *owner)
     object_set_second_pair(base + (0x260 - 0x3B0), 0x50F0C070, 0x50F0C070);
     text_set_alignment(base + (0x260 - 0x3B0), 0x80000000);
     widget_store_field(base + (0x260 - 0x3B0), 0);
-    func_US2_00340AA8(self, 0);
+    radial_menu_update_us2(self, 0);
 }

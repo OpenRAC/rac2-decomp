@@ -17,7 +17,7 @@ extern void item_menu_set_title_mode(u8 *, u32);
 
 /* constructor: stores the owner at +0x28C, allocates the 16-byte position at +0x288 and initialises the
    sub-objects at +0x0, +0x4C, +0x98, +0xE4, +0x1B0, +0x1F8, +0x240 and +0x298 */
-void func_PAL_003455F8(unsigned char *owner)
+void item_menu_clear_selection_state_pal(unsigned char *owner)
 {
     menu_list_clear_state(owner + 0x2c8);
 }

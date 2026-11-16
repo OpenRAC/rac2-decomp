@@ -155,12 +155,12 @@ void ApplyHeroVelocityAndResolveDisplacement_pal(void) {
     /* the part of the move caused by the surface the hero stands on */
     qcopy(horizontal, g_hero_state.position);
     if (FastVecLength(g_hero_state.surface_motion) > 0.0001f) {
-        float w;
+        float surface_w;
 
         FastVecAdd(g_hero_state.position, g_hero_state.position, g_hero_state.surface_motion);
-        w = g_hero_state.surface_motion[3];
+        surface_w = g_hero_state.surface_motion[3];
         vec_clear_128(g_hero_state.surface_motion);
-        g_hero_state.surface_motion[3] = w;
+        g_hero_state.surface_motion[3] = surface_w;
         hero_resolve_collision_with_rewind();
         Hero_ProbeGround();
         FastVecSub(g_hero_state.displacement, g_hero_state.position, old);

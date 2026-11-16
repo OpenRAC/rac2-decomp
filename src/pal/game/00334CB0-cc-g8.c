@@ -43,15 +43,15 @@ extern float math_random_angle(void);
 extern int math_random_int_range(int, int);
 extern float math_random_signed_float_range(float, float);
 extern void vec_build_spherical_offset(void *, float, float, float);
-extern void func_PAL_002BE880(void *, void *, int, int, int, float);
+extern void part_spawn_growing_puff_pal(void *, void *, int, int, int, float);
 extern float mat_fast_helper_a(float, float);
 extern int FloatToInt(float);
 extern float FastAddRotations(float, float);
 extern float math_fast_sin_or_cos_a(float);
 extern float math_fast_sin_or_cos_b(float);
-extern unsigned char *func_PAL_002C8BD0(void *, void *, int);
+extern unsigned char *part_spawn_spinning_spark_pal_2(void *, void *, int);
 extern void RemoveMobyFromIndexList(void *, short *);
-extern void *func_PAL_0032DF28(void *, float, float, int, int, int, int, int, int, int, int, int, int, int);
+extern void *part_spawn_explosion_pal(void *, float, float, int, int, int, int, int, int, int, int, int, int, int);
 extern int coll_process_hit(void *, int, void *, int, float);
 extern void FastVecSub(void *, void *, void *);
 extern void make_hit_descriptor(void *, void *, int, void *, float);
@@ -69,7 +69,7 @@ static inline int func_00333048_kind(int index)
    point at D_001B5200+0x140, a ring effect, then a hit on every moby in range. The ring prototype is
    interleaved as (pointer, float, float, ints...): the EE passes the two floats in $f12/$f13
    either way, and this order gives retail's argument scheduling. */
-void func_PAL_00334CB0(char *object)
+void moby_explode_and_hurt_nearby_pal(char *object)
 {
     float direction[4] __attribute__((aligned(16)));
     float spark[4] __attribute__((aligned(16)));
@@ -93,7 +93,7 @@ void func_PAL_00334CB0(char *object)
         distance = math_random_float_range(0.002f, 0.020000001f);
         yaw = math_random_angle();
         vec_build_spherical_offset(direction, distance, yaw, math_random_angle());
-        func_PAL_002BE880(spark, direction, 0x4F20507F, 0x102F, math_random_int_range(25, 47), 150000.0f);
+        part_spawn_growing_puff_pal(spark, direction, 0x4F20507F, 0x102F, math_random_int_range(25, 47), 150000.0f);
     }
     camera = g_active_camera;
     for (j = 0; j < 50; j++) {
@@ -109,10 +109,10 @@ void func_PAL_00334CB0(char *object)
         spark[1] = math_fast_sin_or_cos_b(angle) * 0.020000001f * distance;
         distance = g_explode_hurt_distance_b;
         spark[2] = distance * 0.020000001f;
-        func_PAL_002C8BD0(direction, spark, 0x10b);
+        part_spawn_spinning_spark_pal_2(direction, spark, 0x10b);
     }
     RemoveMobyFromIndexList(object, g_explosion_moby_index_list);
-    func_PAL_0032DF28(object + 0x10, 1.0f, 20.0f, 1, 25, 20, 20, 20, 45, 1, 1, 1, 0, g_turret_target_moby);
+    part_spawn_explosion_pal(object + 0x10, 1.0f, 20.0f, 1, 25, 20, 20, 20, 45, 1, 1, 1, 0, g_turret_target_moby);
     count = coll_process_hit(object + 0x10, 0, object, 0, 3.0f);
     if (count > 0) {
         char **list = g_nearby_mobys;

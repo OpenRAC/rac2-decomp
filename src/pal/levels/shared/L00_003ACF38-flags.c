@@ -26,31 +26,32 @@ typedef struct {
     unsigned char flag;
 } Entry262570;
 
-void projectile_damage_nearby_on_hit_pal(char *a0, char *a1, char *a2)
+/* Damages everything near a projectile hit and starts the weapon's attached effect on each target. */
+void projectile_damage_nearby_on_hit_pal(char *moby, char *direction, char *position)
 {
-    Trail_3A9798 s;
+    Trail_3A9798 damage;
     int count;
     int i;
-    unsigned int *p;
+    unsigned int *targets;
 
-    s.magic = 0x810000;
-    s.len = *(float *)(a1 + 0x18);
-    s.count = 1;
-    s.obj = (unsigned int)a0;
-    *(TI128 *)s.pos = *(TI128 *)a1;
-    vec_scale_to_length(&s, &s, 1.0f);
-    s.pos[3] = 5627.9248046875f;
-    s.kind = 3;
-    s.kind2 = 2;
-    s.id = *(unsigned short *)(a0 + 0xAA);
-    count = coll_process_hit(6.0f, (int)a2, 1, g_hero_moby, (int)&s);
+    damage.magic = 0x810000;
+    damage.len = *(float *)(direction + 0x18);
+    damage.count = 1;
+    damage.obj = (unsigned int)moby;
+    *(TI128 *)damage.pos = *(TI128 *)direction;
+    vec_scale_to_length(&damage, &damage, 1.0f);
+    damage.pos[3] = 5627.9248046875f;
+    damage.kind = 3;
+    damage.kind2 = 2;
+    damage.id = *(unsigned short *)(moby + 0xAA);
+    count = coll_process_hit(6.0f, (int)position, 1, g_hero_moby, (int)&damage);
     if (((Entry262570 *)(g_weapon_l00_table + g_item_slot_to_record[0x19] * 224))->flag != 0) {
-        p = g_area_hit_targets;
+        targets = g_area_hit_targets;
         for (i = 0; i < count; i++)
-            StartAttachedEffect_pal(g_area_hit_targets[i], 0x46, *(int *)(a0 + 0xB8));
+            StartAttachedEffect_pal(g_area_hit_targets[i], 0x46, *(int *)(moby + 0xB8));
     } else {
-        p = g_area_hit_targets;
+        targets = g_area_hit_targets;
         for (i = 0; i < count; i++)
-            StartAttachedEffect_pal(g_area_hit_targets[i], 0x19, *(int *)(a0 + 0xB8));
+            StartAttachedEffect_pal(g_area_hit_targets[i], 0x19, *(int *)(moby + 0xB8));
     }
 }

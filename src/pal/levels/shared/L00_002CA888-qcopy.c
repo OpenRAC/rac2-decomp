@@ -10,15 +10,16 @@ extern float math_fast_sin_or_cos_a(float);
 extern float math_fast_sin_or_cos_b(float);
 extern int CollLine(void *, void *, int, void *, int);
 
-int func_PAL_L00_002CB138(void)
+/* Checks whether there is a ledge or step just in front of the hero that it can step onto. */
+int hero_check_step_ahead_pal(void)
 {
     char *base = g_hero_state;
     float first[4], second[4];
-    float t;
+    float angle_or_height;
     if ((unsigned char)base[0x22C3] == 2) return 0;
     if (*(float *)(base + 0x174) < *(float *)(base + 0x264) * 0.05882353f) return 0;
-    t = FastDiffRots(mat_fast_helper_a(*(float *)(base + 0x110), *(float *)(base + 0x114)), *(float *)(base + 0x98));
-    if (0.5235988497734069824f < t) return 0;
+    angle_or_height = FastDiffRots(mat_fast_helper_a(*(float *)(base + 0x110), *(float *)(base + 0x114)), *(float *)(base + 0x98));
+    if (0.5235988497734069824f < angle_or_height) return 0;
     *(Position *)first = *(Position *)(base + 0x80);
     first[0] += math_fast_sin_or_cos_a(*(float *)(base + 0x98)) * *(float *)(base + 0x264) * 0.75f;
     first[1] += math_fast_sin_or_cos_b(*(float *)(base + 0x98)) * *(float *)(base + 0x264) * 0.75f;
@@ -26,9 +27,9 @@ int func_PAL_L00_002CB138(void)
     first[2] += 0.47f;
     second[2] -= 1.0f;
     if (!CollLine(first, second, 2, *(void **)(base + 0x2290), 0)) return 0;
-    t = g_hero_ground_height - *(float *)(base + 0x88);
-    if (t < 0.37f) {
-        if (-1.0f < t) return 1;
+    angle_or_height = g_hero_ground_height - *(float *)(base + 0x88);
+    if (angle_or_height < 0.37f) {
+        if (-1.0f < angle_or_height) return 1;
         else return 0;
     }
     return 0;

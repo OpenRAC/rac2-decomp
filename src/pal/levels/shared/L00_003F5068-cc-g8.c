@@ -88,7 +88,8 @@ extern void part_update_ring_pieces(char *);
 extern void ref_L00_003F0CC8_00(void (*)(void *), void *);
 extern void gfx_update_screen_fade(void *);
 
-void func_PAL_L00_003F5068(char *object)
+/* Updates the hero lightning burst: sparks and rings grow around the hero, then everything nearby takes damage, and the effect fades out (PAL: 50 Hz). */
+void hero_lightning_burst_update_pal(char *object)
 {
     Vector point;
     DamageRequest request;

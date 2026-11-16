@@ -196,7 +196,7 @@ extern int mothership_call_helper_return_true(void);
 extern int L23_DrawEncounterHud(void);
 extern void cancel_hero_item_animation(void);
 extern void release_moby_animation_slot(void *, void *);
-extern int func_US2_L22_002C9B20(int, int);
+extern int hero_set_action_us2(int, int);
 extern char *GetLocalizedString(int);
 extern int level_l00_call_module_handler_with_arg_9_us2(int, int);
 extern void cam_compute_view_direction(void *, void *, int);
@@ -204,16 +204,17 @@ extern void vec_negate_and_forward(void *, void *, void *);
 extern void UpdateShieldHitsAndStrength(L23Moby *);
 
 /* Initialize the encounter objects and refresh their shared presentation state. */
-void mothership_update_us2(L23Moby *object) {
-    Quad v[10];
-    L23Boss *state = object->vars;
-    L23Moby *entity;
+/* Initialize the encounter objects and refresh their shared presentation state (USA v2.00). */
+void mothership_update_us2(L23Moby *moby) {
+    Quad vecs[10];
+    L23Boss *state = moby->vars;
+    L23Moby *obj;
     L23Moby *scan;
-    int i, j, id, n, m, mode;
+    int i, j, class_id, crowd_count, part_count, mode;
     float health;
 
     math_fast_float_d(&g_boss_hud_timer);
-    if (object->mode == 0) {
+    if (moby->mode == 0) {
         g_mothership_state_pair[1] = 0;
         g_mothership_state_pair[0] = 0;
         g_boss_part_age_counter = 1;
@@ -229,7 +230,7 @@ void mothership_update_us2(L23Moby *object) {
         state->m620 = 0;
         state->m624 = 0;
         g_flying_enemy_active_flag = 1;
-        g_mothership_boss_moby = object;
+        g_mothership_boss_moby = moby;
         state->i60C = 0;
         g_enemy_effect_param = state->i31C;
         g_mothership_effect_radius = state->f308;
@@ -260,10 +261,10 @@ void mothership_update_us2(L23Moby *object) {
         state->i408 = 0;
         for (i = 0; i < 8; i++) {
             for (j = 0; j < 3; j++) {
-                qzero(&v[0]);
+                qzero(&vecs[0]);
                 g_mothership_beam_handles[i][j] = 0;
                 g_mothership_beam_end_handles[i][j] = 0;
-                qcopy(&g_mothership_barrier_points[i][j], &v[0]);
+                qcopy(&g_mothership_barrier_points[i][j], &vecs[0]);
             }
         }
         for (i = 0; i < 4; i++) g_mothership_effect_handles[i] = 0;
@@ -273,29 +274,29 @@ void mothership_update_us2(L23Moby *object) {
         state->f57C = 0.098174773f;
         state->i578 = 0;
         g_enemy_relocate_count = 0;
-        n = 0;
-        m = 0;
+        crowd_count = 0;
+        part_count = 0;
         if (g_mothership_moby_begin < g_mothership_moby_end) {
         for (; &g_mothership_moby_begin[i] < g_mothership_moby_end; i++) {
-                entity = &g_mothership_moby_begin[i];
-                id = entity->kind;
-                if (id == 0x7E5) {
-                    g_mothership_crowd_mobys[n++] = entity;
-                } else if (id == 0x27D) {
-                    qcopy(&v[0], &entity->pos);
-                    qcopy(g_hero_state + 0x80, &entity->pos);
-                } else if (id == 0xF7E) {
-                    state->parts[m++] = entity;
-                } else if (id == 0x120F) {
-                    state->m610 = entity;
-                } else if (id == 0x123C) {
-                    state->m614 = entity;
-                } else if (id == 0xF7F) {
-                    g_mothership_part_moby = entity;
-                } else if (id == 0xF6E) {
+                obj = &g_mothership_moby_begin[i];
+                class_id = obj->kind;
+                if (class_id == 0x7E5) {
+                    g_mothership_crowd_mobys[crowd_count++] = obj;
+                } else if (class_id == 0x27D) {
+                    qcopy(&vecs[0], &obj->pos);
+                    qcopy(g_hero_state + 0x80, &obj->pos);
+                } else if (class_id == 0xF7E) {
+                    state->parts[part_count++] = obj;
+                } else if (class_id == 0x120F) {
+                    state->m610 = obj;
+                } else if (class_id == 0x123C) {
+                    state->m614 = obj;
+                } else if (class_id == MOBY_CLASS_MOTHERSHIP_BOSS_PART) {
+                    g_mothership_part_moby = obj;
+                } else if (class_id == 0xF6E) {
                     L23Tint *tint;
-                    g_mothership_moby = entity;
-                    entity->alpha = 255;
+                    g_mothership_moby = obj;
+                    obj->alpha = 255;
                     tint = g_mothership_moby->vars;
                     tint->r = 0;
                     tint->g = 0;
@@ -303,25 +304,25 @@ void mothership_update_us2(L23Moby *object) {
                 }
         }
         }
-        FastVecSub(&v[0], &v[0], g_hero_state + 0xB0);
-        g_mothership_surface_radius = FastVecLength(&v[0]);
-        v[1] = 0;
-        ((float *)&v[1])[0] = 500.0f;
-        ((float *)&v[1])[1] = 500.0f;
-        ((float *)&v[1])[2] = 430.0f;
-        mothership_project_point_onto_surface(&v[1], 0.0f);
-        qcopy(&g_boss_target_pos_a, &v[1]);
-        v[1] = 0;
-        ((float *)&v[1])[0] = 500.0f;
-        ((float *)&v[1])[1] = 500.0f;
-        ((float *)&v[1])[2] = 552.0f;
-        mothership_project_point_onto_surface(&v[1], 0.0f);
-        qcopy(&g_boss_target_pos_b, &v[1]);
-        qcopy(&object->pos, &g_mothership_start_position);
-        mothership_project_point_onto_surface(&object->pos, g_boss_surface_height);
-        object->colour = 255;
-        object->alpha = 255;
-        object->flags |= 0x100;
+        FastVecSub(&vecs[0], &vecs[0], g_hero_state + 0xB0);
+        g_mothership_surface_radius = FastVecLength(&vecs[0]);
+        vecs[1] = 0;
+        ((float *)&vecs[1])[0] = 500.0f;
+        ((float *)&vecs[1])[1] = 500.0f;
+        ((float *)&vecs[1])[2] = 430.0f;
+        mothership_project_point_onto_surface(&vecs[1], 0.0f);
+        qcopy(&g_boss_target_pos_a, &vecs[1]);
+        vecs[1] = 0;
+        ((float *)&vecs[1])[0] = 500.0f;
+        ((float *)&vecs[1])[1] = 500.0f;
+        ((float *)&vecs[1])[2] = 552.0f;
+        mothership_project_point_onto_surface(&vecs[1], 0.0f);
+        qcopy(&g_boss_target_pos_b, &vecs[1]);
+        qcopy(&moby->pos, &g_mothership_start_position);
+        mothership_project_point_onto_surface(&moby->pos, g_boss_surface_height);
+        moby->colour = 255;
+        moby->alpha = 255;
+        moby->flags |= 0x100;
         health = (float)state->h2F6;
         state->f17C = 0.15f;
         state->maxHealth = state->h2F6;
@@ -345,8 +346,8 @@ void mothership_update_us2(L23Moby *object) {
         state->flags88 |= 5;
         state->f60 = 1.57079649f;
         state->f80 = 1.55334318f;
-        moby_set_controller_speed_limits(object, 0.019444445f, 0.6333334f, 0.0017453295f, 0.20943955f);
-        moby_set_state(object, 2, 0);
+        moby_set_controller_speed_limits(moby, 0.019444445f, 0.6333334f, 0.0017453295f, 0.20943955f);
+        moby_set_state(moby, 2, 0);
         memset(g_path_end_masks, 0, 0xFE0);
         state->h390 = 0;
         state->h39C = -1;
@@ -361,14 +362,14 @@ void mothership_update_us2(L23Moby *object) {
             for (left = 4; left != 0; left--) *dst++ = *src++;
         }
         g_mothership_scan_slot_index = 0;
-        mothership_link_touching_path_ends(object);
-        part_spawn_random_path_effects(object);
+        mothership_link_touching_path_ends(moby);
+        part_spawn_random_path_effects(moby);
         state->f588 = g_boss_second_measure_a;
         state->flags88 |= 16;
-        object->timer = 15;
+        moby->timer = 15;
     } else {
-        mothership_advance_scan_slot(object);
-        mode = object->mode;
+        mothership_advance_scan_slot(moby);
+        mode = moby->mode;
         if (mode != 4 && mode != 10 && mode != 11) {
             int part;
             for (part = 5; part < 10; part++) {
@@ -393,7 +394,7 @@ void mothership_update_us2(L23Moby *object) {
         }
     }
     level_store_value_pair_us2((int)mothership_call_helper_return_true, (int)L23_DrawEncounterHud);
-    object->scale = object->cls->scale * g_mothership_scale_factor;
+    moby->scale = moby->cls->scale * g_mothership_scale_factor;
     {
         int part;
         for (part = 0; part < 10; part++) {
@@ -410,7 +411,7 @@ void mothership_update_us2(L23Moby *object) {
         state->h390 = 0;
         if (pad->f1A4 & 0x50) {
             g_boss_part_age_counter = 0;
-            moby_set_state(object, 1, 0);
+            moby_set_state(moby, 1, 0);
             game->f1E0 = 20;
             pad->f1A4 = 0;
             g_boss_hud_timer = g_mothership_init_value_a;
@@ -420,11 +421,11 @@ void mothership_update_us2(L23Moby *object) {
             cancel_hero_item_animation();
             release_moby_animation_slot(game->f2290, game->f1870);
             game->f187C = 0;
-            func_US2_L22_002C9B20(0, 1);
+            hero_set_action_us2(0, 1);
         }
     }
-    cam_compute_view_direction(&object->pos, state->m410, 0);
-    vec_negate_and_forward(&object->rot, state->m410, 0);
-    if (object->mode != 7) mothership_project_point_onto_surface(&object->pos, state->f588);
-    UpdateShieldHitsAndStrength(object);
+    cam_compute_view_direction(&moby->pos, state->m410, 0);
+    vec_negate_and_forward(&moby->rot, state->m410, 0);
+    if (moby->mode != 7) mothership_project_point_onto_surface(&moby->pos, state->f588);
+    UpdateShieldHitsAndStrength(moby);
 }

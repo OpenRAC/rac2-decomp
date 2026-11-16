@@ -14,7 +14,7 @@ extern int save_count_nonzero_flags(void);
 extern int level_get_resident_byte(void);
 extern void value_set_entry_by_index_us2(int, int);
 
-void func_US2_L00_002B22D0(void)
+void hero_play_collection_voice_line_us2(void)
 {
     int count;
     int selector;

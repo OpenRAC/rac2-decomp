@@ -40,42 +40,42 @@ extern s32 math_random_int_below(s32);
 
 /* Turns the script's angle around the actor, hands the result to the level's helpers
    and counts the class the script's identifier names. */
-s32 arena_place_and_start_fighter_pal(u8 *object, u8 *arg) {
+s32 arena_place_and_start_fighter_pal(u8 *object, u8 *fighter) {
     u8 *state = *(u8 **)(object + 0x68);
     f32 step = g_arena_fighter_turn_step;
-    f32 v;
+    f32 value;
 
-    v = FastAddRotations(*(f32 *)(state + 0x19C), step);
-    *(f32 *)(state + 0x19C) = v;
-    v = math_fast_sin_or_cos_a(v);
-    *(f32 *)(arg + 0x10) = g_arena_fighter_velocity_scale * v;
-    v = math_fast_sin_or_cos_b(*(f32 *)(state + 0x19C));
-    *(f32 *)(arg + 0x14) = g_arena_fighter_velocity_scale * v;
-    FastVecAdd(arg + 0x10, arg + 0x10, arena_get_center_point(object));
-    *(f32 *)(arg + 0x18) = math_random_float_range(g_arena_fighter_param_min, g_arena_fighter_param_max);
-    *(f32 *)(arg + 0xF4) = -1.570796489715576171875f;
-    *(s32 *)(arg + 0xF0) = 0;
-    *(f32 *)(arg + 0xF8) = *(f32 *)(state + 0x19C);
-    euler_rotation_basis(arg + 0xC0, arg + 0xF0);
-    switch (*(s16 *)(arg + 0xAA)) {
+    value = FastAddRotations(*(f32 *)(state + 0x19C), step);
+    *(f32 *)(state + 0x19C) = value;
+    value = math_fast_sin_or_cos_a(value);
+    *(f32 *)(fighter + 0x10) = g_arena_fighter_velocity_scale * value;
+    value = math_fast_sin_or_cos_b(*(f32 *)(state + 0x19C));
+    *(f32 *)(fighter + 0x14) = g_arena_fighter_velocity_scale * value;
+    FastVecAdd(fighter + 0x10, fighter + 0x10, arena_get_center_point(object));
+    *(f32 *)(fighter + 0x18) = math_random_float_range(g_arena_fighter_param_min, g_arena_fighter_param_max);
+    *(f32 *)(fighter + 0xF4) = -1.570796489715576171875f;
+    *(s32 *)(fighter + 0xF0) = 0;
+    *(f32 *)(fighter + 0xF8) = *(f32 *)(state + 0x19C);
+    euler_rotation_basis(fighter + 0xC0, fighter + 0xF0);
+    switch (*(s16 *)(fighter + 0xAA)) {
     case 0xD98:
-        security_robot_init(arg, 0, 1);
+        security_robot_init(fighter, 0, 1);
         *(s32 *)(state + 0x100) += 1;
         break;
     case 0xDCF:
-        smasher_robot_init(arg, 0, 1);
+        smasher_robot_init(fighter, 0, 1);
         *(s32 *)(state + 0x104) += 1;
         break;
     case 0xDF4:
-        flamethrower_robot_init(arg, 0, 1);
+        flamethrower_robot_init(fighter, 0, 1);
         *(s32 *)(state + 0x108) += 1;
         break;
     case 0xDF7:
-        drone_init_state(arg, 0, 1);
+        drone_init_state(fighter, 0, 1);
         *(s32 *)(state + 0x10C) += 1;
         break;
     case 0xD37:
-        enemy_init_state(arg, 0, 1);
+        enemy_init_state(fighter, 0, 1);
         *(s32 *)(state + 0x114) += 1;
         break;
     }

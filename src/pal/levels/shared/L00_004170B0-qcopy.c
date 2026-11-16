@@ -11,6 +11,7 @@ extern int math_random_int_range(int, int);
 extern void ref_L00_00412230_00(void *, void *, void *, void *, void *, float);
 extern void ref_L00_00412230_01(void *, int, void *, int);
 
+/* Builds a jagged lightning bolt of 25 points between two ends, with small random wobble, and draws it (PAL: lower threshold, 8). */
 void lightning_bolt_build_jittered_pal(char *object, char *state) {
     CurveVector points[25];
     CurveVector start, end, jitter;

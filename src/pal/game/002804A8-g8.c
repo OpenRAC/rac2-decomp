@@ -6,7 +6,7 @@ typedef unsigned long u64;
 extern int g_screen_flag_enabled __attribute__((nosda));
 extern int g_text_color_table[8] __attribute__((sda));
 extern int measure_text_width(u8 *, int, u8 *);
-extern void func_PAL_0027FB48(float, float, u64, u8 *, int, float, u64, u8 *);
+extern void FontPrintScaled_pal(float, float, u64, u8 *, int, float, u64, u8 *);
 extern int g_current_game_mode __attribute__((section(".sdata")));
 extern int g_text_flag_enabled __attribute__((sda));
 extern int g_screen_width __attribute__((nosda));
@@ -22,78 +22,78 @@ struct FontWindow {
 
 /* func_PAL_002804A8, the PAL copy of func_0027FC70 (FontPrintWindow, adapted from RAC1 draw.c,
  * GPL-3.0) with a scale, longer line tables and a flag that keeps the clip window. */
-void func_PAL_002804A8(unsigned short *win_p, u64 a1, u8 *text_p, int len, u64 a4, u8 *glyphs, float scale)
+void FontPrintWindow_pal(unsigned short *window_ptr, u64 color, u8 *text_ptr, int length, u64 texture, u8 *glyphs, float scale)
 {
-    struct FontWindow *win = (struct FontWindow *)win_p;
-    unsigned char *text = (unsigned char *)text_p;
-    short start[80];
-    short endi[80];
-    short colr_arr[80];
-    int W, Wsave, line, i, brk, width, colr, n0, last, balanced;
-    int k, y, adv;
+    struct FontWindow *window = (struct FontWindow *)window_ptr;
+    unsigned char *text = (unsigned char *)text_ptr;
+    short line_start[80];
+    short line_end[80];
+    short line_color[80];
+    int line_width, saved_width, line, i, break_pos, width, color_index, first_line_count, last_width, balanced;
+    int line_index, y, advance;
 
-    if (g_current_game_mode != 1 && !(win->flags & 0x10))
-        gfx_set_scissor_clamped(win->x_min, win->x_max - 1, win->y_min, win->y_max - 1);
+    if (g_current_game_mode != 1 && !(window->flags & 0x10))
+        gfx_set_scissor_clamped(window->x_min, window->x_max - 1, window->y_min, window->y_max - 1);
     g_text_flag_enabled = 1;
-    if ((win->flags ^ 1) & 1) {
-        W = win->x_max - win->x_anchor;
+    if ((window->flags ^ 1) & 1) {
+        line_width = window->x_max - window->x_anchor;
     } else {
-        int l = win->x_anchor;
-        int a = win->x_max - l;
-        W = l - win->x_min;
-        if (a < W)
-            W = a;
-        W = W * 2;
+        int anchor = window->x_anchor;
+        int half_right = window->x_max - anchor;
+        line_width = anchor - window->x_min;
+        if (half_right < line_width)
+            line_width = half_right;
+        line_width = line_width * 2;
     }
-    Wsave = W;
-    colr = 0;
+    saved_width = line_width;
+    color_index = 0;
     balanced = 0;
-    n0 = 0;
-    last = 0;
+    first_line_count = 0;
+    last_width = 0;
 
     for (;;) {
         line = 0;
         i = 0;
-        while (i != len && text[i] != 0 && line < 79) {
-            start[line] = i;
-            colr_arr[line] = colr;
+        while (i != length && text[i] != 0 && line < 79) {
+            line_start[line] = i;
+            line_color[line] = color_index;
             width = 0;
-            brk = i;
-            while (width < W) {
+            break_pos = i;
+            while (width < line_width) {
                 if (text[i] == 0x20 || text[i] < 0x10)
-                    brk = i;
+                    break_pos = i;
                 if (g_screen_flag_enabled != 0 && (unsigned char)(text[i] - 8) < 8)
-                    colr = text[i] - 8;
+                    color_index = text[i] - 8;
                 if (text[i] < 2)
                     break;
-                adv = ((signed char *)glyphs)[text[i] * 4 + 3];
+                advance = ((signed char *)glyphs)[text[i] * 4 + 3];
                 i++;
-                if (adv != 0)
-                    width += adv;
+                if (advance != 0)
+                    width += advance;
             }
-            endi[line] = brk;
-            if ((short)brk == start[line])
-                endi[line] = i;
-            i = endi[line];
+            line_end[line] = break_pos;
+            if ((short)break_pos == line_start[line])
+                line_end[line] = i;
+            i = line_end[line];
             if (text[i] == 0x20 || text[i] < 0x10)
-                endi[line] = endi[line] - 1;
+                line_end[line] = line_end[line] - 1;
             line++;
             if (text[i] == 0) {
-                last = width;
+                last_width = width;
                 break;
             }
             i++;
         }
         if (!balanced && line >= 2) {
-            if (n0 == 0)
-                n0 = line;
-            if (n0 < line) {
-                W = Wsave;
+            if (first_line_count == 0)
+                first_line_count = line;
+            if (first_line_count < line) {
+                line_width = saved_width;
                 balanced = 1;
                 continue;
             }
-            if (last < W / 3) {
-                W -= 16;
+            if (last_width < line_width / 3) {
+                line_width -= 16;
                 continue;
             }
         }
@@ -101,50 +101,50 @@ void func_PAL_002804A8(unsigned short *win_p, u64 a1, u8 *text_p, int len, u64 a
     }
 
     {
-        struct FontWindow *dw = win;
-        int cnt, w;
-        dw->out_w = 0;
-        y = dw->y_start;
-        dw->out_h = line * dw->line_h;
-        if (dw->flags & 2)
-            y -= (line * dw->line_h) >> 1;
-        for (k = 0; k < line; k++, y += dw->line_h) {
-            if (y + dw->line_h < dw->y_min)
+        struct FontWindow *block = window;
+        int char_count, text_width;
+        block->out_w = 0;
+        y = block->y_start;
+        block->out_h = line * block->line_h;
+        if (block->flags & 2)
+            y -= (line * block->line_h) >> 1;
+        for (line_index = 0; line_index < line; line_index++, y += block->line_h) {
+            if (y + block->line_h < block->y_min)
                 continue;
-            if (dw->y_max < y)
+            if (block->y_max < y)
                 continue;
-            cnt = endi[k] - start[k] + 1;
-            if (len > 0 && cnt > len)
-                cnt = len;
-            w = measure_text_width(text + start[k], cnt, glyphs);
-            if (dw->out_w < w)
-                dw->out_w = w;
-            if (!(dw->flags & 4)) {
-                g_text_color_table[0] = a1;
-                if (dw->flags & 8) {
+            char_count = line_end[line_index] - line_start[line_index] + 1;
+            if (length > 0 && char_count > length)
+                char_count = length;
+            text_width = measure_text_width(text + line_start[line_index], char_count, glyphs);
+            if (block->out_w < text_width)
+                block->out_w = text_width;
+            if (!(block->flags & 4)) {
+                g_text_color_table[0] = color;
+                if (block->flags & 8) {
                     float fx;
-                    if (dw->flags & 1)
-                        fx = (dw->x_anchor - (w >> 1)) + dw->x_sub * 0.0625f;
+                    if (block->flags & 1)
+                        fx = (block->x_anchor - (text_width >> 1)) + block->x_sub * 0.0625f;
                     else
-                        fx = dw->x_anchor + dw->x_sub * 0.0625f;
-                    func_PAL_0027FB48(fx, y + dw->y_sub * 0.0625f, (long)g_text_color_table[colr_arr[k]],
-                                      text + start[k], cnt, scale, a4, glyphs);
-                } else if (dw->flags & 1) {
-                    func_PAL_0027FB48(dw->x_anchor - (w >> 1), y, (long)g_text_color_table[colr_arr[k]],
-                                      text + start[k], cnt, scale, a4, glyphs);
+                        fx = block->x_anchor + block->x_sub * 0.0625f;
+                    FontPrintScaled_pal(fx, y + block->y_sub * 0.0625f, (long)g_text_color_table[line_color[line_index]],
+                                      text + line_start[line_index], char_count, scale, texture, glyphs);
+                } else if (block->flags & 1) {
+                    FontPrintScaled_pal(block->x_anchor - (text_width >> 1), y, (long)g_text_color_table[line_color[line_index]],
+                                      text + line_start[line_index], char_count, scale, texture, glyphs);
                 } else {
-                    func_PAL_0027FB48(dw->x_anchor, y, (long)g_text_color_table[colr_arr[k]],
-                                      text + start[k], cnt, scale, a4, glyphs);
+                    FontPrintScaled_pal(block->x_anchor, y, (long)g_text_color_table[line_color[line_index]],
+                                      text + line_start[line_index], char_count, scale, texture, glyphs);
                 }
             }
-            if (len > 0) {
-                len -= cnt;
-                if (len <= 0)
+            if (length > 0) {
+                length -= char_count;
+                if (length <= 0)
                     break;
             }
         }
     }
     g_text_flag_enabled = 0;
-    if (g_current_game_mode != 1 && !(win->flags & 0x10))
+    if (g_current_game_mode != 1 && !(window->flags & 0x10))
         gfx_set_scissor_clamped(0, g_screen_width - 1, 0, g_screen_height - 1);
 }

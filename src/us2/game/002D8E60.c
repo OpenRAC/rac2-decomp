@@ -11,15 +11,16 @@ extern int g_block_load_disc_handle;
 extern State2D6E78 g_pause_menu_state;
 extern void menu_stream_chunk_table_init(int);
 
-int func_US2_002D8E60(char *object)
+/* Starts the block load: clears the loader's saved values and marks the chunk slots whose key is below the limit. */
+int menu_block_load_start_us2(char *menu)
 {
     int i;
     unsigned int *key;
     unsigned int *flags;
 
     menu_stream_chunk_table_init(1);
-    *(int *)(object + 0x54) = 0;
-    *(int *)(object + 0x38) = 0;
+    *(int *)(menu + 0x54) = 0;
+    *(int *)(menu + 0x38) = 0;
     flags = &g_menu_chunk_table[0].flags;
     key = &g_menu_chunk_table[0].key;
     for (i = 0; i < 5; i++) {
@@ -28,8 +29,8 @@ int func_US2_002D8E60(char *object)
         flags += 2;
         key += 2;
     }
-    *(int *)(object + 0x50) = 0;
-    *(int *)(object + 0x10) |= 4;
+    *(int *)(menu + 0x50) = 0;
+    *(int *)(menu + 0x10) |= 4;
     return 0;
 }
 extern void load_request_disc_read_break(void);
@@ -38,15 +39,16 @@ extern void load_request_disc_read_break(void);
 extern int g_subtitle_entries __attribute__((sda));
 extern int g_block_load_object_word;
 
-int func_US2_002D8F00(char *object)
+/* Finishes the loader: stops a running read, then stores the loaded block values. */
+int menu_block_load_finish_us2(char *menu)
 {
-    if (g_sequence_active_flag != 0 && *(int *)(object + 0x50) == 3)
+    if (g_sequence_active_flag != 0 && *(int *)(menu + 0x50) == 3)
         load_request_disc_read_break();
     menu_stream_chunk_table_init(1);
     {
-        int value = *(int *)(object + 0x54);
+        int value = *(int *)(menu + 0x54);
         if (value != 0) {
-            g_block_load_object_word = *(int *)(object + 0x38);
+            g_block_load_object_word = *(int *)(menu + 0x38);
             g_subtitle_entries = value;
         }
     }
@@ -73,9 +75,10 @@ typedef struct {
 
 /* func_US2_002D8F70, the v2.00 copy of func_002D8338: the read now takes two steps, first one
    sector holding a table of byte offsets, then the block at the entry D_001A7BB4 selects. */
-int func_US2_002D8F70(char *object)
+/* Advances the loader: reads the offset table, then the block for the current language, and unpacks and relocates its entries. */
+int menu_block_loader_update_us2(char *menu)
 {
-    Loader2D8338 *loader = (Loader2D8338 *)object;
+    Loader2D8338 *loader = (Loader2D8338 *)menu;
 
     switch (loader->state) {
     case 4:
@@ -145,107 +148,108 @@ extern int g_initial_field_value SDATA(D_US2_001ABB3C);
 extern void VU1_addGSregister(unsigned int, unsigned long long);
 extern void SetupGifPaging(int);
 extern void *memset(void *, int, int);
-extern unsigned long func_US2_0027CED8(int);
+extern unsigned long tex_get_effect_descriptor_us2(int);
 extern char *GetLocalizedString(int);
 extern void gfx_disable_screen_flag(void), gfx_enable_screen_flag(void), DoGifPaging(void);
-extern void func_US2_00280550(short *, unsigned long, int, int, unsigned long, char *, float);
+extern void FontPrintWindow_us2(short *, unsigned long, int, int, unsigned long, char *, float);
 extern void DrawMenuCheckBox(int, int, int);
 extern void gfx_draw_screen_line(int, int, int, int, int, int);
 
 /* func_US2_002D9178, the v2.00 copy of func_002D84B0: the lower scroll limit is rounded to whole
    row steps, a scroll step is capped at four, and text goes through the scaled print function. */
-int func_US2_002D9178(char *object)
+/* Draws a scrolling list of menu rows with checkboxes, highlighting the selected row. */
+int menu_text_list_draw_checkboxes_us2(char *menu)
 {
     MenuTextRectangle rectangle, initial;
     short *row;
-    int height = 12, texture = 1, lineHeight, top;
+    int height = 12, texture = 1, line_height, top;
     int count, index, selected, enabled, text;
-    int active = *(char **)(g_active_menu_object + 0xE8) == object;
+    int active = *(char **)(g_active_menu_object + 0xE8) == menu;
     char *font = g_font_glyphs_small;
     int spacing;
-    unsigned long textureWord;
+    unsigned long texture_word;
     int colour;
     int step, span, limit;
-    if (*(int *)(object + 0x30) & 4) { height = 14; font = g_font_glyphs_large; texture = 3; }
-    if (*(int *)(object + 0x30) & 8) { height = 11; font = g_font_glyphs_medium; texture = 2; }
+    if (*(int *)(menu + 0x30) & 4) { height = 14; font = g_font_glyphs_large; texture = 3; }
+    if (*(int *)(menu + 0x30) & 8) { height = 11; font = g_font_glyphs_medium; texture = 2; }
     VU1_addGSregister(66, 68);
-    lineHeight = height + 2;
+    line_height = height + 2;
     VU1_addGSregister(71, 0x2004B);
     SetupGifPaging(0);
-    row = *(short **)(object + 0x34);
+    row = *(short **)(menu + 0x34);
     count = 0;
     while (row[0]) { row += 6; count++; }
-    if (*(int *)(object + 0x30) & 16) spacing = height + 3;
-    else spacing = *(int *)(object + 0x24) / (count + 1);
+    if (*(int *)(menu + 0x30) & 16) spacing = height + 3;
+    else spacing = *(int *)(menu + 0x24) / (count + 1);
     top = height / 2 - 1;
     memset(&initial, 0, 24);
     initial.fields[0] = 4;
-    initial.fields[1] = *(int *)(object + 0x24) - 4;
+    initial.fields[1] = *(int *)(menu + 0x24) - 4;
     initial.fields[2] = g_initial_field_value;
-    initial.fields[3] = *(int *)(object + 0x20) - 2;
-    initial.fields[5] = top - *(int *)(object + 0x44);
-    initial.fields[8] = lineHeight;
+    initial.fields[3] = *(int *)(menu + 0x20) - 2;
+    initial.fields[5] = top - *(int *)(menu + 0x44);
+    initial.fields[8] = line_height;
     rectangle = initial;
     step = rectangle.fields[8] * 2;
-    if (*(int *)(object + 0x30) & 0x20) step += 6 + spacing;
+    if (*(int *)(menu + 0x30) & 0x20) step += 6 + spacing;
     span = rectangle.fields[1] - (rectangle.fields[0] + top) + 2;
     limit = step * ((span + rectangle.fields[8]) / step) + top;
-    textureWord = func_US2_0027CED8(texture);
-    for (index = 0; (*(short **)(object + 0x34))[index * 6]; index++) {
-        selected = active && *(int *)(object + 0x40) == index;
-        enabled = (*(short **)(object + 0x34))[index * 6 + 1] != 0;
-        if (*(int *)(object + 0x30) & 2) colour = (int)0x80F0F0F0u;
+    texture_word = tex_get_effect_descriptor_us2(texture);
+    for (index = 0; (*(short **)(menu + 0x34))[index * 6]; index++) {
+        selected = active && *(int *)(menu + 0x40) == index;
+        enabled = (*(short **)(menu + 0x34))[index * 6 + 1] != 0;
+        if (*(int *)(menu + 0x30) & 2) colour = (int)0x80F0F0F0u;
         else if (selected) colour = enabled ? (int)0x8020FFFFu : (int)0x80006060u;
         else colour = enabled ? (int)0x80F0F0F0u : (int)0x80303030u;
-        if (!(*(int *)(object + 0x30) & 0x10000) && selected && rectangle.fields[5] < top) {
+        if (!(*(int *)(menu + 0x30) & 0x10000) && selected && rectangle.fields[5] < top) {
             int delta = top - rectangle.fields[5];
             if (delta > 4) delta = 4;
-            *(int *)(object + 0x44) -= delta;
+            *(int *)(menu + 0x44) -= delta;
         }
-        text = GetLocalizedString((*(short **)(object + 0x34))[index * 6]);
-        rectangle.fields[4] = (*(int *)(object + 0x30) & 0xA00) ? 32 : 4;
-        if (*(int *)(object + 0x30) & 0x400) {
+        text = GetLocalizedString((*(short **)(menu + 0x34))[index * 6]);
+        rectangle.fields[4] = (*(int *)(menu + 0x30) & 0xA00) ? 32 : 4;
+        if (*(int *)(menu + 0x30) & 0x400) {
             rectangle.fields[9] = 1;
-            rectangle.fields[4] = *(int *)(object + 0x20) >> 1;
+            rectangle.fields[4] = *(int *)(menu + 0x20) >> 1;
         }
         if (selected) gfx_disable_screen_flag();
-        func_US2_00280550(rectangle.fields, colour, text, -1, textureWord, font, 1.0f);
+        FontPrintWindow_us2(rectangle.fields, colour, text, -1, texture_word, font, 1.0f);
         if (selected) gfx_enable_screen_flag();
-        if (*(int *)(object + 0x30) & 0x200)
+        if (*(int *)(menu + 0x30) & 0x200)
             DrawMenuCheckBox(15, rectangle.fields[5] + 9, g_item_enabled_flags[index] != 0);
-        if (*(int *)(object + 0x30) & 0x800)
-            DrawMenuCheckBox(15, rectangle.fields[5] + 9, g_language == *(int *)(*(short **)(object + 0x34) + index * 6 + 2));
+        if (*(int *)(menu + 0x30) & 0x800)
+            DrawMenuCheckBox(15, rectangle.fields[5] + 9, g_language == *(int *)(*(short **)(menu + 0x34) + index * 6 + 2));
         rectangle.fields[5] += rectangle.fields[7];
-        if ((*(short **)(object + 0x34))[index * 6 + 4]) {
-            text = GetLocalizedString((*(short **)(object + 0x34))[index * 6 + 4]);
+        if ((*(short **)(menu + 0x34))[index * 6 + 4]) {
+            text = GetLocalizedString((*(short **)(menu + 0x34))[index * 6 + 4]);
             rectangle.fields[4] = 20;
-            if (*(int *)(object + 0x30) & 0x20) {
+            if (*(int *)(menu + 0x30) & 0x20) {
                 int x, y;
-                rectangle.fields[4] = *(int *)(object + 0x20) >> 1;
+                rectangle.fields[4] = *(int *)(menu + 0x20) >> 1;
                 x = rectangle.fields[2] + rectangle.fields[4];
                 y = rectangle.fields[0] + rectangle.fields[5] + 2;
                 gfx_draw_screen_line(x - 8, y, x + 8, y, (colour & 0xFFFFFF) | 0x50000000, 0);
                 rectangle.fields[5] += 6;
             }
-            func_US2_00280550(rectangle.fields, colour, text, -1, textureWord, font, 1.0f);
+            FontPrintWindow_us2(rectangle.fields, colour, text, -1, texture_word, font, 1.0f);
             rectangle.fields[5] += spacing;
         }
         rectangle.fields[5] += rectangle.fields[7];
-        if (!(*(int *)(object + 0x30) & 0x10000) && selected) {
+        if (!(*(int *)(menu + 0x30) & 0x10000) && selected) {
             if (rectangle.fields[5] > limit) {
-                if (*(int *)(object + 0x30) & 0x8000)
-                    *(int *)(object + 0x44) += rectangle.fields[5] - limit;
+                if (*(int *)(menu + 0x30) & 0x8000)
+                    *(int *)(menu + 0x44) += rectangle.fields[5] - limit;
                 else {
                     int delta = rectangle.fields[5] - limit;
                     if (delta > 4) delta = 4;
-                    *(int *)(object + 0x44) += delta;
+                    *(int *)(menu + 0x44) += delta;
                 }
             }
         }
     }
     DoGifPaging();
-    if (*(int *)(object + 0x30) & 0x8000) {
-        *(int *)(object + 0x30) ^= 0x8000;
+    if (*(int *)(menu + 0x30) & 0x8000) {
+        *(int *)(menu + 0x30) ^= 0x8000;
         return 1;
     }
     return 2;

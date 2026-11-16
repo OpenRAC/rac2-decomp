@@ -126,6 +126,7 @@ extern float coll_probe_ground_height_below(void *, int, float);
 extern int PlayMobySound(int, int, CrateMoby *);
 extern void set_moby_color(CrateMoby *, int, int, int);
 
+/* Updates a crate: follows the stack motion, reacts to hits, breaks open and drops its loot, and respawns when allowed (v2.00 copy). */
 void CrateUpdate_us2(CrateMoby *moby)
 {
     CrateBurst burst;
@@ -161,7 +162,7 @@ void CrateUpdate_us2(CrateMoby *moby)
         vec_clear_128(vars->f90);
         moby->state = 1;
         vars->fA8 = 0;
-        if (moby->oClass == 0x1FF) {
+        if (moby->oClass == MOBY_CLASS_AMMO_CRATE) {
             vars->frame++;
         }
         if (vars->fCC == 0) {
@@ -171,11 +172,11 @@ void CrateUpdate_us2(CrateMoby *moby)
             }
         }
         vars->linked = 0;
-        if (moby->oClass == 0x1FF) {
+        if (moby->oClass == MOBY_CLASS_AMMO_CRATE) {
             vars->fC6 = 100;
-        } else if (moby->oClass == 0x1F5) {
+        } else if (moby->oClass == MOBY_CLASS_NANOTECH_CRATE) {
             vars->linked = moby_spawn_linked_child(moby, 0);
-        } else if (moby->oClass == 0x200) {
+        } else if (moby->oClass == MOBY_CLASS_PURPLE_NANOTECH_CRATE) {
             vars->linked = moby_spawn_linked_child(moby, 1);
         }
         break;
@@ -183,7 +184,7 @@ void CrateUpdate_us2(CrateMoby *moby)
         if (flag_set_first_pending(moby)) {
             vars->f100 = 0;
         }
-        if (moby->oClass == 0x1F9 &&
+        if (moby->oClass == MOBY_CLASS_EXPLOSIVE_CRATE &&
             (HERO->f270 == moby || HERO->collHitMoby == moby ||
              (HERO->groundMoby == moby && HERO->airFrames == 0) ||
              HERO->ledgeMoby == moby || touched)) {
@@ -197,12 +198,12 @@ void CrateUpdate_us2(CrateMoby *moby)
             break;
         }
         if (hit != 0 && hit->f2C > 0.0f) {
-            int doHit = 1;
+            int do_hit = 1;
 
-            if (moby->oClass == 0x1F6 && !(hit->flags & 0x20000)) {
-                doHit = 0;
+            if (moby->oClass == 0x1F6 /* moby class 502 */ && !(hit->flags & 0x20000)) {
+                do_hit = 0;
             }
-            if (moby->oClass == 0x1F9) {
+            if (moby->oClass == MOBY_CLASS_EXPLOSIVE_CRATE) {
                 moby->state = 5;
                 if (hit->flags & 0x20000) {
                     moby->command = 1;
@@ -210,10 +211,10 @@ void CrateUpdate_us2(CrateMoby *moby)
                     moby->command = FloatToInt(math_random_float_range(5.0f, 15.0f));
                 }
                 vars->savedColor = moby->color;
-                doHit = 0;
+                do_hit = 0;
             }
-            if (doHit) {
-                DestroyCrate(moby, moby->oClass == 0x1F9, hit);
+            if (do_hit) {
+                DestroyCrate(moby, moby->oClass == MOBY_CLASS_EXPLOSIVE_CRATE, hit);
                 crate_drop_loot_us2(moby);
             }
             moby->hitSlot = 255;
@@ -226,7 +227,7 @@ void CrateUpdate_us2(CrateMoby *moby)
         }
         break;
     case 3:
-        if (moby->oClass == 0x1F9 && vars->burstFrame < 21) {
+        if (moby->oClass == MOBY_CLASS_EXPLOSIVE_CRATE && vars->burstFrame < 21) {
             float radius;
             int target;
 

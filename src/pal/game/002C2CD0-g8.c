@@ -7,6 +7,8 @@ extern void part_kill(void *);
 extern unsigned char *g_part_tex_spinning_fall_table[];
 extern float g_falling_spin_param __attribute__((sda));
 
+/* Spinning particle that falls with growing speed once its timer ends and is freed when it
+   passes its height limit. (PAL: 50 Hz timings) */
 void part_update_spinning_fall_pal(char *self)
 {
     char *state = self + 32;

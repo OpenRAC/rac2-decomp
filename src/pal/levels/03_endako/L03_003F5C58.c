@@ -21,22 +21,22 @@ extern s32 g_object_group_count[] __attribute__((sda));
  * state's group (word 0x80) to func_0029F338 and ends with func_0029B3E0(0, -1). */
 void endako_boss_start_area_objects_pal(u8 *entity) {
     u8 *state = *(u8 **)(entity + 0x68);
-    u16 *p;
-    u8 *e;
+    u16 *id_ptr;
+    u8 *record;
 
     part_start_record_effect_by_index(*(s32 *)(state + 0x58), *(s32 *)(state + 0x5C));
     g_status_flag_b[0x04] = 1;
     g_status_flag_b[0x3C] = 1;
     help_unlock_entry(13);
     moby_handle_request_slot_state(13);
-    for (p = (u16 *)g_entity_id_lists[*(s32 *)(state + 0x80)];
+    for (id_ptr = (u16 *)g_entity_id_lists[*(s32 *)(state + 0x80)];
          (*(s32 *)(state + 0x80) & 0xFF) != 0xFF && *(s32 *)(state + 0x80) <= g_object_group_count[0] &&
-         p != 0 && ((p != 0 && (s16)p[-1] >= 0) || p == (u16 *)g_entity_id_lists[*(s32 *)(state + 0x80)]);
-         p++) {
-        e = g_moby_record_base + ((*p & 0x7FFF) << 8);
-        if (e == 0)
+         id_ptr != 0 && ((id_ptr != 0 && (s16)id_ptr[-1] >= 0) || id_ptr == (u16 *)g_entity_id_lists[*(s32 *)(state + 0x80)]);
+         id_ptr++) {
+        record = g_moby_record_base + ((*id_ptr & 0x7FFF) << 8);
+        if (record == 0)
             break;
-        moby_mark_spawned(e);
+        moby_mark_spawned(record);
     }
     MemcardSave(0, -1);
 }

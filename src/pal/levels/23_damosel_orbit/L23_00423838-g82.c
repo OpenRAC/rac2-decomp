@@ -8,7 +8,8 @@ extern s32 g_boss_camera_timer;
 extern void part_queue_impact_effect(void *,void *,s32,const TI16 *,const float *,f32);
 extern void part_start_effect_default_table(void *,void *,s32,const TI16 *,f32);
 
-void func_PAL_L23_00423898(u8 *target,s32 flags,s32 duration,TI16 *position,float *settings,s32 save)
+/* Plays a camera or hero effect on a target, either with extra settings or without. (PAL: 50 Hz timer) */
+void cam_play_effect_on_target_pal(u8 *target,s32 flags,s32 duration,TI16 *position,float *settings,s32 save)
 {
     TI16 copy=*position;
     if(settings!=0)

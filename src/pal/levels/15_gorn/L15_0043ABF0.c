@@ -20,20 +20,21 @@ extern int math_random_int_range(int, int);
 extern int FloatToInt(float);
 extern float IntToFloat(int);
 
-void func_PAL_L15_0043ABF0(char *object, int a1, int joint, float radius) {
+/* Spawns a spinning spark particle at a joint of the Gorn ship, thrown away from the hero. (PAL: 50 Hz speeds and lifetimes) */
+void gorn_part_spawn_puff_pal(char *object, int joint, int spread_mode, float radius) {
     float initial[4], point[4], velocity[4];
     float heading, speed, tilt, yaw;
     unsigned char *particle;
     unsigned char *data;
     int one = 1;
 
-    moby_transform_joint_to_world(object, a1, initial);
+    moby_transform_joint_to_world(object, joint, initial);
     heading = mat_fast_helper_a(g_hero_l15_state_floats.position[0] - *(float *)(object + 0x10),
                             g_hero_l15_state_floats.position[1] - *(float *)(object + 0x14));
     point[0] = initial[0] + math_random_signed_float_range(0, radius);
     point[1] = initial[1] + math_random_signed_float_range(0, radius);
     point[2] = initial[2] + math_random_signed_float_range(0, radius);
-    if (joint != 0) {
+    if (spread_mode != 0) {
         speed = math_random_float_range(radius * 0.020000001f, radius * 2 * 0.020000001f);
         tilt = math_random_signed_float_range(0, 1.396263599395752f);
     } else {

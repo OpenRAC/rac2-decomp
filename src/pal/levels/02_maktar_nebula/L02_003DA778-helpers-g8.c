@@ -24,6 +24,7 @@ extern float math_fabs(float);
 
 /* Only table-row stores use the non-clobbering copy: the surrounding scalar
  * accesses and live stack vectors occupy distinct storage. */
+/* Records the blade's end and base positions each frame into a trail history of up to 50 samples, smoothing towards the new positions. */
 void chainblade_record_trail_sample_pal(char *self, int joint) {
     float origin[4] __attribute__((aligned(16)));
     float endpoint[4] __attribute__((aligned(16)));

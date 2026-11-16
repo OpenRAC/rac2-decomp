@@ -50,7 +50,8 @@ static __inline__ int scaled_coord(int value, float scale, float half, int activ
     return result;
 }
 
-void func_US2_L11_0044709C(char *a0) {
+/* Draws the Joba menu header and the count box with its message. (USA v2.00 text ids) */
+void joba_menu_draw_header_count_box_us2(char *moby) {
     char buf1[0x20];
     char buf2[0x70];
     char *state;
@@ -59,9 +60,9 @@ void func_US2_L11_0044709C(char *a0) {
     float x, s, half;
     int r0, r1, r2, r3, one;
 
-    joba_menu_draw_help_prompts(a0, 0);
+    joba_menu_draw_help_prompts(moby, 0);
     half = 0.5f;
-    state = *(char **)(a0 + 0x68);
+    state = *(char **)(moby + 0x68);
     text = (char *)GetLocalizedString(0x2DDB);
     one = 1;
     s = g_hud_label_y_param;

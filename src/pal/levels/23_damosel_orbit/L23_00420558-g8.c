@@ -9,8 +9,8 @@ extern float math_fabs(float);
 
 /* Springs the first measure toward its target at the three scaled global rates, and latches
  * it once it is within a tenth of the target. */
-void mothership_ease_value_to_target_pal(char *arg0) {
-    char *state = *(char **)(arg0 + 0x68);
+void mothership_ease_value_to_target_pal(char *boss) {
+    char *state = *(char **)(boss + 0x68);
 
     if (*(int *)(state + 0x5DC) != 0)
         return;

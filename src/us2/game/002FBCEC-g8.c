@@ -1,5 +1,5 @@
 /* func_US2_002FBCEC, the v2.00 boot copy of func_002FAE68 and the C of func_US2_L00_0037A5D0, where D_001A7A20
- * is a plain extern read with lui/lw. */
+ * is prev_state plain extern read with lui/lw. */
 #include "include_asm.h"
 #include "names.h"
 
@@ -26,7 +26,7 @@ extern char *GetLocalizedString(int);
 
 /* func_US2_002FBCEC, the v2.00 copy of func_002FAE68: the same state machine, where the
  * prompts are looked up in the text table. */
-void func_US2_002FBCEC(void) {
+void shop_step_message_states_us2(void) {
     {
     static void *rc2_labels[] = {&&rc2_case_0, &&rc2_case_1, &&rc2_case_2, &&rc2_case_3, &&rc2_case_4, &&rc2_case_5, &&rc2_case_6};
     unsigned int rc2_selector = (unsigned int)(g_vendor_menu_state.st);
@@ -100,9 +100,9 @@ goto *D_0026DBE0[rc2_selector];
     rc2_case_6:
         if (g_memcard_state.f15C < 3 && g_memcard_state.f164 < 0) {
             if (g_memcard_state.f1C == 0) {
-                int a = g_memcard_state.f8;
-                if (a == 2 && g_memcard_state.f14 != 0) {
-                    g_vendor_menu_state.st = a;
+                int prev_state = g_memcard_state.f8;
+                if (prev_state == 2 && g_memcard_state.f14 != 0) {
+                    g_vendor_menu_state.st = prev_state;
                     goto rc2_switch_end;
                 }
             }

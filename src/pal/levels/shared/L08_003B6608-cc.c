@@ -112,6 +112,7 @@ extern float FastVecLength(void *);
 extern u8 *part_spawn_velocity_particle(void *, void *, int, int, float);
 extern void SpawnExplosionEffects_pal(void *, void *, void *, float, float, int, int, int, float, float, float, float, int, float, int, int, int, int, int);
 extern int coll_process_hit(void *, float, int, void *, void *);
+/* Updates a flying bolt effect moby: moves it, plays a near-miss sound, and bursts into sparks when it hits something. */
 void bolt_effect_update_pal(char *obj) {
     struct { Vec old; CollisionInput collision; Vec velocity, random; } frame;
     CollisionInput *input;

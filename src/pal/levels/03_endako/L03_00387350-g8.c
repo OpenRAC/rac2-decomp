@@ -15,11 +15,12 @@ extern void matrix_mul_vec3(void *, void *, void *);
 extern void FastVecAdd(void *, void *, void *);
 extern unsigned int FastTweenColor(unsigned int, unsigned int, float);
 extern void *part_spawn_trail(void *, void *, void *, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, int);
-void func_PAL_L03_00387350(char *m)
+/* Spawns trails of coloured particles from each of the sixteen linked effect records. (PAL: 50 Hz) */
+void linked_effect_spawn_particles_pal(char *moby)
 {
     float point[4], position[4], velocity[4], params[4];
     int i;
-    ParticleIds *ids = *(ParticleIds **)(m + 0x68);
+    ParticleIds *ids = *(ParticleIds **)(moby + 0x68);
     for (i = 0; i < 16; i++) {
         int index = ids->id[i];
         char *base = g_linked_effect_records;

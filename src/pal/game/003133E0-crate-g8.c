@@ -64,7 +64,7 @@ extern void DestroyCrate_pal(Moby *moby, int, int);
 extern void crate_drop_loot_pal(Moby *moby);
 extern int coll_apply_push_to_object(Moby *moby, void *attachment, void *position, void *rotation,
                           void *outPosition, void *outRotation);
-extern void mat_combine_and_store(void *, void *movement, void *previousRotation, void *rotation);
+extern void mat_combine_and_store(void *, void *movement, void *previous_rotation, void *rotation);
 extern AttachmentInfo *moby_get_private_value_2(void *attachment);
 extern int CollLine(void *start, void *end, int, void *moby, int);
 
@@ -78,9 +78,9 @@ void UpdateCrateStackMotion_pal(Moby *moby)
     float end[4] __attribute__((aligned(16)));
     float hit[4] __attribute__((aligned(16)));
     float delta[4] __attribute__((aligned(16)));
-    float attachPosition[4] __attribute__((aligned(16)));
-    float previousPosition[4] __attribute__((aligned(16)));
-    float previousRotation[4] __attribute__((aligned(16)));
+    float attach_position[4] __attribute__((aligned(16)));
+    float previous_position[4] __attribute__((aligned(16)));
+    float previous_rotation[4] __attribute__((aligned(16)));
     float movement[4] __attribute__((aligned(16)));
     CrateVars *vars;
     Moby *bottom;
@@ -118,7 +118,7 @@ void UpdateCrateStackMotion_pal(Moby *moby)
             if (math_fabs(delta[0]) < 0.55f && math_fabs(delta[1]) < 0.55f &&
                 delta[2] < 0.0f && delta[2] > -(g_hero_state.f250 + g_hero_state.f264) &&
                 (moby->state == 1 || moby->state == 5)) {
-                DestroyCrate_pal(moby, moby->oClass == 0x1F9, 0);
+                DestroyCrate_pal(moby, moby->oClass == MOBY_CLASS_EXPLOSIVE_CRATE, 0);
                 crate_drop_loot_pal(moby);
             }
 
@@ -145,22 +145,22 @@ void UpdateCrateStackMotion_pal(Moby *moby)
                                       math_fabs(vars->velocity[3])) == 0.0f)
                         vars->velocity[3] = 0.0f;
                 }
-                qcopy(attachPosition, vars->attachOffset);
-                attachPosition[2] += vars->lift;
+                qcopy(attach_position, vars->attachOffset);
+                attach_position[2] += vars->lift;
                 if (moby != 0)
                     moby->f36 = 0x7F80;
-                qcopy(previousPosition, moby->position);
-                qcopy(previousRotation, moby->rotation);
-                coll_apply_push_to_object(moby, vars->attachment, attachPosition, vars->attachRotation,
+                qcopy(previous_position, moby->position);
+                qcopy(previous_rotation, moby->rotation);
+                coll_apply_push_to_object(moby, vars->attachment, attach_position, vars->attachRotation,
                               moby->position, moby->rotation);
                 if (moby_get_private_value_2(vars->attachment)->flags & 4) {
-                    qcopy(vars->attachOffset, attachPosition);
+                    qcopy(vars->attachOffset, attach_position);
                     vars->attachOffset[2] -= vars->lift;
                 }
-                FastVecSub(movement, moby->position, previousPosition);
+                FastVecSub(movement, moby->position, previous_position);
                 movement[3] = vars->velocity[3];
                 qcopy(vars->velocity, movement);
-                mat_combine_and_store(vars->f50, vars->velocity, previousRotation, moby->rotation);
+                mat_combine_and_store(vars->f50, vars->velocity, previous_rotation, moby->rotation);
             } else {
                 /* Fall until the line down from the crate hits the ground, or onto the crate
                  * below. */
@@ -182,12 +182,12 @@ void UpdateCrateStackMotion_pal(Moby *moby)
                     /* A fast landing sets off a class 0x1F9 crate in state 1: this one, or the
                      * one below. */
                     if ((vars->flags & 0x20) && FastVecLength(vars->velocity) > 0.010000001f) {
-                        if (moby->oClass == 0x1F9 && moby->state == 1) {
+                        if (moby->oClass == MOBY_CLASS_EXPLOSIVE_CRATE && moby->state == 1) {
                             moby->fBC = 0;
                             moby->state = 5;
                         } else {
                             below = vars->below;
-                            if (below != 0 && below->oClass == 0x1F9 && below->state == 1) {
+                            if (below != 0 && below->oClass == MOBY_CLASS_EXPLOSIVE_CRATE && below->state == 1) {
                                 below->state = 5;
                                 vars->below->fBC = 0;
                             }

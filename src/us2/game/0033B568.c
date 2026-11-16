@@ -4,7 +4,7 @@
 typedef struct { float x, y, width, height; } TitlePosition;
 extern void object_init_derived_c(void *, void *, void *);
 extern int *object_get_fourth_field(void *);
-extern void func_US2_003377B0(void *, void *, void *);
+extern void hud_init_widget_defaults_us2(void *, void *, void *);
 extern int *ui_return_second_arg(int, int);
 extern void *pool_alloc_cell(void *);
 extern void object_set_second_float4(void *, float, float, float, float);
@@ -46,7 +46,7 @@ void title_screen_init_labels_us2(unsigned char *obj, void *arg)
     *(int *)object_get_fourth_field(obj + 0x134) = 0x60F0F0B0;
     v = 65.0f;
     *(float *)(obj + 0x214) = v;
-    func_US2_003377B0(obj + 0x170, text, *(void **)(obj + 0x210));
+    hud_init_widget_defaults_us2(obj + 0x170, text, *(void **)(obj + 0x210));
     *(int *)object_get_fourth_field(obj + 0x170) = 0x80F0F0F0;
     object_set_second_float4(obj + 0x170, 0.7f, 0.7f, 0.0f, 0.0f);
 }

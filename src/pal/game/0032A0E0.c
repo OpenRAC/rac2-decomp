@@ -7,6 +7,7 @@ extern void matrix_mul_vec3(void *, void *, void *);
 extern void FastVecAdd(void *, void *, void *);
 extern void FastVecAdd(void *, void *, void *);
 
+/* Moves the owner's spark records around it and frees each one after it has turned a full circle. */
 void part_update_orbiting_sparks_pal(char *owner)
 {
     int address = (int)g_spark_records;
@@ -41,18 +42,19 @@ extern void gfx_draw_facing_sprite(char *, int, int, float, char *, int, char *,
 extern void gfx_draw_facing_sprite_near_cam(char *, int, int, float, float, int, int, float);
 extern void DrawAndReleaseObjectParticles(char *);
 
+/* Draws the glow, sparkle and particle effects of the object. */
 void DrawObjectSpriteEffects_pal(char *obj)
 {
     char *data;
-    float f;
-    char *pos;
+    float fraction;
+    char *position;
 
     data = *(char **)(obj + 0x68);
     if ((unsigned char)(*(unsigned char *)(obj + 0x20) - 2) < 2) {
-        pos = data + 0x30;
-        f = IntToFloat(*(int *)(data + 0x44)) / IntToFloat(0x11);
-        gfx_draw_facing_sprite(pos, 0x204080, *(int *)(data + 0x58),
-                       math_ease_out_quad(1.0f - f) * 0.75f, (char *)0x2E, 1,
+        position = data + 0x30;
+        fraction = IntToFloat(*(int *)(data + 0x44)) / IntToFloat(0x11);
+        gfx_draw_facing_sprite(position, 0x204080, *(int *)(data + 0x58),
+                       math_ease_out_quad(1.0f - fraction) * 0.75f, (char *)0x2E, 1,
                        data + 0x20, 0.0f);
     }
     DrawParticleGlows(obj);

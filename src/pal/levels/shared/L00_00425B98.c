@@ -37,7 +37,7 @@ typedef struct {
     TI128 v90;                     
     char padA0[0x58];
     GroundMoby *ground;            
-    float groundHeight;            
+    float ground_height;            
 } MoveView;
 typedef struct {
     TI128 v00;                     
@@ -81,13 +81,13 @@ void TranslateObjectAndView_pal(MoveObject *object, TI128 *input)
         if (g_hero_locked_flag[0] == 0) {
             if (g_hero_state.flag348 == 0) {
                 if (ground == view->ground) {
-                    height = ground->height - view->groundHeight;
+                    height = ground->height - view->ground_height;
                     if (height > 0.0f && ((float *)step)[2] < height)
                         ((float *)step)[2] = height;
-                    view->groundHeight = g_hero_state.ground->height;
+                    view->ground_height = g_hero_state.ground->height;
                 } else {
                     view->ground = ground;
-                    view->groundHeight = g_hero_state.ground->height;
+                    view->ground_height = g_hero_state.ground->height;
                 }
             } else
                 view->ground = 0;

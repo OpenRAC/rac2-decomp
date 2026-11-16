@@ -29,17 +29,18 @@ extern void snd_set_default_group_volumes(void);
 extern int snd_pump_music_and_disc_read_pal(int);
 extern void snd_send_cmd11_one_value(int);
 extern void load_data_and_setup_callback(void);
-extern int func_PAL_002D6710(int, char *);
+extern int menu_send_request_pal(int, char *);
 extern void save_build_packet(char *);
 extern void menu_init_block_fields(void);
 extern int request_begin_slot(int, int, int, int, int);
 extern int menu_get_counter(void);
 extern int menu_get_mode(void);
 extern int snd_play_from_global_bank(int, unsigned int, void *);
-extern int func_PAL_00299518(void);
-extern int func_PAL_00299520(void);
+extern int menu_get_pending_value_pal(void);
+extern int menu_take_pending_value_pal(void);
 
-int func_PAL_002DDCE8(SaveMenu *menu)
+/* Load slot menu input: picks a slot with up and down and starts loading the chosen one. */
+int load_slot_menu_update_pal(SaveMenu *menu)
 {
     int old = menu->cursor;
     int buttons;
@@ -54,7 +55,7 @@ int func_PAL_002DDCE8(SaveMenu *menu)
         if (g_pause_menu_state.ready < 11)
             return 0;
         g_pause_menu_state.busy = 0;
-        if (g_memcard_state.f16c != 0 || g_memcard_state.f10 != 0 || func_PAL_00299518() != 0) {
+        if (g_memcard_state.f16c != 0 || g_memcard_state.f10 != 0 || menu_get_pending_value_pal() != 0) {
             g_memcard_state.f17c = 0;
             g_save_menu_flags |= 0x100;
             if (request_begin_slot(4, 1, 1, (int)g_pause_menu_state.owner, 0) == 0)
@@ -88,7 +89,7 @@ finish:
         return status;
     }
     if (g_save_menu_screen == 9)
-        func_PAL_002D6710(5, g_menu_panel_active ? g_load_slot_screen_alt : g_load_slot_screen);
+        menu_send_request_pal(5, g_menu_panel_active ? g_load_slot_screen_alt : g_load_slot_screen);
     else if (g_save_menu_screen != 16 && g_save_menu_screen != 1) {
         if (menu_get_counter() == 0 && menu_get_mode() == 1)
             request_begin_slot(4, 1, 1, (int)g_pause_menu_state.owner, 0);
@@ -137,7 +138,7 @@ done:
                 save->f164 = 13;
             }
             g_pause_menu_state.busy = 1;
-            func_PAL_00299520();
+            menu_take_pending_value_pal();
             g_pause_menu_state.delay = 0xC0E;
             g_load_slot_menu_state[0] = 0;
         } else

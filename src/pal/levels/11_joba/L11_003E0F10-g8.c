@@ -21,33 +21,34 @@ extern f32 g_bomb_speed __attribute__((sda));
 
 typedef int TI128 __attribute__((mode(TI)));
 
-u8 *func_PAL_L11_003E0F10(u8 *arg0, u8 *arg1, u8 *arg2, f32 arg3) {
-    u8 *s0 = arg0;
-    u8 *s2 = arg1;
-    u8 *s3 = arg2;
-    f32 f21 = arg3;
-    u8 *s1 = CreateMoby(0xA77);
+/* Spawns a hoverbike bomb thrown from a start point to a target (PAL: speed scaled to 50 Hz). */
+u8 *hoverbike_bomb_spawn_pal(u8 *parent, u8 *start, u8 *target, f32 gravity_arg) {
+    u8 *vars = parent;
+    u8 *start_ptr = start;
+    u8 *target_ptr = target;
+    f32 gravity = gravity_arg;
+    u8 *bomb = CreateMoby(MOBY_CLASS_HOVERBIKE_RACE_BOMB);
 
-    if (s1 != 0) {
-        u8 *v1;
+    if (bomb != 0) {
+        u8 *temp;
         TI128 *dst;
-        f32 f20;
+        f32 flight_time;
 
-        v1 = s0;
-        s0 = *(u8 **)(s1 + 0x68);
-        moby_init_child_from_parent(s1, v1);
-        v1 = *(u8 **)(s1 + 0x24);
-        dst = (TI128 *)(s1 + 0x10);
+        temp = vars;
+        vars = *(u8 **)(bomb + 0x68);
+        moby_init_child_from_parent(bomb, temp);
+        temp = *(u8 **)(bomb + 0x24);
+        dst = (TI128 *)(bomb + 0x10);
 
-        *(f32 *)(s1 + 0x2C) = *(f32 *)(v1 + 0x24) * g_bomb_velocity_scale;
-        *(u16 *)(s1 + 0x34) |= 0x5000;
-        *dst = *(TI128 *)s2;
-        FastVecSub((f32 *)s0, (f32 *)s3, (f32 *)s2);
-        *(s32 *)(s0 + 0x8) = 0;
-        f20 = FastVecLength((f32 *)s0) / ((g_bomb_speed * 5.0f + 2.0f) * 0.16666667f);
-        vec_scale_to_length((f32 *)s0, (f32 *)s0, f20);
-        *(f32 *)(s0 + 0x8) = weapon_compute_shot_launch_speed((char *)s2, (char *)s3, 0, f20, -f21);
-        *(f32 *)(s0 + 0xC) = f21;
+        *(f32 *)(bomb + 0x2C) = *(f32 *)(temp + 0x24) * g_bomb_velocity_scale;
+        *(u16 *)(bomb + 0x34) |= 0x5000;
+        *dst = *(TI128 *)start_ptr;
+        FastVecSub((f32 *)vars, (f32 *)target_ptr, (f32 *)start_ptr);
+        *(s32 *)(vars + 0x8) = 0;
+        flight_time = FastVecLength((f32 *)vars) / ((g_bomb_speed * 5.0f + 2.0f) * 0.16666667f);
+        vec_scale_to_length((f32 *)vars, (f32 *)vars, flight_time);
+        *(f32 *)(vars + 0x8) = weapon_compute_shot_launch_speed((char *)start_ptr, (char *)target_ptr, 0, flight_time, -gravity);
+        *(f32 *)(vars + 0xC) = gravity;
     }
-    return s1;
+    return bomb;
 }

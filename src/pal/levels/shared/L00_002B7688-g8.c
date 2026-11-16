@@ -55,6 +55,7 @@ extern void transform_vector(void *, void *, void *);
 extern void cam_set_limits_second(float, float);
 extern float fast_vec_dist(void *, void *);
 
+/* Tilts the hero's head, spine and arms toward where the stick or aim points, with limits that depend on what the hero is doing. */
 void UpdateHeroTiltPoseTargets_pal(void)
 {
     union { Vec q; float f[4]; } vector;

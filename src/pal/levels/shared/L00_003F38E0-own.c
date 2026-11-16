@@ -26,6 +26,7 @@ extern char *moby_spawn_template_effect(void *, void *, int, int);
 extern int gfx_swap_packed_color_channels(unsigned int, int);
 extern char *part_spawn_spark(void *, void *, int, int, int, int, int, int, int, float);
 
+/* Starts a big burst at the position: it throws out sparks, trails and smoke with random speeds and colours, and adds a bright flash of light (PAL: 50 Hz). */
 void blast_spawn_burst_particles_pal(char *object, BurstVector *position) {
     BurstVector delta, velocity, random;
     /* Both 24-byte local copies begin on observed 16-byte stack boundaries. */

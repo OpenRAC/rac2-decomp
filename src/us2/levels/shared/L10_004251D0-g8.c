@@ -18,7 +18,7 @@ extern void ship_save_transform_state(void);
 
 /* func_US2_L10_004251D0, the v2.00 copy of func_L10_00423698: the same C with the carried-object test
    of func_L10_004235A0, the 0x2C store moved last, and without removing the two temporary objects. */
-void func_US2_L10_004251D0(void) {
+void mission_reset_counters_alt_us2(void) {
     char *state;
     int i;
     entry_init_all_registered();

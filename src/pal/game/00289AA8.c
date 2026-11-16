@@ -10,7 +10,7 @@
  */
 
 typedef struct {
-    int state, timer, width, height, y, x, drawWidth, drawHeight;
+    int state, timer, width, height, y, x, draw_width, draw_height;
     int entry, pending, selection, unk2C, enabled, wait;
     short flag38, flag3A;
     int countdown, offset, shake, duration;
@@ -72,7 +72,8 @@ extern int Help_FindIndex(int);
     (D_0018C958[D_00254E78.selection].levels = \
         (D_0018C958[D_00254E78.selection].levels | (1u << D_001A79F0[0])) | 0x80000000u)
 
-void func_PAL_00289AA8(void)
+/* Runs the subtitle state machine each frame: opens, shows and closes subtitle boxes and records how long each was seen. */
+void subtitle_update_state_machine_pal(void)
 {
     if (!g_subtitle_state.enabled) {
         if (g_current_map_index[0] >= 0) {

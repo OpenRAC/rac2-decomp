@@ -18,8 +18,8 @@ extern float g_spray_burst_life_max __attribute__((sda));
 extern int g_spray_ground_effect_left __attribute__((sda));
 extern int g_spray_ground_effect_right __attribute__((sda));
 extern int g_spray_ground_effect_type __attribute__((sda));
-/* Emit two particles for each randomly perturbed point. */
-void func_PAL_L22_00401788(float *position, float *direction, int count) {
+/* Emits two ground-effect particles for each randomly perturbed point of a spray burst (PAL: 50 Hz timings). */
+void part_emit_spray_burst_pal(float *position, float *direction, int count) {
     float velocity[4] __attribute__((aligned(16)));
     float point[4] __attribute__((aligned(16)));
     float scaled[4] __attribute__((aligned(16)));

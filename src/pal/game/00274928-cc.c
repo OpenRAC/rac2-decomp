@@ -12,18 +12,18 @@ extern void multiply_quaternions(void *, void *, void *);
 void coll_clamp_movement_vector_pal(void *unused, float *output, const TI128_00274A88 *input)
 {
     TI128_00274A88 vector;
-    float halfLength;
-    float lowLimit;
-    float highLimit;
+    float half_length;
+    float low_limit;
+    float high_limit;
 
     vector = *input;
-    halfLength = FastVecLength(&vector) * 0.5f;
-    lowLimit = math_fast_sin_or_cos_b(0.015707966f);
-    highLimit = math_fast_sin_or_cos_b(0.031415932f);
-    if (lowLimit < halfLength)
-        halfLength = lowLimit;
-    vec_set_direction_with_complement((float *)&vector, (float *)&vector, halfLength);
+    half_length = FastVecLength(&vector) * 0.5f;
+    low_limit = math_fast_sin_or_cos_b(0.015707966f);
+    high_limit = math_fast_sin_or_cos_b(0.031415932f);
+    if (low_limit < half_length)
+        half_length = low_limit;
+    vec_set_direction_with_complement((float *)&vector, (float *)&vector, half_length);
     multiply_quaternions(output, output, &vector);
-    if (highLimit < FastVecLength(output))
-        vec_set_direction_with_complement(output, output, highLimit);
+    if (high_limit < FastVecLength(output))
+        vec_set_direction_with_complement(output, output, high_limit);
 }

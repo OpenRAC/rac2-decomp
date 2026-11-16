@@ -5,16 +5,18 @@
 
 extern int FloatToInt(float);
 extern void moby_set_controller_speed_limits(char *, float, float, float, float);
-extern void func_PAL_002A7E68(void *, int, int, int);
+extern void anim_start_blended_pal(void *, int, int, int);
 extern void moby_set_state(void *, int, int);
 extern void drone_kill_with_effects_pal(char *);
-extern int func_PAL_002B1A50(char *, char *, int);
+extern int moby_apply_damage_to_object_pal(char *, char *, int);
 extern int weapon_select_aim_target(char *, int, int, int, float, float);
 extern float fast_vec_dist(void *, void *);
 extern void moby_update_ground_check(char *);
 extern char g_hero_l11_position[];
 
-void func_PAL_L11_0043F9A8(char *object) {
+/* Sets up the flying drone on its first frame, then each frame handles hits and checks whether the
+   hero is very close (PAL: 50 Hz values). */
+void drone_setup_and_hits_pal(char *object) {
     char *state = *(char **)(object + 0x68);
 
     if (*(unsigned char *)(object + 0x20) == 0) {
@@ -40,12 +42,12 @@ void func_PAL_L11_0043F9A8(char *object) {
             *(float *)(state + 0x20) = 10;
         }
         if (*(unsigned char *)(object + 0x43) != 1)
-            func_PAL_002A7E68(object, 1, 0, 0);
+            anim_start_blended_pal(object, 1, 0, 0);
         moby_set_state(object, 1, -1);
         drone_kill_with_effects_pal(object);
     }
     if (*(unsigned char *)(object + 0x20) >= 4)
-        func_PAL_002B1A50(object, state + 0x170, 0);
+        moby_apply_damage_to_object_pal(object, state + 0x170, 0);
     if (*(unsigned char *)(object + 0x20) >= 3 &&
         *(unsigned char *)(state + 0x2E) == 2)
         drone_kill_with_effects_pal(object);

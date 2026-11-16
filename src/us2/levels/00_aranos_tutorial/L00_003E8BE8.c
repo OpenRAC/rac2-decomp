@@ -21,6 +21,7 @@ extern int request_begin_slot(int,int,int,int,int);
 extern int IsPointInCuboid(void *a0, int a1);
 extern char g_hero_position[];
 
+/* Shows tutorial help prompts when the hero reaches the matching trigger area, and locks interaction while a prompt is up. */
 void tutorial_prompt_trigger_update_us2(unsigned char *object) {
     int *state=*(int **)(object+0x68);
     unsigned char *other;

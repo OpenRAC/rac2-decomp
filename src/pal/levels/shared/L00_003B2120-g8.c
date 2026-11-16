@@ -150,8 +150,8 @@ extern MobyAE900 *g_target_l00_list[];
 extern char g_moby_index_list_head[];
 extern char g_effect_definitions[];
 
-extern void func_PAL_L00_003B16B8(void);
-extern int func_PAL_L00_003B1D70(VarsAE900 *, MobyAE900 *, int);
+extern void UpdateMobyLinks_pal(void);
+extern int PredictMineImpact_pal(VarsAE900 *, MobyAE900 *, int);
 extern float math_clamp_angle_step(float, float, float);
 extern void *SpawnDistanceFadedParticle(void *, void *, unsigned int, float, float, int, float, int, int);
 extern int math_lerp_int_fraction(int, int, float);
@@ -167,7 +167,7 @@ extern int math_random_int_below(int);
 extern float coll_get_ground_height_at_position(void *, void *);
 extern void FastVecScale(void *, void *, float);
 extern float math_random_float_range(float, float);
-extern void * func_PAL_002C0428(void *, void *, float, float);
+extern void * part_spawn_bubble_pal(void *, void *, float, float);
 extern void vec_fast_normalize_helper(void *, void *, float);
 extern float IntToFloat(int);
 extern float math_fast_sin_or_cos_b(float);
@@ -179,7 +179,7 @@ extern void vec_clear_128(void *);
 extern char *moby_spawn_scaled_effect(void *, float);
 extern float math_random_angle(void);
 extern int math_random_int_range(int, int);
-extern void * func_PAL_002C0838(void *, void *, int, int);
+extern void * part_spawn_spark_2_pal(void *, void *, int, int);
 extern int moby_is_in_special_class_range(void *);
 extern float coll_probe_ground_height_below(void *, int, float);
 extern void vec_fast_normalize(void *, void *, void *);
@@ -190,7 +190,7 @@ extern float square_root(float);
 extern float mat_fast_helper_a(float, float);
 extern int moby_transform_point_and_rotation_by_parent(void *, void *, void *, void *, void *, void *);
 extern void snd_stop_voice(int);
-extern void func_PAL_002A7E68(void *, int, int, int);
+extern void anim_start_blended_pal(void *, int, int, int);
 extern int snd_is_voice_playing_for_owner(void *, int);
 extern int PlayMobySound(int, int, void *);
 extern int FastDecTimer(void *);
@@ -210,7 +210,7 @@ extern float FastAddRotations(float, float);
 extern void moby_queue_knockback_for_nodes(void *, void *, void *, int, int, int, int, int, float, float, float);
 extern float coll_get_ground_height_under_object(void *);
 extern int gfx_swap_packed_color_channels(unsigned int, int);
-extern char *func_PAL_002BD790(void *, void *, int, int, float, int, int, int, int, int);
+extern char *part_spawn_spark_pal(void *, void *, int, int, float, int, int, int, int, int);
 extern void SpawnExplosionEffects_pal(void *, void *, void *, float, float, int, int, int, float, float, float, float, int, float, int, int, int, int, int);
 extern int FloatToInt(float);
 extern char *part_spawn_falling_drop(void *, void *, int, int, float, int, int);
@@ -264,7 +264,8 @@ static __inline__ void AlignToOwnerAE900(MobyAE900 *moby, VarsAE900 *vars)
     copy_matrix3x4(moby->matrix, rot);
 }
 
-void func_PAL_L00_003B2120(MobyAE900 *moby)
+/* Per-frame update of the hero-steered bot: flight, collision, attachment, idle effects and self-destruct burst (PAL: 50 Hz timings). */
+void UpdateHeldBot_pal(MobyAE900 *moby)
 {
     TemplateAE900 small;
     TemplateAE900 big;
@@ -283,7 +284,7 @@ void func_PAL_L00_003B2120(MobyAE900 *moby)
     up.q = 0;
     up.f[2] = 1.0f;
     vars = moby->vars;
-    func_PAL_L00_003B16B8();
+    UpdateMobyLinks_pal();
 
     if ((g_hero_state.b22B5 != 0 || g_hero_state.b22BF != 0) && moby->state == 1)
         moby->flags |= 0x41;
@@ -309,10 +310,10 @@ void func_PAL_L00_003B2120(MobyAE900 *moby)
             if (owner->state != 0xFD)
                 if (owner->oClass == 0x81E && vars->s36 == 0 && FastVecLength(vars) > 0.0f) {
                     if (g_hero_state.standing == 0 || moby_get_private_value_2(g_hero_state.standing) == 0) {
-                        func_PAL_L00_003B1D70(vars, moby, 1);
+                        PredictMineImpact_pal(vars, moby, 1);
                     } else {
-                        if (func_PAL_L00_003B1D70(vars, moby, 0) == 0)
-                            func_PAL_L00_003B1D70(vars, moby, 2);
+                        if (PredictMineImpact_pal(vars, moby, 0) == 0)
+                            PredictMineImpact_pal(vars, moby, 2);
                     }
                 }
 
@@ -350,7 +351,7 @@ void func_PAL_L00_003B2120(MobyAE900 *moby)
                 if (math_random_int_below(4) == 0) {
                     float height = coll_get_ground_height_at_position(&moby->pos, &hit.dir);
                     FastVecScale(&hit.dir, &vars->vel, 0.25f);
-                    func_PAL_002C0428(&moby->pos, &hit.dir, math_random_float_range(0.05f, 0.1f) * 210000.0f, height);
+                    part_spawn_bubble_pal(&moby->pos, &hit.dir, math_random_float_range(0.05f, 0.1f) * 210000.0f, height);
                 }
             }
         }
@@ -397,7 +398,7 @@ void func_PAL_L00_003B2120(MobyAE900 *moby)
                     t130.f[1] = math_fast_sin_or_cos_b(a) * r;
                     t130.f[2] = math_random_float_range(3.0f * FRAME_AE900, 6.5f * FRAME_AE900);
                     life = math_random_int_range(90, 120);
-                    func_PAL_002C0838(&t120, &t130, math_random_int_below(2), life);
+                    part_spawn_spark_2_pal(&t120, &t130, math_random_int_below(2), life);
                 }
             } else if (vars->inWater != 0 || GetCollHitMaterial() != 0) {
                 if (g_collision_result.hit) {
@@ -536,14 +537,14 @@ void func_PAL_L00_003B2120(MobyAE900 *moby)
                 DETACH_AE900();
                 vars->target = 0;
                 if (moby->b43)
-                    func_PAL_002A7E68(moby, 0, 0, 10);
+                    anim_start_blended_pal(moby, 0, 0, 10);
             }
         kept:
             if (vars->target != 0 && (moby->state & 8)) {
                 t130.q = moby->pos.q;
                 if (moby->b60 & 2) {
                     if (moby->b42 == 1 && moby->b43 != 2)
-                        func_PAL_002A7E68(moby, 2, 0, 10);
+                        anim_start_blended_pal(moby, 2, 0, 10);
                 }
                 if (!snd_is_voice_playing_for_owner(moby, vars->sound))
                     vars->sound = PlayMobySound(1, 4, moby);
@@ -683,7 +684,7 @@ void func_PAL_L00_003B2120(MobyAE900 *moby)
                     t140.f[2] = math_random_float_range(-0.5f, -2.0f);
                     t130.q = t140.q;
                     vec_scale_to_length(&t130, &t130, math_random_float_range(4.0f * FRAME_AE900, 8.0f * FRAME_AE900));
-                    func_PAL_002C0428(&moby->pos, &t130, math_random_float_range(0.05f, 0.1f) * 210000.0f, surface);
+                    part_spawn_bubble_pal(&moby->pos, &t130, math_random_float_range(0.05f, 0.1f) * 210000.0f, surface);
                 }
                 cr = 0x60;
                 cg = 0x60;
@@ -737,7 +738,7 @@ void func_PAL_L00_003B2120(MobyAE900 *moby)
                     life = math_random_int_range(75, 125);
                     defs = (char **)g_effect_definitions;
                     tex = *(unsigned char *)defs[11];
-                    func_PAL_002BD790(&t130, &t140, c1, c2, sz, life, 1, tex, -1, 0);
+                    part_spawn_spark_pal(&t130, &t140, c1, c2, sz, life, 1, tex, -1, 0);
                 }
             } else if (water + 2.0f < moby->pos.f[2]) {
                 vec_clear_128(&t120);

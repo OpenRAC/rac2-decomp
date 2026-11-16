@@ -18,22 +18,23 @@ extern void hero_clear_tracked_slots(void);
 extern void hero_clear_queued_anim(void);
 extern s32 anim_copy_entry_data(char *, s32, s32, s32);
 extern void cam_reset_default(void);
-extern s32 func_US2_L20_002D79B0(s32, s32);
+extern s32 hero_l20_set_state_us2(s32, s32);
 
 /* Apart from the leading state-1 block this is the same code as func_L18_002CFF48
    (src/levels/shared/L18_002CFD68-qcopy.c), and it needs the same grouped-copy profile.
    The state-1 block and the rest each take the hero block's address on their own: retail
    rebuilds it from the %hi kept in $s2.  D_L20_001A8F00 is declared as an sda array, as in
    the sibling, which gives retail's lui + lw into the same register. */
+/* Takes the hero out of vehicle or ride mode and puts it back on foot (USA v2.00). */
 void hero_exit_vehicle_mode_us2(s32 keep)
 {
     u8 *hero = g_hero_state;
     u8 *base;
-    u8 *object;
-    float *record;
+    u8 *vehicle_moby;
+    float *saved_value;
     s32 value;
     u8 *attached;
-    u8 *restored;
+    u8 *hero_moby;
     u8 *current;
 
     if (hero[0x22B4] == 1) {
@@ -50,11 +51,11 @@ void hero_exit_vehicle_mode_us2(s32 keep)
     }
     base = g_hero_state;
     if (base[0x22B4] == 4) {
-        record = (float *)moby_get_private_value_0(*(u8 **)(base + 0x2290));
-        if (record) *record = (float)*(s32 *)(base + 0x24CC);
-        object = *(u8 **)(base + 0xC18);
-        qcopy((base + 0x80), (object + 0x10));
-        qcopy((base + 0x90), (object + 0xF0));
+        saved_value = (float *)moby_get_private_value_0(*(u8 **)(base + 0x2290));
+        if (saved_value) *saved_value = (float)*(s32 *)(base + 0x24CC);
+        vehicle_moby = *(u8 **)(base + 0xC18);
+        qcopy((base + 0x80), (vehicle_moby + 0x10));
+        qcopy((base + 0x90), (vehicle_moby + 0xF0));
         *(s32 *)(base + 0x24CC) = *(s16 *)(base + 0x24D4);
         if (!keep) level_store_value_pair_us2(0, 0);
         hero_reset_speeds_and_vectors();
@@ -72,10 +73,10 @@ void hero_exit_vehicle_mode_us2(s32 keep)
     if (attached) *(u16 *)(attached + 0x34) &= ~6;
     *(u8 **)(g_hero_state + 0xC14) = 0;
     hero_clear_tracked_slots();
-    restored = *(u8 **)(g_hero_state + 0xC18);
-    *(u8 **)(g_hero_state + 0x2290) = restored;
-    qcopy((restored + 0x10), (g_hero_state + 0x80));
-    *(s32 *)(restored + 0x9C) = 0;
+    hero_moby = *(u8 **)(g_hero_state + 0xC18);
+    *(u8 **)(g_hero_state + 0x2290) = hero_moby;
+    qcopy((hero_moby + 0x10), (g_hero_state + 0x80));
+    *(s32 *)(hero_moby + 0x9C) = 0;
     *(float *)(g_hero_state + 0xC24) = 1.0f;
     hero_clear_queued_anim();
     current = *(u8 **)(g_hero_state + 0x2290);
@@ -93,7 +94,7 @@ void hero_exit_vehicle_mode_us2(s32 keep)
         goto done;
     }
 reset:
-    func_US2_L20_002D79B0(0, 1);
+    hero_l20_set_state_us2(0, 1);
 done:
     if (g_hero_state[0x22B4] == 4) cam_reset_default();
 }

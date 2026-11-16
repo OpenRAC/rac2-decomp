@@ -19,8 +19,8 @@ extern void hero_clear_tracked_slots(void);
 extern void attachment_reset_all(void);
 extern void hero_clear_queued_anim(void);
 extern void func_002A677C(int a0);
-extern s32 func_PAL_L01_002BEC60(int a0, int a1);
-extern void func_PAL_L01_002B3C40(void);
+extern s32 SetHeroMoveState_pal(int a0, int a1);
+extern void hero_l01_update_blend_channels_pal(void);
 extern char g_hero_state[];
 
 void hero_switch_mode_and_moby_pal(int a0, int a1, int a2) {
@@ -44,7 +44,7 @@ void hero_switch_mode_and_moby_pal(int a0, int a1, int a2) {
         *(int *)(s1 + 0xC14) = a2;
         *(int *)(s1 + 0x2290) = a2;
     }
-    func_PAL_L01_002B3C40();
+    hero_l01_update_blend_channels_pal();
     {
         char *s2 = g_hero_state;
 
@@ -57,6 +57,6 @@ void hero_switch_mode_and_moby_pal(int a0, int a1, int a2) {
         func_002A677C(*(int *)(s2 + 0x2290));
         *(unsigned short *)(s2 + 0x24F2) = a1;
     }
-    func_PAL_L01_002BEC60(a1, 2);
+    SetHeroMoveState_pal(a1, 2);
 }
 

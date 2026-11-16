@@ -23,14 +23,15 @@ extern int g_exhaust_count_scale __attribute__((sda));
 extern u8 g_exhaust_particle_settings_alt[16] __attribute__((sda));
 extern u8 g_exhaust_particle_settings[16] __attribute__((sda));
 
-void part_l18_spawn_exhaust_pal(u8 *a,void *offset) {
+/* Sprays two kinds of exhaust particles from a spot on the object; the faster it moves, the more it makes. (PAL: 50 Hz timings) */
+void part_l18_spawn_exhaust_pal(u8 *moby,void *offset) {
  float direction[4],velocity[4],position[4],drift[4];
  float speed;
  int i;
- matrix_mul_vec3(position,offset,a+0xc0);
- FastVecAdd(position,a+0x10,position);
- qcopy(direction,a+0xc0);
- speed=FastVecLength(*(u8 **)(a+0x68)+0x80);
+ matrix_mul_vec3(position,offset,moby+0xc0);
+ FastVecAdd(position,moby+0x10,position);
+ qcopy(direction,moby+0xc0);
+ speed=FastVecLength(*(u8 **)(moby+0x68)+0x80);
  { float r=math_random_float_range(0.0f,0.1f); speed*=5.0f; speed/=g_leader_exhaust_speed*0.020000001f; speed+=r; }
  if(speed>1.0f) speed=1.0f;
  else if(speed<0.0f) speed=0.0f;

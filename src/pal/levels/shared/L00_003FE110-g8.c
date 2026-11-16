@@ -4,13 +4,13 @@
 #include "common.h"
 
 extern void vec_transform_or_copy(void *, void *);
-extern void func_PAL_L00_004007B0(void);
+extern void cam_update_screen_fade_pal(void);
 extern float FastAddRotations(float, float);
 extern int FastDecTimer(void *);
 extern int math_fast_float_d(void *);
 extern void moby_mark_spawned(void *);
 extern void gfx_register_final_draw_callback(void *, void *);
-extern void func_PAL_L00_003FF050(void);
+extern void draw_moby_glow_sprites_pal(void);
 extern float math_random_float_range(float, float);
 extern float math_random_signed_float_range(float, float);
 extern float math_random_angle(void);
@@ -74,16 +74,16 @@ typedef struct Emitter {
 /* Advance the emitter's angles and timers, emit its initial burst, then spread
  * spinning sparks along a height-dependent segment above the stored ground height.
  */
-void func_PAL_L00_003FE110(Emitter *self)
+void timed_particle_emitter_update_pal(Emitter *self)
 {
     EffectState *state = self->state;
-    float a[4], b[4], c[4], d[4], e[4], f[4];
+    float vec_a[4], vec_b[4], vec_c[4], vec_d[4], vec_e[4], vec_f[4];
     float x, y, radius, height, ratio;
     char *spark;
     int i, count, remaining;
 
     vec_transform_or_copy(self->pos, self->pos);
-    func_PAL_L00_004007B0();
+    cam_update_screen_fade_pal();
     state->angles[0] = FastAddRotations(state->angles[0], g_effect_spin_speed_a * 0.01745329424738884f);
     state->angles[1] = FastAddRotations(state->angles[1], g_effect_spin_speed_b * 0.01745329424738884f);
     state->angles[2] = FastAddRotations(state->angles[2], 0.00436332356184721f);
@@ -99,23 +99,23 @@ void func_PAL_L00_003FE110(Emitter *self)
         return;
     }
 
-    gfx_register_final_draw_callback((void *)func_PAL_L00_003FF050, self);
+    gfx_register_final_draw_callback((void *)draw_moby_glow_sprites_pal, self);
 
     if (state->timer2 >= ((g_effect_timer_limit - 6) * 5 + 2) / 6) {
         for (i = 0; i < 20; i++) {
             float angle1, angle2;
             int id;
 
-            FastVecScale(a, self->dirC0, math_random_float_range(g_effect_dir_speed_min, g_effect_dir_speed_max) * 0.020000001f);
+            FastVecScale(vec_a, self->dirC0, math_random_float_range(g_effect_dir_speed_min, g_effect_dir_speed_max) * 0.020000001f);
             angle1 = math_random_signed_float_range(0.2617994248867035f, 1.396263599395752f);
             angle2 = math_random_signed_float_range(0.2617994248867035f, 1.396263599395752f);
-            math_build_axis_angle_quat(c, self->dirD0, angle1);
-            vec_rotate_by_quaternion(b, a, c);
-            math_build_axis_angle_quat(c, self->dirC0, angle2);
-            vec_rotate_by_quaternion(b, b, c);
+            math_build_axis_angle_quat(vec_c, self->dirD0, angle1);
+            vec_rotate_by_quaternion(vec_b, vec_a, vec_c);
+            math_build_axis_angle_quat(vec_c, self->dirC0, angle2);
+            vec_rotate_by_quaternion(vec_b, vec_b, vec_c);
             id = (math_random_int_range(g_effect_id_min, g_effect_id_max) * 5 + 2) / 6;
-            vec_add_transformed_or_copy(b, b, self->pos);
-            part_spawn_trail_2(self->pos, b, id, g_effect_trail_speed_scale * 0.00040000002f);
+            vec_add_transformed_or_copy(vec_b, vec_b, self->pos);
+            part_spawn_trail_2(self->pos, vec_b, id, g_effect_trail_speed_scale * 0.00040000002f);
         }
     }
 
@@ -124,15 +124,15 @@ void func_PAL_L00_003FE110(Emitter *self)
 
         z = math_random_float_range(-0.9599311947822571f, -1.396263599395752f);
         x = math_random_angle();
-        vec_build_spherical_offset(a, math_random_float_range(0.0f, 0.5f) * 0.020000001f, x, z);
+        vec_build_spherical_offset(vec_a, math_random_float_range(0.0f, 0.5f) * 0.020000001f, x, z);
         speed = math_random_float_range(0.25f, 0.75f) * 210000.0f;
-        FastVecScale(b, self->dirC0, -0.45f);
-        FastVecAdd(b, self->pos, b);
-        c[0] = b[0] + math_random_signed_float_range(0.0f, 0.25f);
-        c[1] = b[1] + math_random_signed_float_range(0.0f, 0.25f);
-        c[2] = b[2] + math_random_signed_float_range(0.0f, 0.25f);
-        vec_add_transformed_or_copy(a, a, c);
-        part_spawn_spinning_particle(c, a, 0x4F93E5FF, 0x102434EE, speed, math_random_int_range(25, 37), 1, -1, -1, 0, 0.5f);
+        FastVecScale(vec_b, self->dirC0, -0.45f);
+        FastVecAdd(vec_b, self->pos, vec_b);
+        vec_c[0] = vec_b[0] + math_random_signed_float_range(0.0f, 0.25f);
+        vec_c[1] = vec_b[1] + math_random_signed_float_range(0.0f, 0.25f);
+        vec_c[2] = vec_b[2] + math_random_signed_float_range(0.0f, 0.25f);
+        vec_add_transformed_or_copy(vec_a, vec_a, vec_c);
+        part_spawn_spinning_particle(vec_c, vec_a, 0x4F93E5FF, 0x102434EE, speed, math_random_int_range(25, 37), 1, -1, -1, 0, 0.5f);
     }
 
     x = IntToFloat(state->timer2);
@@ -148,17 +148,17 @@ void func_PAL_L00_003FE110(Emitter *self)
         if (count <= 0)
             count = 1;
 
-        *(EffectQuad *)a = 0;
-        a[2] = 1.0f;
-        a[3] = 1.0f;
-        FastVecCross(b, a, self->dirC0);
-        vec_scale_to_length(b, b, radius * factor);
-        qcopy(c, self->pos);
-        c[2] = height + 0.25f;
-        FastVecAdd(d, c, b);
-        FastVecSub(e, c, b);
-        FastVecSub(f, e, d);
-        FastVecScale(f, f, 1.0f / (float)count);
+        *(EffectQuad *)vec_a = 0;
+        vec_a[2] = 1.0f;
+        vec_a[3] = 1.0f;
+        FastVecCross(vec_b, vec_a, self->dirC0);
+        vec_scale_to_length(vec_b, vec_b, radius * factor);
+        qcopy(vec_c, self->pos);
+        vec_c[2] = height + 0.25f;
+        FastVecAdd(vec_d, vec_c, vec_b);
+        FastVecSub(vec_e, vec_c, vec_b);
+        FastVecSub(vec_f, vec_e, vec_d);
+        FastVecScale(vec_f, vec_f, 1.0f / (float)count);
 
         for (remaining = 0; remaining < count; remaining++) {
             float speed;
@@ -168,8 +168,8 @@ void func_PAL_L00_003FE110(Emitter *self)
             if (math_random_int_below(2))
                 id = -id;
             speed = math_random_float_range(0.2f, 1.5f) * 210000.0f;
-            spark = SpawnSpinningSparkParticle(0.3f, 1.0f, d, id, g_default_vector, 0x7F204080, 1, 0.9f, speed);
-            FastVecAdd(d, d, f);
+            spark = SpawnSpinningSparkParticle(0.3f, 1.0f, vec_d, id, g_default_vector, 0x7F204080, 1, 0.9f, speed);
+            FastVecAdd(vec_d, vec_d, vec_f);
             if (spark) {
                 char *ext = spark + 0x20;
 

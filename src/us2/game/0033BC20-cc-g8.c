@@ -4,7 +4,7 @@
 extern void *pool_alloc_cell(void *);
 extern int *ui_return_second_arg(int, int);
 extern void object_init_derived_arrays(void *, void *, void *);
-extern void func_US2_003377B0(void *, void *, void *);
+extern void hud_init_widget_defaults_us2(void *, void *, void *);
 extern int *object_get_fourth_field(void *);
 extern void object_set_helper_result(void *, void *, int);
 extern char *GetLocalizedString(int);
@@ -42,7 +42,7 @@ typedef struct { int first, second, color; float angle; short id; short pad; int
 extern void *pool_alloc_cell(void *);
 extern int *ui_return_second_arg(int, int);
 extern void object_init_derived_arrays(void *, void *, void *);
-extern void func_US2_003377B0(void *, void *, void *);
+extern void hud_init_widget_defaults_us2(void *, void *, void *);
 extern int *object_get_fourth_field(void *);
 extern void object_set_helper_result(void *, void *, int);
 extern void *memset(void *, int, int);
@@ -93,15 +93,15 @@ void prompt_bar_init_us2(char *object, char *owner, short *list)
         flags++;
     }
     p = (short *)g_circle_menu_icon_data;
-    func_US2_003377B0(rec198, p, owner);
+    hud_init_widget_defaults_us2(rec198, p, owner);
     memset(vel278, 0, 8);
     object_set_first_float4(rec198, 0.0f, 0.0f, 0.0f, 0.0f);
     *object_get_fourth_field(rec198) = 0x80F0F0F0;
-    func_US2_003377B0(rec228, p, owner);
+    hud_init_widget_defaults_us2(rec228, p, owner);
     memset(vel288, 0, 8);
     object_set_first_float4(rec228, 0.0f, 0.0f, 0.0f, 0.0f);
     *object_get_fourth_field(rec228) = 0x80F0F0F0;
-    func_US2_003377B0(rec1E0, p, owner);
+    hud_init_widget_defaults_us2(rec1E0, p, owner);
     memset(vel280, 0, 8);
     object_set_first_float4(rec1E0, 0.0f, 0.0f, 0.0f, 0.0f);
     *object_get_fourth_field(rec1E0) = 0x80F0F0F0;

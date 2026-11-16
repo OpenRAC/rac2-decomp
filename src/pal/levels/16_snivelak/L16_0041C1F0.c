@@ -47,13 +47,13 @@ extern void *part_spawn_ground_effect(void *, int, unsigned int, float, float, i
 extern void snd_stop_voice(int);
 
 /* Animate the emitter and spawn three sparks at the qualifying collision point. */
-void func_PAL_L16_0041D030(char *object)
+void update_snivelak_contact_sparks_pal(char *object)
 {
     SparkWorkspace local;
     char *state = *(char **)(object + 0x68);
     char *target;
     struct SoundAnchor *sound;
-    float speed, firstAngle, secondAngle, magnitude;
+    float speed, first_angle, second_angle, magnitude;
     int i, index, handle;
 
     if (*(unsigned char *)(object + 0x20) == 0) {
@@ -91,20 +91,20 @@ void func_PAL_L16_0041D030(char *object)
     if (coll_test_point(&local.player, 0, g_hero_position.collision, 0.5f) != 0 && g_coll_hit_result.owner != 0 && *(short *)(g_coll_hit_result.owner + 0xaa) == 0x10fb) {
         qcopy(&local.point, &g_coll_hit_result.point);
         {
-            char *audioBank = g_sound_state;
+            char *audio_bank = g_sound_state;
             for (i = 2; i >= 0; i--) {
-                int loopHandle = *(int *)(state + 12);
-                struct SoundAnchor *loopSound = (struct SoundAnchor *)(audioBank + 0x70*loopHandle);
-                if (loopSound->owner != object || loopSound->active == 0)
+                int loop_handle = *(int *)(state + 12);
+                struct SoundAnchor *loop_sound = (struct SoundAnchor *)(audio_bank + 0x70*loop_handle);
+                if (loop_sound->owner != object || loop_sound->active == 0)
                     *(int *)(state + 12) = PlayMobySound(1, 4, object);
                 speed = math_random_float_range(1.0f, 2.0f);
                 index = math_random_int_below(2);
                 if (index == 0)
                     index--;
-                firstAngle = math_random_angle();
-                secondAngle = math_random_float_range(0.3490658998f, 1.535889864f);
+                first_angle = math_random_angle();
+                second_angle = math_random_float_range(0.3490658998f, 1.535889864f);
                 magnitude = math_random_float_range(0.05f, 0.1f);
-                vec_build_spherical_offset((float *)&local.velocity, magnitude, firstAngle, secondAngle);
+                vec_build_spherical_offset((float *)&local.velocity, magnitude, first_angle, second_angle);
                 qcopy(&local.previous, &local.point);
                 ((float *)&local.point)[0] += math_random_signed_float_range(0.0f, 0.15f);
                 ((float *)&local.point)[1] += math_random_signed_float_range(0.0f, 0.15f);

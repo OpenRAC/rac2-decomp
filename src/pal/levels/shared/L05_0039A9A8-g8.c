@@ -43,7 +43,7 @@ extern unsigned char *func_L05_003D1E60(void *, int, int);
 extern void moby_mark_spawned(void *);
 extern void vec_build_spherical_offset(void *, float, float, float);
 extern int CollLine(void *, void *, int, void *, int);
-extern void func_PAL_L05_0039B1F0(void *, void *, int);
+extern void record_claim_effect_slot_pal(void *, void *, int);
 extern void record_animate_owned(char *);
 extern void record_update_owned_effects(char *);
 extern void gfx_add_draw_callback_third(void (*)(char *), char *);
@@ -51,7 +51,7 @@ extern int coll_process_hit(void *, float, int, char *, void *);
 extern int GetCollHitMaterial(void);
 extern int coll_test_point(void *, float, int, void *);
 extern void SubmitFlightStateHitRecord(char *, char *, char *);
-extern char *func_PAL_L05_0042A240(char *, int, int, int, int, int, int, int, int, int, int, float);
+extern char *moby_spawn_large_explosion_pal(char *, int, int, int, int, int, int, int, int, int, int, float);
 
 /* Moves the projectile along its velocity, slowing it and spinning its two angles. When its life
    runs out or it leaves the 2..1021 box it releases all twenty-four records, bursts and removes
@@ -100,7 +100,7 @@ void homing_l05_projectile_update_pal(char *obj)
         FastVecAdd(target, target, obj + 0x10);
         if (CollLine(obj + 0x10, target, 0, obj, 0))
             qcopy(target, g_projectile_target_pos);
-        func_PAL_L05_0039B1F0(obj, target, 1);
+        record_claim_effect_slot_pal(obj, target, 1);
         record_animate_owned(obj);
         gfx_add_draw_callback_third(record_update_owned_effects, obj);
 
@@ -134,7 +134,7 @@ void homing_l05_projectile_update_pal(char *obj)
             qcopy(obj + 0x10, g_projectile_target_pos);
             SubmitFlightStateHitRecord(obj, state, obj + 0x10);
             if (*(int *)(state + 0x24))
-                func_PAL_L05_0042A240(obj + 0x10, 0, 50, 30, 30, 30, 40, 1, 1, 1, 1, 2.0f);
+                moby_spawn_large_explosion_pal(obj + 0x10, 0, 50, 30, 30, 30, 40, 1, 1, 1, 1, 2.0f);
             func_L05_003D1E60(obj + 0x10, 0, 0);
             moby_mark_spawned(obj);
         }

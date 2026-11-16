@@ -40,7 +40,8 @@ extern u32 FastTweenColor(u32,u32,float);
 extern void FastVecAdd(void *,void *,void *);
 extern void draw_world_quad(void *,void *,s32);
 
-void func_PAL_L06_004046D8(char *obj)
+/* Draws the scrolling mesh grid of a ripple-grid ribbon moby as textured quads, fading each column by age (PAL). */
+void gfx_draw_ripple_grid_pal(char *obj)
 {
     RenderQuad quad[2];
     RenderVec rotation[4];
@@ -49,15 +50,15 @@ void func_PAL_L06_004046D8(char *obj)
     char *matrices = __builtin_alloca((u32)(RI(data,4)<<9)>>3);
     float fade;
     float distance;
-    s32 n,uvIndex,i,j,k;
+    s32 n,uv_index,i,j,k;
     u8 *order;
-    s32 groupAge;
-    char *ageBase, *ages;
-    s32 groupVertices;
+    s32 group_age;
+    char *age_base, *ages;
+    s32 group_vertices;
     float *uv0;
-    s32 nextGroup, nextRow;
+    s32 next_group, next_row;
     float *uv1, *v0, *v1;
-    s32 matrixIndex;
+    s32 matrix_index;
     u64 blend;
     u64 texture;
     float scroll;
@@ -72,12 +73,12 @@ void func_PAL_L06_004046D8(char *obj)
     uv1=&quad[1].uv[0][0];
     v0=uv0+1;
     v1=uv1+1;
-    for (matrixIndex=0;matrixIndex<RI(data,4);matrixIndex++) {
-        char *matrix=matrices+matrixIndex*64;
+    for (matrix_index=0;matrix_index<RI(data,4);matrix_index++) {
+        char *matrix=matrices+matrix_index*64;
         euler_to_matrix(matrix,obj+0xF0);
         multiply_matrix(matrix,matrix,rotation);
         *(QuadWord *)(matrix+0x30) = *(QuadWord *)(obj+0x10);
-        RF(matrix,0x38)+=IntToFloat(matrixIndex+1)*RF(data,8);
+        RF(matrix,0x38)+=IntToFloat(matrix_index+1)*RF(data,8);
     }
     texture=GetEffectTextureDescriptor(14);
     blend=(u64)g_ripple_blend_a | ((u64)g_ripple_blend_b<<2);
@@ -91,24 +92,24 @@ void func_PAL_L06_004046D8(char *obj)
     quad[0].r70=quad[1].r70=0;
     quad[0].blend=quad[1].blend=blend;
     {
-        s32 initialUV;
-        for(initialUV=0;initialUV<4;initialUV++) {
-            v0[initialUV*2]=v1[initialUV*2]=g_ripple_uv_init_table[initialUV*2];
+        s32 initial_uv_index;
+        for(initial_uv_index=0;initial_uv_index<4;initial_uv_index++) {
+            v0[initial_uv_index*2]=v1[initial_uv_index*2]=g_ripple_uv_init_table[initial_uv_index*2];
         }
     }
     i=0;
     do {
-        nextGroup=i+1;
+        next_group=i+1;
         scroll=0.0f;
         j=0;
         do {
             s32 next;
             scroll+=g_texture_scroll_step;
             if(scroll>1.0f) scroll-=1.0f;
-            nextRow=j+1;
-            for(uvIndex=0;uvIndex<4;uvIndex++) {
-                float uv=g_ripple_uv_table[uvIndex*2]+scroll+RF(mesh,0x12DE0);
-                uv0[uvIndex*2]=uv1[uvIndex*2]=uv;
+            next_row=j+1;
+            for(uv_index=0;uv_index<4;uv_index++) {
+                float uv=g_ripple_uv_table[uv_index*2]+scroll+RF(mesh,0x12DE0);
+                uv0[uv_index*2]=uv1[uv_index*2]=uv;
             }
             for(n=0;n<RI(data,4);n=next) {
                 s32 offset;
@@ -116,11 +117,11 @@ void func_PAL_L06_004046D8(char *obj)
                 float alpha;
                 s32 time;
                 order=(u8 *)data+0x10;
-                groupAge=i*120;
-                ageBase=mesh+0x10000;
-                ages=ageBase+0x2C00;
-                time=RI(ages,order[n]*4+groupAge);
-                groupVertices=i*0x2580;
+                group_age=i*120;
+                age_base=mesh+0x10000;
+                ages=age_base+0x2C00;
+                time=RI(ages,order[n]*4+group_age);
+                group_vertices=i*0x2580;
                 if(time>g_ripple_grid_fade_start) progress=IntToFloat(time-g_ripple_grid_fade_start)/IntToFloat(g_ripple_grid_duration-g_ripple_grid_fade_start);
                 else progress=1.0f-IntToFloat(time)/IntToFloat(g_ripple_grid_fade_start);
                 color=FastTweenColor(g_ripple_color_start,g_ripple_color_end,progress);
@@ -139,12 +140,12 @@ void func_PAL_L06_004046D8(char *obj)
                 quad[1].colors[1]=color;
                 quad[1].colors[0]=color;
                 for(;k<4;k++) {
-                    FastVecAdd(&quad[1].points[k],&g_ripple_quad_offsets[k],&((RenderVec (*)[20])(mesh+groupVertices))[j+(k>>1)][order[n]]);
+                    FastVecAdd(&quad[1].points[k],&g_ripple_quad_offsets[k],&((RenderVec (*)[20])(mesh+group_vertices))[j+(k>>1)][order[n]]);
                 }
                 draw_world_quad(&quad[1],matrices+offset,0);
             }
-            j=nextRow;
+            j=next_row;
         } while(j<19);
-        i=nextGroup;
+        i=next_group;
     } while(i<4);
 }

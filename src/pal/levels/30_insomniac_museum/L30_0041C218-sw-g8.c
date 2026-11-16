@@ -3,7 +3,7 @@
 #include "common.h"
 typedef struct MuseumPlayer {
     char pad00[0x40];
-    float matrix40[16];
+    float matrix_40[16];
     float position[4];
     char pad90[8];
     float rotation[4];
@@ -19,7 +19,7 @@ typedef struct MuseumPlayer {
     int saved;
     char pad124C[0x1044];
     char *animation;
-    int animationId;
+    int animation_id;
     char pad2298[0x30];
     int action;
 } MuseumPlayer;
@@ -53,7 +53,7 @@ extern void museum_effect_object_spawn(char *),museum_effect_holder_update(char 
 extern int ForceClaimNotice(int,int,int);
 extern int load_is_class_cached(int);
 extern void LoadClassIntoFreeCacheSlot(int), hero_start_loader_state(int);
-extern s32 func_PAL_L00_002C4480(int,int);
+extern s32 hero_l00_set_action_pal(int,int);
 extern void matrix_mul_vec3(void *,void *,void *),FastVecAdd(void *,void *,void *),FastVecSub(void *,void *,void *);
 extern float FastAddRotations(float,float),mat_fast_helper_a(float,float),vec_distance_xy(void *,void *);
 extern void hero_start_target_state(void *,int,float);
@@ -81,9 +81,9 @@ static __inline__ unsigned int AdvanceMuseumTimer(char *obj) {
 typedef struct MuseumDisplayVars { char pad[0x6C]; unsigned short settings; } MuseumDisplayVars;
 typedef struct MuseumDisplay { char pad[0x68]; MuseumDisplayVars *vars; } MuseumDisplay;
 typedef struct MuseumExhibit {
-    int childIds[2];
-    int cleanupId;
-    int trackIds[14];
+    int child_ids[2];
+    int cleanup_id;
+    int track_ids[14];
     unsigned short settings;
     char pad46[2];
     int duration, limit;
@@ -94,8 +94,9 @@ typedef struct MuseumExhibit {
     float fade;
 } MuseumExhibit;
 
-void func_PAL_L30_0041CE18(char *obj) {
-    MuseumExhibit *st = (MuseumExhibit *)P(obj,0x68);
+/* Updates a museum exhibit: the hero walks up to it, the camera moves in, an effect object plays with the saved track settings, and the exhibit counts as seen afterwards (PAL version). */
+void museum_effect_exhibit_update_pal(char *obj) {
+    MuseumExhibit *exhibit = (MuseumExhibit *)P(obj,0x68);
     float vec[4] __attribute__((aligned(16)));
     float pos[4] __attribute__((aligned(16)));
     float rot[4] __attribute__((aligned(16)));
@@ -109,15 +110,15 @@ void func_PAL_L30_0041CE18(char *obj) {
             || (state = g_moby_nibble_table[((short)id>>1)+(g_current_map_index<<10)], (id & 1) ? (state>>4)&7 : state&7)) {
             moby_set_state(obj,8,-1);
             moby_set_flag_bit(obj,1);
-            for (j=0;j<2;j++) if (st->childIds[j]!=-1) moby_set_flag_bit(g_moby_l30_table+(st->childIds[j]<<8),1);
+            for (j=0;j<2;j++) if (exhibit->child_ids[j]!=-1) moby_set_flag_bit(g_moby_l30_table+(exhibit->child_ids[j]<<8),1);
         } else {
             moby_set_state(obj,1,-1);
             museum_effect_object_spawn(obj);
-            o=(char *)st->display;
+            o=(char *)exhibit->display;
             qcopy(o+0x10,obj+0x10);
             F(o,0x18)+=1.0f;
-            U(st->display,0x34)|=1;
-            B(st->display,0x31)=0;
+            U(exhibit->display,0x34)|=1;
+            B(exhibit->display,0x31)=0;
         }
         break;
     }
@@ -129,31 +130,31 @@ void func_PAL_L30_0041CE18(char *obj) {
             break;
         }
         if (g_pad_state.buttons.words.high&0x10) {
-            st->saved=g_hero_state.saved;
+            exhibit->saved=g_hero_state.saved;
             g_hero_state.action=0x33;
             moby_set_state(obj,2,-1);
         } else if ((g_current_map_index==21 || g_current_map_index==30) && ((g_pad_state.buttons.mask&3)==3)) moby_set_state(obj,9,-1);
         break;
     case 2: {
-        unsigned int cameraState;
+        unsigned int camera_state;
         if (flag_set_first_pending(obj)) {
             matrix_mul_vec3(vec,D_L30_001B1FC0_gp,obj+0xC0);
             FastVecAdd(vec,vec,obj+0x10);
             hero_start_target_state(vec,0,FastAddRotations(F(obj,0xF8),3.1415927f));
         }
-        cameraState=hero_get_target_state_kind();
-        if (cameraState==2) moby_set_state(obj,3,-1);
+        camera_state=hero_get_target_state_kind();
+        if (camera_state==2) moby_set_state(obj,3,-1);
         else if ((AdvanceMuseumTimer(obj)>=251)) {hero_start_loader_state(0);moby_set_state(obj,1,-1);}
-        else if (!cameraState) moby_set_state(obj,1,-1);
+        else if (!camera_state) moby_set_state(obj,1,-1);
         break;
     }
     case 3:
         if (flag_set_first_pending(obj)) {
-            func_PAL_L00_002C4480(0x6F,0);set_hero_animation_pal(0x54,0,17.0f);
+            hero_l00_set_action_pal(0x6F,0);set_hero_animation_pal(0x54,0,17.0f);
             FastVecSub(vec,g_camera_l30_position,g_hero_state.position);
-            matrix_mul_vec3(vec,vec,g_hero_state.matrix40);
+            matrix_mul_vec3(vec,vec,g_hero_state.matrix_40);
             SetCamera5Pose(g_camera_l30_position,g_camera_l30_position,3,100,0);
-            st->fade=0;
+            exhibit->fade=0;
         }
         matrix_mul_vec3(vec,D_L30_001B1FC0_gp,obj+0xC0);
         FastVecAdd(vec,vec,obj+0x10);
@@ -163,7 +164,7 @@ void func_PAL_L30_0041CE18(char *obj) {
         StepAngleTowardTarget(g_hero_state.rotation,0,FastAddRotations(F(obj,0xF8),3.1415927f),0.020943955f);
         g_hero_state.mode=3;
         if ((g_hero_state.flags&2) && B(g_hero_state.animation,0x43)==0x54) set_hero_animation_pal(0x55,0,6.0f);
-        if (g_hero_state.animationId!=0x6F) moby_set_state(obj,1,-1);
+        if (g_hero_state.animation_id!=0x6F) moby_set_state(obj,1,-1);
         matrix_mul_vec3(pos,D_L30_001B1FD0_gp,&g_hero_state);
         FastVecAdd(pos,pos,g_hero_state.position);
         qzero_nc(rot);
@@ -182,9 +183,9 @@ void func_PAL_L30_0041CE18(char *obj) {
         }
         g_hero_state.mode=3;
         if ((AdvanceMuseumTimer(obj)<18)) break;
-        ApproachValue(&st->fade,1.0f,0.14000002f);
+        ApproachValue(&exhibit->fade,1.0f,0.14000002f);
         elapsed=U(obj,0x96);
-        g_museum_fade_value=st->fade;
+        g_museum_fade_value=exhibit->fade;
         if (elapsed<26) break;
         g_museum_angle_scale=1.1243411f;
         cam_set_value_target(1,0,1.1243411f,0.005f,0.2f,0.0f);
@@ -196,31 +197,31 @@ void func_PAL_L30_0041CE18(char *obj) {
             int i;
             museum_effect_object_spawn(obj);
             g_museum_effect_timer=0;
-            /* Pointer arithmetic, not trackIds[i]: an array field of a BLKmode struct would form st+0xC in its own
+            /* Pointer arithmetic, not track_ids[i]: an array field of a BLKmode struct would form exhibit+0xC in its own
              * register ahead of the loop's duplicated exit test. The scalar globals leave the loop through load_mems. */
-            for (i=0;i<14&&*(st->trackIds+i)>=0;i++) {
-                g_track_slot_table[i][0]=*(st->trackIds+i);
+            for (i=0;i<14&&*(exhibit->track_ids+i)>=0;i++) {
+                g_track_slot_table[i][0]=*(exhibit->track_ids+i);
                 g_museum_effect_timer++;
-                g_museum_effect_duration=st->duration;
-                g_museum_effect_end_time=st->duration+100;
-                g_museum_effect_limit=st->limit;
-                st->display->vars->settings=st->settings;
+                g_museum_effect_duration=exhibit->duration;
+                g_museum_effect_end_time=exhibit->duration+100;
+                g_museum_effect_limit=exhibit->limit;
+                exhibit->display->vars->settings=exhibit->settings;
             }
-            U(st->display,0x34)&=~1;
-            B(st->display,0x31)=1;
-            U(st->display,0x34)&=~0x80;
+            U(exhibit->display,0x34)&=~1;
+            B(exhibit->display,0x31)=1;
+            U(exhibit->display,0x34)&=~0x80;
             set_identity_rotation_rows(g_camera_rotation_rows);
-            vec_clear_128((char *)st->display+0xF0);
-            F(st->display,0xF4)=-1.5707964f;
-            euler_rotation_basis((char *)st->display+0xC0,(char *)st->display+0xF0);
+            vec_clear_128((char *)exhibit->display+0xF0);
+            F(exhibit->display,0xF4)=-1.5707964f;
+            euler_rotation_basis((char *)exhibit->display+0xC0,(char *)exhibit->display+0xF0);
             moby_set_state(obj,6,-1);
         } else if ((AdvanceMuseumTimer(obj)>=5)) moby_set_state(obj,1,-1);
         break;
     case 6:
         if (g_museum_effect_mode==7) {set_identity_rotation_rows(g_camera_rotation_rows);museum_effect_holder_update(obj);break;}
         museum_effect_object_release(obj);
-        if (st->cleanupId!=-1) cam_reset_entry(st->cleanupId);
-        if (st->completed) {
+        if (exhibit->cleanup_id!=-1) cam_reset_entry(exhibit->cleanup_id);
+        if (exhibit->completed) {
             unsigned short id;
             unsigned char *p;
             moby_set_state(obj,7,-1);
@@ -233,7 +234,7 @@ void func_PAL_L30_0041CE18(char *obj) {
     case 7: {
         int j;
         moby_set_flag_bit(obj,1);
-        for (j=0;j<2;j++) if (st->childIds[j]!=-1) moby_set_flag_bit(g_moby_l30_table+(st->childIds[j]<<8),1);
+        for (j=0;j<2;j++) if (exhibit->child_ids[j]!=-1) moby_set_flag_bit(g_moby_l30_table+(exhibit->child_ids[j]<<8),1);
         hero_start_loader_state(0);moby_set_state(obj,8,-1);
         break;
     }
@@ -242,28 +243,28 @@ void func_PAL_L30_0041CE18(char *obj) {
         break;
     case 9:
         if (flag_set_first_pending(obj)) {
-            st->menu=museum_tweak_menu_spawn(obj);
-            MuseumTweakMenuAddItem(st->menu,&st->settings,g_str_effect_settings,0,0,10000);
-            MuseumTweakMenuAddItem(st->menu,&st->duration,g_str_effect_duration,0,30,1000);
-            MuseumTweakMenuAddItem(st->menu,&st->limit,g_str_effect_limit,0,15,1000);
-            MuseumTweakMenuAddItem(st->menu,&st->trackIds[0],g_str_track_id_a,0,-1,3);
-            MuseumTweakMenuAddItem(st->menu,&st->trackIds[1],g_str_track_id_b,0,-1,3);
-            MuseumTweakMenuAddItem(st->menu,&st->trackIds[2],g_str_track_id_c,0,-1,3);
-            MuseumTweakMenuAddItem(st->menu,&st->trackIds[3],g_str_track_id_d,0,-1,3);
-            MuseumTweakMenuAddItem(st->menu,&st->trackIds[4],g_str_track_id_e,0,-1,3);
-            MuseumTweakMenuAddItem(st->menu,&st->trackIds[5],g_str_track_id_f,0,-1,3);
-            MuseumTweakMenuAddItem(st->menu,&st->trackIds[6],g_str_track_id_g,0,-1,3);
-            MuseumTweakMenuAddItem(st->menu,&st->trackIds[7],g_str_track_id_h,0,-1,3);
-            MuseumTweakMenuAddItem(st->menu,&st->trackIds[8],g_str_track_id_i,0,-1,3);
-            MuseumTweakMenuAddItem(st->menu,&st->trackIds[9],g_str_track_id_j,0,-1,3);
-            MuseumTweakMenuAddItem(st->menu,&st->trackIds[10],g_str_track_id_k,0,-1,3);
-            MuseumTweakMenuAddItem(st->menu,&st->trackIds[11],g_str_track_id_l,0,-1,3);
-            MuseumTweakMenuAddItem(st->menu,&st->trackIds[12],g_str_track_id_m,0,-1,3);
-            MuseumTweakMenuAddItem(st->menu,&st->trackIds[13],g_str_track_id_n,0,-1,3);
-            st->completed=0;
+            exhibit->menu=museum_tweak_menu_spawn(obj);
+            MuseumTweakMenuAddItem(exhibit->menu,&exhibit->settings,g_str_effect_settings,0,0,10000);
+            MuseumTweakMenuAddItem(exhibit->menu,&exhibit->duration,g_str_effect_duration,0,30,1000);
+            MuseumTweakMenuAddItem(exhibit->menu,&exhibit->limit,g_str_effect_limit,0,15,1000);
+            MuseumTweakMenuAddItem(exhibit->menu,&exhibit->track_ids[0],g_str_track_id_a,0,-1,3);
+            MuseumTweakMenuAddItem(exhibit->menu,&exhibit->track_ids[1],g_str_track_id_b,0,-1,3);
+            MuseumTweakMenuAddItem(exhibit->menu,&exhibit->track_ids[2],g_str_track_id_c,0,-1,3);
+            MuseumTweakMenuAddItem(exhibit->menu,&exhibit->track_ids[3],g_str_track_id_d,0,-1,3);
+            MuseumTweakMenuAddItem(exhibit->menu,&exhibit->track_ids[4],g_str_track_id_e,0,-1,3);
+            MuseumTweakMenuAddItem(exhibit->menu,&exhibit->track_ids[5],g_str_track_id_f,0,-1,3);
+            MuseumTweakMenuAddItem(exhibit->menu,&exhibit->track_ids[6],g_str_track_id_g,0,-1,3);
+            MuseumTweakMenuAddItem(exhibit->menu,&exhibit->track_ids[7],g_str_track_id_h,0,-1,3);
+            MuseumTweakMenuAddItem(exhibit->menu,&exhibit->track_ids[8],g_str_track_id_i,0,-1,3);
+            MuseumTweakMenuAddItem(exhibit->menu,&exhibit->track_ids[9],g_str_track_id_j,0,-1,3);
+            MuseumTweakMenuAddItem(exhibit->menu,&exhibit->track_ids[10],g_str_track_id_k,0,-1,3);
+            MuseumTweakMenuAddItem(exhibit->menu,&exhibit->track_ids[11],g_str_track_id_l,0,-1,3);
+            MuseumTweakMenuAddItem(exhibit->menu,&exhibit->track_ids[12],g_str_track_id_m,0,-1,3);
+            MuseumTweakMenuAddItem(exhibit->menu,&exhibit->track_ids[13],g_str_track_id_n,0,-1,3);
+            exhibit->completed=0;
         }
         ForceClaimNotice(1,0,1);
-        if (!st->menu || H(st->menu,0xAA)!=0x118A || B(st->menu,0x20)==254 || B(st->menu,0x20)==253) moby_set_state(obj,1,-1);
+        if (!exhibit->menu || H(exhibit->menu,0xAA)!=0x118A || B(exhibit->menu,0x20)==254 || B(exhibit->menu,0x20)==253) moby_set_state(obj,1,-1);
         break;
     }
 }

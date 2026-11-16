@@ -30,10 +30,11 @@ extern s32 drone_is_state_at_least_four(u8 *);
 extern u8 g_hero_state[];
 extern u8 g_music_state[];
 
+/* Resets every member of the object's group by calling the reset handler of its class. */
 void arena_run_member_handlers_pal(u8 *obj)
 {
     s32 index = *(s32 *)(*(u8 **)(obj + 0x68) + 0xC0);
-    u16 *p;
+    u16 *cursor;
     u8 *list;
     u8 *entry;
 
@@ -42,9 +43,9 @@ void arena_run_member_handlers_pal(u8 *obj)
     list = g_group_id_lists[index];
     if (list == 0)
         return;
-    p = (u16 *)list;
+    cursor = (u16 *)list;
     do {
-        entry = D_L11_001B359C_base[0] + ((*p & 0x7FFF) << 8);
+        entry = D_L11_001B359C_base[0] + ((*cursor & 0x7FFF) << 8);
         switch (*(s16 *)(entry + 0xAA)) {
         case 0xD98:
             security_robot_deactivate(entry);
@@ -70,10 +71,10 @@ void arena_run_member_handlers_pal(u8 *obj)
         case 0xD4B:
             drone_kill_with_effects_pal(entry);
             break;
-        case 0xB3A:
+        case MOBY_CLASS_ARACHNOID:
             joba_enemy_reset(entry);
             break;
         }
-    } while (*(s16 *)p++ >= 0);
+    } while (*(s16 *)cursor++ >= 0);
 }
 

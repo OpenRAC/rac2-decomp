@@ -16,21 +16,21 @@ extern float g_screen_fade;
 extern int g_mode_change_flag;
 extern float g_fov_tangent __attribute__((nosda));
 extern int g_moby_hide_mode_a;
-extern void func_PAL_002CB5D0(void);
+extern void restore_menu_display_state_pal(void);
 extern void menu_end(void);
 extern void mpeg_resume_after_movie(void);
 extern void cutscene_end_pal(void);
 extern void cam_set_value_target(int, int, float, float, float, float);
 extern void UpdateViewContext(void);
 extern void scene_end_playback_pal(void);
-extern void func_PAL_002F96D8(void);
+extern void shop_reset_menu_camera_pal(void);
 extern void moby_show_all(void);
-extern void func_PAL_00300300(void);
-extern void func_PAL_00291A40(void);
+extern void stub_empty_flags_pal(void);
+extern void gfx_lighting_wrapper_pal(void);
 extern void math_trap_always(void);
-extern void func_PAL_002B5540(int);
+extern void request_set_setting_a_pal(int);
 extern int menu_get_mode(void);
-extern void func_PAL_002CAAF0(int);
+extern void menu_init_pause_state_pal(int);
 extern void menu_set_mode(int, int);
 extern void mpeg_start_movie_from_toc(int);
 extern float ApproachValue(float *, float, float);
@@ -41,8 +41,8 @@ extern void scene_init_list(int);
 extern void scene_reset_state_on_start_pal(void);
 extern void OpenVendorMenu_pal(int);
 extern void moby_hide_all(int, int);
-extern void func_PAL_00300130(void);
-extern void func_PAL_00291A20(void);
+extern void BeginPreviewTransition_pal(void);
+extern void gfx_lighting_init_wrapper_pal(void);
 
 /* Applies a requested change of mode: D_001A8BB8 holds the requested mode (-2 when none) and
    D_001A8BB0 the current one. The first dispatch runs the handler of the mode being left and the
@@ -52,7 +52,7 @@ extern void func_PAL_00291A20(void);
    `entering` only keep the labels alive. A handler reached through a table starts with no known
    values, so D_001A8BB8 is read again where retail reads it (the compare in the first handler of
    mode 3) without any qualifier on the global. */
-void func_PAL_002B57D0(void)
+void mode_apply_pending_change_pal(void)
 {
     static void *leaving[12] = {&&L1_3, &&L1_4, &&L1_1, &&L1_2, &&L1_6, &&L1_5, &&L1_7, &&L1_8, &&L1_9, &&L1_0, &&L1_def, &&shared};
     static void *entering[11] = {&&L2_3, &&L2_0, &&L2_4, &&L2_1, &&L2_2, &&L2_6, &&L2_5, &&L2_7, &&L2_8, &&L2_9, &&L2_def};
@@ -73,7 +73,7 @@ void func_PAL_002B57D0(void)
     goto *D_0026CBB0[mode];
 L1_3:
     if (g_requested_game_mode != 4 || g_pending_mode_arg_a == 8)
-        func_PAL_002CB5D0();
+        restore_menu_display_state_pal();
     goto E1;
 L1_4:
     menu_end();
@@ -93,22 +93,22 @@ L1_6:
         scene_end_playback_pal();
     goto E1;
 L1_5:
-    func_PAL_002F96D8();
+    shop_reset_menu_camera_pal();
     goto E1;
 L1_7:
     moby_show_all();
     goto E1;
 L1_8:
-    func_PAL_00300300();
+    stub_empty_flags_pal();
     goto E1;
 L1_9:
-    func_PAL_00291A40();
+    gfx_lighting_wrapper_pal();
     goto E1;
 L1_def:
     math_trap_always();
 L1_0:
 E1:
-    func_PAL_002B5540(10);
+    request_set_setting_a_pal(10);
     hold = 0;
     sel = g_requested_game_mode;
     if ((unsigned)sel >= 10)
@@ -116,7 +116,7 @@ E1:
     goto *D_0026CBE0[sel];
 L2_3:
     if (g_previous_game_mode != 4 || menu_get_mode() == 8)
-        func_PAL_002CAAF0(g_pending_mode_arg_a);
+        menu_init_pause_state_pal(g_pending_mode_arg_a);
 L2_0:
     hold = 0;
     goto E2;
@@ -169,10 +169,10 @@ L2_7:
     }
     goto E2;
 L2_8:
-    func_PAL_00300130();
+    BeginPreviewTransition_pal();
     goto E2;
 L2_9:
-    func_PAL_00291A20();
+    gfx_lighting_init_wrapper_pal();
     goto E2;
 L2_def:
     math_trap_always();
@@ -234,18 +234,19 @@ extern void FastVecAdd(void *, void *, void *);
 extern float vec_length_xy(void *);
 extern void math_approach_target_with_braking(void *, float, float, float, float);
 
-void moby_update_controller_velocity_pal(Self_002B52A0 *self, Ctl_002B52A0 *ctl, void *target, float x)
+/* Turns the moby toward a heading, accelerates its velocity toward the target and applies gravity or ground clamping (PAL). */
+void moby_update_controller_velocity_pal(Self_002B52A0 *self, Ctl_002B52A0 *ctl, void *target, float target_heading)
 {
     float local[4] __attribute__((aligned(16)));
     float local2[4] __attribute__((aligned(16)));
-    float h, scale, dist, dot, len, len2, diff, g90;
+    float angle_diff, scale, dist, dot, len, len2, diff, ground_z;
 
     if (!(ctl->flags38 & 0x10))
-        math_approach_target_with_direction_mode(&self->heading, x, &ctl->fB4, 0, ctl->f14, ctl->f18, ctl->f1C);
-    h = FastDiffRots(self->heading, x);
-    if (!(ctl->flags38 & 0x10) && ctl->f30 < h) {
+        math_approach_target_with_direction_mode(&self->heading, target_heading, &ctl->fB4, 0, ctl->f14, ctl->f18, ctl->f1C);
+    angle_diff = FastDiffRots(self->heading, target_heading);
+    if (!(ctl->flags38 & 0x10) && ctl->f30 < angle_diff) {
         vec_clear_128(local);
-        if (h - ctl->f30 > ctl->fB4 * 25.0f)
+        if (angle_diff - ctl->f30 > ctl->fB4 * 25.0f)
             ctl->flags9C |= 2;
     } else {
         ctl->flags9C &= ~2;
@@ -257,18 +258,18 @@ void moby_update_controller_velocity_pal(Self_002B52A0 *self, Ctl_002B52A0 *ctl,
             scale = square_root(2.0f * (dist - ctl->f34) * ctl->f24);
             if (ctl->f28 < scale)
                 scale = ctl->f28;
-            h = x;
+            angle_diff = target_heading;
             if (ctl->w80 != 0) {
-                x = FastAddRotations(mat_fast_helper_a(ctl->f60 - self->pos[0], ctl->f64 - self->pos[1]), 3.14159f);
-                h = fast_subtract_rotations(h, x);
-                if (g_controller_velocity_limit < h)
-                    h = g_controller_velocity_limit;
-                else if (h < -g_controller_velocity_limit)
-                    h = -g_controller_velocity_limit;
-                h = FastAddRotations(h, x);
+                target_heading = FastAddRotations(mat_fast_helper_a(ctl->f60 - self->pos[0], ctl->f64 - self->pos[1]), 3.14159f);
+                angle_diff = fast_subtract_rotations(angle_diff, target_heading);
+                if (g_controller_velocity_limit < angle_diff)
+                    angle_diff = g_controller_velocity_limit;
+                else if (angle_diff < -g_controller_velocity_limit)
+                    angle_diff = -g_controller_velocity_limit;
+                angle_diff = FastAddRotations(angle_diff, target_heading);
             }
-            local[0] = math_fast_sin_or_cos_a(h) * scale;
-            local[1] = math_fast_sin_or_cos_b(h) * scale;
+            local[0] = math_fast_sin_or_cos_a(angle_diff) * scale;
+            local[1] = math_fast_sin_or_cos_b(angle_diff) * scale;
             local[2] = 0;
         }
     }
@@ -284,10 +285,10 @@ void moby_update_controller_velocity_pal(Self_002B52A0 *self, Ctl_002B52A0 *ctl,
     ctl->speed = len;
     if (ctl->flags38 & 4)
         return;
-    g90 = ctl->f90;
-    if (g90 < self->pos[2]) {
+    ground_z = ctl->f90;
+    if (ground_z < self->pos[2]) {
         if (ctl->hC2 < 2) {
-            if (self->pos[2] - g90 < 0.15f) {
+            if (self->pos[2] - ground_z < 0.15f) {
                 len2 = vec_length_xy(ctl->v50);
                 if (0.087266475f < mat_fast_helper_a(ctl->v50[2], len2)) {
                     if (-FastVecDot(ctl->vel, ctl->v50) < ctl->vel[2])
@@ -299,7 +300,7 @@ void moby_update_controller_velocity_pal(Self_002B52A0 *self, Ctl_002B52A0 *ctl,
         if (ctl->hC0 == 0)
             ctl->flags94 |= 0x20;
     } else {
-        diff = g90 - self->pos[2];
+        diff = ground_z - self->pos[2];
         if (diff < ctl->vel[2])
             ctl->vel[2] = diff;
         else if (ctl->vel[2] < 0.0f)

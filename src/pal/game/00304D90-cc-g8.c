@@ -11,7 +11,7 @@ extern float math_fast_sin_or_cos_a(float);
 /* Fills three columns of the 64-entry, 32-byte-stride table at D_002222E0 from the state's
    parameters, one column for each flag bit (0x10, 0x40, 0x20) the state's word at +0x4C has
    clear: a sine of the wrapped phase 8 x 8 grid position, a cosine, and a sine again. */
-void func_PAL_00304D90(char *object)
+void surface_grid_update_wave_tables_pal(char *object)
 {
     char *state = *(char **)(object + 0x68);
     int i;

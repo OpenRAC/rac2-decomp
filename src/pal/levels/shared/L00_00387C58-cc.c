@@ -19,7 +19,8 @@ extern float g_goal_hit_float_a SDATA(D_L00_001AEE20);
 extern float g_goal_hit_float_b;
 extern unsigned int g_goal_hit_particle_table[4] SDATA(D_L00_001AEE28);
 
-void func_PAL_L00_00387C58(unsigned char *object, void *position)
+/* Spawns the particles for a goal hit: one burst at the position and one flying out in a random direction (PAL: 50 Hz timings). */
+void part_spawn_goal_hit_pal(unsigned char *object, void *position)
 {
     char buffer[16];
     unsigned int *table = g_goal_hit_particle_table;

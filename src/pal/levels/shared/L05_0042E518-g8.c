@@ -69,7 +69,8 @@ typedef struct BurstObject {
     u8 pad6C[0x54];
     float forward[4], right[4];
 } BurstObject;
-void func_PAL_L05_0042E518(BurstObject *object)
+/* Spawns the big fire explosion: layered glow and flame particles, sparks, a shockwave ring, and a flash if the hero is near (PAL: 50 Hz timings). */
+void part_spawn_fire_explosion_pal(BurstObject *object)
 {
     float position[4] __attribute__((aligned(16)));
     float velocity[4] __attribute__((aligned(16)));

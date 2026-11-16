@@ -36,67 +36,68 @@ struct LiftMoby {
 };
 extern struct LiftPoint *ref_L02_003EB8F8_00 __attribute__((sda));
 extern struct LiftPoint *ref_L02_003EB8F8_01 MACRO_ADDR;
-void func_PAL_L03_003CEFA8(struct LiftMoby *obj) {
-    struct LiftData *data = obj->data;
+/* Updates an elevator that rides between two heights, switching direction when the hero steps on or near it, with its sound. (PAL) */
+void elevator_l03_l02_update_pal(struct LiftMoby *moby) {
+    struct LiftData *data = moby->data;
     int oldpos[4] __attribute__((aligned(16)));
     float delta[4] __attribute__((aligned(16)));
     float target, speed;
     float endpoint;
-    float *d;
-    struct LiftHero *h, *h2;
-    qcopy(oldpos,obj->pos);
-    switch (obj->state) {
+    float *delta_ptr;
+    struct LiftHero *hero_a, *hero_b;
+    qcopy(oldpos,moby->pos);
+    switch (moby->state) {
     case 0:
-        if (!data) { ref_L02_003EB8F8_02(obj); return; }
-        qcopy((char *)data+0x70,obj->pos);
-        ref_L02_003EB8F8_03(obj,1,-1);
+        if (!data) { ref_L02_003EB8F8_02(moby); return; }
+        qcopy((char *)data+0x70,moby->pos);
+        ref_L02_003EB8F8_03(moby,1,-1);
         break;
     case 1:
         target = data->direction ? ref_L02_003EB8F8_00[data->waypoint].z : data->origin[2];
-        if (ref_L02_003EB8F8_04(target-obj->pos[2]) < 2.0f) {
+        if (ref_L02_003EB8F8_04(target-moby->pos[2]) < 2.0f) {
             endpoint = ref_L02_003EB8F8_01[data->waypoint].z;
             
-            if (((struct LiftHero *)g_hero_state)->standing==obj && ((struct LiftHero *)g_hero_state)->active) {
+            if (((struct LiftHero *)g_hero_state)->standing==moby && ((struct LiftHero *)g_hero_state)->active) {
                 if (!data->latched) data->direction=(data->direction+1)&1;
                 data->latched=1;
             } else {
-                if (((struct LiftHero *)g_hero_state)->standing!=obj || ((struct LiftHero *)g_hero_state)->f31c>0.2f) data->latched=0;
+                if (((struct LiftHero *)g_hero_state)->standing!=moby || ((struct LiftHero *)g_hero_state)->f31c>0.2f) data->latched=0;
                 if (data->direction) {
-                        if (ref_L02_003EB8F8_04(((struct LiftHero *)g_hero_state)->pos[2]-data->origin[2])<4.0f && ref_L02_003EB8F8_05(((struct LiftHero *)g_hero_state)->pos,obj->pos)<24.0f) data->direction=0;
+                        if (ref_L02_003EB8F8_04(((struct LiftHero *)g_hero_state)->pos[2]-data->origin[2])<4.0f && ref_L02_003EB8F8_05(((struct LiftHero *)g_hero_state)->pos,moby->pos)<24.0f) data->direction=0;
                     } else {
-                        if (ref_L02_003EB8F8_04(((struct LiftHero *)g_hero_state)->pos[2]-endpoint)<4.0f && ref_L02_003EB8F8_05(((struct LiftHero *)g_hero_state)->pos,obj->pos)<24.0f) data->direction=1;
+                        if (ref_L02_003EB8F8_04(((struct LiftHero *)g_hero_state)->pos[2]-endpoint)<4.0f && ref_L02_003EB8F8_05(((struct LiftHero *)g_hero_state)->pos,moby->pos)<24.0f) data->direction=1;
                     }
             }
         }
         speed=0.0056000003f;
-        d=delta;
+        delta_ptr=delta;
         if (data->direction) {
-            if (((struct LiftHero *)g_hero_state)->pos[2]<obj->pos[2]-1.0f || F(g_camera_l02_position,8)<obj->pos[2]) {
-                ref_L02_003EB8F8_06(d,g_camera_l02_position,(char *)&ref_L02_003EB8F8_01[data->waypoint]+0x30);
-                ref_L02_003EB8F8_07(d,d,(char *)&ref_L02_003EB8F8_01[data->waypoint]+0x40);
+            if (((struct LiftHero *)g_hero_state)->pos[2]<moby->pos[2]-1.0f || F(g_camera_l02_position,8)<moby->pos[2]) {
+                ref_L02_003EB8F8_06(delta_ptr,g_camera_l02_position,(char *)&ref_L02_003EB8F8_01[data->waypoint]+0x30);
+                ref_L02_003EB8F8_07(delta_ptr,delta_ptr,(char *)&ref_L02_003EB8F8_01[data->waypoint]+0x40);
                 if (ref_L02_003EB8F8_08(((struct LiftHero *)g_hero_state)->pos,data->waypoint) || (ref_L02_003EB8F8_04(delta[0])<1.0f && ref_L02_003EB8F8_04(delta[1])<1.0f)) {
-                    if (obj->kind==0xbf5) target+=5.0f; else target+=3.0f;
+                    if (moby->kind==0xbf5) target+=5.0f; else target+=3.0f;
                 }
                 speed+=speed;
             } else target+=0.15f;
         }
-        ref_L02_003EB8F8_09(&obj->pos[2],(char *)data+0x6c,target,0.0028000001f,speed,0.6f);
-        if (ref_L02_003EB8F8_04(obj->pos[2]-target)<=data->velocity) {
-            obj->pos[2]=target;
+        ref_L02_003EB8F8_09(&moby->pos[2],(char *)data+0x6c,target,0.0028000001f,speed,0.6f);
+        if (ref_L02_003EB8F8_04(moby->pos[2]-target)<=data->velocity) {
+            moby->pos[2]=target;
             if (data->velocity!=0.0f) data->velocity=0.0f;
         }
         break;
     }
     if (ref_L02_003EB8F8_04(data->velocity)>0.01f) {
-        char *e=g_sound_state+data->sound*0x70;
-        if (P(e,0x88)!=obj || !*(unsigned char *)(e+0x74)) data->sound=ref_L02_003EB8F8_10(0,4,obj);
+        char *sound_record=g_sound_state+data->sound*0x70;
+        if (P(sound_record,0x88)!=moby || !*(unsigned char *)(sound_record+0x74)) data->sound=ref_L02_003EB8F8_10(0,4,moby);
     } else {
         if (data->sound!=-1) {
-            char *e=g_sound_state+data->sound*0x70;
-            if (P(e,0x88)==obj && *(unsigned char *)(e+0x74)) ref_L02_003EB8F8_11(data->sound);
+            char *sound_record=g_sound_state+data->sound*0x70;
+            if (P(sound_record,0x88)==moby && *(unsigned char *)(sound_record+0x74)) ref_L02_003EB8F8_11(data->sound);
         }
         data->sound=-1;
     }
-    ref_L02_003EB8F8_06(delta,obj->pos,oldpos);
-    ref_L02_003EB8F8_12((char *)data+0x20,delta,obj->rotation,obj->rotation);
+    ref_L02_003EB8F8_06(delta,moby->pos,oldpos);
+    ref_L02_003EB8F8_12((char *)data+0x20,delta,moby->rotation,moby->rotation);
 }

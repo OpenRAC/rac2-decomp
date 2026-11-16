@@ -11,6 +11,7 @@ extern CallbackState g_pause_menu_state;
 extern int g_menu_input_flags;
 extern int func_0029C760(int);
 
+/* Menu input handler: confirm keeps the selection, back or cancel closes the menu, anything else goes to the page updater. */
 int menu_page_update_us2(void) {
     int result = 0;
     int flags = g_menu_input_flags;

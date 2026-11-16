@@ -18,6 +18,7 @@ extern void *part_spawn_ground_effect(void *, unsigned int, unsigned int, unsign
 extern unsigned int scene_get_state_word(void);
 extern int follower_get_state();
 
+/* Keeps a follower object inside its allowed range of its target. When its counter reaches 7 it resets the counter and throws out a burst of 20 sparks. */
 void follower_clamp_range_spawn_sparks_pal(u8 *a0)
 {
     u8 *s2;

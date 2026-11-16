@@ -3,7 +3,7 @@
 #include "common.h"
 typedef int EffectQuad __attribute__((mode(TI)));
 extern void route_set_node_enabled_flag(u32, u8 *, s32);
-extern void func_PAL_L03_0038E5C8(void *);
+extern void effect_init_moby_state_pal(void *);
 extern void func_L03_0038B408(void *);
 extern void moby_set_state(u8 *, s32, s32);
 extern int flag_set_first_pending(u8 *);
@@ -28,6 +28,7 @@ extern void snd_stop_voice(int);
 extern int PlayMobySound(int, int, char *);
 extern void moby_mark_spawned(void *);
 
+/* Updates a moby (class 2832) that cycles through three timed states, draws its effect, and blows up with a sound when destroyed. (PAL: timers scaled to 50 Hz) */
 void timed_state_effect_update_pal(unsigned char *object) {
     unsigned char *state = *(unsigned char **)(object + 0x68);
     union { EffectQuad quad; float values[4]; } position;
@@ -37,7 +38,7 @@ void timed_state_effect_update_pal(unsigned char *object) {
         qcopy(state, object + 0x10);
         if (*(int *)(state + 0x10) != -1 && *(int *)(state + 0x14))
             route_set_node_enabled_flag(*(int *)(state + 0x10), object + 0x10, 0);
-        func_PAL_L03_0038E5C8(object);
+        effect_init_moby_state_pal(object);
         if ((*(unsigned long long *)(state + 0x38) & 0x1100000000ULL) == 0x1100000000ULL)
             func_L03_0038B408(object);
         moby_set_state(object, 1, -1);

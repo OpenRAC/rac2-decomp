@@ -50,6 +50,7 @@ extern void level_forward_value_b_us2(int);
 extern void level_forward_value(int);
 extern void SubmitBufferedDmaChain(void);
 
+/* Closes the menu after a short wait and saves any changed choices. */
 void menu_close_and_save_choices_us2(void)
 {
     int i, j;

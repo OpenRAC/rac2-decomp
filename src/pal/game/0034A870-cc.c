@@ -8,7 +8,7 @@ typedef unsigned char u8;
 extern int *object_get_fourth_field(u8 *);
 extern void *ui_return_second_arg(int, int);
 extern void *pool_alloc_cell(void *);
-extern void func_PAL_00338688(void *, void *, void *);
+extern void hud_init_widget_defaults_pal(void *, void *, void *);
 extern void object_set_helper_result(char *, char *, int);
 extern void menu_set_field_44c_pal(u8 *, int);
 extern void object_init_derived_arrays(void *, void *, void *);
@@ -25,63 +25,63 @@ extern char ref_003486A8_05[];
 extern char ref_003486A8_06[];
 extern char ref_003486A8_07[];
 
-void menu_page_construct_with_rows_pal(char *o, void *data)
+void menu_page_construct_with_rows_pal(char *menu, void *data)
 {
-    int *v;
+    int *origin;
 
-    *(int *)(o + 0x4ac) = 0;
-    menu_set_field_44c_pal((u8 *)o, 0);
-    *(void **)(o + 0x4a8) = data;
+    *(int *)(menu + 0x4ac) = 0;
+    menu_set_field_44c_pal((u8 *)menu, 0);
+    *(void **)(menu + 0x4a8) = data;
     if (data) {
-        v = ui_return_second_arg(16, pool_alloc_cell(data));
-        *(int **)(o + 0x4a4) = v;
-        v[1] = 0;
-        v[2] = 0;
-        v[3] = 0;
-        v[0] = 0;
+        origin = ui_return_second_arg(16, pool_alloc_cell(data));
+        *(int **)(menu + 0x4a4) = origin;
+        origin[1] = 0;
+        origin[2] = 0;
+        origin[3] = 0;
+        origin[0] = 0;
     }
     {
-        float *position = *(float **)(o + 0x4a4);
+        float *position = *(float **)(menu + 0x4a4);
 
-        *(int *)(o + 0x4b0) = 1;
+        *(int *)(menu + 0x4b0) = 1;
         position[0] = 250.0f;
     }
-    (*(float **)(o + 0x4a4))[1] = 190.0f;
-    object_init_derived_arrays(o + 0x0, ref_003486A8_00, data);
-    object_init_derived_arrays(o + 0x130, ref_003486A8_01, data);
-    object_init_derived_arrays(o + 0x4C, ref_003486A8_02, data);
-    object_init_derived_arrays(o + 0x98, ref_003486A8_03, data);
-    object_init_derived_arrays(o + 0xE4, ref_003486A8_04, data);
-    object_init_derived_arrays(o + 0x17C, ref_003486A8_05, data);
-    object_init_derived_arrays(o + 0x1C8, ref_003486A8_06, data);
-    *(int *)(o + 0x480) = 0;
-    *(int *)(o + 0x4b4) = 0;
+    (*(float **)(menu + 0x4a4))[1] = 190.0f;
+    object_init_derived_arrays(menu + 0x0, ref_003486A8_00, data);
+    object_init_derived_arrays(menu + 0x130, ref_003486A8_01, data);
+    object_init_derived_arrays(menu + 0x4C, ref_003486A8_02, data);
+    object_init_derived_arrays(menu + 0x98, ref_003486A8_03, data);
+    object_init_derived_arrays(menu + 0xE4, ref_003486A8_04, data);
+    object_init_derived_arrays(menu + 0x17C, ref_003486A8_05, data);
+    object_init_derived_arrays(menu + 0x1C8, ref_003486A8_06, data);
+    *(int *)(menu + 0x480) = 0;
+    *(int *)(menu + 0x4b4) = 0;
     {
         int i;
-        char *row = o + 0x218;
+        char *row = menu + 0x218;
 
         for (i = 0; i < 7; i++) {
-            func_PAL_00338688(row, ref_003486A8_07, data);
+            hud_init_widget_defaults_pal(row, ref_003486A8_07, data);
             hud_set_widget_field_b(row, 0);
             object_set_second_float4(row, 1.0f, 0.0f, 0.0f, 0.0f);
             *(int *)object_get_fourth_field((u8 *)row) = 0x80F0F0F0;
-            *(int *)(o + 0x488 + i * 4) = 1;
+            *(int *)(menu + 0x488 + i * 4) = 1;
             row += 88;
         }
     }
-    *(int *)object_get_fourth_field((u8 *)o + 0x0) = 0x60442D00;
-    *(int *)object_get_fourth_field((u8 *)o + 0x130) = 0x55F0C070;
-    *(int *)object_get_fourth_field((u8 *)o + 0x4C) = 0x55F0C070;
-    *(int *)object_get_fourth_field((u8 *)o + 0x98) = 0x80FFDE8D;
-    *(int *)object_get_fourth_field((u8 *)o + 0xE4) = 0x70FFFEED;
-    *(int *)object_get_fourth_field((u8 *)o + 0x17C) = 0x60442D00;
-    *(int *)object_get_fourth_field((u8 *)o + 0x1C8) = 0x55F0C070;
-    object_set_helper_result(o + 0x0, g_resident_data_base[0] + 0x8710, 28);
-    object_set_helper_result(o + 0x130, g_resident_data_base[0] + 0x8710, 29);
-    object_set_helper_result(o + 0x4C, g_resident_data_base[0] + 0x8710, 30);
-    object_set_helper_result(o + 0x98, g_resident_data_base[0] + 0x8710, 31);
-    object_set_helper_result(o + 0xE4, g_resident_data_base[0] + 0x8710, 32);
-    object_set_helper_result(o + 0x17C, g_resident_data_base[0] + 0x8710, 115);
-    object_set_helper_result(o + 0x1C8, g_resident_data_base[0] + 0x8710, 116);
-    UpdateMenuChoiceListWidgets_pal(o, 0);
+    *(int *)object_get_fourth_field((u8 *)menu + 0x0) = 0x60442D00;
+    *(int *)object_get_fourth_field((u8 *)menu + 0x130) = 0x55F0C070;
+    *(int *)object_get_fourth_field((u8 *)menu + 0x4C) = 0x55F0C070;
+    *(int *)object_get_fourth_field((u8 *)menu + 0x98) = 0x80FFDE8D;
+    *(int *)object_get_fourth_field((u8 *)menu + 0xE4) = 0x70FFFEED;
+    *(int *)object_get_fourth_field((u8 *)menu + 0x17C) = 0x60442D00;
+    *(int *)object_get_fourth_field((u8 *)menu + 0x1C8) = 0x55F0C070;
+    object_set_helper_result(menu + 0x0, g_resident_data_base[0] + 0x8710, 28);
+    object_set_helper_result(menu + 0x130, g_resident_data_base[0] + 0x8710, 29);
+    object_set_helper_result(menu + 0x4C, g_resident_data_base[0] + 0x8710, 30);
+    object_set_helper_result(menu + 0x98, g_resident_data_base[0] + 0x8710, 31);
+    object_set_helper_result(menu + 0xE4, g_resident_data_base[0] + 0x8710, 32);
+    object_set_helper_result(menu + 0x17C, g_resident_data_base[0] + 0x8710, 115);
+    object_set_helper_result(menu + 0x1C8, g_resident_data_base[0] + 0x8710, 116);
+    UpdateMenuChoiceListWidgets_pal(menu, 0);
 }

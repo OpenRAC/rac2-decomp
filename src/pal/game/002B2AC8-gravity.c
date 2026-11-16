@@ -37,7 +37,7 @@ extern struct ImpactQueueState g_collision_hit;
 int moby_update_positional_gravity_motion_pal(char *object, char *state)
 {
     float predicted[4] __attribute__((aligned(16)));
-    float oldPosition[4] __attribute__((aligned(16)));
+    float old_position[4] __attribute__((aligned(16)));
     float direction[4] __attribute__((aligned(16)));
     float scaled[4] __attribute__((aligned(16)));
     float start[4] __attribute__((aligned(16)));
@@ -46,14 +46,14 @@ int moby_update_positional_gravity_motion_pal(char *object, char *state)
     /* The 48-byte rotation output shares storage with later collision probes. */
     union {
         float rotation[12];
-        struct { float impulse[4], probeStart[4], probeEnd[4]; } collision;
+        struct { float impulse[4], probe_start[4], probe_end[4]; } collision;
     } scratch __attribute__((aligned(16)));
-    float speed, root1, root2, angle, damped, flightTime;
+    float speed, root1, root2, angle, damped, flight_time;
     int result = 0;
     float length, approach, acceleration;
     char *hit;
-    int fallback, rayHit;
-    MotionQuad *hitPoint=&g_collision_hit.point;
+    int fallback, ray_hit;
+    MotionQuad *hit_point=&g_collision_hit.point;
     cam_compute_view_direction(object+0x10, direction, 0);
     mat_align_to_down_dir(object+0xC0, direction, 0);
     length = coll_get_ground_distance_below(object+0x10, 0, 0);
@@ -65,8 +65,8 @@ int moby_update_positional_gravity_motion_pal(char *object, char *state)
         gravity_offset_object_position(object,state+0x80,state+0x80,F(state,0x50));
         acceleration = F(state,0x50)*FastVecLength(direction);
     }
-    qcopy(oldPosition,object+0x10);
-    gravity_offset_object_position(object,oldPosition,oldPosition,-F(state,0x34));
+    qcopy(old_position,object+0x10);
+    gravity_offset_object_position(object,old_position,old_position,-F(state,0x34));
     vec_scale_to_length(scaled,direction,-approach);
     FastVecSub(state+0x80,state+0x80,scaled);
     speed = FastVecLength(state+0x80);
@@ -83,10 +83,10 @@ int moby_update_positional_gravity_motion_pal(char *object, char *state)
     if (F(state,0x60)!=-1.0f && F(state,0x54)!=-1.0f) {
         switch (B(state,0x1A)) {
         case 0:
-            flightTime = math_fabs(approach / acceleration);
-            if (flightTime>2.0f) {
+            flight_time = math_fabs(approach / acceleration);
+            if (flight_time>2.0f) {
                 float numerator=(F(state,0x54)-moby_get_anim_value(object))*2.0f;
-                float target = numerator / flightTime;
+                float target = numerator / flight_time;
                 if (target>0.0f) ApproachValue(object+0x48,target,0.120000005f);
             }
             break;
@@ -132,21 +132,21 @@ int moby_update_positional_gravity_motion_pal(char *object, char *state)
     euler_rotation_basis(scratch.rotation,normal);
     multiply_matrix3x3(object+0xC0,object+0xC0,scratch.rotation);
     FastVecAdd(object+0x10,object+0x10,state+0x80);
-    FastVecAdd(predicted,oldPosition,state+0x80);
+    FastVecAdd(predicted,old_position,state+0x80);
     FastVecAdd(start,predicted,state+0x80);
     coll_sweep_from_object(object,F(state,0x30),start,0x4000000,1.0f,1.0f,0,1,0);
     if (FastVecLength(state+0x80)>F(state,0x30)) {
-        if (CollLine(oldPosition,predicted,0x24,object,0)) qcopy(predicted,hitPoint);
+        if (CollLine(old_position,predicted,0x24,object,0)) qcopy(predicted,hit_point);
     }
-    rayHit=coll_test_point(predicted,F(state,0x30),0x24,object);
+    ray_hit=coll_test_point(predicted,F(state,0x30),0x24,object);
     fallback=0;
-    if (!rayHit) {
-        rayHit=CollLine(predicted,object+0x10,0x24,object,0);
+    if (!ray_hit) {
+        ray_hit=CollLine(predicted,object+0x10,0x24,object,0);
         fallback=1;
-        if (!rayHit) goto finish;
+        if (!ray_hit) goto finish;
     }
     result |= 4;
-    if (fallback) qcopy(object+0x10,hitPoint);
+    if (fallback) qcopy(object+0x10,hit_point);
     else {
         qcopy(object+0x10,&g_collision_hit.offset);
         vec_scale_to_length(temp,direction,F(state,0x34));
@@ -158,11 +158,11 @@ int moby_update_positional_gravity_motion_pal(char *object, char *state)
         float projection=FastVecDot(state+0x80,normal);
         if (projection<0.0f) {
             if (g_collision_hit.hit==0 || g_collision_hit.flags>0) {
-                vec_scale_to_length(scratch.collision.probeStart,object+0xE0,0.2f);
-                vec_scale_to_length(scratch.collision.probeEnd,object+0xE0,-2.0f);
-                FastVecAdd(scratch.collision.probeStart,scratch.collision.probeStart,object+0x10);
-                FastVecAdd(scratch.collision.probeEnd,scratch.collision.probeEnd,object+0x10);
-                if (CollLine(scratch.collision.probeStart,scratch.collision.probeEnd,2,object,0)) B(state,0x1A)=2;
+                vec_scale_to_length(scratch.collision.probe_start,object+0xE0,0.2f);
+                vec_scale_to_length(scratch.collision.probe_end,object+0xE0,-2.0f);
+                FastVecAdd(scratch.collision.probe_start,scratch.collision.probe_start,object+0x10);
+                FastVecAdd(scratch.collision.probe_end,scratch.collision.probe_end,object+0x10);
+                if (CollLine(scratch.collision.probe_start,scratch.collision.probe_end,2,object,0)) B(state,0x1A)=2;
             }
             vec_scale_to_length(scratch.collision.impulse,normal,projection);
             FastVecSub(state+0x80,state+0x80,scratch.collision.impulse);

@@ -39,6 +39,7 @@ extern void gfx_draw_scrolling_stream_layers(void *);
 
 typedef union { float f[0x40]; int i[0x40]; u16 uh[0x80]; } Fields;
 
+/* Updates a stream of seven moving pieces that slide along a line and wrap around to the start, and draws them (PAL: 50 Hz). */
 void scrolling_stream_update_pal(u8 *actor)
 {
     Vector position, step, rotation;

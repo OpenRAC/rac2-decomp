@@ -9,8 +9,9 @@ extern void FastVecAdd(void *, void *, void *);
 extern float math_fast_sin_or_cos_a(float);
 extern float math_fast_sin_or_cos_b(float);
 
-void chainblade_step_follow_point_pal(char *arg0) {
-    char *state = *(char **)(arg0 + 0x68);
+/* Moves the Chainblade's follow point towards its goal point, snapping to it when close and curving the path otherwise. */
+void chainblade_step_follow_point_pal(char *self) {
+    char *state = *(char **)(self + 0x68);
     char *dst = state + 0x2D0;
     char *src = state + 0x2C0;
     float v[4];

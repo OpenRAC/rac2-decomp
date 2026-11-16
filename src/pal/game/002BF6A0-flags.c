@@ -4,7 +4,8 @@
 void part_kill(void *);
 int FastDecTimer(short *);
 
-void func_PAL_002C03F0(void *param_1)
+/* Frees the particle when its timer runs out. */
+void part_free_when_expired_pal(void *param_1)
 {
   int lVar1;
 
@@ -38,29 +39,29 @@ extern float math_fast_sin_or_cos_b(float);
    sub-object's float at 0x3C, the object's vector is moved by the sub-object's
    motion triple and the last pair of floats is written back from the angle
    kept in the sub-object. */
-void func_PAL_002C05F0(char *self)
+void part_update_smoke_wisp_pal(char *self)
 {
-    char *s1 = self + 0x20;
+    char *state = self + 0x20;
     float vec[3];
     float f0;
     float f1;
     float f2;
     float f3;
-    float g;
-    unsigned int a;
+    float angle;
+    unsigned int color;
 
     if (FastDecTimer((short *)(self + 0xA)) != 0) {
         part_kill(self);
         return;
     }
     f1 = *(float *)(self + 0x18);
-    if (*(float *)(s1 + 0x10) < f1) {
-        *(int *)(s1 + 8) = 0;
+    if (*(float *)(state + 0x10) < f1) {
+        *(int *)(state + 8) = 0;
         if (*(short *)(self + 0xA) >= 11) {
             *(short *)(self + 0xA) = 10;
         }
     }
-    if (*(float *)(s1 + 0x10) < *(float *)(self + 0x18) + 1.04f) {
+    if (*(float *)(state + 0x10) < *(float *)(self + 0x18) + 1.04f) {
         if (math_random_int_below(20) == 0) {
             if (*(short *)(self + 0xA) >= 11) {
                 *(short *)(self + 0xA) = 10;
@@ -68,34 +69,34 @@ void func_PAL_002C05F0(char *self)
         }
     }
     if (*(short *)(self + 0xA) < 12) {
-        a = *(unsigned int *)(self + 4);
-        *(unsigned int *)(self + 4) = (((int)(a >> 24) * (int)*(short *)(self + 0xA) / 12) << 24) | (a & 0xFFFFFF);
+        color = *(unsigned int *)(self + 4);
+        *(unsigned int *)(self + 4) = (((int)(color >> 24) * (int)*(short *)(self + 0xA) / 12) << 24) | (color & 0xFFFFFF);
     }
     f0 = *(float *)(self + 0xC);
     f0 = f0 + 1008.0001f;
     *(float *)(self + 0xC) = f0;
-    f1 = *(float *)(s1 + 0xC);
+    f1 = *(float *)(state + 0xC);
     if (f1 < f0) {
         *(float *)(self + 0xC) = f1;
     }
-    vec[0] = *(float *)(s1 + 0);
-    vec[1] = *(float *)(s1 + 4);
-    vec[2] = *(float *)(s1 + 8);
+    vec[0] = *(float *)(state + 0);
+    vec[1] = *(float *)(state + 4);
+    vec[2] = *(float *)(state + 8);
     f0 = vec_length_xy((void *)vec);
     vec_fast_normalize_helper((char *)vec, (char *)vec, f0 * 0.96400005f);
     FastVecAdd(self + 0x10, self + 0x10, (char *)vec);
     ApproachValue(&vec[2], 0.026f, 0.002f);
-    *(float *)(s1 + 4) = vec[1];
-    *(float *)(s1 + 0) = vec[0];
-    *(float *)(s1 + 8) = vec[2];
-    f0 = FastAddRotations(*(float *)(s1 + 0x14), *(float *)(s1 + 0x18));
-    *(float *)(s1 + 0x14) = f0;
-    g = FastAddRotations(g_rotation_base_angle, 1.5707964897155761718750e+00f);
-    f3 = math_fast_sin_or_cos_b(*(float *)(s1 + 0x14));
-    f2 = f3 * *(float *)(s1 + 0x1C);
-    f0 = math_fast_sin_or_cos_a(g);
+    *(float *)(state + 4) = vec[1];
+    *(float *)(state + 0) = vec[0];
+    *(float *)(state + 8) = vec[2];
+    f0 = FastAddRotations(*(float *)(state + 0x14), *(float *)(state + 0x18));
+    *(float *)(state + 0x14) = f0;
+    angle = FastAddRotations(g_rotation_base_angle, 1.5707964897155761718750e+00f);
+    f3 = math_fast_sin_or_cos_b(*(float *)(state + 0x14));
+    f2 = f3 * *(float *)(state + 0x1C);
+    f0 = math_fast_sin_or_cos_a(angle);
     vec[0] = f0 * f2;
-    vec[1] = math_fast_sin_or_cos_b(g) * f2;
+    vec[1] = math_fast_sin_or_cos_b(angle) * f2;
     vec[2] = 0.0f;
     FastVecAdd(self + 0x10, self + 0x10, (char *)vec);
 }
@@ -125,7 +126,8 @@ extern Effect2BFB38 *part_alloc(int);
 extern int FloatToInt(float);
 extern float math_random_float_range(float, float);
 
-Effect2BFB38 *func_PAL_002C0838(void *pos, void *dir, s32 kind, s32 life) {
+/* Spawns a spark particle at pos moving along dir, with a random size and rate. */
+Effect2BFB38 *part_spawn_spark_2_pal(void *pos, void *dir, s32 kind, s32 life) {
     Effect2BFB38 *e;
     Spark2BFB38 *s;
 

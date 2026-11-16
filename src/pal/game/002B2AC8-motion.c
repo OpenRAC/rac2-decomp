@@ -17,7 +17,7 @@ extern int GetCollHitMaterial(void);
 extern float coll_get_ground_height_under_object(void *);
 extern float math_fabs(float);
 extern float moby_get_anim_value(void *);
-extern void func_PAL_002A7E68(void *,int,int,int);
+extern void anim_start_blended_pal(void *,int,int,int);
 extern int math_solve_quadratic(float *,float *,float,float,float);
 extern int CollLine(void *,void *,int,void *,int);
 extern float math_approach_target_with_direction_mode(void *,void *,int,float,float,float,float);
@@ -43,10 +43,10 @@ int moby_update_ground_motion_pal(char *object,char *state)
     float destination[4], original[4], offset[4], start[4];
     /* Collision vectors and the later 3x4 rotation matrix share stack storage. */
     union {
-        struct { float normal[4], work[4], rayStart[4]; } collision;
+        struct { float normal[4], work[4], ray_start[4]; } collision;
         float rotation[12];
     } scratch;
-    float rayEnd[4], impact[4];
+    float ray_end[4], impact[4];
     float speed, root1, root2, length;
     float t, ground, accel, response, distance;
     int flags=0;
@@ -81,13 +81,13 @@ int moby_update_ground_motion_pal(char *object,char *state)
     else if (BU(object,0x43)!=BU(state,0x15) && BF(state,0x60)!=-1.0f && BF(state,0x54)!=-1.0f) {
         switch (BU(state,0x1a)) {
         case 0: {
-            float flightTime, numerator;
-            flightTime=math_fabs(BF(state,0x88)/BF(state,0x4c));
-            if (2.0f<flightTime) {
+            float flight_time, numerator;
+            flight_time=math_fabs(BF(state,0x88)/BF(state,0x4c));
+            if (2.0f<flight_time) {
                 distance=moby_get_anim_value(object);
                 numerator=BF(state,0x54)-distance;
                 numerator=numerator+numerator;
-                accel=numerator/flightTime;
+                accel=numerator/flight_time;
                 if (0.0f<accel) ApproachValue((float *)(object+0x48),accel,0.24000001f);
             }
             break;
@@ -95,15 +95,15 @@ int moby_update_ground_motion_pal(char *object,char *state)
         case 1:
             if (BF(state,0x60)<=moby_get_anim_value(object)) { BF(object,0x48)=0; break; }
             else if (BU(state,0x15)!=255 && (ground==0.0f || ground<BF(state,0x40) || 10.0f<BF(object,0x18)-ground)) {
-                if (BU(object,0x43)!=BU(state,0x15)) func_PAL_002A7E68(object,BU(state,0x15),0,4);
+                if (BU(object,0x43)!=BU(state,0x15)) anim_start_blended_pal(object,BU(state,0x15),0,4);
                 if (0.006f<BF(state,0x50)) BF(state,0x50)=0.006f;
                 break;
             }
             {
                 float numerator;
-                float halfGravity=BF(state,0x50)*-0.5f;
+                float half_gravity=BF(state,0x50)*-0.5f;
                 t=60.0f;
-                if (math_solve_quadratic(&root1,&root2,halfGravity,BF(state,0x88)-halfGravity,BF(object,0x18)-ground)>0 && 0.0f<root1 && root1<t) t=root1;
+                if (math_solve_quadratic(&root1,&root2,half_gravity,BF(state,0x88)-half_gravity,BF(object,0x18)-ground)>0 && 0.0f<root1 && root1<t) t=root1;
                 if (t<0.0001f) t=0.0001f;
                 distance=moby_get_anim_value(object);
                 numerator=BF(state,0x60)-distance;
@@ -146,9 +146,9 @@ int moby_update_ground_motion_pal(char *object,char *state)
         float projection=FastVecDot((state+0x80),scratch.collision.normal);
         if (projection<0.0f) {
             if (!g_collision_hit.hit || g_collision_hit.flags>0) {
-                qcopy(scratch.collision.rayStart,(object+0x10)); scratch.collision.rayStart[2]+=0.2f;
-                qcopy(rayEnd,(object+0x10)); rayEnd[2]-=2.0f;
-                if (CollLine(scratch.collision.rayStart,rayEnd,2,object,0)) {
+                qcopy(scratch.collision.ray_start,(object+0x10)); scratch.collision.ray_start[2]+=0.2f;
+                qcopy(ray_end,(object+0x10)); ray_end[2]-=2.0f;
+                if (CollLine(scratch.collision.ray_start,ray_end,2,object,0)) {
                     BU(state,0x1a)=2;
                     if (GetCollHitMaterial()==1) {
                         record=moby_get_private_value_0(object);

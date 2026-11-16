@@ -102,7 +102,7 @@ extern void matrix_from_basis_rows(void *, void *);
 extern float FastAddRotations(float, float);
 extern float fast_subtract_rotations(float, float);
 extern float IntToFloat(int);
-extern void func_PAL_002A7E68(void *, int, int, int);
+extern void anim_start_blended_pal(void *, int, int, int);
 extern void moby_set_state(void *, int, int);
 extern float math_random_float_range(float, float);
 extern void moby_update_ground_check(void *);
@@ -113,20 +113,20 @@ extern void vec_build_spherical_offset(void *, float, float, float);
 extern int TryClaimNotice(int, int, int);
 extern int flag_set_first_pending(void *);
 /* Interleaved: each register bank keeps the order of the definition in 002BDCE8.c. */
-extern void *func_PAL_002BE9A8(void *, int, void *, float, float, int, int, float, float);
+extern void *part_spawn_spinning_spark_pal(void *, int, void *, float, float, int, int, float, float);
 extern void snd_stop_voice(int);
 extern int snd_play_from_class_bank(int, int, void *, int);
 extern void hero_reset_speeds_and_vectors(void);
 extern void hero_record_play_counters_pal(void);
 extern void set_hero_animation_pal(int, int, float);
 extern void script_queue_keyed_request(int, int);
-extern int func_PAL_L08_002D3078(int, int);
+extern int hero_l08_enter_state_pal(int, int);
 extern void cam_update_aim_values_pal(void *, void *);
 extern void hero_move_with_mount_to_transform(void *, void *);
 extern void hero_save_transform_snap_object(void *, void *);
-extern void func_PAL_L08_003D1540(void *, void *, float);
+extern void vehicle_update_steering_pal(void *, void *, float);
 extern void moby_place_at_stored_transform(void *);
-extern int func_PAL_L08_003D1A30(void *, void *);
+extern int vehicle_handle_collision_pal(void *, void *);
 
 typedef struct {
     u8 unk0[0x80];
@@ -154,11 +154,12 @@ extern PlayerCDF98 g_hero_state;
 #define OB(o) (*(u8 *)(obj + (o)))
 static __inline__ void SetAnimation(u8 *p, s32 animation, s32 mode, s32 blend)
 {
-    if (p[0x43] != animation) func_PAL_002A7E68(p, animation, mode, blend);
+    if (p[0x43] != animation) anim_start_blended_pal(p, animation, mode, blend);
 }
 #define OH(o) (((u16 *)obj)[(o) / 2])
 
-void func_PAL_L08_003D1E50(u8 *obj)
+/* Updates a Glider (moby class 2309): it waits at its pad, lets the hero hop on, launches, then steers and glides with the stick, leaves a smoke trail, and lands or lets go at a target (PAL: 50 Hz values). */
+void hero_npc_update_pal(u8 *obj)
 {
     Vec saved;
     union {
@@ -210,7 +211,7 @@ void func_PAL_L08_003D1E50(u8 *obj)
                 }
             } else {
                 u8 *q = (u8 *)g_platform_actor_ref[0];
-                if (q != 0 && *(s16 *)(q + 0xAA) == 0x988 && q == g_moby_array[DI(0x6C)].bytes) {
+                if (q != 0 && *(s16 *)(q + 0xAA) == MOBY_CLASS_GLIDER_PAD && q == g_moby_array[DI(0x6C)].bytes) {
                     SetAnimation(obj, 0, 0, 0xA);
                     moby_set_state(obj, 2, -1);
                 }
@@ -220,7 +221,7 @@ void func_PAL_L08_003D1E50(u8 *obj)
     case 2: {
         int ok;
         hero_save_transform_snap_object(obj, d);
-        if (g_hero_state.target == 0 || *(s16 *)(g_hero_state.target + 0xAA) != 0x988) {
+        if (g_hero_state.target == 0 || *(s16 *)(g_hero_state.target + 0xAA) != MOBY_CLASS_GLIDER_PAD) {
             SetAnimation(obj, 0, 0, 0xA);
             qcopy(d, g_moby_array[DI(0x6C)].bytes + 0x10);
             DF(8) = DF(8) + g_vehicle_df8_step;
@@ -231,7 +232,7 @@ void func_PAL_L08_003D1E50(u8 *obj)
             if (ok && g_hero_state.target == g_moby_array[DI(0x6C)].bytes && g_hero_state.unk340 != 0
                 && g_hero_state.unk34E == 0) {
                 u8 *q;
-                func_PAL_L08_002D3078(0x31, 0);
+                hero_l08_enter_state_pal(0x31, 0);
                 set_hero_animation_pal(0x87, 0, 3.0f);
                 ((s32 *)g_hero_state.unk2290)[0x9C / 4] = -1;
                 q = g_moby_array[DI(0x6C)].bytes;
@@ -278,7 +279,7 @@ void func_PAL_L08_003D1E50(u8 *obj)
                         snd_play_from_class_bank(0, 0, obj, 0x988);
                     }
                     DI(0x50) = (((s32)(g_vehicle_timer_start) * 5 + 2) / 6);
-                    func_PAL_L08_002D3078(0x31, 0);
+                    hero_l08_enter_state_pal(0x31, 0);
                     set_hero_animation_pal(0x81, 0, 12.0f);
                     ((s32 *)g_hero_state.unk2290)[0x9C / 4] = -1;
                     if (g_vehicle_active_flag != 0)
@@ -335,7 +336,7 @@ void func_PAL_L08_003D1E50(u8 *obj)
                 else if (r < 0.0f)
                     DF(0x64) = 0.0f;
             }
-            func_PAL_L08_003D1540(obj, d, DF(0x64));
+            vehicle_update_steering_pal(obj, d, DF(0x64));
             FastVecScale(d + 0x20, d + 0x20, 1.0f - DF(0x64));
             vec_build_spherical_offset(&scratch.v.velocity, DF(0x54), DF(0x18), -DF(0x14));
             FastVecScale(&scratch.v.velocity, &scratch.v.velocity, DF(0x64));
@@ -343,7 +344,7 @@ void func_PAL_L08_003D1E50(u8 *obj)
         }
         if (g_vehicle_active_flag != 0)
             FastVecAdd(d, d, d + 0x20);
-        if (func_PAL_L08_003D1A30(obj, &saved) == 0) {
+        if (vehicle_handle_collision_pal(obj, &saved) == 0) {
             float sp = DF(0x54) + g_vehicle_speed_accel * 0.00040000002f;
             float top = g_vehicle_l08_max_speed * 0.020000001f;
             float rate;
@@ -377,7 +378,7 @@ void func_PAL_L08_003D1E50(u8 *obj)
             if (slot->voice.owner != obj || slot->voice.active == 0)
                 DI(0xAC) = snd_play_from_class_bank(1, 4, obj, 0x988);
         }
-        func_PAL_L08_003D1540(obj, d, 1.0f);
+        vehicle_update_steering_pal(obj, d, 1.0f);
         t = DF(0x5C);
         if (t < -0.4f) {
             if (*(u8 *)(g_hero_state.unk2290 + 0x42) != 0x85 && *(u8 *)(g_hero_state.unk2290 + 0x43) != 0x85) {
@@ -463,7 +464,7 @@ void func_PAL_L08_003D1E50(u8 *obj)
             moby_set_state(obj, 7, -1);
         }
         hero_move_with_mount_to_transform(obj, d);
-        func_PAL_L08_003D1A30(obj, &saved);
+        vehicle_handle_collision_pal(obj, &saved);
         if (g_hero_state.unk2294 != 0x31)
             moby_set_state(obj, 1, -1);
         break;
@@ -484,8 +485,8 @@ void func_PAL_L08_003D1E50(u8 *obj)
             t = 0.0f;
         if (g_vehicle_active_flag != 0)
             DF(0x14) = FastAddRotations(DF(0x14), DF(0x68));
-        func_PAL_L08_003D1540(obj, d, 1.0f);
-        func_PAL_L08_003D1A30(obj, &saved);
+        vehicle_update_steering_pal(obj, d, 1.0f);
+        vehicle_handle_collision_pal(obj, &saved);
         hero_move_with_mount_to_transform(obj, d);
         break;
     }
@@ -503,9 +504,9 @@ void func_PAL_L08_003D1E50(u8 *obj)
         if (g_vehicle_active_flag != 0)
             FastVecAdd(d, d, d + 0x20);
         DF(0x54) = FastVecLength(d + 0x20);
-        func_PAL_L08_003D1540(obj, d, 1.0f);
+        vehicle_update_steering_pal(obj, d, 1.0f);
         hero_move_with_mount_to_transform(obj, d);
-        func_PAL_L08_003D1A30(obj, &saved);
+        vehicle_handle_collision_pal(obj, &saved);
         break;
     }
     case 9: {
@@ -526,7 +527,7 @@ void func_PAL_L08_003D1E50(u8 *obj)
         if (g_vehicle_active_flag != 0)
             FastVecAdd(d, d, d + 0x20);
         hero_move_with_mount_to_transform(obj, d);
-        func_PAL_L08_003D1A30(obj, &saved);
+        vehicle_handle_collision_pal(obj, &saved);
         if (DF(0x28) > 0.0f || DF(8) < 12.0f || FastVecLength(d + 0x20) < 0.020000001f
             || (s32)OH(0x96) > ((s32)(g_vehicle_threshold_frames) * 5 + 2) / 6) {
             SpawnExplosionEffects_pal(obj, g_str_effect_name, 0, 0.0f, 0.0f, 0xA, 3, 0x10, 4.0f, 2.0f, 9.0f, 1.0f,
@@ -572,7 +573,7 @@ void func_PAL_L08_003D1E50(u8 *obj)
             g_vehicle_collision_x = g_vehicle_saved_x;
             g_vehicle_collision_y = g_vehicle_saved_y;
             DI(0x50) = 0;
-            func_PAL_L08_002D3078(0, 1);
+            hero_l08_enter_state_pal(0, 1);
             hero_reset_speeds_and_vectors();
             SetAnimation(obj, 0, 0, 0xA);
             if (DI(0x6C) > 0) {
@@ -613,7 +614,7 @@ void func_PAL_L08_003D1E50(u8 *obj)
                     t = 0.0f;
                     if (OB(0x20) >= 7)
                         t = 0.07f;
-                    p = func_PAL_002BE9A8(&scratch.v.point, 2, &scratch.v.velocity, t, 0.5f, 0x0E7F7F7F, 0, 1.01f,
+                    p = part_spawn_spinning_spark_pal(&scratch.v.point, 2, &scratch.v.velocity, t, 0.5f, 0x0E7F7F7F, 0, 1.01f,
                                       math_random_float_range(24000.0f, 35000.0f));
                     if (p != 0)
                         p[8] = func_001163B0();
@@ -625,7 +626,7 @@ void func_PAL_L08_003D1E50(u8 *obj)
                     && *(float *)(g_collision_box_table[slot[i]].bytes + 0x38) < g_hero_state.pos[2]) {
                     /* Written out: SetAnimation's int compare would keep 3 in a saved register across the loop. */
                     if (OB(0x43) != 3)
-                        func_PAL_002A7E68(obj, 3, 0, 2);
+                        anim_start_blended_pal(obj, 3, 0, 2);
                     set_hero_animation_pal(0x88, 0, 12.0f);
                     qcopy(d + 0x80, g_collision_box_table[slot[i]].bytes + 0x30);
                     DF(0x90) = fast_vec_dist(g_hero_state.pos, d + 0x80);

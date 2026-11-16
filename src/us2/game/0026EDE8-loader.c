@@ -74,12 +74,12 @@ extern void gfx_process_screen_copy_regions(void);
 extern void math_trap_always(void);
 extern float IntToFloat(int);
 extern int gfx_query_display_buffer(void);
-extern void gfx_append_draw_list_header(void), PutDrawBufferSmall(void), gfx_queue_second_strip_packet(void), func_US2_00287140(void);
+extern void gfx_append_draw_list_header(void), PutDrawBufferSmall(void), gfx_queue_second_strip_packet(void), UpdateModalState_us2(void);
 extern int req_push_queue(unsigned char *, int);
 extern int req_launch_queued(void *);
 extern void InitializeHudSlotsAndBuffers(void);
 extern void level_init_systems(void), InitOnce(void);
-extern void func_US2_00292650(int *, int);
+extern void gfx_load_texture_upload_params_us2(int *, int);
 extern void tex_load_pack_to_vram_us2(int), LoadPackSingleTexture(int), load_disc_table_entry_for_draw(int), LoadDiscTableTexture(int);
 extern void hud_load_banks_us2(void);
 extern void map_setup_screen_us2(void);
@@ -99,7 +99,7 @@ extern int UpdatePlaybackScene_us2(void);
 extern void transition_draw_background_us2(void);
 extern void RunLevelTransition_us2(void);
 extern void gfx_reset_buffer_slot_table(void);
-extern void func_US2_002F6E10(void);
+extern void mpeg_play_movie_us2(void);
 extern void gfx_swap_packet_buffer(void), SubmitBufferedDmaChain(void);
 extern void gfx_wait_for_dma_status_bits(unsigned long long);
 extern long long tex_upload_blocks_return_setup(int, int, int, int);
@@ -110,6 +110,7 @@ static inline int CardFormat(BootMemcard *mc) { return mc->card[0].format; }
 static inline int CardStatus(BootMemcard *mc) { return mc->card[0].status; }
 static inline int CardFree(BootMemcard *mc) { return mc->card[0].free; }
 
+/* Runs the boot title loop: waits for the memory card check, shows the splash screens, unpacks the archive's resource tables and loads the first sound and HUD banks (USA v2.00). */
 void RunBootTitleLoop_us2(void)
 {
     LoaderResource *tables[8];
@@ -185,7 +186,7 @@ void RunBootTitleLoop_us2(void)
         {
             LoaderBank *bank = (LoaderBank *)(archive->offsets[0] + (int)archive);
             g_texture_data_base = (char *)bank + bank->code + bank->size;
-            func_US2_00292650((int *)((char *)bank + bank->data), bank->count);
+            gfx_load_texture_upload_params_us2((int *)((char *)bank + bank->data), bank->count);
         }
     }
     {
@@ -284,7 +285,7 @@ void RunBootTitleLoop_us2(void)
             }
             break;
         case 1:
-            func_US2_002F6E10();
+            mpeg_play_movie_us2();
             if (extra) {
                 int i;
                 ShowSplashImage((int)extra);
@@ -308,7 +309,7 @@ void RunBootTitleLoop_us2(void)
             break;
         case 4:
             pad_poll_ports();
-            func_US2_00287140();
+            UpdateModalState_us2();
             gfx_render_frame_extra_layers_us2();
             break;
         case 6:

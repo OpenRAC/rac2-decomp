@@ -77,7 +77,7 @@ extern void shop_clear_preview(void), shop_set_message_text(char *);
 extern char *GetLocalizedString(int);
 extern void tex_load_level_pack_pal(void *), LoadDiscTableTexture_pal(int);
 extern float mat_fast_helper_a(float, float), FastAddRotations(float, float), fast_subtract_rotations(float, float);
-extern void func_PAL_0029FA60(void *, int), gfx_pack_render_command_fields(void *, int, int, int, int);
+extern void moby_init_instance_pal(void *, int), gfx_pack_render_command_fields(void *, int, int, int, int);
 extern void func_002A0F48(void *), update_moby_animation_state(void *);
 extern void mem_clear(void *, int, int), AttachManipulator(void *, unsigned int, void *);
 extern void func_002A1130(void *, unsigned int, long long, unsigned int);
@@ -88,7 +88,7 @@ extern void load_start_disc_entry_by_id(int, int);
 typedef char PreviewMobySize[(sizeof(PreviewMoby) == 0x100) ? 1 : -1];
 typedef char PreviewStateSize[(sizeof(PreviewState) == 0x760) ? 1 : -1];
 
-void func_PAL_002FC1D0(void)
+void PrepareVendorSelectionPreview_pal(void)
 {
     PreviewClasses classes;
     int parts[20] __attribute__((aligned(16)));
@@ -115,7 +115,7 @@ void func_PAL_002FC1D0(void)
         facing = FastAddRotations(mat_fast_helper_a(g_active_camera.x, g_active_camera.y), 1.7453294f);
         while (classes.ids[g_vendor_menu_state.objectCount] >= 0) {
             moby = &g_vendor_menu_state.objects[g_vendor_menu_state.objectCount];
-            func_PAL_0029FA60(moby, classes.ids[g_vendor_menu_state.objectCount]);
+            moby_init_instance_pal(moby, classes.ids[g_vendor_menu_state.objectCount]);
             gfx_pack_render_command_fields(moby, 0x202020, 14, 14, 0);
             moby->color = 0x80808080;
             moby->drawMask = 64;
@@ -248,7 +248,7 @@ void func_PAL_002FC1D0(void)
                 PreviewState *loopState = &g_vendor_menu_state;
                 PreviewMoby *moby = &loopState->objects[i];
                 float one = 1.0f;
-                func_PAL_0029FA60(moby, (unsigned short)((unsigned)parts[i] >> 16) & 0x7FFF);
+                moby_init_instance_pal(moby, (unsigned short)((unsigned)parts[i] >> 16) & 0x7FFF);
                 gfx_pack_render_command_fields(moby, 0x202020, 14, 14, 0);
                 if ((unsigned)parts[i] & 0x80000000) loopState->selectedPart[n++] = i;
                 moby->drawMask = 0x100;
@@ -282,7 +282,7 @@ void func_PAL_002FC1D0(void)
     } else if (mode == 0) {
         g_vendor_menu_state.field750 = 0;
         if (g_vendor_menu_state.rows.item[g_vendor_menu_state.selected].kind == 1) {
-            func_PAL_0029FA60(moby, 0xCDB);
+            moby_init_instance_pal(moby, 0xCDB);
             gfx_pack_render_command_fields(moby, 0x202020, 14, 14, 0);
             moby->drawMask = 64; moby->color = 0x80808080; moby->flags = 0x2010;
             moby->render = 1; moby->opacity = 0; moby->unk23 = 0; moby->state = 0; moby->unk98 = 0; moby->unk7c = 1;

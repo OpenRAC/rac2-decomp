@@ -22,6 +22,7 @@ extern void level_fade_glow_colors_pal(void);
 extern void hero_update_item_glow_pal(void);
 extern void UpdateHeroSlotCallbacks_pal(void);
 
+/* Sets the hero lock flags for the current state, then updates the hero item slots and related effects. */
 void hero_update_items_and_flags_pal(void)
 {
     int m = g_hero_state.mode;

@@ -4,13 +4,14 @@
 extern float g_actor_cycle_timer_rate __attribute__((sda));
 extern int g_actor_shared_state;
 
-void func_PAL_L02_003F9D50(void) {
-    int v0 = g_actor_shared_state;
-    float *p = (float *)((char *)v0 + 0x74);
-    float f;
+/* Advances a shared cycle timer in the actor's state by a fixed rate, wrapping it past 1.0 (PAL). */
+void actor_advance_cycle_timer_pal(void) {
+    int shared_state = g_actor_shared_state;
+    float *timer_ptr = (float *)((char *)shared_state + 0x74);
+    float timer_value;
 
-    f = p[0] + g_actor_cycle_timer_rate * 0.020000001f;
-    p[0] = f;
-    if (f > 1.0f)
-        p[0] = f - 1.0f;
+    timer_value = timer_ptr[0] + g_actor_cycle_timer_rate * 0.020000001f;
+    timer_ptr[0] = timer_value;
+    if (timer_value > 1.0f)
+        timer_ptr[0] = timer_value - 1.0f;
 }

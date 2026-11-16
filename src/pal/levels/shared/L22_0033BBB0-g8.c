@@ -15,7 +15,7 @@ extern s32 g_homing_trail_value __attribute__((sda));
 
 /* func_PAL_L22_0033BBB0, the PAL copy of func_L22_003398B8: the same C, where the halfword read
    becomes a word read scaled to 50 Hz. */
-void func_PAL_L22_0033BBB0(u32 colour, Vector point, u8 *handle)
+void part_spawn_homing_trail_pal(u32 colour, Vector point, u8 *handle)
 {
     Vector target;
     Vector step;

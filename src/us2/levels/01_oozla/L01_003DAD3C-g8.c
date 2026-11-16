@@ -65,16 +65,17 @@ extern float g_swing_sink_height_limit __attribute__((sda));
 extern float g_swing_sink_speed __attribute__((sda));
 extern float g_swing_rise_speed __attribute__((sda));
 
-void func_US2_L01_003DAD3C(u8 *m)
+/* Updates a floating platform: bobs it with the water height, carries the attached object and resets it when it sinks. */
+void floating_platform_update_us2(u8 *m)
 {
-    Vec oldPos,oldRot,anchor,target,delta,prevRot,prevPos,out;
+    Vec old_pos,old_rot,anchor,target,delta,prev_rot,prev_pos,out;
     u8 *s=*(u8 **)(m+0x68);
     u8 *other;
     u8 *cursor;
     float height;
-    float *fieldD0,*fieldD4,*fieldD8,*fieldDC;
-    qcopy_nc(oldPos,m+0x10);
-    qcopy_nc(oldRot,m+0xF0);
+    float *fieldD0,*fieldD4,*fieldD8,*field_dc;
+    qcopy_nc(old_pos,m+0x10);
+    qcopy_nc(old_rot,m+0xF0);
     height=level_get_water_height();
     if(m[0x20]!=0) {
         u8 *attached;
@@ -112,18 +113,18 @@ void func_US2_L01_003DAD3C(u8 *m)
         vec_scale_to_length(target,*(u8 **)(s+0xC8)+0xC0,5.0f);
         FastVecAdd(target,target,*(u8 **)(s+0xC8)+0x10);
         if(((HeroView *)g_hero_state)->mode==0 && ((HeroView *)g_hero_state)->platform==m) {
-            float dotX,dotY,y,x,scale;
+            float dot_x,dotY,y,x,scale;
             FastVecSub(delta,((HeroView *)g_hero_state)->position,m+0x10);
-            dotX=FastVecDot(delta,m+0xC0);
+            dot_x=FastVecDot(delta,m+0xC0);
             dotY=FastVecDot(delta,m+0xD0);
             scale=g_swing_object_scale;
             y=-scale*dotY;
-            x=scale*dotX;
-            *(Quad *)prevRot=*(Quad *)(s+0x90);
-            *(Quad *)prevPos=*(Quad *)(m+0x10);
+            x=scale*dot_x;
+            *(Quad *)prev_rot=*(Quad *)(s+0x90);
+            *(Quad *)prev_pos=*(Quad *)(m+0x10);
             math_approach_with_velocity((float *)(s+0x90),y,(float *)(s+0xA0),g_swing_tilt_accel*4.848137450608192e-06f,g_swing_tilt_max_speed,g_swing_tilt_damping*0.0002908882452175021f,0);
             math_approach_with_velocity((float *)(s+0x94),x,(float *)(s+0xA4),g_swing_tilt_accel*4.848137450608192e-06f,g_swing_tilt_max_speed,g_swing_tilt_damping*0.0002908882452175021f,0);
-            mat_transform_offset_two_matrices(((HeroView *)g_hero_state)->position,out,m+0x10,prevRot,s+0x90);
+            mat_transform_offset_two_matrices(((HeroView *)g_hero_state)->position,out,m+0x10,prev_rot,s+0x90);
         } else {
             math_approach_with_velocity((float *)(s+0x90),0.0f,(float *)(s+0xA0),g_swing_return_accel*4.848137450608192e-06f,g_swing_return_max_speed,g_swing_return_damping*0.0002908882452175021f,0);
             math_approach_with_velocity((float *)(s+0x94),0.0f,(float *)(s+0xA4),g_swing_return_accel*4.848137450608192e-06f,g_swing_return_max_speed,g_swing_return_damping*0.0002908882452175021f,0);
@@ -135,20 +136,20 @@ void func_US2_L01_003DAD3C(u8 *m)
                 dist2=vec_distance_xy(m+0x10,target);
                 if(dist2<dist) { FastVecSub(delta,m+0x10,target); dist=dist2; }
                 if(dist<g_swing_outer_pull_radius) {
-                    float falloff,anchorDistance,d;
+                    float falloff,anchor_distance,d;
                     dist=g_swing_outer_pull_radius-dist;
                     falloff=dist/(g_swing_outer_pull_radius-g_swing_inner_pull_radius);
                     if(falloff>1.0f) falloff=1.0f;
                     else if(falloff<0.0f) falloff=0.0f;
                     vec_scale_to_length(delta,delta,dist*falloff);
                     vec_fast_divide_helper(delta,delta,g_swing_pull_time_b*(1.0f/60.0f));
-                    anchorDistance=vec_distance_xy(*(u8 **)(s+0xC8)+0x10,anchor);
-                    FastVecSub(prevRot,m+0x10,anchor);
-                    d=FastVecLength(prevRot)-anchorDistance;
+                    anchor_distance=vec_distance_xy(*(u8 **)(s+0xC8)+0x10,anchor);
+                    FastVecSub(prev_rot,m+0x10,anchor);
+                    d=FastVecLength(prev_rot)-anchor_distance;
                     d=d/math_fabs(d);
                     d*=1.0f/60.0f;
-                    vec_scale_to_length(prevRot,prevRot,(g_swing_rotation_strength*d)*falloff);
-                    FastVecAdd(m+0x10,m+0x10,prevRot);
+                    vec_scale_to_length(prev_rot,prev_rot,(g_swing_rotation_strength*d)*falloff);
+                    FastVecAdd(m+0x10,m+0x10,prev_rot);
                     FastVecAdd(m+0x10,m+0x10,delta);
                 }
             }
@@ -156,7 +157,7 @@ void func_US2_L01_003DAD3C(u8 *m)
         FastVecSub(delta,s+0xB0,m+0x10);
         fieldD8=(float *)(s+0xD8);
         FastVecScale(delta,delta,g_swing_pull_scale);
-        fieldDC=(float *)(s+0xDC); fieldD0=(float *)(s+0xD0);
+        field_dc=(float *)(s+0xDC); fieldD0=(float *)(s+0xD0);
         vec_fast_divide_helper(delta,delta,g_swing_pull_time_a*(1.0f/60.0f));
         fieldD4=(float *)(s+0xD4);
         FastVecAdd(m+0x10,m+0x10,delta);
@@ -182,14 +183,14 @@ void func_US2_L01_003DAD3C(u8 *m)
                 if(limit<dist2) {
                     float radius;
                     FastVecSub(cursor+0x10,cursor+0x10,delta);
-                    FastVecSub(prevRot,cursor+0x10,anchor);
-                    radius=FastVecLength(prevRot);
+                    FastVecSub(prev_rot,cursor+0x10,anchor);
+                    radius=FastVecLength(prev_rot);
                     if(radius<g_swing_min_radius) {
-                        vec_scale_to_length(prevRot,prevRot,g_swing_min_radius);
-                        FastVecAdd(cursor+0x10,anchor,prevRot);
+                        vec_scale_to_length(prev_rot,prev_rot,g_swing_min_radius);
+                        FastVecAdd(cursor+0x10,anchor,prev_rot);
                     } else if(g_swing_max_radius<radius) {
-                        vec_scale_to_length(prevRot,prevRot,g_swing_max_radius);
-                        FastVecAdd(cursor+0x10,anchor,prevRot);
+                        vec_scale_to_length(prev_rot,prev_rot,g_swing_max_radius);
+                        FastVecAdd(cursor+0x10,anchor,prev_rot);
                     }
                 } else FastVecAdd(m+0x10,m+0x10,delta);
             }
@@ -208,7 +209,7 @@ void func_US2_L01_003DAD3C(u8 *m)
             }
         }
         *(float *)(m+0x18)=height;
-        math_update_wrapped_angle_offset(m,fieldD8,fieldDC,0.08f,0.008726648055016994f,-1.0f);
+        math_update_wrapped_angle_offset(m,fieldD8,field_dc,0.08f,0.008726648055016994f,-1.0f);
         moby_scale_owner_words_by_angles(m,fieldD0,fieldD4,0.04363323748111725f,0.007272206246852875f,0.00901753549f);
         *(float *)(m+0xF0)=FastAddRotations(*(float *)(s+0x90),*(float *)(m+0xF0));
         *(float *)(m+0xF4)=FastAddRotations(*(float *)(s+0x94),*(float *)(m+0xF4));
@@ -239,7 +240,7 @@ void func_US2_L01_003DAD3C(u8 *m)
     if(*(float *)(m+0x18)<10.0f) *(float *)(m+0x18)=10.0f;
     if(*(float *)(m+0x18)>1013.0f) *(float *)(m+0x18)=1013.0f;
     if(m[0x20]!=2) {
-        FastVecSub(anchor,m+0x10,oldPos);
-        mat_combine_and_store(s+0x50,anchor,oldRot,m+0xF0);
+        FastVecSub(anchor,m+0x10,old_pos);
+        mat_combine_and_store(s+0x50,anchor,old_rot,m+0xF0);
     }
 }

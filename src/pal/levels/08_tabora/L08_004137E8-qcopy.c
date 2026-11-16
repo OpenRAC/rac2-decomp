@@ -13,40 +13,41 @@ extern void moby_mark_spawned(void *a0);
 extern u8 g_spinning_object_data[];
 typedef int V4 __attribute__((mode(TI)));
 
-s32 func_PAL_L08_00414850(void *a0, void *a1, void *a2, f32 p1, f32 p2)
+/* Creates a new object (moby class 3704) at a position with a start velocity and a random spin; returns it, or 0 if its first setup step fails. */
+s32 moby_spawn_spinning_object_pal(void *owner, void *start_pos, void *start_vel, f32 turn_speed, f32 move_speed)
 {
-    u8 *m;
-    u8 *p;
-    u8 *st;
-    f32 v;
-    s32 r;
+    u8 *moby;
+    u8 *position;
+    u8 *state;
+    f32 angle;
+    s32 handle;
 
-    m = (u8 *)CreateMoby(0xE78);
-    if (m != 0) {
-        st = *(u8 **)(m + 0x68);
-        p = m + 0x10;
-        *(u8 *)(m + 0x30) = 0x40;
-        *(u8 *)(m + 0xBC) = 0;
-        *(u8 *)(m + 0x95) = 0;
-        *(u8 *)(m + 0x20) = 0;
-        *(u32 *)(st + 0x18) = (u32)a0;
-        *(V4 *)p = *(V4 *)a1;
-        *(V4 *)st = *(V4 *)a2;
-        *(f32 *)(st + 0x14) = p1 * 0.0003490659f;
-        *(f32 *)(st + 0x10) = p2 * 0.00040000002f;
-        v = math_random_angle();
-        *(f32 *)(m + 0xF0) = v;
-        v = math_random_angle();
-        *(f32 *)(m + 0xF4) = v;
-        v = math_random_angle();
-        *(f32 *)(m + 0xF8) = v;
-        r = moby_create_effect_at_position(p, 0);
-        *(u32 *)(st + 0x1C) = r;
-        if (r == 0) {
+    moby = (u8 *)CreateMoby(0xE78);
+    if (moby != 0) {
+        state = *(u8 **)(moby + 0x68);
+        position = moby + 0x10;
+        *(u8 *)(moby + 0x30) = 0x40;
+        *(u8 *)(moby + 0xBC) = 0;
+        *(u8 *)(moby + 0x95) = 0;
+        *(u8 *)(moby + 0x20) = 0;
+        *(u32 *)(state + 0x18) = (u32)owner;
+        *(V4 *)position = *(V4 *)start_pos;
+        *(V4 *)state = *(V4 *)start_vel;
+        *(f32 *)(state + 0x14) = turn_speed * 0.0003490659f;
+        *(f32 *)(state + 0x10) = move_speed * 0.00040000002f;
+        angle = math_random_angle();
+        *(f32 *)(moby + 0xF0) = angle;
+        angle = math_random_angle();
+        *(f32 *)(moby + 0xF4) = angle;
+        angle = math_random_angle();
+        *(f32 *)(moby + 0xF8) = angle;
+        handle = moby_create_effect_at_position(position, 0);
+        *(u32 *)(state + 0x1C) = handle;
+        if (handle == 0) {
             STUB_printf(g_spinning_object_data);
-            moby_mark_spawned(m);
-            m = 0;
+            moby_mark_spawned(moby);
+            moby = 0;
         }
     }
-    return (s32)m;
+    return (s32)moby;
 }

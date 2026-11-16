@@ -26,9 +26,9 @@ void checkpoint_trigger_update_pal(char *actor) {
     if (*(u8 *)(actor + 0x30) < 0x20) *(u8 *)(actor + 0x30) = 0x20;
     if (g_frame_l00_counter == 0 && state[5] != -1) cam_reset_entry(state[5]);
     {
-        int currentFlags = state[2];
-        int disabled = currentFlags & 8;
-        flags = currentFlags;
+        int current_flags = state[2];
+        int disabled = current_flags & 8;
+        flags = current_flags;
         if (disabled) return;
     }
     if (*(u8 *)(actor + 0xBC) == 0) {
@@ -46,10 +46,10 @@ void checkpoint_trigger_update_pal(char *actor) {
     active = IsPointInCuboid(g_hero_position, state[0]);
     if (active) goto activate;
     {
-        unsigned short triggerId = *(u16 *)(actor + 0xB2);
-        if (g_controller_level_state.disabled[(short)triggerId]) goto activate;
-        bits = g_moby_nibble_table[((short)triggerId >> 1) + g_current_map_index * 0x400];
-        if (triggerId & 1) {
+        unsigned short trigger_id = *(u16 *)(actor + 0xB2);
+        if (g_controller_level_state.disabled[(short)trigger_id]) goto activate;
+        bits = g_moby_nibble_table[((short)trigger_id >> 1) + g_current_map_index * 0x400];
+        if (trigger_id & 1) {
             if ((bits >> 4) & 7) goto activate;
             goto inactive;
         }

@@ -93,7 +93,7 @@ extern void hero_build_relative_point(void *, int, float, float, float), hero_ap
 /* Corresponds to RAC1 update_hero_timers_and_reach_state in
  * src/overlays/shared/hero_vehicle_and_collision.c. */
 void hero_update_timers_and_reach_state_pal(void) {
-    unsigned char *m, *pos, *hero;
+    unsigned char *moby, *pos, *hero;
     float sum[4], delta[4];
     int i, count, history_index, first_index, second_index;
     if (!g_hero_l01_state_block.tilt_disabled) hero_ease_lean_to_upright_pal();
@@ -172,15 +172,15 @@ void hero_update_timers_and_reach_state_pal(void) {
         }
     }
     if (g_hero_l01_state_block.field_224) {
-        for (i = 0;(m = g_target_lists[i]) != 0;i++) {
-            if (moby_is_in_special_class_range(m) || (m && BP(m, 0x24) && BS(BP(m, 0x24), 0x46) == 22)) {
-                if ((g_frame_counter_4&7) == (((int)m>>8)&7) || !math_random_int_below(4)) {
+        for (i = 0;(moby = g_target_lists[i]) != 0;i++) {
+            if (moby_is_in_special_class_range(moby) || (moby && BP(moby, 0x24) && BS(BP(moby, 0x24), 0x46) == 22)) {
+                if ((g_frame_counter_4&7) == (((int)moby>>8)&7) || !math_random_int_below(4)) {
                     hero = (unsigned char *)&g_hero_l01_state_block+0x80;
-                    pos = m+0x10;
+                    pos = moby+0x10;
                     if (fast_vec_dist(hero, pos)<15.37f) {
                         FastVecSub(sum, pos, hero);
                         vec_scale_to_length(sum, sum, 1.7f);
-                        part_queue_impact_effect(m, g_hero_l01_state_block.field_2290, 0x4000000, hero, sum, 1.0f);
+                        part_queue_impact_effect(moby, g_hero_l01_state_block.field_2290, 0x4000000, hero, sum, 1.0f);
                     }
                 }
             }
@@ -210,8 +210,8 @@ void hero_update_timers_and_reach_state_pal(void) {
 history_done:
     hero_update_landing_slide_pal();
     {
-        unsigned char *bodyCenter = (unsigned char *)&g_hero_l01_state_block+0xE0;
-        hero_build_relative_point(bodyCenter, 1, 0, 0, 0.7f);
+        unsigned char *body_center = (unsigned char *)&g_hero_l01_state_block+0xE0;
+        hero_build_relative_point(body_center, 1, 0, 0, 0.7f);
         if (!(g_frame_counter_4&3)) {
             if (g_hero_reach_flag) {
                 g_hero_l01_state_block.reach_distance = 14;
@@ -229,9 +229,9 @@ history_done:
     }
     else qcopy(((unsigned char *)&g_hero_l01_state_block)+0xD0, ((unsigned char *)&g_hero_l01_state_block)+0xE0);
     {
-        unsigned char *heldMoby = g_hero_l01_state_block.field_5C0;
-        if (heldMoby) {
-            if (!(BU(heldMoby, 0x34)&0x1000) || heldMoby == g_hero_l01_state_block.field_33C) g_hero_l01_state_block.field_5C0 = 0;
+        unsigned char *held_moby = g_hero_l01_state_block.field_5C0;
+        if (held_moby) {
+            if (!(BU(held_moby, 0x34)&0x1000) || held_moby == g_hero_l01_state_block.field_33C) g_hero_l01_state_block.field_5C0 = 0;
             if (g_hero_l01_state_block.field_5C0 && g_hero_l01_state_block.field_1248 != 46) g_hero_l01_state_block.field_5C0 = 0;
         }
     }

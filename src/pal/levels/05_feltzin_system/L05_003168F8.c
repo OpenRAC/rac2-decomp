@@ -6,15 +6,15 @@
 extern void vec_fast_to_int_helper(char *, char *);
 extern void quaternion_to_rotation_basis(char *, char *);
 extern void anim_start_startup_animations(void);
-extern void func_PAL_002E7270(char *);
+extern void update_equipment_pieces_pal(char *);
 extern void math_store_angle_update_result(char *, char *, int, int, float);
 extern void moby_compute_local_point(char *, char *, float, float, float);
-extern char *func_PAL_L05_0042A240(char *, int, int, int, int, int, int, int, int, int, int, float);
+extern char *moby_spawn_large_explosion_pal(char *, int, int, int, int, int, int, int, int, int, int, float);
 extern int math_random_int_below(int kind);
 extern float math_random_signed_float_range(float, float);
 extern void FastVecSub(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
-extern char *func_PAL_L05_0041EA08(char *, char *, char *, int, int, int, int, int, float);
+extern char *moby_spawn_shot_effect_pal(char *, char *, char *, int, int, int, int, int, float);
 
 typedef struct {
     char pad[0x30];
@@ -28,7 +28,8 @@ extern Scene05 g_scene_objects;
 extern char g_scene_spawn_entries[];
 extern int g_current_map_index __attribute__((sda));
 
-void func_PAL_L05_003168F8(void)
+/* Sets up the Feltzin System scene objects: flags the scenery, and in the intro plays sparks and spawns effects around the ship (PAL: 50 Hz timings). */
+void feltzin_init_scene_objects_pal(void)
 {
     float pos[4] __attribute__((aligned(16)));
     union {
@@ -36,15 +37,15 @@ void func_PAL_L05_003168F8(void)
         struct { float dest[4], delta[4]; } vectors;
     } scratch __attribute__((aligned(16)));
     int i;
-    char *obj;
+    char *moby;
     anim_start_startup_animations();
     for (i = 0; i < g_scene_objects.count; i++) {
         char *current = g_scene_objects.objects[i];
-        if (current && *(short *)(current + 0xAA) == 0xE29)
+        if (current && *(short *)(current + 0xAA) == 0xE29 /* moby class 3625 */)
             *(unsigned short *)(current + 0x34) |= 0x800;
-        if (*(short *)(current + 0xAA) == 0xD54) func_PAL_002E7270(current);
+        if (*(short *)(current + 0xAA) == 0xD54 /* moby class 3412 */) update_equipment_pieces_pal(current);
         if (current) {
-            int effect_class = 0xFA0;
+            int effect_class = MOBY_CLASS_TV_SCREENS;
             if (*(short *)(current + 0xAA) == effect_class && g_current_map_index != 0x33) {
                 char *state = *(char **)(current + 0x68);
                 if (state) math_store_angle_update_result(current, state + 0xC, 0x80AAAAD2, 0x80396464, 0.07330384f);
@@ -52,27 +53,27 @@ void func_PAL_L05_003168F8(void)
         }
     }
     if (g_current_map_index != 5 || g_scene_objects.mode) return;
-    obj = g_scene_objects.objects[2];
+    moby = g_scene_objects.objects[2];
     if (g_scene_objects.timer == 0x52) {
-        vec_fast_to_int_helper(*(char **)(obj + 0x58) + 0x10, (char *)scratch.matrix);
-        quaternion_to_rotation_basis((char *)scratch.matrix, obj + 0xC0);
-        moby_compute_local_point(obj, (char *)pos, 4.0f, 3.0f, 5.0f);
-        func_PAL_L05_0042A240((char *)pos, 1, 25, 20, 20, 20, 45, 1, 1, 1, 0, 1.5f);
-        moby_compute_local_point(obj, (char *)pos, 9.0f, 4.0f, 4.0f);
-        func_PAL_L05_0042A240((char *)pos, 35, 50, 30, 30, 30, 50, 1, 1, 1, 1, 1.0f);
+        vec_fast_to_int_helper(*(char **)(moby + 0x58) + 0x10, (char *)scratch.matrix);
+        quaternion_to_rotation_basis((char *)scratch.matrix, moby + 0xC0);
+        moby_compute_local_point(moby, (char *)pos, 4.0f, 3.0f, 5.0f);
+        moby_spawn_large_explosion_pal((char *)pos, 1, 25, 20, 20, 20, 45, 1, 1, 1, 0, 1.5f);
+        moby_compute_local_point(moby, (char *)pos, 9.0f, 4.0f, 4.0f);
+        moby_spawn_large_explosion_pal((char *)pos, 35, 50, 30, 30, 30, 50, 1, 1, 1, 1, 1.0f);
     }
     if ((unsigned int)(g_scene_objects.timer - 0x22) < 0x5f && !math_random_int_below(4)) {
         float sign = 1.0f;
         float *entry;
         if (math_random_int_below(2)) sign = -1.0f;
         entry = (float *)(g_scene_spawn_entries + math_random_int_below(3) * 32);
-        moby_compute_local_point(obj, (char *)pos, entry[0], entry[1], entry[2]);
-        moby_compute_local_point(obj, (char *)scratch.vectors.dest, entry[4], entry[5], entry[6]);
+        moby_compute_local_point(moby, (char *)pos, entry[0], entry[1], entry[2]);
+        moby_compute_local_point(moby, (char *)scratch.vectors.dest, entry[4], entry[5], entry[6]);
         scratch.vectors.dest[0] += math_random_signed_float_range(0.5f, 1.5f);
         scratch.vectors.dest[1] += math_random_signed_float_range(0.5f, 1.5f);
         scratch.vectors.dest[2] += math_random_signed_float_range(0.5f, 1.5f);
         FastVecSub((char *)scratch.vectors.delta, (char *)scratch.vectors.dest, (char *)pos);
         vec_scale_to_length((char *)scratch.vectors.delta, (char *)scratch.vectors.delta, 1.4000001f);
-        func_PAL_L05_0041EA08(obj, (char *)pos, (char *)scratch.vectors.delta, 0x46BE20, 0x327814, 1, 0, 1, sign);
+        moby_spawn_shot_effect_pal(moby, (char *)pos, (char *)scratch.vectors.delta, 0x46BE20, 0x327814, 1, 0, 1, sign);
     }
 }

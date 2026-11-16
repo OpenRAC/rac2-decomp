@@ -35,7 +35,7 @@ extern void *part_spawn_trail(void *, float *, float *, int, int, int, int, int,
 /* Spawn func_002BAA28 entries along the object's height: the count scales with the
  * height and the level's density (a fifth of it unless fullDensity), each at a
  * random spread transformed into the object's frame, with random colours and size. */
-void func_PAL_L22_003F9B18(u8 *object, int fullDensity)
+void part_emit_column_pal(u8 *object, int full_density)
 {
     EmissionVector position, scratch, to;
     u8 *state = *(u8 **)(object + 0x68);
@@ -43,10 +43,10 @@ void func_PAL_L22_003F9B18(u8 *object, int fullDensity)
     float count = (height * 7.2900004386901855f) * D_L22_001B0A20_gp[0];
     float step;
     float zero;
-    float baseWidth = 2.7f;
+    float base_width = 2.7f;
     int i;
 
-    if (!fullDensity)
+    if (!full_density)
         count *= 0.2f;
     i = 0;
     step = height / count;
@@ -54,8 +54,8 @@ void func_PAL_L22_003F9B18(u8 *object, int fullDensity)
         zero = (float)i;
         do {
             float progress = IntToFloat(i) * step;
-            float spread = baseWidth + progress * 0.1f;
-            int firstColor, secondColor, kind, duration;
+            float spread = base_width + progress * 0.1f;
+            int first_color, second_color, kind, duration;
             float size;
 
             scratch.q = 0;
@@ -65,9 +65,9 @@ void func_PAL_L22_003F9B18(u8 *object, int fullDensity)
             position.q = scratch.q;
             matrix_mul_vec3(position.f, position.f, object + 0xC0);
             FastVecAdd(position.f, position.f, object + 0x10);
-            firstColor = FastTweenColor(D_L22_001B0A28_gp[0], g_column_color_table[1],
+            first_color = FastTweenColor(D_L22_001B0A28_gp[0], g_column_color_table[1],
                                        math_random_float_range(zero, 1.0f));
-            secondColor = FastTweenColor(g_column_color_table[2], g_column_color_table[3],
+            second_color = FastTweenColor(g_column_color_table[2], g_column_color_table[3],
                                         math_random_float_range(zero, 1.0f));
             size = D_L22_001B0A38_gp[math_random_int_below(2)];
             vec_clear_128(scratch.f);
@@ -76,7 +76,7 @@ void func_PAL_L22_003F9B18(u8 *object, int fullDensity)
             to.f[3] = size;
             kind = ((s32)math_random_int_range(1, D_L22_001B0A48_gp[0]) * 5 + 2) / 6;
             duration = ((s32)math_random_int_range(g_column_int_params_b[1], g_column_int_params_b[2]) * 5 + 2) / 6;
-            part_spawn_trail(position.f, scratch.f, to.f, firstColor, secondColor, kind, duration,
+            part_spawn_trail(position.f, scratch.f, to.f, first_color, second_color, kind, duration,
                           50, D_L22_001B0A44_gp[0]);
             ++i;
         } while ((float)i < count);

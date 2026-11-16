@@ -10,7 +10,7 @@
 extern u8 *g_group_id_lists[];
 extern u8 *g_moby_l11_table __attribute__((section(".sdata")));
 extern u8 g_hero_state[];
-extern void func_PAL_L11_0044B820(u8 *, int, float, float);
+extern void joba_boss_start_random_action_pal(u8 *, int, float, float);
 extern int snd_start_in_slot(int, int, int);
 extern int FastDecTimer(short *);
 /* Tallies the group's living members and their health, records the losses in
@@ -79,7 +79,7 @@ void arena_update_loss_history_pal(u8 *object)
                 MemberHealth *hp = *(MemberHealth **)(member+0x68);
                 total += hp->health;
                 if (hp->health > 0.0f) active++;
-            } else if (kind == 0xb3a) {
+            } else if (kind == MOBY_CLASS_ARACHNOID) {
                 MemberHealth *hp = *(MemberHealth **)(member+0x68);
                 active++;
                 total += hp->health;
@@ -87,7 +87,7 @@ void arena_update_loss_history_pal(u8 *object)
         }
     } while (*list++ >= 0);
     player = g_hero_state;
-    func_PAL_L11_0044B820(object, I32(state,0x140)-active, F32(state,0x144)-total,
+    joba_boss_start_random_action_pal(object, I32(state,0x140)-active, F32(state,0x144)-total,
         F32(state,0x148)-(float)I32(player,0x24cc));
     if (F32(state,0x148)-(float)I32(player,0x24cc) > 0.0f)
         snd_start_in_slot(0x17,0,0);

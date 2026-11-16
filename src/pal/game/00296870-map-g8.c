@@ -155,7 +155,7 @@ extern void map_convert_world_to_map_position(f32,f32,f32 *,f32 *,s32);
 extern s32 moby_get_current_variant_index(void);
 
 /* UNK_NoMapAvailable */
-void func_PAL_00296870(s32 paging, s32 set_clip) {
+void DrawMapOverlay_pal(s32 paging, s32 set_clip) {
     s32 rx0, ry0, rx1, ry1;
     struct DmaTag_205E70 *tag;
     u64 *packet_words;

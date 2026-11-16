@@ -6,7 +6,8 @@ extern int g_screen_flag_enabled __attribute__((sda));
 
 extern int g_level_init_flag_d __attribute__((sda));
 
-void func_US2_L00_00403EC0(void) {
+/* Clears the level init flag d. */
+void level_clear_init_flag_d_us2(void) {
     g_level_init_flag_d = 0;
 }
 

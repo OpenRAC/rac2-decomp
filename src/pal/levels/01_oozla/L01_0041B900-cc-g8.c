@@ -86,11 +86,11 @@ extern f32 math_fast_sin_or_cos_a(f32);
 extern f32 math_fast_sin_or_cos_b(f32);
 extern s32 math_random_int_below(s32);
 extern s32 math_fast_float_d(void *);
-extern void func_PAL_L01_0041BFF0(void *);
-extern void func_PAL_L01_0041C0D8(void *);
+extern void gold_bolt_glow_init_pal(void *);
+extern void gfx_draw_glow_rings_pal(void *);
 extern void part_spawn_sparkle_drift_pal(void *);
 extern void gold_bolt_cam_update(void *);
-extern void func_PAL_L01_0041BF10(void *);
+extern void bobbing_l01_moby_update_2_pal(void *);
 extern void value_set_entry_by_index_pal(s32, s32);
 extern void help_unlock_entry(s32);
 extern s32 PlayMobySound(s32, s32, void *);
@@ -104,7 +104,7 @@ extern void SetCamera5Pose(void *, void *, s32, s32, s32);
 extern void object_copy_vector_to_selected(void *);
 extern void cam_set_state_rotation(void *);
 extern void cam_set_mode_state(s32);
-extern void func_PAL_002A7E68(void *, s32, s32, s32);
+extern void anim_start_blended_pal(void *, s32, s32, s32);
 extern void set_hero_animation_pal(s32, s32, f32);
 extern s32 MemcardSave(s32, s32);
 
@@ -112,9 +112,9 @@ extern s32 MemcardSave(s32, s32);
 
 /* Gold bolt update: idle spin, hero pickup check, pickup animation and camera, removal.
  * Adapted from RAC1's gold_bolt_update (GPL-3.0). */
-void func_PAL_L01_0041B900(GoldBoltMoby *moby) {
+void GoldBoltUpdate_pal(GoldBoltMoby *moby) {
     GoldBoltVars *vars = moby->pvars;
-    GoldBoltHero *h;
+    GoldBoltHero *hero;
     Vec4f at, look, at2, look2;
     s32 i;
 
@@ -136,7 +136,7 @@ void func_PAL_L01_0041B900(GoldBoltMoby *moby) {
             moby->unk32 = 0x40;
         }
         moby->state = 1;
-        func_PAL_L01_0041BFF0(moby);
+        gold_bolt_glow_init_pal(moby);
         break;
     case 1:
         moby->scale = moby->pclass->scale * g_bobbing_scale_factor;
@@ -144,7 +144,7 @@ void func_PAL_L01_0041B900(GoldBoltMoby *moby) {
         moby->rot.y = FastAddRotations(moby->rot.y, g_spin_rate_y * SPIN);
         moby->rot.z = FastAddRotations(moby->rot.z, g_spin_rate_z * SPIN);
         moby->rot.w = FastAddRotations(moby->rot.w, g_spin_rate_w * SPIN);
-        func_PAL_L01_0041C0D8(moby);
+        gfx_draw_glow_rings_pal(moby);
         if (!math_random_int_below(g_random_effect_chance)) {
             part_spawn_sparkle_drift_pal(moby);
         }
@@ -196,7 +196,7 @@ void func_PAL_L01_0041B900(GoldBoltMoby *moby) {
         qcopy(&moby->pos, &g_hero_state.pos);
         qcopy(&moby->rot, &g_hero_state.rot);
         if (moby->prev_seq != 1) {
-            func_PAL_002A7E68(moby, 1, 0, 0);
+            anim_start_blended_pal(moby, 1, 0, 0);
         }
         set_hero_animation_pal(0x7B, 0, 0.0f);
         if (g_state_flag_c) {
@@ -213,13 +213,13 @@ void func_PAL_L01_0041B900(GoldBoltMoby *moby) {
         qcopy(&moby->pos, &g_hero_state.pos);
         qcopy(&moby->rot, &g_hero_state.rot);
         if (moby->seq == 1) {
-            func_PAL_L01_0041BF10(moby);
+            bobbing_l01_moby_update_2_pal(moby);
             if (!math_random_int_below(10)) {
                 part_spawn_sparkle_drift_pal(moby);
             }
             if (moby->anim_flags & 2) {
                 if (moby->prev_seq != 0) {
-                    func_PAL_002A7E68(moby, 0, 0, 0);
+                    anim_start_blended_pal(moby, 0, 0, 0);
                 }
                 moby->visible = 0;
                 moby->flags |= 1;
@@ -228,8 +228,8 @@ void func_PAL_L01_0041B900(GoldBoltMoby *moby) {
                 }
             }
         }
-        h = &g_hero_state;
-        if (h->anim_flags & 2) {
+        hero = &g_hero_state;
+        if (hero->anim_flags & 2) {
             set_hero_animation_pal(0, 0, 25.0f);
         }
         if (moby->seq != 0 || !math_fast_float_d(&vars->timer)) {
@@ -239,7 +239,7 @@ void func_PAL_L01_0041B900(GoldBoltMoby *moby) {
         value_set_entry_by_index_pal(0x129A, -1);
         help_unlock_entry(50);
         D_L01_001B1FA8_gp = 0;
-        hero_reset_position_and_direction_pal(&h->pos, &h->rot, 0, 0);
+        hero_reset_position_and_direction_pal(&hero->pos, &hero->rot, 0, 0);
         cam_set_mode_state(0);
         MemcardSave(0, -1);
         moby_mark_spawned(moby);

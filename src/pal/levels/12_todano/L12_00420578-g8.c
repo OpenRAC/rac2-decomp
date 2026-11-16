@@ -41,8 +41,9 @@ extern int PlayMobySound(int, int, void *);
 extern void snd_stop_voice(int);
 extern int IsPointInCuboid(void *, int), tracked_object_is_open(void), tracked_moby_is_active(void), second_tracked_object_is_open(void);
 extern void make_hit_descriptor(void *, void *, int, void *, float), QueueMobyImpact(void *, void *);
-extern void func_PAL_L00_003E38E8(int, int), func_PAL_L00_004071F0(int, int), gfx_add_draw_callback_first(void *, void *);
+extern void tracked_moby_set_state_pal(int, int), global_object_start_pal(int, int), gfx_add_draw_callback_first(void *, void *);
 
+/* Runs a beam that sweeps through its volume. It hurts the hero and the buddy when they stand in it, and plays a humming sound while the way is clear (PAL: 50 Hz timings). */
 void sweeping_beam_update_pal(u8 *self)
 {
     float start[4], end[4], delta[4], local[4];
@@ -194,14 +195,14 @@ Destroy:
     }
     {
         u8 *query = g_hero_position;
-        float height, t;
+        float height, probe_z;
         float *pos;
 
         if (IsPointInCuboid(query, state->index)) {
-            t = *(float *)(query + 8);
-            if (state->start[2] + 4.0f <= t)
+            probe_z = *(float *)(query + 8);
+            if (state->start[2] + 4.0f <= probe_z)
                 height = state->heights[2];
-            else if (state->start[2] + 1.0f <= t)
+            else if (state->start[2] + 1.0f <= probe_z)
                 height = state->heights[1];
             else
                 height = state->heights[0];
@@ -226,10 +227,10 @@ Destroy:
                 beam_restore_child_collision(self);
             }
         } else if (IsPointInCuboid(query + 0x60, state->index)) {
-            t = *(float *)(query + 0x68);
-            if (state->start[2] + 4.0f <= t)
+            probe_z = *(float *)(query + 0x68);
+            if (state->start[2] + 4.0f <= probe_z)
                 height = state->heights[2];
-            else if (state->start[2] + 1.0f <= t)
+            else if (state->start[2] + 1.0f <= probe_z)
                 height = state->heights[1];
             else
                 height = state->heights[0];
@@ -260,7 +261,7 @@ Destroy:
         if (math_fabs(*(float *)(candidate + 0x18) - g_path_waypoint_table[state->index].position[2]) < 2.0f)
             delta[2] = g_path_waypoint_table[state->index].position[2];
         if (IsPointInCuboid(delta, state->index))
-            func_PAL_L00_003E38E8(1, -1);
+            tracked_moby_set_state_pal(1, -1);
     }
     if (second_tracked_object_is_open()) {
         u8 *candidate = g_second_tracked_object;
@@ -269,7 +270,7 @@ Destroy:
         if (math_fabs(*(float *)(candidate + 0x18) - g_path_waypoint_table[state->index].position[2]) < 2.0f)
             delta[2] = g_path_waypoint_table[state->index].position[2];
         if (IsPointInCuboid(delta, state->index))
-            func_PAL_L00_004071F0(1, -1);
+            global_object_start_pal(1, -1);
     }
     gfx_add_draw_callback_first(g_sweeping_beam_draw_callback, self);
     helper_push_objects(self);

@@ -30,7 +30,7 @@ extern void text_box_draw_frame(char *, unsigned int, unsigned int, float, float
    D_001A8CFC[0] + 0x8710 and colour 0x55F0C070. The cleared cells store word 0 last, as in
    func_00339078; the colour cell is cleared as floats before its integer colour is stored. */
 /* Initialises an object: two float stores through the pointer at +0, clears byte +423, stores an int at +440, calls a callee with (this+168, -1) storing its result at +468 and the address at +472, sets +432 to 1 and writes 1.0f through the pointer at +4. */
-void func_US2_00338CD8(char *p, int a1, int a2, float f12, float f13);
+void msg_box_init_state_us2(char *p, int a1, int a2, float f12, float f13);
 
 /* Sets the box's text up: position, duration, then splits the text at each 1 byte into the line
    table, measuring every line with func_0027F178 and keeping the widest in maxWidth. */
@@ -65,5 +65,5 @@ void msg_box_init_localized_us2(char *object, int text_id, int value, int count)
     char *buffer = object + 0x1e34;
 
     sprintf(buffer, GetLocalizedString(text_id), value);
-    func_US2_00338CD8(sub, 2, limit, 255.0f, 135.0f);
+    msg_box_init_state_us2(sub, 2, limit, 255.0f, 135.0f);
 }

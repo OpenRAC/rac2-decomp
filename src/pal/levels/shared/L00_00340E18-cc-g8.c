@@ -17,40 +17,41 @@ extern float FastVecLength(void *);
 extern void vec_scale_to_length(void *,void *,float);
 extern void FastVecScale(void *,void *,float);
 extern int math_random_int_range(int,int);
-extern void *func_PAL_002BD790(void *,void *,int,int,int,int,int,int,float,int);
+extern void *part_spawn_spark_pal(void *,void *,int,int,int,int,int,int,float,int);
 extern int g_frame_l00_counter MACRO_ADDR;
-void func_PAL_L00_00340E18(char *p)
+/* Updates a spark shedder: fades it and, every other frame, sheds a new spark (PAL). */
+void part_update_spark_shedder_pal(char *particle)
 {
     float old[4], velocity[4], random[4];
-    char *q=p+32;
+    char *motion=particle+32;
     char *pos;
     char *initial;
-    float t, length;
+    float fraction, length;
     int life;
-    if (FastDecTimer((short *)(p+10))) { part_kill(p); return; }
-    initial=p+16;
-    t=IntToFloat(FS(p,10));
-    t=t/IntToFloat(FS(q,24));
-    FI(p,4)=math_lerp_int_fraction(FI(q,20),FI(q,16),t);
-    FastVecAdd(initial,initial,q);
-    FF(q,8)-=FF(q,12);
+    if (FastDecTimer((short *)(particle+10))) { part_kill(particle); return; }
+    initial=particle+16;
+    fraction=IntToFloat(FS(particle,10));
+    fraction=fraction/IntToFloat(FS(motion,24));
+    FI(particle,4)=math_lerp_int_fraction(FI(motion,20),FI(motion,16),fraction);
+    FastVecAdd(initial,initial,motion);
+    FF(motion,8)-=FF(motion,12);
     qcopy(old,initial);
     pos=initial;
-    if (FF(p,28)!=0.0f) {
-        if (FF(p,28)==2.0f) vec_transform_or_copy(pos,pos);
-        FF(p,28)=2.0f;
+    if (FF(particle,28)!=0.0f) {
+        if (FF(particle,28)==2.0f) vec_transform_or_copy(pos,pos);
+        FF(particle,28)=2.0f;
     }
-    if (FS(q,26) && (g_frame_l00_counter&1)) {
+    if (FS(motion,26) && (g_frame_l00_counter&1)) {
         *(EffectQuad *)random=0;
         random[0]=math_random_float_range(-1.0f,1.0f);
         random[1]=math_random_float_range(-1.0f,1.0f);
         random[2]=math_random_float_range(-1.0f,1.0f);
         *(EffectQuad *)velocity=*(EffectQuad *)random;
-        length=FastVecLength(q);
+        length=FastVecLength(motion);
         vec_scale_to_length(velocity,velocity,length*math_random_float_range(0.15f,0.25f));
-        FastVecAdd(velocity,velocity,q);
+        FastVecAdd(velocity,velocity,motion);
         FastVecScale(velocity,velocity,math_random_float_range(0.75f,0.95f));
         life=(((int)(math_random_int_range(15,30)) * 5 + 2) / 6);
-        func_PAL_002BD790(pos,velocity,FI(p,4),FI(q,20),life,0,FB(p,2),FB(p,3),FF(p,12),FloatToInt(FF(p,28)));
-    } else FastVecScale(q,q,0.96f);
+        part_spawn_spark_pal(pos,velocity,FI(particle,4),FI(motion,20),life,0,FB(particle,2),FB(particle,3),FF(particle,12),FloatToInt(FF(particle,28)));
+    } else FastVecScale(motion,motion,0.96f);
 }

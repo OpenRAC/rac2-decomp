@@ -66,7 +66,7 @@ extern void copy_matrix_rotation(void *, void *);
 extern Moby403730 *CreateMoby(int);
 extern void moby_mark_spawned(void *);
 extern void func_002A0F48(void *);
-extern void func_US2_002A7AA8(void *, int, int);
+extern void SetDeathBits_us2(void *, int, int);
 extern int math_random_int_range(int, int);
 extern float math_random_float_range(float, float);
 extern float math_random_angle(void);
@@ -78,58 +78,59 @@ extern short g_dark_sheep_moby_index_list[] __attribute__((sda));
 extern void AddMobyToIndexList(void *, short *, short);
 
 /* func_US2_L00_00409CF0, the v2.00 copy of func_L00_00408800: the same C, except that the 0x1000
-   flag is read from self, and a link already in mode 2 stays there. Retail rereads link->mode
+   flag is read from source, and a link already in mode 2 stays there. Retail rereads link->mode
    after the null test fails, so the second test really has no guard. */
-Moby403730 *func_US2_L00_00409CF0(Moby403730 *self) {
+/* Spawns a dark sheep (class 0xEB0) at the source object's position and puts it on the dark sheep list (US2 copy of dark_sheep_spawn_from_object). */
+Moby403730 *dark_sheep_spawn_from_object_us2(Moby403730 *source) {
     f32 mtx[16] __attribute__((aligned(16)));
-    Moby403730 *m;
+    Moby403730 *dark_sheep;
     Vars403730 *vars;
     Link403730 *link;
-    Weapon403730 *w;
+    Weapon403730 *weapon;
     f32 rate;
 
-    m = CreateMoby(0xEB0);
-    if (m != 0) {
-        m->alpha = 0x7F;
-        m->f32 = 0x7F;
-        m->f31 = 1;
-        vars = m->vars;
-        m->scale = math_random_float_range(0.85f, 1.15f);
-        qcopy(m->pos, self->pos);
+    dark_sheep = CreateMoby(MOBY_CLASS_DARK_SHEEP);
+    if (dark_sheep != 0) {
+        dark_sheep->alpha = 0x7F;
+        dark_sheep->f32 = 0x7F;
+        dark_sheep->f31 = 1;
+        vars = dark_sheep->vars;
+        dark_sheep->scale = math_random_float_range(0.85f, 1.15f);
+        qcopy(dark_sheep->pos, source->pos);
         if (g_hero_action_blocked_flag[0] != 0 || g_hero_locked_flag[0] != 0) {
-            copy_matrix_rotation(mtx, self->mtx);
-            mat_get_euler_angles(mtx, m->rot);
+            copy_matrix_rotation(mtx, source->mtx);
+            mat_get_euler_angles(mtx, dark_sheep->rot);
         } else {
-            vec_clear_128(m->rot);
-            m->rot[2] = mat_fast_helper_a(m->pos[0] - g_hero_state.x, m->pos[1] - g_hero_state.y);
+            vec_clear_128(dark_sheep->rot);
+            dark_sheep->rot[2] = mat_fast_helper_a(dark_sheep->pos[0] - g_hero_state.x, dark_sheep->pos[1] - g_hero_state.y);
         }
-        m->state = 1;
+        dark_sheep->state = 1;
         vars->f56 = 0;
         vars->delay = math_random_int_range(0x78, 0x12C);
         vars->f70 = 600;
         vars->f74 = 15;
         vars->f5C = 0;
         vars->f78 = 0;
-        m->state = 4;
-        m->f98 = m->cls->f10;
-        w = &g_weapon_l00_table[g_sheepinator_weapon_index[0]];
+        dark_sheep->state = 4;
+        dark_sheep->f98 = dark_sheep->cls->f10;
+        weapon = &g_weapon_l00_table[g_sheepinator_weapon_index[0]];
         rate = 1.0f;
-        if (w->f4 != 0) {
+        if (weapon->f4 != 0) {
             rate = 4.0f;
         }
         vars->rate = rate;
         vars->f60 = -1;
-        if (self->flags & 0x1000) {
-            func_US2_002A7AA8(self, 0, 3);
+        if (source->flags & 0x1000) {
+            SetDeathBits_us2(source, 0, 3);
         }
-        link = moby_get_private_value_0(self);
+        link = moby_get_private_value_0(source);
         if ((link != 0 && link->mode == 1) || link->mode == 2) {
             link->mode = 2;
         } else {
-            moby_mark_spawned(self);
+            moby_mark_spawned(source);
         }
-        AddMobyToIndexList(m, g_dark_sheep_moby_index_list, 31);
-        func_002A0F48(m);
+        AddMobyToIndexList(dark_sheep, g_dark_sheep_moby_index_list, 31);
+        func_002A0F48(dark_sheep);
     }
-    return m;
+    return dark_sheep;
 }

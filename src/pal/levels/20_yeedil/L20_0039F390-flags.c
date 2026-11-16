@@ -15,6 +15,7 @@ extern unsigned char *g_particle_color_ptr_b;
 extern unsigned char *g_particle_color_ptr_a;
 extern int g_frame_l20_counter[] __attribute__((sda));
 
+/* Throws glowing particles around the object and a few small ones along a line toward its target. (PAL version) */
 void EmitJitteredParticleTrail_pal(unsigned char *object) {
     Vector delta, position, jitter;
     unsigned char *state = *(unsigned char **)(object + 0x68);

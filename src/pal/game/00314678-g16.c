@@ -68,7 +68,7 @@ static __inline__ short *PairTimer(PairVars *vars, int offset)
 
 /* Draws the moby's four particle pairs, in a row behind it as seen from the camera, while
  * their timers run: each spins and fades with its timer. Returns 1 while one is above 40. */
-int func_PAL_00314678(Moby *self)
+int emit_four_timed_particle_pairs_pal(Moby *self)
 {
     float position[4] __attribute__((aligned(16)));
     float step[4] __attribute__((aligned(16)));
@@ -76,14 +76,14 @@ int func_PAL_00314678(Moby *self)
     int active = 0;
     PairVars *vars = self->vars;
     short *timer = vars->timer;
-    int floatOffset = 0;
-    int timerOffset = 0;
+    int float_offset = 0;
+    int timer_offset = 0;
     int span = 212;
-    float baseZ;
+    float base_z;
     float remaining;
     float mix;
     float duration;
-    int oldAlpha;
+    int old_alpha;
     int color;
     int alpha;
     unsigned char *particle;
@@ -93,44 +93,44 @@ int func_PAL_00314678(Moby *self)
     vec_scale_to_length(step, position, 0.1f);
     count = 3;
     FastVecAdd(position, position, self->position);
-    baseZ = position[2];
+    base_z = position[2];
     do {
         if (FastDecTimer(timer) == 0) {
-            if (TIMER(timerOffset) >= 41)
+            if (TIMER(timer_offset) >= 41)
                 active = 1;
-            ANGLE(floatOffset) += ENTRY(g_spark_spin_table, floatOffset);
-            if (ANGLE(floatOffset) >= 255.0f)
-                ANGLE(floatOffset) -= 255.0f;
-            else if (ANGLE(floatOffset) <= 0.0f)
-                ANGLE(floatOffset) += 255.0f;
+            ANGLE(float_offset) += ENTRY(g_spark_spin_table, float_offset);
+            if (ANGLE(float_offset) >= 255.0f)
+                ANGLE(float_offset) -= 255.0f;
+            else if (ANGLE(float_offset) <= 0.0f)
+                ANGLE(float_offset) += 255.0f;
 
-            mix = math_fabs(0.5f - IntToFloat(span - TIMER(timerOffset)) * 0.004716981f);
+            mix = math_fabs(0.5f - IntToFloat(span - TIMER(timer_offset)) * 0.004716981f);
             if (vars->altColors)
                 color = FastTweenColor(g_spark_color_b_from, g_spark_color_b_to, mix);
             else
                 color = FastTweenColor(g_spark_color_a_from, g_spark_color_a_to, mix);
-            oldAlpha = color >> 24;
+            old_alpha = color >> 24;
             duration = IntToFloat(((s32)(g_nanotech_duration) * 5 + 2) / 6);
-            remaining = 1.0f - (float)TIMER(timerOffset) / duration;
-            alpha = FloatToInt(IntToFloat(oldAlpha) * (1.0f - remaining)) << 24;
+            remaining = 1.0f - (float)TIMER(timer_offset) / duration;
+            alpha = FloatToInt(IntToFloat(old_alpha) * (1.0f - remaining)) << 24;
             color = alpha | (color & 0xFFFFFF);
 
-            position[2] = baseZ + ENTRY(g_spark_height_table, floatOffset);
-            particle = part_spawn_fading(position, color, FloatToInt(ANGLE(floatOffset)) & 255,
+            position[2] = base_z + ENTRY(g_spark_height_table, float_offset);
+            particle = part_spawn_fading(position, color, FloatToInt(ANGLE(float_offset)) & 255,
                                      g_spark_param_b, 0, 2, 1,
-                                     ENTRY(g_spark_size_table, floatOffset) * remaining);
+                                     ENTRY(g_spark_size_table, float_offset) * remaining);
             if (particle != 0)
                 particle[2] = g_particle_texture_table[62][0];
             particle = part_spawn_fading(position, alpha | 0xFFFFFF,
-                                     FloatToInt(ANGLE(floatOffset)) & 255, g_spark_param_b,
+                                     FloatToInt(ANGLE(float_offset)) & 255, g_spark_param_b,
                                      g_spark_param_a, 2, 1,
-                                     ENTRY(g_spark_size_table, floatOffset) * 0.7f * remaining);
+                                     ENTRY(g_spark_size_table, float_offset) * 0.7f * remaining);
             if (particle != 0)
                 particle[2] = g_particle_texture_table[62][0];
             FastVecAdd(position, position, step);
         }
-        floatOffset += 4;
-        timerOffset += 2;
+        float_offset += 4;
+        timer_offset += 2;
         timer++;
     } while (--count >= 0);
     return active;

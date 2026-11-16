@@ -19,6 +19,7 @@ extern int PlayMobySound(int, int, void *);
 extern void STUB_printf(void *);
 typedef struct { char pad[0x20]; unsigned char state; char pad2[3]; char *classData; char pad3[0xC]; unsigned short flags; char pad4[0x62]; int field98; } ControllerMoby10;
 
+/* Updates the Aranos controller object, which runs the two scripted camera and object sequences (PAL: 50 Hz timings). */
 void aranos_controller_update_pal(unsigned char *object)
 {
     int *state = *(int **)(object + 0x68);

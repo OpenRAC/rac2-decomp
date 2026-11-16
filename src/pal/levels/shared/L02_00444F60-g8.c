@@ -14,7 +14,7 @@ extern u8 g_zero_l02_vector[] MACRO_ADDR;
 extern float math_random_angle(void);
 extern float math_random_signed_float_range(float,float);
 extern int math_random_int_below(int);
-extern void func_PAL_002A7E68(void *,int,int,int);
+extern void anim_start_blended_pal(void *,int,int,int);
 extern void moby_set_state(void *,int,int);
 extern float FastAddRotations(float,float);
 extern float math_fast_sin_or_cos_b(float);
@@ -36,13 +36,13 @@ extern void part_l01_spawn_spark_burst_pal(void *,void *,int,int,int,float,float
 extern int FastDecTimer(short *);
 extern void vec_clear_128(void *);
 extern void SpawnExplosionEffects_pal(void *,void *,void *,float,float,int,int,int,float,float,float,float,int,float,int,int,int,int,int);
-extern void func_PAL_002B15D8(char *,int,float *,u8,float,float,float,float);
+extern void part_spawn_masked_debris_pal(char *,int,float *,u8,float,float,float,float);
 extern void part_spawn_scaled_bolts_pal(void *,int,float);
 extern void moby_mark_spawned(void *);
-extern void func_PAL_L02_00445550(void *);
+extern void moby_pick_evasive_anim_state_pal(void *);
 
 /* Advance the hovering object's idle, launch and impact states. */
-void func_PAL_L02_00444F60(u8 *object)
+void hovering_object_update_pal(u8 *object)
 {
     Vector delta;
     /* The tilt input dies after 833F0. The later inverse has four rows. */
@@ -67,7 +67,7 @@ void func_PAL_L02_00444F60(u8 *object)
         object[0x40]=math_random_int_below((*(u8 **)(*(u8 **)(object+0x24)+0x48))[0x10]);
         *(short *)(effect+0x48)=180;
         mode=math_random_int_below(2)+1;
-        if(object[0x43]!=mode) func_PAL_002A7E68(object,mode,0,5);
+        if(object[0x43]!=mode) anim_start_blended_pal(object,mode,0,5);
         moby_set_state(object,1,-1);
         break;
     case 1: {
@@ -128,11 +128,11 @@ void func_PAL_L02_00444F60(u8 *object)
     case 3:
         if(*(short *)(effect+0x3C)) vec_clear_128(effect+0x20);
         SpawnExplosionEffects_pal(object,g_zero_l02_vector,object+0x10,0.0f,0.0f,10,5,15,0.0f,0.0f,9.0f,*(float *)(object+0x2C)*10.0f,-1,0.0f,0,0,-1,0,0x810001);
-        func_PAL_002B15D8((char *)object,0x3FFF,(float *)(effect+0x20),255,3.0f,6.0f,3.0f,6.0f);
+        part_spawn_masked_debris_pal((char *)object,0x3FFF,(float *)(effect+0x20),255,3.0f,6.0f,3.0f,6.0f);
         part_spawn_scaled_bolts_pal(object,3,0.0f);
         PlayMobySound(1,0,object);
         moby_mark_spawned(object);
         return;
     }
-    if(object[0x20]) func_PAL_L02_00445550(object);
+    if(object[0x20]) moby_pick_evasive_anim_state_pal(object);
 }

@@ -18,7 +18,8 @@ extern float g_orb_alpha_scale[] __attribute__((sda));
 extern Vector g_orb_arm_vectors[8][25];
 extern Vector g_electric_orb_basis_vectors[8];
 
-unsigned char *func_PAL_L20_003A1E38(unsigned char *owner, const Vector *position) {
+/* Creates the electric orb at a position and sets up the directions of its eight arms. */
+unsigned char *electric_orb_spawn_pal(unsigned char *owner, const Vector *position) {
     unsigned char *object = CreateMoby(0x1316);
     unsigned char *state;
     Vector *x, *y, *z;

@@ -11,6 +11,7 @@ extern CallbackState g_pause_menu_state;
 extern int g_menu_input_flags;
 extern int func_0029C7D0(int);
 
+/* Handles button input for a menu page: reports cancel or accept, and otherwise passes the buttons to the page handler. (USA v2.00) */
 int menu_page_update_2_us2(void) {
     int result = 0;
     int flags = g_menu_input_flags;

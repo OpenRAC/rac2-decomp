@@ -23,7 +23,8 @@ extern float g_sparkle_camera_offset[4] __attribute__((sda));
 extern char g_camera_l00_position[];
 extern float g_default_vector[4];
 
-void func_PAL_L00_003BADA0(void)
+/* Spawns a few sparkles near the camera. (PAL: 50 Hz timings) */
+void part_spawn_camera_sparkles_pal(void)
 {
     float point[4], velocity[4], scatter[4];
     int i = 0;

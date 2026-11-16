@@ -22,7 +22,7 @@ extern u64 GetEffectTextureDescriptor(int);
 extern void FastVecSub(void *, void *, void *), FastVecCross(void *, void *, void *);
 extern float FastVecDot(void *, void *);
 extern void draw_world_quad(void *, void *, int);
-void func_PAL_L00_003CB888(void *object)
+void DrawBeamRingAndRailEffects_pal(void *object)
 {
     SurfacePacket packet;
     SurfaceVector edge, side, normal, eye;

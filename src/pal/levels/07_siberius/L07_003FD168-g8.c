@@ -29,20 +29,21 @@ typedef struct {
     s32 x458;
 } Vars;
 
-s32 func_PAL_L07_003FD168(void *arg0) {
+/* Picks the enemy's next action from its current phase and a random roll, and sets up the timer and handlers for it. Returns the chosen action number (PAL: 50 Hz timings). */
+s32 enemy_choose_action_pal(void *moby) {
     s32 one = 1;
-    Vars *temp_s0;
-    s32 var_s1;
-    s32 temp_v1;
-    s32 temp_v0;
+    Vars *vars;
+    s32 action;
+    s32 value;
+    s32 roll;
 
-    temp_s0 = *(Vars **)((u8 *)arg0 + 0x68);
-    temp_v1 = temp_s0->x420;
-    var_s1 = 7;
-    if (temp_v1 != one) {
-        var_s1 = 7;
-        if (temp_v1 < 2) {
-            if (temp_v1 != 0) {
+    vars = *(Vars **)((u8 *)moby + 0x68);
+    value = vars->x420;
+    action = 7;
+    if (value != one) {
+        action = 7;
+        if (value < 2) {
+            if (value != 0) {
                 goto state_default;
             }
         } else {
@@ -52,62 +53,62 @@ s32 func_PAL_L07_003FD168(void *arg0) {
     }
 
     one = ref_L07_003F8908_00(0xFF) & 1;
-    temp_v1 = 6;
+    value = 6;
     if (one != 0) {
-        var_s1 = temp_v1;
+        action = value;
     }
     goto dispatch;
 
 state_default:
-    temp_v0 = ref_L07_003F8908_00(temp_s0->x420 + 1);
-    switch (temp_v0) {
+    roll = ref_L07_003F8908_00(vars->x420 + 1);
+    switch (roll) {
     case 0:
-        var_s1 = 7;
+        action = 7;
         break;
     case 1:
-        var_s1 = 6;
+        action = 6;
         break;
     case 2:
-        if (temp_s0->x458 != 0) {
-            var_s1 = 8;
-            ref_L07_003F8908_02(&temp_s0->x458, 0, 1);
+        if (vars->x458 != 0) {
+            action = 8;
+            ref_L07_003F8908_02(&vars->x458, 0, 1);
         } else {
-            s32 arg0 = 2;
+            s32 roll_arg = 2;
 
-            var_s1 = 6;
-            temp_v0 = ref_L07_003F8908_00(arg0);
-            temp_v1 = 7;
-            if (temp_v0 != 0) {
-                var_s1 = temp_v1;
+            action = 6;
+            roll = ref_L07_003F8908_00(roll_arg);
+            value = 7;
+            if (roll != 0) {
+                action = value;
             }
         }
         break;
     case 3:
-        var_s1 = 9;
+        action = 9;
         break;
     }
 
 dispatch:
-    switch (var_s1) {
+    switch (action) {
     case 7:
-        temp_s0->x444 = (ref_L07_003F8908_05 * 5 + 2) / 6;
-        temp_s0->x448 = (ref_L07_003F8908_08 * 5 + 2) / 6;
-        temp_s0->x438 = ref_L07_003F8908_01(3, 5);
+        vars->x444 = (ref_L07_003F8908_05 * 5 + 2) / 6;
+        vars->x448 = (ref_L07_003F8908_08 * 5 + 2) / 6;
+        vars->x438 = ref_L07_003F8908_01(3, 5);
         break;
     case 6:
-        temp_s0->x444 = (ref_L07_003F8908_04 * 5 + 2) / 6;
-        temp_s0->x448 = (ref_L07_003F8908_07 * 5 + 2) / 6;
-        temp_s0->x438 = ref_L07_003F8908_01(2, 3);
+        vars->x444 = (ref_L07_003F8908_04 * 5 + 2) / 6;
+        vars->x448 = (ref_L07_003F8908_07 * 5 + 2) / 6;
+        vars->x438 = ref_L07_003F8908_01(2, 3);
         break;
     case 8:
-        temp_s0->x438 = 1;
-        temp_s0->x41C = ref_L07_003F8908_03(temp_s0->x180);
+        vars->x438 = 1;
+        vars->x41C = ref_L07_003F8908_03(vars->x180);
         break;
     case 9:
-        temp_s0->x444 = (ref_L07_003F8908_06 * 5 + 2) / 6;
-        temp_s0->x448 = (ref_L07_003F8908_09 * 5 + 2) / 6;
-        temp_s0->x438 = ref_L07_003F8908_01(1, 3);
+        vars->x444 = (ref_L07_003F8908_06 * 5 + 2) / 6;
+        vars->x448 = (ref_L07_003F8908_09 * 5 + 2) / 6;
+        vars->x438 = ref_L07_003F8908_01(1, 3);
         break;
     }
-    return var_s1;
+    return action;
 }

@@ -49,7 +49,7 @@ typedef struct ActionView {
     unsigned char gap1234[0x6];
     unsigned char actionLock;
     unsigned char gap123B[0x5];
-    int actionAge;
+    int action_age;
     int actionMode;
     int request;
     unsigned char gap124C[0x24E];
@@ -94,8 +94,8 @@ typedef struct ActionTableEntry {
 extern ActionTableEntry g_action_table[];
 extern unsigned int PadPressedWithin(unsigned int, int, int *);
 extern int moby_is_class_71(unsigned char *);
-extern void func_PAL_L00_002BA480(void);
-extern int func_PAL_L01_002BEC60(long, int);
+extern void hero_setup_attached_object_transform_pal(void);
+extern int SetHeroMoveState_pal(long, int);
 extern int get_ammo(int);
 extern int snd_play_from_class_bank(int, int, char *, int);
 extern int PlayMobySound(int, int, char *);
@@ -105,7 +105,7 @@ extern float mat_fast_helper_a(float, float);
 extern float fast_subtract_rotations(float, float);
 extern int FloatToInt(float);
 extern int math_fast_float_d(int *);
-extern void func_PAL_L00_002AF458(void);
+extern void start_equipped_item_animation_pal(void);
 
 /* Field views retain the measured resident layout without asserting its extent. */
 
@@ -115,13 +115,13 @@ extern void func_PAL_L00_002AF458(void);
 int ProcessHeroItemActionInput_pal(void)
 {
     int request;
-    int previousTimer;
+    int previous_timer;
     unsigned int mask;
     struct {
         Quadword position;
-        int attackBuffered;
-        int actionBuffered;
-        int wrenchBuffered;
+        int attack_buffered;
+        int action_buffered;
+        int wrench_buffered;
     } scratch;
     char *object;
     char *timing;
@@ -135,13 +135,13 @@ int ProcessHeroItemActionInput_pal(void)
     if (g_hero_state.actionMode != 2) return 0;
     request = g_hero_state.request;
     mask = g_hero_state.actionMask;
-    previousTimer = g_hero_state.transitionTimer;
+    previous_timer = g_hero_state.transitionTimer;
 
     switch (request) {
     case 10:
         if (g_hero_state.attackDisabled) break;
         if (g_hero_state.motion < 2 || (g_hero_state.motion == 4 && g_hero_state.canAttack)) {
-            if (PadPressedWithin(mask, 8, &scratch.attackBuffered)) {
+            if (PadPressedWithin(mask, 8, &scratch.attack_buffered)) {
                 object = g_hero_state.actionObject;
                 if (!object) goto clearPending;
                 if (!moby_is_class_71((unsigned char *)object) || *(unsigned char *)(object + 0x20))
@@ -149,12 +149,12 @@ int ProcessHeroItemActionInput_pal(void)
                 if ((g_pad_state.buttons.word.buffered & 8) ||
                     ((g_hero_state.action == 1 || g_hero_state.action == 0x1D) && g_hero_state.transitionTimer > 17)) {
                     if ((g_hero_state.action == 1 || g_hero_state.action == 0x1D) && g_hero_state.transitionTimer > 17) {
-                        func_PAL_L00_002BA480();
+                        hero_setup_attached_object_transform_pal();
                         goto clearPending;
                     }
-                    func_PAL_L01_002BEC60(0x15, 1);
+                    SetHeroMoveState_pal(0x15, 1);
                 } else {
-                    func_PAL_L01_002BEC60(0x13, 1);
+                    SetHeroMoveState_pal(0x13, 1);
                 }
             }
         } else {
@@ -164,16 +164,16 @@ int ProcessHeroItemActionInput_pal(void)
                 (g_hero_state.action == 0xB && g_hero_state.airStyle == 3 && g_hero_state.animationFrame > 20.0f) ||
                 g_hero_state.action == 0x2C || g_hero_state.action == 0x11) {
                 if (g_hero_state.transitionTimer > 8) {
-                    int airWindow = 0xC;
-                    if (g_hero_state.action == 0xB || g_hero_state.action == 0xE) airWindow = 0xF;
-                    if (!PadPressedWithin(mask, airWindow, 0)) goto clearPending;
+                    int air_window = 0xC;
+                    if (g_hero_state.action == 0xB || g_hero_state.action == 0xE) air_window = 0xF;
+                    if (!PadPressedWithin(mask, air_window, 0)) goto clearPending;
                     if ((!g_hero_state.highAttack && g_hero_state.height > 0.1f) ||
                         (g_hero_state.highAttack && g_hero_state.height > 0.57f) ||
                         (g_hero_state.action == 8 && g_hero_state.height > 0.57f)) {
                         if (!g_hero_state.attackBlock && !g_hero_state.pendingAttack)
-                            func_PAL_L01_002BEC60(0x14, 1);
+                            SetHeroMoveState_pal(0x14, 1);
                     } else {
-                        func_PAL_L01_002BEC60(0x13, 1);
+                        SetHeroMoveState_pal(0x13, 1);
                     }
                     goto clearPending;
                 }
@@ -185,7 +185,7 @@ int ProcessHeroItemActionInput_pal(void)
                     if (g_hero_state.animationLock) goto clearPending;
                     if ((float)*(int *)(timing + 0x10) <= g_hero_state.animationFrame &&
                         (g_pad_state.buttons.word.buffered & 8) && PadPressedWithin(mask, 12, 0)) {
-                        func_PAL_L01_002BEC60(0x15, 1);
+                        SetHeroMoveState_pal(0x15, 1);
                         goto complete;
                     }
                 }
@@ -198,9 +198,9 @@ checkAnimationLock:
                             window = window > 0 ? window : 1;
                             if (PadPressedWithin(mask, window < 13 ? window : 12, 0)) {
                                 if (g_pad_state.buttons.word.buffered & 8)
-                                    func_PAL_L01_002BEC60(0x15, 1);
+                                    SetHeroMoveState_pal(0x15, 1);
                                 else
-                                    func_PAL_L01_002BEC60(0x13, 1);
+                                    SetHeroMoveState_pal(0x13, 1);
                                 goto clearPending;
                             }
                         }
@@ -217,9 +217,9 @@ clearPending:
         if (g_hero_state.action == 1 || g_hero_state.action == 0x1D ||
             (g_hero_state.motion > 1 && g_hero_state.motion != 12 && (g_hero_state.motion != 4 || !g_hero_state.canAttack)) ||
             (g_hero_state.queuedAction && g_hero_state.queuedAction != 22 && g_hero_state.queuedAction != 65)) break;
-        if (!(g_pad_state.buttons.word.buffered & 0x20) || g_hero_state.actionAge < 19) break;
+        if (!(g_pad_state.buttons.word.buffered & 0x20) || g_hero_state.action_age < 19) break;
         if (get_ammo(request)) {
-            func_PAL_L01_002BEC60(0x83, 1);
+            SetHeroMoveState_pal(0x83, 1);
             goto complete;
         }
         if (g_pad_state.buttons.word.pressed & 0x20)
@@ -243,9 +243,9 @@ clearPending:
                 if (CollLine(&scratch.position, g_hero_state.origin, 2, target, 0)) {
                     g_hero_state.target = 0;
                 } else {
-                    char *aimTarget = g_hero_state.target;
-                    angle = mat_fast_helper_a(g_hero_state.position[0] - *(float *)(aimTarget + 0x10),
-                                          g_hero_state.position[1] - *(float *)(aimTarget + 0x14));
+                    char *aim_target = g_hero_state.target;
+                    angle = mat_fast_helper_a(g_hero_state.position[0] - *(float *)(aim_target + 0x10),
+                                          g_hero_state.position[1] - *(float *)(aim_target + 0x14));
                     g_hero_state.targetAngle = fast_subtract_rotations(*(float *)(g_hero_state.target + 0xF8), angle);
                 }
             }
@@ -254,23 +254,23 @@ clearPending:
     }
 
     case 12: case 15: case 17: case 31: {
-        int actionAge;
-        int actionWindow;
+        int action_age;
+        int action_window;
         if (((g_hero_state.motion != 0 || g_hero_state.action == 0x1D) && g_hero_state.motion != 1 && g_hero_state.motion != 12 &&
              g_hero_state.motion != 5 && g_hero_state.motion != 15 && (g_hero_state.motion != 4 || !g_hero_state.allowAction) &&
              (g_hero_state.action != 0x22 || !(g_hero_state.animationFrame > 55.0f))) || g_hero_state.busy) break;
-        actionAge = g_hero_state.actionAge;
-        actionWindow = actionAge;
-        if (actionAge >= 6) actionWindow = 6;
-        if (!PadPressedWithin(mask, actionWindow, &scratch.actionBuffered) && !(g_pad_state.buttons.word.buffered & 0x20)) break;
-        if (actionAge < 19) break;
+        action_age = g_hero_state.action_age;
+        action_window = action_age;
+        if (action_age >= 6) action_window = 6;
+        if (!PadPressedWithin(mask, action_window, &scratch.action_buffered) && !(g_pad_state.buttons.word.buffered & 0x20)) break;
+        if (action_age < 19) break;
         if (get_ammo(-1)) {
             if (g_hero_state.motion == 12 || g_hero_state.motion == 0 || g_hero_state.action == 3 ||
                 (g_hero_state.motion == 1 && g_hero_state.blend < 0.7f)) {
-                func_PAL_L01_002BEC60(0x22, 1);
+                SetHeroMoveState_pal(0x22, 1);
                 goto complete;
             }
-            func_PAL_L00_002AF458();
+            start_equipped_item_animation_pal();
         } else if (g_hero_state.actionObject && (g_pad_state.buttons.word.pressed & 0x20)) {
             PlayMobySound(0, 0, g_hero_state.actionObject);
         }
@@ -278,15 +278,15 @@ clearPending:
     }
 
     case 53: {
-        int wrenchAge;
-        int wrenchWindow;
+        int wrench_age;
+        int wrench_window;
         if (g_hero_state.motion > 1 && (g_hero_state.motion != 4 || !g_hero_state.canAttack)) break;
         if (g_hero_state.action != 1) {
-            wrenchAge = g_hero_state.actionAge;
-            wrenchWindow = 8;
-            if (wrenchAge < 8) wrenchWindow = wrenchAge;
-            if (PadPressedWithin(mask, wrenchWindow, &scratch.wrenchBuffered) && g_hero_state.actionObject) {
-                func_PAL_L01_002BEC60(31, 1);
+            wrench_age = g_hero_state.action_age;
+            wrench_window = 8;
+            if (wrench_age < 8) wrench_window = wrench_age;
+            if (PadPressedWithin(mask, wrench_window, &scratch.wrench_buffered) && g_hero_state.actionObject) {
+                SetHeroMoveState_pal(31, 1);
                 if (g_hero_state.actionObject) PlayMobySound(0, 0, g_hero_state.actionObject);
             }
         }
@@ -295,7 +295,7 @@ clearPending:
     }
 
 complete:
-    if (g_hero_state.transitionTimer == previousTimer) {
+    if (g_hero_state.transitionTimer == previous_timer) {
         if (g_action_flag && g_menu_choice_table[1] == 0x36 &&
             g_hero_state.action != 0x1D && g_hero_state.action != 1 &&
             !(g_hero_state.flags & 0xFFFFFFFF00000000UL)) {
@@ -303,9 +303,9 @@ complete:
             if (g_hero_action_timer &&
                 (g_hero_state.motion < 2 || g_hero_state.motion == 12 || ((g_hero_state.motion == 2 || g_hero_state.motion == 4) && g_hero_state.platformMode)) &&
                 (g_pad_state.buttons.both & 0x800000008UL) == 0x800000008UL)
-                func_PAL_L01_002BEC60(0x7B, 1);
+                SetHeroMoveState_pal(0x7B, 1);
             if (g_pad_state.buttons.word.pressed & 8) g_hero_action_timer = 25;
         }
     }
-    return g_hero_state.transitionTimer < previousTimer;
+    return g_hero_state.transitionTimer < previous_timer;
 }

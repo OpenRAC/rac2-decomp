@@ -32,10 +32,10 @@ extern s32 g_gorn_challenge_count;
 extern u8 *g_scene_object_base;
 
 /* Applies both material passes to matching objects once, then advances the stage. */
-void func_US2_L15_00432858(u8 *arg0) {
-    s32 n;
+void gorn_stage_materials_apply_us2(u8 *moby) {
+    s32 remaining;
     s32 count;
-    u8 **p;
+    u8 **objects;
 
     if (g_cutscene_l15_started_flag == 0) {
         g_gorn_challenge_vars.timer = 0;
@@ -43,19 +43,19 @@ void func_US2_L15_00432858(u8 *arg0) {
         music_Unpause();
         entry_init_all_registered();
         hero_set_state_value_a(0);
-        p = level_get_object_list();
+        objects = level_get_object_list();
         count = level_get_saved_value();
         if (count > 0) {
-            n = count;
+            remaining = count;
             do {
-                if (*(s16 *)(*p + 0xAA) == 0xF93) {
-                    entry_spawn_list_objects_with_flag(*p, 1);
-                    func_L05_0037CEE0(*p, (u8 *)g_scene_object_base + (g_gorn_challenge_vars.initial << 7) + 0x30, 64.0f);
-                    func_L05_0037D608(*p, (u8 *)g_scene_object_base + (g_gorn_challenge_vars.initial << 7) + 0x30, 64.0f);
+                if (*(s16 *)(*objects + 0xAA) == 0xF93) {
+                    entry_spawn_list_objects_with_flag(*objects, 1);
+                    func_L05_0037CEE0(*objects, (u8 *)g_scene_object_base + (g_gorn_challenge_vars.initial << 7) + 0x30, 64.0f);
+                    func_L05_0037D608(*objects, (u8 *)g_scene_object_base + (g_gorn_challenge_vars.initial << 7) + 0x30, 64.0f);
                 }
-                n--;
-                p++;
-            } while (n);
+                remaining--;
+                objects++;
+            } while (remaining);
         }
         if (g_gorn_path_first_node != 0 && *(unsigned short *)(g_gorn_path_first_node + 0x34) != 0) {
             moby_mark_spawned(g_gorn_path_first_node);
@@ -67,5 +67,5 @@ void func_US2_L15_00432858(u8 *arg0) {
         }
     }
     if (g_gorn_challenge_vars.active == 0 && g_gorn_challenge_count >= 6)
-        gorn_finish_challenge_stage(arg0, 1);
+        gorn_finish_challenge_stage(moby, 1);
 }

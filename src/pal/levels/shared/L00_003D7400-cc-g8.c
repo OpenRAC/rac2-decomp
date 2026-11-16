@@ -18,7 +18,7 @@ extern float math_random_float_range(float, float), math_random_signed_float_ran
 extern int FloatToInt(float);
 extern void FastVecScale(void *, void *, float), math_apply_axis_rotation_to_quat(void *, void *, void *, float);
 extern void FastVecAdd(void *, void *, void *), FastVecSub(void *, void *, void *);
-void func_PAL_L00_003D7400(char *object)
+void lightning_update_arcs_pal(char *object)
 {
     ArcVector local, direction, position, eye, delta[5];
     char *data = *(char **)(object + 0x68);

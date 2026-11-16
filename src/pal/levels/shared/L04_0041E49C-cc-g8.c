@@ -60,7 +60,7 @@ extern Quad g_collision_quad;
 extern float g_projection_scale_float NOT_SDA;
 extern void hero_record_play_counters_pal(void);
 extern void hero_reset_position_and_direction_pal(void *, void *, int, int);
-extern int func_PAL_L04_002E7DA8(int, int);
+extern int hero_l04_enter_state_pal(int, int);
 extern void cam_set_transition_frames(float);
 extern int coll_test_point(void *, int, void *, float);
 extern void UpdateViewContext(void);
@@ -74,7 +74,7 @@ extern void set_identity_rotation_rows(void *);
 extern float IntToFloat(int);
 extern int FloatToInt(float);
 extern void help_unlock_entry(int);
-extern int func_PAL_00289730(int, int);
+extern int subtitle_request_voice_line_pal(int, int);
 extern void load_scene_chunk_pal(int, int);
 extern void level_store_value_pair_pal(int, void *);
 extern void moby_mark_spawned(void *);
@@ -117,8 +117,8 @@ extern int race_update_player_progress_pal(void *, void *);
 extern void math_step_angle_offset(void *, void *, float, float);
 extern void trail_clear_by_owner(void *);
 extern s32 hud_draw_race_ruler(void);
-extern void func_PAL_L04_0041D5F0(void *, void *);
-extern void func_PAL_L04_0041D788(void *, void *);
+extern void hoverbike_update_rider_entry_state_pal(void *, void *);
+extern void hoverbike_update_rail_grind_trick_pal(void *, void *);
 extern void hoverbike_init_race_course(void *);
 extern void barlow_init_animation_paths(void);
 extern void race_set_state_flags_a(void);
@@ -145,7 +145,7 @@ typedef struct { u8 b[0x80]; } NodeRec;
 
 /* The hoverbike race controller of Barlow and Joba: spawns the bikes and the course, waits for
    the hero to mount, runs the countdown, the race and the finish, and puts everything back. */
-void func_PAL_L04_0041E49C(u8 *self)
+void update_hoverbike_race_pal(u8 *self)
 {
     Vector a;
     Vector b;
@@ -307,7 +307,7 @@ void func_PAL_L04_0041E49C(u8 *self)
             I(s, 0x330) = -1;
         }
         if (g_current_map_index == 0xCE) {
-            func_PAL_L04_002E7DA8(0x86, 1);
+            hero_l04_enter_state_pal(0x86, 1);
         } else {
             if (I(s, 0x198) != -1) {
                 if (I(s, 0x19C) != -1) {
@@ -320,7 +320,7 @@ void func_PAL_L04_0041E49C(u8 *self)
                 Q(self, 0xd) = Q(NODE(I(s, 0x198)), 0x30);
                 Q(self, 0xF0) = Q(NODE(I(s, 0x198)), 0x70);
             }
-            func_PAL_L04_002E7DA8(0x31, 1);
+            hero_l04_enter_state_pal(0x31, 1);
             load_scene_chunk_pal(1, I(s, 0x488));
             I(s, 0x58) |= 1;
             I(s, 0x340) = 0;
@@ -405,7 +405,7 @@ void func_PAL_L04_0041E49C(u8 *self)
             level_store_value_pair_pal(0, race_draw_results_panel);
             return;
         case 1:
-            func_PAL_L04_0041D5F0(self, s);
+            hoverbike_update_rider_entry_state_pal(self, s);
             if (*(u8 *)&g_pad_held_flags != 0) {
                 snd_play_from_global_bank(4, 0, 0);
                 self[0xBC] = 3;
@@ -453,7 +453,7 @@ void func_PAL_L04_0041E49C(u8 *self)
             part_refresh_active_records(self);
             self[0xBC] = 4;
         case 4:
-            func_PAL_L04_0041D5F0(self, s);
+            hoverbike_update_rider_entry_state_pal(self, s);
             if (I(s, 0x394) < 100 && g_race_warning_stage == 0) {
                 PlayMobySound(0xD, 0, self);
                 g_race_warning_stage++;
@@ -480,15 +480,15 @@ void func_PAL_L04_0041E49C(u8 *self)
             }
             return;
         case 5:
-            func_PAL_L04_0041D5F0(self, s);
+            hoverbike_update_rider_entry_state_pal(self, s);
             if (g_race_state_flag_d != 0) {
-                func_PAL_00289730(0xA26, 0x7D);
+                subtitle_request_voice_line_pal(0xA26, 0x7D);
                 g_race_state_flag_d = 0;
             }
             if (race_update_player_progress_pal(self, s) != 0) {
                 return;
             }
-            func_PAL_L04_0041D788(self, s);
+            hoverbike_update_rail_grind_trick_pal(self, s);
             gfx_add_draw_callback_third(racer_draw_glow_effects, self);
             if (F(self, 0x18) < F(s, 0x26C) || racer_is_in_jump_window(I(s, 0x314), I(s, 0x318), F(self, 0x18)) != 0) {
                 racer_release_sound_handles(self, s);
@@ -590,7 +590,7 @@ void func_PAL_L04_0041E49C(u8 *self)
         return;
     case 3:
         g_race_state_flags = 1;
-        func_PAL_L04_0041D5F0(self, s);
+        hoverbike_update_rider_entry_state_pal(self, s);
         g_race_extra_ticks++;
         if (F(self, 0x18) < F(s, 0x26C) || racer_is_in_jump_window(I(s, 0x314), I(s, 0x318), F(self, 0x18)) != 0) {
             float ahead, along;

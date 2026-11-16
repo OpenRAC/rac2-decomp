@@ -29,38 +29,38 @@ extern unsigned int math_ping_pong_blend_values(unsigned int, unsigned int, int,
 extern void object_set_value_float(void *, float);
 
 /* Updates the eight item rows, their colors and the current menu selection. */
-int func_US2_00340AA8(char *self, int buttons)
+int radial_menu_update_us2(char *self, int buttons)
 {
-    Pair a, b, c, d, e, f, g, h, j, k;
-    MenuColor firstColor, secondColor, textColor;
+    Pair pos_0, pos_e4, pos_130, pos_4c, pos_828, pos_930, pos_8d8, pos_988, pos_9e0, cursor_pos;
+    MenuColor first_color, second_color, text_color;
     int i;
     char *child;
-    memset(&a,0,8);
-    memset(&b,0,8);
-    memset(&c,0,8);
-    memset(&d,0,8);
-    e = g_radial_menu_pos_first[0];
-    f = g_radial_menu_pos_second[0];
-    g = g_radial_menu_pos_third[0];
-    h = g_radial_menu_pos_fourth[0];
-    j = g_radial_menu_pos_fifth[0];
-    object_set_first_float4(self + 0x0, a.x + (*(Pair **)(self+0x80C))->x, a.y + (*(Pair **)(self+0x80C))->y, 0.0f, 0.0f);
-    object_set_first_float4(self + 0x4C, d.x + (*(Pair **)(self+0x80C))->x, d.y + (*(Pair **)(self+0x80C))->y, 0.0f, 0.0f);
-    object_set_first_float4(self + 0xE4, b.x + (*(Pair **)(self+0x80C))->x, b.y + (*(Pair **)(self+0x80C))->y, 0.0f, 0.0f);
-    object_set_first_float4(self + 0x130, c.x + (*(Pair **)(self+0x80C))->x, c.y + (*(Pair **)(self+0x80C))->y, 0.0f, 0.0f);
-    object_set_first_float4(self + 0x828, e.x + (*(Pair **)(self+0x80C))->x, e.y + (*(Pair **)(self+0x80C))->y, 0.0f, 0.0f);
-    object_set_first_float4(self + 0x8D8, g.x + (*(Pair **)(self+0x80C))->x, g.y + (*(Pair **)(self+0x80C))->y, 0.0f, 0.0f);
-    object_set_first_float4(self + 0x930, f.x + (*(Pair **)(self+0x80C))->x, f.y + (*(Pair **)(self+0x80C))->y, 0.0f, 0.0f);
-    object_set_first_float4(self + 0x988, h.x + (*(Pair **)(self+0x80C))->x, h.y + (*(Pair **)(self+0x80C))->y, 0.0f, 0.0f);
-    object_set_first_float4(self + 0x9E0, j.x + (*(Pair **)(self+0x80C))->x, j.y + (*(Pair **)(self+0x80C))->y, 0.0f, 0.0f);
-    k=g_radial_menu_cursor_pos[0];
-    object_set_first_float4(self + 0x2A8, k.x + (*(Pair **)(self+0x80C))->x, k.y + (*(Pair **)(self+0x80C))->y, 0.0f, 0.0f);
-    object_set_first_float4(self + 0x2F4, k.x + (*(Pair **)(self+0x80C))->x, k.y + (*(Pair **)(self+0x80C))->y, 0.0f, 0.0f);
-    object_set_first_float4(self + 0x5A0, k.x + (*(Pair **)(self+0x80C))->x, k.y + (*(Pair **)(self+0x80C))->y, 0.0f, 0.0f);
+    memset(&pos_0,0,8);
+    memset(&pos_e4,0,8);
+    memset(&pos_130,0,8);
+    memset(&pos_4c,0,8);
+    pos_828 = g_radial_menu_pos_first[0];
+    pos_930 = g_radial_menu_pos_second[0];
+    pos_8d8 = g_radial_menu_pos_third[0];
+    pos_988 = g_radial_menu_pos_fourth[0];
+    pos_9e0 = g_radial_menu_pos_fifth[0];
+    object_set_first_float4(self + 0x0, pos_0.x + (*(Pair **)(self+0x80C))->x, pos_0.y + (*(Pair **)(self+0x80C))->y, 0.0f, 0.0f);
+    object_set_first_float4(self + 0x4C, pos_4c.x + (*(Pair **)(self+0x80C))->x, pos_4c.y + (*(Pair **)(self+0x80C))->y, 0.0f, 0.0f);
+    object_set_first_float4(self + 0xE4, pos_e4.x + (*(Pair **)(self+0x80C))->x, pos_e4.y + (*(Pair **)(self+0x80C))->y, 0.0f, 0.0f);
+    object_set_first_float4(self + 0x130, pos_130.x + (*(Pair **)(self+0x80C))->x, pos_130.y + (*(Pair **)(self+0x80C))->y, 0.0f, 0.0f);
+    object_set_first_float4(self + 0x828, pos_828.x + (*(Pair **)(self+0x80C))->x, pos_828.y + (*(Pair **)(self+0x80C))->y, 0.0f, 0.0f);
+    object_set_first_float4(self + 0x8D8, pos_8d8.x + (*(Pair **)(self+0x80C))->x, pos_8d8.y + (*(Pair **)(self+0x80C))->y, 0.0f, 0.0f);
+    object_set_first_float4(self + 0x930, pos_930.x + (*(Pair **)(self+0x80C))->x, pos_930.y + (*(Pair **)(self+0x80C))->y, 0.0f, 0.0f);
+    object_set_first_float4(self + 0x988, pos_988.x + (*(Pair **)(self+0x80C))->x, pos_988.y + (*(Pair **)(self+0x80C))->y, 0.0f, 0.0f);
+    object_set_first_float4(self + 0x9E0, pos_9e0.x + (*(Pair **)(self+0x80C))->x, pos_9e0.y + (*(Pair **)(self+0x80C))->y, 0.0f, 0.0f);
+    cursor_pos=g_radial_menu_cursor_pos[0];
+    object_set_first_float4(self + 0x2A8, cursor_pos.x + (*(Pair **)(self+0x80C))->x, cursor_pos.y + (*(Pair **)(self+0x80C))->y, 0.0f, 0.0f);
+    object_set_first_float4(self + 0x2F4, cursor_pos.x + (*(Pair **)(self+0x80C))->x, cursor_pos.y + (*(Pair **)(self+0x80C))->y, 0.0f, 0.0f);
+    object_set_first_float4(self + 0x5A0, cursor_pos.x + (*(Pair **)(self+0x80C))->x, cursor_pos.y + (*(Pair **)(self+0x80C))->y, 0.0f, 0.0f);
     if (g_radial_menu_pages) {
-        int resourceOffset;
+        int resource_offset;
         i=0;
-        resourceOffset = 0x36F28;
+        resource_offset = 0x36F28;
         for (child = self + 0x5EC; i < 8; child += 0x3C, i++) {
             char *bar, *row;
             if (!g_radial_menu_pages->items[i].value) object_set_flag_value(child,0);
@@ -68,19 +68,19 @@ int func_US2_00340AA8(char *self, int buttons)
                 object_set_flag_value(child,1);
                 hud_set_widget_value_pair(child,g_radial_menu_pages->items[i].value,0);
             }
-            bar=menu_return_object_unchanged(g_resident_data_base+resourceOffset)+i*0x48;
+            bar=menu_return_object_unchanged(g_resident_data_base+resource_offset)+i*0x48;
             object_set_flag_value(bar,0);
-            firstColor.value = 0;
-            secondColor.value = 0;
-            textColor.value = 0;
-            shop_choose_item_colors(g_radial_menu_pages->items[i].id,&firstColor.value,&secondColor.value,&textColor.value);
+            first_color.value = 0;
+            second_color.value = 0;
+            text_color.value = 0;
+            shop_choose_item_colors(g_radial_menu_pages->items[i].id,&first_color.value,&second_color.value,&text_color.value);
             {
                 int *primary = object_get_fourth_field(child);
-                *primary = (*primary & 0xFF000000) | (textColor.value & 0xFFFFFF);
+                *primary = (*primary & 0xFF000000) | (text_color.value & 0xFFFFFF);
             }
-            bar=menu_return_object_unchanged(g_resident_data_base+resourceOffset)+i*0x48;
+            bar=menu_return_object_unchanged(g_resident_data_base+resource_offset)+i*0x48;
             object_set_flag_value(bar,1);
-            object_set_first_pair(bar,firstColor.value,secondColor.value);
+            object_set_first_pair(bar,first_color.value,second_color.value);
             func_US2_00337A38(bar,100);
             meter_set_value(bar,100);
             row=g_weapon_table+g_item_slot_to_record[g_radial_menu_pages->items[i].id]*224;
@@ -90,7 +90,7 @@ int func_US2_00340AA8(char *self, int buttons)
                     func_US2_00337A38(bar,*(int *)(row+0x6C));
                     {
                         int *secondary = object_get_fourth_field(child);
-                        *secondary = (*secondary & 0xFF000000) | (textColor.value & 0xFFFFFF);
+                        *secondary = (*secondary & 0xFF000000) | (text_color.value & 0xFFFFFF);
                     }
                     if (*(int *)(g_weapon_table+g_item_slot_to_record[g_radial_menu_pages->items[i].id]*224+0x6C)>0)
                         meter_set_value(bar,g_help_entry_state[g_radial_menu_pages->items[i].id]>>5);
@@ -99,16 +99,16 @@ int func_US2_00340AA8(char *self, int buttons)
         }
     }
     if (buttons&4) {
-        int v,lower;
+        int selection,lower;
         snd_play_from_global_bank(3,0,0);
         lower=-1;
-        v=*(int *)(self+0x7CC)-1;
-        *(int *)(self+0x7CC)=v>lower?v:7;
+        selection=*(int *)(self+0x7CC)-1;
+        *(int *)(self+0x7CC)=selection>lower?selection:7;
     } else if (buttons&8) {
-        int v;
+        int selection;
         snd_play_from_global_bank(3,0,0);
-        v=*(int *)(self+0x7CC)+1;
-        *(int *)(self+0x7CC)=v>7?0:v;
+        selection=*(int *)(self+0x7CC)+1;
+        *(int *)(self+0x7CC)=selection>7?0:selection;
     } else {
         switch (*(int *)(self+0x81C)) {
         case 0: radial_menu_move_grid_selection(self,buttons); break;
@@ -117,8 +117,8 @@ int func_US2_00340AA8(char *self, int buttons)
     }
     if (g_pad_state.buttons&12) math_ping_pong_blend_values(0,0,1,0,1);
     {
-        int *p=object_get_fourth_field(self+0x5A0);
-        *p=math_ping_pong_blend_values(0x60442D00,0x70FFFEED,20,0,0);
+        int *color=object_get_fourth_field(self+0x5A0);
+        *color=math_ping_pong_blend_values(0x60442D00,0x70FFFEED,20,0,0);
     }
     object_set_value_float(self+0x5A0,(float)*(int *)(self+0x7CC));
     return 0;

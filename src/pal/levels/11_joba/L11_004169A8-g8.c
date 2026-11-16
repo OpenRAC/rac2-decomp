@@ -52,7 +52,7 @@ extern f32 vec_length_xy(void *);
 extern void divide_vector_xyz(void *, void *, f32);
 extern void snd_stop_voice(s32);
 extern void moby_update_eased_node(void *, void *, s32, f32, f32);
-extern s32 func_PAL_002AF6C0(void *, f32);
+extern s32 math_is_value_within_step_pal(void *, f32);
 extern void vec_build_spherical_offset(void *, f32, f32, f32);
 extern char *robot_spawn_debris(void *, void *, void *, s32, f32);
 extern f32 math_random_float_range(f32, f32);
@@ -73,20 +73,23 @@ typedef struct {
  u8 pad6C[0x50]; u8 command; u8 padBD[3]; u8 matrix[0x30]; f32 rot[4];
 } TurretMoby;
 
-void func_PAL_L11_004169A8(TurretMoby *moby) {
+/* Updates a turret the hero can climb into. While mounted it follows the hero's stick to turn
+   and tilt the gun, fires shots with a beam, and lets the hero climb out again (PAL: 50 Hz
+   timings). */
+void turret_update_pal(TurretMoby *moby) {
     TurretVec seat;
     TurretVec offset;
-    TurretVec tmp;
+    TurretVec work;
     TurretVec shot;
     TurretVec muzzle;
     TurretVec dir;
     TurretVec rnd;
     TurretVars *vars;
     TurretBeam *beam;
-    float len;
+    float stick_length;
     float stick_y;
     float yaw;
-    int n;
+    int frame;
     int i;
     int invert;
 
@@ -159,22 +162,22 @@ void func_PAL_L11_004169A8(TurretMoby *moby) {
                 vars->yaw_speed = yaw;
                 moby->rot[2] = FastAddRotations(moby->rot[2], yaw);
             } else vars->yaw_speed = 0.0f;
-            matrix_mul_vec3(&tmp, &g_l11_turret_muzzle_offset, moby->matrix);
-            FastVecAdd(&tmp, &tmp, &seat);
+            matrix_mul_vec3(&work, &g_l11_turret_muzzle_offset, moby->matrix);
+            FastVecAdd(&work, &work, &seat);
             if (vars->beam == -1) {
                 vars->beam_frames = 0;
-                vars->beam = part_l00_alloc_effect_slot_2(&tmp, 0.4f, 0.0f, 4.0f, 4.0f, 4.0f);
+                vars->beam = part_l00_alloc_effect_slot_2(&work, 0.4f, 0.0f, 4.0f, 4.0f, 4.0f);
                 PlayMobySound(2, 0, moby);
             } else {
                 beam = &g_turret_beam_table[vars->beam];
-                beam->pos[0] = tmp.f[0];
-                beam->pos[1] = tmp.f[1];
-                beam->pos[2] = tmp.f[2];
-                n = ++vars->beam_frames;
-                if (n > 40 || !(n & 4)) {
+                beam->pos[0] = work.f[0];
+                beam->pos[1] = work.f[1];
+                beam->pos[2] = work.f[2];
+                frame = ++vars->beam_frames;
+                if (frame > 40 || !(frame & 4)) {
                     beam->size = 4.0f;
                     beam->alpha = 0.4f;
-                } else if (n >= 25 && (n & 0xA) == 0xA) {
+                } else if (frame >= 25 && (frame & 0xA) == 0xA) {
                     beam->size = 4.0f;
                     beam->alpha = 0.4f;
                 } else {
@@ -201,17 +204,17 @@ void func_PAL_L11_004169A8(TurretMoby *moby) {
         } else {
             moby->pos[2] = vars->rest_z;
         }
-        tmp.f[0] = g_hero_state.stick_x;
+        work.f[0] = g_hero_state.stick_x;
         invert = -1;
         if (g_hero_invert_flags[0]) invert = 1;
         stick_y = -g_hero_state.stick_y * invert;
-        tmp.f[1] = stick_y;
-        len = vec_length_xy(&tmp);
-        if (len > 1.0f) {
-            divide_vector_xyz(&tmp, &tmp, len);
+        work.f[1] = stick_y;
+        stick_length = vec_length_xy(&work);
+        if (stick_length > 1.0f) {
+            divide_vector_xyz(&work, &work, stick_length);
         }
-        vars->yaw_speed += -tmp.f[0] * 0.0012566373f;
-        if (tmp.f[0] == 0.0f) vars->yaw_speed = 0.0f;
+        vars->yaw_speed += -work.f[0] * 0.0012566373f;
+        if (work.f[0] == 0.0f) vars->yaw_speed = 0.0f;
         if (vars->yaw_speed != 0.0f) {
             u8 *slot = (u8 *)&g_sound_state + vars->sound * 0x70;
             if (*(u8 **)(slot + 0x88) != moby || !slot[0x74])
@@ -224,8 +227,8 @@ void func_PAL_L11_004169A8(TurretMoby *moby) {
             }
             vars->sound = -1;
         }
-        vars->pitch_speed += -tmp.f[1] * 0.00045378567f;
-        if (tmp.f[1] == 0.0f) vars->pitch_speed = 0.0f;
+        vars->pitch_speed += -work.f[1] * 0.00045378567f;
+        if (work.f[1] == 0.0f) vars->pitch_speed = 0.0f;
         moby->rot[2] = FastAddRotations(moby->rot[2], vars->yaw_speed);
         vars->pitch = FastAddRotations(vars->pitch, vars->pitch_speed);
         if (vars->pitch < -0.52359885f) {
@@ -243,7 +246,7 @@ void func_PAL_L11_004169A8(TurretMoby *moby) {
             if (g_pad_state.pressed & 0x20) {
                 anim_start_blended(moby, vars->barrel == 0 ? 3 : 2, 0, 1);
             } else if (moby->seq == 2) {
-                if (func_PAL_002AF6C0(moby, 1.1666667f)) {
+                if (math_is_value_within_step_pal(moby, 1.1666667f)) {
                     vec_build_spherical_offset(&shot, 1.2f, moby->rot[2], vars->pitch);
                     moby_transform_joint_to_world(moby, 0, &muzzle);
                     robot_spawn_debris(moby, &shot, &muzzle, 0, 6.0f);
@@ -271,7 +274,7 @@ void func_PAL_L11_004169A8(TurretMoby *moby) {
                     anim_start_blended(moby, 3, 0, 1);
                 }
             } else if (moby->seq == 3) {
-                if (func_PAL_002AF6C0(moby, 1.1666667f)) {
+                if (math_is_value_within_step_pal(moby, 1.1666667f)) {
                     vec_build_spherical_offset(&shot, 1.2f, moby->rot[2], vars->pitch);
                     moby_transform_joint_to_world(moby, 1, &muzzle);
                     robot_spawn_debris(moby, &shot, &muzzle, 0, 6.0f);
@@ -306,10 +309,10 @@ void func_PAL_L11_004169A8(TurretMoby *moby) {
             func_002A0F48(moby);
             moby->flags |= 4;
             overlay_set_shared_flag();
-            moby_transform_joint_to_world(moby, 2, &tmp);
+            moby_transform_joint_to_world(moby, 2, &work);
             vec_build_spherical_offset(&shot, g_l11_turret_shot_radius, moby->rot[2], vars->pitch);
             shot.f[2] += g_l11_turret_shot_height_offset;
-            FastVecAdd(&muzzle, &tmp, &shot);
+            FastVecAdd(&muzzle, &work, &shot);
             object_copy_vector_to_selected(&muzzle);
             dir.f[0] = 0.0f;
             dir.f[1] = -vars->pitch;

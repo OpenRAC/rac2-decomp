@@ -9,7 +9,7 @@ extern char *g_resident_data_base MACRO_ADDR;
 extern char *D_001A8CFC_gp SDATA(D_001A8CFC);
 typedef struct { char pad[0x1C0]; int flags; int pad2[2]; int state; } MenuInput;
 extern MenuInput g_pad_state;
-extern void func_US2_0029C818(void), func_US2_0029C700(void);
+extern void mission_select_refresh_us2(void), mission_menu_refresh_items_us2(void);
 extern void circle_menu_position_label_us2(void *), circle_menu_set_enabled_us2(void *, int), circle_menu_set_selection_us2(void *, int);
 extern int UpdateDirectionSelection(void *, void *), table_find_last_used_entry(int);
 extern void menu_clear_field_150(void *);
@@ -45,7 +45,7 @@ extern MissionMenuItem g_mission_menu_items[];
 
 /* func_US2_0029C700, the v2.00 copy of func_0029B910: the same refresh of the four mission menu
    items, without the item id store. */
-void func_US2_0029C700(void) {
+void mission_menu_refresh_items_us2(void) {
     int i;
     int *ids;
     if (g_resident_data_base != 0) {
@@ -63,19 +63,20 @@ void func_US2_0029C700(void) {
     }
 }
 
-int func_US2_0029C8F0(void) {
+/* Runs the mission select menu: handles the button, picks an item and updates the circle menu. Returns the chosen item or -1. */
+int mission_menu_update_us2(void) {
  int result, changed;
  if (g_mission_menu_depth == 0) return -1;
  if (g_notice_owner != 0) return -1;
  if (D_001A8CFC_gp != 0) {
-  func_US2_0029C818();
+  mission_select_refresh_us2();
   {
    int enabled = 0;
    switch (g_mission_select_enabled) {
     case 0: return -1;
     case 1:
      changed = 0;
-     func_US2_0029C700();
+     mission_menu_refresh_items_us2();
      if (g_pad_state.flags & 0x10) {
       g_mission_menu_flag = 1;
       g_pad_state.state = 2;

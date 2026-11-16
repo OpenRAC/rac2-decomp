@@ -27,7 +27,8 @@ extern int text_draw_centered_medium(int x, int y, unsigned long style, u8 *text
     func_0027FB40((X), row, 0x80f0f0f0UL, (u8 *)func_00288FB8((ID)), -1); \
 }
 
-void func_PAL_L00_0037A878(void)
+/* Draws the buy and back prompts depending on the item kind, its limit and the bolt count. */
+void draw_purchase_affordability_prompt_pal(void)
 {
     if (g_purchase_menu_model.active) {
         if (KIND == 1 && CAPPED) {

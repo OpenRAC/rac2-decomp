@@ -47,7 +47,7 @@ extern GateMoby *CreateMoby(s32 oclass);
 extern u8 *level_find_object_by_class_id(s32 a0);
 extern s32 level_get_saved_value_b(u8 *a0);
 extern void UpdateFeltzinMissionReward_us2(u8 *actor, s32 mission);
-extern void func_US2_L05_00422780(u8 *a0, s32 a1);
+extern void feltzin_mission_handle_failure_us2(u8 *a0, s32 a1);
 extern void FastVecSub(void *dst, void *a, void *b);
 extern void FastVecCross(void *dst, void *a, void *b);
 extern void vec_scale_to_length(void *dst, void *src, f32 scale);
@@ -75,7 +75,7 @@ void UpdateFeltzinGateCourse_us2(u8 *actor)
     u8 **objects;
     s32 found;
     s32 n;
-    f32 dotPlayer, dotOther;
+    f32 dot_player, dot_other;
 
     v.up.q = 0;
     v.up.f[2] = 1.0f;
@@ -144,11 +144,11 @@ void UpdateFeltzinGateCourse_us2(u8 *actor)
     }
     if (level_get_saved_value_b(level_find_object_by_class_id(0xF82))) {
         g_feltzin_failure_flag = 1;
-        func_US2_L05_00422780(actor, 3);
+        feltzin_mission_handle_failure_us2(actor, 3);
         entry_init_all_registered();
     } else if (g_feltzin_countdown_timer >= 12) {
         g_feltzin_failure_flag = 1;
-        func_US2_L05_00422780(actor, 3);
+        feltzin_mission_handle_failure_us2(actor, 3);
         entry_init_all_registered();
     }
     if (g_feltzin_failure_flag) {
@@ -163,10 +163,10 @@ void UpdateFeltzinGateCourse_us2(u8 *actor)
     vec_scale_to_length(&v.away, &v.away, 1.0f);
     FastVecSub(&v.toward, player + 0x10, &g_feltzin_record_a->position);
     vec_scale_to_length(&v.toward, &v.toward, 1.0f);
-    dotPlayer = FastVecDot(&g_feltzin_record_a->forward, &v.toward);
-    dotOther = FastVecDot(&g_feltzin_record_a->forward, &v.away);
-    if ((dotPlayer != g_feltzin_best_dot_player && dotPlayer > 0)
-        || (dotOther != g_feltzin_best_dot_other && dotOther > 0)) {
+    dot_player = FastVecDot(&g_feltzin_record_a->forward, &v.toward);
+    dot_other = FastVecDot(&g_feltzin_record_a->forward, &v.away);
+    if ((dot_player != g_feltzin_best_dot_player && dot_player > 0)
+        || (dot_other != g_feltzin_best_dot_other && dot_other > 0)) {
         path = g_gate_l05_path_table[*(s32 *)(state + 0x20)];
         if (fast_vec_dist(&v.pos, &g_feltzin_record_a->position) <= 1.25f
             || fast_vec_dist(player + 0x10, &g_feltzin_record_a->position) <= 1.25f) {
@@ -206,8 +206,8 @@ void UpdateFeltzinGateCourse_us2(u8 *actor)
             g_feltzin_path_index++;
         }
     }
-    g_feltzin_best_dot_player = dotPlayer;
-    g_feltzin_best_dot_other = dotOther;
+    g_feltzin_best_dot_player = dot_player;
+    g_feltzin_best_dot_other = dot_other;
     if (g_feltzin_record_a) {
         effect_set_enabled((void *)g_feltzin_record_a, 1);
         if (g_feltzin_record_b) {

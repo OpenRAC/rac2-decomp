@@ -15,37 +15,37 @@ extern void ref_L00_003FCA40_02(void);
    header bytes), the second argument's vector is copied into it, the object is normalised
    twice and added to the first argument, and the level's own copy of func_L00_003FD178 runs
    on it. */
-char *func_PAL_L00_004012A0(char *a0, char *a1, Quad_3fca40 *a2, int a3)
+char *large_spark_trail_create_pal(char *origin, char *direction, Quad_3fca40 *position, int owner)
 {
-    Quad_3fca40 local;
-    char *obj;
-    char *obj10;
-    int *p;
-    char *q;
-    int g;
-    float f;
+    Quad_3fca40 offset;
+    char *object;
+    char *object_pos;
+    int *vars;
+    char *velocity;
+    int lifetime;
+    float lifetime_f;
 
-    obj = (char *)CreateMoby(0xD9C);
-    if (obj != 0) {
-        *(unsigned char *)(obj + 0x30) = 0xFF;
-        p = *(int **)(obj + 0x68);
-        *(unsigned short *)(obj + 0x32) = 0xFF;
-        *(unsigned char *)(obj + 0x31) = 1;
-        *(unsigned short *)(obj + 0x34) |= 0x41;
-        *(unsigned char *)(obj + 0x20) = 0;
-        q = (char *)p + 0x20;
-        obj10 = obj + 0x10;
-        vec_scale_to_length(q, a1, 0.40000004f);
-        *(Quad_3fca40 *)obj10 = *a2;
-        vec_scale_to_length(&local, q, -0.25f);
-        FastVecAdd((char *)p + 0x50, a0, &local);
-        g = (int)((s32)(g_large_spark_trail_lifetime) * 5 + 2) / 6;
-        *(int *)((char *)p + 0x38) = g;
-        f = IntToFloat(g);
-        *(int *)((char *)p + 0x34) = a3;
-        *(float *)((char *)p + 0x3C) = 1.0f / f;
-        ref_L00_003FCA40_00(obj10);
-        ref_L00_003FCA40_01(ref_L00_003FCA40_02, obj);
+    object = (char *)CreateMoby(0xD9C);
+    if (object != 0) {
+        *(unsigned char *)(object + 0x30) = 0xFF;
+        vars = *(int **)(object + 0x68);
+        *(unsigned short *)(object + 0x32) = 0xFF;
+        *(unsigned char *)(object + 0x31) = 1;
+        *(unsigned short *)(object + 0x34) |= 0x41;
+        *(unsigned char *)(object + 0x20) = 0;
+        velocity = (char *)vars + 0x20;
+        object_pos = object + 0x10;
+        vec_scale_to_length(velocity, direction, 0.40000004f);
+        *(Quad_3fca40 *)object_pos = *position;
+        vec_scale_to_length(&offset, velocity, -0.25f);
+        FastVecAdd((char *)vars + 0x50, origin, &offset);
+        lifetime = (int)((s32)(g_large_spark_trail_lifetime) * 5 + 2) / 6;
+        *(int *)((char *)vars + 0x38) = lifetime;
+        lifetime_f = IntToFloat(lifetime);
+        *(int *)((char *)vars + 0x34) = owner;
+        *(float *)((char *)vars + 0x3C) = 1.0f / lifetime_f;
+        ref_L00_003FCA40_00(object_pos);
+        ref_L00_003FCA40_01(ref_L00_003FCA40_02, object);
     }
-    return obj;
+    return object;
 }

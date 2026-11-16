@@ -6,6 +6,7 @@ extern float ref_L00_00330BC0_00 __attribute__((sda));
 extern float fast_vec_dist(void *, void *);
 extern int pickup_start_fly_if_idle(void *, void *);
 
+/* Every other frame, makes each nearby class 19 moby start to fly away from the object (PAL: same as USA v1.01). */
 void moby_push_nearby_away_pal(char *object)
 {
     char *cursor;

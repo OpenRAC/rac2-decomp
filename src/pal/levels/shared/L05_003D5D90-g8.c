@@ -81,9 +81,9 @@ static inline void FaceCameraD2618(float *rotation, char *object)
 /* Faces the camera, then draws four layers of a 128-quad mesh, a growing flash quad and, in mode 0,
    two spinning glow quads. Once func_00282948 reports on D_L05_001B2FE8 and the alpha at
    D_L05_001B2FA0 falls below zero, calls func_0029F338 and returns; otherwise calls func_002FC560. */
-void func_PAL_L05_003D6360(char *object)
+void DrawAnimatedMeshAndGlowEffect_pal(char *object)
 {
-    QuadD2618 q;
+    QuadD2618 quad;
     float matrix[16];
     float rotation[4];
     float temporary[4];
@@ -92,7 +92,7 @@ void func_PAL_L05_003D6360(char *object)
     int vertex;
     int corner;
     int inactive;
-    InitQuadD2618(&q, g_quad_init_arg);
+    InitQuadD2618(&quad, g_quad_init_arg);
     VU1_addGSregister(0x47, 0x53001);
     FaceCameraD2618(rotation, object);
     {
@@ -110,14 +110,14 @@ void func_PAL_L05_003D6360(char *object)
             matrix[12 + 1] = g_emitter_group_positions[state->index][group].y;
             matrix[12 + 2] = g_emitter_group_positions[state->index][group].z;
             matrix[12 + 3] = 1.0f;
-            q.color[0] = q.color[1] = q.color[2] = q.color[3] = g_quad_l05_color;
+            quad.color[0] = quad.color[1] = quad.color[2] = quad.color[3] = g_quad_l05_color;
             {
                 unsigned long blend = (unsigned long)g_blend_mode_a;
                 blend |= (unsigned long)g_blend_mode_b << 2;
                 blend |= (unsigned long)g_blend_mode_c << 4;
                 blend |= (unsigned long)g_blend_mode_d << 6;
                 blend |= ((unsigned long)g_emitter_group_alphas[state->index][group] << 32);
-                q.gs[3] = blend;
+                quad.gs[3] = blend;
             }
             if (inactive == 1) {
                 g_emitter_group_alphas[state->index][group] -= g_emitter_group_fade_rates[state->index][group];
@@ -141,76 +141,76 @@ void func_PAL_L05_003D6360(char *object)
             }
             for (vertex = 0; vertex < 128; vertex++) {
                 for (corner = 0; corner < 4; corner++) {
-                    int vi = g_glow_quad_corner_indices[vertex][corner][0];
-                    int ti = g_glow_quad_corner_indices[vertex][corner][1];
-                    FastVecAdd(temporary, g_glow_quad_vertices[vi], g_emitter_vertex_offsets[state->index][group][vi]);
-                    FastVecScale(q.v[corner], temporary, g_quad_scale * state->scale);
-                    q.uv[corner][0] = g_glow_l05_quad_uvs[ti][0];
-                    q.uv[corner][1] = g_glow_l05_quad_uvs[ti][1];
-                    g_glow_l05_quad_uvs[ti][0] += 0.0001f;
-                    if (g_glow_l05_quad_uvs[ti][0] > 8.0f)
-                        g_glow_l05_quad_uvs[ti][0] -= 8.0f;
+                    int vertex_index = g_glow_quad_corner_indices[vertex][corner][0];
+                    int uv_index = g_glow_quad_corner_indices[vertex][corner][1];
+                    FastVecAdd(temporary, g_glow_quad_vertices[vertex_index], g_emitter_vertex_offsets[state->index][group][vertex_index]);
+                    FastVecScale(quad.v[corner], temporary, g_quad_scale * state->scale);
+                    quad.uv[corner][0] = g_glow_l05_quad_uvs[uv_index][0];
+                    quad.uv[corner][1] = g_glow_l05_quad_uvs[uv_index][1];
+                    g_glow_l05_quad_uvs[uv_index][0] += 0.0001f;
+                    if (g_glow_l05_quad_uvs[uv_index][0] > 8.0f)
+                        g_glow_l05_quad_uvs[uv_index][0] -= 8.0f;
                 }
                 if (fast_vec_dist(object + 0x10, g_hero_l05_state.pos) > 10.0f)
-                    draw_world_quad(&q, matrix, 0);
+                    draw_world_quad(&quad, matrix, 0);
             }
         }
     }
-    InitQuadD2618(&q, 0x43);
+    InitQuadD2618(&quad, 0x43);
     {
         unsigned long blend = (unsigned long)g_blend_mode_a;
         blend |= (unsigned long)g_blend_mode_b << 2;
         blend |= (unsigned long)g_blend_mode_c << 4;
         blend |= (unsigned long)g_blend_mode_d << 6;
         blend |= ((unsigned long)g_glow_effect_alphas[state->index] << 32);
-        q.gs[3] = blend;
+        quad.gs[3] = blend;
     }
-    q.color[0] = q.color[1] = q.color[2] = q.color[3] = 0x7F204080;
-    q.uv[0][0] = 0; q.uv[0][1] = 0; q.uv[1][0] = 1; q.uv[1][1] = 0;
-    q.uv[2][0] = 0; q.uv[2][1] = 1; q.uv[3][0] = 1; q.uv[3][1] = 1;
-    q.v[0][2] = -2; q.v[1][2] = 2; q.v[2][2] = -2; q.v[3][2] = 2;
-    q.v[0][1] = -2; q.v[1][1] = -2; q.v[2][1] = 2; q.v[3][1] = 2;
-    q.v[0][0] = 0; q.v[1][0] = 0; q.v[2][0] = 0; q.v[3][0] = 0;
+    quad.color[0] = quad.color[1] = quad.color[2] = quad.color[3] = 0x7F204080;
+    quad.uv[0][0] = 0; quad.uv[0][1] = 0; quad.uv[1][0] = 1; quad.uv[1][1] = 0;
+    quad.uv[2][0] = 0; quad.uv[2][1] = 1; quad.uv[3][0] = 1; quad.uv[3][1] = 1;
+    quad.v[0][2] = -2; quad.v[1][2] = 2; quad.v[2][2] = -2; quad.v[3][2] = 2;
+    quad.v[0][1] = -2; quad.v[1][1] = -2; quad.v[2][1] = 2; quad.v[3][1] = 2;
+    quad.v[0][0] = 0; quad.v[1][0] = 0; quad.v[2][0] = 0; quad.v[3][0] = 0;
     euler_to_matrix(matrix, rotation);
-    FastVecScale(q.v[0], q.v[0], g_glow_effect_scales[state->index] * state->scale);
-    FastVecScale(q.v[1], q.v[1], g_glow_effect_scales[state->index] * state->scale);
-    FastVecScale(q.v[2], q.v[2], g_glow_effect_scales[state->index] * state->scale);
-    FastVecScale(q.v[3], q.v[3], g_glow_effect_scales[state->index] * state->scale);
+    FastVecScale(quad.v[0], quad.v[0], g_glow_effect_scales[state->index] * state->scale);
+    FastVecScale(quad.v[1], quad.v[1], g_glow_effect_scales[state->index] * state->scale);
+    FastVecScale(quad.v[2], quad.v[2], g_glow_effect_scales[state->index] * state->scale);
+    FastVecScale(quad.v[3], quad.v[3], g_glow_effect_scales[state->index] * state->scale);
     matrix[12 + 0] = *(float *)(object + 0x10);
     matrix[12 + 1] = *(float *)(object + 0x14);
     matrix[12 + 2] = *(float *)(object + 0x18);
     matrix[12 + 3] = 1;
-    draw_world_quad(&q, matrix, 0);
+    draw_world_quad(&quad, matrix, 0);
     g_glow_effect_scales[state->index] += 0.4f;
     g_glow_effect_alphas[state->index] -= 5;
     if (g_glow_effect_alphas[state->index] < 0) g_glow_effect_alphas[state->index] = 0;
     if (state->mode == 0) {
         float *angle_a, *size, *angle_b;
         int color = 0x7F8080FF;
-        q.gs[1] = GetEffectTextureDescriptor(0x44);
+        quad.gs[1] = GetEffectTextureDescriptor(0x44);
         angle_a = g_glow_effect_angles_a;
         size = g_glow_effect_sizes;
         angle_b = g_glow_effect_angles_b;
-        q.color[0] = q.color[1] = q.color[2] = q.color[3] = color;
+        quad.color[0] = quad.color[1] = quad.color[2] = quad.color[3] = color;
         {
             unsigned long blend = (unsigned long)g_blend_mode_a;
             blend |= (unsigned long)g_blend_mode_b << 2;
             blend |= (unsigned long)g_blend_mode_c << 4;
             blend |= (unsigned long)g_blend_mode_d << 6;
             blend |= ((unsigned long)g_glow_effect_blends[state->index] << 32);
-            q.gs[3] = blend;
+            quad.gs[3] = blend;
         }
-        q.uv[0][0] = 0; q.uv[0][1] = 0; q.uv[1][0] = 1; q.uv[1][1] = 0;
-        q.uv[2][0] = 0; q.uv[2][1] = 1; q.uv[3][0] = 1; q.uv[3][1] = 1;
-        q.v[0][2] = -2; q.v[1][2] = 2; q.v[2][2] = -2; q.v[3][2] = 2;
-        q.v[0][1] = -2; q.v[1][1] = -2; q.v[2][1] = 2; q.v[3][1] = 2;
-        q.v[0][0] = 0; q.v[1][0] = 0; q.v[2][0] = 0; q.v[3][0] = 0;
+        quad.uv[0][0] = 0; quad.uv[0][1] = 0; quad.uv[1][0] = 1; quad.uv[1][1] = 0;
+        quad.uv[2][0] = 0; quad.uv[2][1] = 1; quad.uv[3][0] = 1; quad.uv[3][1] = 1;
+        quad.v[0][2] = -2; quad.v[1][2] = 2; quad.v[2][2] = -2; quad.v[3][2] = 2;
+        quad.v[0][1] = -2; quad.v[1][1] = -2; quad.v[2][1] = 2; quad.v[3][1] = 2;
+        quad.v[0][0] = 0; quad.v[1][0] = 0; quad.v[2][0] = 0; quad.v[3][0] = 0;
         rotation[0] = angle_a[state->index];
         euler_to_matrix(matrix, rotation);
-        FastVecScale(q.v[0], q.v[0], size[state->index] * state->scale);
-        FastVecScale(q.v[1], q.v[1], size[state->index] * state->scale);
-        FastVecScale(q.v[2], q.v[2], size[state->index] * state->scale);
-        FastVecScale(q.v[3], q.v[3], size[state->index] * state->scale);
+        FastVecScale(quad.v[0], quad.v[0], size[state->index] * state->scale);
+        FastVecScale(quad.v[1], quad.v[1], size[state->index] * state->scale);
+        FastVecScale(quad.v[2], quad.v[2], size[state->index] * state->scale);
+        FastVecScale(quad.v[3], quad.v[3], size[state->index] * state->scale);
         matrix[12 + 2] = math_fast_sin_or_cos_b(-rotation[1]);
         matrix[12 + 0] = math_fast_sin_or_cos_a(-rotation[2]) * (1.0f - math_fabs(matrix[12 + 2]));
         matrix[12 + 1] = -math_fast_sin_or_cos_b(-rotation[2]) * (1.0f - math_fabs(matrix[12 + 2]));
@@ -221,19 +221,19 @@ void func_PAL_L05_003D6360(char *object)
         matrix[12 + 0] += *(float *)(object + 0x10);
         matrix[12 + 1] += *(float *)(object + 0x14);
         matrix[12 + 3] = 1;
-        draw_world_quad(&q, matrix, 0);
-        q.color[0] = q.color[1] = q.color[2] = q.color[3] = color;
-        q.uv[0][0] = 0; q.uv[0][1] = 0; q.uv[1][0] = 1; q.uv[1][1] = 0;
-        q.uv[2][0] = 0; q.uv[2][1] = 1; q.uv[3][0] = 1; q.uv[3][1] = 1;
-        q.v[0][2] = -2; q.v[1][2] = 2; q.v[2][2] = -2; q.v[3][2] = 2;
-        q.v[0][1] = -2; q.v[1][1] = -2; q.v[2][1] = 2; q.v[3][1] = 2;
-        q.v[0][0] = 0; q.v[1][0] = 0; q.v[2][0] = 0; q.v[3][0] = 0;
+        draw_world_quad(&quad, matrix, 0);
+        quad.color[0] = quad.color[1] = quad.color[2] = quad.color[3] = color;
+        quad.uv[0][0] = 0; quad.uv[0][1] = 0; quad.uv[1][0] = 1; quad.uv[1][1] = 0;
+        quad.uv[2][0] = 0; quad.uv[2][1] = 1; quad.uv[3][0] = 1; quad.uv[3][1] = 1;
+        quad.v[0][2] = -2; quad.v[1][2] = 2; quad.v[2][2] = -2; quad.v[3][2] = 2;
+        quad.v[0][1] = -2; quad.v[1][1] = -2; quad.v[2][1] = 2; quad.v[3][1] = 2;
+        quad.v[0][0] = 0; quad.v[1][0] = 0; quad.v[2][0] = 0; quad.v[3][0] = 0;
         rotation[0] = angle_b[state->index];
         euler_to_matrix(matrix, rotation);
-        FastVecScale(q.v[0], q.v[0], size[state->index] * state->scale);
-        FastVecScale(q.v[1], q.v[1], size[state->index] * state->scale);
-        FastVecScale(q.v[2], q.v[2], size[state->index] * state->scale);
-        FastVecScale(q.v[3], q.v[3], size[state->index] * state->scale);
+        FastVecScale(quad.v[0], quad.v[0], size[state->index] * state->scale);
+        FastVecScale(quad.v[1], quad.v[1], size[state->index] * state->scale);
+        FastVecScale(quad.v[2], quad.v[2], size[state->index] * state->scale);
+        FastVecScale(quad.v[3], quad.v[3], size[state->index] * state->scale);
         matrix[12 + 2] = math_fast_sin_or_cos_b(-rotation[1]);
         matrix[12 + 0] = math_fast_sin_or_cos_a(-rotation[2]) * (1.0f - math_fabs(matrix[12 + 2]));
         matrix[12 + 1] = -math_fast_sin_or_cos_b(-rotation[2]) * (1.0f - math_fabs(matrix[12 + 2]));
@@ -244,7 +244,7 @@ void func_PAL_L05_003D6360(char *object)
         matrix[12 + 0] += *(float *)(object + 0x10);
         matrix[12 + 1] += *(float *)(object + 0x14);
         matrix[12 + 3] = 1;
-        draw_world_quad(&q, matrix, 0);
+        draw_world_quad(&quad, matrix, 0);
         angle_a[state->index] = FastAddRotations(angle_a[state->index], 0.055850547f);
         angle_b[state->index] = fast_subtract_rotations(angle_b[state->index], 0.055850547f);
         size[state->index] += 0.02f;

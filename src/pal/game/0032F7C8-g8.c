@@ -18,7 +18,7 @@ extern void SpawnExplosionEffects_pal(void *, void *, void *, float, float, int,
                          float, float, float, float, int, float, int, int, int, int, int);
 extern int math_fast_helper_a(void *, float);
 extern float fast_vec_dist(void *, void *);
-extern void func_PAL_00330020(float);
+extern void cam_set_zoom_effect_pal(float);
 extern void FastVecSub(void *, void *, void *);
 extern void FastVecAdd(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
@@ -26,7 +26,7 @@ extern void FastVecScale(void *, void *, float);
 extern float mat_fast_helper_a(float, float), math_random_signed_float_range(float, float);
 extern float math_random_float_range(float, float), FastAddRotations(float, float);
 extern void vec_build_spherical_offset(void *, float, float, float);
-extern char *func_PAL_002BE9A8(void *, float, float, float, float, int, void *, int, int);
+extern char *part_spawn_spinning_spark_pal(void *, float, float, float, float, int, void *, int, int);
 extern char *part_spawn_gravity_fade(void *, void *, int, int, int, int, int, int, float, float, float);
 /* Alternate typed interleavings preserve the EE integer and FP argument banks. */
 extern char *func_002C65A0_layer(void *, void *, int, int, int, int, int,
@@ -59,7 +59,7 @@ extern int g_blast_kind_alt_max __attribute__((sda));
 extern unsigned char g_blast_sub_byte __attribute__((sda));
 
 /* Emits three particle groups around the object and sets camera shake when visible. */
-void func_PAL_0032F7C8(char *self)
+void part_emit_blast_and_shake_pal(char *self)
 {
     float sphere[4], delta[4], center[4], position[4], velocity[4], other[4];
     int i, j, sign;
@@ -69,7 +69,7 @@ void func_PAL_0032F7C8(char *self)
     qcopy(sphere, self + 0x10);
     sphere[3] = 2;
     if (math_fast_helper_a(sphere, 48) == 1) {
-        func_PAL_00330020(fast_vec_dist(self + 0x10, g_active_camera.position));
+        cam_set_zoom_effect_pal(fast_vec_dist(self + 0x10, g_active_camera.position));
         g_active_camera.flag = 0;
         g_active_camera.duration = 33;
         g_active_camera.amplitude = 0.1f;
@@ -94,7 +94,7 @@ void func_PAL_0032F7C8(char *self)
         a = math_random_signed_float_range(0, 1.3962636f);
         b = math_random_signed_float_range(0, 1.5707964897155762f);
         vec_build_spherical_offset(velocity, speed, FastAddRotations(angle, b), a);
-        particle = func_PAL_002BE9A8(position, 0, 1, 1.01f, g_blast_spark_size * 210000, sign, velocity, g_blast_spark_param, 1);
+        particle = part_spawn_spinning_spark_pal(position, 0, 1, 1.01f, g_blast_spark_size * 210000, sign, velocity, g_blast_spark_param, 1);
         if (particle) {
             *(short *)(particle + 0xA) = ((s32)math_random_int_range(40, 70) * 5 + 2) / 6;
             particle[9] = FloatToInt(4) + 64;

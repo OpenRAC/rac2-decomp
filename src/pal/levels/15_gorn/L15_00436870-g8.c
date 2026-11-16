@@ -26,14 +26,15 @@ extern void *SpawnFreeLevelObjectById_pal(int, int);
 extern void func_L05_0037CEE0(void *, void *, f32);
 extern void func_L05_0037D608(void *, void *, f32);
 extern int CountActiveLinkedListObjects(int);
-extern void func_PAL_L15_00436118(void *, int);
-extern void func_PAL_L15_0043BB70(void *);
-extern void func_PAL_L15_0043BD80(void *);
+extern void gorn_finish_challenge_stage_pal(void *, int);
+extern void gorn_ships_reset_pal(void *);
+extern void gorn_path_mover_wait_init_pal(void *);
 
-void func_PAL_L15_00436870(void *self) {
+/* Gorn scene trigger: sets the stage up once, spawns its objects, and finishes the stage when none are left. */
+void scene_trigger_update_pal(void *self) {
     Moby430C80 **list;
-    void *obj;
-    s32 n;
+    void *spawned;
+    s32 object_count;
     s32 i;
 
     if (g_cutscene_l15_started_flag == 0) {
@@ -43,18 +44,18 @@ void func_PAL_L15_00436870(void *self) {
         entry_init_all_registered();
         hero_set_state_value_a(0);
         list = level_get_object_list();
-        n = level_get_saved_value();
-        for (i = 0; i < n; i++) {
+        object_count = level_get_saved_value();
+        for (i = 0; i < object_count; i++) {
             if (list[i]->uid == 0x957) {
                 entry_spawn_list_objects_with_flag_pal(list[i], 1);
                 func_L05_0037CEE0(list[i], g_scene_object_base[0] + g_gorn_challenge_vars[0] * 128 + 0x30, 64.0f);
                 func_L05_0037D608(list[i], g_scene_object_base[0] + g_gorn_challenge_vars[0] * 128 + 0x30, 64.0f);
             }
         }
-        obj = SpawnFreeLevelObjectById_pal(0x1211, 1);
-        if (obj != 0) {
-            func_PAL_L15_0043BB70(obj);
-            func_PAL_L15_0043BD80(obj);
+        spawned = SpawnFreeLevelObjectById_pal(0x1211, 1);
+        if (spawned != 0) {
+            gorn_ships_reset_pal(spawned);
+            gorn_path_mover_wait_init_pal(spawned);
         }
         if (g_gorn_path_first_node != 0) {
             moby_mark_spawned(g_gorn_path_first_node);
@@ -66,6 +67,6 @@ void func_PAL_L15_00436870(void *self) {
         }
     }
     if (CountActiveLinkedListObjects(level_find_object_by_class_id(0x1211)) == 0 && g_gorn_challenge_count[0] >= 6) {
-        func_PAL_L15_00436118(self, 2);
+        gorn_finish_challenge_stage_pal(self, 2);
     }
 }

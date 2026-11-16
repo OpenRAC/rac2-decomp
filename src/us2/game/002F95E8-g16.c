@@ -30,7 +30,7 @@ extern void snd_send_cmd23(int);
 extern void music_Unpause(void);
 extern int snd_Pump(void);
 
-void func_US2_002F95E8(void)
+void shop_reset_menu_camera_us2(void)
 {
     Vec4_2F8768 out;
     float dir[4];

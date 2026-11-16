@@ -17,7 +17,9 @@ static inline void WrapLow(int *index, int last)
         *index = last;
 }
 
-int func_US2_00348CB8(SelectionMenu *object, int flags)
+/* Moves the list menu's selection one entry up or down on the d-pad, wrapping at both ends and skipping empty
+   entries; returns 1 when the select button is pressed on a filled entry. */
+int list_menu_update_selection_us2(SelectionMenu *object, int flags)
 {
     int direction = 0;
     int last;

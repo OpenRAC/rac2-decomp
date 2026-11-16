@@ -6,11 +6,11 @@
  * because PAL and USA v2.00 have func_003146C0 but not this function, and its jump table must not
  * reach their .rodata.
  *
- * Eight initial values below are overwritten before they are read: both `c = m`, `i = 0` in the
- * state 2 block, `n = 5`, `e = 0`, `p = 0`, `old_health = 0` and `n = 0` in the fly-in arm. Each is
+ * Eight initial values below are overwritten before they are read: both `owner = moby`, `i = 0` in the
+ * state 2 block, `spawn_rate = 5`, `part = 0`, `slot_part = 0`, `old_health = 0` and `effect = 0` in the fly-in arm. Each is
  * a value that local really holds at some point. They bring the function to 1024 RTL insns at gcse,
- * which sizes the PRE hash table at 513: that is what puts the four PRE registers of &v10, &v20,
- * &d->v20 and &m->rot_row2 into retail's spill slots 0x7C-0x88. 988-1003 or 1024-1039 insns all fit.
+ * which sizes the PRE hash table at 513: that is what puts the four PRE registers of &vec_b, &vec_c,
+ * &vars->v20 and &moby->rot_row2 into retail's spill slots 0x7C-0x88. 988-1003 or 1024-1039 insns all fit.
  * Without them the code is the same apart from those four slots.
  */
 /* Adapted from RAC1 nanotech_ball_update (OpenRAC/rac1-decomp, GPL-3.0). */
@@ -119,320 +119,321 @@ extern int snd_play_from_class_bank(int, int, void *, int);
 extern float IntToFloat(int);
 extern float cubic_hermite_scalar(float, float, float, float, float);
 
-void nanotech_ball_update_us2(Moby *m) {
-    V_2D9EA0 v0, v10, v20, v30, v40, v50, v60;
-    D_2D9EA0 *d = (D_2D9EA0 *)m->pvars;
+/* Updates a nanotech ball: it follows its owner, keeps its glowing particle slots moving, and when the hero needs health it flies in and heals (v2.00 copy). */
+void nanotech_ball_update_us2(Moby *moby) {
+    V_2D9EA0 vec_a, vec_b, vec_c, vec_d, vec_e, vec_f, vec_g;
+    D_2D9EA0 *vars = (D_2D9EA0 *)moby->pvars;
 
-    switch (m->state) {
+    switch (moby->state) {
     case 0: {
-        Moby *c = m;
+        Moby *owner = moby;
         int i;
-        m->state = 1;
-        m->flags |= 0x41;
-        m->collision = 0;
-        m->command = 0;
-        c = m->owner;
-        qcopy_nc(&m->pos, &c->pos);
-        qcopy_nc(&m->rot, &c->rot);
-        vec_scale_to_length(&d->pos, &m->rot_row2, 0.5f);
-        FastVecAdd(&d->pos, &d->pos, &m->pos);
-        *(int *)&d->f0 = 0;
-        d->h8 = 0;
-        d->f4 = math_random_float_range(d->f0, 3.1415927f);
-        d->h56 = 0;
-        d->owner = 0;
-        for (i = 0; i < 4; i++) d->f60[i] = (float)math_random_int_below(0xFF);
-        for (i = 0; i < 4; i++) d->h58[i] = g_nanotech_duration;
-        for (i = 0; i < 8; i++) d->slots[i] = 0;
+        moby->state = 1;
+        moby->flags |= 0x41;
+        moby->collision = 0;
+        moby->command = 0;
+        owner = moby->owner;
+        qcopy_nc(&moby->pos, &owner->pos);
+        qcopy_nc(&moby->rot, &owner->rot);
+        vec_scale_to_length(&vars->pos, &moby->rot_row2, 0.5f);
+        FastVecAdd(&vars->pos, &vars->pos, &moby->pos);
+        *(int *)&vars->f0 = 0;
+        vars->h8 = 0;
+        vars->f4 = math_random_float_range(vars->f0, 3.1415927f);
+        vars->h56 = 0;
+        vars->owner = 0;
+        for (i = 0; i < 4; i++) vars->f60[i] = (float)math_random_int_below(0xFF);
+        for (i = 0; i < 4; i++) vars->h58[i] = g_nanotech_duration;
+        for (i = 0; i < 8; i++) vars->slots[i] = 0;
         if (g_nanotech_ball_moby == 0) {
-            euler_rotation_basis(&m->rot_row0, &m->rot);
-            g_nanotech_ball_moby = m;
-            m->update_dist = 0xFF;
-            d->pending = 0;
-            vec_scale_to_length(&g_nanotech_ball_axes[0], &m->rot_row0, g_nanotech_base_length);
-            qcopy_nc(&g_nanotech_ball_basis_vectors[0], &m->rot_row2);
-            vec_scale_to_length(&g_nanotech_ball_axes[1], &m->rot_row1, g_nanotech_base_length);
-            qcopy_nc(&g_nanotech_ball_basis_vectors[1], &m->rot_row0);
-            vec_scale_to_length(&g_nanotech_ball_axes[2], &m->rot_row2, g_nanotech_base_length);
-            qcopy_nc(&g_nanotech_ball_basis_vectors[2], &m->rot_row1);
-            FastVecAdd(&g_nanotech_ball_axes[3], &m->rot_row0, &m->rot_row2);
+            euler_rotation_basis(&moby->rot_row0, &moby->rot);
+            g_nanotech_ball_moby = moby;
+            moby->update_dist = 0xFF;
+            vars->pending = 0;
+            vec_scale_to_length(&g_nanotech_ball_axes[0], &moby->rot_row0, g_nanotech_base_length);
+            qcopy_nc(&g_nanotech_ball_basis_vectors[0], &moby->rot_row2);
+            vec_scale_to_length(&g_nanotech_ball_axes[1], &moby->rot_row1, g_nanotech_base_length);
+            qcopy_nc(&g_nanotech_ball_basis_vectors[1], &moby->rot_row0);
+            vec_scale_to_length(&g_nanotech_ball_axes[2], &moby->rot_row2, g_nanotech_base_length);
+            qcopy_nc(&g_nanotech_ball_basis_vectors[2], &moby->rot_row1);
+            FastVecAdd(&g_nanotech_ball_axes[3], &moby->rot_row0, &moby->rot_row2);
             vec_scale_to_length(&g_nanotech_ball_axes[3], &g_nanotech_ball_axes[3], g_nanotech_base_length);
-            FastVecCross(&g_nanotech_ball_basis_vectors[3], &g_nanotech_ball_axes[3], &m->rot_row1);
-            FastVecAdd(&g_nanotech_ball_axes[4], &m->rot_row0, &m->rot_row1);
+            FastVecCross(&g_nanotech_ball_basis_vectors[3], &g_nanotech_ball_axes[3], &moby->rot_row1);
+            FastVecAdd(&g_nanotech_ball_axes[4], &moby->rot_row0, &moby->rot_row1);
             vec_scale_to_length(&g_nanotech_ball_axes[4], &g_nanotech_ball_axes[4], g_nanotech_base_length);
-            FastVecCross(&g_nanotech_ball_basis_vectors[4], &g_nanotech_ball_axes[4], &m->rot_row2);
-            FastVecSub(&g_nanotech_ball_axes[5], &m->rot_row1, &m->rot_row2);
+            FastVecCross(&g_nanotech_ball_basis_vectors[4], &g_nanotech_ball_axes[4], &moby->rot_row2);
+            FastVecSub(&g_nanotech_ball_axes[5], &moby->rot_row1, &moby->rot_row2);
             vec_scale_to_length(&g_nanotech_ball_axes[5], &g_nanotech_ball_axes[5], g_nanotech_base_length);
-            FastVecCross(&g_nanotech_ball_basis_vectors[5], &g_nanotech_ball_axes[5], &m->rot_row0);
-            FastVecSub(&g_nanotech_ball_axes[6], &m->rot_row0, &m->rot_row2);
+            FastVecCross(&g_nanotech_ball_basis_vectors[5], &g_nanotech_ball_axes[5], &moby->rot_row0);
+            FastVecSub(&g_nanotech_ball_axes[6], &moby->rot_row0, &moby->rot_row2);
             vec_scale_to_length(&g_nanotech_ball_axes[6], &g_nanotech_ball_axes[6], g_nanotech_base_length);
-            FastVecCross(&g_nanotech_ball_basis_vectors[6], &g_nanotech_ball_axes[6], &m->rot_row1);
-            FastVecSub(&g_nanotech_ball_axes[7], &m->rot_row0, &m->rot_row1);
+            FastVecCross(&g_nanotech_ball_basis_vectors[6], &g_nanotech_ball_axes[6], &moby->rot_row1);
+            FastVecSub(&g_nanotech_ball_axes[7], &moby->rot_row0, &moby->rot_row1);
             vec_scale_to_length(&g_nanotech_ball_axes[7], &g_nanotech_ball_axes[7], g_nanotech_base_length);
-            FastVecCross(&g_nanotech_ball_basis_vectors[7], &g_nanotech_ball_axes[7], &m->rot_row2);
+            FastVecCross(&g_nanotech_ball_basis_vectors[7], &g_nanotech_ball_axes[7], &moby->rot_row2);
         }
         {
-            float a;
-            a = math_random_float_range(0.0f, 6.2831855f);
-            vec_build_spherical_offset(&d->v20, 1.0f, a, math_random_float_range(-1.5707964f, 1.5707964f));
+            float angle;
+            angle = math_random_float_range(0.0f, 6.2831855f);
+            vec_build_spherical_offset(&vars->v20, 1.0f, angle, math_random_float_range(-1.5707964f, 1.5707964f));
         }
-        d->v20.w = math_random_signed_float_range(0.785398006f, 1.5707964f);
+        vars->v20.w = math_random_signed_float_range(0.785398006f, 1.5707964f);
     }
     case 1: {
-        Moby *c = m;
-        qcopy_nc(&m->pos, &m->owner->pos);
-        qcopy_nc(&d->pos, &m->owner->pos);
-        gravity_offset_position(&m->pos, &d->pos, &d->pos, -0.5f);
-        c = m->owner;
-        if ((signed char)c->state < 0 || moby_is_state_six(c) || c == m) {
-            m->state = 2;
-            d->f50 = 0;
+        Moby *owner = moby;
+        qcopy_nc(&moby->pos, &moby->owner->pos);
+        qcopy_nc(&vars->pos, &moby->owner->pos);
+        gravity_offset_position(&moby->pos, &vars->pos, &vars->pos, -0.5f);
+        owner = moby->owner;
+        if ((signed char)owner->state < 0 || moby_is_state_six(owner) || owner == moby) {
+            moby->state = 2;
+            vars->f50 = 0;
         }
     }
     case 2:
-        if (m->state == 2) {
+        if (moby->state == 2) {
             int i = 0;
-            qcopy_nc(&d->pos, &m->pos);
-            gravity_offset_position(&m->pos, &d->pos, &d->pos, -0.5f);
-            moby_ground_snapped_update(m);
+            qcopy_nc(&vars->pos, &moby->pos);
+            gravity_offset_position(&moby->pos, &vars->pos, &vars->pos, -0.5f);
+            moby_ground_snapped_update(moby);
             for (i = 0; i < 8; i++) {
-                if (d->slots[i] != 0) {
-                    Ext_2D9EA0 *x = (Ext_2D9EA0 *)(d->slots[i] + 1);
-                    x->u.s.scale = g_nanotech_scale_wobble * math_fast_sin_or_cos_b(x->u.s.ang) + g_nanotech_base_length;
-                    x->u.s.ang = FastAddRotations(x->u.s.ang, D_001AF180_gp[i]);
+                if (vars->slots[i] != 0) {
+                    Ext_2D9EA0 *ext = (Ext_2D9EA0 *)(vars->slots[i] + 1);
+                    ext->u.s.scale = g_nanotech_scale_wobble * math_fast_sin_or_cos_b(ext->u.s.ang) + g_nanotech_base_length;
+                    ext->u.s.ang = FastAddRotations(ext->u.s.ang, D_001AF180_gp[i]);
                 }
             }
         }
         {
-            Hero *g = (Hero *)g_hero_state;
-            int lim = g_player_stats;
-            if (g->vehicle_mode == 1) lim = 4;
-            if (m->state != 1 && g_nanotech_ball_moby != 0 && (D_2D9EA0 *)g_nanotech_ball_moby->pvars != 0 && g->health.hp != 0
-                && (g->health.hp + ((D_2D9EA0 *)g_nanotech_ball_moby->pvars)->pending < lim || (g_cheat_flags[2] != 0 && g->invulnerable_frames == 0))
-                && (d->slots[0] || d->slots[1] || d->slots[2] || d->slots[3] || d->slots[4] || d->slots[5] || d->slots[6] || d->slots[7])
-                && fast_vec_dist(&m->pos, g_hero_position) < 10.0f
-                && is_nanotech_ball_target_line_clear(m)) {
+            Hero *hero = (Hero *)g_hero_state;
+            int max_health = g_player_stats;
+            if (hero->vehicle_mode == 1) max_health = 4;
+            if (moby->state != 1 && g_nanotech_ball_moby != 0 && (D_2D9EA0 *)g_nanotech_ball_moby->pvars != 0 && hero->health.hp != 0
+                && (hero->health.hp + ((D_2D9EA0 *)g_nanotech_ball_moby->pvars)->pending < max_health || (g_cheat_flags[2] != 0 && hero->invulnerable_frames == 0))
+                && (vars->slots[0] || vars->slots[1] || vars->slots[2] || vars->slots[3] || vars->slots[4] || vars->slots[5] || vars->slots[6] || vars->slots[7])
+                && fast_vec_dist(&moby->pos, g_hero_position) < 10.0f
+                && is_nanotech_ball_target_line_clear(moby)) {
                 int i;
-                m->state = 3;
+                moby->state = 3;
                 ((D_2D9EA0 *)g_nanotech_ball_moby->pvars)->pending++;
                 if (g_cheat_flags[2] != 0) *(short *)(g_hero_position + 0x15C) = 0x258;
-                d->h54 = g_nanotech_timer_init;
-                FastVecScale(&v30, g_hero_position + 0x240, -g_nanotech_hero_offset);
-                FastVecAdd(&v30, g_hero_position, &v30);
-                FastVecScale(&v0, g_hero_position + 0x240, -g_nanotech_hero_push);
-                FastVecSub(&v20, &v30, &m->pos);
-                gravity_offset_position(&m->pos, &v20, &v20, 0.5f);
-                FastVecCross(&v40, &v20, &v0);
-                FastVecCross(&v0, &v40, &v20);
-                math_apply_axis_rotation_to_quat(&v0, &v0, -1.5707964f, &v20);
-                vec_scale_to_length(&v0, &v0, g_nanotech_hero_push);
-                FastVecScale(&v50, &v20, 0.5f);
+                vars->h54 = g_nanotech_timer_init;
+                FastVecScale(&vec_d, g_hero_position + 0x240, -g_nanotech_hero_offset);
+                FastVecAdd(&vec_d, g_hero_position, &vec_d);
+                FastVecScale(&vec_a, g_hero_position + 0x240, -g_nanotech_hero_push);
+                FastVecSub(&vec_c, &vec_d, &moby->pos);
+                gravity_offset_position(&moby->pos, &vec_c, &vec_c, 0.5f);
+                FastVecCross(&vec_e, &vec_c, &vec_a);
+                FastVecCross(&vec_a, &vec_e, &vec_c);
+                math_apply_axis_rotation_to_quat(&vec_a, &vec_a, -1.5707964f, &vec_c);
+                vec_scale_to_length(&vec_a, &vec_a, g_nanotech_hero_push);
+                FastVecScale(&vec_f, &vec_c, 0.5f);
                 for (i = 0; i < 8; i++) {
-                    if (d->slots[i] != 0) {
-                        Ext_2D9EA0 *x = (Ext_2D9EA0 *)(d->slots[i] + 1);
-                        math_apply_axis_rotation_to_quat(&v10, &v0, (float)i * 0.44854968786239624f, &v20);
-                        FastVecAdd(&v60, &v50, &v10);
+                    if (vars->slots[i] != 0) {
+                        Ext_2D9EA0 *ext = (Ext_2D9EA0 *)(vars->slots[i] + 1);
+                        math_apply_axis_rotation_to_quat(&vec_b, &vec_a, (float)i * 0.44854968786239624f, &vec_c);
+                        FastVecAdd(&vec_g, &vec_f, &vec_b);
                         {
-                            V3_2D9EA0 *dst = &x->u.a;
-                            dst->x = v60.x;
-                            dst->y = v60.y;
-                            dst->z = v60.z;
+                            V3_2D9EA0 *dst = &ext->u.a;
+                            dst->x = vec_g.x;
+                            dst->y = vec_g.y;
+                            dst->z = vec_g.z;
                         }
                         {
-                            V3_2D9EA0 *dst = &x->b;
-                            V3_2D9EA0 *src = (V3_2D9EA0 *)&d->slots[i]->pos;
+                            V3_2D9EA0 *dst = &ext->b;
+                            V3_2D9EA0 *src = (V3_2D9EA0 *)&vars->slots[i]->pos;
                             dst->x = src->x;
                             dst->y = src->y;
                             dst->z = src->z;
                         }
-                        x->h1E = x->h1C = math_random_int_range(g_nanotech_life_min, g_nanotech_life_max);
+                        ext->h1E = ext->h1C = math_random_int_range(g_nanotech_life_min, g_nanotech_life_max);
                     }
                 }
             }
         }
-        d->f0 = g_nanotech_pulse_amp * math_fast_sin_or_cos_b(d->f4);
-        d->f4 = FastAddRotations(d->f4, g_nanotech_spin_step);
-        if (g_nanotech_ball_moby == m) update_nanotech_ball_slot_offsets();
-        qcopy(&v0, &m->pos);
-        gravity_offset_position(&m->pos, &v0, &v0, -0.5f);
-        v0.w = 1.0f;
-        if (math_fast_helper_a(&v0, 64.0f) >= 0) {
+        vars->f0 = g_nanotech_pulse_amp * math_fast_sin_or_cos_b(vars->f4);
+        vars->f4 = FastAddRotations(vars->f4, g_nanotech_spin_step);
+        if (g_nanotech_ball_moby == moby) update_nanotech_ball_slot_offsets();
+        qcopy(&vec_a, &moby->pos);
+        gravity_offset_position(&moby->pos, &vec_a, &vec_a, -0.5f);
+        vec_a.w = 1.0f;
+        if (math_fast_helper_a(&vec_a, 64.0f) >= 0) {
             int i;
-            int n = 5;
-            gfx_register_world_draw_callback(draw_nanotech_ball, m);
-            if (10.0f < vec_distance_xy(&m->pos, g_camera_l00_position)) n = 5;
-            else n = 40;
+            int spawn_rate = 5;
+            gfx_register_world_draw_callback(draw_nanotech_ball, moby);
+            if (10.0f < vec_distance_xy(&moby->pos, g_camera_l00_position)) spawn_rate = 5;
+            else spawn_rate = 40;
             for (i = 0; i < 8; i++) {
-                Part_2D9EA0 *e = 0;
-                Part_2D9EA0 *p = 0;
-                emitter_get_slot_position(m, &v10, i);
-                e = part_spawn_bluish_fade(&v10, n, 2, 0);
-                if (e != 0) {
-                    Ext_2D9EA0 *x = (Ext_2D9EA0 *)(e + 1);
-                    qcopy(&v20, &m->pos);
-                    qzero_nc(&v30);
-                    if (m->state == 1) moby_transform_point_by_attachment(m, m->owner, &m->pos, &v30);
-                    else if (d->owner) {
-                        moby_transform_point_by_attachment(m, d->owner, &m->pos, &v30);
-                        FastVecSub(&v20, &v20, &v30);
+                Part_2D9EA0 *part = 0;
+                Part_2D9EA0 *slot_part = 0;
+                emitter_get_slot_position(moby, &vec_b, i);
+                part = part_spawn_bluish_fade(&vec_b, spawn_rate, 2, 0);
+                if (part != 0) {
+                    Ext_2D9EA0 *ext = (Ext_2D9EA0 *)(part + 1);
+                    qcopy(&vec_c, &moby->pos);
+                    qzero_nc(&vec_d);
+                    if (moby->state == 1) moby_transform_point_by_attachment(moby, moby->owner, &moby->pos, &vec_d);
+                    else if (vars->owner) {
+                        moby_transform_point_by_attachment(moby, vars->owner, &moby->pos, &vec_d);
+                        FastVecSub(&vec_c, &vec_c, &vec_d);
                     }
-                    FastVecAdd(&v10, &v10, &v30);
-                    x->b.x = e->pos.x - v20.x;
-                    x->b.y = e->pos.y - v20.y;
-                    x->b.z = e->pos.z - v20.z;
-                    if (m->state == 2) x->u.s.owner = m;
-                    else x->u.s.owner = m->owner;
-                    if (d->special) e->f4 = g_nanotech_special_phase;
-                    else e->f4 = g_nanotech_slot_phase;
-                    e->fC = g_nanotech_slot_scale;
+                    FastVecAdd(&vec_b, &vec_b, &vec_d);
+                    ext->b.x = part->pos.x - vec_c.x;
+                    ext->b.y = part->pos.y - vec_c.y;
+                    ext->b.z = part->pos.z - vec_c.z;
+                    if (moby->state == 2) ext->u.s.owner = moby;
+                    else ext->u.s.owner = moby->owner;
+                    if (vars->special) part->f4 = g_nanotech_special_phase;
+                    else part->f4 = g_nanotech_slot_phase;
+                    part->fC = g_nanotech_slot_scale;
                 }
-                p = d->slots[i];
-                if (p == 0) {
-                    d->slots[i] = part_spawn_bluish_fade(&v10, 0, 1, 0);
-                    if (d->slots[i] != 0) {
-                        Ext_2D9EA0 *x = (Ext_2D9EA0 *)(d->slots[i] + 1);
-                        x->u.s.scale = g_nanotech_base_length;
-                        x->u.s.ang = 0.0f;
-                        d->slots[i]->fC = g_nanotech_slot_scale_alt;
-                        if (d->special) d->slots[i]->f4 = g_nanotech_special_phase;
-                        else d->slots[i]->f4 = g_nanotech_slot_phase;
+                slot_part = vars->slots[i];
+                if (slot_part == 0) {
+                    vars->slots[i] = part_spawn_bluish_fade(&vec_b, 0, 1, 0);
+                    if (vars->slots[i] != 0) {
+                        Ext_2D9EA0 *ext = (Ext_2D9EA0 *)(vars->slots[i] + 1);
+                        ext->u.s.scale = g_nanotech_base_length;
+                        ext->u.s.ang = 0.0f;
+                        vars->slots[i]->fC = g_nanotech_slot_scale_alt;
+                        if (vars->special) vars->slots[i]->f4 = g_nanotech_special_phase;
+                        else vars->slots[i]->f4 = g_nanotech_slot_phase;
                     }
                 } else {
-                    qcopy_nc(&p->pos, &v10);
-                    p->b8 += g_nanotech_phase_step;
+                    qcopy_nc(&slot_part->pos, &vec_b);
+                    slot_part->b8 += g_nanotech_phase_step;
                 }
             }
-        } else if (g_turret_target_moby || d->owner) {
+        } else if (g_turret_target_moby || vars->owner) {
             int i;
-            for (i = 0; i < 8; i++) if (d->slots[i]) qcopy_nc(&d->slots[i]->pos, &m->pos);
+            for (i = 0; i < 8; i++) if (vars->slots[i]) qcopy_nc(&vars->slots[i]->pos, &moby->pos);
         }
         break;
     case 3:
-        if (g_nanotech_ball_moby == m) update_nanotech_ball_slot_offsets();
-        if (d->h56 != 0) {
-            FastVecScale(&m->pos, g_hero_state + 0x2C0, -g_nanotech_hero_offset);
-            FastVecAdd(&m->pos, g_hero_state + 0x80, &m->pos);
-            m->rot.w = 0.523598849773407f;
-            if (EmitFourTimedParticlePairs(m) != 0 && math_random_int_below(5) == 0) part_spawn_sparkles(m);
+        if (g_nanotech_ball_moby == moby) update_nanotech_ball_slot_offsets();
+        if (vars->h56 != 0) {
+            FastVecScale(&moby->pos, g_hero_state + 0x2C0, -g_nanotech_hero_offset);
+            FastVecAdd(&moby->pos, g_hero_state + 0x80, &moby->pos);
+            moby->rot.w = 0.523598849773407f;
+            if (EmitFourTimedParticlePairs(moby) != 0 && math_random_int_below(5) == 0) part_spawn_sparkles(moby);
         }
         {
-            Hero *g = (Hero *)g_hero_state;
-            int lim = g_player_stats;
-            if (g->vehicle_mode == 1) lim = 4;
-            if (g->health.hp == lim && g->invulnerable_frames != 0 && g_cheat_flags[2] != 0) {
-                int r = g_nanotech_random_value;
-                if (d->h54 < r) {
+            Hero *hero = (Hero *)g_hero_state;
+            int max_health = g_player_stats;
+            if (hero->vehicle_mode == 1) max_health = 4;
+            if (hero->health.hp == max_health && hero->invulnerable_frames != 0 && g_cheat_flags[2] != 0) {
+                int random_value = g_nanotech_random_value;
+                if (vars->h54 < random_value) {
                     int i;
-                    d->h54 = r;
-                    for (i = 0; i < 4; i++) d->h58[i]++;
+                    vars->h54 = random_value;
+                    for (i = 0; i < 4; i++) vars->h58[i]++;
                 }
             }
         }
-        if (FastDecTimer(&d->h54)) {
+        if (FastDecTimer(&vars->h54)) {
             int i;
             for (i = 0; i < 8; i++) {
-                if (d->slots[i] != 0) {
-                    part_kill(d->slots[i]);
-                    d->slots[i] = 0;
+                if (vars->slots[i] != 0) {
+                    part_kill(vars->slots[i]);
+                    vars->slots[i] = 0;
                 }
             }
-            if (g_nanotech_ball_moby == m) m->state = 4;
-            else moby_mark_spawned(m);
+            if (g_nanotech_ball_moby == moby) moby->state = 4;
+            else moby_mark_spawned(moby);
         } else {
             int i;
-            FastVecScale(&v20, g_hero_state + 0x2C0, -g_nanotech_hero_offset);
-            FastVecAdd(&v20, g_hero_state + 0x80, &v20);
+            FastVecScale(&vec_c, g_hero_state + 0x2C0, -g_nanotech_hero_offset);
+            FastVecAdd(&vec_c, g_hero_state + 0x80, &vec_c);
             for (i = 0; i < 8; i++) {
-                Part_2D9EA0 *e = d->slots[i];
-                Ext_2D9EA0 *x;
-                if (e == 0) continue;
-                x = (Ext_2D9EA0 *)(e + 1);
-                if (FastDecTimer(&x->h1E)) {
-                    if (d->h56 == 0) {
-                        Hero *g = (Hero *)g_hero_state;
-                        int lim = g_player_stats;
+                Part_2D9EA0 *part = vars->slots[i];
+                Ext_2D9EA0 *ext;
+                if (part == 0) continue;
+                ext = (Ext_2D9EA0 *)(part + 1);
+                if (FastDecTimer(&ext->h1E)) {
+                    if (vars->h56 == 0) {
+                        Hero *hero = (Hero *)g_hero_state;
+                        int max_health = g_player_stats;
                         int old_health = 0;
-                        if (g->vehicle_mode == 1) lim = 4;
-                        old_health = g->health.hp;
-                        if (g->health.hp != 0) {
+                        if (hero->vehicle_mode == 1) max_health = 4;
+                        old_health = hero->health.hp;
+                        if (hero->health.hp != 0) {
                             int amount = 1;
                             if (g_extras_unlocked_flag) amount = g_nanotech_amount_alt;
-                            if (d->special) {
-                                int t = g->health.hp + amount * 4;
-                                g->health.hp = (lim < t) ? lim : t;
+                            if (vars->special) {
+                                int new_health = hero->health.hp + amount * 4;
+                                hero->health.hp = (max_health < new_health) ? max_health : new_health;
                             } else {
-                                int t = g->health.hp + amount;
-                                g->health.hp = (lim < t) ? lim : t;
+                                int new_health = hero->health.hp + amount;
+                                hero->health.hp = (max_health < new_health) ? max_health : new_health;
                             }
                             if (old_health != ((Hero *)g_hero_state)->health.hp) level_forward_value_b_us2(0x168);
                         }
                         {
-                            D_2D9EA0 *o = (D_2D9EA0 *)g_nanotech_ball_moby->pvars;
-                            o->pending--;
-                            if ((signed char)o->pending < 0) o->pending = 0;
+                            D_2D9EA0 *ball_vars = (D_2D9EA0 *)g_nanotech_ball_moby->pvars;
+                            ball_vars->pending--;
+                            if ((signed char)ball_vars->pending < 0) ball_vars->pending = 0;
                         }
-                        if (d->special) snd_play_from_class_bank(1, 0x20, m, 0x200);
-                        else snd_play_from_class_bank(1, 0x20, m, 0x1F5);
-                        d->h56 = 1;
+                        if (vars->special) snd_play_from_class_bank(1, 0x20, moby, 0x200);
+                        else snd_play_from_class_bank(1, 0x20, moby, 0x1F5);
+                        vars->h56 = 1;
                     }
-                    part_kill(e);
-                    d->slots[i] = 0;
+                    part_kill(part);
+                    vars->slots[i] = 0;
                 } else {
-                    float t;
-                    float k;
-                    Part_2D9EA0 *n = 0;
-                    V_2D9EA0 *mid = &v40;
+                    float inv_k;
+                    float ratio;
+                    Part_2D9EA0 *effect = 0;
+                    V_2D9EA0 *mid = &vec_e;
                     {
-                        qcopy(mid, &e->pos);
+                        qcopy(mid, &part->pos);
                     }
-                    k = IntToFloat(x->h1C);
-                    k = (float)x->h1E / k;
+                    ratio = IntToFloat(ext->h1C);
+                    ratio = (float)ext->h1E / ratio;
                     {
-                        V3_2D9EA0 *src = &x->b;
-                        v10.x = src->x;
-                        v10.y = src->y;
-                        v10.z = src->z;
+                        V3_2D9EA0 *src = &ext->b;
+                        vec_b.x = src->x;
+                        vec_b.y = src->y;
+                        vec_b.z = src->z;
                     }
-                    v10.w = 0.0f;
-                    t = 1.0f - k;
-                    v0.x = v10.x - x->u.a.x;
-                    v0.y = v10.y - x->u.a.y;
-                    v0.z = v10.z - x->u.a.z;
-                    v30.x = v20.x - x->u.a.x;
-                    v30.y = v20.y - x->u.a.y;
-                    v30.z = v20.z - x->u.a.z;
-                    e->pos.x = cubic_hermite_scalar(v0.x, v10.x, v20.x, v30.x, t);
-                    e->pos.y = cubic_hermite_scalar(v0.y, v10.y, v20.y, v30.y, t);
-                    e->pos.z = cubic_hermite_scalar(v0.z, v10.z, v20.z, v30.z, t);
-                    v50.x = math_random_signed_float_range(0.0f, 0.00999999978f) + e->pos.x;
-                    v50.y = math_random_signed_float_range(0.0f, 0.00999999978f) + e->pos.y;
-                    v50.z = math_random_signed_float_range(0.0f, 0.00999999978f) + e->pos.z;
-                    n = part_spawn_bluish_fade(&v50, 0x14, 0, 0);
-                    if (n != 0) {
-                        if (d->special) n->f4 = g_nanotech_special_phase;
-                        else n->f4 = g_nanotech_slot_phase;
-                        n->fC = g_nanotech_slot_scale;
+                    vec_b.w = 0.0f;
+                    inv_k = 1.0f - ratio;
+                    vec_a.x = vec_b.x - ext->u.a.x;
+                    vec_a.y = vec_b.y - ext->u.a.y;
+                    vec_a.z = vec_b.z - ext->u.a.z;
+                    vec_d.x = vec_c.x - ext->u.a.x;
+                    vec_d.y = vec_c.y - ext->u.a.y;
+                    vec_d.z = vec_c.z - ext->u.a.z;
+                    part->pos.x = cubic_hermite_scalar(vec_a.x, vec_b.x, vec_c.x, vec_d.x, inv_k);
+                    part->pos.y = cubic_hermite_scalar(vec_a.y, vec_b.y, vec_c.y, vec_d.y, inv_k);
+                    part->pos.z = cubic_hermite_scalar(vec_a.z, vec_b.z, vec_c.z, vec_d.z, inv_k);
+                    vec_f.x = math_random_signed_float_range(0.0f, 0.00999999978f) + part->pos.x;
+                    vec_f.y = math_random_signed_float_range(0.0f, 0.00999999978f) + part->pos.y;
+                    vec_f.z = math_random_signed_float_range(0.0f, 0.00999999978f) + part->pos.z;
+                    effect = part_spawn_bluish_fade(&vec_f, 0x14, 0, 0);
+                    if (effect != 0) {
+                        if (vars->special) effect->f4 = g_nanotech_special_phase;
+                        else effect->f4 = g_nanotech_slot_phase;
+                        effect->fC = g_nanotech_slot_scale;
                     }
-                    FastVecAdd(&v40, &e->pos, &v40);
-                    FastVecScale(&v40, &v40, 0.5f);
-                    v50.x = math_random_signed_float_range(0.0f, 0.00999999978f) + v40.x;
-                    v50.y = math_random_signed_float_range(0.0f, 0.00999999978f) + v40.y;
-                    v50.z = math_random_signed_float_range(0.0f, 0.00999999978f) + v40.z;
-                    n = part_spawn_bluish_fade(&v50, 0x14, 0, 0);
-                    if (n != 0) {
-                        if (d->special) n->f4 = g_nanotech_special_phase;
-                        else n->f4 = g_nanotech_slot_phase;
-                        n->fC = g_nanotech_slot_scale;
+                    FastVecAdd(&vec_e, &part->pos, &vec_e);
+                    FastVecScale(&vec_e, &vec_e, 0.5f);
+                    vec_f.x = math_random_signed_float_range(0.0f, 0.00999999978f) + vec_e.x;
+                    vec_f.y = math_random_signed_float_range(0.0f, 0.00999999978f) + vec_e.y;
+                    vec_f.z = math_random_signed_float_range(0.0f, 0.00999999978f) + vec_e.z;
+                    effect = part_spawn_bluish_fade(&vec_f, 0x14, 0, 0);
+                    if (effect != 0) {
+                        if (vars->special) effect->f4 = g_nanotech_special_phase;
+                        else effect->f4 = g_nanotech_slot_phase;
+                        effect->fC = g_nanotech_slot_scale;
                     }
                 }
             }
         }
         break;
     case 4:
-        if (g_nanotech_ball_moby == m) update_nanotech_ball_slot_offsets();
+        if (g_nanotech_ball_moby == moby) update_nanotech_ball_slot_offsets();
         break;
     case 5:
-        if ((g_game_time & 1) && moby_is_in_selected_zone(&m->pos)) moby_set_state(m, 2, -1);
+        if ((g_game_time & 1) && moby_is_in_selected_zone(&moby->pos)) moby_set_state(moby, 2, -1);
         break;
     }
 }

@@ -7,7 +7,7 @@ extern int FastTweenColor(int, int, float);
 extern int PulseColor(int, int, float);
 extern int FastDecTimer(void *);
 extern void moby_update_eased_node(void *, void *, int, float, float);
-extern void func_PAL_002B14F8(void *, float *, float, int, int);
+extern void value_set_and_smooth_pal(void *, float *, float, int, int);
 extern float g_glow_pulse_rate_b __attribute__((sda));
 extern float g_glow_pulse_rate_a __attribute__((sda));
 extern int g_glow_tween_colors[] __attribute__((sda));
@@ -15,7 +15,8 @@ extern int g_glow_pulse_colors[] __attribute__((sda));
 extern int g_arena_state_words[] __attribute__((sda));
 extern char g_hero_state[];
 
-void func_PAL_L02_003D0C08(unsigned char *object)
+/* Pulses the object's glow colours, counts down its timers and eases its two joint nodes. */
+void moby_update_glow_pulse_timers_pal(unsigned char *object)
 {
     char *state = *(char **)(object + 0x68);
     float phase;
@@ -42,5 +43,5 @@ void func_PAL_L02_003D0C08(unsigned char *object)
         *(short *)(state + 0x386) = 0;
     moby_update_eased_node(object, state + 0x210, 1, 0.0432f, 0.43200004f);
     moby_update_eased_node(object, state + 0x290, 2, 0.0432f, 0.43200004f);
-    func_PAL_002B14F8(object, (float *)(state + 0x290), 2.5f, 2, 1);
+    value_set_and_smooth_pal(object, (float *)(state + 0x290), 2.5f, 2, 1);
 }

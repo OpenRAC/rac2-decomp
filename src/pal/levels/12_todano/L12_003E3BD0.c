@@ -7,7 +7,7 @@ extern u8 g_hero_l12_state_records[];
 extern s32 func_315148();
 extern s32 func_32D988();
 extern s32 func_2F15C8(void *arg0);
-extern void func_PAL_002AC3C0(void *arg0, void *arg1);
+extern void gfx_update_color_fade_pal(void *arg0, void *arg1);
 extern void moby_update_eased_node(void *arg0, void *arg1, s32 arg2, f32 x, f32 y);
 extern s32 func_3205F8(void *arg0, s32 arg1, s32 arg2);
 extern s32 func_364DF8(s32 arg0, s32 arg1, void *arg2);
@@ -28,16 +28,16 @@ extern s32 *g_path_zone_table[];
 extern s32 point_in_path_xy(void *, void *, s32);
 
 /* Re-arms the measured two-slot primitive after the counter step. */
-void func_PAL_L12_003E4A20(u8 *object) {
-    u8 *state = *(u8 **)(object + 0x68);
+void joint_pair_advance_counter_pal(u8 *moby) {
+    u8 *vars = *(u8 **)(moby + 0x68);
     u16 counter;
 
-    func_PAL_002AC3C0(object, state + 0x50);
-    moby_update_eased_node(object, state + 0x6C0, 1, 0.0432f, 0.43200004f);
-    moby_update_eased_node(object, state + 0x640, 0, 0.0432f, 0.43200004f);
-    counter = *(u16 *)(object + 0x96);
+    gfx_update_color_fade_pal(moby, vars + 0x50);
+    moby_update_eased_node(moby, vars + 0x6C0, 1, 0.0432f, 0.43200004f);
+    moby_update_eased_node(moby, vars + 0x640, 0, 0.0432f, 0.43200004f);
+    counter = *(u16 *)(moby + 0x96);
     if (counter <= 0xFFFE)
-        *(u16 *)(object + 0x96) = counter + 1;
+        *(u16 *)(moby + 0x96) = counter + 1;
 }
 
 

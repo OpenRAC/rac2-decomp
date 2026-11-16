@@ -29,7 +29,8 @@ typedef struct {
     float phase[9], speed[9];
 } BeamParticle;
 
-void func_PAL_L00_003ABDC8(TI128 *position, int index)
+/* Takes a free slot in the beam particle pool and gives it a random angle, spin, size, lifetime and drift (PAL: lifetimes at 50 Hz). */
+void beam_spawn_particle_pal(TI128 *position, int index)
 {
     char *base = level_get_slot_body(1483, index);
     BeamParticle *entry;

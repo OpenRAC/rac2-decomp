@@ -30,7 +30,9 @@ extern int g_sparkle_kind_ranges[] __attribute__((sda));
 extern float g_sparkle_hero_param_b;
 extern int g_explosion_particle_colors[2] __attribute__((sda));
 
-void func_PAL_L00_003BB200(char *object, float *position)
+/* Throws out a burst of small coloured particles from a position, like an explosion. (PAL: 50 Hz
+ * timings) */
+void part_l00_spawn_explosion_particles_pal(char *object, float *position)
 {
     float point[4], velocity[4];
     int i;

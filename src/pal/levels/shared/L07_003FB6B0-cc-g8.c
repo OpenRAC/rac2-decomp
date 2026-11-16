@@ -42,18 +42,18 @@ extern s32 g_puff_extra_count __attribute__((sda));
    a random speed from the range at D_L07_001B0FE8 (per frame at 60 Hz), with the second colour
    and size. Each kind byte is random in a range (D_L07_001B1000 then D_L07_001B1008), the next
    byte random up to 0xFF. The velocity goes to the first spawn before func_00282C88 clears it. */
-void func_PAL_L07_003FB6B0(u8 *a0)
+void part_spawn_falling_puff_pal(u8 *moby)
 {
     f32 vel[4];
     f32 pos[4];
     s32 i;
 
-    part_spawn_hero_relative(a0 + 0x10, vel, g_puff_kind_a, (u8)(((int)(math_random_int_range(g_puff_size_min_a, g_puff_size_max_a)) * 5 + 2) / 6),
+    part_spawn_hero_relative(moby + 0x10, vel, g_puff_kind_a, (u8)(((int)(math_random_int_range(g_puff_size_min_a, g_puff_size_max_a)) * 5 + 2) / 6),
                   (u8)math_random_int_below(0xFF), 0, g_puff_color_a);
     vec_clear_128(vel);
     for (i = 0; i < g_puff_extra_count; i++) {
         vec_random_direction(pos, 0.0f, 0.5f);
-        FastVecAdd(pos, pos, a0 + 0x10);
+        FastVecAdd(pos, pos, moby + 0x10);
         vel[2] = -(math_random_float_range(g_puff_fall_speed_range[0], g_puff_fall_speed_range[1]) * 0.020000001f);
         part_spawn_hero_relative(pos, vel, g_puff_kind_b, (u8)(((int)(math_random_int_range(g_puff_size_min_b, g_puff_size_max_b)) * 5 + 2) / 6),
                       (u8)math_random_int_below(0xFF), 0, g_puff_color_b);

@@ -34,6 +34,8 @@ extern void func_002A05A8(char *);
 extern void func_002A1130(u32 *, u32, long long, u32);
 extern void func_002A0F48(char *);
 
+/* Attaches the object's two DMA packet buffers (at +0 and +0x600) to the slot entries chosen by the selection
+   bytes, then restarts the slot. (USA v2.00) */
 void menu_attach_slot_packets_us2(char *obj)
 {
     char *sub = obj + 0xC00;

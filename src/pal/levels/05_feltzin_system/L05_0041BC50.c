@@ -15,32 +15,32 @@ extern char g_hero_l05_state[];
 /* Blends the sub-record into the object's transform once three guards clear. */
 void feltzin_helper_check_hit_attach_pal(char *object, char *arg1)
 {
-    char *sub = *(char **)(object + 0x68);
+    char *vars = *(char **)(object + 0x68);
     char buf[16];
     char buf2[16];
-    char *r;
-    char *base;
-    int value;
+    char *target_rec;
+    char *hit_result;
+    int hit_object;
 
-    r = func_379CA0(*(char **)(sub + 0x50));
+    target_rec = func_379CA0(*(char **)(vars + 0x50));
     func_329960(object, 0, buf);
     func_306660(buf2, buf, object + 0x10);
     if (func_2F6C50(arg1, buf, 0, object, 0) == 0)
         return;
-    base = g_collision_l05_result;
-    value = *(int *)(base + 0x18);
-    if (value == 0)
+    hit_result = g_collision_l05_result;
+    hit_object = *(int *)(hit_result + 0x18);
+    if (hit_object == 0)
         return;
-    if (value != *(int *)(r + 0x120))
+    if (hit_object != *(int *)(target_rec + 0x120))
         return;
-    func_306630(object + 0x10, buf2, base + 0x20);
+    func_306630(object + 0x10, buf2, hit_result + 0x20);
     func_37AC80(2.0f);
     {
-        char *state = g_hero_l05_state;
+        char *hero_state = g_hero_l05_state;
 
-        *(float *)(state + 0x160) = 0.05f;
-        *(int *)(state + 0x168) = 0x19;
-        *(int *)(state + 0x16C) = 0;
+        *(float *)(hero_state + 0x160) = 0.05f;
+        *(int *)(hero_state + 0x168) = 0x19;
+        *(int *)(hero_state + 0x16C) = 0;
     }
     *(unsigned char *)(object + 0x20) = 4;
 }

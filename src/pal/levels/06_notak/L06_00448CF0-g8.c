@@ -47,9 +47,9 @@ void marker_update_pulse_pal(L06Obj *self)
 {
     L06Cfg *state = self->cfg;
     L06ColorPair colors = g_marker_color_pairs[0];
-    unsigned short *p;
-    L06Obj *e;
-    L06Cfg *s0;
+    unsigned short *id_ptr;
+    L06Obj *entity;
+    L06Cfg *entity_cfg;
     float angle;
     float blend;
 
@@ -59,21 +59,21 @@ void marker_update_pulse_pal(L06Obj *self)
     state->blend = blend;
     self->tint = FastTweenColor(colors.a, colors.b, blend);
     if (state->stamp != g_game_l06_frame_counter) {
-        for (p = (unsigned short *)g_group_l06_id_lists[self->group];
-             self->group != 0xFF && self->group <= g_moby_l06_group_count && p != 0 &&
-             ((p != 0 && (short)p[-1] >= 0) || p == (unsigned short *)g_group_l06_id_lists[self->group]);
-             p++) {
-            e = (L06Obj *)(D_L06_001B281C_base[0] + ((*p & 0x7FFF) << 8));
-            if (e == 0)
+        for (id_ptr = (unsigned short *)g_group_l06_id_lists[self->group];
+             self->group != 0xFF && self->group <= g_moby_l06_group_count && id_ptr != 0 &&
+             ((id_ptr != 0 && (short)id_ptr[-1] >= 0) || id_ptr == (unsigned short *)g_group_l06_id_lists[self->group]);
+             id_ptr++) {
+            entity = (L06Obj *)(D_L06_001B281C_base[0] + ((*id_ptr & 0x7FFF) << 8));
+            if (entity == 0)
                 break;
-            if (e->live != 0) {
-                if (e->cls == 0xDB0) {
+            if (entity->live != 0) {
+                if (entity->cls == 0xDB0) {
                     /* two tests, as retail has them: `!= 0xFE && != 0xFD` is folded into one */
-                    if (e->kind != 0xFE) {
-                        if (e->kind != 0xFD) {
-                            s0 = e->cfg;
-                            moby_transform_joint_point(e, 0, &s0->vec);
-                            s0->stamp = g_game_l06_frame_counter;
+                    if (entity->kind != 0xFE) {
+                        if (entity->kind != 0xFD) {
+                            entity_cfg = entity->cfg;
+                            moby_transform_joint_point(entity, 0, &entity_cfg->vec);
+                            entity_cfg->stamp = g_game_l06_frame_counter;
                         }
                     }
                 }

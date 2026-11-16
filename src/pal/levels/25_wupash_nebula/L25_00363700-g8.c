@@ -10,7 +10,8 @@ extern InitEntry12 g_menu_l00_entry_table[];
 extern int * volatile g_menu_l00_item_list __attribute__((sda));
 extern struct { char pad[0x230]; int selected; } g_format_root;
 
-int func_PAL_L25_00363700(char *obj) {
+/* Fills the menu entry table from the list of menu ids, then selects the entry of the item list that matches the current selection. */
+int menu_l25_fill_entries_from_item_list_pal(char *menu) {
     int i, entry;
     int *list;
     for (i = 0; i < 28 && g_menu_entry_ids[i]; i++) {
@@ -21,11 +22,11 @@ int func_PAL_L25_00363700(char *obj) {
     }
     list = g_menu_l00_item_list;
     g_menu_l00_entry_table[i].id = 0;
-    *(int *)(obj + 0x40) = 0;
-    *(unsigned int *)(obj + 0x30) |= 0x8000;
+    *(int *)(menu + 0x40) = 0;
+    *(unsigned int *)(menu + 0x30) |= 0x8000;
     for (i = 0, entry = list[0]; entry; entry = g_menu_l00_item_list[++i]) {
         if (g_format_root.selected == entry) {
-            *(int *)(obj + 0x40) = i;
+            *(int *)(menu + 0x40) = i;
             break;
         }
     }

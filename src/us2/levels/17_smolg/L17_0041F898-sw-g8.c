@@ -50,6 +50,8 @@ static inline void update_joint(s32 obj, s32 joint, s32 index, float speed, floa
     moby_update_eased_node(obj, joint, index, speed, rate);
 }
 
+/* Runs a machine that sells something for bolts: it checks the price, takes the bolts and
+   gives the item, while its head follows the player (USA v2.00 copy). */
 void UpdateBoltPurchaseMoby_us2(s32 obj) {
     V target, raised, delta;
     s32 data = I(obj, 0x68), active;

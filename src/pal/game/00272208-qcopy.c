@@ -9,7 +9,7 @@ extern void cam_update_second_scalar_transition(void);
 extern void cam_select_coll_masks(void);
 extern void cam_update_follow_hero(void);
 extern int cam_update_active(void);
-extern void func_PAL_00270D50(void *);
+extern void cam_begin_mode_change_pal(void *);
 extern int stub_empty_22(void);
 extern void FastVecCross(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
@@ -34,7 +34,7 @@ void cam_update_state_pal(void) {
     cam_update_active();
     obj = *(char **)(d + 0x190);
     if ((unsigned)(*(unsigned short *)(d + 0x290) - 1) < 2)
-        func_PAL_00270D50(*(void **)(d + 0x194));
+        cam_begin_mode_change_pal(*(void **)(d + 0x194));
     if (*(short *)(d + 0x290) == 3) {
         moby_test_and_snapshot(obj);
     } else {

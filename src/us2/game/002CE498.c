@@ -31,6 +31,7 @@ extern ToggleState_2CD4E0 *g_menu_flag_target;
 extern int func_0029C248(int first, void *second);
 extern int menu_get_setting_value(void);
 
+/* Handles menu input and keeps the menu flags in step with the current selection. */
 int menu_update_input_flags_us2(void)
 {
     int local[4];

@@ -14,7 +14,8 @@ extern EquipmentState g_pause_menu_state;
 
 #define MATERIAL(id) ((MaterialRecord *)(D_00139568[id]*224 + (char *)D_00239BA0))->material
 
-void HandleColumnSelectionInput_us2(SelectionOwner *o, int buttons)
+/* Handles the pad in the column selection menu: moves the cursor between columns and picks an item (USA v2.00 copy). */
+void HandleColumnSelectionInput_us2(SelectionOwner *owner, int buttons)
 {
     int id, column;
 
@@ -22,36 +23,36 @@ void HandleColumnSelectionInput_us2(SelectionOwner *o, int buttons)
         int next;
 
         snd_play_from_global_bank(3, 0, 0);
-        column = o->column;
+        column = owner->column;
         next = column - 1;
-        o->row = 0;
-        o->state = 3;
+        owner->row = 0;
+        owner->state = 3;
         if (next < 0)
             next = 0;
-        o->column = next;
+        owner->column = next;
     } else if (buttons & 0x4000) {
         snd_play_from_global_bank(3, 0, 0);
-        o->row = 0;
-        o->state = 0;
+        owner->row = 0;
+        owner->state = 0;
     } else if (buttons & 0x8000) {
         snd_play_from_global_bank(3, 0, 0);
-        column = o->column;
+        column = owner->column;
         column--;
-        o->column = column;
+        owner->column = column;
         if (column < 0)
-            o->column = 2;
+            owner->column = 2;
     } else if (buttons & 0x2000) {
         snd_play_from_global_bank(3, 0, 0);
-        column = o->column;
+        column = owner->column;
         column++;
-        o->column = column;
+        owner->column = column;
         if (column >= 3)
-            o->column = 0;
+            owner->column = 0;
     } else if (buttons & 0x40) {
-        id = g_item_grid_second_mode_rows[o->column].v[3];
+        id = g_item_grid_second_mode_rows[owner->column].v[3];
         if (id != 0 && g_item_owned_flags[id] != 0) {
             snd_play_from_global_bank(4, 0, 0);
-            g_selected_item_material = MATERIAL(o->selected);
+            g_selected_item_material = MATERIAL(owner->selected);
             if (g_pause_menu_state.selected == id)
                 g_pause_menu_state.selected = 0;
             else
@@ -61,8 +62,8 @@ void HandleColumnSelectionInput_us2(SelectionOwner *o, int buttons)
         }
     }
     {
-        int selected = g_item_grid_second_mode_rows[o->column].v[3];
-        o->selected = selected;
+        int selected = g_item_grid_second_mode_rows[owner->column].v[3];
+        owner->selected = selected;
         if (selected != 0 && g_item_owned_flags[selected] != 0)
             g_selected_item_material = MATERIAL(selected);
     }

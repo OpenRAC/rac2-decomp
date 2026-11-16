@@ -6,9 +6,9 @@
    Draws the status bar and its two texture labels, the warning and counter texts, the pickup
    icon and its labels. Built with -fno-gcse (as the HUD units func_0032F3D0 and
    func_L02_003C43F0: `half`, `one`, `entry` and the label floats stay in registers) and -g
-   (the nop pair before div.s).
+   (the nop pair before div.vars).
 
-   `hero` is one int local that holds the hero's address and later the counter colour. With two
+   `hero` is one int local that holds the hero'vars address and later the counter colour. With two
    sets alias analysis has no base for it, so the palette stores stay behind the hero load. */
 #include "common.h"
 
@@ -98,9 +98,9 @@ static __inline__ int hud_coord(int mode, float value, float half, int active, f
     return (int)scaled;
 }
 
-/* The status bar's height (a float) scaled for the display and rounded. scaled_coord's
+/* The status bar'vars height (a float) scaled for the display and rounded. scaled_coord'vars
    display-mode test, on the display mode its caller has already read (as scaled_screen_size(mode,
-   ...) in src/game/002D3390.c takes it), compared with the 1 its caller's own test uses. The test
+   ...) in src/game/002D3390.c takes it), compared with the 1 its caller'vars own test uses. The test
    has no effect on the result: flow deletes it after allocation. */
 static __inline__ int hud_size(int mode, float value, float scale, float half)
 {
@@ -112,7 +112,7 @@ static __inline__ int hud_size(int mode, float value, float scale, float half)
     return result;
 }
 
-/* A coordinate scaled for the display and rounded to a whole pixel (upstream's scaled_coord,
+/* A coordinate scaled for the display and rounded to a whole pixel (upstream'vars scaled_coord,
    src/levels/02_maktar_nebula/L02_003FF6E8-g8.c). The display-mode test has no effect on the
    result: flow deletes it after allocation. */
 static __inline__ int scaled_coord(int value, float scale, float half, int active)
@@ -126,7 +126,7 @@ static __inline__ int scaled_coord(int value, float scale, float half, int activ
     return result;
 }
 
-/* A label's y coordinate (a text line or a sprite) scaled for the display and rounded to a whole
+/* A label'vars y coordinate (a text line or a sprite) scaled for the display and rounded to a whole
    pixel. Its display-mode and handle tests do not change the result: flow deletes them after
    allocation, as with scaled_coord in src/levels/02_maktar_nebula/L02_003FF6E8-g8.c. */
 static __inline__ int label_y(void *handle, float value, float scale, float half, int active)
@@ -152,7 +152,7 @@ static __inline__ void sprite(char *id, int col, float x, int y, float a, float 
     gfx_draw_scaled_object_two_axes(id, col, x, (float)y, a, b, c);
 }
 
-/* The status bar's bottom edge. */
+/* The status bar'vars bottom edge. */
 static __inline__ int hud_bar_bottom(void)
 {
     int mode = g_hud_scale_mode;
@@ -168,14 +168,15 @@ static __inline__ int hud_bar_bottom(void)
     return h - y + hud_size(mode, g_hud_size_value, scale, 0.5f);
 }
 
-int func_PAL_L19_00417318(void)
+/* Draws the Grelbin status bar with its labels, the warning and counter texts and the pickup icon (PAL: 50 Hz timers). */
+int grelbin_status_hud_draw_pal(void)
 {
     unsigned int colors[4];
     struct Palette { unsigned int a,b; } palette;
     char text[64];
     int hero = (int)g_hero_state;
     unsigned char *obj = *(unsigned char **)(hero + 0x1830);
-    unsigned char *s = *(unsigned char **)(obj + 0x68);
+    unsigned char *vars = *(unsigned char **)(obj + 0x68);
     int mask = -1;
 
     if (*(float *)(hero + 0x183C) < *(float *)(hero + 0x1840) * 0.25f)
@@ -196,7 +197,7 @@ int func_PAL_L19_00417318(void)
         gfx_append_vectors_to_packet(2, 0x47, test | ((unsigned long)g_hud_gauge_test_high << 17),
             0x42, alpha | ((unsigned long)g_hud_gauge_alpha_high << 32));
     }
-    FastDecTimer(s + 0x8E);
+    FastDecTimer(vars + 0x8E);
     if (g_hud_l19_text_table) {
         float delta, ratio;
         unsigned char *str;
@@ -220,7 +221,7 @@ int func_PAL_L19_00417318(void)
         x = (float)(g_screen_width / 2);
         y = label_y(str, g_hud_label_y_base, g_hud_scale_factor_global, half, 1);
         sprite((char *)str, mask & 0x55F0C070, x, g_screen_height / 2 + y, fade, fade, z);
-        delta = *(float *)(hero + 0x183C) - ((HudState *)s)->level;
+        delta = *(float *)(hero + 0x183C) - ((HudState *)vars)->level;
         delta *= 0.2f;
         {
             float magnitude = math_fabs(delta);
@@ -228,8 +229,8 @@ int func_PAL_L19_00417318(void)
         }
         c0 = g_hud_color_start;
         c1 = g_hud_color_end;
-        ((HudState *)s)->level += delta;
-        ratio = ((HudState *)s)->level / *(float *)(hero + 0x1840);
+        ((HudState *)vars)->level += delta;
+        ratio = ((HudState *)vars)->level / *(float *)(hero + 0x1840);
         palette.a = c0;
         palette.b = c1;
         *(struct Palette *)colors = palette;
@@ -243,11 +244,11 @@ int func_PAL_L19_00417318(void)
     }
     if (g_current_map_index == 8 || g_current_map_index == 19) {
         unsigned char *str;
-        if (*(short *)(s + 0x8E)) {
+        if (*(short *)(vars + 0x8E)) {
             float ratio, scale, alpha;
             int color;
-            if (*(short *)(s + 0x8E) == 1) snd_play_from_class_bank(3,0,obj,0x85C);
-            ratio = IntToFloat(180-*(short *)(s + 0x8E)) / IntToFloat(180);
+            if (*(short *)(vars + 0x8E) == 1) snd_play_from_class_bank(3,0,obj,0x85C);
+            ratio = IntToFloat(180-*(short *)(vars + 0x8E)) / IntToFloat(180);
             scale = g_hud_scale_start + (g_hud_scale_end-g_hud_scale_ease_sub)*math_ease_out_quad(ratio);
             alpha = IntegerPower(3,1.0f-ratio)*127.0f;
             color = FloatToInt(alpha*0.5f) << 24;
@@ -260,17 +261,17 @@ int func_PAL_L19_00417318(void)
             color = FloatToInt(alpha) << 24;
             DrawCenteredScaledText(g_screen_width-g_hud_label_x_inset,g_screen_height-hud_coord(g_hud_scale_mode, (float)g_hud_label_y_inset, 0.5f, 1, -6.0f),
                 (color|0x808080)&mask,str,0x11,scale);
-        } else if (*(int *)(s + 0x6C)) {
-            if (*(float *)(s + 0x68) > g_hud_l19_bar_threshold) {
+        } else if (*(int *)(vars + 0x6C)) {
+            if (*(float *)(vars + 0x68) > g_hud_l19_bar_threshold) {
                 int x, y, pad;
                 char *line;
                 str = GetLocalizedString(0x10f8);
-                thread_call_var_args_worker(text,str,FloatToInt(*(float *)(s + 0x68)));
+                thread_call_var_args_worker(text,str,FloatToInt(*(float *)(vars + 0x68)));
                 line = text;
                 pad = g_pal_region_mode == 3 ? 24 : 0;
                 x = g_screen_width-g_hud_text_x_inset-pad;
                 y = g_screen_height-hud_coord(g_hud_scale_mode, (float)g_hud_label_y_inset, 0.5f, 1, -6.0f);
-                hero = 0x80FFDE8D; /* From here on `hero` is the counter's colour. */
+                hero = 0x80FFDE8D; /* From here on `hero` is the counter'vars colour. */
                 hero = mask & hero;
                 text_draw_medium(x,y,(unsigned int)hero,line,func_001157AC(line));
             } else if (g_pad_pressed_flags & 0x80) {
@@ -287,10 +288,10 @@ int func_PAL_L19_00417318(void)
                     (unsigned int)(mask&0x80F0F0F0),str,0x11,scale);
             }
         }
-        if (s[0x8A]) {
+        if (vars[0x8A]) {
             float ratio, width, height, dx, dy, top;
             int color, tex, x, y, a, b, alpha;
-            ratio = IntToFloat(*(short *)(s + 0x88))/IntToFloat((((int)(g_hud_bar_slide_frames) * 5 + 2) / 6));
+            ratio = IntToFloat(*(short *)(vars + 0x88))/IntToFloat((((int)(g_hud_bar_slide_frames) * 5 + 2) / 6));
             width = math_square(ratio)*32.0f;
             height = math_square(ratio)*24.0f;
             dx = g_hud_bar_slide_dx*math_ease_out_quad(ratio);
@@ -312,7 +313,7 @@ int func_PAL_L19_00417318(void)
                     (float)(g_screen_width/2+32)-dx,(float)(g_screen_height/2+g_hud_l19_bar_y_offset),1.0f,1.0f,0.0f);
                 hero_end_saved_float_hold();
             }
-            if (s[0x8A] < 3) {
+            if (vars[0x8A] < 3) {
                 int c=color|0xF0F0B0;
                 colors[0]=c;
                 colors[1]=c;
@@ -320,7 +321,7 @@ int func_PAL_L19_00417318(void)
                 colors[3]=c;
                 tex=GetIconFrame(0xEAA2,3);
                 x=FloatToInt((float)g_screen_width-g_hud_l19_bar_right_margin-dy);
-                y=FloatToInt(g_hud_bar_top_base+(float)g_hud_l19_bar_y_offset+(float)*(short *)(s + 0x8C)+top);
+                y=FloatToInt(g_hud_bar_top_base+(float)g_hud_l19_bar_y_offset+(float)*(short *)(vars + 0x8C)+top);
                 y=scaled_coord(y,g_hud_scale_factor_global,0.5f,1);
                 a=FloatToInt(height);
                 b=FloatToInt(height);
@@ -330,7 +331,7 @@ int func_PAL_L19_00417318(void)
         radar_draw(obj);
     }
     gfx_append_vectors_to_packet(2,0x47,0x5340B,0x42,0x8000000044ULL);
-    *(float *)(s + 0x68)=1000000.0f;
-    *(int *)(s + 0x6C)=0;
+    *(float *)(vars + 0x68)=1000000.0f;
+    *(int *)(vars + 0x6C)=0;
     return 1;
 }

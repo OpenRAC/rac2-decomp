@@ -10,7 +10,8 @@ extern InitEntry12 g_menu_l00_entry_table[];
 extern int * volatile g_menu_l00_item_list __attribute__((sda));
 extern struct { char pad[0x230]; int selected; } g_format_root;
 
-int func_US2_L10_0036A298(char *obj) {
+/* Fills the menu entry table from the entry ids and selects the entry that is currently chosen. */
+int menu_fill_entry_table_us2(char *obj) {
     int i, entry;
     int *list;
     for (i = 0; i < 28 && g_menu_entry_ids[i]; i++) {

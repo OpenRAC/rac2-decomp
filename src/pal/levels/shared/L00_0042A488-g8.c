@@ -36,14 +36,14 @@ extern float ref_L00_00424F98_03 SDATA(ref_L00_00424F98_03);
 
 /* The vehicle's steering and throttle inputs, with the stunt counter: holding the
    stick centred for a second counts one run and records the best time. */
-void func_PAL_L00_0042A488(char *obj, float *x, float *y)
+void ship_read_steer_and_throttle_pal(char *obj, float *x, float *y)
 {
-    L00_00424F98_Input *t = (L00_00424F98_Input *)(*(char **)(obj + 0x70) + 0x1C0);
-    L00_00424F98_Counter *c;
-    unsigned int n;
-    float v;
+    L00_00424F98_Input *input = (L00_00424F98_Input *)(*(char **)(obj + 0x70) + 0x1C0);
+    L00_00424F98_Counter *stats;
+    unsigned int count;
+    float stick_y;
 
-    if (t->flags & 1) {
+    if (input->flags & 1) {
         *x = 0.0f;
     } else {
         *x = g_stick_axis_x[0];
@@ -53,36 +53,36 @@ void func_PAL_L00_0042A488(char *obj, float *x, float *y)
     if (*x == 0.0f) {
         ref_L00_00424F98_00 = 0;
         ref_L00_00424F98_01 = 0;
-        if (t->steer != 0.0f)
-            *x = t->steer;
+        if (input->steer != 0.0f)
+            *x = input->steer;
     } else {
-        t->steer_out = ref_L00_00424F98_02;
-        c = &g_progress_statistics;
-        n = c->count;
-        if ((unsigned short)n < 3U) {
+        input->steer_out = ref_L00_00424F98_02;
+        stats = &g_progress_statistics;
+        count = stats->count;
+        if ((unsigned short)count < 3U) {
             ref_L00_00424F98_00++;
             if (ref_L00_00424F98_01 == 0 && ref_L00_00424F98_00 > 0x32) {
-                if ((unsigned short)n < 0xFFFF)
-                    c->count = n + 1;
-                if (((s32)(g_frame_counter) * 5 + 2) / 6 > c->best)
-                    c->best = ((s32)(g_frame_counter) * 5 + 2) / 6;
+                if ((unsigned short)count < 0xFFFF)
+                    stats->count = count + 1;
+                if (((s32)(g_frame_counter) * 5 + 2) / 6 > stats->best)
+                    stats->best = ((s32)(g_frame_counter) * 5 + 2) / 6;
                 ref_L00_00424F98_01 = 1;
-                c->flags = (c->flags | (1u << g_current_map_index)) | 0x80000000u;
+                stats->flags = (stats->flags | (1u << g_current_map_index)) | 0x80000000u;
             }
         }
     }
-    if (t->flags & 2) {
+    if (input->flags & 2) {
         *y = 0.0f;
     } else {
-        v = g_stick_axis_y[0];
-        *y = -v;
+        stick_y = g_stick_axis_y[0];
+        *y = -stick_y;
         if (g_invert_aim_option == 0)
-            *y = v;
+            *y = stick_y;
         if (*y != 0.0f)
             return;
     }
     {
-        float throttle = t->throttle;
+        float throttle = input->throttle;
         *y = throttle / ref_L00_00424F98_03;
     }
 }

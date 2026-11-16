@@ -16,33 +16,34 @@ extern int g_electric_orb_color_b;
 extern int g_electric_orb_color_c;
 extern int g_electric_orb_color_d;
 
-void func_PAL_L20_003A1CE8(char *arg0) {
-    char *state = *(char **)(arg0 + 0x68);
+/* Per-frame update of the electric orb: pulses its colour and queues its draw, or removes it when its timer ends. */
+void electric_orb_update_pal(char *orb) {
+    char *state = *(char **)(orb + 0x68);
 
     if (math_fast_float_d(state) != 0) {
-        moby_mark_spawned(arg0);
+        moby_mark_spawned(orb);
     } else {
-        f32 x = *(f32 *)(state + 0x8);
-        f32 r, s;
-        int v, w, lo, hi;
+        f32 phase_old = *(f32 *)(state + 0x8);
+        f32 phase, wave;
+        int color, blended, rgb, alpha_bits;
 
         if (*(int *)(state + 0xC) != 0) {
-            r = FastAddRotations(x, (f32)g_electric_orb_spin_rate * 0.0003490659f);
-            *(f32 *)(state + 0x8) = r;
-            s = math_fast_sin_or_cos_b(r);
-            v = FastTweenColor(s * 0.5f + 0.5f, g_electric_orb_color_a, g_electric_orb_color_b);
+            phase = FastAddRotations(phase_old, (f32)g_electric_orb_spin_rate * 0.0003490659f);
+            *(f32 *)(state + 0x8) = phase;
+            wave = math_fast_sin_or_cos_b(phase);
+            color = FastTweenColor(wave * 0.5f + 0.5f, g_electric_orb_color_a, g_electric_orb_color_b);
         } else {
-            r = FastAddRotations(x, (f32)g_electric_orb_spin_rate * 0.0003490659f);
-            *(f32 *)(state + 0x8) = r;
-            s = math_fast_sin_or_cos_b(r);
-            v = FastTweenColor(s * s * 0.5f + 0.5f, g_electric_orb_color_c, g_electric_orb_color_d);
+            phase = FastAddRotations(phase_old, (f32)g_electric_orb_spin_rate * 0.0003490659f);
+            *(f32 *)(state + 0x8) = phase;
+            wave = math_fast_sin_or_cos_b(phase);
+            color = FastTweenColor(wave * wave * 0.5f + 0.5f, g_electric_orb_color_c, g_electric_orb_color_d);
         }
-        w = FastTweenColor(0.15f, *(int *)(state + 0x10) | *(int *)(state + 0x4), v);
-        lo = w & 0xFFFFFF;
-        hi = w & 0xFF000000;
-        *(int *)(state + 0x10) = hi;
-        *(int *)(state + 0x4) = lo;
-        *(f32 *)(state + 0x14) = IntToFloat(hi >> 24) * 0.00390625f;
-        gfx_add_draw_callback_first(electric_orb_draw_pal, arg0);
+        blended = FastTweenColor(0.15f, *(int *)(state + 0x10) | *(int *)(state + 0x4), color);
+        rgb = blended & 0xFFFFFF;
+        alpha_bits = blended & 0xFF000000;
+        *(int *)(state + 0x10) = alpha_bits;
+        *(int *)(state + 0x4) = rgb;
+        *(f32 *)(state + 0x14) = IntToFloat(alpha_bits >> 24) * 0.00390625f;
+        gfx_add_draw_callback_first(electric_orb_draw_pal, orb);
     }
 }

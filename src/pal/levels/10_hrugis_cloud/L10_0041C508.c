@@ -21,7 +21,8 @@ extern int math_random_int_range(int, int);
 extern int FloatToInt(float);
 extern float IntToFloat(int);
 
-void func_PAL_L10_0041C508(char *object, int joint, float radius) {
+/* Spawns one spinning spark of smoke around an object, thrown away from the camera (PAL copy of part_spawn_smoke_puff, 50 Hz timings). */
+void part_spawn_smoke_puff_pal(char *object, int joint, float radius) {
     float initial[4], point[4], velocity[4];
     float heading, speed, tilt, yaw;
     unsigned char *particle;

@@ -26,7 +26,7 @@ typedef union {
 /* For joints 5 to 7: queries near D_00189EA0 when close enough, then spawns falling particles
    (two colours by the toggle word, then a third). While neither level weight is above 0.95
    and +0x31 is set, joints 3 and 4 also spawn particles along the +0xC0 vector. */
-void func_PAL_L09_003EDFA8(char *object) {
+void part_spawn_falling_pal(char *object) {
     char *data = *(char **)(object + 0x68);
     Quad_L09_003E9AA0 pos, vel, zero;
     int i, j, size, life;

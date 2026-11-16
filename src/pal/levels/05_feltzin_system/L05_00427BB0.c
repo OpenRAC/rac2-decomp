@@ -33,16 +33,17 @@ extern u8 *g_level_byte_ptr_table[];
 extern u8 *g_moby_pool_base;
 extern s32 g_sdata_word_unused_a __attribute__((sda));
 
-void feltzin_target_spawner_init_pal(u8 *arg0) {
-    u8 *s1 = *(u8 **)(arg0 + 0x68);
+/* Sets up a target spawner: marks it active and resets its timers. */
+void feltzin_target_spawner_init_pal(u8 *moby) {
+    u8 *vars = *(u8 **)(moby + 0x68);
 
-    *(u16 *)(arg0 + 0x34) |= 0x100;
-    arg0[0x20] = 1;
-    *(s32 *)((u8 *)func_00379CA0(arg0) + 0x148) = 0xA;
-    func_0037AEC0(arg0, 1);
-    *(s32 *)(s1 + 0x26C) = 0;
-    *(s32 *)(s1 + 0x268) = 0;
-    *(f32 *)(s1 + 0x230) = 10.0f;
-    func_00379C68(arg0, 0xFFFF);
+    *(u16 *)(moby + 0x34) |= 0x100;
+    moby[0x20] = 1;
+    *(s32 *)((u8 *)func_00379CA0(moby) + 0x148) = 0xA;
+    func_0037AEC0(moby, 1);
+    *(s32 *)(vars + 0x26C) = 0;
+    *(s32 *)(vars + 0x268) = 0;
+    *(f32 *)(vars + 0x230) = 10.0f;
+    func_00379C68(moby, 0xFFFF);
 }
 

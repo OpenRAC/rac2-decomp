@@ -37,11 +37,13 @@ extern u8 *g_arena_camera_table __attribute__((sda));
 extern u8 g_hero_state[];
 extern u8 g_music_state[];
 
+/* Launches the first free fighter of the object's group toward target: hands it to the object, puts
+   it at target facing the arena centre and starts it (PAL: 50 Hz timings). */
 int arena_launch_fighter_toward_target_pal(u8 *object, float *target)
 {
     GroupMoby440B28 *member;
     unsigned short *list;
-    unsigned short *p;
+    unsigned short *cursor;
     int group;
     float dx;
 
@@ -51,9 +53,9 @@ int arena_launch_fighter_toward_target_pal(u8 *object, float *target)
     list = g_fighter_target_lists[group];
     if (list == 0)
         return 0;
-    p = list;
+    cursor = list;
     do {
-        member = (GroupMoby440B28 *)(g_moby_group_entries + (*p & 0x7FFF) * 0x100);
+        member = (GroupMoby440B28 *)(g_moby_group_entries + (*cursor & 0x7FFF) * 0x100);
         if (member != 0 && member->state != 0xFE && member->state != 0xFD &&
             member->oclass == 0xD37 && member->state == 1) {
             member->owner = object;
@@ -66,7 +68,7 @@ int arena_launch_fighter_toward_target_pal(u8 *object, float *target)
             enemy_init_state_pal(member, 0, 1);
             return 1;
         }
-    } while ((short)*p++ >= 0);
+    } while ((short)*cursor++ >= 0);
     return 0;
 }
 

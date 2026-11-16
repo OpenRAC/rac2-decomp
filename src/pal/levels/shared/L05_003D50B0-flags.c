@@ -16,11 +16,12 @@ extern void vec_build_spherical_offset(void *, float, float, float);
 
 /* func_L05_003D15E8 is in L05_003D15E8.c. */
 
+/* Sets the object up in its second mode (mode 5) and places it at a random point in the cone of the current challenge record (PAL). */
 void moby_init_state_and_position_pal(char *obj)
 {
     char *sub = *(char **)(obj + 0x68);
     char *table;
-    float a, b, c;
+    float radius, yaw, pitch;
 
     *(unsigned char *)(obj + 0x20) = 1;
     *(unsigned short *)(obj + 0x34) = *(unsigned short *)(obj + 0x34) | 0x100;
@@ -32,10 +33,10 @@ void moby_init_state_and_position_pal(char *obj)
     *(int *)(sub + 0x2F4) = -1;
     *(int *)(sub + 0x268) = 0;
     *(float *)(obj + 0x2C) = 0.04f;
-    a = math_random_float_range(0.0f, *(float *)table);
-    b = math_random_angle();
-    c = math_random_angle();
-    vec_build_spherical_offset(obj + 0x10, a, b, c);
+    radius = math_random_float_range(0.0f, *(float *)table);
+    yaw = math_random_angle();
+    pitch = math_random_angle();
+    vec_build_spherical_offset(obj + 0x10, radius, yaw, pitch);
     FastVecAdd(obj + 0x10, table + 0x30, obj + 0x10);
     *(int *)(sub + 0x26C) = 0;
 }

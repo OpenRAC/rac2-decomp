@@ -22,7 +22,8 @@ extern float g_door_slide_speed __attribute__((sda));
 extern float g_door_slide_accel __attribute__((sda));
 extern char g_sound_state[];
 typedef struct { float value[2]; float rate[2]; } DobboDoorMotion;
-void func_PAL_L09_0040FD68(char *obj) {
+/* Per-frame update of the sliding double door (moby class 3680): it opens, stays open for a while and closes again (PAL: 50 Hz timings). */
+void sliding_l09_door_update_pal(char *obj) {
     char *data = *(char **)(obj+0x68);
     int next, next4, sound, ticks;
     float speed, accel, speed4, accel4;

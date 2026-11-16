@@ -83,7 +83,7 @@ extern int ForceClaimNotice(int, int, int);
 extern void LoadClassIntoFreeCacheSlot(int);
 extern void SwitchCachedDiscAsset(int);
 extern void game_reset_frame_counters(void),moby_update_visible_objects(void),snd_run_callbacks(void);
-extern void func_US2_L00_002A6DD0(void);
+extern void hero_l00_update_frame_2_us2(void);
 extern void part_update_all(void),UpdateLightingEnvironment(void),game_update_idle_frame_counters(void);
 extern int request_end_slot(int,int);
 extern int hud_update_record_timers(int);
@@ -94,14 +94,14 @@ extern float func_L00_002EDCF0(float);
 extern float FastAddRotations(float,float);
 extern void func_002A0F48(void *);
 extern void FastVecScale(void *,void *,float);
-extern void BindVendorPreviewModel(void),func_US2_002FC008(void);
+extern void BindVendorPreviewModel(void),PrepareVendorSelectionPreview_us2(void);
 extern void menu_dispatch_by_mode_us2(void),shop_dispatch_purchase_confirm_us2(void);
 extern void module_l00_call_handler_with_arg_3(int),module_l00_call_handler_with_arg(int,int),func_L00_0030C710(int);
-extern void func_US2_0029CA98(void);
+extern void resident_menus_update_us2(void);
 extern s32 UpdateSoundVoices(void);
 #define MF(o) (*(float *)(m + (o)))
 /* Advances the purchase menu and its model previews, then runs the shared update. */
-void func_US2_L00_00375F40(void)
+void shop_update_purchase_menu_and_preview_us2(void)
 {
     int i, v;
     char *m;
@@ -144,7 +144,7 @@ void func_US2_L00_00375F40(void)
             game_reset_frame_counters();
             moby_update_visible_objects();
             snd_run_callbacks();
-            func_US2_L00_002A6DD0();
+            hero_l00_update_frame_2_us2();
             part_update_all();
         }
         request_end_slot(0, 0);
@@ -181,7 +181,7 @@ void func_US2_L00_00375F40(void)
         }
         if (g_purchase_menu_model[0].f88) {
             for (i = 0; i < g_purchase_menu_model[0].f34; i++) {
-                float stickScale = 0.0033333334f;
+                float stick_scale = 0.0033333334f;
                 m = (char *)g_purchase_menu_model[0].f2c + i * 256;
                 matrix_mul_vec3(m + 16, ((char *)g_purchase_menu_model) + 0xC0, (char *)g_purchase_menu_model[0].f28 + 0xC0);
                 FastVecAdd(m + 16, m + 16, (char *)g_purchase_menu_model[0].f28 + 16);
@@ -193,8 +193,8 @@ void func_US2_L00_00375F40(void)
                 if (g_purchase_menu_model[0].f50 != 2) {
                     MF(0xF8) = FastAddRotations(MF(0xF8), func_L00_002EDCF0(0.01f));
                 } else {
-                    x = g_pad_state[0].x * stickScale;
-                    y = g_pad_state[0].y * stickScale;
+                    x = g_pad_state[0].x * stick_scale;
+                    y = g_pad_state[0].y * stick_scale;
                     if (g_purchase_menu_model[0].fa4 <= 0) {
                         g_purchase_menu_model[0].fb4 = FastAddRotations(g_purchase_menu_model[0].fb4,
                             (g_purchase_menu_model[0].fa8 - g_purchase_menu_model[0].fb4) * 0.006666667f);
@@ -237,7 +237,7 @@ void func_US2_L00_00375F40(void)
             BindVendorPreviewModel();
         else if (g_purchase_menu_model[0].f90 == 3 && g_purchase_menu_model[0].f84 == 0 &&
                  g_purchase_menu_model[0].f6c == 0)
-            func_US2_002FC008();
+            PrepareVendorSelectionPreview_us2();
         g_purchase_menu_model[0].f04++;
         menu_dispatch_by_mode_us2();
         shop_dispatch_purchase_confirm_us2();
@@ -247,8 +247,8 @@ void func_US2_L00_00375F40(void)
             module_l00_call_handler_with_arg_3(*(int *)(((char *)g_purchase_menu_model) + 0x140 + g_purchase_menu_model[0].f80 * 24));
             {
                 int selected = *(int *)(((char *)g_purchase_menu_model) + 0x140 + g_purchase_menu_model[0].f80 * 24);
-                unsigned int classIndex = g_item_slot_to_record[selected];
-                module_l00_call_handler_with_arg(((MenuShopClass *)g_weapon_l00_table)[classIndex].value, 10);
+                unsigned int class_index = g_item_slot_to_record[selected];
+                module_l00_call_handler_with_arg(((MenuShopClass *)g_weapon_l00_table)[class_index].value, 10);
             }
         } else {
             module_l00_call_handler_with_arg_3(0);
@@ -256,7 +256,7 @@ void func_US2_L00_00375F40(void)
         hud_update_record_timers(1);
         if (g_purchase_menu_model[0].f50 != 2)
             func_L00_0030C710(180);
-        func_US2_0029CA98();
+        resident_menus_update_us2();
         break;
     }
     UpdateSoundVoices();

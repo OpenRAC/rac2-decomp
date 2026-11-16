@@ -17,57 +17,57 @@ extern float vec_length_xy(void *), mat_fast_helper_a(float, float), ApproachVal
 extern void vec_scale_to_length(void *, void *, float), FastVecScale(void *, void *, float);
 /* Precomputes path segment lengths and steers the hero along the nearest active path. */
 typedef struct { float f[4]; } PV; typedef struct { char h[16]; PV p[1]; } PC;
-void func_PAL_L00_003A1688(char *actor) {
+void hero_steer_along_rail_paths_pal(char *actor) {
     RailState *state = *(RailState **)(actor + 0x68);
     float previous[4], point[4], delta[4], step[4];
-    int segment, bestSegment;
-    float t, bestT;
-    char *curve, *bestCurve;
+    int segment, best_segment;
+    float t, best_t;
+    char *curve, *best_curve;
     int i, j, path;
-    float distance, bestDistance, advance, length;
+    float distance, best_distance, advance, length;
     if (!state || state->paths[0] == -1 || state->count == 0) return;
     if (state->initialized == 0) {
         state->initialized = 1;
         for (path = 0; path < state->count; path++) {
-            char *initCurve = g_launch_path_table[state->paths[path]];
+            char *init_curve = g_launch_path_table[state->paths[path]];
             j = 0;
-            if (j < *(int *)initCurve - 1) {
-                float *lengths = (float *)(initCurve + 0x1C);
-                char *next = initCurve + 0x20;
-                char *current = initCurve + 0x10;
+            if (j < *(int *)init_curve - 1) {
+                float *lengths = (float *)(init_curve + 0x1C);
+                char *next = init_curve + 0x20;
+                char *current = init_curve + 0x10;
                 do {
                     *lengths = fast_vec_dist(current, next);
                     j++;
                     next += 16;
                     lengths += 4;
                     current += 16;
-                } while (j < *(int *)initCurve - 1);
+                } while (j < *(int *)init_curve - 1);
             }
-            ((PC *)initCurve)->p[j].f[3] = fast_vec_dist(initCurve + (j * 16 + 0x10), initCurve + 0x10);
+            ((PC *)init_curve)->p[j].f[3] = fast_vec_dist(init_curve + (j * 16 + 0x10), init_curve + 0x10);
         }
         *(u8 *)(actor + 0x30) = 0xFF;
     }
     if (g_hero_state.state != 16) return;
-    bestCurve = 0;
-    bestDistance = 9999.0f;
+    best_curve = 0;
+    best_distance = 9999.0f;
     for (i = 0; i < state->count; i++) {
         curve = g_launch_path_table[state->paths[i]];
         find_nearest_path_point(curve, g_hero_state.point, point, &segment, &t, 0, 999.0f, 5.0f, 0.0f);
         distance = fast_vec_dist(g_hero_state.point, point);
-        if (distance < bestDistance) {
-            bestCurve = curve;
+        if (distance < best_distance) {
+            best_curve = curve;
             qcopy(previous, point);
-            bestDistance = distance;
-            bestSegment = segment;
-            bestT = t;
+            best_distance = distance;
+            best_segment = segment;
+            best_t = t;
         }
     }
-    if (!bestCurve) return;
+    if (!best_curve) return;
     advance = 3.7f - (float)g_hero_state.advanceState * 0.02f;
     if (advance < 0.7f) advance = 0.7f;
     {
-        int result = Spline_AdvanceByDistance(bestCurve, point, &bestSegment, &bestT, 0, advance);
-        if (state->radius < bestDistance) return;
+        int result = Spline_AdvanceByDistance(best_curve, point, &best_segment, &best_t, 0, advance);
+        if (state->radius < best_distance) return;
         if (!result) {
             FastVecSub(step, point, previous);
             FastVecSub(delta, point, g_hero_state.point);

@@ -13,6 +13,7 @@ extern void object_set_helper_result(void *, void *, int);
 extern void list_menu_reset_attach_items(void *, void *);
 extern int list_menu_set_selection(void *, int);
 
+/* Sets up a small list menu: its position, two widgets and the list. */
 void small_list_menu_init_us2(char *object, void *argument)
 {
     int *allocation;

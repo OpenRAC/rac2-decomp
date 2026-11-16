@@ -64,7 +64,7 @@ extern int g_scene_spawn_param_i[] __attribute__((sda));
 extern int g_scene_spawn_param_h[] __attribute__((sda));
 
 extern void anim_start_startup_animations(void);
-extern void func_PAL_002E7270(void *);
+extern void update_equipment_pieces_pal(void *);
 extern void math_store_angle_update_result(void *, void *, unsigned int, unsigned int, float);
 extern void gfx_add_draw_callback_first(void (*)(void), void *);
 extern void todano_refresh_scene_tuning(void);
@@ -77,72 +77,72 @@ extern void moby_mark_spawned(void *);
 extern char *SpawnExplosion_pal(void *, int, int, int, int, int, int, int, float, float, int, int, int, int);
 extern void vec_scale_to_length(void *, void *, float);
 extern void FastVecAdd(void *, void *, void *);
-extern char *func_PAL_0032F3B8(void *, void *, void *, float);
+extern char *part_spawn_blast_effect_moby_pal(void *, void *, void *, float);
 extern void matrix_mul_vec3(void *, void *, void *);
 extern void vec_add_random_offset(void *, float);
 extern void FastVecSub(void *, void *, void *);
-extern unsigned char *func_PAL_L00_00342480(void *, void *, int);
+extern unsigned char *part_l00_spawn_spinning_pal(void *, void *, int);
 
-void func_PAL_L12_00301DD8(void)
+void todano_scene_update_events_pal(void)
 {
-    V a, b, c, d;
+    V point_a, point_b, vel_vec, vel_tmp;
     V *velocity;
-    int i, j, k;
-    char *obj;
-    State *st;
-    char **entries;
+    int i, emitter_index, spark_index;
+    char *moby;
+    State *state;
+    char **emitter_list;
 
     anim_start_startup_animations();
     for (i = 0; i < g_trail_slice_state.count; i++) {
-        obj = ((State *)((char *)&g_trail_slice_state + i * 4))->objects[0];
-        if (obj && *(short *)(obj + 0xAA) == 0xE29) {
-            *(unsigned short *)(obj + 0x34) |= 0x800;
+        moby = ((State *)((char *)&g_trail_slice_state + i * 4))->objects[0];
+        if (moby && *(short *)(moby + 0xAA) == 0xE29) {
+            *(unsigned short *)(moby + 0x34) |= 0x800;
         }
-        if (*(short *)(obj + 0xAA) == 0xD54) {
-            func_PAL_002E7270(obj);
+        if (*(short *)(moby + 0xAA) == 0xD54) {
+            update_equipment_pieces_pal(moby);
         }
-        if (obj && *(short *)(obj + 0xAA) == 0xFA0 && g_current_map_index[0] != 0x33) {
-            char *p = *(char **)(obj + 0x68);
-            if (p) {
-                math_store_angle_update_result(obj, p + 0xC, 0x80AAAAD2, 0x80396464, 0.07330384f);
+        if (moby && *(short *)(moby + 0xAA) == MOBY_CLASS_TV_SCREENS && g_current_map_index[0] != 0x33) {
+            char *anim_state = *(char **)(moby + 0x68);
+            if (anim_state) {
+                math_store_angle_update_result(moby, anim_state + 0xC, 0x80AAAAD2, 0x80396464, 0.07330384f);
             }
         }
     }
     gfx_add_draw_callback_first(todano_refresh_scene_tuning, 0);
 
-    st = &g_trail_slice_state;
-    if (st->mode != 5) {
+    state = &g_trail_slice_state;
+    if (state->mode != 5) {
         return;
     }
-    entries = st->emitters;
-    velocity = &c;
-    for (j = 0; j < 2; j++) {
-        char *emitter = *entries;
+    emitter_list = state->emitters;
+    velocity = &vel_vec;
+    for (emitter_index = 0; emitter_index < 2; emitter_index++) {
+        char *emitter_moby = *emitter_list;
 
-        moby_transform_joint_to_world(emitter, 3, &a);
-        moby_transform_joint_to_world(emitter, 5, &b);
-        lerp_vector(&a, &a, &b, 0.5f);
-        d.q = 0;
-        d.f[2] = -(math_random_float_range(g_scene_random_min, g_scene_random_max[0]) * 0.020000001f);
-        c.q = d.q;
+        moby_transform_joint_to_world(emitter_moby, 3, &point_a);
+        moby_transform_joint_to_world(emitter_moby, 5, &point_b);
+        lerp_vector(&point_a, &point_a, &point_b, 0.5f);
+        vel_tmp.q = 0;
+        vel_tmp.f[2] = -(math_random_float_range(g_scene_random_min, g_scene_random_max[0]) * 0.020000001f);
+        vel_vec.q = vel_tmp.q;
         if (g_frame_l12_counter[0] & 1) {
-            part_spawn_scaling(&a, velocity, g_scene_spawn_param_a, g_scene_spawn_param_b[0], ((s32)(math_random_int_range(18, 22)) * 5 + 2) / 6,
+            part_spawn_scaling(&point_a, velocity, g_scene_spawn_param_a, g_scene_spawn_param_b[0], ((s32)(math_random_int_range(18, 22)) * 5 + 2) / 6,
                           g_scene_spawn_param_g, -10, 1);
         } else {
-            part_spawn_scaling(&a, velocity, g_scene_spawn_param_c[0], g_scene_spawn_param_d[0], ((s32)(math_random_int_range(20, 24)) * 5 + 2) / 6,
+            part_spawn_scaling(&point_a, velocity, g_scene_spawn_param_c[0], g_scene_spawn_param_d[0], ((s32)(math_random_int_range(20, 24)) * 5 + 2) / 6,
                           g_scene_spawn_param_h[0], -10, 1);
         }
-        entries++;
-        part_spawn_scaling(&a, velocity, g_scene_spawn_param_e[0], g_scene_spawn_param_f[0], ((s32)(math_random_int_range(10, 15)) * 5 + 2) / 6,
+        emitter_list++;
+        part_spawn_scaling(&point_a, velocity, g_scene_spawn_param_e[0], g_scene_spawn_param_f[0], ((s32)(math_random_int_range(10, 15)) * 5 + 2) / 6,
                       g_scene_spawn_param_i[0], -10, 1);
     }
 
     switch (g_trail_slice_state.event) {
     case 2:
-        for (obj = g_moby_list_start[0]; obj < g_moby_list_end_alt[0]; obj += 0x100) {
-            int cls = *(short *)(obj + 0xAA);
-            if (cls == 0x11EB || cls == 0x1F5 || cls == 0x326) {
-                moby_mark_spawned(obj);
+        for (moby = g_moby_list_start[0]; moby < g_moby_list_end_alt[0]; moby += 0x100) {
+            int class_id = *(short *)(moby + 0xAA);
+            if (class_id == 0x11EB || class_id == MOBY_CLASS_NANOTECH_CRATE || class_id == 0x326) {
+                moby_mark_spawned(moby);
             }
         }
         break;
@@ -150,35 +150,35 @@ void func_PAL_L12_00301DD8(void)
         g_hero_state_copy_a.fade = 0.5f;
         g_hero_state_copy_a.time = 37;
         g_hero_state_copy_a.flag = 0;
-        moby_transform_joint_to_world(g_trail_slice_state.objects[4], 0, &a);
-        SpawnExplosion_pal(&a, 1, 25, 20, 20, 20, 45, 1, 0.666f, 20.0f, 1, 1, 0, 0);
+        moby_transform_joint_to_world(g_trail_slice_state.objects[4], 0, &point_a);
+        SpawnExplosion_pal(&point_a, 1, 25, 20, 20, 20, 45, 1, 0.666f, 20.0f, 1, 1, 0, 0);
         break;
     case 0x6F5:
         g_hero_state_copy_a.fade = 0.5f;
         g_hero_state_copy_a.time = 50;
         g_hero_state_copy_a.flag = 0;
-        vec_scale_to_length(&a, &g_hero_state_copy_a.rot, 4.0f);
-        FastVecAdd(&a, &a, &g_hero_state_copy_a.pos);
-        vec_scale_to_length(&b, &g_hero_state_copy_a.rot, -1.0f);
-        func_PAL_0032F3B8(g_trail_slice_state.objects[2], &a, &b, 0.0f);
+        vec_scale_to_length(&point_a, &g_hero_state_copy_a.rot, 4.0f);
+        FastVecAdd(&point_a, &point_a, &g_hero_state_copy_a.pos);
+        vec_scale_to_length(&point_b, &g_hero_state_copy_a.rot, -1.0f);
+        part_spawn_blast_effect_moby_pal(g_trail_slice_state.objects[2], &point_a, &point_b, 0.0f);
         break;
     case 0x8D2:
         g_hero_state_copy_a.fade = 0.5f;
-        a.q = 0;
-        a.f[0] = 4.0f;
-        a.f[1] = -1.0f;
-        a.f[2] = 1.0f;
+        point_a.q = 0;
+        point_a.f[0] = 4.0f;
+        point_a.f[1] = -1.0f;
+        point_a.f[2] = 1.0f;
         g_hero_state_copy_a.time = 37;
         g_hero_state_copy_a.flag = 0;
-        matrix_mul_vec3(&a, &a, &g_hero_state_copy_a.rot);
-        FastVecAdd(&a, &a, &g_hero_state_copy_a.pos);
-        SpawnExplosion_pal(&a, 1, 25, 20, 20, 20, 45, 1, 0.666f, 20.0f, 1, 1, 0, 0);
-        for (k = 24; k >= 0; k--) {
-            qcopy(&b, &a);
-            vec_add_random_offset(&b, 0.3f);
-            FastVecSub(velocity, &b, &a);
+        matrix_mul_vec3(&point_a, &point_a, &g_hero_state_copy_a.rot);
+        FastVecAdd(&point_a, &point_a, &g_hero_state_copy_a.pos);
+        SpawnExplosion_pal(&point_a, 1, 25, 20, 20, 20, 45, 1, 0.666f, 20.0f, 1, 1, 0, 0);
+        for (spark_index = 24; spark_index >= 0; spark_index--) {
+            qcopy(&point_b, &point_a);
+            vec_add_random_offset(&point_b, 0.3f);
+            FastVecSub(velocity, &point_b, &point_a);
             vec_scale_to_length(velocity, velocity, math_random_float_range(0.0f, 1.0f) * 0.020000001f);
-            func_PAL_L00_00342480(&b, velocity, 250);
+            part_l00_spawn_spinning_pal(&point_b, velocity, 250);
         }
         break;
     }

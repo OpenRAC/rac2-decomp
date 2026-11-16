@@ -16,7 +16,7 @@ extern f32 mat_fast_helper_a(f32, f32);
 extern f32 vec_length_xy(void *);
 extern f32 g_spark_shot_speed_scale __attribute__((sda));
 
-u8 *func_PAL_L03_003DDB50(u8 *owner, void *position, f32 *velocity, s32 value)
+u8 *spark_shot_spawn_pal(u8 *owner, void *position, f32 *velocity, s32 value)
 {
     u8 *object = CreateMoby(0xA72);
     SpawnVars *vars;

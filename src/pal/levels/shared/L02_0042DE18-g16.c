@@ -17,13 +17,13 @@ extern int g_spread_shot_count __attribute__((sda));
 typedef struct { char pad00[0x54]; float rate; char pad58[0xE0 - 0x58]; } AimEntry;
 extern AimEntry g_weapon_l00_table[];
 extern void moby_init_private_data(char *);
-extern s32 func_PAL_L00_002C4480(int, int);
+extern s32 hero_l00_set_action_pal(int, int);
 extern void anim_start_blended_with_flags(void *, int, int, int, int);
 extern int FastDecTimer(s16 *);
 extern int math_fast_float_d(int *);
 extern int vec_fast_helper_b(float *);
 extern void cancel_hero_item_animation_pal(void);
-extern void func_PAL_L00_002AF458(void);
+extern void start_equipped_item_animation_pal(void);
 extern void matrix_mul_vec3(void *, void *, void *);
 extern void FastVecAdd(void *, void *, void *);
 extern int get_ammo(int);
@@ -40,7 +40,7 @@ extern void part_spawn_linked_effect_with_sparks_pal(char *, void *, void *, int
 
 typedef struct { float timer; s16 delay; s16 repeat; int index; int pad0C; char *list[0]; } BeamState;
 
-void func_PAL_L02_0042DE18(unsigned char *object) {
+void tetrabomb_l02_gun_update_pal(unsigned char *object) {
     float origin[4];
     float destination[4];
     AimEntry *entry;
@@ -56,7 +56,7 @@ void func_PAL_L02_0042DE18(unsigned char *object) {
     int phase;
 
     moby_init_private_data(object);
-    if (((Hero *)g_hero_state)->i[2213] == 1) func_PAL_L00_002C4480(29, 1);
+    if (((Hero *)g_hero_state)->i[2213] == 1) hero_l00_set_action_pal(29, 1);
     if (((Hero *)g_hero_state)->ptr[1300] != 0) ((Hero *)g_hero_state)->ptr[766] = ((Hero *)g_hero_state)->ptr[1300];
     if (object[0x42] == object[0x43] && (object[0x60] & 2))
         anim_start_blended_with_flags(object, 1, 0, 5, 0);
@@ -83,7 +83,7 @@ void func_PAL_L02_0042DE18(unsigned char *object) {
             g_tetrabomb_fire_held = phase;
             if (((Hero *)g_hero_state)->i[2213] != 29) anim_start_blended_with_flags(object, 2, 0, 2, 0);
             PlayMobySound(0, 0, object);
-            func_PAL_L00_002AF458();
+            start_equipped_item_animation_pal();
             object[0x20] = 2;
             state->delay = ((s32)g_tetrabomb_gun_delay_first * 5 + 2) / 6;
             state->repeat = ((s32)g_tetrabomb_gun_repeat * 5 + 2) / 6;
@@ -110,7 +110,7 @@ void func_PAL_L02_0042DE18(unsigned char *object) {
             member = *list;
             if (member != 0) {
                 any = 1;
-                if ((*(s16 *)(member + 0xAA) != 0x5D8 || (u8)member[0x20] == 0xFE ||
+                if ((*(s16 *)(member + 0xAA) != MOBY_CLASS_HOVERBOMB_PROJECTILE || (u8)member[0x20] == 0xFE ||
                      (u8)member[0x20] == 0xFD) && !(((Hero *)g_pad_state)->u[104] & ((Hero *)g_hero_state)->u[1164])) *list = 0;
             }
         }

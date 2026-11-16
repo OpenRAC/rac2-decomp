@@ -27,7 +27,7 @@ extern float square_root(float);
 extern float fast_vec_dist(void *, void *);
 extern int math_fast_helper_a(void *, float);
 extern void gfx_add_draw_callback_third(void *, void *);
-extern void func_PAL_L06_004046D8(void);
+extern void gfx_draw_ripple_grid_pal(void);
 extern int snd_is_voice_playing_for_owner(void *, int);
 extern int PlayMobySound(int, int, void *);
 extern int math_fast_float_d(void *);
@@ -55,9 +55,10 @@ typedef struct {
 } Object;
 extern Sequence g_ribbon_variant_sequence;
 
-void func_PAL_L13_003C885C(char *obj) {
-    Object *m = (Object *)obj;
-    Data *data = m->data;
+/* Ribbon sequence object: shuffles a random order of its steps, then while the hero is in range it draws the ribbon and loops its sound. */
+void ribbon_sequence_update_pal(char *obj) {
+    Object *moby = (Object *)obj;
+    Data *data = moby->data;
     /* State 0's shuffle and state 2's sphere share their temporary storage. */
     union {
         Sequence seq;
@@ -69,10 +70,10 @@ void func_PAL_L13_003C885C(char *obj) {
         STUB_printf(g_str_ribbon_error_b, *(short *)(obj + 0xB2));
         moby_mark_spawned(obj);
     }
-    switch (m->state) {
+    switch (moby->state) {
     case 0: {
         int i, j, k;
-        float r;
+        float angle;
         if (g_current_map_index == 10 && g_screen_mode_flag == 1) {
             moby_mark_spawned(obj);
             break;
@@ -80,33 +81,33 @@ void func_PAL_L13_003C885C(char *obj) {
         buffer.seq = g_ribbon_sequence;
         for (i = 0; i < 10; i++) {
             for (j = 0; j < math_random_int_below(9); j++) {
-                u8 b = buffer.seq.x[j + 1];
+                u8 swapped = buffer.seq.x[j + 1];
                 buffer.seq.x[j + 1] = buffer.seq.x[j];
-                buffer.seq.x[j] = b;
+                buffer.seq.x[j] = swapped;
             }
         }
         for (k = 0; k < data->count; k++)
             data->order[k] = buffer.seq.x[k];
-        r = FastAddRotations(m->angle, 1.5707964897155762f);
-        m->mode = 0xFF;
-        m->state = 1;
-        m->angle = r;
+        angle = FastAddRotations(moby->angle, 1.5707964897155762f);
+        moby->mode = 0xFF;
+        moby->state = 1;
+        moby->angle = angle;
         data->effect = -1;
         data->timer = ((s32)(FloatToInt(g_ribbon_duration * 60.0f)) * 5 + 2) / 6;
-        m->flags |= 0x41;
+        moby->flags |= 0x41;
         break;
     }
     case 1: {
-        float r, h;
+        float radius, half_height;
         float sphere[4];
-        r = data->radius * 0.5f;
-        h = (float)data->count * data->step * 0.5f;
+        radius = data->radius * 0.5f;
+        half_height = (float)data->count * data->step * 0.5f;
         *(Quad *)sphere = *(Quad *)(obj + 0x10);
-        sphere[2] += h;
-        sphere[3] = square_root(h * h + r * r);
+        sphere[2] += half_height;
+        sphere[3] = square_root(half_height * half_height + radius * radius);
         if (fast_vec_dist(obj + 0x10, g_hero_l06_position) < 80.0f) {
             if ((float)math_fast_helper_a(sphere, 80.0f) >= 0.0f)
-                gfx_add_draw_callback_third(func_PAL_L06_004046D8, obj);
+                gfx_add_draw_callback_third(gfx_draw_ripple_grid_pal, obj);
         }
         if (!snd_is_voice_playing_for_owner(obj, data->effect))
             data->effect = PlayMobySound(0, 4, obj);
@@ -114,23 +115,23 @@ void func_PAL_L13_003C885C(char *obj) {
     }
     case 2: {
         int i;
-        float r, h;
+        float radius, half_height;
         math_fast_float_d(&data->timer);
         i = data->effect;
         if (i != -1) {
-            Effect *e = (Effect *)(g_sound_state + i * 0x70);
-            if (e->owner == obj && e->active)
+            Effect *voice = (Effect *)(g_sound_state + i * 0x70);
+            if (voice->owner == obj && voice->active)
                 snd_stop_voice(i);
         }
         data->effect = -1;
-        r = data->radius * 0.5f;
-        h = (float)data->count * data->step * 0.5f;
+        radius = data->radius * 0.5f;
+        half_height = (float)data->count * data->step * 0.5f;
         buffer.q = *(Quad *)(obj + 0x10);
-        buffer.f[2] += h;
-        buffer.f[3] = square_root(h * h + r * r);
+        buffer.f[2] += half_height;
+        buffer.f[3] = square_root(half_height * half_height + radius * radius);
         if (fast_vec_dist(obj + 0x10, g_hero_l06_position) < 80.0f &&
             (float)math_fast_helper_a(&buffer, 80.0f) >= 0.0f)
-            gfx_add_draw_callback_third(func_PAL_L06_004046D8, obj);
+            gfx_add_draw_callback_third(gfx_draw_ripple_grid_pal, obj);
         break;
     }
     }

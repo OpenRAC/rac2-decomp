@@ -67,7 +67,7 @@ extern s32 FloatToInt(float);
 extern void hero_clear_tracked_slots(void);
 extern void FastVecSub(void *, void *, void *);
 extern void hero_build_relative_point(void *, s32, float, float, float);
-extern s32 func_PAL_L16_002C0CB0(unsigned long, unsigned long);
+extern s32 hero_l16_enter_state_pal(unsigned long, unsigned long);
 extern u8 *part_find_owned_effect_slot(u8 *, s32, s32);
 extern void AdjustPlayerHealth_pal(s32);
 extern int hero_play_sound(s32, s32);
@@ -75,12 +75,13 @@ extern void hero_flatten_push_vector(void *, s32, float, float);
 extern void cam_scale_view_space_height(void *, void *, float);
 extern void FastVecAdd(void *, void *, void *);
 
-s32 hero_handle_contact_reaction_pal(s32 arg0) {
-    TI16 vec;
-    PlayerContactEntry *e;
+/* Applies the hit reaction (damage, sound, push) when the hero touches a contact object (PAL). Returns 1 when the contact counts. */
+s32 hero_handle_contact_reaction_pal(s32 apply_reaction) {
+    TI16 push;
+    PlayerContactEntry *entry;
     u8 *moby;
-    u8 *other;
-    s32 flag;
+    u8 *hit_moby;
+    s32 launch_flag;
 
     if (g_hero_state.f229C == 20 || g_hero_state.f229C == 7) {
         return 0;
@@ -99,60 +100,60 @@ s32 hero_handle_contact_reaction_pal(s32 arg0) {
     if (moby[0xA8] == 0xFF) {
         return 0;
     }
-    e = &g_contact_reaction_table[moby[0xA8]];
-    if (e->f38 != moby) {
+    entry = &g_contact_reaction_table[moby[0xA8]];
+    if (entry->f38 != moby) {
         return 0;
     }
-    if ((e->f24 & 9) == 0) {
+    if ((entry->f24 & 9) == 0) {
         return 0;
     }
-    if (e->f2C != 0.0f) {
+    if (entry->f2C != 0.0f) {
         g_contact_hit_flag = 0;
         g_bolt_multiplier = 1;
     }
     if (fade_get_value() != 0.0f && g_hero_state.f22B4 == 0) {
-        e->f2C = fade_reduce_value_pal(e->f2C);
-        if (e->f2C == 0.0f) {
+        entry->f2C = fade_reduce_value_pal(entry->f2C);
+        if (entry->f2C == 0.0f) {
             return 0;
         }
     }
-    g_hero_state.f249C = e->f20;
+    g_hero_state.f249C = entry->f20;
     if (g_hero_state.f229C == 15) {
-        g_hero_state.f6C4 = e;
+        g_hero_state.f6C4 = entry;
         g_hero_state.f68E = 1;
         return 0;
     }
-    if (arg0 == 0) {
+    if (apply_reaction == 0) {
         return 1;
     }
-    flag = 0;
+    launch_flag = 0;
     hero_clear_tracked_slots();
-    if (e->f30 & 1) {
-        qcopy(&vec, &e->f10);
-        if (e->f1C == 5627.9248046875f) {
-            flag = 1;
+    if (entry->f30 & 1) {
+        qcopy(&push, &entry->f10);
+        if (entry->f1C == 5627.9248046875f) {
+            launch_flag = 1;
         }
-    } else if (e->f20 != 0) {
-        FastVecSub(&vec, &g_hero_state.f80, e->f20 + 0x10);
+    } else if (entry->f20 != 0) {
+        FastVecSub(&push, &g_hero_state.f80, entry->f20 + 0x10);
     } else {
-        hero_build_relative_point(&vec, 0, -1.0f, 0.0f, 0.0f);
+        hero_build_relative_point(&push, 0, -1.0f, 0.0f, 0.0f);
     }
     switch (g_hero_state.f22B4) {
     case 0:
-        other = g_hero_state.f249C;
-        if (other != 0 && (*(s16 *)(other + 0xAA) == 0x4EB || *(s16 *)(other + 0xAA) == 0x558)) {
-            func_PAL_L16_002C0CB0(0x7D, 1);
+        hit_moby = g_hero_state.f249C;
+        if (hit_moby != 0 && (*(s16 *)(hit_moby + 0xAA) == 0x4EB || *(s16 *)(hit_moby + 0xAA) == 0x558)) {
+            hero_l16_enter_state_pal(0x7D, 1);
             return 1;
         }
         if ((g_hero_state.f2294 == 1 || g_hero_state.f2294 == 0x1D || g_hero_state.f1500 != 0)
-            && !(e->f24 & 8)) {
-            u8 *r = part_find_owned_effect_slot(g_hero_state.f2290, 1, 0);
+            && !(entry->f24 & 8)) {
+            u8 *effect_slot = part_find_owned_effect_slot(g_hero_state.f2290, 1, 0);
 
-            if (r != 0) {
-                AdjustPlayerHealth_pal(FloatToInt(*(float *)(r + 0x2C)));
+            if (effect_slot != 0) {
+                AdjustPlayerHealth_pal(FloatToInt(*(float *)(effect_slot + 0x2C)));
             }
             if (g_hero_state.f24CC == 0) {
-                func_PAL_L16_002C0CB0(0x16, 1);
+                hero_l16_enter_state_pal(0x16, 1);
             }
             g_hero_state.f1DC = 0x40;
             if (g_hero_state.f21C == 0) {
@@ -161,22 +162,22 @@ s32 hero_handle_contact_reaction_pal(s32 arg0) {
             hero_play_sound(0x14, 0);
             return 0;
         }
-        if (e->f24 & 8) {
-            func_PAL_L16_002C0CB0(0x8C, 1);
+        if (entry->f24 & 8) {
+            hero_l16_enter_state_pal(0x8C, 1);
         } else {
-            func_PAL_L16_002C0CB0(0x16, 1);
+            hero_l16_enter_state_pal(0x16, 1);
         }
         if (g_hero_state.f2294 == 0x8C) {
-            qzero(&vec);
+            qzero(&push);
         } else {
-            hero_flatten_push_vector(&vec, flag, g_hero_state.f1497 ? 0.0f : 0.06600001f, 0.034f);
-            if (flag != 0 && e->f28 == 4) {
-                cam_scale_view_space_height(&vec, &vec, 2.0f);
+            hero_flatten_push_vector(&push, launch_flag, g_hero_state.f1497 ? 0.0f : 0.06600001f, 0.034f);
+            if (launch_flag != 0 && entry->f28 == 4) {
+                cam_scale_view_space_height(&push, &push, 2.0f);
             }
         }
         break;
     }
-    FastVecAdd(&g_hero_state.fF0, &g_hero_state.fF0, &vec);
-    FastVecAdd(&g_hero_state.f110, &g_hero_state.f110, &vec);
+    FastVecAdd(&g_hero_state.fF0, &g_hero_state.fF0, &push);
+    FastVecAdd(&g_hero_state.f110, &g_hero_state.f110, &push);
     return 1;
 }

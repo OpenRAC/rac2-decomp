@@ -84,14 +84,14 @@ typedef struct JobaState {
     s32 volume;          /* 0x2F8 */
     u8 pad2FC[4];
     s32 track;           /* 0x300 */
-    s32 trackVolume;     /* 0x304 */
+    s32 track_volume;     /* 0x304 */
 } JobaState;
 
 typedef struct {
     u8 pad00[0x20];
     u8 state;            /* 0x20 */
     u8 pad21[0x68 - 0x21];
-    JobaState *st;       /* 0x68 */
+    JobaState *vars;       /* 0x68 */
     u8 pad6C[0x96 - 0x6C];
     u16 timer;           /* 0x96 */
     u8 pad98[0xBC - 0x98];
@@ -262,68 +262,71 @@ extern void moby_update_class_specials(char *);
 
 #define OBJ ((JobaObj *)obj)
 
-void func_PAL_L11_004439E4(u8 *obj) {
-    JobaState *st;
-    JobaRecord *rec1;
-    JobaRecord *rec3;
-    JobaRecord *rec2;
-    JobaRecord *rec6;
-    JobaRecord *rec8;
-    JobaRecord *rec9;
-    s32 ok1;
-    s32 ok2;
-    s32 sum1;
-    s32 sum2;
-    s32 sum3;
-    s32 r1;
-    s32 r2;
-    s32 r3;
-    s32 r4;
-    s32 r5;
-    s32 cls1;
-    s32 cls2;
-    u32 cls3;
-    JobaLight *lt1;
-    JobaLight *lt2;
-    JobaLight *lt3;
-    JobaLight *lt4;
-    JobaMoby *m1;
-    JobaMoby *m2;
-    JobaMoby *m3;
-    u8 *e1;
-    u8 *e2;
-    f32 f1;
-    f32 f2;
-    u8 *p1;
-    u8 *q1;
-    s32 slot1;
-    s32 k1;
-    s32 k2;
-    s32 k3;
-    s32 k4;
-    s32 k5;
-    s32 k6;
-    s32 k7;
-    s32 k8;
-    s32 k9;
-    s32 k10;
-    s32 c10;
-    s32 c11;
-    s32 k11;
-    s32 k12;
-    s32 k13;
-    s32 sel;
+/* Per-frame driver of the Joba arena encounter: runs the intro, the waves of fighters and bosses,
+   the class selection menu, the lamp and light animation and the result handling (PAL: 50 Hz
+   timings). */
+void arena_controller_update_pal(u8 *obj) {
+    JobaState *vars;
+    JobaRecord *reset_record;
+    JobaRecord *count_record;
+    JobaRecord *wave_record;
+    JobaRecord *boss_wave_record;
+    JobaRecord *late_wave_record;
+    JobaRecord *final_record;
+    s32 activated_a;
+    s32 activated_b;
+    s32 count_sum_a;
+    s32 count_sum_b;
+    s32 count_sum_c;
+    s32 hero_word_a;
+    s32 hero_word_b;
+    s32 boss_a;
+    s32 boss_b;
+    s32 boss_c;
+    s32 class_index_a;
+    s32 class_index_b;
+    u32 class_index_u16;
+    JobaLight *light_up;
+    JobaLight *light_down;
+    JobaLight *light_start;
+    JobaLight *light_end;
+    JobaMoby *lamp_start;
+    JobaMoby *lamp_end;
+    JobaMoby *lamp_down;
+    u8 *squad_moby_a;
+    u8 *squad_moby_b;
+    f32 height_up;
+    f32 height_down;
+    u8 *camera_point;
+    u8 *lamp_bytes;
+    s32 moby_slot;
+    s32 i;
+    s32 j;
+    s32 k;
+    s32 count_i;
+    s32 sum_i;
+    s32 sum_j;
+    s32 add_i;
+    s32 laser_i;
+    s32 fill_i;
+    s32 top_i;
+    s32 clear_i;
+    s32 clear_j;
+    s32 add_j;
+    s32 sum_k;
+    s32 reset_i;
+    s32 choice;
     s32 code;
-    JobaClass *cl1;
-    s32 w1;
-    JobaRecord *next1;
-    s32 snd1;
-    u8 *buf2;
-    u8 *buf3;
-    s32 snd2;
-    s32 snd3;
+    JobaClass *challenge_class;
+    s32 wave_index;
+    JobaRecord *next_record;
+    s32 sound_a;
+    u8 *damage_accum_a;
+    u8 *damage_accum_b;
+    s32 sound_b;
+    s32 sound_c;
 
-    st = OBJ->st;
+    vars = OBJ->vars;
     blast_call_helper_no_args();
     g_arena_l11_active_flag = 1;
     switch (OBJ->state) {
@@ -332,25 +335,25 @@ void func_PAL_L11_004439E4(u8 *obj) {
         arena_run_helper_on_spawn_groups(obj);
         g_hero_control_locked = 0;
         g_hero_l11_input_blocked = 0;
-        g_moby_l11_table[st->door].flags |= 1;
-        g_moby_l11_table[st->door].hidden = 0;
+        g_moby_l11_table[vars->door].flags |= 1;
+        g_moby_l11_table[vars->door].hidden = 0;
         if (g_arena_state_flag == 2) {
             g_arena_state_flag = 0;
             moby_set_state(obj, 2, -1);
             state_set_flag_one();
-            st->fade = g_arena_fade_value[0];
+            vars->fade = g_arena_fade_value[0];
             gfx_add_draw_callback_first(hud_draw_fade_bar, obj);
             OBJ->timer = 0x1A;
         }
         break;
     case 1:
-        if (coll_point_inside_record_volume(&((Hero *)g_hero_state)->f[0x80 / 4], st->zone) != 0) {
+        if (coll_point_inside_record_volume(&((Hero *)g_hero_state)->f[0x80 / 4], vars->zone) != 0) {
             moby_set_state(obj, 4, -1);
-        } else if (IsPointInCuboid(&((Hero *)g_hero_state)->f[0x80 / 4], st->trigger1) != 0) {
+        } else if (IsPointInCuboid(&((Hero *)g_hero_state)->f[0x80 / 4], vars->trigger1) != 0) {
             TryClaimNotice(4, 0xE61, 1);
             moby_try_alloc_enter_state2(obj);
         } else if (g_game_flag_table[arena_get_challenge_flag_index(1)] != 0) {
-            if (IsPointInCuboid(&((Hero *)g_hero_state)->f[0x80 / 4], st->trigger2) != 0) {
+            if (IsPointInCuboid(&((Hero *)g_hero_state)->f[0x80 / 4], vars->trigger2) != 0) {
                 TryClaimNotice(4, 0xE61, 1);
                 moby_try_alloc_enter_state2(obj);
             }
@@ -359,7 +362,7 @@ void func_PAL_L11_004439E4(u8 *obj) {
             g_arena_state_flag = 0;
             moby_set_state(obj, 2, -1);
             state_set_flag_one();
-            st->fade = g_arena_fade_value[0];
+            vars->fade = g_arena_fade_value[0];
             gfx_add_draw_callback_first(hud_draw_fade_bar, obj);
             OBJ->timer = 0x1A;
         }
@@ -370,12 +373,12 @@ void func_PAL_L11_004439E4(u8 *obj) {
             arena_set_group_a_active_count(obj, 0);
             arena_set_group_b_active_count(obj, 0);
             OBJ->phase = 0;
-            g_moby_l11_table[st->door].flags |= 1;
-            g_moby_l11_table[st->door].hidden = 0;
-            lt3 = &g_joba_lights[*g_arena_light_lists[st->light] & 0x7FFF];
-            m1 = &g_moby_l11_table[st->lamp];
-            lt3->height = 419.766f;
-            m1->y = 419.766f;
+            g_moby_l11_table[vars->door].flags |= 1;
+            g_moby_l11_table[vars->door].hidden = 0;
+            light_start = &g_joba_lights[*g_arena_light_lists[vars->light] & 0x7FFF];
+            lamp_start = &g_moby_l11_table[vars->lamp];
+            light_start->height = 419.766f;
+            lamp_start->y = 419.766f;
         } else if (OBJ->phase == 0) {
             if (OBJ->timer < 0x1A) {
                 g_arena_timer_fraction = IntToFloat(OBJ->timer) * 0.05882353f < 1.0f
@@ -384,24 +387,24 @@ void func_PAL_L11_004439E4(u8 *obj) {
             } else {
                 f32 v[4] __attribute__((aligned(16)));
 
-                st->fade = g_arena_fade_value[0];
+                vars->fade = g_arena_fade_value[0];
                 gfx_add_draw_callback_first(hud_draw_fade_bar, obj);
                 if (g_enemy_freeze_flag[0] != 1) {
-                    load_scene_chunk(1, st->music);
+                    load_scene_chunk(1, vars->music);
                 }
-                p1 = g_arena_camera_table + (st->camera << 7);
-                hero_reset_position_and_direction(p1 + 0x30, p1 + 0x70, 0x6F, 1);
+                camera_point = g_arena_camera_table + (vars->camera << 7);
+                hero_reset_position_and_direction(camera_point + 0x30, camera_point + 0x70, 0x6F, 1);
                 level_capture_checkpoint_state(&((Hero *)g_hero_state)->f[0x80 / 4], &((Hero *)g_hero_state)->f[0x90 / 4]);
-                script_queue_keyed_request(st->music, st->volume);
-                *(TI128 *)v = *(TI128 *)(g_arena_camera_table + ((st->camera << 7) + 0x30));
+                script_queue_keyed_request(vars->music, vars->volume);
+                *(TI128 *)v = *(TI128 *)(g_arena_camera_table + ((vars->camera << 7) + 0x30));
                 v[2] += 2.0f;
-                SetCamera5Pose((char *)v, (char *)(g_arena_camera_table + (st->camera << 7) + 0x70), 1, 0, 0);
+                SetCamera5Pose((char *)v, (char *)(g_arena_camera_table + (vars->camera << 7) + 0x70), 1, 0, 0);
                 OBJ->phase = 2;
             }
         } else if (OBJ->phase == 2) {
             gfx_add_draw_callback_third(hud_draw_fade_bar, obj);
             g_arena_timer_fraction = 0.0f;
-            if (st->fade <= 0) {
+            if (vars->fade <= 0) {
                 OBJ->phase = 3;
                 hero_start_loader_state(0);
                 hero_start_target_state(arena_get_center_point(obj), 0, 0.0f);
@@ -411,14 +414,14 @@ void func_PAL_L11_004439E4(u8 *obj) {
                 if (g_game_flag_table[0x4A] == 0) {
                     g_game_flag_table[0x4A] = 1;
                     OBJ->phase = 1;
-                    moby_set_flag_bit((u8 *)&g_moby_l11_table[st->gate1], 1);
+                    moby_set_flag_bit((u8 *)&g_moby_l11_table[vars->gate1], 1);
                     OBJ->timer = 0;
                 } else if (g_game_flag_table[arena_get_challenge_flag_index(0)] != 0) {
                     moby_set_state(obj, 4, -1);
                 } else {
                     hero_reset_position_and_direction(arena_get_center_point(obj), g_arena_hero_reset_direction, 0, 1);
-                    st->cls = 0;
-                    st->wave = 0;
+                    vars->cls = 0;
+                    vars->wave = 0;
                     moby_set_state(obj, 8, -1);
                     cam_set_mode_state(2);
                 }
@@ -427,8 +430,8 @@ void func_PAL_L11_004439E4(u8 *obj) {
             if (OBJ->timer >= 0x33 && g_arena_state != 2) {
                 if (g_game_flag_table[arena_get_challenge_flag_index(0)] == 0) {
                     hero_reset_position_and_direction(arena_get_center_point(obj), g_arena_hero_reset_direction, 0, 1);
-                    st->cls = 0;
-                    st->wave = 0;
+                    vars->cls = 0;
+                    vars->wave = 0;
                     moby_set_state(obj, 8, -1);
                     cam_set_mode_state(2);
                 } else {
@@ -448,10 +451,10 @@ void func_PAL_L11_004439E4(u8 *obj) {
     case 4:
         if (flag_set_first_pending(obj) != 0) {
             if (OBJ->state == 5) {
-                arena_start_challenge_result_scene((char *)obj, st->cls);
+                arena_start_challenge_result_scene((char *)obj, vars->cls);
             }
-            g_moby_l11_table[st->door].flags |= 1;
-            g_moby_l11_table[st->door].hidden = 0;
+            g_moby_l11_table[vars->door].flags |= 1;
+            g_moby_l11_table[vars->door].hidden = 0;
             arena_run_helper_on_spawn_groups(obj);
             arena_run_member_handlers(obj);
             arena_set_group_a_active_count(obj, 0);
@@ -459,7 +462,7 @@ void func_PAL_L11_004439E4(u8 *obj) {
             hero_reset_position_and_direction(arena_get_center_point(obj), g_arena_hero_reset_direction, 0x6F, 1);
             level_capture_checkpoint_state(&((Hero *)g_hero_state)->f[0x80 / 4], &((Hero *)g_hero_state)->f[0x90 / 4]);
             arena_start_intro_script(obj);
-            st->mode = 5;
+            vars->mode = 5;
             joba_update_ribbon_scale(obj);
             g_hero_l11_input_blocked = 0;
             g_hero_control_locked = 0;
@@ -492,17 +495,17 @@ void func_PAL_L11_004439E4(u8 *obj) {
                 break;
             }
             if (OBJ->state == 12) {
-                moby_set_flag_bit((u8 *)&g_moby_l11_table[st->gate2], 1);
+                moby_set_flag_bit((u8 *)&g_moby_l11_table[vars->gate2], 1);
             } else if (OBJ->state == 13) {
-                moby_set_flag_bit((u8 *)&g_moby_l11_table[st->gate3], 1);
+                moby_set_flag_bit((u8 *)&g_moby_l11_table[vars->gate3], 1);
             }
             OBJ->timer = 0;
             OBJ->phase = 1;
         } else if (((Hero *)g_hero_state)->i[0x24CC / 4] > 0 && g_arena_state != 2 && OBJ->timer >= 0xC9) {
-            arena_start_challenge_result_scene((char *)obj, st->cls);
+            arena_start_challenge_result_scene((char *)obj, vars->cls);
             OBJ->state = 5;
-            g_moby_l11_table[st->door].flags |= 1;
-            g_moby_l11_table[st->door].hidden = 0;
+            g_moby_l11_table[vars->door].flags |= 1;
+            g_moby_l11_table[vars->door].hidden = 0;
             arena_run_helper_on_spawn_groups(obj);
             arena_run_member_handlers(obj);
             arena_set_group_a_active_count(obj, 0);
@@ -519,77 +522,77 @@ void func_PAL_L11_004439E4(u8 *obj) {
         break;
     case 7:
         if (flag_set_first_pending(obj) != 0) {
-            sel = g_game_flag_table[0x49];
-            if (sel != 0 && (g_game_flag_table[arena_get_challenge_flag_index(g_arena_challenge_table[sel]->id)] == 0 ||
-                             (sel >= 11 && flag_is_byte_set() == 0) ||
-                             (sel == 8 && g_arena_choice_enabled[0][g_item_l11_record_table].enabled == 0))) {
-                sel = 0;
+            choice = g_game_flag_table[0x49];
+            if (choice != 0 && (g_game_flag_table[arena_get_challenge_flag_index(g_arena_challenge_table[choice]->id)] == 0 ||
+                             (choice >= 11 && flag_is_byte_set() == 0) ||
+                             (choice == 8 && g_arena_choice_enabled[0][g_item_l11_record_table].enabled == 0))) {
+                choice = 0;
             }
-            st->result = sel;
+            vars->result = choice;
         }
         UpdateJobaClassSelectionMenu(obj);
         break;
     case 8:
         arena_get_challenge_flag_index(1);
         if (flag_set_first_pending(obj) != 0) {
-            st->wave = 0;
-            for (k1 = 0; k1 < 8; k1++) {
-                st->counts[k1] = 0;
+            vars->wave = 0;
+            for (i = 0; i < 8; i++) {
+                vars->counts[i] = 0;
             }
-            st->frames = 0;
-            st->lost = 0;
+            vars->frames = 0;
+            vars->lost = 0;
             arena_run_helper_on_spawn_groups(obj);
             arena_count_fighters(obj);
             arena_assign_fighters_to_spawns(obj);
-            rec1 = &g_arena_challenge_table[st->cls]->records[st->wave];
-            arena_set_group_a_active_count(obj, rec1->h[7]);
-            arena_set_group_b_active_count(obj, rec1->h[6]);
-            for (k3 = 0; k3 < 40; k3++) {
-                st->marks[k3] = 0;
+            reset_record = &g_arena_challenge_table[vars->cls]->records[vars->wave];
+            arena_set_group_a_active_count(obj, reset_record->h[7]);
+            arena_set_group_b_active_count(obj, reset_record->h[6]);
+            for (k = 0; k < 40; k++) {
+                vars->marks[k] = 0;
             }
-            for (k3 = 0; k3 < 6; k3++) {
-                st->limits[k3] = g_arena_wave_limits[k3];
+            for (k = 0; k < 6; k++) {
+                vars->limits[k] = g_arena_wave_limits[k];
             }
             ((Hero *)g_hero_state)->i[0x24CC / 4] = g_player_stats;
             moby_update_class_specials((char *)obj);
-            g_moby_l11_table[st->door].flags |= 1;
-            g_moby_l11_table[st->door].hidden = 0;
-            if (st->cls == 7) {
-                r1 = ((Hero *)g_hero_state)->i[0x18D4 / 4];
+            g_moby_l11_table[vars->door].flags |= 1;
+            g_moby_l11_table[vars->door].hidden = 0;
+            if (vars->cls == 7) {
+                hero_word_a = ((Hero *)g_hero_state)->i[0x18D4 / 4];
                 ((Hero *)g_hero_state)->i[0x18D4 / 4] = 0;
-                g_arena_saved_hero_word = r1;
-            } else if (st->cls == 8) {
-                r2 = ((Hero *)g_hero_state)->i[0x18D4 / 4];
+                g_arena_saved_hero_word = hero_word_a;
+            } else if (vars->cls == 8) {
+                hero_word_b = ((Hero *)g_hero_state)->i[0x18D4 / 4];
                 ((Hero *)g_hero_state)->i[0x18D4 / 4] = 0;
                 g_arena_timer_a[0] = 300;
-                g_arena_saved_hero_word = r2;
+                g_arena_saved_hero_word = hero_word_b;
             }
         }
-        rec2 = &g_arena_challenge_table[st->cls]->records[st->wave];
-        if (rec2->b[3] != 0) {
+        wave_record = &g_arena_challenge_table[vars->cls]->records[vars->wave];
+        if (wave_record->b[3] != 0) {
             moby_set_state(obj, 9, -1);
             return;
         }
         arena_update_loss_history(obj);
         if (arena_l11_is_wave_complete(obj) != 0) {
-            st->wave++;
-            for (k4 = 0; k4 < 7; k4++) {
-                st->counts[k4] = 0;
+            vars->wave++;
+            for (count_i = 0; count_i < 7; count_i++) {
+                vars->counts[count_i] = 0;
             }
-            st->lost = 0;
-            if (g_hero_l11_state_block.owner == st->owner) {
+            vars->lost = 0;
+            if (g_hero_l11_state_block.owner == vars->owner) {
                 g_hero_l11_state_block.owner = 0;
             }
-            cls1 = st->cls;
-            cls3 = (u16)st->cls;
-            st->sound = 0;
-            st->owner = 0;
-            if (st->wave >= g_arena_challenge_table[cls1]->count) {
-                if (cls3 - 7U < 2) {
+            class_index_a = vars->cls;
+            class_index_u16 = (u16)vars->cls;
+            vars->sound = 0;
+            vars->owner = 0;
+            if (vars->wave >= g_arena_challenge_table[class_index_a]->count) {
+                if (class_index_u16 - 7U < 2) {
                     ((Hero *)g_hero_state)->i[0x18D4 / 4] = g_arena_saved_hero_word;
                 }
-                st->result = st->cls;
-                if (st->result == 0 && g_game_flag_table[arena_get_challenge_flag_index(0)] == 0) {
+                vars->result = vars->cls;
+                if (vars->result == 0 && g_game_flag_table[arena_get_challenge_flag_index(0)] == 0) {
                     moby_set_state(obj, 12, -1);
                     return;
                 }
@@ -598,24 +601,24 @@ void func_PAL_L11_004439E4(u8 *obj) {
                 global_object_start((char *)1, -1);
                 return;
             }
-            if (cls1 >= 13) {
-                st->cls = 0;
+            if (class_index_a >= 13) {
+                vars->cls = 0;
             }
             arena_assign_fighters_to_spawns(obj);
-            rec3 = &g_arena_challenge_table[st->cls]->records[st->wave];
-            arena_set_group_a_active_count(obj, rec3->h[7]);
-            arena_set_group_b_active_count(obj, rec3->h[6]);
+            count_record = &g_arena_challenge_table[vars->cls]->records[vars->wave];
+            arena_set_group_a_active_count(obj, count_record->h[7]);
+            arena_set_group_b_active_count(obj, count_record->h[6]);
         }
-        st->frames++;
-        if (st->cls == 5) {
-            if (st->frames >= 0x1195) {
+        vars->frames++;
+        if (vars->cls == 5) {
+            if (vars->frames >= 0x1195) {
                 char buf[0x70];
 
-                sum1 = 0;
-                for (k5 = 0; k5 < 6; k5++) {
-                    sum1 += st->counts[k5];
+                count_sum_a = 0;
+                for (sum_i = 0; sum_i < 6; sum_i++) {
+                    count_sum_a += vars->counts[sum_i];
                 }
-                sprintf(buf, g_str_count_line_format, GetLocalizedString(0x1B37), g_arena_wave_kill_targets_a[st->wave] + sum1 - st->lost,
+                sprintf(buf, g_str_count_line_format, GetLocalizedString(0x1B37), g_arena_wave_kill_targets_a[vars->wave] + count_sum_a - vars->lost,
                               GetLocalizedString(0xE86));
                 level_l00_call_module_handler_with_arg_9((int)buf, -1);
                 moby_set_state(obj, 11, -1);
@@ -624,23 +627,23 @@ void func_PAL_L11_004439E4(u8 *obj) {
                 return;
             }
         }
-        if (st->cls == 9 && st->frames >= 0x2329) {
+        if (vars->cls == 9 && vars->frames >= 0x2329) {
             level_l00_call_module_handler_with_arg_9(GetLocalizedString(0x1B37), -1);
             moby_set_state(obj, 11, -1);
-            st->sound = 0;
+            vars->sound = 0;
             tracked_moby_set_state(1, -1);
             global_object_start((char *)1, -1);
             return;
         }
-        if (st->cls == 8) {
-            if (st->frames >= 0xBB9) {
+        if (vars->cls == 8) {
+            if (vars->frames >= 0xBB9) {
                 char buf[0x70];
 
-                sum2 = 0;
-                for (k6 = 0; k6 < 6; k6++) {
-                    sum2 += st->counts[k6];
+                count_sum_b = 0;
+                for (sum_j = 0; sum_j < 6; sum_j++) {
+                    count_sum_b += vars->counts[sum_j];
                 }
-                sprintf(buf, g_str_count_line_format, GetLocalizedString(0x1B37), g_arena_wave_kill_targets_b[st->wave] + sum2 - st->lost,
+                sprintf(buf, g_str_count_line_format, GetLocalizedString(0x1B37), g_arena_wave_kill_targets_b[vars->wave] + count_sum_b - vars->lost,
                               GetLocalizedString(0xE86));
                 level_l00_call_module_handler_with_arg_9((int)buf, -1);
                 moby_set_state(obj, 11, -1);
@@ -649,70 +652,70 @@ void func_PAL_L11_004439E4(u8 *obj) {
                 return;
             }
         }
-        if ((st->cls == 3 || st->cls == 11) && ((Hero *)g_hero_state)->i[0x24CC / 4] < g_player_stats) {
+        if ((vars->cls == 3 || vars->cls == 11) && ((Hero *)g_hero_state)->i[0x24CC / 4] < g_player_stats) {
             level_l00_call_module_handler_with_arg_9(GetLocalizedString(0x1B38), -1);
             moby_set_state(obj, 11, -1);
-            st->sound = 0;
+            vars->sound = 0;
             tracked_moby_set_state(1, -1);
             global_object_start((char *)1, -1);
             return;
         }
-        rec2 = &g_arena_challenge_table[st->cls]->records[st->wave];
-        if (OBJ->timer >= 0x33 || rec2->b[0] != 0) {
-            ok1 = 0;
+        wave_record = &g_arena_challenge_table[vars->cls]->records[vars->wave];
+        if (OBJ->timer >= 0x33 || wave_record->b[0] != 0) {
+            activated_a = 0;
             arena_clear_squad_slots_when_done(obj);
             arena_choose_next_squad_member(obj);
-            e1 = st->slots[st->slot];
-            if (e1 != 0 && moby_has_free_child_slot_state2(e1) != 0) {
-                for (k7 = st->counts[3]; k7 < rec2->h[3]; k7++) {
-                    ok1 |= arena_activate_fighter_of_class(obj, 0xDF7, 0);
+            squad_moby_a = vars->slots[vars->slot];
+            if (squad_moby_a != 0 && moby_has_free_child_slot_state2(squad_moby_a) != 0) {
+                for (add_i = vars->counts[3]; add_i < wave_record->h[3]; add_i++) {
+                    activated_a |= arena_activate_fighter_of_class(obj, 0xDF7, 0);
                 }
-                for (k7 = st->counts[1]; k7 < rec2->h[1]; k7++) {
-                    ok1 |= arena_activate_fighter_of_class(obj, 0xDCF, 0);
+                for (add_i = vars->counts[1]; add_i < wave_record->h[1]; add_i++) {
+                    activated_a |= arena_activate_fighter_of_class(obj, 0xDCF, 0);
                 }
-                for (k7 = st->counts[2]; k7 < rec2->h[2]; k7++) {
-                    ok1 |= arena_activate_fighter_of_class(obj, 0xDF4, 0);
+                for (add_i = vars->counts[2]; add_i < wave_record->h[2]; add_i++) {
+                    activated_a |= arena_activate_fighter_of_class(obj, 0xDF4, 0);
                 }
-                for (k7 = st->counts[0]; k7 < rec2->h[0]; k7++) {
-                    ok1 |= arena_activate_fighter_of_class(obj, 0xD98, 0);
+                for (add_i = vars->counts[0]; add_i < wave_record->h[0]; add_i++) {
+                    activated_a |= arena_activate_fighter_of_class(obj, 0xD98, 0);
                 }
-                for (k7 = st->counts[4]; k7 < rec2->h[4]; k7++) {
-                    ok1 |= arena_activate_fighter_of_class(obj, 0xDF9, 0);
+                for (add_i = vars->counts[4]; add_i < wave_record->h[4]; add_i++) {
+                    activated_a |= arena_activate_fighter_of_class(obj, 0xDF9, 0);
                 }
-                for (k7 = st->counts[5]; k7 < rec2->h[5]; k7++) {
-                    ok1 |= arena_activate_fighter_of_class(obj, 0xD37, 0);
+                for (add_i = vars->counts[5]; add_i < wave_record->h[5]; add_i++) {
+                    activated_a |= arena_activate_fighter_of_class(obj, 0xD37, 0);
                 }
             }
-            if (st->counts[6] == 0 && rec2->b[0] != 0) {
-                r3 = arena_activate_boss_of_class(obj, 0xD4A, 0);
-                st->sound = r3;
-                st->owner = r3;
+            if (vars->counts[6] == 0 && wave_record->b[0] != 0) {
+                boss_a = arena_activate_boss_of_class(obj, 0xD4A, 0);
+                vars->sound = boss_a;
+                vars->owner = boss_a;
                 if (g_hero_l11_state_block.owner == 0) {
-                    g_hero_l11_state_block.owner = r3;
+                    g_hero_l11_state_block.owner = boss_a;
                     g_hero_l11_state_block.timer = 0;
                 }
-                snd1 = st->sound;
+                sound_a = vars->sound;
                 if (g_arena_sound_handles[0] == 0) {
-                    g_arena_sound_handles[0] = snd1;
+                    g_arena_sound_handles[0] = sound_a;
                     mem_clear(g_enemy_damage_accum, 0, 0xE0);
                 }
                 arena_queue_voice_line(obj, 10);
-                script_queue_keyed_request(st->track, st->trackVolume);
+                script_queue_keyed_request(vars->track, vars->track_volume);
             }
-            if (rec2->b[0] == 0) {
-                if (g_music_state[0x48] != st->music && g_music_state[0x3C] != st->music) {
-                    script_queue_keyed_request(st->music, st->volume);
+            if (wave_record->b[0] == 0) {
+                if (g_music_state[0x48] != vars->music && g_music_state[0x3C] != vars->music) {
+                    script_queue_keyed_request(vars->music, vars->volume);
                 }
             }
-            if (ok1 != 0) {
+            if (activated_a != 0) {
                 arena_refresh_squad_slots(obj);
             }
         }
-        if (st->cls == 7) {
+        if (vars->cls == 7) {
             moby_handle_request_slot_state(10);
             ((Hero *)g_hero_state)->b[0x22B7] = 1;
         }
-        if (st->cls == 8) {
+        if (vars->cls == 8) {
             moby_handle_request_slot_state(30);
         }
         gfx_add_draw_callback_first(joba_hud_draw_challenge, obj);
@@ -722,52 +725,52 @@ void func_PAL_L11_004439E4(u8 *obj) {
             arena_mark_nearest_fighters_to_attack(obj);
         }
         arena_update_fighters_inside(obj);
-        if (arena_get_challenge_display_id(st->cls) != -1) {
-            g_arena_challenge_display_id = arena_get_challenge_display_id(st->cls);
+        if (arena_get_challenge_display_id(vars->cls) != -1) {
+            g_arena_challenge_display_id = arena_get_challenge_display_id(vars->cls);
             g_arena_saved_value = g_frame_counter;
         }
         break;
     case 9:
         arena_get_challenge_flag_index(1);
         if (flag_set_first_pending(obj) != 0) {
-            if (st->counts[7] == 0) {
-                if (g_arena_challenge_table[st->cls]->records[st->wave].b[1] != 0) {
-                    r4 = arena_activate_boss_of_class(obj, 0xB3A, 0);
-                    st->sound = r4;
-                    st->owner = r4;
+            if (vars->counts[7] == 0) {
+                if (g_arena_challenge_table[vars->cls]->records[vars->wave].b[1] != 0) {
+                    boss_b = arena_activate_boss_of_class(obj, MOBY_CLASS_ARACHNOID, 0);
+                    vars->sound = boss_b;
+                    vars->owner = boss_b;
                     if (g_hero_l11_state_block.owner == 0) {
-                        g_hero_l11_state_block.owner = r4;
+                        g_hero_l11_state_block.owner = boss_b;
                         g_hero_l11_state_block.timer = 0;
                     }
-                    snd2 = st->sound;
+                    sound_b = vars->sound;
                     if (g_arena_sound_handles[1] == 0) {
-                        g_arena_sound_handles[1] = snd2;
-                        buf2 = g_enemy_damage_accum;
-                        mem_clear(buf2 + 0xE0, 0, 0xE0);
+                        g_arena_sound_handles[1] = sound_b;
+                        damage_accum_a = g_enemy_damage_accum;
+                        mem_clear(damage_accum_a + 0xE0, 0, 0xE0);
                     }
                     arena_queue_voice_line(obj, 4);
-                    script_queue_keyed_request(st->track, st->trackVolume);
+                    script_queue_keyed_request(vars->track, vars->track_volume);
                 }
             }
-            st->mode = 1;
+            vars->mode = 1;
             OBJ->phase = 0;
             arena_queue_voice_line(obj, math_random_int_below(2) + 0x1B);
-            for (k8 = 0; k8 < 4; k8++) {
-                st->phase[k8] = (f32)k8 * 0.25f;
-                st->speed[k8] = math_random_float_range(g_l11_laser_speed_range[0], g_l11_laser_speed_range[1]) * 0.020000001f;
-                st->delay[k8] = math_random_float_range(g_arena_spawn_delay_range[0], g_arena_spawn_delay_range[1]);
+            for (laser_i = 0; laser_i < 4; laser_i++) {
+                vars->phase[laser_i] = (f32)laser_i * 0.25f;
+                vars->speed[laser_i] = math_random_float_range(g_l11_laser_speed_range[0], g_l11_laser_speed_range[1]) * 0.020000001f;
+                vars->delay[laser_i] = math_random_float_range(g_arena_spawn_delay_range[0], g_arena_spawn_delay_range[1]);
             }
         } else if (OBJ->phase == 0) {
             joba_update_ribbon_scale(obj);
             arena_update_loss_history(obj);
-            lt1 = &g_joba_lights[*g_arena_light_lists[st->light] & 0x7FFF];
-            q1 = (u8 *)&g_moby_l11_table[st->lamp];
-            if (lt1->height < 421.266f) {
-                f1 = lt1->height + 0.010000001f;
-                lt1->height = f1;
-                *(f32 *)(q1 + 0x18) = f1;
+            light_up = &g_joba_lights[*g_arena_light_lists[vars->light] & 0x7FFF];
+            lamp_bytes = (u8 *)&g_moby_l11_table[vars->lamp];
+            if (light_up->height < 421.266f) {
+                height_up = light_up->height + 0.010000001f;
+                light_up->height = height_up;
+                *(f32 *)(lamp_bytes + 0x18) = height_up;
             }
-            if (((Hero *)g_hero_state)->ptr[0x33C / 4] == (void *)q1 && ((Hero *)g_hero_state)->i[0x340 / 4] != 0 &&
+            if (((Hero *)g_hero_state)->ptr[0x33C / 4] == (void *)lamp_bytes && ((Hero *)g_hero_state)->i[0x340 / 4] != 0 &&
                 (((Hero *)g_hero_state)->i[0x2294 / 4] == 7 || OBJ->timer >= 0xFB)) {
                 ((Hero *)g_hero_state)->i[0xF0 / 4] = 0;
                 g_hero_speed_param = 80.0f;
@@ -779,28 +782,28 @@ void func_PAL_L11_004439E4(u8 *obj) {
                 } else {
                     hero_l11_enter_state(0x81, 1);
                 }
-                if (vec_distance_xy(&((Hero *)g_hero_state)->f[0x80 / 4], lt1->pos) < 0.01f) {
+                if (vec_distance_xy(&((Hero *)g_hero_state)->f[0x80 / 4], light_up->pos) < 0.01f) {
                     ((Hero *)g_hero_state)->f[0x84 / 4] += 0.01f;
                 }
             }
-            ok2 = 0;
+            activated_b = 0;
             arena_clear_squad_slots_when_done(obj);
             arena_choose_next_squad_member(obj);
-            e2 = st->slots[st->slot];
-            if (e2 != 0 && moby_has_free_child_slot_state2(e2) != 0) {
-                for (k9 = st->counts[1]; k9 < 4; k9++) {
-                    ok2 |= arena_activate_fighter_of_class(obj, 0xDCF, 0);
+            squad_moby_b = vars->slots[vars->slot];
+            if (squad_moby_b != 0 && moby_has_free_child_slot_state2(squad_moby_b) != 0) {
+                for (fill_i = vars->counts[1]; fill_i < 4; fill_i++) {
+                    activated_b |= arena_activate_fighter_of_class(obj, 0xDCF, 0);
                 }
-                for (k9 = st->counts[2]; k9 < 4; k9++) {
-                    ok2 |= arena_activate_fighter_of_class(obj, 0xDF4, 0);
+                for (fill_i = vars->counts[2]; fill_i < 4; fill_i++) {
+                    activated_b |= arena_activate_fighter_of_class(obj, 0xDF4, 0);
                 }
-                for (k9 = st->counts[0]; k9 < 4; k9++) {
-                    ok2 |= arena_activate_fighter_of_class(obj, 0xD98, 0);
+                for (fill_i = vars->counts[0]; fill_i < 4; fill_i++) {
+                    activated_b |= arena_activate_fighter_of_class(obj, 0xD98, 0);
                 }
             }
             part_emit_robot_laser(obj);
             gfx_add_draw_callback_first(part_spawn_channel_beam_effects, obj);
-            if (ok2 != 0) {
+            if (activated_b != 0) {
                 arena_refresh_squad_slots(obj);
             }
             if (g_hero_l11_input_blocked == 0) {
@@ -820,109 +823,109 @@ void func_PAL_L11_004439E4(u8 *obj) {
                 }
             }
             part_emit_object_sparks(obj, 0);
-            if (g_hero_l11_input_blocked != 0 && st->mode == 3) {
+            if (g_hero_l11_input_blocked != 0 && vars->mode == 3) {
                 OBJ->timer = 0;
                 OBJ->phase = 1;
-                rec6 = &g_arena_challenge_table[st->cls]->records[st->wave];
-                for (c10 = 0; c10 < 6; c10++) {
-                    st->counts[c10] = 0;
+                boss_wave_record = &g_arena_challenge_table[vars->cls]->records[vars->wave];
+                for (clear_i = 0; clear_i < 6; clear_i++) {
+                    vars->counts[clear_i] = 0;
                 }
-                st->heading = mat_fast_helper_a(((Hero *)g_hero_state)->f[0x80 / 4] - ((f32 *)arena_get_center_point(obj))[0],
+                vars->heading = mat_fast_helper_a(((Hero *)g_hero_state)->f[0x80 / 4] - ((f32 *)arena_get_center_point(obj))[0],
                                            ((Hero *)g_hero_state)->f[0x84 / 4] - ((f32 *)arena_get_center_point(obj))[1]);
-                st->heading = FastAddRotations(st->heading, -1.5707965f);
-                for (k10 = st->counts[3]; k10 < rec6->h[3]; k10++) {
+                vars->heading = FastAddRotations(vars->heading, -1.5707965f);
+                for (top_i = vars->counts[3]; top_i < boss_wave_record->h[3]; top_i++) {
                     arena_activate_fighter_of_class(obj, 0xDF7, 1);
                 }
-                for (k10 = st->counts[5]; k10 < rec6->h[5]; k10++) {
+                for (top_i = vars->counts[5]; top_i < boss_wave_record->h[5]; top_i++) {
                     arena_activate_fighter_of_class(obj, 0xD37, 1);
                 }
-                for (k10 = st->counts[1]; k10 < rec6->h[1]; k10++) {
+                for (top_i = vars->counts[1]; top_i < boss_wave_record->h[1]; top_i++) {
                     arena_activate_fighter_of_class(obj, 0xDCF, 1);
                 }
-                for (k10 = st->counts[2]; k10 < rec6->h[2]; k10++) {
+                for (top_i = vars->counts[2]; top_i < boss_wave_record->h[2]; top_i++) {
                     arena_activate_fighter_of_class(obj, 0xDF4, 1);
                 }
-                for (k10 = st->counts[0]; k10 < rec6->h[0]; k10++) {
+                for (top_i = vars->counts[0]; top_i < boss_wave_record->h[0]; top_i++) {
                     arena_activate_fighter_of_class(obj, 0xD98, 1);
                 }
             }
         } else if (OBJ->phase == 1) {
             arena_update_loss_history(obj);
             joba_update_ribbon_scale(obj);
-            if (g_arena_challenge_table[st->cls]->records[st->wave].b[4] != 0) {
-                part_spawn_timed_effect_near_anchor(obj, &g_arena_challenge_table[st->cls]->records[st->wave]);
+            if (g_arena_challenge_table[vars->cls]->records[vars->wave].b[4] != 0) {
+                part_spawn_timed_effect_near_anchor(obj, &g_arena_challenge_table[vars->cls]->records[vars->wave]);
             }
             part_emit_object_sparks(obj, 0);
             if (arena_l11_is_wave_complete(obj) != 0) {
-                for (c11 = 0; c11 < 8; c11++) {
-                    st->counts[c11] = 0;
+                for (clear_j = 0; clear_j < 8; clear_j++) {
+                    vars->counts[clear_j] = 0;
                 }
-                st->lost = 0;
-                cl1 = g_arena_challenge_table[st->cls];
-                w1 = st->wave;
-                next1 = &cl1->records[w1 + 1];
-                if (w1 + 1 < cl1->count && next1->b[3] != 0) {
-                    st->heading = mat_fast_helper_a(((Hero *)g_hero_state)->f[0x80 / 4] - ((f32 *)arena_get_center_point(obj))[0],
+                vars->lost = 0;
+                challenge_class = g_arena_challenge_table[vars->cls];
+                wave_index = vars->wave;
+                next_record = &challenge_class->records[wave_index + 1];
+                if (wave_index + 1 < challenge_class->count && next_record->b[3] != 0) {
+                    vars->heading = mat_fast_helper_a(((Hero *)g_hero_state)->f[0x80 / 4] - ((f32 *)arena_get_center_point(obj))[0],
                                                ((Hero *)g_hero_state)->f[0x84 / 4] - ((f32 *)arena_get_center_point(obj))[1]);
-                    st->heading = FastAddRotations(st->heading, -1.5707965f);
-                    st->wave++;
-                    rec8 = &g_arena_challenge_table[st->cls]->records[st->wave];
-                    for (k11 = st->counts[3]; k11 < rec8->h[3]; k11++) {
+                    vars->heading = FastAddRotations(vars->heading, -1.5707965f);
+                    vars->wave++;
+                    late_wave_record = &g_arena_challenge_table[vars->cls]->records[vars->wave];
+                    for (add_j = vars->counts[3]; add_j < late_wave_record->h[3]; add_j++) {
                         arena_activate_fighter_of_class(obj, 0xDF7, 1);
                     }
-                    for (k11 = st->counts[5]; k11 < rec8->h[5]; k11++) {
+                    for (add_j = vars->counts[5]; add_j < late_wave_record->h[5]; add_j++) {
                         arena_activate_fighter_of_class(obj, 0xD37, 1);
                     }
-                    for (k11 = st->counts[1]; k11 < rec8->h[1]; k11++) {
+                    for (add_j = vars->counts[1]; add_j < late_wave_record->h[1]; add_j++) {
                         arena_activate_fighter_of_class(obj, 0xDCF, 1);
                     }
-                    for (k11 = st->counts[2]; k11 < rec8->h[2]; k11++) {
+                    for (add_j = vars->counts[2]; add_j < late_wave_record->h[2]; add_j++) {
                         arena_activate_fighter_of_class(obj, 0xDF4, 1);
                     }
-                    for (k11 = st->counts[0]; k11 < rec8->h[0]; k11++) {
+                    for (add_j = vars->counts[0]; add_j < late_wave_record->h[0]; add_j++) {
                         arena_activate_fighter_of_class(obj, 0xD98, 1);
                     }
-                    if (st->counts[7] == 0 && rec8->b[1] != 0) {
-                        r5 = arena_activate_boss_of_class(obj, 0xB3A, 0);
-                        st->sound = r5;
-                        st->owner = r5;
+                    if (vars->counts[7] == 0 && late_wave_record->b[1] != 0) {
+                        boss_c = arena_activate_boss_of_class(obj, MOBY_CLASS_ARACHNOID, 0);
+                        vars->sound = boss_c;
+                        vars->owner = boss_c;
                         if (g_hero_l11_state_block.owner == 0) {
-                            g_hero_l11_state_block.owner = r5;
+                            g_hero_l11_state_block.owner = boss_c;
                             g_hero_l11_state_block.timer = 0;
                         }
-                        snd3 = st->sound;
+                        sound_c = vars->sound;
                         if (g_arena_sound_handles[1] == 0) {
-                            g_arena_sound_handles[1] = snd3;
-                            buf3 = g_enemy_damage_accum;
-                            mem_clear(buf3 + 0xE0, 0, 0xE0);
+                            g_arena_sound_handles[1] = sound_c;
+                            damage_accum_b = g_enemy_damage_accum;
+                            mem_clear(damage_accum_b + 0xE0, 0, 0xE0);
                         }
                         arena_queue_voice_line(obj, 4);
                     }
                 } else {
                     hero_l11_enter_state(0x6F, 1);
                     OBJ->phase = 2;
-                    st->mode = 4;
+                    vars->mode = 4;
                     OBJ->timer = 0;
                     tracked_moby_set_state(1, -1);
                     global_object_start((char *)1, -1);
                 }
             }
-            st->frames++;
-            if (st->cls == 12) {
-                if (st->frames >= 0x1389) {
+            vars->frames++;
+            if (vars->cls == 12) {
+                if (vars->frames >= 0x1389) {
                     char buf[0x70];
 
-                    sum3 = 0;
-                    for (k12 = 0; k12 < 6; k12++) {
-                        sum3 += st->counts[k12];
+                    count_sum_c = 0;
+                    for (sum_k = 0; sum_k < 6; sum_k++) {
+                        count_sum_c += vars->counts[sum_k];
                     }
-                    sprintf(buf, g_str_count_line_format, GetLocalizedString(0x1B37), g_arena_wave_kill_targets_c[st->wave] + sum3 - st->lost,
+                    sprintf(buf, g_str_count_line_format, GetLocalizedString(0x1B37), g_arena_wave_kill_targets_c[vars->wave] + count_sum_c - vars->lost,
                                   GetLocalizedString(0xE86));
                     level_l00_call_module_handler_with_arg_9((int)buf, -1);
-                    lt4 = &g_joba_lights[*g_arena_light_lists[st->light] & 0x7FFF];
-                    m2 = &g_moby_l11_table[st->lamp];
-                    lt4->height = 419.766f;
-                    m2->y = 419.766f;
+                    light_end = &g_joba_lights[*g_arena_light_lists[vars->light] & 0x7FFF];
+                    lamp_end = &g_moby_l11_table[vars->lamp];
+                    light_end->height = 419.766f;
+                    lamp_end->y = 419.766f;
                     moby_set_state(obj, 11, -1);
                     tracked_moby_set_state(1, -1);
                     global_object_start((char *)1, -1);
@@ -944,27 +947,27 @@ void func_PAL_L11_004439E4(u8 *obj) {
                 ((Hero *)g_hero_state)->h[0x1F0 / 2] = 1;
             }
             joba_update_ribbon_scale(obj);
-            lt2 = &g_joba_lights[*g_arena_light_lists[st->light] & 0x7FFF];
-            m3 = &g_moby_l11_table[st->lamp];
-            if (lt2->height > 419.766f) {
-                f2 = lt2->height - 0.010000001f;
-                lt2->height = f2;
-                m3->y = f2;
+            light_down = &g_joba_lights[*g_arena_light_lists[vars->light] & 0x7FFF];
+            lamp_down = &g_moby_l11_table[vars->lamp];
+            if (light_down->height > 419.766f) {
+                height_down = light_down->height - 0.010000001f;
+                light_down->height = height_down;
+                lamp_down->y = height_down;
             }
-            if (st->mode == 0) {
-                st->wave++;
-                for (k13 = 0; k13 < 7; k13++) {
-                    st->counts[k13] = 0;
+            if (vars->mode == 0) {
+                vars->wave++;
+                for (reset_i = 0; reset_i < 7; reset_i++) {
+                    vars->counts[reset_i] = 0;
                 }
-                st->lost = 0;
-                if (g_hero_l11_state_block.owner == st->owner) {
+                vars->lost = 0;
+                if (g_hero_l11_state_block.owner == vars->owner) {
                     g_hero_l11_state_block.owner = 0;
                 }
-                cls2 = st->cls;
-                st->sound = 0;
-                st->owner = 0;
-                if (st->wave >= g_arena_challenge_table[cls2]->count) {
-                    if (cls2 == 1 && g_game_flag_table[arena_get_challenge_flag_index(1)] == 0) {
+                class_index_b = vars->cls;
+                vars->sound = 0;
+                vars->owner = 0;
+                if (vars->wave >= g_arena_challenge_table[class_index_b]->count) {
+                    if (class_index_b == 1 && g_game_flag_table[arena_get_challenge_flag_index(1)] == 0) {
                         moby_set_state(obj, 13, -1);
                         OBJ->timer = 0x96;
                     } else {
@@ -973,32 +976,32 @@ void func_PAL_L11_004439E4(u8 *obj) {
                     }
                     tracked_moby_set_state(1, -1);
                     global_object_start((char *)1, -1);
-                    st->result = st->cls;
+                    vars->result = vars->cls;
                     return;
                 }
-                if (cls2 >= 13) {
-                    st->cls = 0;
+                if (class_index_b >= 13) {
+                    vars->cls = 0;
                 }
                 arena_assign_fighters_to_spawns(obj);
-                rec9 = &g_arena_challenge_table[st->cls]->records[st->wave];
-                arena_set_group_a_active_count(obj, rec9->h[7]);
-                arena_set_group_b_active_count(obj, rec9->h[6]);
+                final_record = &g_arena_challenge_table[vars->cls]->records[vars->wave];
+                arena_set_group_a_active_count(obj, final_record->h[7]);
+                arena_set_group_b_active_count(obj, final_record->h[6]);
                 OBJ->state = 8;
             }
         }
     tail9:
-        slot1 = (s32)obj >> 8;
+        moby_slot = (s32)obj >> 8;
         gfx_add_draw_callback_first(joba_hud_draw_challenge, obj);
         arena_update_camera_guide(obj);
         joba_boss_pick_action_by_target(obj);
-        if ((g_arena_progress_level & 7) == (slot1 & 7)) {
+        if ((g_arena_progress_level & 7) == (moby_slot & 7)) {
             arena_update_fighters_inside(obj);
         }
-        if ((g_arena_progress_level & 0x3F) == (slot1 & 0x3F)) {
+        if ((g_arena_progress_level & 0x3F) == (moby_slot & 0x3F)) {
             arena_mark_nearest_fighters_to_attack(obj);
         }
-        if (arena_get_challenge_display_id(st->cls) != -1) {
-            g_arena_challenge_display_id = arena_get_challenge_display_id(st->cls);
+        if (arena_get_challenge_display_id(vars->cls) != -1) {
+            g_arena_challenge_display_id = arena_get_challenge_display_id(vars->cls);
             g_arena_saved_value = g_frame_counter;
         }
         break;

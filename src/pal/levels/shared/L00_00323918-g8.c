@@ -29,8 +29,9 @@ extern void vec_scale_to_length(float *, float *, float);
 extern void FastVecAdd(void *, void *, void *), FastVecSub(void *, void *, void *);
 extern int math_solve_quadratic(float *, float *, float, float, float);
 extern int SegmentCrossPolyline(int, void *, void *, void *);
-extern void *func_PAL_00303578(void *, void *, void *, int, int, int);
+extern void *moby_spawn_bolt_pickup_pal(void *, void *, void *, int, int, int);
 
+/* Spawns bolt pickups worth a random amount between low and high, split into the largest bolt values (PAL). */
 void part_spawn_bolt_pickups_pal(char *object, int low, int high, int flags, int surface, int maximum, float height)
 {
     float offset[4], position[4], velocity[4], half[4], end[4], hit[4], correction[4];
@@ -142,12 +143,12 @@ void part_spawn_bolt_pickups_pal(char *object, int low, int high, int flags, int
             velocity[0]=end[0];velocity[1]=end[1];
         }
         FastVecAdd(velocity,velocity,offset);
-        if(thousands){func_PAL_00303578(object,position,velocity,flags,1000,enabled);thousands--;}
-        else if(fivehundreds){func_PAL_00303578(object,position,velocity,flags,500,enabled);fivehundreds--;}
-        else if(hundreds){func_PAL_00303578(object,position,velocity,flags,100,enabled);hundreds--;}
-        else if(fifties){func_PAL_00303578(object,position,velocity,flags,50,enabled);fifties--;}
-        else if(twenties){func_PAL_00303578(object,position,velocity,flags,20,enabled);twenties--;}
-        else if(fives){func_PAL_00303578(object,position,velocity,flags,5,enabled);fives--;}
-        else {func_PAL_00303578(object,position,velocity,flags,1,enabled);ones--;}
+        if(thousands){moby_spawn_bolt_pickup_pal(object,position,velocity,flags,1000,enabled);thousands--;}
+        else if(fivehundreds){moby_spawn_bolt_pickup_pal(object,position,velocity,flags,500,enabled);fivehundreds--;}
+        else if(hundreds){moby_spawn_bolt_pickup_pal(object,position,velocity,flags,100,enabled);hundreds--;}
+        else if(fifties){moby_spawn_bolt_pickup_pal(object,position,velocity,flags,50,enabled);fifties--;}
+        else if(twenties){moby_spawn_bolt_pickup_pal(object,position,velocity,flags,20,enabled);twenties--;}
+        else if(fives){moby_spawn_bolt_pickup_pal(object,position,velocity,flags,5,enabled);fives--;}
+        else {moby_spawn_bolt_pickup_pal(object,position,velocity,flags,1,enabled);ones--;}
     }
 }

@@ -13,37 +13,39 @@ extern void get_moby_color(int first, char *a, char *b, char *c);
 extern int FastDecTimer(char *a0);
 extern void set_moby_color(void *a, int b, int c, int d);
 
-void func_PAL_002AC290(int first, char *object)
+/* Starts a color fade on a moby: sets the timer from the fade length, keeping the progress of a fade already running (PAL: 50 Hz frame counts). */
+void gfx_start_color_fade_pal(int first, char *object)
 {
-    char *s0 = object;
-    short s1 = *(short *)(s0 + 0);
+    char *state = object;
+    short old_timer = *(short *)(state + 0);
     int total;
     float limit;
     int result;
 
-    if (s1 != 0 && *(short *)(s0 + 2) == 0)
+    if (old_timer != 0 && *(short *)(state + 2) == 0)
         return;
-    total = ((s32)(*(short *)(s0 + 12)) * 5 + 2) / 6;
-    *(short *)(s0 + 2) = 0;
-    *(short *)(s0 + 0) = total;
-    if (s1 != 0) {
-        limit = IntToFloat(((s32)(*(short *)(s0 + 14)) * 5 + 2) / 6);
-        result = FloatToInt((float)(((s32)(*(short *)(s0 + 12)) * 5 + 2) / 6) * ((float)s1 / limit));
-        *(short *)(s0 + 0) = (short)result;
+    total = ((s32)(*(short *)(state + 12)) * 5 + 2) / 6;
+    *(short *)(state + 2) = 0;
+    *(short *)(state + 0) = total;
+    if (old_timer != 0) {
+        limit = IntToFloat(((s32)(*(short *)(state + 14)) * 5 + 2) / 6);
+        result = FloatToInt((float)(((s32)(*(short *)(state + 12)) * 5 + 2) / 6) * ((float)old_timer / limit));
+        *(short *)(state + 0) = (short)result;
         if ((short)result <= 0)
-            *(short *)(s0 + 0) = 1;
+            *(short *)(state + 0) = 1;
     } else {
-        int a, b, c;
-        get_moby_color(first, (char *)&a, (char *)&b, (char *)&c);
-        *(char *)(s0 + 4) = (unsigned char)a;
-        *(char *)(s0 + 5) = (unsigned char)b;
-        *(char *)(s0 + 6) = (unsigned char)c;
+        int red, green, blue;
+        get_moby_color(first, (char *)&red, (char *)&green, (char *)&blue);
+        *(char *)(state + 4) = (unsigned char)red;
+        *(char *)(state + 5) = (unsigned char)green;
+        *(char *)(state + 6) = (unsigned char)blue;
     }
 }
 
-void func_PAL_002AC3C0(void *owner, u8 *obj)
+/* Updates a color fade on a moby each frame and sets its color; the fade goes there and back (PAL: 50 Hz frame counts). */
+void gfx_update_color_fade_pal(void *owner, u8 *obj)
 {
-    int r, g, b;
+    int r, g, green;
     float limit, f;
 
     if (*(short *)obj == 0)
@@ -63,14 +65,14 @@ void func_PAL_002AC3C0(void *owner, u8 *obj)
         f = (limit - (float)*(short *)obj) / limit;
         r = obj[7] ? FloatToInt((float)obj[4] + (float)(obj[7] - obj[4]) * f) : obj[4];
         g = obj[8] ? FloatToInt((float)obj[5] + (float)(obj[8] - obj[5]) * f) : obj[5];
-        b = obj[9] ? FloatToInt((float)obj[6] + (float)(obj[9] - obj[6]) * f) : obj[6];
+        green = obj[9] ? FloatToInt((float)obj[6] + (float)(obj[9] - obj[6]) * f) : obj[6];
     } else {
         limit = IntToFloat(((s32)(*(short *)(obj + 0xE)) * 5 + 2) / 6);
         f = (limit - (float)*(short *)obj) / limit;
         r = obj[7] ? FloatToInt((float)obj[7] + (float)(obj[4] - obj[7]) * f) : obj[4];
         g = obj[8] ? FloatToInt((float)obj[8] + (float)(obj[5] - obj[8]) * f) : obj[5];
-        b = obj[9] ? FloatToInt((float)obj[9] + (float)(obj[6] - obj[9]) * f) : obj[6];
+        green = obj[9] ? FloatToInt((float)obj[9] + (float)(obj[6] - obj[9]) * f) : obj[6];
     }
 
-    set_moby_color(owner, r, g, b);
+    set_moby_color(owner, r, g, green);
 }

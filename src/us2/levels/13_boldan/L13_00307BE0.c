@@ -29,7 +29,8 @@ extern void UpdateEquipmentPieces(void *);
 extern void math_store_angle_update_result(void *, void *, int, int, float);
 typedef struct { unsigned char pad[0x7C]; short f7C; } Obj_L13_00306F38;
 
-void func_US2_L13_00307BE0(void) {
+/* Sets up the level's objects each load: shows some, runs setup on others, and prepares two special ones. (USA v2.00) */
+void boldan_init_level_objects_us2(void) {
     int i;
 
     anim_start_startup_animations();

@@ -49,7 +49,7 @@ extern void FastVecScale(void *, void *, float);
 
 /* Steps a thrown object's arc until it lands and records the impact point;
    RAC1's predict_mine_impact (overlays/shared/bolts_and_wrench.c) is the same routine. */
-int func_PAL_L00_003B1D70(char *motion, char *object, int mode)
+int PredictMineImpact_pal(char *motion, char *object, int mode)
 {
     ArcVector position;
     ArcVector velocity;

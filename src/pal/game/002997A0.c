@@ -28,6 +28,7 @@ extern int load_read_disc_with_pause(int, int, int);
 extern void mem_copy_aligned(void *, void *, int);
 extern void save_load_packet(char *);
 
+/* Loads the saved game data into memory, restores it, and then resets the save menu state back to its starting values. */
 void save_load_game_data_reset_menu_pal(void)
 {
     char buf[40];

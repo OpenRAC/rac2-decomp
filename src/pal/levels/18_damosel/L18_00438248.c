@@ -23,38 +23,39 @@ extern u8 *fireball_spawn(void *, void *, void *, int, float, float);
 extern int PlayMobySound(s32 arg0, s32 arg1, u8 *arg2);
 extern void moby_transform_joint_to_world(s32 arg0, s32 arg1, void *arg2);
 
-void extermibot_fire_shot_at_target_pal(u8 *a)
+/* Fires a shot: spawns two sparkles, then a projectile aimed toward a target point, with a sound. (PAL: 50 Hz values) */
+void extermibot_fire_shot_at_target_pal(u8 *moby)
 {
     float pos[4], delta[4], end[4], vel[4];
-    u8 *s = *(u8 **)(a + 0x68), *p, *particle;
-    int c;
-    float z;
+    u8 *vars = *(u8 **)(moby + 0x68), *fireball, *particle;
+    int color_seed;
+    float launch_z;
 
-    if (*(s16 *)(s + 0x7FC) == 0)
+    if (*(s16 *)(vars + 0x7FC) == 0)
         return;
-    *(s16 *)(s + 0x804) = 0;
-    moby_transform_joint_to_world(*(s32 *)(s + 0x7C8), 0, pos);
-    c = math_random_int_below(255);
-    particle = part_spawn_gravity_fade(pos, g_explosion_effect_desc, 2, 0x808080, c, 127, 16,
+    *(s16 *)(vars + 0x804) = 0;
+    moby_transform_joint_to_world(*(s32 *)(vars + 0x7C8), 0, pos);
+    color_seed = math_random_int_below(255);
+    particle = part_spawn_gravity_fade(pos, g_explosion_effect_desc, 2, 0x808080, color_seed, 127, 16,
                             840000.0f, 840000.0f, 0.0f, 0);
     if (particle)
         particle[2] = g_particle_template_table[0][0];
-    particle = part_spawn_gravity_fade(pos, g_explosion_effect_desc, 2, 0x608080, (c + 128) % 255,
+    particle = part_spawn_gravity_fade(pos, g_explosion_effect_desc, 2, 0x608080, (color_seed + 128) % 255,
                             127, 16, 840000.0f, 840000.0f, 0.0f, 0);
     if (particle)
         particle[2] = g_particle_template_table[0][0];
-    FastVecSub(delta, s + 0x760, pos);
+    FastVecSub(delta, vars + 0x760, pos);
     vec_scale_to_length(delta, delta, 0.3f);
     FastVecAdd(pos, pos, delta);
     vec_scale_to_length(delta, delta, 3.0f);
-    FastVecSub(end, s + 0x760, delta);
-    z = weapon_compute_shot_launch_speed(pos, end, 0, 0.3f, -0.0028000001f);
+    FastVecSub(end, vars + 0x760, delta);
+    launch_z = weapon_compute_shot_launch_speed(pos, end, 0, 0.3f, -0.0028000001f);
     FastVecSub(vel, end, pos);
     vel[2] = 0.0f;
     vec_scale_to_length(vel, vel, 0.3f);
-    vel[2] = z;
-    p = fireball_spawn(a, pos, vel, 25, 0.0028000001f,
-                         (float)s[0x35]);
-    PlayMobySound(7, 0, a);
-    *(float *)(p + 0x2C) = 0.005f;
+    vel[2] = launch_z;
+    fireball = fireball_spawn(moby, pos, vel, 25, 0.0028000001f,
+                         (float)vars[0x35]);
+    PlayMobySound(7, 0, moby);
+    *(float *)(fireball + 0x2C) = 0.005f;
 }

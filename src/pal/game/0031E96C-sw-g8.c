@@ -24,7 +24,7 @@ extern void FastVecScale(void *, void *, float);
 extern void vec_scale_to_length(void *, void *, float);
 extern void vec_clear_128(void *);
 extern void gravity_get_dir_at_object(void *, void *, int);
-extern void func_PAL_00320D00(void *, int, int);
+extern void part_spawn_hit_sparks_pal(void *, int, int);
 extern int StartAttachedEffect_pal(void *, int, int);
 extern void make_hit_descriptor(void *, void *, int, void *, float);
 extern void QueueMobyImpact(void *, void *);
@@ -49,7 +49,8 @@ extern char *moby_get_private_value_0(void *);
 extern char *SelectBestTargetInCone(void *, void *, float, float, int *, void *, int, void *,
                            float, float, float, int, void *);
 
-void func_PAL_0031EBA0(char *self)
+/* Updates a flying shot. It moves, damages what it touches, bursts into sparks, sets off a blast around it and then goes away (PAL: 50 Hz timings). */
+void shot_moby_update_pal(char *self)
 {
     char old[16] __attribute__((aligned(16)));
     union { char v[16]; QueryParams params; } temp __attribute__((aligned(16)));
@@ -75,7 +76,7 @@ void func_PAL_0031EBA0(char *self)
         for (i = 0; i < n; i++) {
             obj = ((Candidate *)g_area_hit_targets)[i].item;
             data = moby_get_private_value_0(obj);
-            if (*(short *)(obj + 0xAA) == 0xC4A || obj == ((PlayerRef *)g_hero_state)->player
+            if (*(short *)(obj + 0xAA) == MOBY_CLASS_PLASMA_COIL || obj == ((PlayerRef *)g_hero_state)->player
                 || !(*(short *)(obj + 0x34) & 0x1000))
                 continue;
             if (data) {
@@ -96,7 +97,7 @@ void func_PAL_0031EBA0(char *self)
             *(unsigned char *)(event.raw + 25) = 3;
             *(short *)(event.raw + 26) = *(short *)(self + 0xAA);
             QueueMobyImpact(obj, event.raw);
-            func_PAL_00320D00(self + 0x10, 10, 1);
+            part_spawn_hit_sparks_pal(self + 0x10, 10, 1);
             StartAttachedEffect_pal(obj, 28, *(int *)(self + 0xB8));
             break;
         }
@@ -113,7 +114,7 @@ void func_PAL_0031EBA0(char *self)
                 FastVecAdd(self + 0x10, temp.v, self + 0x10);
                 *(int *)(state + 0x10) = 12;
                 *(unsigned char *)(self + 0x20) = 2;
-                func_PAL_00320D00(self + 0x10, 15, 0);
+                part_spawn_hit_sparks_pal(self + 0x10, 15, 0);
             }
         }
         if (math_fast_float_d(state + 0x10)) {
@@ -165,7 +166,7 @@ void func_PAL_0031EBA0(char *self)
         if (!*(int *)(state + 0x1C)) {
             spark_destroy_moby_free_slot(self);
             if (!*(char **)(state + 0x38)) {
-                func_PAL_00320D00(self + 0x10, 10, 1);
+                part_spawn_hit_sparks_pal(self + 0x10, 10, 1);
                 PlayMobySound(2, 0, self);
             }
         }

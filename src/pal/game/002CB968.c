@@ -24,12 +24,13 @@ typedef struct {
     int fieldF4;
 } GameState_1F2840;
 
+/* Counts down the pause fade timer and, when it ends, asks for the load or save slot that matches the mode, preloading the chosen weapon class (PAL). */
 void menu_handle_pause_fade_timer_pal(void)
 {
-    int n = ((GameState_1F2840 *)g_pause_menu_state)->count;
+    int fade_timer = ((GameState_1F2840 *)g_pause_menu_state)->count;
 
-    if (n != 0)
-        ((GameState_1F2840 *)g_pause_menu_state)->count = n - 1;
+    if (fade_timer != 0)
+        ((GameState_1F2840 *)g_pause_menu_state)->count = fade_timer - 1;
     if (((GameState_1F2840 *)g_pause_menu_state)->count != 0)
         return;
     if (g_sequence_active_flag != 0)

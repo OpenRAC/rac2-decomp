@@ -4,7 +4,7 @@
 extern void hero_clear_tracked_slots(void);
 extern void attachment_reset_all(void);
 extern void hero_clear_queued_anim(void);
-extern s32 func_US2_L18_002E02E8(s32, s32);
+extern s32 hero_l18_set_action_us2(s32, s32);
 extern u8 g_hero_state[];
 extern u8 g_hero_state[];
 extern u8 g_anim_entry_table_a[], g_anim_entry_table_b[];
@@ -23,6 +23,7 @@ extern void hero_clear_queued_anim(void);
 extern s32 anim_copy_entry_data(char *, s32, s32, s32);
 extern void cam_reset_default(void);
 
+/* Gives control back to the hero and restores the saved position and camera state (USA v2.00 copy). */
 void hero_detach_from_object_us2(s32 keep)
 {
     u8 *base = g_hero_state;
@@ -77,7 +78,7 @@ void hero_detach_from_object_us2(s32 keep)
         goto done;
     }
 reset:
-    func_US2_L18_002E02E8(0, 1);
+    hero_l18_set_action_us2(0, 1);
 done:
     if (g_hero_state[0x22B4] == 4) cam_reset_default();
 }

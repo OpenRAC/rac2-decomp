@@ -31,7 +31,7 @@ extern void ship_draw_engine_flames(void *);
 extern void render_environment_mapped_object_pal(void *);
 extern void part_draw_effect_records(void);
 extern void STUB_printf(void *,int,int);
-extern void func_PAL_002E89D0(void *);
+extern void ship_spawn_thruster_particles_pal(void *);
 extern void VU1_addGSregister(unsigned int,unsigned long long);
 extern void gfx_wait_for_dma_status_bits(unsigned long long);
 extern void PatchMobyGifs(void);
@@ -44,21 +44,21 @@ extern void DrawRotatedSprite(float,float,float,float,float,int,int,unsigned lon
 #define B(p,o) (*(unsigned char *)((p)+(o)))
 
 /* Renders the transition scene, its loading indicator and the final fade. */
-void func_PAL_002E99F0(void) {
-    float saved;
+void transition_render_scene_pal(void) {
+    float saved_fov;
     char *object;
     int alpha;
     gfx_append_draw_list_buffer_tag(0);
     gfx_build_view_matrices();
     moby_update_watched_objects();
     gfx_write_clear_color_packets();
-    saved = g_view_params.value;
+    saved_fov = g_view_params.value;
     g_gfx_pass_mode = -1;
-    if (saved<0.62f) g_view_params.value = 0.62f;
+    if (saved_fov<0.62f) g_view_params.value = 0.62f;
     UpdateViewContext();
     gfx_build_view_matrices();
     cam_build_view_transforms();
-    g_view_params.value = saved;
+    g_view_params.value = saved_fov;
     UpdateViewContext();
     gfx_build_view_matrices();
     if (g_hero_moby_default.variant==4) {
@@ -84,7 +84,7 @@ void func_PAL_002E99F0(void) {
         else STUB_printf(g_str_transition_debug, B(object, 0x95), g_frame_counter_3);
 
     } else if (B(g_scene_playback_state.first, 0x95)>16) part_draw_effect_records();
-    if (g_transition_effect_list && ((unsigned short)(H(g_transition_effect_list, 0xAA)-0x128C)<2 || H(g_transition_effect_list, 0xAA)==0x1342)) func_PAL_002E89D0(g_transition_effect_list);
+    if (g_transition_effect_list && ((unsigned short)(H(g_transition_effect_list, 0xAA)-0x128C)<2 || H(g_transition_effect_list, 0xAA)==0x1342)) ship_spawn_thruster_particles_pal(g_transition_effect_list);
     if ((unsigned int)(g_memcard_state.mode-15)<2 || g_memcard_state.next==15 || g_transition_force_flag) {
         float y, angle;
         VU1_addGSregister(0x47, 0x3004B);

@@ -25,64 +25,64 @@ extern f32 math_fast_sin_or_cos_a(f32);
 extern f32 ApproachValue(void *, f32, f32);
 extern void add_vectors(void *, void *, void *);
 
-extern s32 coll_is_point_inside_bounds(u8 *a0, TI128 *a1, f32 f1, f32 f2);
-void fan_l17_update_pal(u8 *a0)
+extern s32 coll_is_point_inside_bounds(u8 *obj, TI128 *a1, f32 f1, f32 f2);
+void fan_l17_update_pal(u8 *obj)
 {
-    f32 *st = *(f32 **)(a0 + 0x68);
+    f32 *vars = *(f32 **)(obj + 0x68);
     TI128 here __attribute__((aligned(16)));
     f32 dir[4] __attribute__((aligned(16)));
 
-    st[2] = g_fan_var_value;
-    switch (a0[0x20]) {
+    vars[2] = g_fan_var_value;
+    switch (obj[0x20]) {
     case 0:
-        *(f32 *)(a0 + 0x18) = *(f32 *)(a0 + 0x18) - 0.05f;
-        a0[0x20] = 1;
-        *(u16 *)(a0 + 0x34) |= 0x41;
+        *(f32 *)(obj + 0x18) = *(f32 *)(obj + 0x18) - 0.05f;
+        obj[0x20] = 1;
+        *(u16 *)(obj + 0x34) |= 0x41;
         break;
     case 1:
         break;
     case 2:
-        if (!(g_hero_state.z < *(f32 *)(a0 + 0x18))) {
+        if (!(g_hero_state.z < *(f32 *)(obj + 0x18))) {
             break;
         }
-        if (!(FastDiffRots(*(f32 *)(a0 + 0xF8),
-                          mat_fast_helper_a(g_hero_state.x - *(f32 *)(a0 + 0x10),
-                                      g_hero_state.y - *(f32 *)(a0 + 0x14))) < 1.5707965f)) {
+        if (!(FastDiffRots(*(f32 *)(obj + 0xF8),
+                          mat_fast_helper_a(g_hero_state.x - *(f32 *)(obj + 0x10),
+                                      g_hero_state.y - *(f32 *)(obj + 0x14))) < 1.5707965f)) {
             break;
         }
         if (g_hero_state.w340 != 0) {
             break;
         }
-        a0[0x20] = 3;
-        st[3] = 0;
+        obj[0x20] = 3;
+        vars[3] = 0;
         /* fall through */
     case 3:
         if (g_hero_state.w340 != 0) {
-            a0[0x20] = 1;
+            obj[0x20] = 1;
             break;
         }
         here = *(TI128 *)&g_hero_state.x;
-        if (coll_is_point_inside_bounds(a0, &here, 60.0f, 2.5f)) {
-            ApproachValue(st + 3, st[2] * (0.020000001f), st[2] * 0.0015584417f);
+        if (coll_is_point_inside_bounds(obj, &here, 60.0f, 2.5f)) {
+            ApproachValue(vars + 3, vars[2] * (0.020000001f), vars[2] * 0.0015584417f);
         } else {
-            ApproachValue(st + 3, 0.0f, st[2] * 0.0007894737f);
+            ApproachValue(vars + 3, 0.0f, vars[2] * 0.0007894737f);
         }
-        dir[0] = math_fast_sin_or_cos_a(*(f32 *)(a0 + 0xF8)) * st[3];
-        dir[1] = math_fast_sin_or_cos_b(*(f32 *)(a0 + 0xF8)) * st[3];
+        dir[0] = math_fast_sin_or_cos_a(*(f32 *)(obj + 0xF8)) * vars[3];
+        dir[1] = math_fast_sin_or_cos_b(*(f32 *)(obj + 0xF8)) * vars[3];
         dir[2] = 0;
         add_vectors(&here, (u8 *)&g_hero_state + 0x100, dir);
         break;
     }
-    if (a0[0x20] != 3) {
-        if (*(f32 *)(a0 + 0x18) <= g_hero_state.z) {
+    if (obj[0x20] != 3) {
+        if (*(f32 *)(obj + 0x18) <= g_hero_state.z) {
             *(TI128 *)dir = *(TI128 *)&g_hero_state.x;
-            if (coll_is_point_inside_bounds(a0, (TI128 *)dir, st[0], st[1])) {
-                a0[0x20] = 2;
+            if (coll_is_point_inside_bounds(obj, (TI128 *)dir, vars[0], vars[1])) {
+                obj[0x20] = 2;
                 return;
             }
         }
-        if (a0[0x20] != 3) {
-            a0[0x20] = 1;
+        if (obj[0x20] != 3) {
+            obj[0x20] = 1;
         }
     }
 }

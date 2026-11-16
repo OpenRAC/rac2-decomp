@@ -19,6 +19,7 @@ extern void FastVecAdd(char *, char *, char *);
 extern void vec_scale_to_length(char *, char *, float);
 extern void part_spawn_large_spark_smoke(char *,int);
 
+/* Throws a burst of smoke and spark particles outward from a point. (PAL: 50 Hz values) */
 void part_spawn_large_spark_smoke_pal(char *pos, int count) {
     float velocity[4] __attribute__((aligned(16)));
     float point[4] __attribute__((aligned(16)));

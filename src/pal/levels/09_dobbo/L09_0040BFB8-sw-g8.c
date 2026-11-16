@@ -32,6 +32,7 @@ extern void script_queue_keyed_request(s32, s32);
 extern s32 coll_point_inside_region(char *, s32);
 #define FIELD(p,o) (*(s32 *)((p)+(o)))
 
+/* Per-frame update of the Dobbo switch controller (moby class 3485): it turns linked lights, doors and lifts on and off as the hero uses it. */
 void switch_controller_update_pal(u8 *obj)
 {
     char *data = *(char **)(obj + 0x68);

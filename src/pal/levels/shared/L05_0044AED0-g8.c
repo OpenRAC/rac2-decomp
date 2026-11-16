@@ -11,7 +11,8 @@ extern int g_lock_on_reticle_enabled[];
 extern int g_ship_lock_threshold_alt __attribute__((sda)), g_ship_lock_duration_alt __attribute__((sda));
 extern int g_ship_lock_threshold_normal __attribute__((sda)), g_ship_lock_duration_normal __attribute__((sda));
 extern char g_sound_state[];
-void func_PAL_L05_0044AED0(char *object)
+/* Draws the lock-on reticle ring over the locked target, growing as the lock completes, and plays the lock sounds (PAL: 50 Hz). */
+void ship_draw_lock_on_reticle_pal(char *object)
 {
  int point[2];
  char *state=*(char **)(object+0x68);

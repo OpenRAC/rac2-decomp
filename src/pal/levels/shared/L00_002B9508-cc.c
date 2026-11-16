@@ -93,7 +93,7 @@ extern int g_hero_state_flags;
 
 /* initialises three 16-byte records, folds a resident 32-byte quad into the first of them, then for the stored mode 2 runs a four-argument fallback and for mode 1 with a short or low field re-copies the resident quad; finally scales and copies the two remaining records through three more calls */
 /* reads a scalar through DATA0 and, when it exceeds 0.001f, re-normalises the vector at DATA0 (and DATA0-112) from the elapsed float, clamping the amount at zero; otherwise it runs the plain refresh entry point. */
-void func_PAL_L00_002B9508(void)
+void hero_steer_reference_point_pal(void)
 {
     float desired[4] __attribute__((aligned(16)));
     float original[4] __attribute__((aligned(16)));

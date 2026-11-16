@@ -12,6 +12,7 @@ extern CallbackState g_pause_menu_state;
 extern int g_menu_input_flags;
 extern int func_0029CA00(int);
 
+/* Handles button input for a menu page: reports cancel or accept, and otherwise passes the buttons to the page handler. (USA v2.00) */
 int menu_page_update_3_us2(void) {
     int result = 0;
     int flags = g_menu_input_flags;
@@ -42,6 +43,7 @@ extern void SetupGifPaging(long arg0);
 extern void SetupGifPaging(long param_1);
 extern void func_0029CA40(void);
 
+/* Draws one menu page by calling its page-specific draw routine between the common start and end of menu drawing. (USA v2.00) */
 int menu_page_draw_5_us2(void) {
     SetupGifPaging(0);
     func_0029CA40();

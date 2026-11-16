@@ -5,30 +5,31 @@ extern void *F449e2f67_FUN_003361A8(char *p);
 extern char *F449e2f67_FUN_00336968(char *p);
 extern void *F449e2f67_FUN_003366D0(char *p);
 
-char *func_PAL_003459F8(char *p)
+/* Constructs the fourteen in-place sub-records of the grid menu and returns the menu. */
+char *grid_menu_init_widgets_pal(char *menu)
 {
-    F449e2f67_FUN_003361A8(p);
-    F449e2f67_FUN_003361A8(p + 76);
-    F449e2f67_FUN_003361A8(p + 152);
-    F449e2f67_FUN_003361A8(p + 228);
-    F449e2f67_FUN_003361A8(p + 304);
-    F449e2f67_FUN_003361A8(p + 380);
-    F449e2f67_FUN_00336968(p + 456);
-    F449e2f67_FUN_00336968(p + 544);
-    F449e2f67_FUN_003366D0(p + 632);
-    F449e2f67_FUN_00336968(p + 696);
-    F449e2f67_FUN_00336968(p + 784);
-    F449e2f67_FUN_00336968(p + 872);
-    F449e2f67_FUN_00336968(p + 960);
-    F449e2f67_FUN_00336968(p + 1048);
-    return p;
+    F449e2f67_FUN_003361A8(menu);
+    F449e2f67_FUN_003361A8(menu + 76);
+    F449e2f67_FUN_003361A8(menu + 152);
+    F449e2f67_FUN_003361A8(menu + 228);
+    F449e2f67_FUN_003361A8(menu + 304);
+    F449e2f67_FUN_003361A8(menu + 380);
+    F449e2f67_FUN_00336968(menu + 456);
+    F449e2f67_FUN_00336968(menu + 544);
+    F449e2f67_FUN_003366D0(menu + 632);
+    F449e2f67_FUN_00336968(menu + 696);
+    F449e2f67_FUN_00336968(menu + 784);
+    F449e2f67_FUN_00336968(menu + 872);
+    F449e2f67_FUN_00336968(menu + 960);
+    F449e2f67_FUN_00336968(menu + 1048);
+    return menu;
 }
 
 
 extern void *pool_alloc_cell(void *);
 extern int *ui_return_second_arg(int, int);
 extern void object_init_derived_arrays(void *, void *, void *);
-extern void func_PAL_00338688(void *, void *, void *);
+extern void hud_init_widget_defaults_pal(void *, void *, void *);
 extern int *object_get_fourth_field(void *);
 extern void hud_set_widget_field_a(void *, int);
 extern void object_set_second_float4(void *, float, float, float, float);
@@ -44,7 +45,7 @@ extern char *g_resident_data_base[] __attribute__((sda));
 
 /* func_PAL_00345A88, the PAL copy of func_00343A30: the same C, where the fields past 0x210 move, the
    text ids change, func_00336A30(self + 0x2B8) takes 0, and three func_00335F88 calls at 0.7 are added. */
-void func_PAL_00345A88(char *self, void *arg)
+void grid_menu_construct_pal(char *self, void *arg)
 {
     int *buf;
     float zero;
@@ -70,13 +71,13 @@ void func_PAL_00345A88(char *self, void *arg)
     object_init_derived_arrays(self + 0xE4, g_menu_widget_desc_fourth, arg);
     object_init_derived_arrays(self + 0x130, g_menu_frame_desc, arg);
     object_init_derived_arrays(self + 0x17C, g_menu_panel_desc, arg);
-    func_PAL_00338688(self + 0x368, g_info_panel_count_desc_first, arg);
-    func_PAL_00338688(self + 0x3C0, g_info_panel_count_desc_second, arg);
-    func_PAL_00338688(self + 0x418, g_info_panel_count_desc_third, arg);
-    func_PAL_00338688(self + 0x2B8, g_menu_hud_desc_body, arg);
-    func_PAL_00338688(self + 0x310, g_grid_menu_widget_defaults, arg);
-    func_PAL_00338688(self + 0x1C8, g_menu_hud_desc_title, arg);
-    func_PAL_00338688(self + 0x220, g_menu_hud_label_desc_alt, arg);
+    hud_init_widget_defaults_pal(self + 0x368, g_info_panel_count_desc_first, arg);
+    hud_init_widget_defaults_pal(self + 0x3C0, g_info_panel_count_desc_second, arg);
+    hud_init_widget_defaults_pal(self + 0x418, g_info_panel_count_desc_third, arg);
+    hud_init_widget_defaults_pal(self + 0x2B8, g_menu_hud_desc_body, arg);
+    hud_init_widget_defaults_pal(self + 0x310, g_grid_menu_widget_defaults, arg);
+    hud_init_widget_defaults_pal(self + 0x1C8, g_menu_hud_desc_title, arg);
+    hud_init_widget_defaults_pal(self + 0x220, g_menu_hud_label_desc_alt, arg);
     *object_get_fourth_field(self) = 0x60442D00;
     *object_get_fourth_field(self + 0x4C) = 0x60241700;
     *object_get_fourth_field(self + 0x98) = 0x55F0C070;
@@ -131,7 +132,8 @@ typedef struct { unsigned char pad[6]; short id; short tail; } SelectionRow;
 extern SelectionRow g_grid_menu_selection_rows[];
 extern SelectionRow ref_L00_00286D68_00[];
 
-void func_PAL_00345F98(DobboGridState312 *state, unsigned int buttons)
+/* Cursor move for the first button group: sets the row, column and mode from the pressed direction. */
+void grid_menu_handle_input_first_group_pal(DobboGridState312 *state, unsigned int buttons)
 {
     if (buttons & 0x1000) {
         snd_play_from_global_bank(3, 0, 0);
@@ -163,7 +165,7 @@ void func_PAL_00345F98(DobboGridState312 *state, unsigned int buttons)
 
 /* The cursor's up/down/left/right move: the button mask picks the direction, the state keeps
    the column (0x43C), the row (0x440), the chosen index (0x444) and the mode (0x448). */
-void func_PAL_003460A8(DobboGridState312 *state, unsigned int buttons)
+void grid_menu_handle_input_main_grid_pal(DobboGridState312 *state, unsigned int buttons)
 {
     if (buttons & 0x1000) {
         snd_play_from_global_bank(3, 0, 0);
@@ -211,7 +213,7 @@ void func_PAL_003460A8(DobboGridState312 *state, unsigned int buttons)
 
 
 /* prioritized masks1000/4000/8000/2000 update signedcolumns43C/rows440 and mode448 with originalevent3 flags0/entitynull; index444=column+2row */
-void func_PAL_00346210(DobboGridState312 *state, unsigned int buttons)
+void grid_menu_handle_input_small_group_pal(DobboGridState312 *state, unsigned int buttons)
 {
     if (buttons & 0x1000) {
         snd_play_from_global_bank(3, 0, 0);
@@ -251,30 +253,31 @@ void func_PAL_00346210(DobboGridState312 *state, unsigned int buttons)
 extern int snd_play_from_global_bank(int, unsigned int, void *);
 extern short g_grid_menu_choice_value;
 
-void func_PAL_00346348(char *object, unsigned int buttons)
+/* Cursor move for the single choice: the pressed direction sets column, row and mode, then stores the choice value. */
+void grid_menu_handle_input_single_choice_pal(char *menu, unsigned int buttons)
 {
     if (buttons & 0x1000) {
         snd_play_from_global_bank(3, 0, 0);
-        *(int *)(object + 0x4B8) = 2;
-        *(int *)(object + 0x4B0) = 1;
-        *(int *)(object + 0x4AC) = 3;
+        *(int *)(menu + 0x4B8) = 2;
+        *(int *)(menu + 0x4B0) = 1;
+        *(int *)(menu + 0x4AC) = 3;
     } else if (buttons & 0x4000) {
         snd_play_from_global_bank(3, 0, 0);
-        *(int *)(object + 0x4B8) = 2;
-        *(int *)(object + 0x4AC) = 3;
-        *(int *)(object + 0x4B0) = 0;
+        *(int *)(menu + 0x4B8) = 2;
+        *(int *)(menu + 0x4AC) = 3;
+        *(int *)(menu + 0x4B0) = 0;
     } else if (buttons & 0x8000) {
         snd_play_from_global_bank(3, 0, 0);
-        *(int *)(object + 0x4B8) = 0;
-        *(int *)(object + 0x4AC) = 1;
-        *(int *)(object + 0x4B0) = 0;
+        *(int *)(menu + 0x4B8) = 0;
+        *(int *)(menu + 0x4AC) = 1;
+        *(int *)(menu + 0x4B0) = 0;
     } else if (buttons & 0x2000) {
         snd_play_from_global_bank(3, 0, 0);
-        *(int *)(object + 0x4B0) = 0;
-        *(int *)(object + 0x4B8) = 3;
-        *(int *)(object + 0x4AC) = 0;
+        *(int *)(menu + 0x4B0) = 0;
+        *(int *)(menu + 0x4B8) = 3;
+        *(int *)(menu + 0x4AC) = 0;
     }
-    *(int *)(object + 0x4B4) = g_grid_menu_choice_value;
+    *(int *)(menu + 0x4B4) = g_grid_menu_choice_value;
 }
 
 
@@ -286,7 +289,8 @@ typedef struct { unsigned char pad[0x42]; short field42; unsigned char rest[0xE0
 typedef struct { int v[4]; } Ids_00344378;
 extern Ids_00344378 g_grid_menu_text_ids;
 
-int func_PAL_00346428(DobboGridState312 *state)
+/* Returns the text id of the selected grid entry: from the weapon table for owned items, from a fixed table for the small group, else 0. */
+int grid_menu_get_selected_text_id_pal(DobboGridState312 *state)
 {
     Ids_00344378 table = g_grid_menu_text_ids;
     int value;

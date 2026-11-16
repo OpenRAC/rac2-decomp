@@ -4,14 +4,14 @@
 typedef int VectorBits __attribute__((mode(TI)));
 typedef struct {
     char p0[0x760]; float facing[4];
-    char p00[0x488]; char *aimTarget;
+    char p00[0x488]; char *aim_target;
     char p1[0x634]; unsigned int buttons;
-    char p2[0xC]; int inputTicks;
-    char p3[0x20C]; char *overrideTarget;
+    char p2[0xC]; int input_ticks;
+    char p3[0x20C]; char *override_target;
     char p4[0xE3C]; char *hero; int mode;
     char p5[0x24]; u8 blocked;
-    char p6[0x22F]; short viewMode;
-    char p7[0x46]; int inputTimer;
+    char p6[0x22F]; short view_mode;
+    char p7[0x46]; int input_timer;
 } PlayerStatePrefix;
 extern PlayerStatePrefix g_hero_state;
 extern u8 g_charged_beam_weapon_index[];
@@ -38,13 +38,13 @@ extern BeamOscillator g_beam_oscillator_table[4];
 typedef struct { char prefix[0x54]; float rate; char tail[0x88]; } WeaponEntry;
 extern WeaponEntry g_weapon_l00_table[];
 extern int math_fast_float_d(void *);
-extern void func_PAL_002A7E68(void *, int, int, int);
+extern void anim_start_blended_pal(void *, int, int, int);
 extern void AttachManipulator(u8 *, u32, u8 *);
 extern int AcquireEntitySlot(void *, int, void *);
 extern char *level_get_slot_body(int, int);
 extern float math_random_signed_float_range(float, float), math_random_float_range(float, float);
 extern void vec_clear_128(VectorBits *);
-extern s32 func_PAL_L01_002BEC60(int, int);
+extern s32 SetHeroMoveState_pal(int, int);
 extern int get_ammo(int);
 extern void hud_add_moby_marker(void *, unsigned int, int, int, int, int, float, float, float);
 extern int vec_fast_helper_b(void *);
@@ -54,25 +54,25 @@ extern int PlayMobySound(int, int, char *);
 extern void moby_transform_joint_to_world(char *, int, char *);
 extern void vec_scale_to_length(void *, void *, float);
 extern void vec_compute_object_to_target(char *, char *, char *, float);
-extern void *func_PAL_L00_003BECF0(char *, char *, char *, char *);
-extern void func_PAL_L00_003A4B50(void *);
+extern void *effect_spawn_moby_pal(char *, char *, char *, char *);
+extern void weapon_draw_beam_network_pal(void *);
 extern void ref_L00_003A0F30_00(void (*)(void *), void *);
 extern float FastAddRotations(float, float), math_fast_sin_or_cos_b(float), math_fast_sin_or_cos_a(float);
 
 /* Initialize the beam oscillators and update the weapon's charge cycle. */
-void func_PAL_L01_0039D1E8(char *moby)
+void charged_l01_beam_weapon_update_pal(char *moby)
 {
     float velocity[4], origin[4], query[4];
     char *state = *(char **)(moby + 0x68);
     int ready = 1;
     if (g_hero_state.mode == 29) {
-        if (math_fast_float_d(&g_hero_state.inputTimer) == 0)
+        if (math_fast_float_d(&g_hero_state.input_timer) == 0)
             ready = 0;
     }
     else
-        g_hero_state.inputTimer = 33;
-    if (g_hero_state.overrideTarget)
-        g_hero_state.aimTarget = (char *)g_hero_state.overrideTarget;
+        g_hero_state.input_timer = 33;
+    if (g_hero_state.override_target)
+        g_hero_state.aim_target = (char *)g_hero_state.override_target;
     switch (*(unsigned char *)(moby + 0x20)) {
     case 0: {
         int i, handle;
@@ -82,7 +82,7 @@ void func_PAL_L01_0039D1E8(char *moby)
         g_charged_beam_phase = 0;
         g_charged_beam_init_flag = 0;
         if (*(unsigned char *)(moby + 0x43) || (*(unsigned char *)(moby + 0x60) & 2))
-            func_PAL_002A7E68(moby, 1, 0, 0);
+            anim_start_blended_pal(moby, 1, 0, 0);
         *(int *)(state + 0xC) = 0;
         *(int *)(state + 0x10) = 0;
         AttachManipulator((u8 *)moby, 0, (u8 *)state + 0x20);
@@ -117,7 +117,7 @@ void func_PAL_L01_0039D1E8(char *moby)
         g_charged_beam_init_flag = 1;
     }
     if (g_hero_state.mode == 1)
-        func_PAL_L01_002BEC60(29, 1);
+        SetHeroMoveState_pal(29, 1);
     if (g_hero_state.mode == 29) {
         unsigned int color;
         if (*(float *)state != 0.0f && get_ammo(-1))
@@ -127,7 +127,7 @@ void func_PAL_L01_0039D1E8(char *moby)
         hud_add_moby_marker(moby, color, 0, 0x26, -1, 4, 1.0f, 0.0f, 90.0f);
     }
     if (vec_fast_helper_b(state) && ready && !g_hero_state.blocked && (g_pad_state[0x68] & g_hero_state.buttons) &&
-        !effect_is_count_two() && g_hero_state.inputTicks > 18) {
+        !effect_is_count_two() && g_hero_state.input_ticks > 18) {
         if (weapon_spend_ammo(-1, 1)) {
             g_charged_beam_state.mode = 1;
             PlayMobySound(2, 0, moby);
@@ -152,7 +152,7 @@ void func_PAL_L01_0039D1E8(char *moby)
                     break;
                 }
                 default:
-                    goto updateCharge;
+                    goto update_charge;
                 }
                 *(float *)state = cooldown;
             }
@@ -161,7 +161,7 @@ void func_PAL_L01_0039D1E8(char *moby)
             g_charged_beam_state.mode = 0;
         }
     }
-updateCharge:
+update_charge:
     switch (g_charged_beam_phase) {
     case 0: {
         float charge = *(float *)(state + 0xC);
@@ -182,14 +182,14 @@ updateCharge:
             float speed;
             moby_transform_joint_to_world(moby, 0, (char *)origin);
             speed = 0.40000004f;
-            if (g_hero_state.viewMode == 1) {
+            if (g_hero_state.view_mode == 1) {
                 speed = -speed;
                 vec_scale_to_length(velocity, moby + 0xD0, speed);
             } else
                 vec_scale_to_length(velocity, g_hero_state.facing, speed);
-            if (g_hero_state.aimTarget)
-                vec_compute_object_to_target(g_hero_state.aimTarget, (char *)origin, (char *)velocity, 0.40000004f);
-            g_charged_beam_effect_moby = func_PAL_L00_003BECF0(moby, (char *)*(int *)(state + 4), (char *)origin, (char *)velocity);
+            if (g_hero_state.aim_target)
+                vec_compute_object_to_target(g_hero_state.aim_target, (char *)origin, (char *)velocity, 0.40000004f);
+            g_charged_beam_effect_moby = effect_spawn_moby_pal(moby, (char *)*(int *)(state + 4), (char *)origin, (char *)velocity);
             if (g_charged_beam_effect_moby)
                 *(char **)(g_charged_beam_effect_moby + 0xB8) = moby;
             g_charged_beam_timer = 42;
@@ -208,7 +208,7 @@ updateCharge:
     }
     }
     if (*(unsigned char *)(moby + 0x31))
-        ref_L00_003A0F30_00(func_PAL_L00_003A4B50, moby);
+        ref_L00_003A0F30_00(weapon_draw_beam_network_pal, moby);
     *(float *)(state + 0x10) = FastAddRotations(*(float *)(state + 0x10), *(float *)(state + 0xC) * 0.37699118f);
     *(float *)(state + 0x30) = math_fast_sin_or_cos_b(*(float *)(state + 0x10) * 0.5f);
     *(float *)(state + 0x3C) = math_fast_sin_or_cos_a(*(float *)(state + 0x10) * 0.5f);

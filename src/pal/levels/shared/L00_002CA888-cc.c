@@ -36,7 +36,7 @@ extern int hero_slot_item_id(int);
 extern int CollLine(void *, void *, int, void *, int);
 extern float math_random_float_range(float, float);
 
-int func_PAL_L00_002CA888(int *selected)
+int hero_choose_idle_anim_pal(int *selected)
 {
     int choices[20], count = 0, index;
     ChoiceRecord *entry;

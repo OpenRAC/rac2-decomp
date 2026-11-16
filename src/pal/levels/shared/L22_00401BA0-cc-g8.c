@@ -26,9 +26,10 @@ extern int flag_set_first_pending(void *);
 extern int math_random_int_below(int);
 extern int CollLine(void *, void *, int, int, int);
 extern float fast_vec_dist(void *, void *);
-extern void func_PAL_L22_00402258(void *, void *, int, int);
+extern void part_emit_spark_burst_alt_pal(void *, void *, int, int);
 
-void func_PAL_L22_00401BA0(char *o) {
+/* Updates a spinning effect moby (alternate type): spins and shrinks its matrix, sprays sparks, follows the hero or its target, and nudges itself out of walls (PAL: 50 Hz timings). */
+void spinning_effect_update_alt_pal(char *moby) {
     float rot[4] __attribute__((aligned(16)));
     /* The matrix and scale workspace is reused for the late collision vectors. */
     union {
@@ -36,110 +37,110 @@ void func_PAL_L22_00401BA0(char *o) {
         struct { float trace[4], random[4], a[4], b[4]; } late;
     } scratch __attribute__((aligned(16)));
 
-    char *ctl = *(char **)(o + 0x68);
+    char *ctl = *(char **)(moby + 0x68);
     float step;
     unsigned int count;
-    if (flag_set_first_pending(o) && *(u8 *)(o + 0x20) == 16)
+    if (flag_set_first_pending(moby) && *(u8 *)(moby + 0x20) == 16)
         snd_start_in_slot(18, 0, 0);
-    if (*(u8 *)(o + 0x31)) {
-        float d = fast_vec_dist(g_hero_state + 0x80, o + 0x10);
+    if (*(u8 *)(moby + 0x31)) {
+        float d = fast_vec_dist(g_hero_state + 0x80, moby + 0x10);
         float threshold = g_pickup_pull_distance;
         *(float *)(ctl + 0x44) = d;
         if (d >= threshold)
-            *(u8 *)(o + 0x23) = 127;
+            *(u8 *)(moby + 0x23) = 127;
     }
     else *(float *)(ctl + 0x44) = 2000.0f;
-    if (*(u8 *)(o + 0x20) == 0) {
+    if (*(u8 *)(moby + 0x20) == 0) {
         qzero(rot);
         rot[2] = 0.022689285f;
         euler_rotation_basis(scratch.early.matrix, rot);
-        multiply_matrix3x3(o + 0xc0, o + 0xc0, scratch.early.matrix);
-        cam_compute_view_direction(o + 0x10, ctl + 0x10, 0);
-        vec_negate_and_forward(o + 0xc0, ctl + 0x10, 0);
+        multiply_matrix3x3(moby + 0xc0, moby + 0xc0, scratch.early.matrix);
+        cam_compute_view_direction(moby + 0x10, ctl + 0x10, 0);
+        vec_negate_and_forward(moby + 0xc0, ctl + 0x10, 0);
     }
     else {
         qzero(rot);
-        rot[2] = ((37.0f - (float)*(u16 *)(o + 0x96)) * 22.0f + 155.0f)
+        rot[2] = ((37.0f - (float)*(u16 *)(moby + 0x96)) * 22.0f + 155.0f)
                  * 0.0003490659f;
         euler_rotation_basis(scratch.early.matrix, rot);
-        if (flag_set_first_pending(o)) *(u8 *)(o + 0x23) = 127;
-        if (*(u8 *)(o + 0x23) >= 3) --*(u8 *)(o + 0x23);
-        if (*(u8 *)(o + 0x23) >= 11 && *(u8 *)(o + 0x20) == 16) {
-            switch (*(u16 *)(o + 0x96) & 3) {
+        if (flag_set_first_pending(moby)) *(u8 *)(moby + 0x23) = 127;
+        if (*(u8 *)(moby + 0x23) >= 3) --*(u8 *)(moby + 0x23);
+        if (*(u8 *)(moby + 0x23) >= 11 && *(u8 *)(moby + 0x20) == 16) {
+            switch (*(u16 *)(moby + 0x96) & 3) {
             case 0:
-                FastVecScale(scratch.early.a, o + 0xc0, -g_spin_effect_offset_b);
-                FastVecAdd(scratch.early.a, scratch.early.a, o + 0x10);
-                FastVecScale(scratch.early.b, o + 0xd0, -((g_spin_effect_offset_a) * 1.2f));
+                FastVecScale(scratch.early.a, moby + 0xc0, -g_spin_effect_offset_b);
+                FastVecAdd(scratch.early.a, scratch.early.a, moby + 0x10);
+                FastVecScale(scratch.early.b, moby + 0xd0, -((g_spin_effect_offset_a) * 1.2f));
                 break;
             case 1:
-                FastVecScale(scratch.early.a, o + 0xc0, g_spin_effect_offset_b);
-                FastVecAdd(scratch.early.a, scratch.early.a, o + 0x10);
-                FastVecScale(scratch.early.b, o + 0xd0, ((g_spin_effect_offset_a) * 1.2f));
+                FastVecScale(scratch.early.a, moby + 0xc0, g_spin_effect_offset_b);
+                FastVecAdd(scratch.early.a, scratch.early.a, moby + 0x10);
+                FastVecScale(scratch.early.b, moby + 0xd0, ((g_spin_effect_offset_a) * 1.2f));
                 break;
             case 2:
-                FastVecScale(scratch.early.a, o + 0xd0, g_spin_effect_offset_b);
-                FastVecAdd(scratch.early.a, scratch.early.a, o + 0x10);
-                FastVecScale(scratch.early.b, o + 0xc0, ((g_spin_effect_offset_a) * 1.2f));
+                FastVecScale(scratch.early.a, moby + 0xd0, g_spin_effect_offset_b);
+                FastVecAdd(scratch.early.a, scratch.early.a, moby + 0x10);
+                FastVecScale(scratch.early.b, moby + 0xc0, ((g_spin_effect_offset_a) * 1.2f));
                 break;
             case 3:
-                FastVecScale(scratch.early.a, o + 0xd0, -g_spin_effect_offset_b);
-                FastVecAdd(scratch.early.a, scratch.early.a, o + 0x10);
-                FastVecScale(scratch.early.b, o + 0xc0, -((g_spin_effect_offset_a) * 1.2f));
+                FastVecScale(scratch.early.a, moby + 0xd0, -g_spin_effect_offset_b);
+                FastVecAdd(scratch.early.a, scratch.early.a, moby + 0x10);
+                FastVecScale(scratch.early.b, moby + 0xc0, -((g_spin_effect_offset_a) * 1.2f));
                 break;
             }
-            func_PAL_L22_00402258(scratch.early.a, scratch.early.b, g_spin_effect_spark_count, 0);
+            part_emit_spark_burst_alt_pal(scratch.early.a, scratch.early.b, g_spin_effect_spark_count, 0);
         }
         step = 0.027027028f;
         set_identity_rotation_rows(scratch.early.scale);
         scratch.early.scale[0] = scratch.early.scale[5] = scratch.early.scale[10] =
-            (37.0f - (float)*(u16 *)(o + 0x96) * step) * (g_spin_effect_rate * step);
+            (37.0f - (float)*(u16 *)(moby + 0x96) * step) * (g_spin_effect_rate * step);
         multiply_matrix3x3(scratch.early.matrix, scratch.early.scale, scratch.early.matrix);
-        multiply_matrix3x3(o + 0xc0, o + 0xc0, scratch.early.matrix);
-        if (*(u16 *)(o + 0x96) >= 38) {
-            moby_mark_spawned(o);
+        multiply_matrix3x3(moby + 0xc0, moby + 0xc0, scratch.early.matrix);
+        if (*(u16 *)(moby + 0x96) >= 38) {
+            moby_mark_spawned(moby);
             return;
         }
-        if (*(u8 *)(o + 0x20) == 16) {
-            qcopy(o + 0x10, g_hero_state + 0x80);
-            cam_compute_view_direction(o + 0x10, ctl + 0x10, 0);
-            vec_negate_and_forward(o + 0xc0, ctl + 0x10, 0);
-            vec_scale_to_length(scratch.early.a, ctl + 0x10, -((float)*(u16 *)(o + 0x96) * step) * 7.5f);
-            FastVecAdd(o + 0x10, o + 0x10, scratch.early.a);
+        if (*(u8 *)(moby + 0x20) == 16) {
+            qcopy(moby + 0x10, g_hero_state + 0x80);
+            cam_compute_view_direction(moby + 0x10, ctl + 0x10, 0);
+            vec_negate_and_forward(moby + 0xc0, ctl + 0x10, 0);
+            vec_scale_to_length(scratch.early.a, ctl + 0x10, -((float)*(u16 *)(moby + 0x96) * step) * 7.5f);
+            FastVecAdd(moby + 0x10, moby + 0x10, scratch.early.a);
         }
         else {
-            qcopy(o + 0x10, ref_L22_003FD2D8_00 + 0x10);
-            cam_compute_view_direction(o + 0x10, ctl + 0x10, 0);
-            vec_negate_and_forward(o + 0xc0, ctl + 0x10, 0);
-            vec_scale_to_length(scratch.early.a, ctl + 0x10, -((float)*(u16 *)(o + 0x96) * step) * 7.5f);
-            FastVecAdd(o + 0x10, o + 0x10, scratch.early.a);
+            qcopy(moby + 0x10, ref_L22_003FD2D8_00 + 0x10);
+            cam_compute_view_direction(moby + 0x10, ctl + 0x10, 0);
+            vec_negate_and_forward(moby + 0xc0, ctl + 0x10, 0);
+            vec_scale_to_length(scratch.early.a, ctl + 0x10, -((float)*(u16 *)(moby + 0x96) * step) * 7.5f);
+            FastVecAdd(moby + 0x10, moby + 0x10, scratch.early.a);
         }
     }
-    count = *(u16 *)(o + 0x96);
-    if (count <= 65534) *(u16 *)(o + 0x96) = count + 1;
-    else *(u16 *)(o + 0x96) = 0;
-    if (*(short *)(ctl + 0x2a) != 0 && (*(u16 *)(o + 0x96) & 31) == 0) {
+    count = *(u16 *)(moby + 0x96);
+    if (count <= 65534) *(u16 *)(moby + 0x96) = count + 1;
+    else *(u16 *)(moby + 0x96) = 0;
+    if (*(short *)(ctl + 0x2a) != 0 && (*(u16 *)(moby + 0x96) & 31) == 0) {
         FastVecScale(rot, ctl + 0x10, 6.0f);
         FastVecScale(scratch.late.trace, ctl + 0x10, -3.0f);
-        FastVecAdd(rot, rot, o + 0x10);
-        FastVecAdd(scratch.late.trace, scratch.late.trace, o + 0x10);
+        FastVecAdd(rot, rot, moby + 0x10);
+        FastVecAdd(scratch.late.trace, scratch.late.trace, moby + 0x10);
         if (CollLine(scratch.late.trace, rot, 18, 0, 0)) return;
-        arena_push_point_out(o + 0x10, 0.0f);
+        arena_push_point_out(moby + 0x10, 0.0f);
         {
             float *random = scratch.late.random;
-            char *dir = o + 0xc0 + math_random_int_below(2) * 16;
+            char *dir = moby + 0xc0 + math_random_int_below(2) * 16;
             float f;
             if (math_random_int_below(2)) f = D_L22_001AF308_gp;
             else f = -g_enemy_random_scale;
             FastVecScale(random, dir, f);
-            FastVecAdd(o + 0x10, o + 0x10, scratch.late.random);
+            FastVecAdd(moby + 0x10, moby + 0x10, scratch.late.random);
         }
-        arena_push_point_out(o + 0x10, 0.0f);
+        arena_push_point_out(moby + 0x10, 0.0f);
         FastVecScale(scratch.late.a, ctl + 0x10, 3.0f);
         FastVecScale(scratch.late.b, ctl + 0x10, -3.0f);
-        FastVecAdd(scratch.late.a, scratch.late.a, o + 0x10);
-        FastVecAdd(scratch.late.b, scratch.late.b, o + 0x10);
+        FastVecAdd(scratch.late.a, scratch.late.a, moby + 0x10);
+        FastVecAdd(scratch.late.b, scratch.late.b, moby + 0x10);
         if (CollLine(scratch.late.b, scratch.late.a, 18, 0, 0))
-            qcopy(o + 0x10, g_spawn_point);
+            qcopy(moby + 0x10, g_spawn_point);
         *(short *)(ctl + 0x2a) = 0;
     }
 }

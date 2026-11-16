@@ -2,6 +2,7 @@
 /* func_PAL_L02_003FF858, the PAL copy of func_L02_003FB120: the same C, where the timer reload is
    read as a word and scaled for 50 Hz at the store, and the callee is func_PAL_L02_00405040. */
 #include "include_asm.h"
+#include "moby_classes.h"
 
 typedef unsigned char u8;
 typedef unsigned short u16;
@@ -24,7 +25,7 @@ extern f32 g_arena_tally_hero_weight __attribute__((sda));
 
 extern s32 g_arena_tally_reload_time __attribute__((sda));
 
-extern void func_PAL_L02_00405040(char *, s32, f32, f32);
+extern void actor_pick_idle_message_pal(char *, s32, f32, f32);
 
 extern int snd_start_in_slot(s32, s32, s32);
 
@@ -47,47 +48,47 @@ extern s32 FastDecTimer(char *);
    weight division: the assembler pads a `div.s` that follows a -g line label by two nops when
    the division is a statement of its own, and by one when the statement shares its source line
    with the two before it, as written here. */
-void func_PAL_L02_003FF858(char *a0) {
-    char *state = *(char **)(a0 + 0x68);
-    u16 *q;
+void arena_update_enemy_tally_pal(char *moby) {
+    char *state = *(char **)(moby + 0x68);
+    u16 *group_start;
 
     if (GROUP(0x40) != 0xFF) {
-        q = (u16 *)g_entity_group_lists[GROUP(0x40)];
-        if (q != 0) {
-            u16 *p = q;
-            char *e;
+        group_start = (u16 *)g_entity_group_lists[GROUP(0x40)];
+        if (group_start != 0) {
+            u16 *entry_ptr = group_start;
+            char *member;
             s32 count = 0;
             s32 kind;
             f32 sum = 0.0f;
-            f32 f;
+            f32 value;
 
             do {
-                e = (char *)g_moby_l02_pool[0] + ((*p & 0x7FFF) << 8);
-                if (e != 0 && *(u8 *)(e + 0x20) != 0xFE && *(u8 *)(e + 0x20) != 0xFD &&
-                    *(u8 *)(e + 0x20) != 1) {
-                    kind = *(s16 *)(e + 0xAA);
-                    if (kind == 0x9CA || kind == 0xB22 || kind == 0xC3B || kind == 0xC3E) {
-                        f = *(f32 *)(*(char **)(e + 0x68) + 0x20);
-                        sum += f;
-                        if (f > 0.0f)
+                member = (char *)g_moby_l02_pool[0] + ((*entry_ptr & 0x7FFF) << 8);
+                if (member != 0 && *(u8 *)(member + 0x20) != 0xFE && *(u8 *)(member + 0x20) != 0xFD &&
+                    *(u8 *)(member + 0x20) != 1) {
+                    kind = *(s16 *)(member + 0xAA);
+                    if (kind == 0x9CA || kind == 0xB22 || kind == MOBY_CLASS_MEGACORP_SECURITY_ROBOT_FLAMETHROWER || kind == MOBY_CLASS_PX6_BLADEBALL) {
+                        value = *(f32 *)(*(char **)(member + 0x68) + 0x20);
+                        sum += value;
+                        if (value > 0.0f)
                             count++;
-                    } else if (kind == 0x9F8 || kind == 0xA44) {
+                    } else if (kind == MOBY_CLASS_CHAINBLADE || kind == MOBY_CLASS_B2_BRAWLER_LEGS) {
                         count++;
-                        sum += *(f32 *)(*(char **)(e + 0x68) + 0x20);
+                        sum += *(f32 *)(*(char **)(member + 0x68) + 0x20);
                     }
                 }
-            } while ((s16)*p++ >= 0);
+            } while ((s16)*entry_ptr++ >= 0);
             {
                 char *hero = g_hero_state;
-                s32 k;
-                s32 r;
-                s32 x;
-                f32 w;
-                f32 s0;
-                f32 s1;
-                f32 s2;
+                s32 i;
+                s32 slot;
+                s32 slot_sum;
+                f32 weight;
+                f32 count_avg;
+                f32 sum_avg;
+                f32 hero_avg;
 
-                func_PAL_L02_00405040(a0, *(s32 *)(state + 0x60) - count, *(f32 *)(state + 0x64) - sum,
+                actor_pick_idle_message_pal(moby, *(s32 *)(state + 0x60) - count, *(f32 *)(state + 0x64) - sum,
                                   *(f32 *)(state + 0x68) - (f32) * (s32 *)(hero + 0x24CC));
                 if (*(f32 *)(state + 0x68) - (f32) * (s32 *)(hero + 0x24CC) > 0.0f)
                     snd_start_in_slot(0x17, 0, 0);
@@ -96,35 +97,35 @@ void func_PAL_L02_003FF858(char *a0) {
                         *(s32 *)(state + 0x60) - count;
                 if (sum < *(f32 *)(state + 0x64)) {
                     char *b4 = state + 4;
-                    f32 *at = (f32 *)(b4 + ((s16) * (s16 *)(state + 0x11C) << 4));
+                    f32 *field_ptr = (f32 *)(b4 + ((s16) * (s16 *)(state + 0x11C) << 4));
 
-                    *at += *(f32 *)(state + 0x64) - sum;
+                    *field_ptr += *(f32 *)(state + 0x64) - sum;
                 }
                 if ((f32) * (s32 *)(hero + 0x24CC) < *(f32 *)(state + 0x68)) {
                     char *b8 = state + 8;
-                    f32 *at = (f32 *)(b8 + ((s16) * (s16 *)(state + 0x11C) << 4));
+                    f32 *field_ptr = (f32 *)(b8 + ((s16) * (s16 *)(state + 0x11C) << 4));
 
-                    *at += *(f32 *)(state + 0x68) - (f32) * (s32 *)(hero + 0x24CC);
+                    *field_ptr += *(f32 *)(state + 0x68) - (f32) * (s32 *)(hero + 0x24CC);
                 }
                 *(f32 *)(state + 0x64) = sum;
                 *(s32 *)(state + 0x60) = count;
                 *(f32 *)(state + 0x68) = (f32) * (s32 *)(hero + 0x24CC);
-                s0 = 0.0f;
-                s1 = 0.0f;
-                s2 = 0.0f;
-                for (k = 4; k > 0; k--) {
+                count_avg = 0.0f;
+                sum_avg = 0.0f;
+                hero_avg = 0.0f;
+                for (i = 4; i > 0; i--) {
                     char *b4;
                     char *b8;
 
-                    x = *(s16 *)(state + 0x11C) + k; r = x - x / 4 * 4; w = 1.0f / (5.0f - (f32)k);
+                    slot_sum = *(s16 *)(state + 0x11C) + i; slot = slot_sum - slot_sum / 4 * 4; weight = 1.0f / (5.0f - (f32)i);
                     b4 = state + 4;
                     b8 = state + 8;
-                    s1 += w * *(f32 *)(b4 + (r << 4));
-                    s0 += w * (f32) * (s32 *)(state + (r << 4));
-                    s2 += w * *(f32 *)(b8 + (r << 4));
+                    sum_avg += weight * *(f32 *)(b4 + (slot << 4));
+                    count_avg += weight * (f32) * (s32 *)(state + (slot << 4));
+                    hero_avg += weight * *(f32 *)(b8 + (slot << 4));
                 }
                 *(f32 *)(state + 0x6C) =
-                    g_arena_tally_sum_weight * s1 + g_arena_tally_count_weight * s0 + g_arena_tally_hero_weight * s2;
+                    g_arena_tally_sum_weight * sum_avg + g_arena_tally_count_weight * count_avg + g_arena_tally_hero_weight * hero_avg;
                 {
                     char *timer = state + 0x11E;
 
@@ -132,13 +133,13 @@ void func_PAL_L02_003FF858(char *a0) {
                         char *b4 = state + 4;
                         char *b8 = state + 8;
                         s32 reload = g_arena_tally_reload_time;
-                        s32 t;
-                        s32 idx;
+                        s32 next_index;
+                        s32 new_index;
 
-                        t = (s16)(*(u16 *)(state + 0x11C) + 1);
-                        idx = t - t / 4 * 4;
-                        *(s16 *)(state + 0x11C) = idx;
-                        *(s32 *)(state + ((s16)idx << 4)) = 0;
+                        next_index = (s16)(*(u16 *)(state + 0x11C) + 1);
+                        new_index = next_index - next_index / 4 * 4;
+                        *(s16 *)(state + 0x11C) = new_index;
+                        *(s32 *)(state + ((s16)new_index << 4)) = 0;
                         *(s32 *)(b4 + ((s16) * (s16 *)(state + 0x11C) << 4)) = 0;
                         *(s32 *)(b8 + ((s16) * (s16 *)(state + 0x11C) << 4)) = 0;
                         *(u16 *)(state + 0x11E) = ((s32)reload * 5 + 2) / 6;

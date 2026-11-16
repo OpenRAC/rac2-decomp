@@ -17,7 +17,7 @@ extern void part_kill(void *);
 extern int FloatToInt(float);
 
 /* Particle tick: age, fade the alpha by 0.01 a frame and drift; dead at zero. */
-void func_PAL_002C0DF0(Particle *p)
+void part_update_smoothed_drift_pal(Particle *p)
 {
     float *pl = p->payload;
     float a;

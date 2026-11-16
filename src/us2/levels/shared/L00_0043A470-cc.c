@@ -20,9 +20,10 @@ void* menu_init_two_sub_objects(void* param_1);
 /* Store the two scalar floating arguments through the supplied pointer cell; original game role is unknown. */
 extern int menu_list_build_ids(char *p);
 
-int func_US2_L00_0043A470(char *p)
+/* Returns the result of building the id list for the list sub-object embedded in the object (v2.00 copy). */
+int sub_object_get_value_far_us2(char *object)
 {
-    return menu_list_build_ids(p + 712);
+    return menu_list_build_ids(object + 712);
 }
 
 /* Return the measured signed-word getter result for the owner subview at 0x 298. */

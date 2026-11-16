@@ -9,6 +9,7 @@ extern int func_0029C4F0(int);
 extern char *tab_menu_get_selected_entry(void *);
 extern void menu_start_action(int);
 
+/* Menu input handler: on confirm, sends the selected tab entry as a menu action message. */
 int menu_handle_input_send_selection_us2(void)
 {
     struct { short reserved; unsigned short key; int value; } message;

@@ -55,18 +55,18 @@ extern void FastVecAdd(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
 extern float mat_fast_helper_a(float, float);
 extern float IntToFloat(int);
-extern int func_PAL_00289730(int, int);
+extern int subtitle_request_voice_line_pal(int, int);
 extern int gfx_add_point_light(float, void *, u32, float);
 extern void gfx_free_point_light(s32);
 extern void moby_transform_joint_to_world(void *, int, void *);
-extern void func_PAL_002A7E68(void *, int, int, int);
+extern void anim_start_blended_pal(void *, int, int, int);
 extern void anim_start_blended_with_flags(void *, int, int, int, int);
 extern float *moby_get_private_value_0(void *);
 extern int moby_is_in_special_class_range(void *);
 extern void snd_stop_voice(s32);
 extern int PlayMobySound(int, int, void *);
-extern void func_PAL_L00_002AF458(void);
-extern s32 func_PAL_L00_002C4480(int, int);
+extern void start_equipped_item_animation_pal(void);
+extern s32 hero_l00_set_action_pal(int, int);
 extern int weapon_spend_ammo(int, int);
 extern int get_ammo(int);
 extern int slot_copy_records_to_free(TargetRecord *);
@@ -76,17 +76,18 @@ extern char *mem_round_up_to_16(char *);
 extern char *level_get_slot_body(int, int);
 extern int *level_get_slot_header(int, int);
 extern void gfx_update_frame_time_scales(int);
-extern void func_PAL_L00_003A7140(void *);
+extern void beam_fire_with_muzzle_flash_pal(void *);
 extern void beam_clear_particle_pool(int);
 #define HERO ((Hero *)D_00189E20)
 #define GAME ((GameState *)D_00138180)
 
-void func_PAL_L00_003A64C8(u8 *moby)
+/* Scoped weapon update: handles the zoom camera, lock-on target marker, firing, reload and muzzle light. (PAL: this release's version) */
+void UpdateScopedWeapon_pal(u8 *moby)
 {
-    ScopeState *st = *(ScopeState **)(moby + 0x68);
+    ScopeState *scope = *(ScopeState **)(moby + 0x68);
     float saved[4];
-    float a[4];
-    float b[4];
+    float vec_a[4];
+    float vec_b[4];
     int found;
     int fire;
 
@@ -98,9 +99,9 @@ void func_PAL_L00_003A64C8(u8 *moby)
         g_zoom_fov_value_d = g_zoom_saved_param_c;
         g_zoom_fov_value_a = g_zoom_saved_param_d;
         cam_set_value_target(0, 3, 1.1243411f, 0.005f, 0.2f, 0.0f);
-        if (st->light >= 0)
-            gfx_free_point_light(st->light);
-        st->light = -1;
+        if (scope->light >= 0)
+            gfx_free_point_light(scope->light);
+        scope->light = -1;
         g_render_state_word = 0xE0;
         gfx_update_frame_time_scales(1);
         return;
@@ -109,9 +110,9 @@ void func_PAL_L00_003A64C8(u8 *moby)
         if (moby[0x20] == 4)
             return;
         moby[0x20] = 4;
-        if (st->light >= 0)
-            gfx_free_point_light(st->light);
-        st->light = -1;
+        if (scope->light >= 0)
+            gfx_free_point_light(scope->light);
+        scope->light = -1;
         g_zoom_fov_value_b = g_zoom_saved_param_a;
         g_zoom_fov_value_c = g_zoom_saved_param_b;
         g_zoom_fov_value_d = g_zoom_saved_param_c;
@@ -127,147 +128,147 @@ void func_PAL_L00_003A64C8(u8 *moby)
         anim_start_blended_with_flags(moby, 1, 0, 2, 0);
     if (HERO->i[0x1500 / 4] != 0 && moby[0x20] != 0) {
         if (g_frame_l00_counter & 4) {
-            st->target = 0;
-            st->locked = 0;
-            vec_scale_to_length(a, g_camera_l00_position + 0x230, 128.0f);
-            FastVecAdd(a, a, g_camera_l00_position);
-            if (CollLine(g_camera_l00_position, a, 0x10, HERO->i[0x2290 / 4], 0) != 0) {
+            scope->target = 0;
+            scope->locked = 0;
+            vec_scale_to_length(vec_a, g_camera_l00_position + 0x230, 128.0f);
+            FastVecAdd(vec_a, vec_a, g_camera_l00_position);
+            if (CollLine(g_camera_l00_position, vec_a, 0x10, HERO->i[0x2290 / 4], 0) != 0) {
                 u8 *hit = (u8 *)g_hit_l00_result[0];
                 if (hit != 0 && hit[0x31] != 0) {
                     float *health = moby_get_private_value_0(hit);
                     if (moby_is_in_special_class_range(hit) != 0
                         || (health != 0 && *health > 0.0f && *(u8 **)(hit + 0x24) != 0
                             && *(s16 *)(*(u8 **)(hit + 0x24) + 0x46) == 5)) {
-                        st->target = (char *)hit;
-                        st->locked = 1;
+                        scope->target = (char *)hit;
+                        scope->locked = 1;
                     }
                 }
             }
         }
         if (HERO->i[0x2534 / 4] == 0) {
-            if (st->locked != 0) {
-                st->blink++;
-                if (st->blink > 17)
-                    st->blink = 0;
-                if (st->reload <= 0.0f && get_ammo(-1) != 0 && st->blink > 8)
+            if (scope->locked != 0) {
+                scope->blink++;
+                if (scope->blink > 17)
+                    scope->blink = 0;
+                if (scope->reload <= 0.0f && get_ammo(-1) != 0 && scope->blink > 8)
                     hud_add_moby_marker(moby, 1.5f, 0x400000FF, 0, 0x20, 0.0f, -1, 90.0f, 4);
             }
-            hud_add_moby_marker(moby, 2.0f, (st->reload > 0.0f && get_ammo(-1) != 0) ? 0x600000FF : 0x600FFF0F,
+            hud_add_moby_marker(moby, 2.0f, (scope->reload > 0.0f && get_ammo(-1) != 0) ? 0x600000FF : 0x600FFF0F,
                           0, 0x27, 0.0f, -1, 90.0f, 4);
         }
     }
     switch (moby[0x20]) {
     case 0: {
         float max;
-        st->zoomed = 0;
-        st->reload = 0.36666667f;
+        scope->zoomed = 0;
+        scope->reload = 0.36666667f;
         moby[0x20] = 3;
         max = mat_fast_helper_a(1.0f, g_fast_math_ratio[0]) * 2.0f;
-        st->zoom_max = max;
-        st->zoom = max + (0.17453295f - max) * 0.25f;
+        scope->zoom_max = max;
+        scope->zoom = max + (0.17453295f - max) * 0.25f;
         g_zoom_saved_param_a = g_zoom_fov_value_b;
         g_zoom_saved_param_b = g_zoom_fov_value_c;
         g_zoom_saved_param_c = g_zoom_fov_value_d;
         g_zoom_saved_param_d = g_zoom_fov_value_a;
-        st->flash = 0;
-        st->locked = 0;
-        st->blink = 0;
-        st->target = 0;
-        st->light = -1;
-        st->sound = -1;
-        st->hud = -1;
-        st->model = AcquireEntitySlot(moby, 0, &found);
+        scope->flash = 0;
+        scope->locked = 0;
+        scope->blink = 0;
+        scope->target = 0;
+        scope->light = -1;
+        scope->sound = -1;
+        scope->hud = -1;
+        scope->model = AcquireEntitySlot(moby, 0, &found);
         if (found == 0) {
-            char *record = level_get_slot_body(*(s16 *)(moby + 0xAA), st->model);
-            int *size = level_get_slot_header(*(s16 *)(moby + 0xAA), st->model);
-            st->record = record;
+            char *record = level_get_slot_body(*(s16 *)(moby + 0xAA), scope->model);
+            int *size = level_get_slot_header(*(s16 *)(moby + 0xAA), scope->model);
+            scope->record = record;
             *size = mem_round_up_to_16(record + 0x2300) - (int)record;
         }
-        if (st->model >= 0)
-            beam_clear_particle_pool(st->model);
+        if (scope->model >= 0)
+            beam_clear_particle_pool(scope->model);
         break;
     }
     case 1: {
         float t;
         if (HERO->i[0x2294 / 4] == 1)
-            func_PAL_L00_002C4480(0x1D, 1);
+            hero_l00_set_action_pal(0x1D, 1);
         fire = 1;
         if (HERO->i[0x1500 / 4] != 0) {
             fire = 0;
             if (math_fast_float_d(&HERO->i[0x2534 / 4]) != 0)
                 fire = 1;
-            if (st->zoomed == 0)
+            if (scope->zoomed == 0)
                 g_render_state_word = 0;
-            st->zoomed = 1;
+            scope->zoomed = 1;
         } else {
             HERO->i[0x2534 / 4] = 0x21;
         }
         if (HERO->i[0x1450 / 4] != 0)
             HERO->i[0xBF8 / 4] = HERO->i[0x1450 / 4];
         if (HERO->i[0x1500 / 4] != 0) {
-            if ((GAME->i[0x1A0 / 4] & 8) && st->zoom > 0.17453295f) {
-                SoundSlot *s = &g_sound_state[st->sound];
+            if ((GAME->i[0x1A0 / 4] & 8) && scope->zoom > 0.17453295f) {
+                SoundSlot *s = &g_sound_state[scope->sound];
                 if ((u8 *)s->p[0x88 / 4] != moby || s->b[0x74] == 0)
-                    st->sound = PlayMobySound(2, 4, moby);
+                    scope->sound = PlayMobySound(2, 4, moby);
                 g_trigger_id_word[0] = 0xFFFF;
-                st->zoom -= 0.01f;
-            } else if ((GAME->i[0x1A0 / 4] & 2) && st->zoom < st->zoom_max) {
-                SoundSlot *s = &g_sound_state[st->sound];
+                scope->zoom -= 0.01f;
+            } else if ((GAME->i[0x1A0 / 4] & 2) && scope->zoom < scope->zoom_max) {
+                SoundSlot *s = &g_sound_state[scope->sound];
                 if ((u8 *)s->p[0x88 / 4] != moby || s->b[0x74] == 0)
-                    st->sound = PlayMobySound(3, 4, moby);
+                    scope->sound = PlayMobySound(3, 4, moby);
                 g_trigger_id_word[0] = 0xFFFF;
-                st->zoom += 0.01f;
+                scope->zoom += 0.01f;
             } else {
-                int h = st->sound;
+                int h = scope->sound;
                 if (h != -1) {
                     SoundSlot *s = &g_sound_state[h];
                     if ((u8 *)s->p[0x88 / 4] == moby && s->b[0x74] != 0)
                         snd_stop_voice(h);
                 }
-                st->sound = -1;
+                scope->sound = -1;
             }
-            if (st->zoom > st->zoom_max)
-                st->zoom = st->zoom_max;
-            else if (st->zoom < 0.17453295f)
-                st->zoom = 0.17453295f;
-            cam_set_value_target(0, 3, st->zoom, 0.02f, 0.2f, 0.0f);
+            if (scope->zoom > scope->zoom_max)
+                scope->zoom = scope->zoom_max;
+            else if (scope->zoom < 0.17453295f)
+                scope->zoom = 0.17453295f;
+            cam_set_value_target(0, 3, scope->zoom, 0.02f, 0.2f, 0.0f);
             gfx_update_frame_time_scales(0);
         } else {
-            int h = st->sound;
+            int h = scope->sound;
             if (h != -1) {
                 SoundSlot *s = &g_sound_state[h];
                 if ((u8 *)s->p[0x88 / 4] == moby && s->b[0x74] != 0)
                     snd_stop_voice(h);
             }
-            st->sound = -1;
-            if (st->zoomed != 0) {
-                float max = st->zoom_max;
-                st->zoom = max + (0.17453295f - max) * 0.25f;
+            scope->sound = -1;
+            if (scope->zoomed != 0) {
+                float max = scope->zoom_max;
+                scope->zoom = max + (0.17453295f - max) * 0.25f;
                 cam_set_value_target(0, 3, max, 0.005f, 0.2f, 0.0f);
-                st->zoomed = 0;
+                scope->zoomed = 0;
                 g_render_state_word = 0xE0;
                 gfx_update_frame_time_scales(1);
             }
         }
-        t = (st->zoom - 0.17453295f) / (st->zoom_max - 0.17453295f);
+        t = (scope->zoom - 0.17453295f) / (scope->zoom_max - 0.17453295f);
         g_zoom_fov_value_b = (g_zoom_saved_param_a - 0.03f) * t + 0.03f;
         g_zoom_fov_value_c = (g_zoom_saved_param_b - 0.4f) * t + 0.4f;
         g_zoom_fov_value_a = (g_zoom_saved_param_d - 0.010471977f) * t + 0.010471977f;
         if (HERO->b[0x22BC] == 0 && (GAME->i[0x1A4 / 4] & HERO->i[0x1230 / 4]) && fire) {
             if (weapon_spend_ammo(-1, 1) != 0) {
-                func_PAL_L00_002AF458();
-                st->hud = slot_copy_records_to_free(g_target_hud_records);
-                st->fire_timer = 2;
+                start_equipped_item_animation_pal();
+                scope->hud = slot_copy_records_to_free(g_target_hud_records);
+                scope->fire_timer = 2;
                 moby[0x20] = 2;
-                func_PAL_002A7E68(moby, 2, 0, 0);
+                anim_start_blended_pal(moby, 2, 0, 0);
             } else {
                 PlayMobySound(1, 0, moby);
             }
         }
         if (!(GAME->i[0x1A0 / 4] & HERO->i[0x1230 / 4]) || get_ammo(-1) == 0 || HERO->b[0x22B8] == 0) {
-            if (st->hud >= 0) {
-                slot_reset_active(st->hud);
-                st->hud = -1;
+            if (scope->hud >= 0) {
+                slot_reset_active(scope->hud);
+                scope->hud = -1;
             }
         }
         break;
@@ -275,57 +276,57 @@ void func_PAL_L00_003A64C8(u8 *moby)
     case 2:
         if (HERO->i[0x1450 / 4] != 0)
             HERO->i[0xBF8 / 4] = HERO->i[0x1450 / 4];
-        if (FastDecTimer(&st->fire_timer) != 0 || st->zoomed != 0) {
-            int h = st->sound;
+        if (FastDecTimer(&scope->fire_timer) != 0 || scope->zoomed != 0) {
+            int h = scope->sound;
             if (h != -1) {
                 SoundSlot *s = &g_sound_state[h];
                 if ((u8 *)s->p[0x88 / 4] == moby && s->b[0x74] != 0)
                     snd_stop_voice(h);
             }
-            st->sound = -1;
+            scope->sound = -1;
             PlayMobySound(0, 0, moby);
-            func_PAL_L00_003A7140(moby);
+            beam_fire_with_muzzle_flash_pal(moby);
             {
                 WeaponEntry *weapon = &g_weapon_l00_table[g_beam_weapon_index[0]];
-                st->reload = 1.0f / weapon->rate;
+                scope->reload = 1.0f / weapon->rate;
             }
             moby[0x20] = 3;
-            if (++st->shots == 5)
-                func_PAL_00289730(0x9F3, 0x4A);
+            if (++scope->shots == 5)
+                subtitle_request_voice_line_pal(0x9F3, 0x4A);
         }
         break;
     case 3:
-        if (vec_fast_helper_b(&st->reload) != 0)
+        if (vec_fast_helper_b(&scope->reload) != 0)
             moby[0x20] = 1;
         break;
     }
-    if (st->flash != 0) {
-        if (math_fast_float_d(&st->flash) != 0) {
-            if (st->light >= 0)
-                gfx_free_point_light(st->light);
-            st->light = -1;
+    if (scope->flash != 0) {
+        if (math_fast_float_d(&scope->flash) != 0) {
+            if (scope->light >= 0)
+                gfx_free_point_light(scope->light);
+            scope->light = -1;
         } else {
-            if (st->light == -1)
-                st->light = gfx_add_point_light(15.0f, moby + 0x10, 0x7F608060, 0.0f);
-            if (st->light >= 0) {
+            if (scope->light == -1)
+                scope->light = gfx_add_point_light(15.0f, moby + 0x10, 0x7F608060, 0.0f);
+            if (scope->light >= 0) {
                 float f;
                 if (HERO->h[0x24EC / 2] == 1) {
-                    moby_transform_joint_to_world(moby, 0, a);
-                    vec_scale_to_length(b, moby + 0xD0, -1.5f);
+                    moby_transform_joint_to_world(moby, 0, vec_a);
+                    vec_scale_to_length(vec_b, moby + 0xD0, -1.5f);
                 } else {
-                    moby_transform_joint_to_world(moby, 0, a);
-                    vec_scale_to_length(b, &HERO->f[0x760 / 4], 1.5f);
+                    moby_transform_joint_to_world(moby, 0, vec_a);
+                    vec_scale_to_length(vec_b, &HERO->f[0x760 / 4], 1.5f);
                 }
                 {
                     float (*positions)[8] = (float (*)[8])g_light_table[0].position;
                     MuzzleLight *lights;
-                    FastVecAdd(positions[st->light], a, b);
+                    FastVecAdd(positions[scope->light], vec_a, vec_b);
                     lights = (MuzzleLight *)((char *)positions - 0x10);
-                    lights[st->light].position[3] = 15.0f;
-                    f = IntToFloat(st->flash) / IntToFloat(25);
-                    lights[st->light].spread = f;
-                    lights[st->light].radius = f * 0.75f;
-                    lights[st->light].power = lights[st->light].radius;
+                    lights[scope->light].position[3] = 15.0f;
+                    f = IntToFloat(scope->flash) / IntToFloat(25);
+                    lights[scope->light].spread = f;
+                    lights[scope->light].radius = f * 0.75f;
+                    lights[scope->light].power = lights[scope->light].radius;
                 }
             }
         }

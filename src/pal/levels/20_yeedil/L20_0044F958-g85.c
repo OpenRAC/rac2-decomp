@@ -28,7 +28,7 @@ extern int flag_set_first_pending(u8 *);
 extern int PlayMobySound(int, int, char *);
 extern float turret_move_toward_target_pal(char *);
 extern void moby_set_state(u8 *, int, int);
-extern void func_PAL_002A7E68(u8 *, int, int, int);
+extern void anim_start_blended_pal(u8 *, int, int, int);
 extern u8 *FindLastGroupMemberInRange(u8 *, u8 *);
 extern int math_random_int_below(int);
 extern float FastAddRotations(float, float);
@@ -47,7 +47,7 @@ void UpdateTargetedProjectileBursts_pal(u8 *moby)
     u8 *state = *(u8 **)(moby + 0x68);
     u8 *selected;
     float *aim;
-    float angle, radius, savedHeight, x;
+    float angle, radius, saved_height, x;
     turret_update_health_aim_pal((char *)moby);
     if (g_hero_vehicle_mode == 2) { moby_mark_spawned(moby); return; }
     switch (moby[0x20]) {
@@ -62,7 +62,7 @@ void UpdateTargetedProjectileBursts_pal(u8 *moby)
         break;
     case 4:
         if (flag_set_first_pending(moby)) {
-            if (moby[0x43]) func_PAL_002A7E68(moby, 0, 0, 12);
+            if (moby[0x43]) anim_start_blended_pal(moby, 0, 0, 12);
             selected = FindLastGroupMemberInRange(*(u8 **)(moby + 0xb8), moby);
             *(u8 **)(state + 0x1b0) = selected;
             if (math_random_int_below(2)) *(u8 **)(state + 0x1b0) = 0;
@@ -74,7 +74,7 @@ void UpdateTargetedProjectileBursts_pal(u8 *moby)
             }
             angle = FastAddRotations(g_hero_l20_extra_state.yaw, math_random_signed_float_range(20.0f, 70.0f) * 0.017453294f);
             radius = math_random_float_range(5.0f, 15.0f);
-            savedHeight = *(float *)(state + 0x198);
+            saved_height = *(float *)(state + 0x198);
             *(float *)(state + 0x190) = math_fast_sin_or_cos_a(angle) * radius;
             *(float *)(state + 0x194) = math_fast_sin_or_cos_b(angle) * radius;
             *(float *)(state + 0x198) = 0.0f;
@@ -82,13 +82,13 @@ void UpdateTargetedProjectileBursts_pal(u8 *moby)
             if (g_hero_state.height != 0.0f) {
                 g_hero_state.height += math_random_float_range(1.5f, 2.5f);
                 *(float *)(state + 0x198) = g_hero_state.height;
-            } else *(float *)(state + 0x198) = savedHeight;
+            } else *(float *)(state + 0x198) = saved_height;
         }
         if (turret_move_toward_target_pal((char *)moby) < 0.1f) moby_set_state(moby, 5, -1);
         break;
     case 5:
         if (flag_set_first_pending(moby)) {
-            if (moby[0x43] != 1) func_PAL_002A7E68(moby, 1, 0, 12);
+            if (moby[0x43] != 1) anim_start_blended_pal(moby, 1, 0, 12);
             if (*(int *)(state + 0x1b0)) *(float *)(state + 0x1b4) = 0.0f;
             else *(float *)(state + 0x1b4) = -math_random_float_range(4.0f, 6.0f);
             PlayMobySound(1, 0, (char *)moby);

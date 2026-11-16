@@ -18,23 +18,23 @@ extern char *moby_spawn_aimed_effect(void *, float, void *, void *);
 typedef struct { char gap[0x2F0]; char *parts[2]; } Parts9708;
 
 /* Fire from a valid linked part after its timer and parent flags permit it. */
-void func_PAL_L09_003FE118(char *obj)
+void trooper_fire_arm_shot_pal(char *moby)
 {
     float pos[4] __attribute__((aligned(16)));
     float dir[4] __attribute__((aligned(16)));
-    char *state = *(char **)(obj + 0x68);
+    char *state = *(char **)(moby + 0x68);
     char *parent;
     int close = 1;
     int side, shift;
-    if (!(vec_distance_xy(obj + 0x10, *(char **)(state + 0x200)+0x10) < g_trooper_attack_range))
+    if (!(vec_distance_xy(moby + 0x10, *(char **)(state + 0x200)+0x10) < g_trooper_attack_range))
         close = 0;
     if (!*(int *)(state + 0x2F8) || !FastDecTimer(state + 0x2E4))
         return;
-    side = (*(unsigned short *)(obj + 0x96) / (((s32)(g_trooper_anim_period) * 5 + 2) / 6)) & 1;
+    side = (*(unsigned short *)(moby + 0x96) / (((s32)(g_trooper_anim_period) * 5 + 2) / 6)) & 1;
     shift = side ? 5 : 4;
     if (!((*(unsigned short *)(*(char **)(state + 0x2F8)+0x7C) >> shift) & 1))
         goto invalid;
-    if (!enemy_check_line_of_sight(obj, 1, 0, *(u8 *)(state + 0x30D) != 0))
+    if (!enemy_check_line_of_sight(moby, 1, 0, *(u8 *)(state + 0x30D) != 0))
         return;
     parent = ((Parts9708 *)state)->parts[side];
     if (!parent || *(short *)(parent + 0xAA) != 0xD66)
@@ -56,7 +56,7 @@ void func_PAL_L09_003FE118(char *obj)
         }
         vec_scale_to_length(dir, dir, g_trooper_arm_shot_speed * 0.020000001f);
         PlayMobySound(1, 0, *(void **)(state + 0x2F8));
-        moby_spawn_aimed_effect(obj, (float)*(u8 *)(state + 0x34), dir, pos);
+        moby_spawn_aimed_effect(moby, (float)*(u8 *)(state + 0x34), dir, pos);
     }
     return;
 invalid:

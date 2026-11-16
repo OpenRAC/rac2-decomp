@@ -4,39 +4,40 @@
 typedef struct { char pad[0x20]; float rate[4]; unsigned int start[4]; unsigned int end[4]; int timer[4]; float angle[4]; } PrisonVisualState;
 extern void gfx_draw_rotated_billboard(void *, int, int, int, float, float, float);
 extern float math_wrap_angle_full_turn(float);
-extern void func_PAL_L14_00436790(void *);
+extern void part_draw_spark_quads_pal(void *);
 extern int math_fast_float_d(void *);
 extern unsigned int FastTweenColor(unsigned int, unsigned int, float);
 extern float FastAddRotations(float, float);
 
-void func_PAL_L14_004364B0(char *self)
+/* Draws the pulse effect's billboards: the base, two rotating fading sprites and the spark quads. (PAL: 50 Hz timings) */
+void prison_animated_quads_draw_pal(char *moby)
 {
-    char *s = *(char **)(self + 0x68);
+    char *vars = *(char **)(moby + 0x68);
     int i;
     unsigned int color;
-    float t, scale, angle;
-    gfx_draw_rotated_billboard(self + 0x10, *(int *)(s+0xb8), *(int *)(s+0xc0), 1,
-        *(float *)(s+0xbc) * *(float *)(s+0x80), *(float *)(s+0x80)*0.5f, 0.0f);
+    float progress, scale, angle;
+    gfx_draw_rotated_billboard(moby + 0x10, *(int *)(vars+0xb8), *(int *)(vars+0xc0), 1,
+        *(float *)(vars+0xbc) * *(float *)(vars+0x80), *(float *)(vars+0x80)*0.5f, 0.0f);
     for (i=0; i<2; i++) {
-        if (((((int)(((int)(math_fast_float_d(s+0x50+i*4)) * 6 + 2)) * 5 + 2) / 6) / 5))
-            ((PrisonVisualState *)s)->timer[i] = (((int)((int)((float)*(int *)(s+0x10) / ((PrisonVisualState *)s)->rate[i])) * 5 + 2) / 6);
-        t = 1.0f - (float)((PrisonVisualState *)s)->timer[i] /
-            (float)(((int)((int)((float)*(int *)(s+0x10) / ((PrisonVisualState *)s)->rate[i])) * 5 + 2) / 6);
-        if (*(float *)(s+0x14) < t) {
-            color = ((PrisonVisualState *)s)->end[i];
-            color = (color & 0xffffff) + (((int)((1.0f-t)/(1.0f-*(float *)(s+0x14))*80.0f)+48)<<24);
+        if (((((int)(((int)(math_fast_float_d(vars+0x50+i*4)) * 6 + 2)) * 5 + 2) / 6) / 5))
+            ((PrisonVisualState *)vars)->timer[i] = (((int)((int)((float)*(int *)(vars+0x10) / ((PrisonVisualState *)vars)->rate[i])) * 5 + 2) / 6);
+        progress = 1.0f - (float)((PrisonVisualState *)vars)->timer[i] /
+            (float)(((int)((int)((float)*(int *)(vars+0x10) / ((PrisonVisualState *)vars)->rate[i])) * 5 + 2) / 6);
+        if (*(float *)(vars+0x14) < progress) {
+            color = ((PrisonVisualState *)vars)->end[i];
+            color = (color & 0xffffff) + (((int)((1.0f-progress)/(1.0f-*(float *)(vars+0x14))*80.0f)+48)<<24);
         } else {
-            color = FastTweenColor(((PrisonVisualState *)s)->start[i], ((PrisonVisualState *)s)->end[i], t / *(float *)(s+0x14));
-            color = (color & 0xffffff) + (((int)(t / *(float *)(s+0x14)*80.0f)+48)<<24);
+            color = FastTweenColor(((PrisonVisualState *)vars)->start[i], ((PrisonVisualState *)vars)->end[i], progress / *(float *)(vars+0x14));
+            color = (color & 0xffffff) + (((int)(progress / *(float *)(vars+0x14)*80.0f)+48)<<24);
         }
-        scale = *(float *)(s+0x80) * *(float *)(s+0x18);
-        angle = math_wrap_angle_full_turn(t * (((PrisonVisualState *)s)->angle[i] * 6.2831855f));
-        gfx_draw_rotated_billboard(self+0x10, *(int *)(s+0x1c), color, 1, scale, *(float *)(s+0x80)*0.5f, angle + -3.1415927f);
+        scale = *(float *)(vars+0x80) * *(float *)(vars+0x18);
+        angle = math_wrap_angle_full_turn(progress * (((PrisonVisualState *)vars)->angle[i] * 6.2831855f));
+        gfx_draw_rotated_billboard(moby+0x10, *(int *)(vars+0x1c), color, 1, scale, *(float *)(vars+0x80)*0.5f, angle + -3.1415927f);
     }
-    *(float *)s = FastAddRotations(*(float *)s, 0.007f);
-    gfx_draw_rotated_billboard(self+0x10, *(int *)(s+4), *(int *)(s+12), 1,
-        *(float *)(s+8)* *(float *)(s+0x80), *(float *)(s+0x80)*0.5f, *(float *)s);
-    func_PAL_L14_00436790(self);
+    *(float *)vars = FastAddRotations(*(float *)vars, 0.007f);
+    gfx_draw_rotated_billboard(moby+0x10, *(int *)(vars+4), *(int *)(vars+12), 1,
+        *(float *)(vars+8)* *(float *)(vars+0x80), *(float *)(vars+0x80)*0.5f, *(float *)vars);
+    part_draw_spark_quads_pal(moby);
 }
 
-void func_PAL_L14_00436790(void *arg);
+void part_draw_spark_quads_pal(void *arg);

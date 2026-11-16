@@ -46,7 +46,7 @@ extern char *part_init_shared_effect_object(int, int);
 
 /* Fills the transition from the preview vectors, asks the voice player for
    line 1511 (key 2000 + 1511) if it is idle, and picks the item's model. */
-void func_PAL_00300130(void)
+void BeginPreviewTransition_pal(void)
 {
     g_object_preview_state.count = ((s32)(g_preview_frame_count) * 5 + 2) / 6;
     g_object_preview_state.rate = 1.0f / IntToFloat(g_object_preview_state.count);

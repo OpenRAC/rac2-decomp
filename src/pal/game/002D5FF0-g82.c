@@ -6,11 +6,12 @@ typedef struct { char reserved[0x1C4]; int flags; } CallbackMenuState;
 extern char *g_resident_data_base;
 extern SelectionCallback g_pause_menu_state;
 extern CallbackMenuState g_pad_state;
-extern int func_PAL_0029D408(int);
+extern int resident_list_menu_update(int);
 extern char *list_menu_get_selected_record_pal(void *);
-extern void func_PAL_002D6A70(int);
+extern void menu_start_action_pal(int);
 
-int func_PAL_002D6378(void)
+/* Handles input for a list menu page: confirms or closes, passes buttons on, and starts the selected record action on X (PAL). */
+int menu_page_handle_input_confirm_pal(void)
 {
     struct { short reserved; unsigned short key; int value; } message;
     CallbackMenuState *state = &g_pad_state;
@@ -32,12 +33,12 @@ int func_PAL_002D6378(void)
     if (flags & 0x900) {
         result = 1;
     } else {
-        func_PAL_0029D408(flags);
+        resident_list_menu_update(flags);
         if ((state->flags & 0x40) && g_resident_data_base != 0) {
             char *data = list_menu_get_selected_record_pal(g_resident_data_base + 0x3E810);
             message.key = *(unsigned short *)(data + 8);
             message.value = *(int *)(data + 0xC);
-            func_PAL_002D6A70((int)&message);
+            menu_start_action_pal((int)&message);
         }
     }
     return result;

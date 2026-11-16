@@ -74,14 +74,14 @@ static __inline__ void ClearPathTags(ButtonVars *vars)
 
 /* A floor button: sinks into place, then glows until the hero stands on it (or its mission
    is complete), then counts the press in the level's progress and unblocks its path. */
-void func_PAL_L01_003B55C4(Moby *moby)
+void floor_button_update_pal(Moby *moby)
 {
     ButtonVars *vars = moby->vars;
     u8 *counter;
     int count;
     int intensity;
     u32 grey;
-    u32 alphaGreen;
+    u32 alpha_green;
     u32 blue;
     short id;
     u16 uid;
@@ -120,9 +120,9 @@ waiting:
         else if (intensity < 32)
             intensity = 32;
         grey = (u32)intensity;
-        alphaGreen = 0x80000000 | (grey << 8);
+        alpha_green = 0x80000000 | (grey << 8);
         blue = grey << 16;
-        moby->color = blue | alphaGreen | grey;
+        moby->color = blue | alpha_green | grey;
 
         /* Wait for the hero to stand on the button, or for its mission. */
         if (g_hero_state.groundMoby != moby || g_hero_state.f34E) {

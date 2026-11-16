@@ -18,7 +18,7 @@ extern void CalculateAimedLaunchVelocity(void *, void *, char *, float, float, f
 extern int coll_trace_projectile_to_impact_pal(float *, float *, float *, float *, void *, void *, int *, float);
 extern void moby_set_entry_list_flag_byte(int, int);
 extern float IntToFloat(int);
-extern void func_PAL_L00_002AF458(void);
+extern void start_equipped_item_animation_pal(void);
 extern void cancel_hero_item_animation_pal(void);
 extern char *part_spawn_flying_chunk_b_pal(int, void *, void *);
 extern char *part_spawn_flying_chunk_a_pal(int, void *, void *);
@@ -68,49 +68,50 @@ typedef struct BeamVars {
     int disabled;
 } BeamVars;
 
-void func_PAL_L24_003F44F8(Target *obj)
+/* Updates the beam-gun target: traces the beam, shows the progress gauge, fires flying chunks while the button is held and fades the beam in or out (PAL). */
+void beam_target_update_pal(Target *obj)
 {
-    BeamVars *v = obj->vars;
+    BeamVars *vars = obj->vars;
     Target *hit;
     float *pos;
     float dir[4] __attribute__((aligned(16)));
     float spread[4] __attribute__((aligned(16)));
     float distance, ratio, length;
-    int a, b;
+    int color_a, color_b;
 
-    pos = v->position;
+    pos = vars->position;
     moby_transform_joint_to_world(obj, 0, pos);
     distance = game_get_override_value(4.5f);
     if (g_hero_state.planet == 29) {
         distance += 6.5f;
     }
-    v->hit = 0;
-    v->valid = 0;
+    vars->hit = 0;
+    vars->valid = 0;
     CalculateAimedLaunchVelocity(dir, pos, 0, 0.00001f, distance, 0.3f, 0.0044f, 0);
-    coll_trace_projectile_to_impact_pal(pos, dir, v->endpoint, v->normal, obj, &v->hit, 0, 0.0044f);
-    hit = v->hit;
+    coll_trace_projectile_to_impact_pal(pos, dir, vars->endpoint, vars->normal, obj, &vars->hit, 0, 0.0044f);
+    hit = vars->hit;
     if (hit != 0) {
         if (hit->class->type == 18) {
             TargetVars *target = hit->vars;
             target->maximum = 25;
-            if (v->hit->slot != 255) {
-                moby_set_entry_list_flag_byte(v->hit->slot, 25);
+            if (vars->hit->slot != 255) {
+                moby_set_entry_list_flag_byte(vars->hit->slot, 25);
             }
-            ratio = IntToFloat(v->hit->progress);
+            ratio = IntToFloat(vars->hit->progress);
             ratio /= IntToFloat(target->maximum);
-            v->fraction = ratio;
+            vars->fraction = ratio;
             if (target->reverse) {
-                v->fraction = 1.0f - ratio;
-                if (v->fraction == 0.0f) {
-                    v->fraction = -0.001f;
+                vars->fraction = 1.0f - ratio;
+                if (vars->fraction == 0.0f) {
+                    vars->fraction = -0.001f;
                 }
             }
-            v->reverse = target->reverse;
-            v->disabled = target->disabled != 0;
-            v->valid = 1;
+            vars->reverse = target->reverse;
+            vars->disabled = target->disabled != 0;
+            vars->valid = 1;
         }
     } else {
-        v->fraction = -1000.0f;
+        vars->fraction = -1000.0f;
     }
 
     switch (obj->state) {
@@ -121,43 +122,43 @@ void func_PAL_L24_003F44F8(Target *obj)
         obj->state = 2;
         break;
     case 2:
-        if ((g_pad_pressed_flags & g_hero_state.input) && v->hit && v->valid && !v->disabled) {
-            func_PAL_L00_002AF458();
+        if ((g_pad_pressed_flags & g_hero_state.input) && vars->hit && vars->valid && !vars->disabled) {
+            start_equipped_item_animation_pal();
             obj->state = 3;
-            if (!v->reverse) {
-                part_spawn_flying_chunk_b_pal((int)obj, v->position, dir);
+            if (!vars->reverse) {
+                part_spawn_flying_chunk_b_pal((int)obj, vars->position, dir);
             } else {
-                part_spawn_flying_chunk_a_pal((int)obj, v->position, dir);
+                part_spawn_flying_chunk_a_pal((int)obj, vars->position, dir);
             }
             snd_play_from_class_bank(1, 0, (char *)obj, 0xFB0);
-            if (v->reverse) {
-                v->countdown = 12;
+            if (vars->reverse) {
+                vars->countdown = 12;
             } else {
-                v->countdown = 6;
+                vars->countdown = 6;
             }
         }
         break;
     case 3:
-        if (!(g_pad_pressed_flags & g_hero_state.input) || !v->hit || !v->valid || v->disabled) {
+        if (!(g_pad_pressed_flags & g_hero_state.input) || !vars->hit || !vars->valid || vars->disabled) {
             cancel_hero_item_animation_pal();
             obj->state = 2;
-        } else if (math_fast_float_d(&v->countdown)) {
+        } else if (math_fast_float_d(&vars->countdown)) {
             qcopy(spread, dir);
             length = FastVecLength(spread);
             spread[0] += math_random_float_range(-0.005f, 0.005f);
             spread[1] += math_random_float_range(-0.005f, 0.005f);
             spread[2] += math_random_float_range(-0.005f, 0.005f);
             vec_scale_to_length(spread, spread, length);
-            if (!v->reverse) {
-                part_spawn_flying_chunk_b_pal((int)obj, v->position, spread);
+            if (!vars->reverse) {
+                part_spawn_flying_chunk_b_pal((int)obj, vars->position, spread);
             } else {
-                part_spawn_flying_chunk_a_pal((int)obj, v->position, spread);
+                part_spawn_flying_chunk_a_pal((int)obj, vars->position, spread);
             }
             snd_play_from_class_bank(1, 0, (char *)obj, 0xFB0);
-            if (v->reverse) {
-                v->countdown = 12;
+            if (vars->reverse) {
+                vars->countdown = 12;
             } else {
-                v->countdown = 6;
+                vars->countdown = 6;
             }
         }
         break;
@@ -167,34 +168,34 @@ void func_PAL_L24_003F44F8(Target *obj)
 
     if (g_hero_state.mode == 3) {
         obj->state = 4;
-        v->fade -= 0.02f;
+        vars->fade -= 0.02f;
     } else {
-        v->fade += 0.01f;
+        vars->fade += 0.01f;
     }
-    if (v->fade > 1.0f) {
-        v->fade = 1.0f;
-    } else if (v->fade < 0.0f) {
-        v->fade = 0.0f;
+    if (vars->fade > 1.0f) {
+        vars->fade = 1.0f;
+    } else if (vars->fade < 0.0f) {
+        vars->fade = 0.0f;
     }
 
-    if (v->fraction > -100.0f) {
-        if (v->smoothed < -100.0f) {
-            v->smoothed = v->fraction;
-        } else if (v->fraction < v->smoothed - 0.01f) {
-            v->smoothed -= 0.01f;
-        } else if (v->smoothed + 0.01f < v->fraction) {
-            v->smoothed += 0.01f;
+    if (vars->fraction > -100.0f) {
+        if (vars->smoothed < -100.0f) {
+            vars->smoothed = vars->fraction;
+        } else if (vars->fraction < vars->smoothed - 0.01f) {
+            vars->smoothed -= 0.01f;
+        } else if (vars->smoothed + 0.01f < vars->fraction) {
+            vars->smoothed += 0.01f;
         } else {
-            v->smoothed = v->fraction;
+            vars->smoothed = vars->fraction;
         }
     } else {
-        v->smoothed = v->fraction;
+        vars->smoothed = vars->fraction;
     }
 
-    a = gfx_blend_colors_by_cycle(ref_L24_003EFA38_00[0], 75, ref_L24_003EFA38_01[0], ref_L24_003EFA38_01[1]);
-    b = gfx_blend_colors_by_cycle(ref_L24_003EFA38_00[0], 75, ref_L24_003EFA38_01[2], ref_L24_003EFA38_01[3]);
-    if (v->smoothed >= 0.0f && v->smoothed <= 1.0f) {
-        gauge_popup_show(0, a, b, v->smoothed);
+    color_a = gfx_blend_colors_by_cycle(ref_L24_003EFA38_00[0], 75, ref_L24_003EFA38_01[0], ref_L24_003EFA38_01[1]);
+    color_b = gfx_blend_colors_by_cycle(ref_L24_003EFA38_00[0], 75, ref_L24_003EFA38_01[2], ref_L24_003EFA38_01[3]);
+    if (vars->smoothed >= 0.0f && vars->smoothed <= 1.0f) {
+        gauge_popup_show(0, color_a, color_b, vars->smoothed);
     }
     gfx_add_draw_callback_third(moby_update_attached_effect_by_state_pal, obj);
 }

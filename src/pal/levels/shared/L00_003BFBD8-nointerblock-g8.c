@@ -20,30 +20,30 @@ extern void gfx_draw_billboard_quad(char *a, int b, unsigned int c, int d, float
    after it says whether it is free. Without interblock scheduling the two skips stay likely
    branches. Each sprite's colour is its own local: one shared variable dies twice, becomes a
    global pseudo, and the shifted alpha no longer ties to its saved register. */
-void effect_draw_slot_sprites_pal(char *a0)
+void effect_draw_slot_sprites_pal(char *owner)
 {
-    unsigned int firstRGB = 0x103080;
-    unsigned int secondRGB = 0xFFFFFF;
+    unsigned int first_rgb = 0x103080;
+    unsigned int second_rgb = 0xFFFFFF;
     char *base = g_spark_slot_records;
     char *p = base + 0x30;
     char *q = base;
     int i;
     int color;
     int color2;
-    float f;
+    float angle;
 
     for (i = 29; i >= 0; p += 0xA0, i--, q += 0xA0) {
-        if (*(int *)(p + 0x5C) == (int)a0) {
-            lightning_draw_curve_pal(a0, q);
+        if (*(int *)(p + 0x5C) == (int)owner) {
+            lightning_draw_curve_pal(owner, q);
             if (*(int *)(p + 0x64) == 0) {
                 color = math_random_int_range(0x50, 0x60);
-                color = (int)(color << 24) | firstRGB;
-                f = math_random_angle();
-                gfx_draw_billboard_quad(p, 0x31, color, 1, 0.5f, 0.15f, f);
+                color = (int)(color << 24) | first_rgb;
+                angle = math_random_angle();
+                gfx_draw_billboard_quad(p, 0x31, color, 1, 0.5f, 0.15f, angle);
                 color2 = math_random_int_range(0x50, 0x60);
-                color2 = (int)(color2 << 24) | secondRGB;
-                f = math_random_angle();
-                gfx_draw_billboard_quad(p, 0x31, color2, 1, 0.3f, 0.151f, f);
+                color2 = (int)(color2 << 24) | second_rgb;
+                angle = math_random_angle();
+                gfx_draw_billboard_quad(p, 0x31, color2, 1, 0.3f, 0.151f, angle);
             }
         }
     }

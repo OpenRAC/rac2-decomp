@@ -48,6 +48,7 @@ extern void gravity_offset_object_position(char *, void *, void *, float);
 extern char *moby_get_private_value_2(char *);
 extern void mat_combine_and_store(char *, void *, void *, void *);
 
+/* Sways a moby (such as a camera rig) with springs: pushes it toward a target or the hero, then applies the damped rotation and keeps its anchor point fixed (PAL: kick every 8 frames). */
 void moby_update_sway_pal(char *self, Sway_2B44C0 *sway, float *target)
 {
     float old_position[4];

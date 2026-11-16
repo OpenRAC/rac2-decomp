@@ -41,10 +41,12 @@ extern AllocationOffsets *level_get_slot_header(int,void *);
 extern void mem_fast_helper_b(void *,int);
 extern int math_fast_float_d(int *),vec_fast_helper_b(float *);
 extern int math_is_below_plane_within_depth(float);
-extern void func_PAL_L00_002AF458(void),initialize_moby_animation_blend(void *,void *,int,int,int,int);
+extern void start_equipped_item_animation_pal(void),initialize_moby_animation_blend(void *,void *,int,int,int,int);
 extern int weapon_spend_ammo(int,int);
 extern int PlayMobySound(int,int,void *);
-extern char *func_PAL_L00_00421578(void *,void *,int,void *,int,int);
+extern char *guided_rocket_create_pal(void *,void *,int,void *,int,int);
+/* Runs the Chopper and Multi-Star weapon: sets up its shot slots, then fires when the button is
+ * pressed and the weapon is ready. (PAL) */
 void chopper_update_pal(unsigned char *object)
 {
     int existing;
@@ -105,7 +107,7 @@ void chopper_update_pal(unsigned char *object)
             if(g_hero_state.field2294==0x83 && !g_hero_state.fieldc2c && math_is_below_plane_within_depth(33.0f)) secondary=get_ammo(22)!=0;
             if(g_hero_state.field229c==4 && allowed && !g_hero_state.field49c &&
                F(ctx,0xC)==0.0f && (g_pad_pressed_flags&0x20) && g_hero_state.field1240>=19 && get_ammo(22)) {
-                func_PAL_L00_002AF458();
+                start_equipped_item_animation_pal();
                 other=*(char **)((char *)&g_hero_state+0xE98);
                 if(other) {
                     F(other,8)=0.0f;
@@ -119,7 +121,7 @@ void chopper_update_pal(unsigned char *object)
         } else if(math_fast_float_d((int *)(ctx+0x10))) {finished=1;object[0x20]=1;}
         if(triggered || secondary || finished) {
             weapon_spend_ammo(-1,1);PlayMobySound(2,0,object);
-            result=func_PAL_L00_00421578(object,object+0x10,triggered,*(void **)ctx,I(ctx,0x14),1);
+            result=guided_rocket_create_pal(object,object+0x10,triggered,*(void **)ctx,I(ctx,0x14),1);
             if(result) *(void **)(result+0xB8)=object;
         }
         return;

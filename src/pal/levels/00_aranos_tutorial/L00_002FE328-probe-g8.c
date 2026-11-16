@@ -25,57 +25,57 @@ extern void matrix_mul_vec3(void *, void *, void *);
 
 /* While the timer is in its window, builds four points around the 0xD54 moby and selects an object. */
 void tutorial_probe_points_update_pal(void) {
-    char temp[16];
-    int low;
-    int high;
-    int which;
+    char offset_vec[16];
+    int window_start;
+    int window_end;
+    int object_index;
     int i;
-    int n;
-    char *found;
-    char *out;
+    int point_index;
+    char *probe_moby;
+    char *point_out;
 
     if (g_current_map_index[0] != 0)
         return;
 
-    low = -1;
-    high = 9999;
-    which = 0;
+    window_start = -1;
+    window_end = 9999;
+    object_index = 0;
     if (g_tutorial_probe_context.state == 0) {
-        low = 183;
-        high = 308;
-        which = 1;
+        window_start = 183;
+        window_end = 308;
+        object_index = 1;
     }
-    if (low == -1)
+    if (window_start == -1)
         return;
 
-    if (g_tutorial_probe_context.timer >= low && g_tutorial_probe_context.timer <= high) {
+    if (g_tutorial_probe_context.timer >= window_start && g_tutorial_probe_context.timer <= window_end) {
         g_tutorial_probe_context.out = g_tutorial_probe_out_a;
 
-        found = 0;
+        probe_moby = 0;
         for (i = 0; i < g_tutorial_probe_context.count; i++) {
-            char *obj = g_tutorial_probe_context.objects[i];
+            char *object = g_tutorial_probe_context.objects[i];
 
-            if (*(short *)(obj + 0xAA) == 0xD54) {
-                found = obj;
+            if (*(short *)(object + 0xAA) == 0xD54) {
+                probe_moby = object;
                 break;
             }
         }
 
-        if (found) {
-            char *matrix;
+        if (probe_moby) {
+            char *moby_matrix;
 
-            out = g_tutorial_probe_out_b;
-            matrix = found + 0xC0;
-            for (n = 0; n < 4; n++) {
-                matrix_mul_vec3(out, g_tutorial_probe_points + n * 16, matrix);
-                FastVecAdd(out, out, found + 0x10);
-                FastVecSub(temp, g_camera_l00_position, out);
-                vec_scale_to_length(temp, temp, 0.15f);
-                FastVecAdd(out, out, temp);
-                out += 16;
+            point_out = g_tutorial_probe_out_b;
+            moby_matrix = probe_moby + 0xC0;
+            for (point_index = 0; point_index < 4; point_index++) {
+                matrix_mul_vec3(point_out, g_tutorial_probe_points + point_index * 16, moby_matrix);
+                FastVecAdd(point_out, point_out, probe_moby + 0x10);
+                FastVecSub(offset_vec, g_camera_l00_position, point_out);
+                vec_scale_to_length(offset_vec, offset_vec, 0.15f);
+                FastVecAdd(point_out, point_out, offset_vec);
+                point_out += 16;
             }
         }
-        *(char **)(g_tutorial_probe_context.out + 0x68) = g_tutorial_probe_context.objects[which];
+        *(char **)(g_tutorial_probe_context.out + 0x68) = g_tutorial_probe_context.objects[object_index];
     } else {
         g_tutorial_probe_context.out = 0;
     }

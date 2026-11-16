@@ -11,6 +11,7 @@ extern char *GetLocalizedString(int);
 extern int sprintf(char *, const char *, ...);
 extern int text_draw_centered_small(int, int, unsigned long, char *, int);
 
+/* Draws the two toggle option menu: two lines, the selected one highlighted. */
 void two_toggle_a_draw_us2(char *object)
 {
     char buffer[128];
@@ -45,7 +46,7 @@ extern void gfx_disable_screen_flag(void);
 /* func_US2_0033E9B8, the v2.00 copy of func_0033D970: the same C with func_0027F120 before the text and
  * func_0027F110 after it. func_0027FAA8 must be declared int here (as in this unit), not void: the ignored
  * call value is what leaves the second test in $v1, so this cannot live in 0033C958.c, which declares it void. */
-void func_US2_0033E9B8(char *object)
+void two_toggle_b_draw_us2(char *object)
 {
     char buffer[128];
     SolTextPair2 pair;
@@ -75,22 +76,22 @@ void func_US2_0033E9B8(char *object)
 
 extern void prompt_bar_draw_us2();
 extern int DrawMenuPreviewImage();
-extern void func_US2_003378A0();
+extern void text_label_draw_us2();
 extern void hud_draw_colored_quad_widget();
 extern void gfx_draw_screen_element_stored();
-extern void func_US2_0033FDD8();
+extern void info_panel_draw_counters_us2();
 
 /* Forwards one object pointer, eight pointer-plus-constant arguments and a null to ten calls in a fixed order. */
-void func_US2_0033FEF8(char *p)
+void info_panel_draw_us2(char *object)
 {
-    prompt_bar_draw_us2(p + 8);
+    prompt_bar_draw_us2(object + 8);
     DrawMenuPreviewImage(0);
-    func_US2_003378A0(p + 792);
-    func_US2_003378A0(p + 880);
-    func_US2_003378A0(p + 968);
-    hud_draw_colored_quad_widget(p + 732);
-    gfx_draw_screen_element_stored(p + 1056);
-    func_US2_003378A0(p + 1576);
-    func_US2_003378A0(p + 1488);
-    func_US2_0033FDD8(p);
+    text_label_draw_us2(object + 792);
+    text_label_draw_us2(object + 880);
+    text_label_draw_us2(object + 968);
+    hud_draw_colored_quad_widget(object + 732);
+    gfx_draw_screen_element_stored(object + 1056);
+    text_label_draw_us2(object + 1576);
+    text_label_draw_us2(object + 1488);
+    info_panel_draw_counters_us2(object);
 }

@@ -28,8 +28,8 @@ void endako_wake_objects_low_counters_pal(u8 *self)
     if ((g_frame_l03_counter & 0x3F) == 0) {
         for (i = 0; i < 0x38; i++) {
             if (g_item_owned_flags[i] != 0) {
-                u8 *e = (u8 *)&g_item_l03_record_table[g_item_slot_to_record[i]];
-                s16 limit = *(s16 *)(e + 0x40);
+                u8 *record = (u8 *)&g_item_l03_record_table[g_item_slot_to_record[i]];
+                s16 limit = *(s16 *)(record + 0x40);
                 if (limit != 0 && (f32)g_item_ammo_counts[i] < (f32)limit * 0.1f) {
                     low = 1;
                 }

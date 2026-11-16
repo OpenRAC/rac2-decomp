@@ -30,11 +30,12 @@ extern int GetCollHitMaterial(void);
 extern float cam_get_view_space_angle(char *);
 extern float FastVecDot(void *, void *);
 
+/* Checks for a wall in front of the hero and slides the hero along it instead of into it. (PAL version) */
 void hero_slide_along_wall_pal(int force)
 {
-    Vec4 offset, start, lowerOffset, lowerStart;
+    Vec4 offset, start, lower_offset, lower_start;
     float height, radius, angle;
-    float lowerHeight;
+    float lower_height;
     int kind;
     if (cam_get_view_space_vector_length(VELOCITY) < 0.002f) return;
     height = 0.37f;
@@ -47,20 +48,20 @@ void hero_slide_along_wall_pal(int force)
         radius = 0.27f;
     } else if (PLAYER->state == 4) height = 0.35f;
     hero_build_relative_point(&offset.x, 0.0f, 0.0f, 1, height);
-    lowerHeight = height * 0.3f;
-    hero_build_relative_point(&lowerOffset.x, 0.0f, 0.0f, 1, lowerHeight);
+    lower_height = height * 0.3f;
+    hero_build_relative_point(&lower_offset.x, 0.0f, 0.0f, 1, lower_height);
     if (force || vec_length_xy(VELOCITY) < 0.01f) {
         vec_scale_to_length(&start, g_hero_state, radius);
-        vec_scale_to_length(&lowerStart, g_hero_state, radius * 1.4f);
+        vec_scale_to_length(&lower_start, g_hero_state, radius * 1.4f);
     } else {
         cam_set_view_space_height((V4_F6a70b950 *)&start, (V4_F6a70b950 *)VELOCITY, 0.0f);
         vec_scale_to_length(&start, &start, radius);
-        FastVecScale(&lowerStart, &start, 1.4f);
+        FastVecScale(&lower_start, &start, 1.4f);
     }
     kind = -1;
     FastVecAdd(&start, &start, &offset);
-    FastVecAdd(&lowerStart, &lowerStart, &lowerOffset);
-    if (CollLine(&lowerOffset, &lowerStart, 2, PLAYER->object, 0) && CONTACT->count > 0)
+    FastVecAdd(&lower_start, &lower_start, &lower_offset);
+    if (CollLine(&lower_offset, &lower_start, 2, PLAYER->object, 0) && CONTACT->count > 0)
         kind = GetCollHitMaterial();
     angle = 0.0f;
     if (CollLine(&offset, &start, 2, PLAYER->object, 0) && CONTACT->count > 0)

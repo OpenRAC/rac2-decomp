@@ -71,7 +71,8 @@ extern char *part_spawn_blast_effect_moby(void *,void *,void *,float);
 extern void EmitScaledObjectParticles(void);
 extern void *SpawnExplosion(void *,int,int,int,int,int,int,int,float,float,int,int,int,int);
 
-void func_US2_L20_00311A60(void *incoming)
+/* Per-frame level object and camera tweaks for Yeedil: marks objects, plays the beam cutscenes and the finale explosion (USA v2.00). */
+void level_script_update_us2(void *incoming)
 {
     int lower, upper;
     void *target;
@@ -93,7 +94,7 @@ void func_US2_L20_00311A60(void *incoming)
             if (object) {
                 /* Set ahead of the load: its longer life is what lets loop.c move
                  * this constant out in its first pass, ahead of the object pointer. */
-                int wanted = 0xFA0;
+                int wanted = MOBY_CLASS_TV_SCREENS;
                 if (*(s16 *)(object+0xAA) == wanted && g_current_map_index != 0x33 && *(void **)(object+0x68))
                     math_store_angle_update_result((char *)object,(float *)(*(u8 **)(object+0x68)+0xC),
                                       0x80AAAAD2,0x80396464,0.06108653545f);
@@ -162,8 +163,8 @@ void func_US2_L20_00311A60(void *incoming)
                 u16 word;
                 object = g_yeedil_state_prefix.refs.objects[i];
                 word = *(u16 *)(object+0xAA);
-                if ((u32)(word-0xD0E) < 2) {
-                    *(u16 *)(object+0x7C) = word = (s16)word == 0xD0F ? 15 : 0x3FF;
+                if ((u32)(word-MOBY_CLASS_MEGACORP_TROOPER_TORSO) < 2) {
+                    *(u16 *)(object+0x7C) = word = (s16)word == MOBY_CLASS_MEGACORP_TROOPER_LEGS ? 15 : 0x3FF;
                 }
                 if (*(s16 *)(object+0xAA) == 0xCE0 && (g_yeedil_state_prefix.mode != 3 || g_yeedil_state_prefix.state < g_level_script_state_limit))
                     EmitScaledObjectParticles();

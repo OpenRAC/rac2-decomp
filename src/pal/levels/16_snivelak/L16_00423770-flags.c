@@ -8,7 +8,7 @@ typedef float f32;
 extern void moby_set_state(char *, s32, s32);
 extern void *part_find_owned_effect_slot(char *, u32, s32);
 extern char g_particle_template[] __attribute__((sda));
-extern void func_PAL_002B15D8(f32, f32, f32, f32, char *, s32, char *, s32);
+extern void part_spawn_masked_debris_pal(f32, f32, f32, f32, char *, s32, char *, s32);
 extern int PlayMobySound(s32, s32, char *);
 extern void part_spawn_scaled_bolts_pal(char *, s32, f32);
 extern void vec_local_offset_to_world(char *, char *, f32, f32, f32);
@@ -18,7 +18,7 @@ extern void moby_mark_spawned(char *);
 typedef int effect_quad __attribute__((mode(TI)));
 
 /* Waits for activation, emits a burst and removes the spent object. */
-void func_PAL_L16_00423770(char *self) {
+void triggered_l16_burst_update_pal(char *self) {
     char direction[16];
     char position[16];
     switch (*(u8 *)(self + 0x20)) {
@@ -31,7 +31,7 @@ void func_PAL_L16_00423770(char *self) {
         *(u8 *)(self + 0xA8) = 255;
         break;
     case 2:
-        func_PAL_002B15D8(1.0f, 3.0f, 3.0f, 7.0f, self, 0x5F, g_particle_template, 255);
+        part_spawn_masked_debris_pal(1.0f, 3.0f, 3.0f, 7.0f, self, 0x5F, g_particle_template, 255);
         PlayMobySound(0, 0, self);
         part_spawn_scaled_bolts_pal(self, 1, 0.0f);
         *(effect_quad *)direction = 0;

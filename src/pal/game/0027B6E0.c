@@ -32,36 +32,36 @@ typedef struct { char pad[0x150]; short width, height; } ScreenDimensions;
 extern ScreenDimensions g_screen_adjust_offsets;
 extern void gfx_apply_display_config(void);
 
-void func_PAL_0027B6E0(int width, int height, float scale, float a, float b, float c, float d)
+void gfx_configure_projection_pal(int width, int height, float proj_scale, float param_a, float param_b, float param_c, float param_d)
 {
-    ScreenState *context = &g_view_params;
-    int halfW = width >> 1;
-    int halfH = height >> 1;
-    float halfHeight;
+    ScreenState *view = &g_view_params;
+    int half_width = width >> 1;
+    int half_height = height >> 1;
+    float half_height_f;
     g_screen_width.width = width;
     g_screen_width.height = height;
-    g_screen_width.half_width = halfW;
-    g_screen_width.half_height = halfH;
-    g_screen_width.left = (2048 - halfW) << 4;
-    g_screen_width.top = (2048 - halfH) << 4;
-    g_screen_width.right = (halfW + 2048) << 4;
-    g_screen_width.bottom = (halfH + 2048) << 4;
-    context->fB0 = scale;
-    context->f200 = IntToFloat(width) * 0.5f;
-    halfHeight = IntToFloat(height) * 0.5f;
-    context->f204 = halfHeight;
-    context->f208 = context->f200 * 4.0f;
-    context->f20C = halfHeight * 4.0f;
-    context->f218 = a;
-    context->f21C = b;
-    context->f228 = c;
-    context->f22C = d;
+    g_screen_width.half_width = half_width;
+    g_screen_width.half_height = half_height;
+    g_screen_width.left = (2048 - half_width) << 4;
+    g_screen_width.top = (2048 - half_height) << 4;
+    g_screen_width.right = (half_width + 2048) << 4;
+    g_screen_width.bottom = (half_height + 2048) << 4;
+    view->fB0 = proj_scale;
+    view->f200 = IntToFloat(width) * 0.5f;
+    half_height_f = IntToFloat(height) * 0.5f;
+    view->f204 = half_height_f;
+    view->f208 = view->f200 * 4.0f;
+    view->f20C = half_height_f * 4.0f;
+    view->f218 = param_a;
+    view->f21C = param_b;
+    view->f228 = param_c;
+    view->f22C = param_d;
     UpdateViewContext();
 }
 
 /* func_PAL_0027B810, the PAL copy of func_0027A9F0: the same C, without the stores to fA0, fA4,
    f218, f21C, f228 and f22C, and with a call of func_00279FF0 at the end. */
-void func_PAL_0027B810(void)
+void gfx_init_view_context_pal(void)
 {
     ScreenDimensions *dimensions = &g_screen_adjust_offsets;
     ScreenState *view = &g_view_params;

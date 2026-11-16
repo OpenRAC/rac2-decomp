@@ -114,13 +114,15 @@ static __inline__ int screen_coord(int mode, float value, float offset)
     return (int)scaled;
 }
 
-int func_PAL_L22_003A83A8(void) {
-    char textBuffer[64];
+/* Draws the space combat HUD: the side bars, the ship health and progress bars, the pickup
+   counts and icons, the pickup message and the hint text. */
+int DrawSpaceCombatHud_pal(void) {
+    char text_buffer[64];
     char *text;
     union { u64 d[2]; u32 w[4]; } colours;
     u8 box[32];
     u8 *obj = ref_L22_003A5018_00;
-    u8 *ctl = *(u8 **)(obj + 0x68);
+    u8 *vars = *(u8 **)(obj + 0x68);
     int y;
     int one, one2;
     int colour;
@@ -163,7 +165,7 @@ int func_PAL_L22_003A83A8(void) {
     hud_draw_sprite_gradient(sprite, ref_L22_003A5018_18, label_y(sprite, (float)ref_L22_003A5018_19, g_hud_l22_scale, 0.5f, 1), ref_L22_003A5018_20, ref_L22_003A5018_21, ref_L22_003A5018_42); }
 
     {
-        float ratio = (float)g_ship_progress_count / (float)*(short *)(ctl + 0x324);
+        float ratio = (float)g_ship_progress_count / (float)*(short *)(vars + 0x324);
         int x, width;
         colours.d[0] = ref_L22_003A5018_03;
         width = ref_L22_003A5018_12;
@@ -175,7 +177,7 @@ int func_PAL_L22_003A83A8(void) {
         gfx_draw_screen_rectangle(x, y, x + (int)(ratio * (float)width), y + ref_L22_003A5018_11, 0xFFFFF1, &colours);
     }
     {
-        float ratio = *(float *)(ctl + 0x20) / (float)g_space_ship_max_health;
+        float ratio = *(float *)(vars + 0x20) / (float)g_space_ship_max_health;
         int right, width, height;
         colours.d[0] = ref_L22_003A5018_04;
         width = ref_L22_003A5018_12;
@@ -195,8 +197,8 @@ int func_PAL_L22_003A83A8(void) {
         hud_draw_sprite_gradient(sprite, ref_L22_003A5018_26, screen_coord(g_hud_label_mode, (float)ref_L22_003A5018_27, 1.0f), ref_L22_003A5018_28, ref_L22_003A5018_29, ref_L22_003A5018_42);
     }
     one2 = 1;
-    sprintf(textBuffer, g_str_hud_count_format, g_ship_pickup_table.leftCount);
-    text = textBuffer;
+    sprintf(text_buffer, g_str_hud_count_format, g_ship_pickup_table.leftCount);
+    text = text_buffer;
     {
     int value = label_y(obj, (float)ref_L22_003A5018_33, g_hud_l22_scale, 0.5f, 1);
     colour = ref_L22_003A5018_30;
@@ -229,7 +231,7 @@ int func_PAL_L22_003A83A8(void) {
     if (g_pickup_message_kind != -1 && obj[0x95] != 10) {
         switch (g_pickup_message_kind) {
         case 0: level_l00_call_module_handler_with_arg_9((int)GetLocalizedString(0xEC8), -1); break;
-        case 2: GetLocalizedString(0x1241); func_0029CC50(0x1241, *(short *)(ctl + 0x32C), -1); break;
+        case 2: GetLocalizedString(0x1241); func_0029CC50(0x1241, *(short *)(vars + 0x32C), -1); break;
         case 1: GetLocalizedString(0x1240); func_0029CC50(0x1240, g_pickup_message_amount, -1); break;
         }
         ref_L22_003A5018_05 = 0;
@@ -237,7 +239,7 @@ int func_PAL_L22_003A83A8(void) {
         if (g_pickup_message_timer <= 0) g_pickup_message_kind = -1;
     }
     if (ref_L22_003A5018_31) {
-        FontSetWindow(box, 240, 480, 44, 468, 256, label_y(ctl, 320.0f, ref_L22_003A5018_06, 0.5f, 1), 16, 3);
+        FontSetWindow(box, 240, 480, 44, 468, 256, label_y(vars, 320.0f, ref_L22_003A5018_06, 0.5f, 1), 16, 3);
         label = GetLocalizedString(0x9FC);
         hint = GetLocalizedString(0xE51);
         level_forward_draw_args(box, 0x80F0F0F0, label, 0, 0, -1, 0, hint, 0, 0);

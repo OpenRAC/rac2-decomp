@@ -8,15 +8,16 @@ extern void hero_trigger_spawn_effect(void);
 extern void moby_set_state(char *, int, int);
 extern void moby_set_state();
 
-void trigger_l02_update_pal(char *arg0) {
-    char *state = *(char **)(arg0 + 0x68);
+/* Updates a trigger volume. State 0 marks it and moves to state 1; state 1 spawns the hero effect and, while the hero is inside the cuboid, sets the hero's field at +0x19A to 4 (PAL). */
+void trigger_l02_update_pal(char *moby) {
+    char *state = *(char **)(moby + 0x68);
 
-    switch (*(unsigned char *)(arg0 + 0x20)) {
+    switch (*(unsigned char *)(moby + 0x20)) {
     case 0:
-        *(unsigned char *)(arg0 + 0x30) = 0xFF;
+        *(unsigned char *)(moby + 0x30) = 0xFF;
         if (g_barlow_hint_inside_flag == 0)
             g_hud_offset_flag[0] = 1;
-        moby_set_state(arg0, 1, -1);
+        moby_set_state(moby, 1, -1);
         break;
     case 1:
         hero_trigger_spawn_effect();

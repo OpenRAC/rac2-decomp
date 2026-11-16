@@ -1,7 +1,7 @@
 #include "include_asm.h"
 
 #include "common.h"
-#define F(p, o) (*(f32 *)((u8 *)(p) + (o)))
+#define F(vars, o) (*(f32 *)((u8 *)(vars) + (o)))
 typedef struct {
     u8 pad[0x60];
     s32 node;
@@ -49,12 +49,13 @@ extern f32 math_approach_target_with_direction_mode(void *, void *, f32, f32, f3
 extern void FastVecSub(void *, void *, void *);
 extern void mat_combine_and_store(void *, void *, void *, void *);
 
+/* Moves a lift up and down while turning it, when the hero stands on it and asks, or walks up to it. (USA v2.00) */
 void UpdateTodanoRotatingLift_us2(u8 *self)
 {
     f32 oldpos[4] __attribute__((aligned(16)));
     f32 oldrot[4] __attribute__((aligned(16)));
     f32 delta[4] __attribute__((aligned(16)));
-    LiftVars *p = *(LiftVars **)(self + 0x68);
+    LiftVars *vars = *(LiftVars **)(self + 0x68);
     f32 target, speed, y;
 
     qcopy(oldpos, self + 0x10);
@@ -62,41 +63,41 @@ void UpdateTodanoRotatingLift_us2(u8 *self)
     switch (self[0x20]) {
     case 0:
         F(self, 0xF8) = FastAddRotations(F(self, 0xF8), 1.5707964897155762f);
-        qcopy_nc(p->origin, self + 0x10);
-        p->origin[3] = F(self, 0xF8);
+        qcopy_nc(vars->origin, self + 0x10);
+        vars->origin[3] = F(self, 0xF8);
         moby_set_state(self, 2, -1);
         break;
     case 2:
-        p->targetHeight = p->destination ?
-            F((u8 *)(p->node * 128 + (u32)g_path_waypoint_table), 0x38) : p->origin[2];
-        p->targetAngle = p->destination ?
-            FastAddRotations(F((u8 *)(p->node * 128 + (u32)g_path_waypoint_table), 0x78),
-                          4.7123894691467285f) : p->origin[3];
-        y = F((u8 *)(p->node * 128 + (u32)g_path_waypoint_table), 0x38);
+        vars->targetHeight = vars->destination ?
+            F((u8 *)(vars->node * 128 + (u32)g_path_waypoint_table), 0x38) : vars->origin[2];
+        vars->targetAngle = vars->destination ?
+            FastAddRotations(F((u8 *)(vars->node * 128 + (u32)g_path_waypoint_table), 0x78),
+                          4.7123894691467285f) : vars->origin[3];
+        y = F((u8 *)(vars->node * 128 + (u32)g_path_waypoint_table), 0x38);
         if (g_hero_state.lift == self && g_hero_state.active) {
             TryClaimNotice(8, 0x12EC, 1);
             if (g_pad_held_flags & 16) {
-                p->destination = (p->destination + 1) & 1;
+                vars->destination = (vars->destination + 1) & 1;
                 moby_set_state(self, 3, -1);
             }
-        } else if (p->destination) {
-            if (math_fabs(g_hero_state.position[2] - p->origin[2]) < 4.0f &&
+        } else if (vars->destination) {
+            if (math_fabs(g_hero_state.position[2] - vars->origin[2]) < 4.0f &&
                 vec_distance_xy(g_hero_state.position, self + 0x10) < 32.0f) {
-                p->destination = 0;
+                vars->destination = 0;
                 moby_set_state(self, 1, -1);
             }
         } else if (math_fabs(g_hero_state.position[2] - y) < 4.0f &&
                    vec_distance_xy(g_hero_state.position, self + 0x10) < 32.0f) {
-            p->destination = 1;
+            vars->destination = 1;
             moby_set_state(self, 1, -1);
         }
         break;
     case 3:
         if (flag_set_first_pending(self)) {
             hero_start_target_state(self + 0x10, 0, F(g_hero_moby, 0xF8));
-            p->timer = 0;
+            vars->timer = 0;
         }
-        if (++p->timer >= 361) {
+        if (++vars->timer >= 361) {
             hero_set_move_state_by_speed();
             moby_set_state(self, 2, -1);
         } else if (hero_get_target_state_kind() != 1) {
@@ -105,30 +106,30 @@ void UpdateTodanoRotatingLift_us2(u8 *self)
         break;
     case 1:
         if (flag_set_first_pending(self)) {
-            p->angularSpeed = 0;
-            p->speed = 0;
+            vars->angularSpeed = 0;
+            vars->speed = 0;
         }
-        p->targetHeight = p->destination ?
-            F((u8 *)(p->node * 128 + (u32)g_path_waypoint_table), 0x38) : p->origin[2];
-        p->targetAngle = p->destination ?
-            FastAddRotations(F((u8 *)(p->node * 128 + (u32)g_path_waypoint_table), 0x78),
-                          4.7123894691467285f) : p->origin[3];
-        target = p->targetHeight;
+        vars->targetHeight = vars->destination ?
+            F((u8 *)(vars->node * 128 + (u32)g_path_waypoint_table), 0x38) : vars->origin[2];
+        vars->targetAngle = vars->destination ?
+            FastAddRotations(F((u8 *)(vars->node * 128 + (u32)g_path_waypoint_table), 0x78),
+                          4.7123894691467285f) : vars->origin[3];
+        target = vars->targetHeight;
         speed = 0.003888889f;
-        if (p->destination) {
+        if (vars->destination) {
             if (g_hero_state.position[2] < F(self, 0x18) - 1.0f &&
-                IsPointInCuboid(g_hero_state.position, p->node)) {
+                IsPointInCuboid(g_hero_state.position, vars->node)) {
                 target += 3.0f;
                 speed = 0.007777778f;
             } else {
                 target += 0.5f;
             }
         }
-        math_step_value_toward_target(self + 0x18, &p->speed, target, 0.0019444445f, speed, 0.5f);
-        if (math_fabs(p->targetHeight - F(self, 0x18)) < 0.6f &&
-            math_fabs(p->speed) < 0.01f) {
+        math_step_value_toward_target(self + 0x18, &vars->speed, target, 0.0019444445f, speed, 0.5f);
+        if (math_fabs(vars->targetHeight - F(self, 0x18)) < 0.6f &&
+            math_fabs(vars->speed) < 0.01f) {
             {
-                s32 index = p->sound;
+                s32 index = vars->sound;
 
                 if (index != -1) {
                     LiftSound *entry = (LiftSound *)(index * 0x70 + (s32)g_sound_state);
@@ -137,18 +138,18 @@ void UpdateTodanoRotatingLift_us2(u8 *self)
                         snd_stop_voice(index);
                 }
             }
-            p->sound = -1;
+            vars->sound = -1;
             moby_set_state(self, 2, -1);
         } else {
-            LiftSound *entry = (LiftSound *)(p->sound * 0x70 + (s32)g_sound_state);
+            LiftSound *entry = (LiftSound *)(vars->sound * 0x70 + (s32)g_sound_state);
 
             if (entry->owner != self || !entry->active)
-                p->sound = PlayMobySound(0, 4, self);
+                vars->sound = PlayMobySound(0, 4, self);
         }
-        math_approach_target_with_direction_mode(self + 0xF8, &p->angularSpeed, p->targetAngle,
+        math_approach_target_with_direction_mode(self + 0xF8, &vars->angularSpeed, vars->targetAngle,
                       0.00014544412260875106f, 0.00014544412260875106f, 0.10471977f, 0);
         break;
     }
     FastVecSub(delta, self + 0x10, oldpos);
-    mat_combine_and_store((u8 *)p + 0x20, delta, oldrot, self + 0xF0);
+    mat_combine_and_store((u8 *)vars + 0x20, delta, oldrot, self + 0xF0);
 }

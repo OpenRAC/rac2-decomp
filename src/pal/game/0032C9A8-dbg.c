@@ -21,7 +21,7 @@ void gfx_update_screen_fade_pal(unsigned char *object)
     char *vars = *(char **)(object + 0x68);
     unsigned char state;
     float t;
-    int v;
+    int alpha;
 
     g_screen_fade_texture_desc[0] = GetEffectTextureDescriptor(-1);
     state = object[0x20];
@@ -29,16 +29,16 @@ void gfx_update_screen_fade_pal(unsigned char *object)
         DrawQuadFaces_pal(object);
         if (object[0x20] == state) {
             t = IntToFloat(*(int *)(vars + 4)) / IntToFloat(0x32);
-            v = FloatToInt(math_square(1.0f - t) * 128.0f);
-            gfx_draw_colored_rectangle(0, g_screen_adjust_offsets[0xA9], 0, g_screen_adjust_offsets[0xA8], (v << 24) | 0xFFFFFF);
+            alpha = FloatToInt(math_square(1.0f - t) * 128.0f);
+            gfx_draw_colored_rectangle(0, g_screen_adjust_offsets[0xA9], 0, g_screen_adjust_offsets[0xA8], (alpha << 24) | 0xFFFFFF);
             part_draw_ring_piece_flashes_pal(object);
             goto done;
         }
     }
     if (*(int *)(vars + 4) >= 0x58) {
         t = IntToFloat(*(int *)(vars + 4) - 0x57) / IntToFloat(0xC);
-        v = FloatToInt(math_ease_out_quad(t) * 128.0f);
-        gfx_draw_colored_rectangle(0, g_screen_adjust_offsets[0xA9], 0, g_screen_adjust_offsets[0xA8], (v << 24) | 0xFFFFFF);
+        alpha = FloatToInt(math_ease_out_quad(t) * 128.0f);
+        gfx_draw_colored_rectangle(0, g_screen_adjust_offsets[0xA9], 0, g_screen_adjust_offsets[0xA8], (alpha << 24) | 0xFFFFFF);
     }
 done:
     part_draw_trail_nodes(object);

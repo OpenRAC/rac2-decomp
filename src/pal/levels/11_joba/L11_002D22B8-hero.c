@@ -80,7 +80,7 @@ extern void StepAngleTowardTarget(s32, s32, f32, f32);
 extern f32 math_approach_with_velocity(s32, f32, s32, f32, f32, f32, s32);
 extern s32 moby_is_in_special_class_range(s32);
 extern void vec_clamp_length(s32, f32);
-extern void func_PAL_002BEF58(s32, s32, s32, f32);
+extern void part_spawn_white_flash_pal(s32, s32, s32, f32);
 extern void *part_spawn_bubble(s32, s32, f32, f32);
 extern void snd_stop_voice(s32);
 extern s32 PlayMobySound(s32, s32, s32);
@@ -95,7 +95,7 @@ extern void cam_set_limits_fourth(f32, f32);
 extern void ProbeHeroAirborneWallContact_pal(void);
 extern s32 hero_find_ledge_grab_pal(s32, s32, s32);
 extern s32 hero_slot_item_id(s32);
-extern void func_PAL_L00_002B34C0(void);
+extern void hero_update_turn_from_anim_pal(void);
 extern s32 math_is_below_plane_within_depth(f32);
 extern void hero_resolve_stick_direction(f32, s32);
 extern void hero_refresh_speed_from_timer_pal(void);
@@ -108,9 +108,9 @@ extern void hero_set_push_direction(s32);
 extern void hero_cancel_velocity_into_wall_pal(void);
 extern void hero_build_move_impulse(f32, f32);
 extern f32 hero_get_speed_along_forward(s32);
-extern void func_PAL_L01_002B6870(f32);
-extern void func_PAL_L00_002B6488(void);
-extern void func_PAL_L03_002BC3A0(void);
+extern void hero_approach_velocity_pal(f32);
+extern void ApplyHeroGravityAndJumpMotion_pal(void);
+extern void hero_update_hop_velocity_pal(void);
 extern void hero_l00_select_aim_target(f32, f32, f32);
 extern void hero_apply_mode_pose_offsets_pal(void);
 extern void UpdateHeroMotionResponseParameters_pal(void);
@@ -123,8 +123,8 @@ extern void snd_update_slot_object(s32, s32, s32);
 extern void hero_try_surface_push_response(f32, f32, f32);
 extern void part_emit_effects_at_nearby_mobys_pal(s32, s32);
 extern void part_emit_hero_radial_particles_pal(void);
-extern void func_PAL_L00_002BA480(void);
-extern s32 func_PAL_L00_002CB2C8(void);
+extern void hero_setup_attached_object_transform_pal(void);
+extern s32 hero_try_start_grab_pal(void);
 extern void set_hero_animation_pal(s32, s32, f32);
 extern void hero_apply_mode_transform(s32, s32, f32);
 extern void hero_build_relative_point(s32, s32, f32, f32, f32);
@@ -152,10 +152,12 @@ extern void UpdateHeroAimTarget(f32, f32, f32);
 extern s32 hero_get_gadget_value(s32);
 extern void DeflectHeroOffSteepSurface_pal(s32);
 extern char g_impact_effect_data[] MACRO_ADDR;
-extern void func_PAL_L00_0038C620();
+extern void moby_l00_raise_state_to_8();
 extern void moby_raise_state_to_eight_copy();
 
-void func_PAL_L11_002D22B8(void) {
+/* Runs every frame for the hero (PAL). It looks at the current hero state and moves, animates and
+   switches the hero accordingly. */
+void hero_l11_update_state_machine_pal(void) {
     f32 speed62;
     s32 lim67;
     s32 *cnt32;
@@ -568,7 +570,7 @@ void func_PAL_L11_002D22B8(void) {
             }
         }
         if (((Hero *)g_hero_state)->u[0x2294/4] == 3) {
-            if (func_PAL_L00_002CB2C8() != 0) {
+            if (hero_try_start_grab_pal() != 0) {
                 break;
             }
         }
@@ -1077,7 +1079,7 @@ void func_PAL_L11_002D22B8(void) {
         }
         if ((((Hero *)g_hero_state)->i[0xC2C/4] == 0) && (M2C_FIELD(((Hero *)g_hero_state)->ptr[0x2290/4], u8* , 0x43) == 0x1A) && (math_is_below_plane_within_depth(33.0f) != 0)) {
             if (((Hero *)g_hero_state)->u[0x2294/4] == 0x15) {
-                func_PAL_L00_002BA480();
+                hero_setup_attached_object_transform_pal();
             }
         }
         hero_approach_speed(0.014800001f, 0.0112000005f);
@@ -1371,7 +1373,7 @@ void func_PAL_L11_002D22B8(void) {
         }
         var_f20_7 = 1.0f;
         if (((Hero *)g_hero_state)->h[0x1454/2] != 0) {
-            func_PAL_L00_002B34C0();
+            hero_update_turn_from_anim_pal();
         } else {
             ((Hero *)g_hero_state)->f[0x1458/4] = (f32) ((Hero *)g_hero_state)->f[0x98/4];
             qcopy(&((Hero *)g_hero_state)->q[0x1440/16], &((Hero *)g_hero_state)->q[0x0/16]);
@@ -1507,7 +1509,7 @@ void func_PAL_L11_002D22B8(void) {
                 v20[1] += math_fast_sin_or_cos_b(f20_71) * f21_71;
                 v20[2] = math_random_float_range(0.060000002f, 0.10000001f);
                 v20[3] = -0.014f;
-                func_PAL_002BEF58((s32)v10, (s32)v20, 0, -1.0f);
+                part_spawn_white_flash_pal((s32)v10, (s32)v20, 0, -1.0f);
             }
         }
         find_nearest_path_point(((Hero *)g_hero_state)->i[0x6E0/4], (s32)v0, (s32)(g_hero_state + 0x6D0), (s32)(g_hero_state + 0x6E4), (s32)(g_hero_state + 0x6E8), ((Hero *)g_hero_state)->i[0x6FC/4], 999.0f, 8.0f, 2.5f);
@@ -1592,7 +1594,7 @@ void func_PAL_L11_002D22B8(void) {
     case 0x76:                                      /* switch 1 */
         ((Hero *)g_hero_state)->f[0x1A0/4] = ((Hero *)g_hero_state)->f[0x32C/4];
         ((Hero *)g_hero_state)->f[0x1B0/4] = 0.11000001f;
-        func_PAL_L01_002B6870(0.010000001f);
+        hero_approach_velocity_pal(0.010000001f);
         hero_apply_mode_transform((s32) (((void*)g_hero_state) + 0xF0), (s32) ((void*)g_hero_state) + 0x130, 0.0072000003f);
         break;
     case 0x6:                                       /* switch 1 */
@@ -1612,7 +1614,7 @@ void func_PAL_L11_002D22B8(void) {
         }
         hero_refresh_speed_from_timer_pal();
         if (((Hero *)g_hero_state)->h[0x1E0/2] == 0) {
-            func_PAL_L03_002BC3A0();
+            hero_update_hop_velocity_pal();
         }
         var_s1_5 = ((void*)g_hero_state) + 0xF0;
         hero_apply_mode_pose_offsets_pal();
@@ -1684,7 +1686,7 @@ void func_PAL_L11_002D22B8(void) {
         if (((Hero *)g_hero_state)->f[0x24B8/4] < 0.2f) {
             var_f12_19 = 0.00080000004f;
         }
-        func_PAL_L01_002B6870(var_f12_19);
+        hero_approach_velocity_pal(var_f12_19);
         break;
     case 0x8:                                       /* switch 1 */
         if (hero_slot_item_id(3) == 2) {
@@ -1823,7 +1825,7 @@ void func_PAL_L11_002D22B8(void) {
                 }
             }
         } else {
-            func_PAL_L03_002BC3A0();
+            hero_update_hop_velocity_pal();
         }
         temp_f1_14 = ((Hero *)g_hero_state)->f[0x318/4];
         temp_f2_7 = ((Hero *)g_hero_state)->f[0x490/4];
@@ -1877,7 +1879,7 @@ void func_PAL_L11_002D22B8(void) {
         if ((((Hero *)g_hero_state)->u[0x2294/4] == 0x38) && (((Hero *)g_hero_state)->b[0x49E] == 0) && (((Hero *)g_hero_state)->f[0xF8/4] > 0.030000001f)) {
             EmitHeroTimedEffects_pal();
         }
-        func_PAL_L00_002B6488();
+        ApplyHeroGravityAndJumpMotion_pal();
         ProbeHeroAirborneWallContact_pal();
         break;
     case 0x16:                                      /* switch 1 */
@@ -1957,7 +1959,7 @@ void func_PAL_L11_002D22B8(void) {
                         part_queue_impact_effect(m, (s32) ((Hero *)g_hero_state)->ptr[0x2290/4], 0x10000, (s32) (((void*)g_hero_state) + 0xE0), (s32) g_impact_effect_data, 100.0f);
                         break;
                     case 0x1366:
-                        func_PAL_L00_0038C620();
+                        moby_l00_raise_state_to_8();
                         break;
                     case 0x1367:
                         moby_raise_state_to_eight_copy();
@@ -2085,7 +2087,7 @@ void func_PAL_L11_002D22B8(void) {
     case 0x4E:                                      /* switch 1 */
         ((Hero *)g_hero_state)->f[0x1A0/4] = (f32) ((Hero *)g_hero_state)->f[0x32C/4];
         ((Hero *)g_hero_state)->f[0x1B0/4] = 0.11000001f;
-        func_PAL_L01_002B6870(0.010000001f);
+        hero_approach_velocity_pal(0.010000001f);
         var_f12_16_u2 = 0.0072000003f;
         var_a1_5_u2 = ((void*)g_hero_state) + 0x130;
         hero_apply_mode_transform((s32)(g_hero_state + 0xF0), (s32) var_a1_5_u2, var_f12_16_u2);
@@ -2093,7 +2095,7 @@ void func_PAL_L11_002D22B8(void) {
     case 0x41:                                      /* switch 1 */
         hero_resolve_stick_direction(0.060000002f, 0);
         if (((Hero *)g_hero_state)->h[0x1E0/2] == 0) {
-            func_PAL_L03_002BC3A0();
+            hero_update_hop_velocity_pal();
         }
         hero_apply_mode_transform((s32) (((void*)g_hero_state) + 0xF0), (s32) (((void*)g_hero_state) + 0xF0), 0.0048f);
         if (((Hero *)g_hero_state)->f[0xF8/4] < -0.20000002f) {

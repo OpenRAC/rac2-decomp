@@ -9,30 +9,31 @@ extern void menu_set_anchor_pos(void *, float, float);
 extern int snd_play_from_global_bank(int, int, void *);
 extern void UpdateViewContext(void);
 
-int UpdateFourOptionMenuInput_us2(u8_Ff4eb83c9 *a0, int a1)
+/* Handles input for the four option menu: moves the selection and changes the chosen option. */
+int UpdateFourOptionMenuInput_us2(u8_Ff4eb83c9 *object, int flags)
 {
-    u8_Ff4eb83c9 *p = a0 + 8;
+    u8_Ff4eb83c9 *bar = object + 8;
     unsigned int *sfx = (unsigned int *)0x1A7BAC;
     unsigned int *music = (unsigned int *)0x1A7BB0;
     int *mode = (int *)0x1A7BB4;
     unsigned char *toggle = (unsigned char *)0x1A7BB9;
-    float *q;
-    int v;
+    float *anchor;
+    int selected;
 
-    prompt_bar_update_us2(p);
-    q = *(float **)(a0 + 0x2DC);
-    menu_set_anchor_pos(p, q[0], q[1]);
-    if (a1 & 0x1000) {
+    prompt_bar_update_us2(bar);
+    anchor = *(float **)(object + 0x2DC);
+    menu_set_anchor_pos(bar, anchor[0], anchor[1]);
+    if (flags & 0x1000) {
         snd_play_from_global_bank(3, 0, 0);
-        v = *(int *)(a0 + 0x2D8);
-        *(int *)(a0 + 0x2D8) = (v + 3) % 4;
-    } else if (a1 & 0x4000) {
+        selected = *(int *)(object + 0x2D8);
+        *(int *)(object + 0x2D8) = (selected + 3) % 4;
+    } else if (flags & 0x4000) {
         snd_play_from_global_bank(3, 0, 0);
-        v = *(int *)(a0 + 0x2D8);
-        *(int *)(a0 + 0x2D8) = (v + 1) % 4;
-    } else if (a1 & 0x40) {
+        selected = *(int *)(object + 0x2D8);
+        *(int *)(object + 0x2D8) = (selected + 1) % 4;
+    } else if (flags & 0x40) {
         snd_play_from_global_bank(4, 0, 0);
-        switch (*(int *)(a0 + 0x2D8)) {
+        switch (*(int *)(object + 0x2D8)) {
         case 0:
             *sfx = *sfx < 1;
             break;
@@ -48,7 +49,7 @@ int UpdateFourOptionMenuInput_us2(u8_Ff4eb83c9 *a0, int a1)
             break;
         }
     }
-    return (a1 >> 6) & 1;
+    return (flags >> 6) & 1;
 }
 
 typedef struct { int ids[2]; } OptionPair;
@@ -72,6 +73,7 @@ extern char *GetLocalizedString(int);
 extern int sprintf(char *, const char *, ...);
 extern int text_draw_centered_medium(int, int, unsigned long, char *, int);
 
+/* Draws the four option menu: its prompt bar and the four option lines. */
 void four_option_menu_draw_us2(char *object)
 {
     char buffer[128];

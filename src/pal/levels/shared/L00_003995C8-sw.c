@@ -23,13 +23,13 @@ extern Light g_dynamic_lights[];
 extern int g_beam_reset_flag __attribute__((sda));
 extern int gfx_add_point_light(void *, int, float, float);
 extern int math_fast_float_d(void *);
-extern void func_PAL_0030E850(void *);
-extern void func_PAL_L00_002AF458(void);
-extern void func_PAL_0030F2B0(void *, int);
+extern void beam_draw_ribbons_level_pal(void *);
+extern void start_equipped_item_animation_pal(void);
+extern void spawn_effect_burst_pal(void *, int);
 extern void gfx_free_point_light(int), matrix_mul_vec3(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
 extern void moby_transform_joint_to_world(void *, int, void *);
-extern void FastVecAdd(void *, void *, void *), func_PAL_0030DEC0(void *), func_PAL_0030E0E0(void *);
+extern void FastVecAdd(void *, void *, void *), initialize_bolt_point_chain_pal(void *), beam_update_chain_points_pal(void *);
 extern void cancel_hero_item_animation_pal(void);
 extern void gfx_add_draw_callback_third(void *, void *);
 extern void snd_stop_voice(int);
@@ -38,7 +38,7 @@ extern float IntToFloat(int);
 extern void ref_PAL_L00_003995C8_00(void *, void *);
 
 /* Maintains the beam's endpoint, light fade and looping sound state. */
-void func_PAL_L00_003995C8(u8 *actor) {
+void tractor_beam_update_pal(u8 *actor) {
     Vector offset;
     BeamState *beam = *(BeamState **)(actor + 0x68);
     float fade;
@@ -76,8 +76,8 @@ void func_PAL_L00_003995C8(u8 *actor) {
             vec_scale_to_length(&beam->end, &((Hero *)g_hero_state)->b[0x730], beam->length);
             FastVecAdd(&beam->end, &beam->start, &beam->end);
         }
-        func_PAL_0030DEC0(actor); func_PAL_0030E0E0(actor);
-        ref_PAL_L00_003995C8_00(func_PAL_0030E850, actor);
+        initialize_bolt_point_chain_pal(actor); beam_update_chain_points_pal(actor);
+        ref_PAL_L00_003995C8_00(beam_draw_ribbons_level_pal, actor);
       }
     } else
         beam->target = 0;
@@ -102,10 +102,10 @@ void func_PAL_L00_003995C8(u8 *actor) {
                 snd_stop_voice(beam->sound);
         }
         beam->sound = -1;
-        if (active) { func_PAL_L00_002AF458(); actor[0x20] = 3; }
+        if (active) { start_equipped_item_animation_pal(); actor[0x20] = 3; }
         if ((((Pad *)g_pad_state)->u[0x1A4 / 4] & ((Hero *)g_hero_state)->u[0x1230 / 4]) && !((Hero *)g_hero_state)->b[0x22BC]) {
-            func_PAL_0030F2B0(actor, 20);
-            if (active) { func_PAL_L00_002AF458(); actor[0x20] = 3; }
+            spawn_effect_burst_pal(actor, 20);
+            if (active) { start_equipped_item_animation_pal(); actor[0x20] = 3; }
             else { PlayMobySound(2, 0, actor); beam->target = 0; actor[0x20] = 1; cancel_hero_item_animation_pal(); }
         }
         break;

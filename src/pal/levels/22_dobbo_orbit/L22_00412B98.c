@@ -39,6 +39,7 @@ extern void vec_scale_to_length(void *, void *, f32);
 extern u8 *g_hero_moby;
 extern void vec_scale_to_length(void *, void *, f32);
 
+/* Spawns a short-lived trail particle at a position, moving along a velocity and facing the camera. (PAL) */
 TrailMoby0040DE00 *part_spawn_trail_effect_pal(float *pos, float *vel, float *scale)
 {
     float ref[4];
@@ -87,14 +88,15 @@ extern void make_hit_descriptor(void *, void *, int, void *, f32);
 extern void QueueMobyImpact(void *, void *);
 extern void part_start_random_scale_effect_pal(void *, s32, s32);
 
-void projectile_check_hit_explode_pal(u8 *a0, u8 *a1) {
-    u8 *s0 = *(u8 **)(a0 + 0x68);
+/* Checks a projectile's path for a hit, queues the impact on the target and explodes the projectile. (PAL) */
+void projectile_check_hit_explode_pal(u8 *moby, u8 *prev_pos) {
+    u8 *vars = *(u8 **)(moby + 0x68);
     u8 vec[16] __attribute__((aligned(16)));
     u8 ev[0x30] __attribute__((aligned(16)));
     u8 buf[16] __attribute__((aligned(16)));
     u8 *target;
 
-    if (CollLine(a1, a0 + 0x10, 0, a0, 0) == 0) {
+    if (CollLine(prev_pos, moby + 0x10, 0, moby, 0) == 0) {
         return;
     }
     target = g_projectile_hit_info.target;
@@ -104,23 +106,23 @@ void projectile_check_hit_explode_pal(u8 *a0, u8 *a1) {
     if (*(s16 *)(target + 0xAA) == 0xEDD || *(s16 *)(target + 0xAA) == 0xE0B) {
         return;
     }
-    if (target == g_hero_moby && !(*(f32 *)(s0 + 0x1C) < 50.0f)) {
+    if (target == g_hero_moby && !(*(f32 *)(vars + 0x1C) < 50.0f)) {
         return;
     }
-    if (*(f32 *)(s0 + 0x1C) >= 50.0f) {
-        *(f32 *)(s0 + 0x1C) = 50.1f;
+    if (*(f32 *)(vars + 0x1C) >= 50.0f) {
+        *(f32 *)(vars + 0x1C) = 50.1f;
     }
-    vec_scale_to_length(vec, s0, 1.0f);
-    make_hit_descriptor(ev, a0, 0x8B0003, vec, *(f32 *)(s0 + 0x1C));
+    vec_scale_to_length(vec, vars, 1.0f);
+    make_hit_descriptor(ev, moby, 0x8B0003, vec, *(f32 *)(vars + 0x1C));
     ev[0x18] = 5;
     ev[0x19] = 3;
-    *(u16 *)(ev + 0x1A) = *(u16 *)(a0 + 0xAA);
+    *(u16 *)(ev + 0x1A) = *(u16 *)(moby + 0xAA);
     QueueMobyImpact(g_projectile_hit_info.target, ev);
-    part_start_random_scale_effect_pal(a0 + 0x10, 10, 1);
+    part_start_random_scale_effect_pal(moby + 0x10, 10, 1);
     if (g_projectile_hit_info.target == 0) {
-        qcopy(buf, a0 + 0x10);
+        qcopy(buf, moby + 0x10);
         part_start_random_scale_effect_pal(buf, 15, 0);
     }
-    a0[0x20] = 2;
+    moby[0x20] = 2;
 }
 

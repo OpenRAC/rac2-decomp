@@ -44,7 +44,7 @@ extern int g_current_weapon_channel;
 extern void hud_add_moby_marker(void *, int, int, int, int, int, float, float, float);
 extern void ref_L00_0038BF18_00(void *, void *);
 extern void UpdateTrailStrips(void *);
-extern void func_PAL_002A7E68(void *, int, int, int);
+extern void anim_start_blended_pal(void *, int, int, int);
 extern void weapon_sync_anim_to_hero_pal(char *);
 extern void moby_transform_joint_to_world(void *, int, void *);
 extern float mat_fast_helper_a(float, float);
@@ -79,7 +79,7 @@ extern int math_fast_float_d(void *);
 extern float coll_probe_ground_height_below(void *, int, float);
 extern float ApproachValue(float *, float, float);
 extern void moby_trigger_nearby_response_pal(char *);
-extern void func_PAL_L00_002D29D0(int);
+extern void hero_set_anim_mode_pal(int);
 extern void snd_stop_voice(int);
 extern int hero_play_sound(int, int);
 extern void level_release_slot_list(void *);
@@ -142,32 +142,32 @@ void wrench_update_pal(char *m)
         if (*(u8 *)(m + 0x43) != 0) {
             if (*(u8 *)(m + 0x43) == 0xE) {
                 if (*(u8 *)(m + 0x60) & 2) {
-                    func_PAL_002A7E68(m, 1, 0, 4);
+                    anim_start_blended_pal(m, 1, 0, 4);
                 }
                 return;
             }
             if (((Hero *)g_hero_state)->b[0x22BE] != 0) {
                 if ((u8)(*(u8 *)(m + 0x43) - 0xF) >= 2) {
-                    func_PAL_002A7E68(m, 0xF, 0, 3);
+                    anim_start_blended_pal(m, 0xF, 0, 3);
                 } else if ((*(u8 *)(m + 0x60) & 2) && *(u8 *)(m + 0x43) == 0xF) {
-                    func_PAL_002A7E68(m, 0x10, 0, 4);
+                    anim_start_blended_pal(m, 0x10, 0, 4);
                 }
                 return;
             }
             if ((u8)(*(u8 *)(m + 0x43) - 0xF) < 2) {
-                func_PAL_002A7E68(m, 0xE, 0, 2);
+                anim_start_blended_pal(m, 0xE, 0, 2);
                 return;
             }
         }
         if ((*(u8 *)(m + 0x60) & 2) && ((Hero *)g_hero_state)->i[0x2294 / 4] != 0x37 && ((Hero *)g_hero_state)->i[0x229C / 4] != 0x22
             && *(u8 *)(m + 0x43) != 1) {
-            func_PAL_002A7E68(m, 1, 0, 4);
+            anim_start_blended_pal(m, 1, 0, 4);
         }
         weapon_sync_anim_to_hero_pal(m);
         if (((Hero *)g_hero_state)->i[0x2294 / 4] != 0x13 && ((Hero *)g_hero_state)->i[0x2294 / 4] != 0x20 && ((Hero *)g_hero_state)->i[0x2294 / 4] != 0x2A
             && ((Hero *)g_hero_state)->i[0x2294 / 4] != 0x6D && ((Hero *)g_hero_state)->i[0x2294 / 4] != 0x14
             && *(u8 *)(m + 0x43) >= 3 && *(u8 *)(m + 0x43) < 6) {
-            func_PAL_002A7E68(m, 1, 0, 3);
+            anim_start_blended_pal(m, 1, 0, 3);
         }
         t = ((Hero *)g_hero_state)->ptr[0x2290 / 4];
         if (*(u8 *)(t + 0x43) != *(u8 *)(t + 0x42) || *(u8 *)(t + 0x41) - *(u8 *)(t + 0x40) >= 3) {
@@ -390,7 +390,7 @@ void wrench_update_pal(char *m)
             *(f32 *)(pv + 0x60) = *(f32 *)(pv + 0x60) + *(f32 *)(pv + 0x64);
             d = FastVecLength(vec[1]);
             if (d / *(f32 *)(pv + 0x60) < 4.0f && *(u8 *)(m + 0x43) != 1) {
-                func_PAL_002A7E68(m, 1, 0, 4);
+                anim_start_blended_pal(m, 1, 0, 4);
             }
             if (d <= *(f32 *)(pv + 0x60)) {
                 *(f32 *)(pv + 0x60) = d;
@@ -399,7 +399,7 @@ void wrench_update_pal(char *m)
             vec_scale_to_length(vec[1], vec[1], *(f32 *)(pv + 0x60));
             FastVecAdd(pos, pos, vec[1]);
             if (d / *(f32 *)(pv + 0x60) < 3.0f && ((Hero *)g_hero_state)->i[0xC40 / 4] != -1) {
-                func_PAL_L00_002D29D0(2);
+                hero_set_anim_mode_pal(2);
                 ((Hero *)g_hero_state)->i[0xC44 / 4] = 0x1A;
                 if (((Hero *)g_hero_state)->i[0x2430 / 4] != -1) {
                     snd = (char *)g_sound_state + ((Hero *)g_hero_state)->i[0x2430 / 4] * 0x70;

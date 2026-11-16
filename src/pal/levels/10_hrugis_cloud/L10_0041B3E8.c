@@ -30,24 +30,25 @@ extern u8 g_sound_state[];
 extern s32 g_unused_sda_word_a __attribute__((sda));
 extern s32 g_unused_sda_word_b __attribute__((sda));
 
-void hrugis_boss_init_pal(u8 *arg0) {
-    u8 *s1 = *(u8 **)(arg0 + 0x68);
+/* Sets the Hrugis boss up: its state, health, size and timers (PAL copy of hrugis_boss_init). */
+void hrugis_boss_init_pal(u8 *moby) {
+    u8 *vars = *(u8 **)(moby + 0x68);
 
-    *(s32 *)((u8 *)func_0037BA88(arg0) + 0x148) = 0x1E;
-    func_0037CCB0(arg0, 1);
-    *(f32 *)(s1 + 0x180) = 30.0f;
-    arg0[0x20] = 1;
-    arg0[0x30] = 0xFF;
-    *(u16 *)(arg0 + 0x32) = 0x1FF;
-    *(f32 *)(s1 + 0x2BC) = func_00335320();
-    *(f32 *)(s1 + 0x2B8) = *(f32 *)(arg0 + 0x18);
-    *(s32 *)(s1 + 0x2C0) = 0;
-    *(s32 *)(s1 + 0x2C4) = 0;
-    *(s32 *)(s1 + 0x2C8) = 0;
-    *(f32 *)(arg0 + 0x2C) = *(f32 *)(*(u8 **)(arg0 + 0x24) + 0x24) * 6.4f;
-    *(s32 *)(s1 + 0x2E4) = 0x21C;
-    *(s32 *)(s1 + 0x2D0) = 0;
-    *(s32 *)(s1 + 0x2CC) = 0;
-    *(u16 *)(arg0 + 0x7C) = 0xFF;
+    *(s32 *)((u8 *)func_0037BA88(moby) + 0x148) = 0x1E;
+    func_0037CCB0(moby, 1);
+    *(f32 *)(vars + 0x180) = 30.0f;
+    moby[0x20] = 1;
+    moby[0x30] = 0xFF;
+    *(u16 *)(moby + 0x32) = 0x1FF;
+    *(f32 *)(vars + 0x2BC) = func_00335320();
+    *(f32 *)(vars + 0x2B8) = *(f32 *)(moby + 0x18);
+    *(s32 *)(vars + 0x2C0) = 0;
+    *(s32 *)(vars + 0x2C4) = 0;
+    *(s32 *)(vars + 0x2C8) = 0;
+    *(f32 *)(moby + 0x2C) = *(f32 *)(*(u8 **)(moby + 0x24) + 0x24) * 6.4f;
+    *(s32 *)(vars + 0x2E4) = 0x21C;
+    *(s32 *)(vars + 0x2D0) = 0;
+    *(s32 *)(vars + 0x2CC) = 0;
+    *(u16 *)(moby + 0x7C) = 0xFF;
 }
 

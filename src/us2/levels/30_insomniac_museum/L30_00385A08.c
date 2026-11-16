@@ -10,7 +10,7 @@ typedef struct {
     float y;
     float z;
     float u;
-    float v;
+    float model_handle;
     float w;
 } Vec6;
 typedef struct {
@@ -24,15 +24,16 @@ typedef struct {
 } D00189E20_View;
 extern D00189E20_View g_hero_state;
 
-void museum_draw_selected_exhibit_entry_us2(char *a0) {
-    char *st = *(char **)(a0 + 0x68);
+/* Draws the currently picked entry on the screen with a fixed color. */
+void museum_draw_selected_exhibit_entry_us2(char *selector) {
+    char *st = *(char **)(selector + 0x68);
     Vec6 buf;
-    int v;
+    int model_handle;
 
     g_hero_state.mode = 5;
     g_hero_state.flag = 1;
     buf = *(Vec6 *)g_museum_entry_vec;
-    v = func_2FB3C8(*(int *)(g_museum_exhibit_models + *(int *)(st + 0x144) * 4));
-    func_3132D8(&buf, 0x80F0F0F0, v, 1, 0, -1, 0, 0, 0, 0);
+    model_handle = func_2FB3C8(*(int *)(g_museum_exhibit_models + *(int *)(st + 0x144) * 4));
+    func_3132D8(&buf, 0x80F0F0F0, model_handle, 1, 0, -1, 0, 0, 0, 0);
 }
 

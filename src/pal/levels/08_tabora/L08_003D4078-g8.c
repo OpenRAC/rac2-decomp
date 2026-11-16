@@ -14,6 +14,7 @@ extern float math_fabs(float);
 extern int PlayMobySound(int, int, void *);
 extern void moby_attach_parts(void *);
 
+/* Seesaw beam: tilts when the hero stands on either end and rocks back toward level, playing a creak sound as it moves (PAL: 50 Hz timings). */
 void UpdateLinkedObjectTilt_pal(char *object) {
     char *state = *(char **)(object + 0x68);
     float delta, previous, magnitude;

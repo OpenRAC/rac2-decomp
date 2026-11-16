@@ -17,19 +17,19 @@ extern f32 math_approach_with_velocity(f32 *position, f32 target, f32 *velocity,
                          f32 acceleration, f32 damping, f32 limit, s32 direction);
 typedef int L04Quad __attribute__((mode(TI)));
 typedef struct {
-    u8  field00;
-    u8  field01;
-    u8  field02;
-    u8  field03;
-    u32 field04;
-    u8  field08;
-    u8  field09;
-    u16 field0A;
-    u32 field0C;
-    L04Quad field10;
+    u8  unk_00;
+    u8  unk_01;
+    u8  unk_02;
+    u8  unk_03;
+    u32 unk_04;
+    u8  unk_08;
+    u8  unk_09;
+    u16 unk_0A;
+    u32 unk_0C;
+    L04Quad unk_10;
     u8  pad20[0xC];
-    f32 field2C;
-    L04Quad field30;
+    f32 unk_2C;
+    L04Quad unk_30;
 } L04Spawned;
 typedef struct {
     L04Quad v;
@@ -85,28 +85,29 @@ extern f32 math_random_signed_float_range(f32 a0, f32 a1);
 extern f32 math_random_float_range(f32 a0, f32 a1);
 extern u32 g_running_total __attribute__((sda));
 
-void *func_PAL_L04_00364D88(void *a0, void *a1, u32 a2, f32 f3) {
-    L04Spawned *p = (L04Spawned *)(u32)part_alloc(0x5F);
-    L04Vector *q;
-    f32 v[4];
+/* Spawns a streak particle (record kind 0x5F) that trails back from a position along a direction (PAL). */
+void *part_spawn_streak_pal(void *position, void *direction, u32 duration, f32 width) {
+    L04Spawned *particle = (L04Spawned *)(u32)part_alloc(0x5F);
+    L04Vector *streak;
+    f32 trail[4];
 
-    if ((u32)p != 0) {
-        p->field04 = 0x7F003CFF;
-        p->field0C = 0x7F003CFF;
-        p->field09 = (u8)(FloatToInt(2.0f) + 0x20);
-        p->field03 = 0x48;
-        p->field01 = 3;
-        q = (L04Vector *)((u8 *)p + 0x30);
-        p->field02 = *(u8 *)ref_L04_00362940_00;
-        q->v = *(L04Quad *)a1;
-        *(f32 *)((u8 *)q + 0xC) = f3;
-        p->field10 = *(L04Quad *)a0;
-        vec_scale_to_length(v, (f32 *)q, 0.5f);
-        FastVecSub((f32 *)((u8 *)p + 0x20), (f32 *)a0, v);
-        p->field0A = (u16)a2;
-        *(f32 *)((u8 *)p + 0x1C) = 0.005f;
-        p->field08 = (u8)(*(u8 *)&p->field0A - 4);
-        p->field2C = 1.0f;
+    if ((u32)particle != 0) {
+        particle->unk_04 = 0x7F003CFF;
+        particle->unk_0C = 0x7F003CFF;
+        particle->unk_09 = (u8)(FloatToInt(2.0f) + 0x20);
+        particle->unk_03 = 0x48;
+        particle->unk_01 = 3;
+        streak = (L04Vector *)((u8 *)particle + 0x30);
+        particle->unk_02 = *(u8 *)ref_L04_00362940_00;
+        streak->v = *(L04Quad *)direction;
+        *(f32 *)((u8 *)streak + 0xC) = width;
+        particle->unk_10 = *(L04Quad *)position;
+        vec_scale_to_length(trail, (f32 *)streak, 0.5f);
+        FastVecSub((f32 *)((u8 *)particle + 0x20), (f32 *)position, trail);
+        particle->unk_0A = (u16)duration;
+        *(f32 *)((u8 *)particle + 0x1C) = 0.005f;
+        particle->unk_08 = (u8)(*(u8 *)&particle->unk_0A - 4);
+        particle->unk_2C = 1.0f;
     }
-    return (u32)p;
+    return (u32)particle;
 }

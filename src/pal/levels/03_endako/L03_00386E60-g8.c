@@ -6,7 +6,7 @@ extern char *part_find_owned_effect_slot(void *, int, int);
 extern float math_random_angle(void);
 extern float math_random_float_range(float, float);
 extern float math_fast_sin_or_cos_a(float), math_fast_sin_or_cos_b(float);
-extern void *func_PAL_00303578(void *, void *, void *, int, int, int);
+extern void *moby_spawn_bolt_pickup_pal(void *, void *, void *, int, int, int);
 extern int g_hit_spark_init_flag __attribute__((sda));
 extern char g_hit_spark_piece_params_c[8] __attribute__((sda)), g_hit_spark_piece_params_b[8] __attribute__((sda)), g_hit_spark_piece_params_a[8] __attribute__((sda));
 extern void part_explode_object_into_pieces_pal(void *, void *, void *, void *, int, int, int, int, int, int, int);
@@ -19,30 +19,31 @@ extern char *CreateMoby(int);
 extern char g_camera_pose_buffer[];
 extern int g_hero_allowed_mode, g_hit_spark_timer;
 
-void hit_spark_update_pal(char *m)
+/* Updates the hit spark: waits to be struck, then throws sparks, pieces and an explosion, or starts a countdown and spawns a camera object. (PAL) */
+void hit_spark_update_pal(char *moby)
 {
     float pos[4], vel[4];
     int i;
-    char *p;
-    switch (*(unsigned char *)(m + 0x20)) {
+    char *flash;
+    switch (*(unsigned char *)(moby + 0x20)) {
     case 0:
-        *(unsigned short *)(m + 0x34) |= 0x1000;
-        moby_set_state(m, 1, -1);
+        *(unsigned short *)(moby + 0x34) |= 0x1000;
+        moby_set_state(moby, 1, -1);
         break;
     case 1: {
         char *hit;
-        hit = part_find_owned_effect_slot(m, 0x4010000, 0);
+        hit = part_find_owned_effect_slot(moby, 0x4010000, 0);
         if (hit) {
             hit = *(char **)(hit + 0x20);
             if (hit && *(short *)(hit + 0xAA) == 0x825)
-                moby_set_state(m, 3, -1);
-            else moby_set_state(m, 2, -1);
+                moby_set_state(moby, 3, -1);
+            else moby_set_state(moby, 2, -1);
         }
-        *(unsigned char *)(m + 0xA8) = 0xFF;
+        *(unsigned char *)(moby + 0xA8) = 0xFF;
         break;
     }
     case 2: {
-        char *position = m + 0x10;
+        char *position = moby + 0x10;
         if (!g_hit_spark_init_flag) {
             g_hit_spark_init_flag = 1;
             qcopy(pos, position);
@@ -57,30 +58,30 @@ void hit_spark_update_pal(char *m)
                 vel[1] = math_fast_sin_or_cos_b(angle) * speed;
                 vel[2] = 0;
                 vel[2] = math_random_float_range(5, 10) * (0.020000001f);
-                func_PAL_00303578(m, pos, vel, 0, 100, 0);
+                moby_spawn_bolt_pickup_pal(moby, pos, vel, 0, 100, 0);
             } while (i >= 0);
         }
-        part_explode_object_into_pieces_pal(m, g_hit_spark_piece_params_c, g_hit_spark_piece_params_b, g_hit_spark_piece_params_a, 65535, 0, -1, 6, 65535, 255, 0);
+        part_explode_object_into_pieces_pal(moby, g_hit_spark_piece_params_c, g_hit_spark_piece_params_b, g_hit_spark_piece_params_a, 65535, 0, -1, 6, 65535, 255, 0);
         SpawnExplosion_pal(position, 0, 25, 20, 20, 20, 45, 1, 1, 1, 0, 0, 0.5f, 20);
-        moby_mark_spawned(m);
+        moby_mark_spawned(moby);
         break;
     }
     case 3:
-        if (flag_set_first_pending(m)) timer_start_countdown(1, 15);
+        if (flag_set_first_pending(moby)) timer_start_countdown(1, 15);
         if (g_hit_spark_threshold >= 1) {
-            p = CreateMoby(0x1335);
-            if (p) {
-                qcopy(p + 0x10, g_camera_pose_buffer);
-                *(unsigned char *)(p + 0x30) = 255;
+            flash = CreateMoby(0x1335);
+            if (flash) {
+                qcopy(flash + 0x10, g_camera_pose_buffer);
+                *(unsigned char *)(flash + 0x30) = 255;
             }
             g_hero_allowed_mode = 2;
             g_hit_spark_timer = 12;
-            moby_set_state(m, 1, -1);
+            moby_set_state(moby, 1, -1);
         } else {
-            unsigned int count = *(unsigned short *)(m + 0x96);
+            unsigned int count = *(unsigned short *)(moby + 0x96);
             unsigned int old = count++;
-            *(unsigned short *)(m + 0x96) = count;
-            if (old >= 51) moby_set_state(m, 1, -1);
+            *(unsigned short *)(moby + 0x96) = count;
+            if (old >= 51) moby_set_state(moby, 1, -1);
         }
         break;
     }

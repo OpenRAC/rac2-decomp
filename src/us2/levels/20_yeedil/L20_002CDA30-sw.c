@@ -173,13 +173,14 @@ extern s32 shooter_update_ranged_attack(s32);
 extern s32 SelectHeroStateAnimation(s32);
 extern void hero_exit_vehicle_mode_us2(s32);
 extern void hero_slide_along_wall(s32);
-extern s32 func_US2_L20_002D79B0(s32, s32);
+extern s32 hero_l20_set_state_us2(s32, s32);
 extern s32 g_hero_sound_flag_4;
 extern char g_impact_effect_data[] MACRO_ADDR;
 extern void moby_raise_state_to_eight();
 extern void moby_raise_state_to_eight_copy();
 
-void func_US2_L20_002CDA30(void) {
+/* Runs the hero state machine for one frame: one big switch on the hero state decides movement and animation (USA v2.00). */
+void hero_l20_update_state_machine_us2(void) {
     f32 speed62;
     s32 lim67;
     s32 *cnt32;
@@ -3122,7 +3123,7 @@ block_807:
             }
             hero_try_surface_push_response(3.7f, 0.0f, 0.35f);
             if (shooter_update_ranged_attack((s32) temp_fp) != 0) {
-                func_US2_L20_002D79B0(0x8D, 1);
+                hero_l20_set_state_us2(0x8D, 1);
             }
         }
         break;

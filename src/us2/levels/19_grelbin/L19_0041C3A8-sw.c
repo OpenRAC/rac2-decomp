@@ -17,7 +17,7 @@ extern int math_random_int_range(int,int);
 extern int flag_set_second_pending(void *);
 extern int flag_set_first_pending(void *);
 extern int moby_dispatch_action_by_kind(void *,void *);
-extern void func_US2_002A7AA8(void *,int,int);
+extern void SetDeathBits_us2(void *,int,int);
 extern void part_queue_moby_for_glow(void *,int,void *);
 extern int math_random_int_below(int);
 extern float math_random_float_range(float,float);
@@ -57,6 +57,7 @@ typedef struct { char pad[0x34]; u16 flags; } GrelbinObjectFlags;
       I(data,0x230)=timer; D_L19_001B1D20=active-1; } }
 #define DISABLE_COLLISION() { B(obj,0x31)=1; H(obj)&=0xFFFE; I(obj,0x98)=I(*(char **)(obj+0x24),0x10); SOLID(); }
 
+/* Updates a Y.E.T.I. every frame. It waits in hiding, runs toward the player, and attacks up close or with a leap. It runs away to a new spot when it is hurt (USA v2.00 copy). */
 void yeti_update_us2(char *obj)
 {
     char *data;
@@ -110,7 +111,7 @@ void yeti_update_us2(char *obj)
     case 3:
         result=moby_dispatch_action_by_kind(obj,data+0x140);
         if(result&1) {
-            func_US2_002A7AA8(obj,0,3); part_queue_moby_for_glow(obj,0,0); g_active_yeti_count--;
+            SetDeathBits_us2(obj,0,3); part_queue_moby_for_glow(obj,0,0); g_active_yeti_count--;
         } else if(result&2) {
             if(I(data,0x204)==1 && g_active_yeti_count<=g_max_active_yetis) {
                 ANIM(3,0,10); moby_set_state(obj,14,2);
@@ -168,16 +169,16 @@ void yeti_update_us2(char *obj)
         } else moby_turn_toward_target_and_step(obj,data+0x1F0,F(data,0x270));
         break;
     case 15: {
-        float attackDistance;
+        float attack_distance;
         if(flag_set_first_pending(obj)) { SOLID(); }
-        attackDistance=moby_get_anim_value(obj);
-        if(attackDistance>4.0f && attackDistance<15.0f) moby_l01_turn_toward_target(obj,data+0x1F0);
+        attack_distance=moby_get_anim_value(obj);
+        if(attack_distance>4.0f && attack_distance<15.0f) moby_l01_turn_toward_target(obj,data+0x1F0);
         if(math_is_value_within_step_us2(obj,30.0f)) {
             ANIM(7,0,10);moby_set_state(obj,24,-1);
             if(math_random_int_below(3)) {ANIM(6,0,10);} else if(math_random_int_below(2)) {ANIM(13,41,10);}
             if(math_random_int_below(5)) { ANIM(5,0,10);moby_set_state(obj,17,-1); }
         }
-        if(attackDistance<19.0f) {
+        if(attack_distance<19.0f) {
             coll_test_hit_at_bone(0.75f,(float)B(data,0x34),1.0f,obj,0,1,0,1,0);
         }
         break;

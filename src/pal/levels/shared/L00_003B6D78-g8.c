@@ -51,15 +51,18 @@ extern int FastDecTimer(short *),math_fast_float_d(int *);
 extern void lerp_vector(void *,void *,void *,float),ref_L00_003B3450_00(void (*)(void *),void *);
 extern int coll_test_point(void *,int,void *,float);
 extern void moby_mark_spawned(void *);
-extern void coll_object_with_walls(void *),func_PAL_L00_003B88F8(void *),UpdateJitterTrails(void *),func_PAL_L00_003B7BB8(void *),func_PAL_L00_003B7870(void *),func_PAL_L00_003B7A10(void *),func_PAL_L00_003B7608(void *),blast_broadcast_area_message(void *);
+extern void coll_object_with_walls(void *),jitter_trail_reset_slots_pal(void *),UpdateJitterTrails(void *),draw_timed_quad_effects_pal(void *),part_l00_spawn_spark_ring_pal(void *),update_timed_events_pal(void *),part_spawn_spark_burst_away_from_camera_pal(void *),blast_broadcast_area_message(void *);
 extern void SpawnExplosionEffects(void *,void *,void *,float,float,int,int,int,float,float,float,float,int,float,int,int,int,int,int);
-void func_PAL_L00_003B6D78(UpdateObject *object)
+/* Updates the glowing orb weapon: it flies out, slows down, then hovers and pulses with rings and
+ * sparks, and finally bursts. It goes away at once if the weapon is no longer held. (PAL: 50 Hz
+ * timings) */
+void glowing_orb_update_pal(UpdateObject *object)
 {
     Quad previous;
     UpdateContext *ctx=object->context;
     UpdateObject *hero_object=g_hero_state.field1220;
     float fraction;
-    if((!hero_object || hero_object->classId!=0xC0) && !object->state) { moby_mark_spawned(object); return; }
+    if((!hero_object || hero_object->classId!=MOBY_CLASS_BOMB_GLOVE) && !object->state) { moby_mark_spawned(object); return; }
     if(g_hero_state.field22b4 && !object->state) { moby_mark_spawned(object); return; }
     if((g_hero_state.field22b5 || g_hero_state.field22bf) && !object->state) object->flags|=0x41;
     else object->flags&=~0x41;
@@ -78,7 +81,7 @@ void func_PAL_L00_003B6D78(UpdateObject *object)
             ctx->timer8 = ((s32)g_orb_duration_frames * 5 + 2) / 6;
             ctx->timerA = ((s32)g_orb_transition_frames * 5 + 2) / 6;
             qcopy(&ctx->saved,&ctx->velocity);
-            func_PAL_L00_003B88F8(object);
+            jitter_trail_reset_slots_pal(object);
         }
         return;
     case 2: {
@@ -91,23 +94,23 @@ void func_PAL_L00_003B6D78(UpdateObject *object)
         object->rotX=FastAddRotations(object->rotX,ctx->rotC);
         object->rotY=FastAddRotations(object->rotY,ctx->rot10);
         UpdateJitterTrails(object);
-        ref_L00_003B3450_00(func_PAL_L00_003B7BB8,object);
+        ref_L00_003B3450_00(draw_timed_quad_effects_pal,object);
         if(coll_test_point(&object->position,0,g_hero_state.field2290,0.25f)) qcopy(&object->position,&g_collision_position);
         if(object->position.f[0]<2.0f || object->position.f[0]>1021.0f || object->position.f[1]<2.0f || object->position.f[1]>1021.0f || object->position.f[2]<2.0f || object->position.f[2]>1021.0f) {
         moby_mark_spawned(object);return;
         }
         if(FastDecTimer(&ctx->timerA) && !g_active_orb) {
             object->state=3;ctx->timer14=((s32)g_effect_lifetime_frames * 5 + 2) / 6;
-            g_active_orb=(int)object;func_PAL_L00_003B7870(object);
+            g_active_orb=(int)object;part_l00_spawn_spark_ring_pal(object);
         }
         return;
     }
     case 3:
         object->rotX=FastAddRotations(object->rotX,ctx->rotC);
         object->rotY=FastAddRotations(object->rotY,ctx->rot10);
-        UpdateJitterTrails(object);func_PAL_L00_003B7A10(object);
-        if(ctx->timer8>=50) func_PAL_L00_003B7608(object);
-        ref_L00_003B3450_00(func_PAL_L00_003B7BB8,object);
+        UpdateJitterTrails(object);update_timed_events_pal(object);
+        if(ctx->timer8>=50) part_spawn_spark_burst_away_from_camera_pal(object);
+        ref_L00_003B3450_00(draw_timed_quad_effects_pal,object);
         math_fast_float_d(&ctx->timer14);
         if(ctx->timer14) {
             fraction=IntToFloat(ctx->timer14);fraction/=IntToFloat(((s32)g_effect_lifetime_frames * 5 + 2) / 6);

@@ -34,11 +34,11 @@ extern void part_steer_effect_direction(char *, char *, int);
 extern void vec_transform_or_copy(char *, char *), shop_trigger_current_state_effect(char *, char *);
 extern void vec_add_object_direction_scaled(char *, char *, float);
 extern void vec_clear_128(char *);
-extern s32 func_US2_L00_002C4560(int, int);
+extern s32 hero_l00_change_action_us2(int, int);
 extern void part_setup_object_effect_entry(char *, char *, char *);
 extern void anim_start_blended(char *, int, int, int);
 extern int PlayMobySound(int, int, char *);
-extern void func_US2_00327AB0(char *), moby_steer_heading_to_target(char *), moby_move_with_friction(char *), moby_find_nearby_same_kind(char *);
+extern void pad_clamp_stick_to_vars_us2(char *), moby_steer_heading_to_target(char *), moby_move_with_friction(char *), moby_find_nearby_same_kind(char *);
 extern void snd_play_on_threshold_cross(void);
 extern int math_fast_float_d(char *), CollideSweptSphere(char *), weapon_get_group(int);
 extern float FastVecLength(char *);
@@ -52,25 +52,26 @@ extern void euler_rotation_basis(char *, char *), part_queue_ground_shadow(char 
 extern void ref_US2_L00_003DEAF8_00(void), helper_set_active_flag(void);
 extern int hud_draw_timer(void);
 
-void spider_bot_update_us2(char *object)
+/* Updates the Spider Bot: it flies forward until it hits a surface, then rolls, explodes or expires, and aligns itself to the surface (US2 copy of spider_bot_update). */
+void spider_bot_update_us2(char *spider_bot)
 {
-    char oldpos[16], ahead[16], behind[16];
-    char *data = *(char **)(object + 0x68);
+    char old_position[16], ahead_point[16], behind_point[16];
+    char *vars = *(char **)(spider_bot + 0x68);
     PlayerState *player;
     int i, result;
     float (*randoms)[2];
-    if ((unsigned char)object[0x20] >= 2) {
-        moby_forward_position_call(object, g_gravity_direction, 1);
+    if ((unsigned char)spider_bot[0x20] >= 2) {
+        moby_forward_position_call(spider_bot, g_gravity_direction, 1);
     } else {
-        char *p = object + 0x10;
-        moby_get_facing_direction(p, g_gravity_direction);
+        char *facing_point = spider_bot + 0x10;
+        moby_get_facing_direction(facing_point, g_gravity_direction);
     }
     FastVecScale(g_gravity_direction, g_gravity_direction, -1.0f);
-    FastVecScale(ahead, object + 0xE0, g_vehicle_probe_lift);
-    FastVecAdd(ahead, object + 0x10, ahead);
-    FastVecScale(behind, object + 0xE0, -1.0f);
-    FastVecAdd(behind, object + 0x10, behind);
-    if (CollLine(ahead, behind, 2, object, 0)) {
+    FastVecScale(ahead_point, spider_bot + 0xE0, g_vehicle_probe_lift);
+    FastVecAdd(ahead_point, spider_bot + 0x10, ahead_point);
+    FastVecScale(behind_point, spider_bot + 0xE0, -1.0f);
+    FastVecAdd(behind_point, spider_bot + 0x10, behind_point);
+    if (CollLine(ahead_point, behind_point, 2, spider_bot, 0)) {
         if (GetCollHitMaterial() == 2) {
             FastVecScale(g_gravity_direction, g_coll_hit_normal, 0.0009765625f);
             vec_scale_to_length(g_gravity_direction, g_gravity_direction, -1.0f);
@@ -86,13 +87,13 @@ void spider_bot_update_us2(char *object)
     ForceClaimNotice(6, 0, 1);
     /* Each case is its own block: the address-taken locals leave their stack slots when the
      * switch ends, and the attachment block below reuses that space. */
-    switch ((unsigned char)object[0x20]) {
+    switch ((unsigned char)spider_bot[0x20]) {
     case 0: {
-        object[0x20] = 1;
-        *(int *)(data + 0x18) = 0;
-        *(float *)(object + 0x2C) = 0.00025f;
+        spider_bot[0x20] = 1;
+        *(int *)(vars + 0x18) = 0;
+        *(float *)(spider_bot + 0x2C) = 0.00025f;
         g_hud_timer_a = 1800;
-        *(int *)(object + 0x98) = 0;
+        *(int *)(spider_bot + 0x98) = 0;
         randoms = g_random_angle_pairs;
         i = 97;
         do {
@@ -109,64 +110,64 @@ void spider_bot_update_us2(char *object)
         if (player->state == 98 || g_current_game_mode == 2 || player->state == 111 || player->state == 100 || player->state == 99 ||
             player->state == 23 || player->state == 24 || player->state == 129 || player->state == 39) {
             ref_US2_L00_003DEAF8_00();
-            object[0x20] = 7;
+            spider_bot[0x20] = 7;
             helper_set_active_flag();
-            *(int *)(data + 0x20) = 0;
+            *(int *)(vars + 0x20) = 0;
             break;
         }
-        *(float *)(object + 0x2C) += 0.01f;
-        if (*(float *)(object + 0x2C) > 0.0181099995970726f)
-            *(float *)(object + 0x2C) = 0.0181099995970726f;
-        qcopy(oldpos, object + 0x10);
-        FastVecAdd(object + 0x10, object + 0x10, data);
-        part_steer_effect_direction(g_effect_direction_ptrs[0], data, 0);
-        vec_transform_or_copy(object + 0x10, object + 0x10);
-        shop_trigger_current_state_effect(data, data);
-        vec_add_object_direction_scaled(object + 0x10, data, 0.003055555745959282f);
-        if (CollLine(oldpos, object + 0x10, 2, object, 0)) {
-            char *hitinfo = g_collision_hit;
-            char *hit = *(char **)(hitinfo + 0x18);
+        *(float *)(spider_bot + 0x2C) += 0.01f;
+        if (*(float *)(spider_bot + 0x2C) > 0.0181099995970726f)
+            *(float *)(spider_bot + 0x2C) = 0.0181099995970726f;
+        qcopy(old_position, spider_bot + 0x10);
+        FastVecAdd(spider_bot + 0x10, spider_bot + 0x10, vars);
+        part_steer_effect_direction(g_effect_direction_ptrs[0], vars, 0);
+        vec_transform_or_copy(spider_bot + 0x10, spider_bot + 0x10);
+        shop_trigger_current_state_effect(vars, vars);
+        vec_add_object_direction_scaled(spider_bot + 0x10, vars, 0.003055555745959282f);
+        if (CollLine(old_position, spider_bot + 0x10, 2, spider_bot, 0)) {
+            char *hit_info = g_collision_hit;
+            char *hit = *(char **)(hit_info + 0x18);
             if (hit && (hit == player->target || *(short *)(hit + 0xAA) == 0x907)) break;
-            qcopy(object + 0x10, hitinfo + 0x20);
-            vec_clear_128(data);
+            qcopy(spider_bot + 0x10, hit_info + 0x20);
+            vec_clear_128(vars);
             ForceClaimNotice(6, 0, 1);
-            func_US2_L00_002C4560(28, 1);
-            part_setup_object_effect_entry(object + 0x10, object + 0xF0, object);
-            object[0x20] = 2;
-            anim_start_blended(object, 1, 0, 10);
-            *(int *)(object + 0x48) = 0;
+            hero_l00_change_action_us2(28, 1);
+            part_setup_object_effect_entry(spider_bot + 0x10, spider_bot + 0xF0, spider_bot);
+            spider_bot[0x20] = 2;
+            anim_start_blended(spider_bot, 1, 0, 10);
+            *(int *)(spider_bot + 0x48) = 0;
             return;
         }
         break;
     }
     case 2: {
-        object[0x20] = 3;
-        PlayMobySound(2, 0, object);
+        spider_bot[0x20] = 3;
+        PlayMobySound(2, 0, spider_bot);
         if (g_game_mode[0] != 28 || g_current_game_mode == 2) {
             ref_US2_L00_003DEAF8_00();
-            object[0x20] = 9;
-            *(int *)(data + 0x20) = 0;
+            spider_bot[0x20] = 9;
+            *(int *)(vars + 0x20) = 0;
         }
         break;
     }
     case 3: {
-        func_US2_00327AB0(object);
-        moby_steer_heading_to_target(object);
-        moby_move_with_friction(object);
-        moby_find_nearby_same_kind(object);
+        pad_clamp_stick_to_vars_us2(spider_bot);
+        moby_steer_heading_to_target(spider_bot);
+        moby_move_with_friction(spider_bot);
+        moby_find_nearby_same_kind(spider_bot);
         snd_play_on_threshold_cross();
         if (math_fast_float_d((char *)&g_hud_timer_a)) {
-            object[0x20] = 9;
-            *(int *)(data + 0x20) = 10;
+            spider_bot[0x20] = 9;
+            *(int *)(vars + 0x20) = 10;
         }
         if (g_pad_held_flags[0] & 0x20) {
-            object[0x20] = 9;
-            *(int *)(data + 0x20) = 10;
+            spider_bot[0x20] = 9;
+            *(int *)(vars + 0x20) = 10;
         }
         if (g_game_mode[0] != 28 || g_current_game_mode == 2) {
             ref_US2_L00_003DEAF8_00();
-            object[0x20] = 9;
-            *(int *)(data + 0x20) = 0;
+            spider_bot[0x20] = 9;
+            *(int *)(vars + 0x20) = 0;
         }
         break;
     }
@@ -178,89 +179,89 @@ void spider_bot_update_us2(char *object)
             float radius, friction, elasticity;
             int field48, field4c, enabled, surface, field58;
         } collision;
-        qcopy(oldpos, object + 0x10);
-        FastVecAdd(object + 0x10, object + 0x10, data);
-        vec_add_object_direction_scaled(object + 0x10, data, 0.006111111491918564f);
-        vec_transform_or_copy(object + 0x10, object + 0x10);
-        shop_trigger_current_state_effect(data, data);
-        qcopy(collision.start, oldpos);
-        qcopy(collision.end, object + 0x10);
-        qcopy(collision.velocity, data);
+        qcopy(old_position, spider_bot + 0x10);
+        FastVecAdd(spider_bot + 0x10, spider_bot + 0x10, vars);
+        vec_add_object_direction_scaled(spider_bot + 0x10, vars, 0.006111111491918564f);
+        vec_transform_or_copy(spider_bot + 0x10, spider_bot + 0x10);
+        shop_trigger_current_state_effect(vars, vars);
+        qcopy(collision.start, old_position);
+        qcopy(collision.end, spider_bot + 0x10);
+        qcopy(collision.velocity, vars);
         collision.radius = 0.2f;
         collision.friction = 0.85f;
         collision.elasticity = 0.75f;
         collision.enabled = 1;
-        collision.owner = object;
+        collision.owner = spider_bot;
         collision.flags = 0;
         collision.mode = 0;
         collision.field48 = 0;
         collision.field4c = 0;
         collision.field58 = 0;
         result = CollideSweptSphere((char *)&collision);
-        qcopy(object + 0x10, collision.end);
-        qcopy(data, collision.velocity);
+        qcopy(spider_bot + 0x10, collision.end);
+        qcopy(vars, collision.velocity);
         if (result == 2) {
             if (weapon_get_group(collision.surface) || collision.surface == 12) {
-                object[0x20] = 9;
-                *(int *)(data + 0x20) = 10;
+                spider_bot[0x20] = 9;
+                *(int *)(vars + 0x20) = 10;
             } else {
-                object[0x20] = result;
-                vec_clear_128(data);
+                spider_bot[0x20] = result;
+                vec_clear_128(vars);
             }
-        } else if (FastVecLength(data) > 0.4f) {
-            object[0x20] = 9;
-            *(int *)(data + 0x20) = 10;
+        } else if (FastVecLength(vars) > 0.4f) {
+            spider_bot[0x20] = 9;
+            *(int *)(vars + 0x20) = 10;
         }
         break;
     }
     case 9: {
-        object[0x20] = 5;
+        spider_bot[0x20] = 5;
         helper_set_active_flag();
     }
         /* fall through */
     case 5: {
         char direction[16];
-        if (math_fast_float_d(data + 0x20)) {
-            vec_scale_to_length(direction, object + 0xC0, 1.0f);
-            part_spawn_blast_effect_moby(object, object + 0x10, direction, *(float *)(object + 0x18));
-            PlayMobySound(1, 0, object);
-            object[0x20] = 6;
-            *(unsigned short *)(object + 0x34) |= 0x41;
+        if (math_fast_float_d(vars + 0x20)) {
+            vec_scale_to_length(direction, spider_bot + 0xC0, 1.0f);
+            part_spawn_blast_effect_moby(spider_bot, spider_bot + 0x10, direction, *(float *)(spider_bot + 0x18));
+            PlayMobySound(1, 0, spider_bot);
+            spider_bot[0x20] = 6;
+            *(unsigned short *)(spider_bot + 0x34) |= 0x41;
             if (g_game_mode[0] != 28 || g_current_game_mode == 2) {
                 ref_US2_L00_003DEAF8_00();
-                *(int *)(data + 0x20) = 0;
-            } else *(int *)(data + 0x20) = g_thrown_object_timer_init;
-            *(int *)(data + 0x24) = 0;
+                *(int *)(vars + 0x20) = 0;
+            } else *(int *)(vars + 0x20) = g_thrown_object_timer_init;
+            *(int *)(vars + 0x24) = 0;
         }
         break;
     }
     case 6: {
-        DamageNearbyMobys(object);
-        *(float *)(data + 0x24) += g_thrown_object_speed * (1.0f / 60.0f);
-        if (math_fast_float_d(data + 0x20) && !*(int *)(data + 0x28)) object[0x20] = 8;
+        DamageNearbyMobys(spider_bot);
+        *(float *)(vars + 0x24) += g_thrown_object_speed * (1.0f / 60.0f);
+        if (math_fast_float_d(vars + 0x20) && !*(int *)(vars + 0x28)) spider_bot[0x20] = 8;
         break;
     }
     case 7: {
-        if (math_fast_float_d(data + 0x20)) object[0x20] = 8;
+        if (math_fast_float_d(vars + 0x20)) spider_bot[0x20] = 8;
         break;
     }
     case 8: {
-        if (g_game_mode[0] == 28) func_US2_L00_002C4560(0, 1);
+        if (g_game_mode[0] == 28) hero_l00_change_action_us2(0, 1);
         if (*(short *)(g_camera_state_ptr[0] + 0x86) == 27) ref_US2_L00_003DEAF8_00();
         g_hud_timer_a_state = 0;
         level_store_value_pair_us2(0, 0);
         table_clear_entry_flag((int)D_001B27CC_gp);
-        moby_mark_spawned(object);
+        moby_mark_spawned(spider_bot);
         return;
     }
     }
-    gfx_register_final_draw_callback(ring_update_if_below_threshold, object);
-    if ((unsigned char)object[0x20] >= 2 && g_turret_target_moby[0]) {
+    gfx_register_final_draw_callback(ring_update_if_below_threshold, spider_bot);
+    if ((unsigned char)spider_bot[0x20] >= 2 && g_turret_target_moby[0]) {
         char angles[16], adjusted[16], matrix[64];
-        copy_matrix_rotation(matrix, object + 0xC0);
+        copy_matrix_rotation(matrix, spider_bot + 0xC0);
         mat_get_euler_angles(matrix, angles);
-        moby_transform_point_and_rotation_by_parent(object, g_turret_target_moby[0], object + 0x10, angles, object + 0x10, adjusted);
-        euler_rotation_basis(object + 0xC0, adjusted);
+        moby_transform_point_and_rotation_by_parent(spider_bot, g_turret_target_moby[0], spider_bot + 0x10, angles, spider_bot + 0x10, adjusted);
+        euler_rotation_basis(spider_bot + 0xC0, adjusted);
     }
-    part_queue_ground_shadow(object, g_vehicle_probe_radius);
+    part_queue_ground_shadow(spider_bot, g_vehicle_probe_radius);
 }

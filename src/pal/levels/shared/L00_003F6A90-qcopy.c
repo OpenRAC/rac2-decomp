@@ -11,6 +11,7 @@ extern void vec_scale_to_length(void *, void *, float);
 extern int math_random_int_range(int, int);
 extern void ref_L00_003F26C8_00(void *, int, void *, int);
 
+/* Builds a wobbly curve of 24 points between two end points, shakes each point by a small random amount, and draws it. */
 void gfx_draw_jittered_curve_pal(char *object, char *state) {
     CurveVector points[25];
     CurveVector start, end, jitter;

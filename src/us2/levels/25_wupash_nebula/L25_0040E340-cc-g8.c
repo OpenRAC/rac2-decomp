@@ -20,10 +20,10 @@ typedef struct MissionContext {
     char pad18[0xC];
     int enabled;
     int pad28;
-    int timerVisible;
+    int timer_visible;
     float scale;
     char pad34[0x20];
-    int (*deathCallback)(char *, int);
+    int (*death_callback)(char *, int);
     char pad58[0x20];
     char *owner;
 } MissionContext;
@@ -50,7 +50,7 @@ extern float g_hud_screen_scale MACRO_ADDR;
 extern unsigned char g_mission_active_flag MACRO_ADDR;
 extern int g_current_map_index MACRO_ADDR;
 extern int moby_tick_death_timer(char *,int);
-extern int func_US2_00289840(int,int);
+extern int subtitle_request_voice_line_us2(int,int);
 extern int math_fast_float_d(void *);
 extern void level_select_random_object(void);
 extern void level_store_pair_with_increment(int,int);
@@ -93,6 +93,7 @@ static __inline__ int label_y(void *handle, float value, float scale, float half
     return result;
 }
 
+/* Updates the mission object: sets up the level, runs the timer and moves on when the mission is done. */
 void mission_timer_update_us2(char *obj)
 {
     char *state = *(char **)(obj+0x68);
@@ -108,7 +109,7 @@ void mission_timer_update_us2(char *obj)
         ctx = &g_hud_l25_state;
         
         ctx->scale=8.0f;
-        ctx->deathCallback=moby_tick_death_timer;
+        ctx->death_callback=moby_tick_death_timer;
         g_mission_moby=obj;
         g_hud_icon_a=0; g_hud_icon_b=0;
         g_hud_icon_c=0; g_mission_timer_active=0;
@@ -122,10 +123,10 @@ void mission_timer_update_us2(char *obj)
         if (g_hero_moby) H(g_hero_moby,0x34)|=0x41;
     case 1:
         
-        if (!g_subtitle_history.dialogue) func_US2_00289840(0xa16,0x6d);
+        if (!g_subtitle_history.dialogue) subtitle_request_voice_line_us2(0xa16,0x6d);
         
-        if (math_fast_float_d(state+0x34)) g_hud_l25_state.timerVisible=0;
-        else g_hud_l25_state.timerVisible=1;
+        if (math_fast_float_d(state+0x34)) g_hud_l25_state.timer_visible=0;
+        else g_hud_l25_state.timer_visible=1;
         active = 1;
         level_select_random_object();
         level_store_pair_with_increment(label_y(obj, -2.3e+02f, g_hud_screen_scale, 0.5f, 1),2);
@@ -140,7 +141,7 @@ void mission_timer_update_us2(char *obj)
         for (delay=6; delay>=0; delay--) {}
         if (g_hud_l25_state.paused || g_mission_timer_limit<6) break;
         if (g_hud_l25_state.completed<=0) {
-            g_hud_l25_state.timerVisible=1;
+            g_hud_l25_state.timer_visible=1;
             if (!math_fast_float_d(state+0x2c)) break;
             I(state,0x2c)=540;
             ship_start_transition(&g_mission_transition_start,&g_mission_transition_end,240);
@@ -163,7 +164,7 @@ void mission_timer_update_us2(char *obj)
                     effect_remove_family_mobys(); g_mission_family_mobys_removed=1;
                 }
                 { u32 seen = g_subtitle_history.completed & (1u << g_current_map_index);
-                if (!seen) func_US2_00289840(0xa36,0x8d); }
+                if (!seen) subtitle_request_voice_line_us2(0xa36,0x8d); }
             }
         }
         break;
@@ -172,7 +173,7 @@ void mission_timer_update_us2(char *obj)
     case 3:
         
         if (!cam_is_mode_active()) {
-            g_hud_l25_state.timerVisible=0;
+            g_hud_l25_state.timer_visible=0;
             g_hud_l25_state.completed++;
             B(obj,0x20)=active;
         }

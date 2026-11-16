@@ -23,7 +23,7 @@ extern float mat_fast_helper_a(float, float);
    sets it up at pos; returns it, or 0 if there is none or the setup fails. */
 YeedilObject *trooper_spawn_from_free_slot_pal(void *parent, int group, const float *pos) {
     YeedilObject *found = 0;
-    unsigned short *p = g_group_l20_id_lists[group];
+    unsigned short *id_list = g_group_l20_id_lists[group];
     YeedilObject *obj;
 
     if ((group & 0xFF) == 0xFF) {
@@ -32,11 +32,11 @@ YeedilObject *trooper_spawn_from_free_slot_pal(void *parent, int group, const fl
     if (g_group_count < group) {
         goto end;
     }
-    if (p == 0) {
+    if (id_list == 0) {
         goto end;
     }
     for (;;) {
-        obj = &g_group_l20_member_table[*p & 0x7FFF];
+        obj = &g_group_l20_member_table[*id_list & 0x7FFF];
 
         if (obj == 0) {
             goto end;
@@ -46,20 +46,20 @@ YeedilObject *trooper_spawn_from_free_slot_pal(void *parent, int group, const fl
             found->parent = parent;
             goto end;
         }
-        p++;
+        id_list++;
         if ((group & 0xFF) == 0xFF) {
             goto end;
         }
         if (g_group_count < group) {
             goto end;
         }
-        if (p == 0) {
+        if (id_list == 0) {
             goto end;
         }
-        if ((short)p[-1] >= 0) {
+        if ((short)id_list[-1] >= 0) {
             continue;
         }
-        if (p == g_group_l20_id_lists[group]) {
+        if (id_list == g_group_l20_id_lists[group]) {
             continue;
         }
         break;

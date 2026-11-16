@@ -15,7 +15,8 @@ extern int save_count_items_above_baseline(void);
 extern char *GetLocalizedString(int);
 extern int text_draw_centered_medium(int, int, long, unsigned char *, int);
 
-void func_US2_L00_0037A218(void)
+/* Shows one of two messages depending on whether the player has reached the limit for the selected item. */
+void shop_draw_selected_item_limit_status_us2(void)
 {
     LimitModel *base = &g_purchase_menu_model;
     int index;

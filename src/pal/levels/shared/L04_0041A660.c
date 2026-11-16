@@ -17,14 +17,14 @@ typedef struct RankState {
     u8 count;
     u8 padA4[0x11C - 0xA4];
     f32 progress;
-    s32 f120;
-    s32 f124;
+    s32 unk_120;
+    s32 unk_124;
     u8 pad128[0x160 - 0x128];
     s32 lap;
     u8 pad164[0x1E4 - 0x164];
     s32 slots[21];
     u8 pad238[0x244 - 0x238];
-    s32 f244;
+    s32 unk_244;
 } RankState;
 typedef struct RankObject {
     u8 pad0[0x20];
@@ -55,8 +55,8 @@ typedef struct {
     u8 pad11A[0x128 - 0x11A];
     s16 h128;
     u8 pad12A[0x138 - 0x12A];
-    s32 i138;
-    s32 i13C;
+    s32 unk_138;
+    s32 unk_13C;
     u32 color;
     s32 active;
     u8 *owner;
@@ -66,7 +66,8 @@ extern void FastVecAdd(void *, void *, void *);
 extern void transform_vector(void *, void *, void *);
 extern void matrix_from_basis_rows(void *, void *);
 
-void func_PAL_L04_0041A660(u8 *owner, f32 *pos, f32 *to, f32 *from)
+/* Starts a trail: takes the first free entry of the trail pool and fills it from the owner and the given points (PAL). */
+void racer_start_trail_pal(u8 *owner, f32 *pos, f32 *to, f32 *from)
 {
     f32 d[4] __attribute__((aligned(16)));
     f32 m[16] __attribute__((aligned(16)));
@@ -83,9 +84,9 @@ void func_PAL_L04_0041A660(u8 *owner, f32 *pos, f32 *to, f32 *from)
             transform_vector(b->dir, pos, m);
             qcopy(b->origin, pos);
             b->to = to;
-            b->i138 = 1;
+            b->unk_138 = 1;
             b->from = from;
-            b->i13C = 0x19;
+            b->unk_13C = 0x19;
             b->owner = owner;
             b->color = 0x80858585;
             b->h128 = 0;

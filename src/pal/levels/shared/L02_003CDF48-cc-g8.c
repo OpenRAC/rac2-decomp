@@ -27,7 +27,7 @@ extern void *part_spawn_hero_relative(void *, void *, int, int, int, int, float)
 extern void FastVecScale(void *, void *, float);
 
 /* Spawns the effect's burst: 32 pairs of particles in a ring around the object. */
-void func_PAL_L02_003CDF48(char *obj)
+void spawn_effect_particle_ring_pal(char *obj)
 {
     float pos[4] __attribute__((aligned(16)));
     struct Pair speed, range;

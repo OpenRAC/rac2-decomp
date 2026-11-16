@@ -16,7 +16,7 @@ extern float FastVecDot(void *a, void *b);
 extern int math_fast_float_d(void *timer);
 extern int weapon_spend_ammo(int a, int b);
 extern int ForceClaimNotice(int a, int b, int c);
-extern void func_PAL_L00_002AF458(void);
+extern void start_equipped_item_animation_pal(void);
 extern int PlayMobySound(int a, int b, void *obj);
 extern void cancel_hero_item_animation_pal(void);
 extern char *spider_bot_create(void *pos, void *offset);
@@ -96,7 +96,7 @@ void placement_object_update_pal(char *obj)
             if (weapon_spend_ammo(-1, 1)) {
                 *(short *)(player + 0x1E0) = 120;
                 ForceClaimNotice(6, 0, 1);
-                func_PAL_L00_002AF458();
+                start_equipped_item_animation_pal();
                 obj[32] = 2;
                 *(int *)(ctx + 32) = 10;
                 *(int *)(ctx + 40) = 0;
@@ -131,22 +131,22 @@ extern int g_level_data_pointer __attribute__((sda));
 
 /* Writes the object's state byte (7 when arg0 is zero, 5 otherwise), lets the shared
  * updater run, then writes the caller's value in the object's slot - 10 when it is -1. */
-void func_PAL_L00_004071F0(int arg0, int arg1)
+void global_object_start_pal(int is_active, int frames)
 {
-    char *p = (char *)g_level_data_pointer;
-    int a = arg1;
-    char *q;
+    char *moby = (char *)g_level_data_pointer;
+    int duration = frames;
+    char *vars;
 
-    if (p == 0)
+    if (moby == 0)
         return;
-    q = *(char **)(p + 0x68);
-    if (arg0 != 0)
-        p[0x20] = 5;
+    vars = *(char **)(moby + 0x68);
+    if (is_active != 0)
+        moby[0x20] = 5;
     else
-        p[0x20] = 7;
+        moby[0x20] = 7;
     linked_object_activate_data();
-    if (a != -1)
-        *(int *)(q + 0x60) = ((s32)(a) * 5 + 2) / 6;
+    if (duration != -1)
+        *(int *)(vars + 0x60) = ((s32)(duration) * 5 + 2) / 6;
     else
-        *(int *)(q + 0x60) = 8;
+        *(int *)(vars + 0x60) = 8;
 }

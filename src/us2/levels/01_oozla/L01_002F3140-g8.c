@@ -37,7 +37,7 @@ extern SceneManager g_ship_trail_state;
 extern TrailCamera g_trail_camera;
 
 extern void anim_start_startup_animations(void);
-extern void func_US2_002E72D8(char *);
+extern void UpdateEquipmentPieces_us2(char *);
 extern void math_store_angle_update_result(char *, float *, int, int, float);
 extern void mem_clear(void *, unsigned int, int);
 extern void euler_rotation_basis(void *, void *);
@@ -52,7 +52,8 @@ extern void gfx_add_draw_callback_third(void (*)(void *), void *);
 extern void gfx_add_draw_callback_first(void (*)(void *), void *);
 extern char *tv_screen_find_nearest(float, float, float);
 
-void func_US2_L01_002F3140(void)
+/* Updates the Oozla intro scene objects and the trail camera each frame. */
+void oozla_intro_scene_update_us2(void)
 {
     int i;
     char *actor;
@@ -66,7 +67,7 @@ void func_US2_L01_002F3140(void)
             *(unsigned short *)(actor + 0x34) |= 0x800;
         }
         if (*(short *)(actor + 0xAA) == 0xD54)
-            func_US2_002E72D8(actor);
+            UpdateEquipmentPieces_us2(actor);
         if (actor) {
             int kind = 0xFA0;
 

@@ -2,7 +2,7 @@
 
 #include "common.h"
 extern s32 FastDecTimer(s16 *timer);
-extern s32 func_US2_00289840(s32 key, s32 selection);
+extern s32 subtitle_request_voice_line_us2(s32 key, s32 selection);
 extern s32 IsPointInCuboid(void *point, s32 index);
 extern s32 snd_play_from_global_bank(s32 index, s32 value, void *object);
 extern void value_set_entry_by_index_us2(s32 first, s32 second);
@@ -16,6 +16,7 @@ extern s32 func_001163B0(void);
 extern s32 FloatToInt(float);
 extern u8 *g_orbiting_effect_type_table;
 
+/* Watches the hero in two steps, first for one action and then for another, and then triggers an event with a sound (USA v2.00 copy). */
 void two_step_hero_trigger_update_us2(u8 *entity) {
     u8 *state;
     u32 substate;
@@ -32,7 +33,7 @@ void two_step_hero_trigger_update_us2(u8 *entity) {
         goto after;
     if (g_map_overlay_flag[0] != 0) {
         if (FastDecTimer((s16 *)(state + 0xE)) != 0)
-            func_US2_00289840(0xA27, 0x7E);
+            subtitle_request_voice_line_us2(0xA27, 0x7E);
     }
 after:
     mode = entity[0x20];

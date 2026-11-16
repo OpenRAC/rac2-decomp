@@ -38,31 +38,31 @@ extern s32 math_random_int_below(s32 limit);
 extern u8 *g_particle_record_byte_ptr;
 
 /* func_PAL_L06_00380B10, the PAL copy of func_L06_0037E6B0: the same C, where the
-   spin halfword a2 is scaled for 50 Hz once before its two uses. */
-void func_PAL_L06_00380B10(void *a0, void *a1, u32 a2, f32 f3, f32 f4) {
-    L06Record *p = (L06Record *)(u32)part_alloc(0x53);
-    L06RecordTail *q;
-    L06Quad t;
+   spin halfword spin_rate is scaled for 50 Hz once before its two uses. */
+void part_spawn_spinning_effect_record_pal(void *start, void *end, u32 spin_rate, f32 size, f32 speed) {
+    L06Record *particle = (L06Record *)(u32)part_alloc(0x53);
+    L06RecordTail *tail;
+    L06Quad end_copy;
 
-    if ((u32)p != 0) {
-        p->field10 = *(L06Quad *)a0;
-        q = (L06RecordTail *)((u8 *)p + 0x20);
-        p->field04 = 0x50502010;
-        p->field09 = (u8)(FloatToInt(2.0f) + 0x40);
-        p->field03 = 0x48;
-        p->field01 = 0;
-        p->field02 = *g_particle_record_byte_ptr;
-        p->field0C = f3 * 105000.0f;
-        p->field08 = (u8)math_random_int_below(0xFF);
-        a2 = ((s32)a2 * 5 + 2) / 6;
-        p->field0A = (u16)a2;
-        t = *(L06Quad *)a1;
-        p->field20 = t;
-        q->field0C = IntToFloat((s16)a2);
-        q->field10 = 0.5f;
-        q->field14 = f3;
-        q->field18 = 0;
-        q->field1C = f4;
-        q->field1A = (s16)(math_random_int_below(6) - 3);
+    if ((u32)particle != 0) {
+        particle->field10 = *(L06Quad *)start;
+        tail = (L06RecordTail *)((u8 *)particle + 0x20);
+        particle->field04 = 0x50502010;
+        particle->field09 = (u8)(FloatToInt(2.0f) + 0x40);
+        particle->field03 = 0x48;
+        particle->field01 = 0;
+        particle->field02 = *g_particle_record_byte_ptr;
+        particle->field0C = size * 105000.0f;
+        particle->field08 = (u8)math_random_int_below(0xFF);
+        spin_rate = ((s32)spin_rate * 5 + 2) / 6;
+        particle->field0A = (u16)spin_rate;
+        end_copy = *(L06Quad *)end;
+        particle->field20 = end_copy;
+        tail->field0C = IntToFloat((s16)spin_rate);
+        tail->field10 = 0.5f;
+        tail->field14 = size;
+        tail->field18 = 0;
+        tail->field1C = speed;
+        tail->field1A = (s16)(math_random_int_below(6) - 3);
     }
 }

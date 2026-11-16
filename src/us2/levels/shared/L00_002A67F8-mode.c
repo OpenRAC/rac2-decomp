@@ -78,6 +78,7 @@ extern float math_fabs(float);
 extern int subtitle_request_voice_line(int,int);
 extern int menu_update_entry_states(void);
 extern void level_advance_checked_cursor(void);
+/* Every frame, tracks player stats and unlocks. It counts quick left-right stick flicks, counts long airborne times, and checks a few conditions that award skill points. */
 void hero_update_stat_trackers_us2(void)
 {
     float v[4], mag;

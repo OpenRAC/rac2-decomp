@@ -8,7 +8,7 @@ extern int g_transition_pending_sound __attribute__((sda)), g_transition_flag __
 extern void mem_clear(void *, int, int), FlushCache(int);
 extern s16 snd_pump_music_and_disc_read_pal(int);
 extern void *snd_set_stop_callback(void (*)(s32));
-extern int snd_Pump(void), snd_CheckLoadInProgress(int), sceGsSyncV(int), func_PAL_002EA0B0(void), ServiceLevelArchiveLoad(void);
+extern int snd_Pump(void), snd_CheckLoadInProgress(int), sceGsSyncV(int), update_playback_scene_pal(void), ServiceLevelArchiveLoad(void);
 extern char *CreateMoby(int);
 extern void moby_clear_object_slots(), snd_send_cmd50_five_values(), snd_clear_flag_and_update(), snd_clear_all_voices(), snd_wait_for_music_idle(), snd_send_cmd6(), STUB_printf(), SetBackgroundColor(), mc_update_state_pal(), map_update_state_machine(), gfx_remove_dma_handlers(), FadeToBlack(), load_copy_setup_entry(), SpawnEquipmentPieces(), part_init_effect_table(), SubmitBufferedDmaChain(), gfx_swap_packet_buffer(), PutDrawBufferSmall(), gfx_queue_second_strip_packet(), gfx_append_draw_list_header(), pad_poll_ports_pal(), gfx_wait_for_dma_status_bits(), InitializeLevelRuntime_pal(), transition_draw_background_pal();
 extern int LoadLevelChunkFromDisc();
@@ -39,9 +39,10 @@ typedef struct { char pad[0x218]; float near_plane, far_plane, pad2[2], near_int
 typedef struct { char pad[0x10]; unsigned flags; } TransitionArchive;
 typedef struct { char pad[0x54]; char *current; } TransitionScene;
 
+/* Runs the whole level transition: shows the transition scene until the next level is loaded. */
 void RunLevelTransition_pal(void)
 {
-    int i,ready,done,kind,current;
+    int i,ready,done,scene_kind,previous_map_index;
     mem_clear(g_visibility_bitmap,-1,0x80);
     g_current_game_mode[0]=6;
     ((TransitionState *)g_hero_moby_default)->phase=0;
@@ -110,8 +111,8 @@ void RunLevelTransition_pal(void)
         gfx_remove_dma_handlers();
         return;
     }
-    current=g_current_map_index[0];
-    if((unsigned)current<19 && (current || (g_progress_flags_c&2)) && current<28)g_map_unlocked_flags[current]=2;
+    previous_map_index=g_current_map_index[0];
+    if((unsigned)previous_map_index<19 && (previous_map_index || (g_progress_flags_c&2)) && previous_map_index<28)g_map_unlocked_flags[previous_map_index]=2;
     g_current_map_index[0]=g_small_data_value[0];
     g_loader_archives[0]=0;
     g_loader_archives[1]=1;
@@ -119,16 +120,16 @@ void RunLevelTransition_pal(void)
     ready=0;
     InitializeLevelRuntime_pal();
     load_copy_setup_entry(g_current_map_index[0],g_setup_entry_buffer);
-    kind=((TransitionState *)g_hero_moby_default)->scene;
-    if(kind==3){
+    scene_kind=((TransitionState *)g_hero_moby_default)->scene;
+    if(scene_kind==3){
         g_transition_effect_list[0]=CreateMoby(0x1342);
         *(unsigned short *)(((TransitionScene *)D_001B8840_raw)->current+0x34)|=1;
     }
-    else if(kind==1){
+    else if(scene_kind==1){
         g_transition_effect_list[0]=CreateMoby(0x128c);
         *(unsigned short *)(((TransitionScene *)D_001B8840_raw)->current+0x34)|=1;
     }
-    else if(kind==2){
+    else if(scene_kind==2){
         g_transition_effect_list[0]=CreateMoby(0x128d);
         *(unsigned short *)(((TransitionScene *)D_001B8840_raw)->current+0x34)|=1;
     }
@@ -145,7 +146,7 @@ void RunLevelTransition_pal(void)
         gfx_queue_second_strip_packet();
         gfx_append_draw_list_header();
         pad_poll_ports_pal();
-        done=func_PAL_002EA0B0();
+        done=update_playback_scene_pal();
         transition_draw_background_pal();
         mc_update_state_pal();
         map_update_state_machine();

@@ -67,7 +67,9 @@ extern float math_random_signed_float_range(float, float);
 extern int math_random_int_range(int, int);
 extern void FastVecScale(void *, void *, float);
 
-void func_PAL_L02_0038ECC0(struct Object *owner, int group) {
+/* Shuffles the group's members and spaces them out along the rail with random speeds and phases
+   (PAL: 50 Hz timings). */
+void init_rail_group_members_pal(struct Object *owner, int group) {
     float vectors[6][4];
     struct PrivateData *data;
     struct Object *object;
@@ -78,7 +80,7 @@ void func_PAL_L02_0038ECC0(struct Object *owner, int group) {
     float (*source)[4];
     float (*destination)[4];
     float (*scaled)[4];
-    float segmentLength, endDistance, spacing, speed, railCount, numerator;
+    float segment_inverse_length, end_distance, spacing, speed, rail_count, numerator;
 
     cursor = g_entity_group_lists[group];
     if (!cursor)
@@ -86,12 +88,12 @@ void func_PAL_L02_0038ECC0(struct Object *owner, int group) {
     data = owner->data;
     owner->flags30 = 0xFF;
     rail = g_route_polygons[data->railIndex];
-    segmentLength = 1.0f / fast_vec_dist(rail->point[0], rail->point[1]);
-    railCount = (float)rail->count;
-    endDistance = fast_vec_dist(rail->point[0], rail->point[rail->count - 1]);
-    data->closed = endDistance < 5.0f;
+    segment_inverse_length = 1.0f / fast_vec_dist(rail->point[0], rail->point[1]);
+    rail_count = (float)rail->count;
+    end_distance = fast_vec_dist(rail->point[0], rail->point[rail->count - 1]);
+    data->closed = end_distance < 5.0f;
     data->rail = rail;
-    data->step = data->f08 * (segmentLength * 0.020000001f);
+    data->step = data->f08 * (segment_inverse_length * 0.020000001f);
     cursor = g_entity_group_lists[group];
     i = 0;
     total = 1;
@@ -116,7 +118,7 @@ void func_PAL_L02_0038ECC0(struct Object *owner, int group) {
         if (object != owner)
             object->flags34 |= 2;
         numerator = IntToFloat(index);
-        data->position = numerator / IntToFloat(total) * railCount;
+        data->position = numerator / IntToFloat(total) * rail_count;
         data->spacing = spacing;
         data->speed = speed * math_random_float_range(0.75f, 1.25f);
         data->phase = math_random_angle();

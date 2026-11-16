@@ -21,6 +21,8 @@ extern float vec_get_vertical_offset(char *, char *, char *);
 extern void math_approach_target_with_braking(float *, float, float, float, float);
 extern u8 *g_object_table_base __attribute__((section(".sdata")));
 
+/* Works out how a creature moves this frame: slows down near its target, accelerates its
+ * velocity toward the wanted one and keeps it on the ground (PAL). */
 void creature_compute_motion_pal(char *object, char *data, void *target, Vector128 *input, void *unused0, void *unused1, char *transform) {
     MotionVector desired, change;
     float vertical;

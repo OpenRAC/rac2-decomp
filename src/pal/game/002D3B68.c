@@ -13,6 +13,7 @@ extern int g_menu_input_flags;
 extern int g_menu_input_flags;
 extern int func_0029C6B0(int);
 
+/* Handles input on a menu page: closes or refuses on cancel, otherwise passes the buttons on. */
 int menu_handle_page_input_pal(void) {
     int result = 0;
     int flags = g_menu_input_flags;
@@ -43,6 +44,7 @@ void DoGifPaging(void);
 extern void SetupGifPaging(long arg0);
 extern void SetupGifPaging(long param_1);
 
+/* Draws a menu page between the GIF paging calls. */
 int menu_page_draw_pal(void)
 {
     SetupGifPaging(0);

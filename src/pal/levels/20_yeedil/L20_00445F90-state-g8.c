@@ -20,7 +20,7 @@ extern char *GetLocalizedString(int);
 extern void moby_mark_spawned(void *);
 extern float moby_get_anim_value(char *);
 extern void SetDeathBits_pal(void *, int, int);
-extern void func_PAL_002A7E68(void *, int, int, int);
+extern void anim_start_blended_pal(void *, int, int, int);
 extern void moby_set_state(char *, int, int);
 extern int math_random_int_below(int);
 extern int math_random_int_range(int, int);
@@ -32,10 +32,10 @@ extern float ApproachValue(float *, float, float);
 extern void StepAngleTowardTarget(float *, int, f32, f32);
 extern void vec_add_random_offset(float *, float);
 extern int IsPointInCuboid(void *, int);
-extern s32 func_PAL_002AF6C0(u8 *, f32);
+extern s32 math_is_value_within_step_pal(u8 *, f32);
 extern int flag_set_first_pending(u8 *);
 extern int request_begin_slot(int, int, int, int, int);
-extern void func_PAL_002BE880(char *, char *, int, int, int, float);
+extern void part_spawn_growing_puff_pal(char *, char *, int, int, int, float);
 extern void level_capture_checkpoint_state(void *, void *);
 extern void snd_stop_voice(s32);
 extern int PlayMobySound(int, int, char *);
@@ -45,17 +45,17 @@ extern void level_clear_first_table_entry(void);
 extern int moby_start_effect_from_entry(void *, float);
 extern void cutscene_start_scene(void);
 extern void trooper_destroy_parts(char *arg0);
-extern void func_PAL_L20_003A2180(char *arg0, char *arg1, int arg2);
+extern void electric_orb_set_position_mode_pal(char *arg0, char *arg1, int arg2);
 extern void moby_set_motion_limits_pal(char *arg0);
 extern void yeedil_boss_start_jump_pal(char *actor);
 extern void moby_set_motion_limits_range_pal(char *arg0, float f);
 extern void moby_chase_target_update_pal(char *arg0, char *arg1, float f);
-extern void func_PAL_L20_00448650(char *arg0);
+extern void enemy_choose_next_state_pal(char *arg0);
 extern void moby_run_type_update(char *arg0);
 extern int enemy_is_valid_target(char *arg0, char *arg1);
 extern char * yeedil_boss_spawn_lobbed_object_pal(char *arg0, int arg1, char *arg2);
 extern void yeedil_boss_compute_shot_launch_pal(char *, char *, char *, float *);
-extern char *func_PAL_L20_00449B08(char *arg0);
+extern char *yeedil_boss_launch_damage_shot_pal(char *arg0);
 extern void enemy_compute_aim_turn_angle(char *arg0, float *arg1);
 typedef union { u8 b[0x2600]; s8 c[0x2600]; s16 h[0x1300]; u16 uh[0x1300]; s32 i[0x980]; u32 u[0x980]; f32 f[0x980]; void *ptr[0x980]; s64 d[0x4C0]; } Hero;
 extern u8 g_hero_state[];
@@ -68,12 +68,12 @@ extern void yeedil_boss_choose_attack(char *);
 extern void yeedil_boss_frame_upkeep_pal(char *);
 extern void yeedil_boss_compute_side_step(char *, char *);
 extern u8 *group_activate_member_along_aim_pal(char *);
-extern char *func_PAL_L20_004497B8(char *);
-extern char *func_PAL_L20_00449870(char *);
+extern char *enemy_fire_projectile_along_aim_pal(char *);
+extern char *yeedil_boss_fire_lobbed_projectile_pal(char *);
 extern char *yeedil_boss_launch_group_shot_pal(char *);
-extern void func_PAL_L20_00449C78(char *);
+extern void yeedil_boss_explode_death_pal(char *);
 extern int group_count_active_members(int);
-extern char *func_PAL_L20_003A1E38(char *, char *);
+extern char *electric_orb_spawn_pal(char *, char *);
 extern char *yeedil_enemy_spawn_shot(char *, char *, int, float, int, int);
 extern void gfx_start_screen_effect(void);
 extern s32 g_hero_vehicle_mode[] __attribute__((sda));
@@ -114,32 +114,33 @@ extern char * g_hero_moby[];
 extern s32 g_game_mode[];
 #define AT(T, p, o) (*(T *)((char *)(p) + (o)))
 
-void func_PAL_L20_00445F90(char *self) {
-    float sp[16] __attribute__((aligned(16)));
-    char *st;
-    int ctr = g_level_mode[0];
-    int v1, v2, v3, v5, v6;
-    int fl;
-    char *s0_1, *s0_2, *s0_3, *s0_4, *s0_5, *s0_6, *s0_7, *tb_1, *tb_2, *tb_3;
+/* Runs the main Yeedil enemy each frame (moby class 4576). It walks, throws things and shoots at the hero, calls in helpers, and plays the scripted end of the fight. (PAL) */
+void yeedil_boss_update_pal(char *self) {
+    float scratch[16] __attribute__((aligned(16)));
+    char *vars;
+    int level_mode = g_level_mode[0];
+    int sound_id, state_entered_a, hero_mode, state_entered_b, sound_id_b;
+    int saved_mode;
+    char *hero_moby, *target_moby, *hero_pos, *step_target, *hero_pos_b, *list_moby, *move_target, *sound_slot, *sound_slot_b, *sound_slot_c;
 
-    if (ctr == 2) {
-        st = AT(char *, self, 0x68);
+    if (level_mode == 2) {
+        vars = AT(char *, self, 0x68);
         yeedil_boss_init_damage_pal(self);
         if (AT(u8, self, 0x95) == 6) {
             if (AT(u8, self, 0x20) == 0x18 || AT(u8, self, 0x20) == 0x19) {
-                if (IsPointInCuboid(g_hero_state + 0x80, AT(s32, st, 0x230)) != 0) {
-                    qcopy(sp, g_yeedil_boss_vectors);
-                    qzero_nc(&sp[4]);
-                    sp[6] = g_yeedil_boss_vector_tail[0];
-                    level_capture_checkpoint_state(sp, &sp[4]);
+                if (IsPointInCuboid(g_hero_state + 0x80, AT(s32, vars, 0x230)) != 0) {
+                    qcopy(scratch, g_yeedil_boss_vectors);
+                    qzero_nc(&scratch[4]);
+                    scratch[6] = g_yeedil_boss_vector_tail[0];
+                    level_capture_checkpoint_state(scratch, &scratch[4]);
                     g_level_interp_counter = g_level_interp_counter + 1.0f;
                     moby_set_state(self, 1, 0);
-                    fl = g_hero_vehicle_mode[0];
+                    saved_mode = g_hero_vehicle_mode[0];
                 } else {
-                    fl = D_L20_001A8F00_gp;
+                    saved_mode = D_L20_001A8F00_gp;
                 }
-                /* ctr is 2 here; retail compares against its saved copy. */
-                if (fl == ctr) {
+                /* level_mode is 2 here; retail compares against its saved copy. */
+                if (saved_mode == level_mode) {
                     AT(s32, self, 0x98) = 0;
                     AT(u16, self, 0x34) = (AT(u16, self, 0x34) | 0x41) & 0xEFFF;
                 } else {
@@ -154,68 +155,68 @@ void func_PAL_L20_00445F90(char *self) {
         switch (AT(u8, self, 0x20)) {
         case 1:
             if (flag_set_first_pending(self) != 0 && AT(u8, self, 0x43) != 0x13) {
-                func_PAL_002A7E68(self, 0x13, 0, 0x11);
+                anim_start_blended_pal(self, 0x13, 0, 0x11);
             }
-            s0_1 = g_hero_moby[0];
-            moby_start_effect_from_entry(self, mat_fast_helper_a(AT(f32, s0_1, 0x10) - AT(f32, self, 0x10), AT(f32, s0_1, 0x14) - AT(f32, self, 0x14)));
+            hero_moby = g_hero_moby[0];
+            moby_start_effect_from_entry(self, mat_fast_helper_a(AT(f32, hero_moby, 0x10) - AT(f32, self, 0x10), AT(f32, hero_moby, 0x14) - AT(f32, self, 0x14)));
             if (AT(u8, self, 0x60) & 2) {
-                func_PAL_L20_00448650(self);
+                enemy_choose_next_state_pal(self);
             }
             break;
         case 2:
             if (flag_set_first_pending(self) != 0) {
                 if (AT(u8, self, 0x43) != 6) {
-                    func_PAL_002A7E68(self, 6, 0, 0x11);
+                    anim_start_blended_pal(self, 6, 0, 0x11);
                 }
                 moby_set_motion_limits_pal(self);
                 AT(s32, self, 0x9C) = 1;
             }
-            tb_1 = (char *)g_sound_state + AT(s32, st, 0x1854) * 0x70;
-            if (AT(s32, tb_1, 0x88) != (s32)self || AT(u8, tb_1, 0x74) == 0) {
-                AT(s32, st, 0x1854) = PlayMobySound(1, 4, self);
+            sound_slot = (char *)g_sound_state + AT(s32, vars, 0x1854) * 0x70;
+            if (AT(s32, sound_slot, 0x88) != (s32)self || AT(u8, sound_slot, 0x74) == 0) {
+                AT(s32, vars, 0x1854) = PlayMobySound(1, 4, self);
             }
-            if (AT(char *, st, 0x1850) != 0) {
-                matrix_mul_vec3(sp, g_local_to_world_vec, self + 0xC0);
-                FastVecAdd(sp, sp, self + 0x10);
-                func_PAL_L20_003A2180(AT(char *, st, 0x1850), (char *)sp, 1);
+            if (AT(char *, vars, 0x1850) != 0) {
+                matrix_mul_vec3(scratch, g_local_to_world_vec, self + 0xC0);
+                FastVecAdd(scratch, scratch, self + 0x10);
+                electric_orb_set_position_mode_pal(AT(char *, vars, 0x1850), (char *)scratch, 1);
             }
             if (yeedil_boss_update_grab_pal(self) != 0) {
                 moby_set_state(self, 3, -1);
-                v1 = AT(s32, st, 0x1854);
-                if (v1 != -1 && (tb_2 = (char *)g_sound_state + v1 * 0x70, AT(s32, tb_2, 0x88) == (s32)self)) {
-                    if (AT(u8, tb_2, 0x74) != 0) {
-                        snd_stop_voice(v1);
+                sound_id = AT(s32, vars, 0x1854);
+                if (sound_id != -1 && (sound_slot_b = (char *)g_sound_state + sound_id * 0x70, AT(s32, sound_slot_b, 0x88) == (s32)self)) {
+                    if (AT(u8, sound_slot_b, 0x74) != 0) {
+                        snd_stop_voice(sound_id);
                     }
                 }
-                AT(s32, st, 0x1854) = -1;
+                AT(s32, vars, 0x1854) = -1;
             }
             break;
         case 3:
             if (flag_set_first_pending(self) != 0) {
                 yeedil_boss_start_jump_pal(self);
                 if (AT(u8, self, 0x43) != 6) {
-                    func_PAL_002A7E68(self, 6, 0, 0x11);
+                    anim_start_blended_pal(self, 6, 0, 0x11);
                 }
                 AT(s32, self, 0x9C) = 1;
-                if (AT(char *, st, 0x1850) == 0) {
-                    if (AT(s32, st, 0x17F8) != 0) {
-                        AT(char *, st, 0x1850) = func_PAL_L20_003A1E38(self, self + 0x10);
+                if (AT(char *, vars, 0x1850) == 0) {
+                    if (AT(s32, vars, 0x17F8) != 0) {
+                        AT(char *, vars, 0x1850) = electric_orb_spawn_pal(self, self + 0x10);
                     }
                 }
             }
-            if (AT(char *, st, 0x1850) != 0) {
-                matrix_mul_vec3(sp, g_local_to_world_vec, self + 0xC0);
-                FastVecAdd(sp, sp, self + 0x10);
-                func_PAL_L20_003A2180(AT(char *, st, 0x1850), (char *)sp, 0);
+            if (AT(char *, vars, 0x1850) != 0) {
+                matrix_mul_vec3(scratch, g_local_to_world_vec, self + 0xC0);
+                FastVecAdd(scratch, scratch, self + 0x10);
+                electric_orb_set_position_mode_pal(AT(char *, vars, 0x1850), (char *)scratch, 0);
             }
-            StepAngleTowardTarget((float *)(st + 0x1804), 0, 0.0f, 0.12566373f);
+            StepAngleTowardTarget((float *)(vars + 0x1804), 0, 0.0f, 0.12566373f);
             if (UpdateBouncingMoby_pal(self) != 0) {
-                if (g_game_mode[0] != 0x8C && (math_fast_float_d(st + 0x17F8) == 1 || g_yeedil_boss_debug_flag != 0)) {
-                    if (AT(s32, st, 0x1810) > 0) {
-                        AT(s32, st, 0x1810) = -1;
+                if (g_game_mode[0] != 0x8C && (math_fast_float_d(vars + 0x17F8) == 1 || g_yeedil_boss_debug_flag != 0)) {
+                    if (AT(s32, vars, 0x1810) > 0) {
+                        AT(s32, vars, 0x1810) = -1;
                         yeedil_boss_spawn_minion_at_point_pal(self);
                     }
-                    func_PAL_L20_00448650(self);
+                    enemy_choose_next_state_pal(self);
                     AT(s32, self, 0x9C) = 2;
                 } else {
                     moby_set_state(self, 2, 1);
@@ -226,39 +227,39 @@ void func_PAL_L20_00445F90(char *self) {
             if (flag_set_first_pending(self) != 0) {
                 moby_set_motion_limits_range_pal(self, g_yeedil_boss_motion_range);
                 if (AT(u8, self, 0x43) != 2) {
-                    func_PAL_002A7E68(self, 2, 0, 0x11);
+                    anim_start_blended_pal(self, 2, 0, 0x11);
                 }
             }
-            { char *p = AT(char *, st, 0x17FC);
+            { char *p = AT(char *, vars, 0x17FC);
             moby_chase_target_update_pal(self, p + 0x10, mat_fast_helper_a(AT(f32, p, 0x10) - AT(f32, self, 0x10), AT(f32, p, 0x14) - AT(f32, self, 0x14))); }
-            if (enemy_is_valid_target(self, AT(char *, st, 0x17FC)) == 0) {
+            if (enemy_is_valid_target(self, AT(char *, vars, 0x17FC)) == 0) {
                 moby_set_state(self, 1, -1);
             } else {
-                if (AT(f32, st, 0x11C) <= g_yeedil_boss_motion_range || AT(u16, self, 0x96) >= 0xFBU) {
+                if (AT(f32, vars, 0x11C) <= g_yeedil_boss_motion_range || AT(u16, self, 0x96) >= 0xFBU) {
                     moby_set_state(self, 5, -1);
                 }
             }
             break;
         case 5:
             if (flag_set_first_pending(self) != 0 && AT(u8, self, 0x43) != 0xB) {
-                func_PAL_002A7E68(self, 0xB, 0, 0xC);
+                anim_start_blended_pal(self, 0xB, 0, 0xC);
             }
             if (moby_get_anim_value(self) < 31.0f) {
-                { char *p = AT(char *, st, 0x17FC);
+                { char *p = AT(char *, vars, 0x17FC);
                 moby_start_effect_from_entry(self, mat_fast_helper_a(AT(f32, p, 0x10) - AT(f32, self, 0x10), AT(f32, p, 0x14) - AT(f32, self, 0x14))); }
-                if (enemy_is_valid_target(self, AT(char *, st, 0x17FC)) == 0) {
+                if (enemy_is_valid_target(self, AT(char *, vars, 0x17FC)) == 0) {
                     moby_set_state(self, 1, -1);
                 }
-            } else if (func_PAL_002AF6C0((u8 *)self, 32.0f) != 0) {
-                s0_2 = AT(char *, st, 0x17FC);
-                FastVecScale(sp, g_yeedil_boss_vec, g_yeedil_boss_scale);
-                matrix_mul_vec3(sp, sp, self + 0xC0);
-                FastVecAdd(sp, sp, self + 0x10);
-                AT(char *, st, 0x17FC) = yeedil_boss_spawn_lobbed_object_pal(s0_2, AT(s16, s0_2, 0xAA), (char *)sp);
-                AT(s32, st, 0x183C) = AT(s16, s0_2, 0xAA);
-                moby_run_type_update(s0_2);
+            } else if (math_is_value_within_step_pal((u8 *)self, 32.0f) != 0) {
+                target_moby = AT(char *, vars, 0x17FC);
+                FastVecScale(scratch, g_yeedil_boss_vec, g_yeedil_boss_scale);
+                matrix_mul_vec3(scratch, scratch, self + 0xC0);
+                FastVecAdd(scratch, scratch, self + 0x10);
+                AT(char *, vars, 0x17FC) = yeedil_boss_spawn_lobbed_object_pal(target_moby, AT(s16, target_moby, 0xAA), (char *)scratch);
+                AT(s32, vars, 0x183C) = AT(s16, target_moby, 0xAA);
+                moby_run_type_update(target_moby);
                 AT(f32, self, 0x48) = g_yeedil_boss_anim_value;
-            } else if (func_PAL_002AF6C0((u8 *)self, 50.0f) != 0) {
+            } else if (math_is_value_within_step_pal((u8 *)self, 50.0f) != 0) {
                 AT(f32, self, 0x48) = 1.0f;
             }
             if (moby_get_anim_value(self) >= 60.0f) {
@@ -269,39 +270,39 @@ void func_PAL_L20_00445F90(char *self) {
         case 6:
             if (flag_set_first_pending(self) != 0) {
                 if (AT(u8, self, 0x43) != 2) {
-                    func_PAL_002A7E68(self, 2, 0, 0x11);
+                    anim_start_blended_pal(self, 2, 0, 0x11);
                 }
-                moby_set_motion_limits_range_pal(self, AT(f32, st, 0x1838) * 0.5f);
+                moby_set_motion_limits_range_pal(self, AT(f32, vars, 0x1838) * 0.5f);
             }
-            s0_3 = (char *)(&((Hero *)g_hero_state)->b[0x80]);
-            moby_chase_target_update_pal(self, s0_3, mat_fast_helper_a(((Hero *)g_hero_state)->f[0x80 / 4] - AT(f32, self, 0x10), ((Hero *)g_hero_state)->f[0x84 / 4] - AT(f32, self, 0x14)));
-            if (AT(f32, st, 0x11C) < AT(f32, st, 0x1838) && FastDiffRots(AT(f32, self, 0xF8), mat_fast_helper_a(((Hero *)g_hero_state)->f[0x80 / 4] - AT(f32, self, 0x10), ((Hero *)g_hero_state)->f[0x84 / 4] - AT(f32, self, 0x14))) < 0.087266475f) {
-                moby_set_state(self, AT(s32, st, 0x1834), -1);
+            hero_pos = (char *)(&((Hero *)g_hero_state)->b[0x80]);
+            moby_chase_target_update_pal(self, hero_pos, mat_fast_helper_a(((Hero *)g_hero_state)->f[0x80 / 4] - AT(f32, self, 0x10), ((Hero *)g_hero_state)->f[0x84 / 4] - AT(f32, self, 0x14)));
+            if (AT(f32, vars, 0x11C) < AT(f32, vars, 0x1838) && FastDiffRots(AT(f32, self, 0xF8), mat_fast_helper_a(((Hero *)g_hero_state)->f[0x80 / 4] - AT(f32, self, 0x10), ((Hero *)g_hero_state)->f[0x84 / 4] - AT(f32, self, 0x14))) < 0.087266475f) {
+                moby_set_state(self, AT(s32, vars, 0x1834), -1);
             }
             break;
         case 7: {
             int n;
             if (flag_set_first_pending(self) != 0) {
                 if (AT(u8, self, 0x43) != 0x11) {
-                    func_PAL_002A7E68(self, 0x11, 0, 0x11);
+                    anim_start_blended_pal(self, 0x11, 0, 0x11);
                 }
-                AT(s32, st, 0x180C) = 0;
+                AT(s32, vars, 0x180C) = 0;
             }
             moby_start_effect_from_entry(self, mat_fast_helper_a(((Hero *)g_hero_state)->f[0x80 / 4] - AT(f32, self, 0x10), ((Hero *)g_hero_state)->f[0x84 / 4] - AT(f32, self, 0x14)));
-            AT(s32, st, 0x1808) = g_frame_l20_counter[0];
-            matrix_mul_vec3(sp, g_yeedil_boss_local_vec, self + 0xC0);
-            FastVecAdd(sp, sp, self + 0x10);
+            AT(s32, vars, 0x1808) = g_frame_l20_counter[0];
+            matrix_mul_vec3(scratch, g_yeedil_boss_local_vec, self + 0xC0);
+            FastVecAdd(scratch, scratch, self + 0x10);
             for (n = 1; n >= 0; n -= 1) {
-                qcopy(&sp[4], sp);
-                vec_add_random_offset(&sp[4], 1.5f);
-                sp[2] -= 0.5f;
-                func_PAL_002BE880((char *)&sp[4], g_effect_color_table, 0x60309030, 0x107090, 0x25, math_random_float_range(2.0f, 3.0f) * 210000.0f);
+                qcopy(&scratch[4], scratch);
+                vec_add_random_offset(&scratch[4], 1.5f);
+                scratch[2] -= 0.5f;
+                part_spawn_growing_puff_pal((char *)&scratch[4], g_effect_color_table, 0x60309030, 0x107090, 0x25, math_random_float_range(2.0f, 3.0f) * 210000.0f);
             }
-            if (AT(u8, self, 0x42) == AT(u8, self, 0x43) && math_fast_float_d(st + 0x180C) != 0) {
-                AT(s32, st, 0x180C) = ((s32)(g_yeedil_boss_state_value) * 5 + 2) / 6;
-                yeedil_boss_compute_shot_launch_pal(self, (char *)&sp[4], (char *)&sp[8], &sp[12]);
-                sp[6] += 1.5f;
-                yeedil_enemy_spawn_shot(self, (char *)&sp[4], 0x64, (f32)AT(u8, st, 0x35), math_random_int_below(2), (int)(st + 0x1808));
+            if (AT(u8, self, 0x42) == AT(u8, self, 0x43) && math_fast_float_d(vars + 0x180C) != 0) {
+                AT(s32, vars, 0x180C) = ((s32)(g_yeedil_boss_state_value) * 5 + 2) / 6;
+                yeedil_boss_compute_shot_launch_pal(self, (char *)&scratch[4], (char *)&scratch[8], &scratch[12]);
+                scratch[6] += 1.5f;
+                yeedil_enemy_spawn_shot(self, (char *)&scratch[4], 0x64, (f32)AT(u8, vars, 0x35), math_random_int_below(2), (int)(vars + 0x1808));
             }
             if ((s32)AT(u16, self, 0x96) > ((s32)(g_yeedil_boss_frame_limit) * 5 + 2) / 6) {
                 moby_set_state(self, 1, -1);
@@ -311,111 +312,111 @@ void func_PAL_L20_00445F90(char *self) {
         case 11:
             if (flag_set_first_pending(self) != 0) {
                 if (AT(u8, self, 0x43) != 0x11) {
-                    func_PAL_002A7E68(self, 0x11, 0, 0x11);
+                    anim_start_blended_pal(self, 0x11, 0, 0x11);
                 }
-                AT(s32, st, 0x1840) = math_random_int_range(0xA, 0xF);
+                AT(s32, vars, 0x1840) = math_random_int_range(0xA, 0xF);
             }
             enemy_compute_aim_turn_angle(self, (float *)(&((Hero *)g_hero_state)->b[0x80]));
             if (AT(u8, self, 0x42) == AT(u8, self, 0x43) && (AT(u16, self, 0x96) % 50U) == 0x19) {
-                func_PAL_L20_00449B08(self);
-                math_fast_float_d(st + 0x1840);
+                yeedil_boss_launch_damage_shot_pal(self);
+                math_fast_float_d(vars + 0x1840);
             }
-            if (AT(s32, st, 0x1840) == 0) {
+            if (AT(s32, vars, 0x1840) == 0) {
                 moby_set_state(self, 1, -1);
             }
             break;
         case 10:
             if (flag_set_first_pending(self) != 0) {
                 if (AT(u8, self, 0x43) != 0x11) {
-                    func_PAL_002A7E68(self, 0x11, 0, 0x11);
+                    anim_start_blended_pal(self, 0x11, 0, 0x11);
                 }
-                AT(s32, st, 0x1840) = math_random_int_range(0x1E, 0x32);
+                AT(s32, vars, 0x1840) = math_random_int_range(0x1E, 0x32);
             }
             if (AT(u8, self, 0x42) == AT(u8, self, 0x43) && (g_frame_l20_counter[0] & 7) == (((s32)self >> 8) & 7)) {
-                func_PAL_L20_004497B8(self);
-                math_fast_float_d(st + 0x1840);
+                enemy_fire_projectile_along_aim_pal(self);
+                math_fast_float_d(vars + 0x1840);
             }
-            if (AT(s32, st, 0x1840) == 0) {
+            if (AT(s32, vars, 0x1840) == 0) {
                 moby_set_state(self, 1, -1);
             }
             break;
         case 8:
             if (flag_set_first_pending(self) != 0) {
                 if (AT(u8, self, 0x43) != 0x11) {
-                    func_PAL_002A7E68(self, 0x11, 0, 0x11);
+                    anim_start_blended_pal(self, 0x11, 0, 0x11);
                 }
-                AT(s32, st, 0x1840) = math_random_int_range(0xA, 0x14);
+                AT(s32, vars, 0x1840) = math_random_int_range(0xA, 0x14);
             }
             if (AT(u8, self, 0x42) == AT(u8, self, 0x43) && (g_frame_l20_counter[0] & 0x1F) == (((s32)self >> 8) & 0x1F)) {
-                func_PAL_L20_00449870(self);
-                math_fast_float_d(st + 0x1840);
+                yeedil_boss_fire_lobbed_projectile_pal(self);
+                math_fast_float_d(vars + 0x1840);
             }
-            if (AT(s32, st, 0x1840) == 0) {
+            if (AT(s32, vars, 0x1840) == 0) {
                 moby_set_state(self, 1, -1);
             }
             break;
         case 9:
             if (flag_set_first_pending(self) != 0) {
                 if (AT(u8, self, 0x43) != 0x11) {
-                    func_PAL_002A7E68(self, 0x11, 0, 0x11);
+                    anim_start_blended_pal(self, 0x11, 0, 0x11);
                 }
-                AT(s32, st, 0x1840) = math_random_int_range(4, 5);
+                AT(s32, vars, 0x1840) = math_random_int_range(4, 5);
             }
             if (AT(u8, self, 0x42) == AT(u8, self, 0x43) && (g_frame_l20_counter[0] & 0x1F) == (((s32)self >> 8) & 0x1F)) {
                 if (yeedil_boss_launch_group_shot_pal(self) != 0) {
-                    math_fast_float_d(st + 0x1840);
+                    math_fast_float_d(vars + 0x1840);
                 } else {
-                    AT(s32, st, 0x1840) = 0;
+                    AT(s32, vars, 0x1840) = 0;
                 }
             }
-            if (AT(s32, st, 0x1840) == 0) {
+            if (AT(s32, vars, 0x1840) == 0) {
                 moby_set_state(self, 1, -1);
             }
             break;
         case 12:
             if (flag_set_first_pending(self) != 0 && AT(u8, self, 0x43) != 0x11) {
-                func_PAL_002A7E68(self, 0x11, 0, 0x11);
+                anim_start_blended_pal(self, 0x11, 0, 0x11);
             }
             if ((g_frame_l20_counter[0] & 7) == (((s32)self >> 8) & 7)) {
                 if (g_yeedil_boss_flag != 0) {
                     moby_set_state(self, 0xD, -1);
-                } else if (group_activate_member_along_aim_pal(self) == 0 || group_count_active_members(AT(s32, st, 0x21C)) >= 0x15) {
+                } else if (group_activate_member_along_aim_pal(self) == 0 || group_count_active_members(AT(s32, vars, 0x21C)) >= 0x15) {
                     moby_set_state(self, 0xD, -1);
                 }
             }
             break;
         case 13:
-            v2 = flag_set_first_pending(self);
-            s0_4 = st + 0x17D0;
-            if (v2 != 0) {
+            state_entered_a = flag_set_first_pending(self);
+            step_target = vars + 0x17D0;
+            if (state_entered_a != 0) {
                 if (AT(u8, self, 0x43) != 2) {
-                    func_PAL_002A7E68(self, 2, 0, 0x11);
+                    anim_start_blended_pal(self, 2, 0, 0x11);
                 }
-                yeedil_boss_compute_side_step(self, s0_4);
+                yeedil_boss_compute_side_step(self, step_target);
                 moby_set_motion_limits_range_pal(self, 1.0f);
             }
-            moby_chase_target_update_pal(self, s0_4, mat_fast_helper_a(((Hero *)g_hero_state)->f[0x80 / 4] - AT(f32, self, 0x10), ((Hero *)g_hero_state)->f[0x84 / 4] - AT(f32, self, 0x14)));
-            if (AT(f32, st, 0x11C) < 1.0f && FastDiffRots(AT(f32, self, 0xF8), mat_fast_helper_a(((Hero *)g_hero_state)->f[0x80 / 4] - AT(f32, self, 0x10), ((Hero *)g_hero_state)->f[0x84 / 4] - AT(f32, self, 0x14))) < 0.087266475f) {
+            moby_chase_target_update_pal(self, step_target, mat_fast_helper_a(((Hero *)g_hero_state)->f[0x80 / 4] - AT(f32, self, 0x10), ((Hero *)g_hero_state)->f[0x84 / 4] - AT(f32, self, 0x14)));
+            if (AT(f32, vars, 0x11C) < 1.0f && FastDiffRots(AT(f32, self, 0xF8), mat_fast_helper_a(((Hero *)g_hero_state)->f[0x80 / 4] - AT(f32, self, 0x10), ((Hero *)g_hero_state)->f[0x84 / 4] - AT(f32, self, 0x14))) < 0.087266475f) {
                 moby_set_state(self, 0xE, -1);
-            } else if (group_count_active_members(AT(s32, st, 0x21C)) < 3) {
+            } else if (group_count_active_members(AT(s32, vars, 0x21C)) < 3) {
                 moby_set_state(self, 1, -1);
             }
             break;
         case 14:
             if (flag_set_first_pending(self) != 0 && AT(u8, self, 0x43) != 1) {
-                func_PAL_002A7E68(self, 1, 0, 0x11);
+                anim_start_blended_pal(self, 1, 0, 0x11);
             }
             enemy_compute_aim_turn_angle(self, (float *)(&((Hero *)g_hero_state)->b[0x80]));
             if (vec_distance_xy(self + 0x10, g_hero_state + 0x80) < g_yeedil_boss_hero_distance) {
                 moby_set_state(self, 0xD, -1);
             }
-            if (group_count_active_members(AT(s32, st, 0x21C)) < 3) {
+            if (group_count_active_members(AT(s32, vars, 0x21C)) < 3) {
                 moby_set_state(self, 1, -1);
             }
             break;
         case 15:
             if (flag_set_first_pending(self) != 0 && AT(u8, self, 0x43) != 0x15) {
-                func_PAL_002A7E68(self, 0x15, 0, 0x8);
+                anim_start_blended_pal(self, 0x15, 0, 0x8);
             }
             { float t = coll_probe_ground_height_below(self + 0x10, 0, 0.5f); ApproachValue((f32 *)(self + 0x18), t, 0.20000002f); }
             if (AT(u8, self, 0x60) & 2) {
@@ -431,25 +432,25 @@ void func_PAL_L20_00445F90(char *self) {
             f32 dist;
             if (flag_set_first_pending(self) != 0) {
                 if (AT(u8, self, 0x43) != 7) {
-                    func_PAL_002A7E68(self, 7, 0, 0x11);
+                    anim_start_blended_pal(self, 7, 0, 0x11);
                 }
                 moby_set_motion_limits_range_pal(self, 1.0f);
-                AT(s32, st, 0x1830) = 0;
+                AT(s32, vars, 0x1830) = 0;
             }
             if (AT(u8, self, 0x60) & 2) {
                 switch (AT(u8, self, 0x42)) {
                 case 7:
                     if (AT(u8, self, 0x43) != 8) {
-                        func_PAL_002A7E68(self, 8, 0, 1);
+                        anim_start_blended_pal(self, 8, 0, 1);
                     }
                     break;
                 case 8:
                     if (AT(u8, self, 0x43) != 9) {
-                        func_PAL_002A7E68(self, 9, 0, 1);
+                        anim_start_blended_pal(self, 9, 0, 1);
                     }
                     break;
                 case 9:
-                    AT(s32, st, 0x1830) = AT(s32, st, 0x1830) + 1;
+                    AT(s32, vars, 0x1830) = AT(s32, vars, 0x1830) + 1;
                     break;
                 }
             }
@@ -459,28 +460,28 @@ void func_PAL_L20_00445F90(char *self) {
             dist = moby_get_anim_value(self);
             if (AT(u8, self, 0x42) == AT(u8, self, 0x43)) {
                 if ((AT(u8, self, 0x42) == 8 && dist < 9.0f) || (AT(u8, self, 0x42) == 9 && dist > 12.0f && dist < 30.0f)) {
-                    s0_5 = (char *)(&((Hero *)g_hero_state)->b[0x80]);
-                    moby_chase_target_update_pal(self, s0_5, mat_fast_helper_a(((Hero *)g_hero_state)->f[0x80 / 4] - AT(f32, self, 0x10), ((Hero *)g_hero_state)->f[0x84 / 4] - AT(f32, self, 0x14)));
+                    hero_pos_b = (char *)(&((Hero *)g_hero_state)->b[0x80]);
+                    moby_chase_target_update_pal(self, hero_pos_b, mat_fast_helper_a(((Hero *)g_hero_state)->f[0x80 / 4] - AT(f32, self, 0x10), ((Hero *)g_hero_state)->f[0x84 / 4] - AT(f32, self, 0x14)));
                     if (AT(u8, self, 0x42) == AT(u8, self, 0x43)) {
                         if ((AT(u8, self, 0x42) == 8 && dist < 9.0f && dist > 7.0f) || (AT(u8, self, 0x43) == 9 && dist > 25.0f && dist < 30.0f)) {
-                            qcopy(sp, self + 0x10);
-                            sp[2] += 1.0f;
-                            coll_sweep_from_object(self, sp, 0x10008, 0, 1, 0, 5.5f, (f32)AT(u8, st, 0x34), 2.0f);
+                            qcopy(scratch, self + 0x10);
+                            scratch[2] += 1.0f;
+                            coll_sweep_from_object(self, scratch, 0x10008, 0, 1, 0, 5.5f, (f32)AT(u8, vars, 0x34), 2.0f);
                         }
                     }
                 }
             }
-            if (AT(u8, self, 0x42) == 8 && func_PAL_002AF6C0((u8 *)self, 6.0f) != 0) {
+            if (AT(u8, self, 0x42) == 8 && math_is_value_within_step_pal((u8 *)self, 6.0f) != 0) {
                 ((Blk200 *)g_hero_l20_extra_state)->i[0x16C / 4] = 0;
                 ((Blk200 *)g_hero_l20_extra_state)->i[0x188 / 4] = 0x25;
                 ((Blk200 *)g_hero_l20_extra_state)->f[0x180 / 4] = 0.05f;
             }
-            if (AT(u8, self, 0x42) == 9 && func_PAL_002AF6C0((u8 *)self, 30.0f) != 0) {
-                if (AT(s32, st, 0x1830) >= 2 || ((Hero *)g_hero_state)->i[0x2294 / 4] == 0x8C) {
-                    func_PAL_L20_00449C78(self);
+            if (AT(u8, self, 0x42) == 9 && math_is_value_within_step_pal((u8 *)self, 30.0f) != 0) {
+                if (AT(s32, vars, 0x1830) >= 2 || ((Hero *)g_hero_state)->i[0x2294 / 4] == 0x8C) {
+                    yeedil_boss_explode_death_pal(self);
                     moby_set_state(self, 3, -1);
                 }
-                ((Blk200 *)g_hero_l20_extra_state)->f[0x180 / 4] = (f32)(AT(s32, st, 0x1830) + 1) * 0.05f;
+                ((Blk200 *)g_hero_l20_extra_state)->f[0x180 / 4] = (f32)(AT(s32, vars, 0x1830) + 1) * 0.05f;
                 ((Blk200 *)g_hero_l20_extra_state)->i[0x16C / 4] = 0;
                 ((Blk200 *)g_hero_l20_extra_state)->i[0x188 / 4] = 0x25;
             }
@@ -489,40 +490,40 @@ void func_PAL_L20_00445F90(char *self) {
         case 17:
             if (flag_set_first_pending(self) != 0) {
                 if (AT(u8, self, 0x43) != 0x15) {
-                    func_PAL_002A7E68(self, 0x15, 0, 0x8);
+                    anim_start_blended_pal(self, 0x15, 0, 0x8);
                 }
-                s0_6 = g_yeedil_moby_list_heads[0];
-                v3 = D_L20_001A8F00_gp;
-                if (s0_6 != 0) {
+                list_moby = g_yeedil_moby_list_heads[0];
+                hero_mode = D_L20_001A8F00_gp;
+                if (list_moby != 0) {
                     /* Retail keeps these four in saved registers; with literals cc1 folds the two state
                        tests into one range check. */
-                    int class_removed = 0xCBC, state_dead = 0xFE, state_dying = 0xFD;
-                    int class_reset = 0xD0F;
+                    int class_removed = MOBY_CLASS_MEGACORP_HOVER_TANK, state_dead = 0xFE, state_dying = 0xFD;
+                    int class_reset = MOBY_CLASS_MEGACORP_TROOPER_LEGS;
                     int id;
                     do {
-                        id = AT(s16, s0_6, 0xAA);
-                        if (id == class_removed && s0_6 != 0) {
-                            u8 k = AT(u8, s0_6, 0x20);
+                        id = AT(s16, list_moby, 0xAA);
+                        if (id == class_removed && list_moby != 0) {
+                            u8 k = AT(u8, list_moby, 0x20);
                             if (k != state_dead && k != state_dying) {
-                                moby_mark_spawned(s0_6);
+                                moby_mark_spawned(list_moby);
                             }
-                            id = AT(s16, s0_6, 0xAA);
+                            id = AT(s16, list_moby, 0xAA);
                         }
-                        if (id == class_reset && s0_6 != 0) {
-                            u8 k = AT(u8, s0_6, 0x20);
-                            if (k != state_dead && k != state_dying && AT(u8, s0_6, 0x21) == AT(s32, st, 0x21C)) {
-                                SetDeathBits_pal(s0_6, 0, 3);
-                                trooper_destroy_parts(s0_6);
+                        if (id == class_reset && list_moby != 0) {
+                            u8 k = AT(u8, list_moby, 0x20);
+                            if (k != state_dead && k != state_dying && AT(u8, list_moby, 0x21) == AT(s32, vars, 0x21C)) {
+                                SetDeathBits_pal(list_moby, 0, 3);
+                                trooper_destroy_parts(list_moby);
                             }
                         }
-                        s0_6 = AT(char *, s0_6, 0x28);
-                    } while (s0_6 != 0);
-                    v3 = g_hero_vehicle_mode[0];
+                        list_moby = AT(char *, list_moby, 0x28);
+                    } while (list_moby != 0);
+                    hero_mode = g_hero_vehicle_mode[0];
                 }
             } else {
-                v3 = g_hero_vehicle_mode[0];
+                hero_mode = g_hero_vehicle_mode[0];
             }
-            if (v3 == 2) {
+            if (hero_mode == 2) {
                 AT(s32, self, 0x98) = 0;
                 AT(u16, self, 0x34) = (AT(u16, self, 0x34) | 0x41) & 0xEFFF;
             }
@@ -577,33 +578,33 @@ void func_PAL_L20_00445F90(char *self) {
             } else {
                 char *t;
                 level_clear_first_table_entry();
-                t = g_linked_moby_table[0] + (AT(s32, st, 0x248) << 7);
+                t = g_linked_moby_table[0] + (AT(s32, vars, 0x248) << 7);
                 level_capture_checkpoint_state(t + 0x30, t + 0x70);
                 g_yeedil_boss_words[0] = 0;
                 hero_record_play_counters_pal();
             }
             break;
         case 24:
-            v5 = flag_set_first_pending(self);
-            s0_7 = st + 0x17D0;
-            if (v5 != 0) {
+            state_entered_b = flag_set_first_pending(self);
+            move_target = vars + 0x17D0;
+            if (state_entered_b != 0) {
                 f32 mag = math_random_float_range(5.0f, 15.0f);
                 f32 ang = math_random_angle();
                 char *target;
                 f32 y;
-                AT(f32, st, 0x17D0) = math_fast_sin_or_cos_a(ang) * mag;
+                AT(f32, vars, 0x17D0) = math_fast_sin_or_cos_a(ang) * mag;
                 y = math_fast_sin_or_cos_b(ang) * mag;
-                target = g_linked_moby_table[0] + (AT(s32, st, 0x230) << 7);
-                AT(s32, st, 0x17D8) = 0;
-                AT(f32, st, 0x17D4) = y;
-                FastVecAdd(s0_7, s0_7, target + 0x30);
+                target = g_linked_moby_table[0] + (AT(s32, vars, 0x230) << 7);
+                AT(s32, vars, 0x17D8) = 0;
+                AT(f32, vars, 0x17D4) = y;
+                FastVecAdd(move_target, move_target, target + 0x30);
                 if (AT(u8, self, 0x43) != 2) {
-                    func_PAL_002A7E68(self, 2, 0, 0x11);
+                    anim_start_blended_pal(self, 2, 0, 0x11);
                 }
                 moby_set_motion_limits_range_pal(self, 1.5f);
             }
-            moby_chase_target_update_pal(self, s0_7, mat_fast_helper_a(((Hero *)g_hero_state)->f[0x80 / 4] - AT(f32, self, 0x10), ((Hero *)g_hero_state)->f[0x84 / 4] - AT(f32, self, 0x14)));
-            if (AT(f32, st, 0x11C) <= 1.5f && FastDiffRots(AT(f32, self, 0xF8), mat_fast_helper_a(((Hero *)g_hero_state)->f[0x80 / 4] - AT(f32, self, 0x10), ((Hero *)g_hero_state)->f[0x84 / 4] - AT(f32, self, 0x14))) < 0.087266475f) {
+            moby_chase_target_update_pal(self, move_target, mat_fast_helper_a(((Hero *)g_hero_state)->f[0x80 / 4] - AT(f32, self, 0x10), ((Hero *)g_hero_state)->f[0x84 / 4] - AT(f32, self, 0x14)));
+            if (AT(f32, vars, 0x11C) <= 1.5f && FastDiffRots(AT(f32, self, 0xF8), mat_fast_helper_a(((Hero *)g_hero_state)->f[0x80 / 4] - AT(f32, self, 0x10), ((Hero *)g_hero_state)->f[0x84 / 4] - AT(f32, self, 0x14))) < 0.087266475f) {
                 moby_set_state(self, 0x19, -1);
             }
             break;
@@ -612,7 +613,7 @@ void func_PAL_L20_00445F90(char *self) {
             if (flag_set_first_pending(self) != 0) {
                 anim = (math_random_int_below(3) != 0) ? 0x13 : 0x14;
                 if (AT(u8, self, 0x43) != anim) {
-                    func_PAL_002A7E68(self, anim, 0, 0x11);
+                    anim_start_blended_pal(self, anim, 0, 0x11);
                 }
             }
             if (AT(u8, self, 0x60) & 2) {
@@ -623,14 +624,14 @@ void func_PAL_L20_00445F90(char *self) {
         }
         yeedil_boss_frame_upkeep_pal(self);
         if (AT(u8, self, 0x20) != 2) {
-            v6 = AT(s32, st, 0x1854);
-            if (v6 != -1) {
-                tb_3 = (char *)g_sound_state + v6 * 0x70;
-                if (AT(s32, tb_3, 0x88) == (s32)self && AT(u8, tb_3, 0x74) != 0) {
-                    snd_stop_voice(v6);
+            sound_id_b = AT(s32, vars, 0x1854);
+            if (sound_id_b != -1) {
+                sound_slot_c = (char *)g_sound_state + sound_id_b * 0x70;
+                if (AT(s32, sound_slot_c, 0x88) == (s32)self && AT(u8, sound_slot_c, 0x74) != 0) {
+                    snd_stop_voice(sound_id_b);
                 }
             }
-            AT(s32, st, 0x1854) = -1;
+            AT(s32, vars, 0x1854) = -1;
         }
     }
 }

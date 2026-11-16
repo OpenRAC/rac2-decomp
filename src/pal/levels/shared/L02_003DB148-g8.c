@@ -14,6 +14,7 @@ extern void vec_clear_128(Quad *),FastVecAdd(void *,void *,void *),FastVecSub(vo
 extern float math_random_float_range(float,float);
 extern void *enemy_spawn_record(void *,void *,void *,void *,int);
 
+/* Sometimes spawns a smoke puff in front of the object, towards the camera (PAL: 50 Hz speed). */
 void part_spawn_puff_at_moby_pal(char *object) {
     Vector velocity,origin,direction;
     float speed;

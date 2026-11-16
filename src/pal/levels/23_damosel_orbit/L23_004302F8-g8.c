@@ -38,71 +38,72 @@ extern void multiply_matrix3x3(void *, void *, void *);
 extern void FastVecScale(float, void *, void *);
 extern void draw_world_quad(void *, void *, s32);
 
-void gfx_draw_spinning_quad_table_pal(u8 *obj) {
-    Quad q;
-    float m[12];
-    float v3[4];
-    float v5[4];
-    float v4[4];
-    float x[12];
+/* Updates the spin state at +0x68 and draws the 40 spinning quads of the table around the mothership boss (PAL). */
+void gfx_draw_spinning_quad_table_pal(u8 *moby) {
+    Quad quad;
+    float matrix[12];
+    float center[4];
+    float offset[4];
+    float temp_vec[4];
+    float spin_matrix[12];
     u64 alpha;
     float wave;
-    s32 fix;
-    s32 base;
+    s32 alpha_value;
+    s32 alpha_base;
     Vars *payload;
-    s32 n;
+    s32 period;
     s32 i;
     s32 j;
     s32 uv;
 
     if (g_mothership_boss_moby != 0) {
-        payload = *(Vars **)(obj + 0x68);
+        payload = *(Vars **)(moby + 0x68);
         g_spinning_quad_scale = g_mothership_scale_factor * 1.1f;
         payload->angle = FastAddRotations(payload->angle, (float)g_spinning_quad_turn_speed * 0.0003490659f);
-        n = g_spinning_quad_period;
-        wave = math_fast_sin_or_cos_b((float)(s32)(*(u16 *)(obj + 0x96) % n) * (1.0f / (float)n) * 3.1415927f);
-        fix = g_spinning_quad_alpha_base;
-        base = fix;
-        fix = (s32)(wave * g_spinning_quad_alpha_scale) + base;
-        payload->fix = fix;
+        period = g_spinning_quad_period;
+        wave = math_fast_sin_or_cos_b((float)(s32)(*(u16 *)(moby + 0x96) % period) * (1.0f / (float)period) * 3.1415927f);
+        alpha_value = g_spinning_quad_alpha_base;
+        alpha_base = alpha_value;
+        alpha_value = (s32)(wave * g_spinning_quad_alpha_scale) + alpha_base;
+        payload->fix = alpha_value;
         alpha = (u64)g_quad_alpha_a | ((u64)g_quad_alpha_b << 2);
         alpha |= (u64)g_quad_alpha_c << 4;
         alpha |= (u64)g_quad_alpha_d << 6;
-        q.w[3] = alpha | ((u64)payload->fix << 32);
-        q.w[1] = GetEffectTextureDescriptor(g_quad_effect_texture);
-        q.w[2] = 0xFF9000000260ULL;
-        q.w[0] = 0;
+        quad.w[3] = alpha | ((u64)payload->fix << 32);
+        quad.w[1] = GetEffectTextureDescriptor(g_quad_effect_texture);
+        quad.w[2] = 0xFF9000000260ULL;
+        quad.w[0] = 0;
         VU1_addGSregister(0x47, 0x53001);
-        qcopy(m, obj + 0xC0);
-        qcopy(m + 4, obj + 0xD0);
-        qcopy(m + 8, obj + 0xE0);
-        qcopy_nc(m, g_mothership_boss_moby + 0xC0);
-        qcopy_nc(m + 4, g_mothership_boss_moby + 0xD0);
-        qcopy_nc(m + 8, g_mothership_boss_moby + 0xE0);
-        qcopy_nc(v3, g_mothership_boss_moby + 0x10);
-        *(TI128 *)v4 = 0;
-        v4[3] = 1.0f;
-        v4[2] = g_quad_l23_depth;
-        *(TI128 *)v5 = *(TI128 *)v4;
-        func_L22_002F3B38(v5, v5, g_mothership_boss_moby + 0xE0);
-        FastVecAdd(v3, g_mothership_boss_moby + 0x10, v5);
-        qzero_nc(v4);
-        v4[2] = payload->angle;
-        euler_rotation_basis(x, v4);
-        multiply_matrix3x3(m, m, x);
-        v3[3] = 1.0f;
-        q.c[3] = g_quad_l23_color;
-        q.c[2] = g_quad_l23_color;
-        q.c[1] = g_quad_l23_color;
-        q.c[0] = g_quad_l23_color;
+        qcopy(matrix, moby + 0xC0);
+        qcopy(matrix + 4, moby + 0xD0);
+        qcopy(matrix + 8, moby + 0xE0);
+        qcopy_nc(matrix, g_mothership_boss_moby + 0xC0);
+        qcopy_nc(matrix + 4, g_mothership_boss_moby + 0xD0);
+        qcopy_nc(matrix + 8, g_mothership_boss_moby + 0xE0);
+        qcopy_nc(center, g_mothership_boss_moby + 0x10);
+        *(TI128 *)temp_vec = 0;
+        temp_vec[3] = 1.0f;
+        temp_vec[2] = g_quad_l23_depth;
+        *(TI128 *)offset = *(TI128 *)temp_vec;
+        func_L22_002F3B38(offset, offset, g_mothership_boss_moby + 0xE0);
+        FastVecAdd(center, g_mothership_boss_moby + 0x10, offset);
+        qzero_nc(temp_vec);
+        temp_vec[2] = payload->angle;
+        euler_rotation_basis(spin_matrix, temp_vec);
+        multiply_matrix3x3(matrix, matrix, spin_matrix);
+        center[3] = 1.0f;
+        quad.c[3] = g_quad_l23_color;
+        quad.c[2] = g_quad_l23_color;
+        quad.c[1] = g_quad_l23_color;
+        quad.c[0] = g_quad_l23_color;
         for (i = 0; i < 40; i++) {
             for (j = 0; j < 4; j++) {
                 uv = g_spinning_quad_corner_pairs[i][j].b;
-                FastVecScale(g_spinning_quad_scale, &q.v[j], g_spinning_quad_vertices[g_spinning_quad_corner_pairs[i][j].a]);
-                q.uv[j][0] = g_spinning_quad_uvs[uv][0];
-                q.uv[j][1] = g_spinning_quad_uvs[uv][1];
+                FastVecScale(g_spinning_quad_scale, &quad.v[j], g_spinning_quad_vertices[g_spinning_quad_corner_pairs[i][j].a]);
+                quad.uv[j][0] = g_spinning_quad_uvs[uv][0];
+                quad.uv[j][1] = g_spinning_quad_uvs[uv][1];
             }
-            draw_world_quad(&q, m, 0);
+            draw_world_quad(&quad, matrix, 0);
         }
     }
 }

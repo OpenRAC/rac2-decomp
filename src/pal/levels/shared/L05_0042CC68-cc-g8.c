@@ -17,8 +17,8 @@ extern int GetCollHitMaterial(void);
 extern void FastVecSub(void *, void *, void *);
 extern void FastVecScale(void *, void *, float);
 extern int coll_test_point(void *, int, void *, float);
-extern void func_PAL_L05_0042D118(void *, void *, void *);
-extern void *func_PAL_L05_0042A240(void *, int, int, int, int, int, int, int, int, int, int, float);
+extern void projectile_l05_impact_spawn_pal(void *, void *, void *);
+extern void *moby_spawn_large_explosion_pal(void *, int, int, int, int, int, int, int, int, int, int, float);
 extern unsigned char *func_L05_003D1E60(void *, int, int);
 extern float math_random_angle(void);
 extern void vec_build_spherical_offset(void *, float, float, float);
@@ -35,7 +35,7 @@ static __inline__ void ShotEndFlight(char *object, char *state)
 {
     if (*(int *)(state + 0x2C)) {
         if (*(int *)(state + 0x24))
-            func_PAL_L05_0042A240(object + 0x10, 0, 50, 30, 30, 30, 40, 1, 1, 1, 1, 2.0f);
+            moby_spawn_large_explosion_pal(object + 0x10, 0, 50, 30, 30, 30, 40, 1, 1, 1, 1, 2.0f);
         func_L05_003D1E60(object + 0x10, 0, 0);
     }
     moby_mark_spawned(object);
@@ -47,7 +47,7 @@ static __inline__ void ShotEndFlight(char *object, char *state)
  * collision.point loads merge through their shared REG_EQUIV constant, which leaves a dead lui
  * before the impact code, so one shared label does not reproduce it.
  */
-void func_PAL_L05_0042CC68(char *object)
+void UpdateProjectile_pal(char *object)
 {
     float old[4], pos[4], step[4], random[4];
     char *state = *(char **)(object + 0x68);
@@ -89,7 +89,7 @@ void func_PAL_L05_0042CC68(char *object)
             if (collision->hit) {
                 snd_play_from_class_bank(7, 0, object, 0xFBF);
                 qcopy(object + 0x10, &collision->point);
-                func_PAL_L05_0042D118(object, state, object + 0x10);
+                projectile_l05_impact_spawn_pal(object, state, object + 0x10);
                 ShotEndFlight(object, state);
                 return;
             }
@@ -109,7 +109,7 @@ void func_PAL_L05_0042CC68(char *object)
         if (hit || CollLine(old, object + 0x10, 16, *(void **)(state + 0x20), 0)) {
             snd_play_from_class_bank(7, 0, object, 0xFBF);
             qcopy(object + 0x10, &((Collision *)g_collision_l05_result)->point);
-            func_PAL_L05_0042D118(object, state, object + 0x10);
+            projectile_l05_impact_spawn_pal(object, state, object + 0x10);
             ShotEndFlight(object, state);
             return;
         }

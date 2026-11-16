@@ -73,7 +73,7 @@ extern int FindNearestRoutePointIndex(void *, void *, int);
 /* A racer's route choice in Barlow and Joba: takes the shortcuts at the scripted points,
    turns onto a nearby branch route at random, and rejoins its main route at the end of a
    branch. */
-void func_PAL_L04_00407168(u8 *self)
+void UpdateRacerRouteChoice_pal(u8 *self)
 {
     float delta[4];
     u8 *s;

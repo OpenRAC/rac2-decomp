@@ -19,9 +19,9 @@ extern void item_menu_set_title_mode(u8 *, u32);
 
 /* constructor: stores the owner at +0x28C, allocates the 16-byte position at +0x288 and initialises the
    sub-objects at +0x0, +0x4C, +0x98, +0xE4, +0x1B0, +0x1F8, +0x240 and +0x298 */
-void func_PAL_003455B0(QwenRecovery_a2544d80ec96_AbiByte22 *p1, const QwenRecovery_a2544d80ec96_AbiByte22 *table)
+void item_menu_fill_list_pal(QwenRecovery_a2544d80ec96_AbiByte22 *menu, const QwenRecovery_a2544d80ec96_AbiByte22 *table)
 {
-    menu_list_build_ids(p1 + 0x2c8, table);
+    menu_list_build_ids(menu + 0x2c8, table);
 }
 
 /* Measured target: byte-identical across all 27 levels. */

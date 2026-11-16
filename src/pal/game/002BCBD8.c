@@ -10,7 +10,8 @@ extern void FastVecScale(void *,void *,float);
 extern int vec_fast_helper_a(void *);
 extern int math_random_int_range(int,int);
 extern float g_frame_time_scale MACRO_ADDR;
-void func_PAL_002BCBD8(char *p)
+/* Updates a firework rocket or burst particle: it rises and splits into sparks, fades its colour, and dies after its life runs out (PAL: 50 Hz timings). */
+void part_update_firework_pal(char *p)
 {
     char *q=p+32;
     short *remaining;
@@ -107,7 +108,8 @@ extern unsigned char *g_part_tex_flash, *g_part_tex_white_flash;
 
 /* func_002BC508 is in 002BC508-g8.c. */
 
-char *func_PAL_002BD400(char *pos, int spin, int color, float spread, float low, float high, float accel, float size)
+/* Spawns a short-lived flash particle at a jittered position with a random spin direction and a random speed. */
+char *part_spawn_flash_pal(char *pos, int spin, int color, float spread, float low, float high, float accel, float size)
 {
     char *p = part_alloc(13);
     char *q;
@@ -142,7 +144,8 @@ extern int Fd1c348f5_FUN_00282978(char *p);
 extern int Fd1c348f5_FUN_00283CF0(float v);
 extern void Fd1c348f5_FUN_002B9180(char *p);
 
-void func_PAL_002BD580(char *p)
+/* Updates a flash particle: it fades in, then holds and fades out again until it expires. */
+void part_update_flash_pal(char *p)
 {
     char *q = p + 32;
     int r;
@@ -193,7 +196,7 @@ extern int FastDecTimer(void *);
 extern void part_kill(void *);
 
 /* Particle tick: drift the position along its anchor, or fade out. */
-void func_PAL_002BD698(Particle *p)
+void part_update_anchored_fade_pal(Particle *p)
 {
     float *pl = p->payload;
     p->seed += *(unsigned char *)pl;

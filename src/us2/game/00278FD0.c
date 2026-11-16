@@ -59,7 +59,8 @@ extern int data_query_shared_block(void);
 extern float ApproachValue(float *p, float a, float b);
 extern int UpdateSoundVoices(void);
 
-void func_US2_00278FD0(void)
+/* Plays the disc player sequence: registers the row table, then streams each row's frames from disc and advances until the sequence ends (USA v2.00: text ids moved, rows chosen by language). */
+void seq_update_disc_player_us2(void)
 {
     int i;
     int frame;

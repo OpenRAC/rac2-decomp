@@ -12,6 +12,7 @@ extern void moby_set_state(void *, int, int);
 extern int snd_play_from_global_bank(int, int, int);
 extern void value_set_entry_by_index_us2(int, int);
 
+/* Counts the hovering objects when the level loads, then plays the reward sound and sets the one-shot flag once few enough are left (USA v2.00, maps 2 and 3). */
 void enemy_count_trigger_update_us2(unsigned char *object) {
     int state = object[0x20];
     switch (state) {
@@ -24,7 +25,7 @@ void enemy_count_trigger_update_us2(unsigned char *object) {
             int kind;
             for (entry = g_moby_l02_list_head[0]; entry; entry = *(char **)(entry + 0x28)) {
                 kind = *(short *)(entry + 0xAA);
-                if ((kind == 0xA9C || kind == 0xD0D || kind == 0xAA4 || kind == 0xE93 || kind == 0x1259) && *(float *)(entry + 0x18) < 400.0f)
+                if ((kind == MOBY_CLASS_SLOT_MACHINE || kind == 0xD0D || kind == 0xAA4 || kind == 0xE93 || kind == 0x1259) && *(float *)(entry + 0x18) < 400.0f)
                     ++g_hovering_object_count;
             }
         } else if (g_current_map_index[0] == 3) {

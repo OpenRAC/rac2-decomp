@@ -34,7 +34,8 @@ extern int ref_L00_003A9000_00(void *);
 extern void vec_scale_to_length(void *, void *, float);
 extern void FastVecAdd(void *, void *, void *);
 
-int func_PAL_L00_003AC7A0(TrailActor *self)
+/* Advances one trail slot by a step, scrolling its timers and moving its points; returns 0 when the slot has finished. */
+int trail_update_slot_pal(TrailActor *self)
 {
     TrailSource *source = self->source;
     char *base = level_get_slot_body(0x5CB, source->id);

@@ -15,13 +15,13 @@ extern f32 math_approach_with_velocity(f32 *position, f32 target, f32 *velocity,
                          f32 acceleration, f32 damping, f32 limit, s32 direction);
 typedef struct {
     u8 pad00[0x7A8];
-    f32 field7A8;
-    f32 field7AC;
-    f32 field7B0;
-    f32 field7B4;
+    f32 unk_7A8;
+    f32 unk_7AC;
+    f32 unk_7B0;
+    f32 unk_7B4;
     u8 pad7B8[0x2290 - 0x7B8];
-    u32 field2290;
-    u32 field2294;
+    u32 unk_2290;
+    u32 unk_2294;
 } D00189E20;
 extern D00189E20 g_hero_state;
 extern void math_update_wrapped_angle_offset(u32 a0, void *a1, void *a2, f32 f0, f32 f1, f32 f2);
@@ -73,18 +73,20 @@ extern f32 math_random_signed_float_range(f32 a0, f32 a1);
 extern f32 math_random_float_range(f32 a0, f32 a1);
 extern u32 g_running_total __attribute__((sda));
 
+/* Starts the hero's turn-and-sway animation when in the matching state (PAL). */
 void hero_start_turn_sway_anim_pal(void) {
-    if (g_hero_state.field2294 != 0x7C)
+    if (g_hero_state.unk_2294 != 0x7C)
         return;
-    math_update_wrapped_angle_offset(g_hero_state.field2290, &g_hero_state.field7A8, &g_hero_state.field7AC,
+    math_update_wrapped_angle_offset(g_hero_state.unk_2290, &g_hero_state.unk_7A8, &g_hero_state.unk_7AC,
                   0.3f, 0.13962635f, -1.0f);
 }
 
 extern void moby_scale_owner_words_by_angles(u32 a0, void *a1, void *a2, f32 f0, f32 f1, f32 f2);
 
+/* Starts the second hero sway animation when in the matching state (PAL). */
 void hero_start_second_sway_anim_pal(void) {
-    if (g_hero_state.field2294 != 0x7C)
+    if (g_hero_state.unk_2294 != 0x7C)
         return;
-    moby_scale_owner_words_by_angles(g_hero_state.field2290, &g_hero_state.field7B0, &g_hero_state.field7B4,
+    moby_scale_owner_words_by_angles(g_hero_state.unk_2290, &g_hero_state.unk_7B0, &g_hero_state.unk_7B4,
                   0.174532949924469f, 0.031415932f, 0.04188791f);
 }

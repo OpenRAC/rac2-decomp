@@ -66,9 +66,10 @@ extern s32 math_random_int_range(s32, s32);
 extern f32 math_fast_sin_or_cos_a(f32);
 extern f32 math_fast_sin_or_cos_b(f32);
 
+/* Updates the Glider moby (class 3675): it rises into place, turns slowly, and when the hero is near it plays a sound and removes itself (USA v2.00). */
 void glider_update_us2(u8 *self) {
-    u8 *st = *(u8 **)(self + 0x68);
-    u8 *ent;
+    u8 *state = *(u8 **)(self + 0x68);
+    u8 *entry;
 
     switch (self[0x20]) {
     case 0:
@@ -82,7 +83,7 @@ void glider_update_us2(u8 *self) {
         break;
     case 1:
         *(float *)(self + 0xF8) = FastAddRotations(*(float *)(self + 0xF8), 0.07853982597589493f);
-        if (IsPointInCuboid(g_hero_position, *(s32 *)(st + 4)) != 0) {
+        if (IsPointInCuboid(g_hero_position, *(s32 *)(state + 4)) != 0) {
             if (req_push_queue(g_request_l08_queue, 0x5B) != 0) {
                 req_launch_queued(g_request_l08_queue);
                 self[0x20] = 2;
@@ -101,10 +102,10 @@ void glider_update_us2(u8 *self) {
             break;
         g_glider_flag_table[10] = 0;
         self[0x31] = 1;
-        ent = g_collision_box_table[0];
+        entry = g_collision_box_table[0];
         *(u16 *)(self + 0x34) &= 0xFFFE;
-        ent += *(s32 *)(st + 8) * 0x80;
-        hero_reset_position_and_direction(ent + 0x30, ent + 0x70, 0, 1);
+        entry += *(s32 *)(state + 8) * 0x80;
+        hero_reset_position_and_direction(entry + 0x30, entry + 0x70, 0, 1);
         help_unlock_entry(0x15);
         value_set_entry_by_index_us2(0x122B, -1);
         MemcardSave(0, -1);

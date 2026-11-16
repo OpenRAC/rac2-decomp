@@ -189,7 +189,7 @@ extern void moby_update_ground_check(void *),func_002A0F48(void *);
 extern void cam_compute_view_direction(void *,void *,int), vec_negate_and_forward(void *,void *,int);
 extern int moby_apply_damage_to_object(void *,void *,int);
 extern void moby_set_state(void *,int,int), cancel_hero_item_animation(void), release_moby_animation_slot(void *,void *);
-extern s32 func_US2_L22_002C9B20(int,int);
+extern s32 hero_set_action_us2(int,int);
 
 /* Sets the record up on the first update (health scaled by difficulty, the object table
    scan, then the tuning block) and keeps the three child objects in step. The tuning
@@ -205,7 +205,7 @@ void space_ship_init_and_update_us2(Obj_15D0 *obj) {
     union { Quad q; float f[4]; } vec;
     anim_choose_next(obj);
     if (obj->f20 == 0) {
-        float factor, health, damageScale, rangeScale;
+        float factor, health, damage_scale, range_scale;
         short x380;
         int eight, alpha;
         int difficulty=g_space_ship_difficulty;
@@ -261,12 +261,12 @@ health_done:
         p->f77=eight; p->f72=eight; p->f76=eight;
         p->fCC=9; p->fCD=18; p->fCE=9; p->fCF=18; p->fD2=-1; p->fD3=-1;
         health=(float)g_space_ship_max_health;
-        rangeScale=900.0f/health; damageScale=9.0f/health;
+        range_scale=900.0f/health; damage_scale=9.0f/health;
         p->f7C=0.5833333730697632f; p->f80=1.0f/15;
         p->f84=1.0f/24; p->f88=1.0f/12;
         p->f8C=1.0f/60; p->f90=3; p->f94=4;
         p->f9C=0.4f; p->fA8=eight;
-        p->fBC=rangeScale; p->fB8=damageScale;
+        p->fBC=range_scale; p->fB8=damage_scale;
         p->f130=0.0044444446f; p->f134=0.0044444446f;
         p->f138=0.20000002f; p->f110=2.5f; p->f114=0.75f;
         p->f120=2; p->f118=2.75f; p->f144=0; p->f380=x380;
@@ -329,7 +329,7 @@ health_done:
         } else if(g_space_ship_timer<30) {
             g_hero_state.field2294=0; cancel_hero_item_animation();
             release_moby_animation_slot(g_hero_state.field2290,&g_hero_state.field1870);
-            g_hero_state.field187C=0; func_US2_L22_002C9B20(0,1);
+            g_hero_state.field187C=0; hero_set_action_us2(0,1);
         }
     } else if(g_hero_state.health<=0 && obj->f95!=1) {
         p->f350=0; p->f3E4=p->f3E8=0.0f;

@@ -26,6 +26,7 @@ extern void matrix_mul_vec3(void *,void *,void *);
 extern void FastVecAdd(void *,void *,void *);
 extern char *moby_get_private_value_0(u8 *);
 
+/* Works out the launch velocity to throw something from a start point to a target (or where the player aims). */
 void CalculateAimedLaunchVelocity_pal(Vector *output, Vector *origin, char *targetObject,
                    float minimum, float maximum,
                    float speed, float acceleration, char *sourceObject)

@@ -32,7 +32,7 @@ extern int D_L03_001B1C60_1[] MACRO_ADDR;
 extern int g_laser_beam_type_range __attribute__((sda));
 extern float D_L03_001B1C70_1[] MACRO_ADDR;
 /* Emits two particle families along the visible segment between from and to. */
-void func_PAL_L03_00424858(u8 *entity, Vector *from, Vector *to, int enabled) {
+void laser_bot_emit_beam_particles_pal(u8 *moby, Vector *from, Vector *to, int enabled) {
     Vector test, velocity, point, aux;
     int i, count, color, rotation;
     float life, step;
@@ -54,7 +54,7 @@ void func_PAL_L03_00424858(u8 *entity, Vector *from, Vector *to, int enabled) {
     if (enabled) {
         int j;
         count = g_laser_beam_particle_count;
-        if (entity[0x20] == 5) count = math_random_int_below(2);
+        if (moby[0x20] == 5) count = math_random_int_below(2);
         step = 1.0f / (float)g_laser_beam_particle_count;
         for (j=0; j<count; j++) {
             point.q = 0;
@@ -67,9 +67,9 @@ void func_PAL_L03_00424858(u8 *entity, Vector *from, Vector *to, int enabled) {
             lerp_vector(&aux, from, to, life + (float)j * step);
             aux.f[2] += 0.02f;
             {
-                u8 *p = part_spawn_trail(&aux, &velocity, &point, 0x40000000, 0x10000000, 5,
+                u8 *particle = part_spawn_trail(&aux, &velocity, &point, 0x40000000, 0x10000000, 5,
                                     g_laser_beam_type_range, D_L03_001B1C60_1[1], -1);
-                if (p) p[1] = 1;
+                if (particle) particle[1] = 1;
             }
         }
     }

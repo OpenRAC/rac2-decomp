@@ -50,50 +50,50 @@ extern f32 math_approach_target_with_direction_mode(char *a0, f32 *a1, f32 a3, f
 extern void cam_set_state_rotation(char *a0);
 extern void cam_set_mode_state(s32 a0);
 
-void camera_trigger_area_update_pal(char *a0)
+void camera_trigger_area_update_pal(char *moby)
 {
-    L03_22C8State *s2 = *(L03_22C8State **)(a0 + 0x68);
-    f32 v0[4] __attribute__((aligned(16)));
-    f32 v1[4] __attribute__((aligned(16)));
-    f32 v2[4] __attribute__((aligned(16)));
-    f32 k;
-    f32 len;
-    f32 one;
-    f32 k2;
+    L03_22C8State *vars = *(L03_22C8State **)(moby + 0x68);
+    f32 aim_pos[4] __attribute__((aligned(16)));
+    f32 aim_angles[4] __attribute__((aligned(16)));
+    f32 delta[4] __attribute__((aligned(16)));
+    f32 speed;
+    f32 distance;
+    f32 blend;
+    f32 angle_speed;
 
     if (g_camera_trigger_active != 0) {
         return;
     }
-    switch (*(u8 *)(a0 + 0x20)) {
+    switch (*(u8 *)(moby + 0x20)) {
     case 0:
-        moby_set_state(a0, 1, -1);
-        if (s2->index == -1) {
-            moby_mark_spawned(a0);
+        moby_set_state(moby, 1, -1);
+        if (vars->index == -1) {
+            moby_mark_spawned(moby);
         }
         break;
     case 1:
-        if (point_in_path_xy(g_hero_position, ((u8 *)g_path_l03_entry_table[s2->index] + 0x10), g_path_l03_entry_table[s2->index]->field00) != 0) {
+        if (point_in_path_xy(g_hero_position, ((u8 *)g_path_l03_entry_table[vars->index] + 0x10), g_path_l03_entry_table[vars->index]->field00) != 0) {
             SetCamera5Pose(g_camera_pose_buffer, g_camera_pose_buffer + 0x10, 1, 0, 0);
-            moby_set_state(a0, 2, -1);
+            moby_set_state(moby, 2, -1);
         }
         break;
     case 2:
-        k = 0.004f;
-        cam_compute_aim_and_angles(a0, v0, v1);
-        one = 1.0f;
-        FastVecSub(v2, v0, g_camera_pose_buffer);
-        k2 = 0.0012566373f;
-        len = FastVecLength(v2);
-        math_approach_target_with_braking(&s2->f18, len, k, k, one);
-        vec_scale_to_length(v2, v2, s2->f18);
-        FastVecAdd(g_camera_pose_buffer, v2, g_camera_pose_buffer);
+        speed = 0.004f;
+        cam_compute_aim_and_angles(moby, aim_pos, aim_angles);
+        blend = 1.0f;
+        FastVecSub(delta, aim_pos, g_camera_pose_buffer);
+        angle_speed = 0.0012566373f;
+        distance = FastVecLength(delta);
+        math_approach_target_with_braking(&vars->f18, distance, speed, speed, blend);
+        vec_scale_to_length(delta, delta, vars->f18);
+        FastVecAdd(g_camera_pose_buffer, delta, g_camera_pose_buffer);
         object_copy_vector_to_selected(g_camera_pose_buffer);
-        math_approach_target_with_direction_mode(g_camera_pose_buffer + 0x14, &s2->f1C, v1[1], k2, k2, one, 0);
-        math_approach_target_with_direction_mode(g_camera_pose_buffer + 0x18, &s2->f20, v1[2], k2, k2, one, 0);
+        math_approach_target_with_direction_mode(g_camera_pose_buffer + 0x14, &vars->f1C, aim_angles[1], angle_speed, angle_speed, blend, 0);
+        math_approach_target_with_direction_mode(g_camera_pose_buffer + 0x18, &vars->f20, aim_angles[2], angle_speed, angle_speed, blend, 0);
         cam_set_state_rotation(g_camera_pose_buffer + 0x10);
-        if (point_in_path_xy(g_hero_position, ((u8 *)g_path_l03_entry_table[s2->index] + 0x10), g_path_l03_entry_table[s2->index]->field00) == 0) {
+        if (point_in_path_xy(g_hero_position, ((u8 *)g_path_l03_entry_table[vars->index] + 0x10), g_path_l03_entry_table[vars->index]->field00) == 0) {
             cam_set_mode_state(1);
-            moby_set_state(a0, 1, -1);
+            moby_set_state(moby, 1, -1);
         }
         break;
     }

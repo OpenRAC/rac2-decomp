@@ -84,7 +84,7 @@ typedef struct {
    on the two level-specific actions, fades the effect out (releasing it at zero)
    or in, and creates it when it is allowed and absent. */
 void hero_update_effect_slot_pal(void) {
-    float v[4];
+    float point[4];
     int available;
     int i;
 
@@ -92,8 +92,8 @@ void hero_update_effect_slot_pal(void) {
         return;
     if (((Hero_002AA678 *)g_hero_state)->unk2294 == 1 && PadPressedWithin(16, 6, 0) && !player_slot_has_object(((Hero_002AA678 *)g_hero_state)->unk2290) &&
         ((Hero_002AA678 *)g_hero_state)->counts->unkC) {
-        hero_build_relative_point(v, 1, 2.0f, -2.1f, 8.7f);
-        ref_L22_002AA678_00(((Hero_002AA678 *)g_hero_state)->unk2290, v, 1);
+        hero_build_relative_point(point, 1, 2.0f, -2.1f, 8.7f);
+        ref_L22_002AA678_00(((Hero_002AA678 *)g_hero_state)->unk2290, point, 1);
         ((Hero_002AA678 *)g_hero_state)->counts->unkC--;
     }
     available = 1;
@@ -137,12 +137,12 @@ void hero_update_effect_slot_pal(void) {
             ((Hero_002AA678 *)g_hero_state)->fading = 0;
     }
     if (!((Hero_002AA678 *)g_hero_state)->active && available && PadPressedWithin(32, 7, 0)) {
-        Effect_002AA678 *p = allocate_moby_animation_slot(((Hero_002AA678 *)g_hero_state)->unk2290, 2);
+        Effect_002AA678 *effect_slot = allocate_moby_animation_slot(((Hero_002AA678 *)g_hero_state)->unk2290, 2);
         ((Hero_002AA678 *)g_hero_state)->fading = 0;
-        ((Hero_002AA678 *)g_hero_state)->effect = p;
-        if (p) {
+        ((Hero_002AA678 *)g_hero_state)->effect = effect_slot;
+        if (effect_slot) {
             ((Hero_002AA678 *)g_hero_state)->active = 1;
-            initialize_moby_animation_blend(((Hero_002AA678 *)g_hero_state)->unk2290, p, 13, 0, 7, 1);
+            initialize_moby_animation_blend(((Hero_002AA678 *)g_hero_state)->unk2290, effect_slot, 13, 0, 7, 1);
         }
     }
     if (!((Hero_002AA678 *)g_hero_state)->active || !((Hero_002AA678 *)g_hero_state)->effect || ((Hero_002AA678 *)g_hero_state)->fading)
@@ -154,10 +154,10 @@ void hero_update_effect_slot_pal(void) {
     if (((Hero_002AA678 *)g_hero_state)->effect->state == 4 && !((Hero_002AA678 *)g_hero_state)->timer) {
         ((Hero_002AA678 *)g_hero_state)->timer = 4;
         for (i = 0; i < 2; i++) {
-            moby_transform_joint_to_world(((Hero_002AA678 *)g_hero_state)->unk2290, i + 3, v);
-            vec_add_transformed_point(((Hero_002AA678 *)g_hero_state)->unk2290, v, 1.4f, 0, 0);
+            moby_transform_joint_to_world(((Hero_002AA678 *)g_hero_state)->unk2290, i + 3, point);
+            vec_add_transformed_point(((Hero_002AA678 *)g_hero_state)->unk2290, point, 1.4f, 0, 0);
             if (((Hero_002AA678 *)g_hero_state)->counts->unk8) {
-                ref_L22_002AA678_01(((Hero_002AA678 *)g_hero_state)->unk2290, v, 0, 0, ((Hero_002AA678 *)g_hero_state)->counts->unk0 != 0);
+                ref_L22_002AA678_01(((Hero_002AA678 *)g_hero_state)->unk2290, point, 0, 0, ((Hero_002AA678 *)g_hero_state)->counts->unk0 != 0);
                 ((Hero_002AA678 *)g_hero_state)->counts->unk8--;
             }
         }
@@ -171,28 +171,28 @@ void hero_update_effect_slot_pal(void) {
    so each stretch of the body re-materialises the base instead of keeping it
    live across the calls; the three table entries are the routines the tuning
    table points at, whose places differ from level to level. */
-void hero_restart_in_mode_pal(int a0, int a1, void *a2) {
-    char *s0 = g_hero_state;
+void hero_restart_in_mode_pal(int mode, int entry_id, void *moby_arg) {
+    char *hero = g_hero_state;
 
     cancel_hero_item_animation();
-    s0[0x22B6] = 1;
+    hero[0x22B6] = 1;
     UpdateHeroSlotCallbacks();
-    *(int *)(s0 + 0x2290) = *(int *)(s0 + 0xC18);
-    level_release_slot_list(s0 + 0x18E0);
-    level_release_slot_list(s0 + 0x1A30);
-    *(int *)(*(int *)(s0 + 0x2290) + 0x9C) = -1;
-    if (a0 != 4 || *(u8 *)(s0 + 0x22B4) != a0)
+    *(int *)(hero + 0x2290) = *(int *)(hero + 0xC18);
+    level_release_slot_list(hero + 0x18E0);
+    level_release_slot_list(hero + 0x1A30);
+    *(int *)(*(int *)(hero + 0x2290) + 0x9C) = -1;
+    if (mode != 4 || *(u8 *)(hero + 0x22B4) != mode)
         hero_set_objects_flag_bit();
     hero_clear_tracked_slots();
     attachment_reset_all();
     {
-        char *s1 = g_hero_state;
+        char *hero_2 = g_hero_state;
 
-        *(u8 *)(s1 + 0x22B4) = (u8)a0;
-        *(int *)(s1 + 0xC14) = (int)a2;
-        *(int *)(s1 + 0x2290) = (int)a2;
+        *(u8 *)(hero_2 + 0x22B4) = (u8)mode;
+        *(int *)(hero_2 + 0xC14) = (int)moby_arg;
+        *(int *)(hero_2 + 0x2290) = (int)moby_arg;
     }
-    if ((a0 & 0xFF) == 1) {
+    if ((mode & 0xFF) == 1) {
         if (g_pad_pressed_flags & 0x10) {
             hud_set_slot_contents(0x23, 0, &ref_L22_002B70F8_00, &ref_L22_002B70F8_01,
                           &ref_L22_002B70F8_02, 0, 0);
@@ -201,28 +201,28 @@ void hero_restart_in_mode_pal(int a0, int a1, void *a2) {
     }
     hero_l22_update_speed_targets();
     {
-        char *s2 = g_hero_state;
+        char *hero_3 = g_hero_state;
 
-        *(f32 *)(s2 + 0x250) = *(f32 *)(s2 + 0x258);
-        *(f32 *)(s2 + 0x254) = *(f32 *)(s2 + 0x25C);
-        *(u16 *)(*(int *)(s2 + 0x2290) + 0x34) |= 6;
-        *(f32 *)(s2 + 0xC20) = 1.0f;
-        *(f32 *)(s2 + 0xC24) = 1.0f;
+        *(f32 *)(hero_3 + 0x250) = *(f32 *)(hero_3 + 0x258);
+        *(f32 *)(hero_3 + 0x254) = *(f32 *)(hero_3 + 0x25C);
+        *(u16 *)(*(int *)(hero_3 + 0x2290) + 0x34) |= 6;
+        *(f32 *)(hero_3 + 0xC20) = 1.0f;
+        *(f32 *)(hero_3 + 0xC24) = 1.0f;
         hero_clear_queued_anim();
-        func_002A677C(*(int *)(s2 + 0x2290));
-        *(u16 *)(s2 + 0x24F2) = (u16)a1;
-        switch (a0) {
+        func_002A677C(*(int *)(hero_3 + 0x2290));
+        *(u16 *)(hero_3 + 0x24F2) = (u16)entry_id;
+        switch (mode) {
         case 1:
-            *(u16 *)(s2 + 0x24D4) = *(u16 *)(s2 + 0x24CC);
-            *(int *)(s2 + 0x24CC) = *(int *)(s2 + 0x24D0);
-            if (*(int *)(s2 + 0x24D0) >= 5)
-                *(int *)(s2 + 0x24CC) = 4;
+            *(u16 *)(hero_3 + 0x24D4) = *(u16 *)(hero_3 + 0x24CC);
+            *(int *)(hero_3 + 0x24CC) = *(int *)(hero_3 + 0x24D0);
+            if (*(int *)(hero_3 + 0x24D0) >= 5)
+                *(int *)(hero_3 + 0x24CC) = 4;
             break;
         case 2:
-            *(int *)(s2 + 0x1874) = 0x4B0;
+            *(int *)(hero_3 + 0x1874) = 0x4B0;
             break;
         }
     }
-    hero_l22_set_action(a1, 2);
+    hero_l22_set_action(entry_id, 2);
 }
 

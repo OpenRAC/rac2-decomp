@@ -44,7 +44,7 @@ extern EffectAngles g_effect_angles;
 extern EffectMaterialSelector g_item_slot_to_record;
 extern EffectMaterialEntry g_weapon_l00_table[];
 extern int g_effect_moby_count __attribute__((sda));
-extern char *func_PAL_L00_003BEE68(EffectObject *);
+extern char *spark_move_projectile_pal(EffectObject *);
 extern void vec_scale_to_length(void *, void *, float);
 extern void make_hit_descriptor(void *, void *, int, float, void *);
 extern void QueueMobyImpact(void *, void *);
@@ -62,7 +62,7 @@ extern void vec_clear_128(void *);
 extern void *part_spawn_ground_effect(void *, float, float, int, unsigned int, int, int,
                           void *, float, int);
 extern void moby_get_facing_direction(void *, void *);
-extern void func_PAL_L00_003C11A0(void *, void *, int, int);
+extern void part_l00_spawn_spark_burst_2_pal(void *, void *, int, int);
 extern void table_clear_entry_flag(int);
 extern void pair_clear_owner_key_entries(void *);
 extern void gfx_free_point_light(int);
@@ -73,19 +73,19 @@ extern void ref_L00_003BAC30_00(void *, EffectObject *);
 extern void spark_draw_projectile_pal(void *);
 
 /* Updates motion and hits, then shrinks, emits particles and releases resources. */
-void func_PAL_L01_003BA750(EffectObject *self)
+void update_l01_moving_effect_state_pal(EffectObject *self)
 {
     EffectAngles angles;
     char *hits[16];
     char vector[16];
     EffectHitPacket packet;
-    int count;
+    int hit_count;
     EffectState *state = self->state;
-    char *result;
+    char *hit_target;
     int i;
-    int handle;
-    int material;
-    EffectMaterialEntry *entry;
+    int light_handle;
+    int class_index;
+    EffectMaterialEntry *class_entry;
     float scale;
     float ratio;
 
@@ -94,23 +94,23 @@ void func_PAL_L01_003BA750(EffectObject *self)
     case 0:
     case 1:
         state->intensity += (0.6f - state->intensity) * 0.125f;
-        result = func_PAL_L00_003BEE68(self);
-        if (result) {
+        hit_target = spark_move_projectile_pal(self);
+        if (hit_target) {
             qcopy(vector, state);
             vec_scale_to_length(vector, vector, 0.040000003f);
-            material = g_item_slot_to_record.index;
-            entry = g_weapon_l00_table + material;
-            scale = entry->scale;
+            class_index = g_item_slot_to_record.index;
+            class_entry = g_weapon_l00_table + class_index;
+            scale = class_entry->scale;
             make_hit_descriptor(&packet, self, 0x210000, scale, vector);
             packet.field_18 = 1;
             packet.field_19 = 3;
             packet.id = self->id;
-            QueueMobyImpact(result, &packet);
-            StartAttachedEffect_pal(result, 0x3E, self->f_B8);
+            QueueMobyImpact(hit_target, &packet);
+            StartAttachedEffect_pal(hit_target, 0x3E, self->f_B8);
         }
         SelectBestTargetInCone(self->position, 6.2831855f, self->f_C0, 6.2831855f, 15.0f, 0.0f,
-                      &count, hits, 15, 0, 0.0f, 0, &angles);
-        for (i = 0; i < count; i++) {
+                      &hit_count, hits, 15, 0, 0.0f, 0, &angles);
+        for (i = 0; i < hit_count; i++) {
             if (state->f54 < 15 && pair_is_owner_key_free(self, hits[i])) {
                 KeyOwnerTableInsert(self, hits[i], 120);
                 spark_spawn_orbiting_record_pal(self, hits[i], 10);
@@ -123,7 +123,7 @@ void func_PAL_L01_003BA750(EffectObject *self)
         }
         break;
     case 2:
-        func_PAL_L00_003BEE68(self);
+        spark_move_projectile_pal(self);
         ratio = IntToFloat(state->timer) / IntToFloat(40);
         state->intensity = ratio * 0.5900000333786011f + 0.01f;
         self->position[0] += math_random_float_range(-0.1f, 0.1f);
@@ -138,14 +138,14 @@ void func_PAL_L01_003BA750(EffectObject *self)
     case 3:
         if (state->f54 == 0 && state->f58 == 0) {
             moby_get_facing_direction(self->position, &packet);
-            func_PAL_L00_003C11A0(self->position, &packet, 6, 0x72FF);
-            func_PAL_L00_003C11A0(self->position, &packet, 6, 0xFF0000);
+            part_l00_spawn_spark_burst_2_pal(self->position, &packet, 6, 0x72FF);
+            part_l00_spawn_spark_burst_2_pal(self->position, &packet, 6, 0xFF0000);
             table_clear_entry_flag(state->f50);
             pair_clear_owner_key_entries(self);
-            handle = state->light_index;
+            light_handle = state->light_index;
             g_effect_moby_count--;
-            if (handle != -1)
-                gfx_free_point_light(handle);
+            if (light_handle != -1)
+                gfx_free_point_light(light_handle);
             moby_mark_spawned(self);
             return;
         }

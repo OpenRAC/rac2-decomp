@@ -31,8 +31,8 @@ typedef struct {
 } HeroActionState;
 extern HeroActionState g_hero_state;
 
-/* Hand-adapted from func_L00_002CA898. */
-void func_PAL_L01_002C2EE8(void)
+/* Picks the hero's next move after landing: roll, hard landing, run or idle, depending on input, fall timer and speed (PAL). Hand-adapted from func_L00_002CA898. */
+void hero_l01_choose_next_move_after_landing_pal(void)
 {
     g_hero_state.reset_24a0 = 0;
     hero_resolve_stick_direction(0, 1.0f);

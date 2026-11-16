@@ -14,9 +14,9 @@ typedef struct {
     unsigned int levels;
 } Statistics_2D2CE8;
 extern Statistics_2D2CE8 g_progress_statistics;
-extern int func_PAL_0029D088(int);
+extern int menu_update_four_option_pal(int);
 
-int func_PAL_002D3C20(void)
+int menu_page_update_count_stats_pal(void)
 {
     int result = 0;
     unsigned int flags = g_menu_input_flags;
@@ -46,18 +46,19 @@ finish:
         if (((s32)g_frame_counter * 5 + 2) / 6 > stats->maximum) stats->maximum = ((s32)g_frame_counter * 5 + 2) / 6;
         stats->levels = (stats->levels | (1u << g_current_map_index)) | 0x80000000u;
         result = 1;
-    } else func_PAL_0029D088(flags);
+    } else menu_update_four_option_pal(flags);
     return result;
 }
 
 extern void SetupGifPaging(long);
-extern void func_PAL_0029D0C8(void);
+extern void menu_draw_four_option_pal(void);
 extern void DoGifPaging(void);
 
-int func_PAL_002D3DB8(void)
+/* Draws the statistics menu page between the GIF paging calls. */
+int menu_page_draw_2_pal(void)
 {
   SetupGifPaging(0);
-  func_PAL_0029D0C8();
+  menu_draw_four_option_pal();
   DoGifPaging();
   return 0;
 }

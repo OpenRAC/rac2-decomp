@@ -38,7 +38,7 @@ extern int math_random_int_below(int);
 extern void moby_set_flag_bit(unsigned char *, int);
 extern void moby_set_controller_speed_limits(unsigned char *, float, float, float, float);
 extern void moby_set_state(unsigned char *, unsigned char, int);
-extern void func_PAL_002A7E68(void *, int, int, int);
+extern void anim_start_blended_pal(void *, int, int, int);
 extern char *CreateMoby(int);
 extern void func_002A0F48(void *);
 extern void moby_copy_joint_transform_to_object(void *, void *, int, int);
@@ -65,7 +65,7 @@ typedef struct {
 extern Hero20C88 g_hero_state;
 extern char *g_path_l11_table[];
 extern char g_str_tribesman_debug[];
-extern int func_PAL_L11_00429B30(unsigned char *);
+extern int joba_rider_update_pal(unsigned char *);
 extern float vec_distance_xy(void *, void *);
 extern float mat_fast_helper_a(float, float);
 extern float fast_subtract_rotations(float, float);
@@ -95,13 +95,13 @@ extern int moby_l01_turn_toward_target_pal(char *, char *);
 extern float moby_turn_toward_position(struct family_27f9_object *, float *, float *, float, float, float);
 extern float MobySpringTurn(struct family_27f9_object *, float *, float, float, float, float);
 extern int moby_turn_toward_target_and_step_pal(char *, float *, float);
-extern int func_PAL_L11_0042A858(char *, char *, float, float, float, float);
+extern int tribesman_turn_toward_point_pal(char *, char *, float, float, float, float);
 extern float math_fabs(float);
-extern int func_PAL_002AF6C0(char *, float);
+extern int math_is_value_within_step_pal(char *, float);
 extern void vec_build_spherical_offset(float *, float, float, float);
 extern char *robot_spawn_debris_pal(void *, void *, void *, int, float);
 extern int coll_sweep_from_object(void *, void *, int, float, float, float, int, int, int);
-extern void func_PAL_L11_0042AB20(char *);
+extern void tribesman_rearm_guard_nodes_pal(char *);
 
 /* A group's ID list entry names an object; bit 15 only marks the list's last entry. */
 static inline int group_entry_id(unsigned short *entry)
@@ -138,7 +138,10 @@ static inline int rider_kind(char *moby)
 #define PLAY(p, animation, start, blend) \
     (BYTE((p), 0x43) != (animation) ? func_PAL_002A7E68((p), (animation), (start), (blend)) : (void)0)
 
-void func_PAL_L11_00425B68(unsigned char *object)
+/* Updates a Joba Tribesman. It follows its paths, turns to face the hero, picks fight or idle
+   animations, reacts to its linked mount and group, and removes itself when its health object
+   says it is done (PAL: 50 Hz timings). */
+void tribesman_l11_update_pal(unsigned char *object)
 {
     Vector offset, side, point;
     char *state, *path;
@@ -150,7 +153,7 @@ void func_PAL_L11_00425B68(unsigned char *object)
     if (g_hero_state.mode == 0x6f && BYTE(object, 0x95) != 4) return;
     old_z = REAL(object, 0x18);
     state = POINTER(object, 0x68);
-    if (func_PAL_L11_00429B30(object) != 0) {
+    if (joba_rider_update_pal(object) != 0) {
         moby_mark_spawned(object);
         return;
     }
@@ -188,7 +191,7 @@ void func_PAL_L11_00425B68(unsigned char *object)
                 }
                 if (WORD(state, 0x294) == 1) {
                     if (BYTE(object, 0x43) != 0x22)
-                        func_PAL_002A7E68(object, 0x22, 0, ((s32)math_random_int_range(7, 20) * 5 + 2) / 6);
+                        anim_start_blended_pal(object, 0x22, 0, ((s32)math_random_int_range(7, 20) * 5 + 2) / 6);
                     moby_set_state(object, 0x18, 2);
                 } else {
                     if (WORD(state, 0x570) != 0) {
@@ -207,7 +210,7 @@ void func_PAL_L11_00425B68(unsigned char *object)
                 } else {
                     if (WORD(state, 0x294) == 1) {
                         if (BYTE(object, 0x43) != 0x22)
-                            func_PAL_002A7E68(object, 0x22, 0, ((s32)math_random_int_range(7, 20) * 5 + 2) / 6);
+                            anim_start_blended_pal(object, 0x22, 0, ((s32)math_random_int_range(7, 20) * 5 + 2) / 6);
                         moby_set_state(object, 0x18, 2);
                     } else {
                         if (WORD(state, 0x570) != 0) {
@@ -231,11 +234,11 @@ void func_PAL_L11_00425B68(unsigned char *object)
             if (HALF(state, 0x266) == 0) break;
             if (WORD(state, 0x558) != -1 && WORD(state, 0x560) == 1) {
                 if (BYTE(object, 0x43) != 0x18)
-                    func_PAL_002A7E68(object, 0x18, 0, ((s32)math_random_int_range(5, 15) * 5 + 2) / 6);
+                    anim_start_blended_pal(object, 0x18, 0, ((s32)math_random_int_range(5, 15) * 5 + 2) / 6);
                 moby_set_state(object, 6, -1);
             } else if (WORD(state, 0x558) != -1 && WORD(state, 0x560) > 1) {
                 if (BYTE(object, 0x43) != 15)
-                    func_PAL_002A7E68(object, 15, 0, ((s32)math_random_int_range(5, 15) * 5 + 2) / 6);
+                    anim_start_blended_pal(object, 15, 0, ((s32)math_random_int_range(5, 15) * 5 + 2) / 6);
                 moby_set_state(object, 7, -1);
                 moby_set_controller_speed_limits(object, 0.0056000003f, 0.14000002f, 0.004886923f, 0.31415933f);
             } else {
@@ -251,7 +254,7 @@ void func_PAL_L11_00425B68(unsigned char *object)
                     moby_set_state(object, 0x20, 2);
                 } else if (WORD(state, 0x294) == 1) {
                     if (BYTE(object, 0x43) != 0x22)
-                        func_PAL_002A7E68(object, 0x22, 0, ((s32)math_random_int_range(7, 20) * 5 + 2) / 6);
+                        anim_start_blended_pal(object, 0x22, 0, ((s32)math_random_int_range(7, 20) * 5 + 2) / 6);
                     moby_set_state(object, 0x18, 2);
                 } else if (WORD(state, 0x570) != 0) {
                     PLAY(object, 0x21, 0, 4);
@@ -323,7 +326,7 @@ void func_PAL_L11_00425B68(unsigned char *object)
             if (WORD(state, 0x294) == 1) {
                 if (BYTE(object, 0x43) != 0x19) {
                     index = math_random_int_below(4);
-                    func_PAL_002A7E68(object, 0x19, index, ((s32)math_random_int_range(7, 20) * 5 + 2) / 6);
+                    anim_start_blended_pal(object, 0x19, index, ((s32)math_random_int_range(7, 20) * 5 + 2) / 6);
                 }
                 moby_set_state(object, 0x18, 2);
             } else {
@@ -335,7 +338,7 @@ void func_PAL_L11_00425B68(unsigned char *object)
             if (WORD(state, 0x294) == 1) {
                 if (BYTE(object, 0x43) != 0x22) {
                     index = math_random_int_below(4);
-                    func_PAL_002A7E68(object, 0x22, index, ((s32)math_random_int_range(7, 20) * 5 + 2) / 6);
+                    anim_start_blended_pal(object, 0x22, index, ((s32)math_random_int_range(7, 20) * 5 + 2) / 6);
                 }
                 moby_set_state(object, 0x18, 2);
             } else {
@@ -424,12 +427,12 @@ void func_PAL_L11_00425B68(unsigned char *object)
                 moby_set_state(object, 0x22, 2);
             }
             if (g_hero_state.mode == 0x31 && WORD(state, 0x574) != -1) {
-                if (BYTE(object, 0x43) != 15) func_PAL_002A7E68(object, 15, 0, ((s32)math_random_int_range(5, 15) * 5 + 2) / 6);
+                if (BYTE(object, 0x43) != 15) anim_start_blended_pal(object, 15, 0, ((s32)math_random_int_range(5, 15) * 5 + 2) / 6);
                 moby_set_state(object, 8, 8);
             }
         } else if (WORD(state, 0x558) != -1) {
             WORD(state, 0x178) &= ~0x10;
-            if (BYTE(object, 0x43) != 15) func_PAL_002A7E68(object, 15, 0, ((s32)math_random_int_range(5, 15) * 5 + 2) / 6);
+            if (BYTE(object, 0x43) != 15) anim_start_blended_pal(object, 15, 0, ((s32)math_random_int_range(5, 15) * 5 + 2) / 6);
             moby_set_state(object, 7, 1);
             moby_set_controller_speed_limits(object, 0.0056000003f, 0.14000002f, 0.004886923f, 0.31415933f);
         } else {
@@ -453,7 +456,7 @@ void func_PAL_L11_00425B68(unsigned char *object)
         }
     check_route:
         if (g_hero_state.mode == 0x31 && WORD(state, 0x574) != -1) {
-            if (BYTE(object, 0x43) != 15) func_PAL_002A7E68(object, 15, 0, ((s32)math_random_int_range(5, 15) * 5 + 2) / 6);
+            if (BYTE(object, 0x43) != 15) anim_start_blended_pal(object, 15, 0, ((s32)math_random_int_range(5, 15) * 5 + 2) / 6);
             moby_set_state(object, 9, 8);
             moby_set_controller_speed_limits(object, 0.0056000003f, 0.14000002f, 0.004886923f, 0.31415933f);
         }
@@ -543,14 +546,14 @@ void func_PAL_L11_00425B68(unsigned char *object)
         euler_rotation_basis(linked + 0xc0, object + 0xf0);
         if ((unsigned int)(UHALF(state, 0x264) - 1) > 1 && BYTE(object, 0x20) != 0x26 && BYTE(object, 0x20) != 0x28) {
             PLAY(object, 0x1f, 0, 8);
-            func_PAL_002A7E68(linked, 0, 0, 8);
+            anim_start_blended_pal(linked, 0, 0, 8);
             moby_set_state(object, 0x28, -1);
         }
         if (BYTE(object, 0x20) == 0x28 && HALF(state, 0x264) == 2) {
             moby_set_controller_speed_limits(object, 0.0056000003f, 0.14000002f, 0.0016755164f, 0.12566373f);
             PLAY(object, 0x20, 0, 8);
             moby_set_state(object, 0x27, -1);
-            func_PAL_002A7E68(linked, 1, 0, 8);
+            anim_start_blended_pal(linked, 1, 0, 8);
         }
         break;
     }
@@ -611,7 +614,7 @@ void func_PAL_L11_00425B68(unsigned char *object)
         }
         if ((unsigned int)(BYTE(object, 0x42) - 0x1a) < 2 && (BYTE(object, 0x60) & 2) != 0) {
             PLAY(object, 0x1d, 0, 25);
-            if (HALF(POINTER(state, 0x55c), 0xaa) == 0xcf5) {
+            if (HALF(POINTER(state, 0x55c), 0xaa) == MOBY_CLASS_JOBA_TRIBESMAN) {
                 WORD(POINTER(POINTER(state, 0x55c), 0x68), 0x540) = 1;
                 WORD(state, 0x540) = 2;
             }
@@ -626,7 +629,7 @@ void func_PAL_L11_00425B68(unsigned char *object)
                 ids = g_group_id_lists[BYTE(object, 0x21)];
                 for (;;) {
                     linked = moby_at(group_entry_id(ids));
-                    if (moby_state(linked) >= 0 && moby_class(linked) == 0xcf5 &&
+                    if (moby_state(linked) >= 0 && moby_class(linked) == MOBY_CLASS_JOBA_TRIBESMAN &&
                         rider_kind(linked) == 1)
                         break;
                     if (*(short *)ids++ < 0) goto partner_done;
@@ -665,13 +668,13 @@ void func_PAL_L11_00425B68(unsigned char *object)
             moby_set_state(object, 10, -1);
         }
         if (WORD(state, 0x588) != 0) {
-            if (BYTE(object, 0x43) != 15) func_PAL_002A7E68(object, 15, 0, ((s32)math_random_int_range(5, 15) * 5 + 2) / 6);
+            if (BYTE(object, 0x43) != 15) anim_start_blended_pal(object, 15, 0, ((s32)math_random_int_range(5, 15) * 5 + 2) / 6);
             moby_set_state(object, 8, 8);
         }
         break;
     case 10:
         if ((BYTE(object, 0x60) & 2) != 0) {
-            if (BYTE(object, 0x43) != 15) func_PAL_002A7E68(object, 15, 0, ((s32)math_random_int_range(5, 15) * 5 + 2) / 6);
+            if (BYTE(object, 0x43) != 15) anim_start_blended_pal(object, 15, 0, ((s32)math_random_int_range(5, 15) * 5 + 2) / 6);
             moby_set_state(object, 8, 8);
             WORD(state, 0x588) = 1;
         }
@@ -816,7 +819,7 @@ void func_PAL_L11_00425B68(unsigned char *object)
         }
         if (WORD(state, 0x528) == 0) {
             moby_turn_toward_target_and_step_pal((char *)object, g_hero_state.position.v, REAL(state, 0x298));
-        } else if (func_PAL_L11_0042A858((char *)object, (char *)&g_hero_state.position, REAL(object, 0xf8), 7.0f, 0.25f, REAL(state, 0x298)) != 0 &&
+        } else if (tribesman_turn_toward_point_pal((char *)object, (char *)&g_hero_state.position, REAL(object, 0xf8), 7.0f, 0.25f, REAL(state, 0x298)) != 0 &&
                    BYTE(object, 0x21) <= g_tribe_group_limit && moby_count_group_not_in_state(BYTE(object, 0x21), -1) > 1) {
             unsigned short *ids;
             unsigned int id;
@@ -906,18 +909,18 @@ void func_PAL_L11_00425B68(unsigned char *object)
         }
         angle = mat_fast_helper_a(g_hero_state.position.v[0] - REAL(object, 0x10), g_hero_state.position.v[1] - REAL(object, 0x14));
         if (FastDiffRots(REAL(object, 0xf8), angle) < 0.26179942f && BYTE(linked, 0x43) != 1) {
-            func_PAL_002A7E68(linked, 1, 0, 4);
+            anim_start_blended_pal(linked, 1, 0, 4);
             PLAY(object, 0x20, 0, 4);
             break;
         }
         if (BYTE(linked, 0x42) != 1) break;
-        if (func_PAL_002AF6C0(linked, 6.0f) != 0 || func_PAL_002AF6C0(linked, 12.0f) != 0 || func_PAL_002AF6C0(linked, 0.0f) != 0) {
+        if (math_is_value_within_step_pal(linked, 6.0f) != 0 || math_is_value_within_step_pal(linked, 12.0f) != 0 || math_is_value_within_step_pal(linked, 0.0f) != 0) {
             moby_transform_joint_to_world(linked, 1, (char *)&offset);
             FastVecSub(&side, &g_hero_state.aim, &offset);
             vec_scale_to_length(&side, &side, 0.6f);
             robot_spawn_debris_pal(linked, &side, &offset, 0, (float)BYTE(state, 0x36));
             break;
-        } else if (func_PAL_002AF6C0(linked, 3.0f) != 0 || func_PAL_002AF6C0(linked, 9.0f) != 0 || func_PAL_002AF6C0(linked, 15.0f) != 0) {
+        } else if (math_is_value_within_step_pal(linked, 3.0f) != 0 || math_is_value_within_step_pal(linked, 9.0f) != 0 || math_is_value_within_step_pal(linked, 15.0f) != 0) {
             moby_transform_joint_to_world(linked, 0, (char *)&offset);
             FastVecSub(&side, &g_hero_state.aim, &offset);
             vec_scale_to_length(&side, &side, 0.6f);
@@ -930,13 +933,13 @@ void func_PAL_L11_00425B68(unsigned char *object)
         char *linked;
 
         linked = (char *)(g_moby_l11_table + WORD(state, 0x548) * 0x100);
-        if (func_PAL_002AF6C0(linked, 6.0f) != 0 || func_PAL_002AF6C0(linked, 12.0f) != 0 || func_PAL_002AF6C0(linked, 0.0f) != 0) {
+        if (math_is_value_within_step_pal(linked, 6.0f) != 0 || math_is_value_within_step_pal(linked, 12.0f) != 0 || math_is_value_within_step_pal(linked, 0.0f) != 0) {
             moby_transform_joint_to_world(linked, 1, (char *)&offset);
             FastVecSub(&side, &g_hero_state.aim, &offset);
             vec_scale_to_length(&side, &side, 0.6f);
             robot_spawn_debris_pal(linked, &side, &offset, 0, (float)BYTE(state, 0x36));
             break;
-        } else if (func_PAL_002AF6C0(linked, 3.0f) != 0 || func_PAL_002AF6C0(linked, 9.0f) != 0 || func_PAL_002AF6C0(linked, 15.0f) != 0) {
+        } else if (math_is_value_within_step_pal(linked, 3.0f) != 0 || math_is_value_within_step_pal(linked, 9.0f) != 0 || math_is_value_within_step_pal(linked, 15.0f) != 0) {
             moby_transform_joint_to_world(linked, 0, (char *)&offset);
             FastVecSub(&side, &g_hero_state.aim, &offset);
             vec_scale_to_length(&side, &side, 0.6f);
@@ -964,23 +967,23 @@ void func_PAL_L11_00425B68(unsigned char *object)
             if (WORD(state, 0x568) > 1) WORD(state, 0x568) = 0;
             if (BYTE(object, 0x42) == 0x20 && UHALF(object, 0x96) > 120) {
                 PLAY(object, 0x1f, 0, 8);
-                func_PAL_002A7E68(mount, 0, 0, 8);
+                anim_start_blended_pal(mount, 0, 0, 8);
             }
         }
         if (WORD(state, 0x584) != 0) {
             STUB_printf(g_str_tribesman_debug);
             PLAY(object, 0x20, 0, 4);
-            func_PAL_002A7E68(mount, 1, 0, 4);
+            anim_start_blended_pal(mount, 1, 0, 4);
             WORD(state, 0x584) = 0;
             UHALF(object, 0x96) = 0;
         }
         if (BYTE(object, 0x42) != 0x20) break;
-        if (func_PAL_002AF6C0(mount, 6.0f) != 0 || func_PAL_002AF6C0(mount, 12.0f) != 0 || func_PAL_002AF6C0(mount, 0.0f) != 0) {
+        if (math_is_value_within_step_pal(mount, 6.0f) != 0 || math_is_value_within_step_pal(mount, 12.0f) != 0 || math_is_value_within_step_pal(mount, 0.0f) != 0) {
             moby_transform_joint_to_world(mount, 1, (char *)&offset);
             vec_build_spherical_offset(side.v, 0.6f, REAL(object, 0xf8),
                           mat_fast_helper_a(vec_distance_xy(&offset, &g_hero_state.aim), g_hero_state.aim.v[2] - offset.v[2]));
             robot_spawn_debris_pal(mount, &side, &offset, 0, (float)BYTE(state, 0x36));
-        } else if (func_PAL_002AF6C0(mount, 3.0f) != 0 || func_PAL_002AF6C0(mount, 9.0f) != 0 || func_PAL_002AF6C0(mount, 15.0f) != 0) {
+        } else if (math_is_value_within_step_pal(mount, 3.0f) != 0 || math_is_value_within_step_pal(mount, 9.0f) != 0 || math_is_value_within_step_pal(mount, 15.0f) != 0) {
             moby_transform_joint_to_world(mount, 0, (char *)&offset);
             vec_build_spherical_offset(side.v, 0.6f, REAL(object, 0xf8),
                           mat_fast_helper_a(vec_distance_xy(&offset, &g_hero_state.aim), g_hero_state.aim.v[2] - offset.v[2]));
@@ -1068,7 +1071,7 @@ void func_PAL_L11_00425B68(unsigned char *object)
         break;
     case 26:
         if (WORD(state, 0x528) != 0) {
-            if (func_PAL_L11_0042A858((char *)object, (char *)&g_hero_state.position, REAL(object, 0xf8), 7.0f, 0.25f, REAL(state, 0x298)) != 0) {
+            if (tribesman_turn_toward_point_pal((char *)object, (char *)&g_hero_state.position, REAL(object, 0xf8), 7.0f, 0.25f, REAL(state, 0x298)) != 0) {
                 PLAY(object, 0x15, 0, 8);
                 moby_set_state(object, 0x19, -1);
             }
@@ -1178,6 +1181,6 @@ void func_PAL_L11_00425B68(unsigned char *object)
     default:
         break;
     }
-    func_PAL_L11_0042AB20((char *)object);
+    tribesman_rearm_guard_nodes_pal((char *)object);
     if (math_fabs(REAL(object, 0x18) - old_z) < 0.005f) REAL(object, 0x18) = old_z;
 }

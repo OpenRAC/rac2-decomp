@@ -51,12 +51,12 @@ static __inline__ unsigned long PackGaugeFlag(unsigned long flags,
     return flags | ((unsigned long)value << shift);
 }
 
-/* Draws the museum status gauge and updates its swizzled palette. */
+/* Draws the museum status gauge and updates its swizzled palette (PAL version). */
 void DrawMuseumStatusGauge_pal(char *obj) {
-    char *s = *(char **)(obj + 0x68);
-    unsigned long tex;
+    char *state = *(char **)(obj + 0x68);
+    unsigned long texture;
     float scale = 0.017453294f, delta, absdelta, angle;
-    int n, lo, hi, i, j;
+    int fill, lo, hi, i, palette_index;
 
     unsigned long flags, mode;
     flags = g_gauge_flags_base;
@@ -72,51 +72,51 @@ void DrawMuseumStatusGauge_pal(char *obj) {
     mode = PackGaugeFlag(mode, g_gauge_mode_flag_c, 6);
     gfx_append_vectors_to_packet(2, 0x47, flags | ((unsigned long)g_gauge_flags_high_bits << 17),
             0x42, mode | ((unsigned long)g_gauge_mode_high_byte << 32));
-    tex = GetEffectTextureDescriptor(g_effect_texture_base_a + *(int *)(s + 0x64));
+    texture = GetEffectTextureDescriptor(g_effect_texture_base_a + *(int *)(state + 0x64));
     DrawTexturedQuad(FloatToInt(g_gauge_l30_screen_x), g_screen_height - 80,
-           64, 64, 0, 0, 64, 64, g_effect_texture_size_arg, tex);
-    tex = GetEffectTextureDescriptor(g_effect_texture_base_b + *(int *)(s + 0x64));
+           64, 64, 0, 0, 64, 64, g_effect_texture_size_arg, texture);
+    texture = GetEffectTextureDescriptor(g_effect_texture_base_b + *(int *)(state + 0x64));
     DrawTexturedQuad(FloatToInt(g_gauge_l30_screen_x) + 64, g_screen_height - 80,
-           64, 64, 0, 0, 64, 64, g_effect_texture_size_arg, tex);
-    tex = GetEffectTextureDescriptor(g_effect_texture_base_c + *(int *)(s + 0x64));
-    angle = g_gauge_angle_scale * (FastVecLength(s) * scale);
+           64, 64, 0, 0, 64, 64, g_effect_texture_size_arg, texture);
+    texture = GetEffectTextureDescriptor(g_effect_texture_base_c + *(int *)(state + 0x64));
+    angle = g_gauge_angle_scale * (FastVecLength(state) * scale);
     angle /= g_vehicle_turn_speed * 0.020000001f;
     angle = FastAddRotations(angle, g_gauge_angle_rate * scale);
     AppendRotatedSpriteQuad(g_gauge_l30_screen_x + 32.0f, (float)(g_screen_height - 48),
-           32.0f, 32.0f, angle, 32, 32, tex, 0xFFFFF3, 0x60808080, 0, 0, 0.5f, 0.35f);
-    absdelta = g_gauge_delta_scale * (math_fabs(*(float *)(s + 0x5C)) * scale);
+           32.0f, 32.0f, angle, 32, 32, texture, 0xFFFFF3, 0x60808080, 0, 0, 0.5f, 0.35f);
+    absdelta = g_gauge_delta_scale * (math_fabs(*(float *)(state + 0x5C)) * scale);
     angle = FastAddRotations(g_gauge_angle_offset_scale * scale, absdelta);
     AppendRotatedSpriteQuad(g_gauge_l30_screen_x + 64.0f + 32.0f, (float)(g_screen_height - 48),
-           32.0f, 32.0f, angle, 32, 32, tex, 0xFFFFF3, 0x60808080, 0, 0, 0.5f, 0.35f);
-    delta = g_hero_state.current - *(float *)(s + 0x94);
+           32.0f, 32.0f, angle, 32, 32, texture, 0xFFFFF3, 0x60808080, 0, 0, 0.5f, 0.35f);
+    delta = g_hero_state.current - *(float *)(state + 0x94);
     delta *= 0.2f;
     absdelta = math_fabs(delta);
     if (absdelta > 1.0f) {
         delta /= absdelta;
     }
-    *(float *)(s + 0x94) += delta;
-    n = FloatToInt(*(float *)(s + 0x94) * 251.0f / g_hero_state.maximum) + 2;
-    if (n > 253) {
-        n = 253;
+    *(float *)(state + 0x94) += delta;
+    fill = FloatToInt(*(float *)(state + 0x94) * 251.0f / g_hero_state.maximum) + 2;
+    if (fill > 253) {
+        fill = 253;
     }
-    if (n < 2) {
-        n = 2;
+    if (fill < 2) {
+        fill = 2;
     }
-    lo = *(int *)(s + 0x98) <= n ? *(int *)(s + 0x98) : n;
-    hi = *(int *)(s + 0x98) < n ? n : *(int *)(s + 0x98);
+    lo = *(int *)(state + 0x98) <= fill ? *(int *)(state + 0x98) : fill;
+    hi = *(int *)(state + 0x98) < fill ? fill : *(int *)(state + 0x98);
     for (i = lo; i <= hi; i++) {
-        j = (i & 0xE7) | ((i & 16) >> 1) | ((i & 8) << 1);
-        if (i < n) {
-            (*(unsigned **)&g_gauge_palette_ptr)[j] = g_palette_copy[j];
+        palette_index = (i & 0xE7) | ((i & 16) >> 1) | ((i & 8) << 1);
+        if (i < fill) {
+            (*(unsigned **)&g_gauge_palette_ptr)[palette_index] = g_palette_copy[palette_index];
         } else {
-            (*(unsigned **)&g_gauge_palette_ptr)[j] = 0x80000000;
+            (*(unsigned **)&g_gauge_palette_ptr)[palette_index] = 0x80000000;
         }
     }
-    tex = GetEffectTextureDescriptor(*(int *)(s + 0x64) + g_effect_texture_offset);
-    DrawTexturedQuad(368, g_screen_height - 144, 128, 128, 0, 0, 128, 128, 0x70808080, tex);
-    tex = GetEffectTextureDescriptor(*(int *)(s + 0x64) + g_effect_texture_offset_alt);
-    DrawTexturedQuad(368, g_screen_height - 144, 128, 128, 0, 0, 128, 128, 0x70808080, tex);
-    *(int *)(s + 0x98) = n;
+    texture = GetEffectTextureDescriptor(*(int *)(state + 0x64) + g_effect_texture_offset);
+    DrawTexturedQuad(368, g_screen_height - 144, 128, 128, 0, 0, 128, 128, 0x70808080, texture);
+    texture = GetEffectTextureDescriptor(*(int *)(state + 0x64) + g_effect_texture_offset_alt);
+    DrawTexturedQuad(368, g_screen_height - 144, 128, 128, 0, 0, 128, 128, 0x70808080, texture);
+    *(int *)(state + 0x98) = fill;
     if (g_hero_state.current < g_hero_state.maximum * 0.1f && ((g_low_health_blink_timer / 90) & 1)) {
         text_draw_centered_medium(256, 370, 0x80000080, GetLocalizedString(0x1149), 100);
     }

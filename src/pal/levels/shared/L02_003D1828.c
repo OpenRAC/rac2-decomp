@@ -9,15 +9,15 @@ extern L02Word g_group_max_index __attribute__((sda));
 extern int g_group_max_index __attribute__((sda));
 
 /* Sets every entity of the object's group to state 1 with a 0xB4 timer. */
-void func_PAL_L02_003D1828(unsigned char *arg0) {
+void moby_set_group_state_timer_pal(unsigned char *owner) {
     unsigned short *q;
     char *e;
 
-    if (arg0[0x21] == 0xFF)
+    if (owner[0x21] == 0xFF)
         return;
-    q = (unsigned short *)g_entity_group_lists[arg0[0x21]];
-    while (arg0[0x21] != 0xFF && arg0[0x21] <= g_group_max_index && q != 0 &&
-           ((q != 0 && (short)q[-1] >= 0) || q == (unsigned short *)g_entity_group_lists[arg0[0x21]])) {
+    q = (unsigned short *)g_entity_group_lists[owner[0x21]];
+    while (owner[0x21] != 0xFF && owner[0x21] <= g_group_max_index && q != 0 &&
+           ((q != 0 && (short)q[-1] >= 0) || q == (unsigned short *)g_entity_group_lists[owner[0x21]])) {
         char *o;
 
         e = g_moby_l02_pool + ((*q & 0x7FFF) << 8);

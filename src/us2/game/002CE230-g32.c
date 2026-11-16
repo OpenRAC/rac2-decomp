@@ -20,10 +20,11 @@ extern int menu_get_setting_value(void);
 extern void tex_upload_queued_blocks(void *);
 extern int func_0029C208(int);
 
+/* Handles button input for a menu page: confirm picks the selected item, back closes the page, and the cursor highlight flag stays in step with the selection. */
 int menu_handle_selection_input_us2(void)
 {
     int result = 0;
-    int old = menu_get_setting_value();
+    int previous_setting = menu_get_setting_value();
     int flags = g_pad_state.flags;
 
     if (flags & 0x10) {
@@ -37,13 +38,13 @@ int menu_handle_selection_input_us2(void)
     } else
         func_0029C208(flags);
     if (g_resident_data_base != 0) {
-        int cur = menu_get_setting_value();
-        if (old == cur && g_sequence_active_flag[0] == 0
-            && ((g_menu_cursor_fields.f50 == cur && g_menu_cursor_fields.f44 == 2) || (g_menu_cursor_fields.f54 == cur && g_menu_cursor_fields.f44 == 4)))
+        int current_setting = menu_get_setting_value();
+        if (previous_setting == current_setting && g_sequence_active_flag[0] == 0
+            && ((g_menu_cursor_fields.f50 == current_setting && g_menu_cursor_fields.f44 == 2) || (g_menu_cursor_fields.f54 == current_setting && g_menu_cursor_fields.f44 == 4)))
             g_menu_flag_target_list[0]->flags &= -5;
         else
             g_menu_flag_target_list[0]->flags |= 4;
-        g_menu_cursor_fields.f58 = cur;
+        g_menu_cursor_fields.f58 = current_setting;
     }
     return result;
 }

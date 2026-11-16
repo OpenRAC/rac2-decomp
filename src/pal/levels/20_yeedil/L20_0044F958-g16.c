@@ -36,6 +36,7 @@ extern void quaternion_to_rotation_basis(void *, void *);
 extern void multiply_matrix3x3(void *, void *, void *);
 extern int math_fast_float_d(int *);
 
+/* Update handler for moby class 4846, a flying projectile: it moves, bounces off walls, falls and spins, and is removed when it hits something or its time runs out. */
 void yeedil_projectile_update_pal(u8 *moby)
 {
     float rate;

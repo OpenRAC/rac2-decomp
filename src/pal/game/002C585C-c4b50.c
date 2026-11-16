@@ -11,7 +11,9 @@ extern float g_particle_ground_vector[];
 extern float g_particle_floor_offset;
 extern float g_particle_min_floor_height;
 
-void func_PAL_002C585C(FallingParticle_C4B50 *self) {
+/* Particle that falls with gravity and is freed when it leaves the map or sinks below the
+   ground height. */
+void part_update_falling_ground_pal(FallingParticle_C4B50 *self) {
     ParticlePayload_C4B50 motion, sample, sample_again;
     float *velocity = self->velocity_floor.lane;
     float floor = velocity[3];
@@ -63,7 +65,7 @@ extern int FastDecTimer(short *);
 /* The velocity decays by 0.98 per frame. While D_001A8BB0 is clear the spark
    follows its owner (its offset moved by the velocity, then rotated by the
    owner's matrix at 0xC0) and dies with it; otherwise it drifts. */
-void func_PAL_002C5A28(char *self)
+void part_update_owner_following_spark_pal(char *self)
 {
     float v[4], w[4], m[4];
     SparkMotion_C4D18 *p = (SparkMotion_C4D18 *)(self + 0x20);

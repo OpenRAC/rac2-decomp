@@ -25,7 +25,7 @@ extern void moby_set_state(void *, int, int);
 extern int math_fast_float_d(int *);
 extern f32 math_random_float_range(f32, f32);
 extern int FloatToInt(f32);
-extern void func_PAL_002A7E68(void *, int, int, int);
+extern void anim_start_blended_pal(void *, int, int, int);
 extern f32 vec_distance_xy(void *, void *);
 extern f32 mat_fast_helper_a(f32, f32);
 extern f32 FastDiffRots(f32, f32);
@@ -49,48 +49,49 @@ extern void settings_store_four(int, int, int, int);
 extern void menu_set_size_limits(int, int);
 extern int request_begin_slot(int, int, int, int, unsigned char *);
 
-void func_PAL_L04_0043ECD0(u8 *object) {
+/* Talking character that waits for the player, plays a conversation and a hint message once, then turns its head toward the player (PAL: 50 Hz timings). */
+void barlow_hint_npc_update_pal(u8 *moby) {
     BarlowVector target, origin, delta;
-    u8 *data = *(u8 **)(object + 0x68);
+    u8 *vars = *(u8 **)(moby + 0x68);
     u8 *linked;
     int message;
     f32 rate;
     f32 blend;
     f32 heading, yaw, pitch;
     int look;
-    conversation_clear_target_on_talk(object);
-    switch (object[0x20]) {
+    conversation_clear_target_on_talk(moby);
+    switch (moby[0x20]) {
     case 0:
-        linked = g_moby_l04_pool + *(int *)(data + 0x120) * 256;
+        linked = g_moby_l04_pool + *(int *)(vars + 0x120) * 256;
         *(int *)(linked + 0x98) = 0;
         linked[0x31] = 0;
         *(u16 *)(linked + 0x34) |= 1;
-        moby_reset_vars_defaults(object);
-        if (g_object_state_flags_b & 0x20000000) moby_set_state(object, 4, -1);
-        else moby_set_state(object, 1, -1);
+        moby_reset_vars_defaults(moby);
+        if (g_object_state_flags_b & 0x20000000) moby_set_state(moby, 4, -1);
+        else moby_set_state(moby, 1, -1);
         break;
     case 1:
-        if (hero_is_reachable_for_count(object, 10, 6.5f)) {
-            level_apply_index_for_key((int)object);
+        if (hero_is_reachable_for_count(moby, 10, 6.5f)) {
+            level_apply_index_for_key((int)moby);
             req_push_queue(g_request_l04_queue, 0x3D);
             req_launch_queued(g_request_l04_queue);
-            moby_set_state(object, 2, -1);
+            moby_set_state(moby, 2, -1);
         }
         break;
     case 2:
         if (g_game_l04_mode == 2) {
-            object[0x31] = 0;
-            *(u16 *)(object + 0x34) |= 1;
+            moby[0x31] = 0;
+            *(u16 *)(moby + 0x34) |= 1;
         }
         g_cutscene_flags[1] = 1;
         if (!game_is_either_mode_two()) {
             g_cutscene_flags[1] = 0;
-            object[0x31] = 1;
-            *(u16 *)(object + 0x34) &= ~1;
-            vec_scale_to_length(&target, object + 0xC0, 4.0f);
-            add_vectors(&origin, &target, object + 0x10);
+            moby[0x31] = 1;
+            *(u16 *)(moby + 0x34) &= ~1;
+            vec_scale_to_length(&target, moby + 0xC0, 4.0f);
+            add_vectors(&origin, &target, moby + 0x10);
             hero_reset_position_and_direction_pal(&target, &((Hero *)g_hero_state)->q[0x90 / 16], 0, 1);
-            moby_set_state(object, 3, -1);
+            moby_set_state(moby, 3, -1);
         }
         break;
     case 3:
@@ -100,56 +101,56 @@ void func_PAL_L04_0043ECD0(u8 *object) {
             settings_store_four(message, 0, GetLocalizedString(0x1B64), 1);
             menu_set_size_limits(0x40, 0);
             request_begin_slot(4, 1, 10, 0, 0);
-            moby_set_state(object, 4, -1);
+            moby_set_state(moby, 4, -1);
         }
         break;
     case 4:
         break;
     }
-    if (object[0x20] != 0) {
-        if (object[0x43] == 0 && math_fast_float_d((int *)(data + 0x11C))) {
-            *(int *)(data + 0x11C) = FloatToInt((math_random_float_range(1200.0f, 2400.0f) * 5.0f + 2.0f) * 0.16666667f);
-            if (object[0x43] != 1)
-                func_PAL_002A7E68(object, 1, 0, 8);
-        } else if ((object[0x60] & 2) && object[0x43] != 0) {
-            func_PAL_002A7E68(object, 0, 0, 8);
+    if (moby[0x20] != 0) {
+        if (moby[0x43] == 0 && math_fast_float_d((int *)(vars + 0x11C))) {
+            *(int *)(vars + 0x11C) = FloatToInt((math_random_float_range(1200.0f, 2400.0f) * 5.0f + 2.0f) * 0.16666667f);
+            if (moby[0x43] != 1)
+                anim_start_blended_pal(moby, 1, 0, 8);
+        } else if ((moby[0x60] & 2) && moby[0x43] != 0) {
+            anim_start_blended_pal(moby, 0, 0, 8);
         }
     }
     rate = 0.02f;
     blend = 0.3f;
     look = 0;
-    if (object[0x43] == 0) {
+    if (moby[0x43] == 0) {
         look = 1;
-        if (vec_distance_xy(object + 0x10, &((Hero *)g_hero_state)->q[0x80 / 16]) < 8.0f &&
-            FastDiffRots(*(f32 *)(object + 0xF8), mat_fast_helper_a(((Hero *)g_hero_state)->f[0xE0 / 4] - *(f32 *)(object + 0x10), ((Hero *)g_hero_state)->f[0xE4 / 4] - *(f32 *)(object + 0x14))) < 1.5707964897155762f) {
+        if (vec_distance_xy(moby + 0x10, &((Hero *)g_hero_state)->q[0x80 / 16]) < 8.0f &&
+            FastDiffRots(*(f32 *)(moby + 0xF8), mat_fast_helper_a(((Hero *)g_hero_state)->f[0xE0 / 4] - *(f32 *)(moby + 0x10), ((Hero *)g_hero_state)->f[0xE4 / 4] - *(f32 *)(moby + 0x14))) < 1.5707964897155762f) {
             if (FastVecLength(&((Hero *)g_hero_state)->q[0x110 / 16]) > 0.01f)
-                *(int *)(data + 0x114) = 100;
+                *(int *)(vars + 0x114) = 100;
             else
-                math_fast_float_d((int *)(data + 0x114));
-        } else if (*(int *)(data + 0x114)) {
-            *(int *)(data + 0x114) = 0;
-            qcopy((data + 0x100), &((Hero *)g_hero_state)->q[0xE0 / 16]);
+                math_fast_float_d((int *)(vars + 0x114));
+        } else if (*(int *)(vars + 0x114)) {
+            *(int *)(vars + 0x114) = 0;
+            qcopy((vars + 0x100), &((Hero *)g_hero_state)->q[0xE0 / 16]);
         }
-        if (math_fast_float_d((int *)(data + 0x118))) {
-            *(int *)(data + 0x118) = FloatToInt((math_random_float_range(180.0f, 300.0f) * 5.0f + 2.0f) * 0.16666667f);
-            heading = FastAddRotations(*(f32 *)(object + 0xF8), math_random_float_range(-90.0f, 90.0f) * 0.01745329424738884f);
+        if (math_fast_float_d((int *)(vars + 0x118))) {
+            *(int *)(vars + 0x118) = FloatToInt((math_random_float_range(180.0f, 300.0f) * 5.0f + 2.0f) * 0.16666667f);
+            heading = FastAddRotations(*(f32 *)(moby + 0xF8), math_random_float_range(-90.0f, 90.0f) * 0.01745329424738884f);
             pitch = math_random_float_range(0.0f, 30.0f) * 0.01745329424738884f;
-            vec_build_spherical_offset(data + 0x100, 6.0f, heading, pitch);
-            FastVecAdd(data + 0x100, data + 0x100, object + 0x10);
+            vec_build_spherical_offset(vars + 0x100, 6.0f, heading, pitch);
+            FastVecAdd(vars + 0x100, vars + 0x100, moby + 0x10);
         }
-        if (*(int *)(data + 0x114)) {
+        if (*(int *)(vars + 0x114)) {
             qcopy(&target, &((Hero *)g_hero_state)->q[0xE0 / 16]);
             rate = 0.04f;
             blend = 0.3f;
         } else {
-            qcopy(&target, (data + 0x100));
+            qcopy(&target, (vars + 0x100));
         }
     }
     if (look) {
-        qcopy(&origin, (object + 0x10));
+        qcopy(&origin, (moby + 0x10));
         origin.f[2] += 2.0f;
         FastVecSub(&delta, &target, &origin);
-        yaw = fast_subtract_rotations(mat_fast_helper_a(delta.f[0], delta.f[1]), *(f32 *)(object + 0xF8));
+        yaw = fast_subtract_rotations(mat_fast_helper_a(delta.f[0], delta.f[1]), *(f32 *)(moby + 0xF8));
         pitch = -mat_fast_helper_a(vec_length_xy(&delta), delta.f[2]);
         if (yaw > 1.5707964897155762f)
             yaw = 1.5707964897155762f;
@@ -159,12 +160,12 @@ void func_PAL_L04_0043ECD0(u8 *object) {
             pitch = 0.174532949924469f;
         else if (pitch < -0.174532949924469f)
             pitch = -0.174532949924469f;
-        *(f32 *)(data + 0x64) = pitch;
-        *(f32 *)(data + 0x68) = yaw * 0.6f;
-        *(f32 *)(data + 0xE8) = yaw * 0.4f;
+        *(f32 *)(vars + 0x64) = pitch;
+        *(f32 *)(vars + 0x68) = yaw * 0.6f;
+        *(f32 *)(vars + 0xE8) = yaw * 0.4f;
     }
     if (g_unlocked_item_flags)
-        *(f32 *)(data + 0x70) = 2.75f;
-    moby_update_eased_node(object, data, 0, rate * 1.44f, blend * 1.44f);
-    moby_update_eased_node(object, data + 0x80, 1, rate * 1.44f, blend * 1.44f);
+        *(f32 *)(vars + 0x70) = 2.75f;
+    moby_update_eased_node(moby, vars, 0, rate * 1.44f, blend * 1.44f);
+    moby_update_eased_node(moby, vars + 0x80, 1, rate * 1.44f, blend * 1.44f);
 }

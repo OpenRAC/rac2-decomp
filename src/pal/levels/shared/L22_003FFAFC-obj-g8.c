@@ -30,13 +30,14 @@ extern f32 ref_L22_003FB310_06;
 extern const f32 ref_L22_003FB310_07;
 extern u8 ref_L22_003FB310_08[];
 extern u8 * ref_L22_003FB310_09;
-extern void func_PAL_L22_004001E8(void *, void *, int, int);
+extern void part_l22_emit_spark_burst_pal(void *, void *, int, int);
 extern void part_update_effect_particles_pal(void *);
 
-void func_PAL_L22_003FFAFC(u8 *obj) {
+/* Per-frame update for moby class 3642: a spinning, shrinking effect that follows the camera view, throws sparks, kills its particles and removes itself when done. (PAL: 50 Hz timings) */
+void spinning_effect_update_pal(u8 *obj) {
     f32 axis[4] __attribute__((aligned(16)));
-    u8 *ctl = *(u8 **)(obj + 0x68);
-    f32 f;
+    u8 *vars = *(u8 **)(obj + 0x68);
+    f32 dist;
     int i;
     f32 rot[4] __attribute__((aligned(16)));
     /* Transform construction and collision recovery use this scratch space
@@ -56,9 +57,9 @@ void func_PAL_L22_003FFAFC(u8 *obj) {
         } collision;
     } scratch __attribute__((aligned(16)));
     if (obj[0x20] == 0x62) return;
-    f = fast_vec_dist(g_hero_state + 0x80, obj + 0x10);
-    *(f32 *)(ctl + 0x2C) = f;
-    if (ref_L22_003FB310_07 <= f) obj[0x23] = 255;
+    dist = fast_vec_dist(g_hero_state + 0x80, obj + 0x10);
+    *(f32 *)(vars + 0x2C) = dist;
+    if (ref_L22_003FB310_07 <= dist) obj[0x23] = 255;
     cam_compute_view_direction(obj + 0x10, axis, 0);
     if (flag_set_first_pending(obj) && obj[0x20] == 0x10) snd_start_in_slot(0x12, 0, 0);
     if (obj[0x20] == 0) {
@@ -97,15 +98,15 @@ void func_PAL_L22_003FFAFC(u8 *obj) {
                 FastVecScale(scratch.transform.end, obj + 0xC0, -(ref_L22_003FB310_01 * 1.2f));
                 break;
             }
-            func_PAL_L22_004001E8(scratch.transform.start, scratch.transform.end, ref_L22_003FB310_02, 0);
+            part_l22_emit_spark_burst_pal(scratch.transform.start, scratch.transform.end, ref_L22_003FB310_02, 0);
         }
         set_identity_rotation_rows(scratch.transform.scale);
-        f = (37.0f - (f32)*(u16 *)(obj + 0x96) * 0.027027028f) * (ref_L22_003FB310_03 * 0.027027028f);
-        scratch.transform.scale[0] = scratch.transform.scale[5] = scratch.transform.scale[10] = f;
+        dist = (37.0f - (f32)*(u16 *)(obj + 0x96) * 0.027027028f) * (ref_L22_003FB310_03 * 0.027027028f);
+        scratch.transform.scale[0] = scratch.transform.scale[5] = scratch.transform.scale[10] = dist;
         multiply_matrix3x3(scratch.transform.mat, scratch.transform.scale, scratch.transform.mat);
         multiply_matrix3x3(obj + 0xC0, obj + 0xC0, scratch.transform.mat);
         for (i = 0; i < 8; i++) {
-            void **slot = (void **)(ctl + 0x60 + i * 4);
+            void **slot = (void **)(vars + 0x60 + i * 4);
             if (*slot) { part_kill(*slot); *slot = 0; }
         }
         if (*(u16 *)(obj + 0x96) >= 38) {
@@ -128,7 +129,7 @@ void func_PAL_L22_003FFAFC(u8 *obj) {
     }
     if (*(u16 *)(obj + 0x96) < 65535) (*(u16 *)(obj + 0x96))++;
     else *(u16 *)(obj + 0x96) = 0;
-    if (*(s16 *)(ctl + 0x2A) != 0 && (*(u16 *)(obj + 0x96) & 31) == 0) {
+    if (*(s16 *)(vars + 0x2A) != 0 && (*(u16 *)(obj + 0x96) & 31) == 0) {
         FastVecScale(rot, axis, 6.0f);
         FastVecScale(scratch.collision.mat, axis, -3.0f);
         FastVecAdd(rot, rot, obj + 0x10);
@@ -145,7 +146,7 @@ void func_PAL_L22_003FFAFC(u8 *obj) {
             FastVecAdd(scratch.collision.start, scratch.collision.start, obj + 0x10);
             FastVecAdd(scratch.collision.end, scratch.collision.end, obj + 0x10);
             if (CollLine(scratch.collision.end, scratch.collision.start, 0x12, 0, 0)) qcopy(obj + 0x10, ref_L22_003FB310_08);
-            *(s16 *)(ctl + 0x2A) = 0;
+            *(s16 *)(vars + 0x2A) = 0;
         }
     }
 }

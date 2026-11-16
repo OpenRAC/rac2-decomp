@@ -38,7 +38,7 @@ extern int g_trail_duration_max __attribute__((sda));
  * overwrites; its RNG calls and actual writes are retained without qualifiers.
  * The second radial lower bound is absolute, including at the RNG call site:
  * NOT_SDA plus the standard no-split-addresses profile retains that access. */
-void func_PAL_L00_003EC0E0(unsigned char *object, const unsigned char *info, float opacity)
+void part_spawn_model_trails_pal(unsigned char *object, const unsigned char *info, float opacity)
 {
     MmiPoint points[32] __attribute__((aligned(16)));
     TrailVector from, to;

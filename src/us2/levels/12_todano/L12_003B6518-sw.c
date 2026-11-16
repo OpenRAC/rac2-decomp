@@ -83,8 +83,9 @@ extern s32 point_in_path_xy(void *, void *, s32);
 extern void anim_start_blended(void *, s32, s32, s32);
 extern void moby_set_state(void *, s32, s32);
 
+/* Updates the item trade NPC (moby class 2001). It spawns a partner object, talks to the hero, and keeps turning its head to follow the hero or look around. (USA v2.00) */
 void UpdateTodanoItemTradeNpc_us2(u8 *self) {
-    UpdateVars *v = *(UpdateVars **)(self + 0x68);
+    UpdateVars *vars = *(UpdateVars **)(self + 0x68);
     float target[4] __attribute__((aligned(16)));
     float position[4] __attribute__((aligned(16)));
     float delta[4] __attribute__((aligned(16)));
@@ -97,14 +98,14 @@ void UpdateTodanoItemTradeNpc_us2(u8 *self) {
     case 0:
         if (!g_item_owned_flags[7]) {
             partner = CreateMoby(0x127B);
-            v->partner = partner;
+            vars->partner = partner;
             if (partner) {
                 *(u16 *)(partner+0x32) = *(u16 *)(self+0x32);
-                v->partner[0x30] = self[0x30];
-                *(u64 *)(v->partner+0x38) = *(u64 *)(self+0x38);
-                *(u32 *)(v->partner+0x78) = *(u32 *)(self+0x78);
-                v->partner[0x31] = 1;
-                func_002A0F48(v->partner);
+                vars->partner[0x30] = self[0x30];
+                *(u64 *)(vars->partner+0x38) = *(u64 *)(self+0x38);
+                *(u32 *)(vars->partner+0x78) = *(u32 *)(self+0x78);
+                vars->partner[0x31] = 1;
+                func_002A0F48(vars->partner);
                 if (g_object_state_flags_f & 0x200000) moby_set_state(self,2,-1);
                 else moby_set_state(self,1,-1);
             }
@@ -132,8 +133,8 @@ void UpdateTodanoItemTradeNpc_us2(u8 *self) {
                 int partnerMode = g_partner_mode_words[1];
                 *(u16 *)(self+0x34) = flags;
                 if (partnerMode == 2) {
-                    *(u16 *)(v->partner+0x34) |= 1;
-                    v->partner[0x31] = 0;
+                    *(u16 *)(vars->partner+0x34) |= 1;
+                    vars->partner[0x31] = 0;
                 }
             }
         }
@@ -141,8 +142,8 @@ void UpdateTodanoItemTradeNpc_us2(u8 *self) {
             g_glow_resize_flags[1] = 0;
             self[0x31] = 1;
             *(u16 *)(self+0x34) &= ~1;
-            *(u16 *)(v->partner+0x34) &= ~1;
-            v->partner[0x31] = 1;
+            *(u16 *)(vars->partner+0x34) &= ~1;
+            vars->partner[0x31] = 1;
             if (g_item_owned_flags[0x31]) moby_set_state(self,4,-1);
             else moby_set_state(self,3,-1);
         }
@@ -174,8 +175,8 @@ void UpdateTodanoItemTradeNpc_us2(u8 *self) {
                 int partnerMode = g_partner_mode_words[1];
                 *(u16 *)(self+0x34) = flags;
                 if (partnerMode == 2) {
-                    *(u16 *)(v->partner+0x34) |= 1;
-                    v->partner[0x31] = 0;
+                    *(u16 *)(vars->partner+0x34) |= 1;
+                    vars->partner[0x31] = 0;
                 }
             }
         }
@@ -183,8 +184,8 @@ void UpdateTodanoItemTradeNpc_us2(u8 *self) {
             g_glow_resize_flags[1] = 0;
             self[0x31] = 1;
             *(u16 *)(self+0x34) &= ~1;
-            moby_mark_spawned(v->partner);
-            v->partner = 0;
+            moby_mark_spawned(vars->partner);
+            vars->partner = 0;
             if (self[0x21] != 0xFF) moby_set_byte_on_group(self[0x21],1);
             if (!g_item_owned_flags[7]) {
                 g_item_owned_flags[0x31] = 0;
@@ -199,8 +200,8 @@ void UpdateTodanoItemTradeNpc_us2(u8 *self) {
         break;
     }
     if (self[0x20] != 0) {
-        if (self[0x43] < 2 && math_fast_float_d(&v->timer11C)) {
-            v->timer11C = FloatToInt(math_random_float_range(1200.0f,2400.0f));
+        if (self[0x43] < 2 && math_fast_float_d(&vars->timer11C)) {
+            vars->timer11C = FloatToInt(math_random_float_range(1200.0f,2400.0f));
             if (self[0x43] != 2) anim_start_blended(self,2,0,10);
         }
         else if ((self[0x60] & 2) && self[0x43] == math_random_int_below(2))
@@ -212,24 +213,24 @@ void UpdateTodanoItemTradeNpc_us2(u8 *self) {
         active = 1;
         if (vec_distance_xy(self+0x10,g_hero_state.pos) < 8.0f &&
             FastDiffRots(*(float *)(self+0xF8),mat_fast_helper_a(g_hero_state.target[0]-*(float *)(self+0x10),g_hero_state.target[1]-*(float *)(self+0x14))) < 1.5707964897155762f) {
-                if (FastVecLength(g_hero_state.velocity) > 0.01f) v->timer114 = 120;
-                else math_fast_float_d(&v->timer114);
-        } else if (v->timer114) {
-            v->timer114 = 0;
-            qcopy(v->direction,g_hero_state.target);
+                if (FastVecLength(g_hero_state.velocity) > 0.01f) vars->timer114 = 120;
+                else math_fast_float_d(&vars->timer114);
+        } else if (vars->timer114) {
+            vars->timer114 = 0;
+            qcopy(vars->direction,g_hero_state.target);
         }
-        if (math_fast_float_d(&v->timer118)) {
+        if (math_fast_float_d(&vars->timer118)) {
             float randomTurn;
-            v->timer118 = FloatToInt(math_random_float_range(180.0f,300.0f));
+            vars->timer118 = FloatToInt(math_random_float_range(180.0f,300.0f));
             randomTurn = FastAddRotations(*(float *)(self+0xF8),math_random_float_range(-90.0f,90.0f)*0.01745329424738884f);
             pitch = math_random_float_range(0.0f,30.0f)*0.01745329424738884f;
-            vec_build_spherical_offset(v->direction,6.0f,randomTurn,pitch);
-            FastVecAdd(v->direction,v->direction,self+0x10);
+            vec_build_spherical_offset(vars->direction,6.0f,randomTurn,pitch);
+            FastVecAdd(vars->direction,vars->direction,self+0x10);
         }
-        if (v->timer114) {
+        if (vars->timer114) {
             qcopy(target,g_hero_state.target);
             rate = 0.04f;
-        } else qcopy(target,v->direction);
+        } else qcopy(target,vars->direction);
     }
     if (active) {
         qcopy(position,self+0x10);
@@ -241,12 +242,12 @@ void UpdateTodanoItemTradeNpc_us2(u8 *self) {
         else if (turn < -1.5707964897155762f) turn = -1.5707964897155762f;
         if (pitch > 0.523598849773407f) pitch = 0.523598849773407f;
         else if (pitch < -0.523598849773407f) pitch = -0.523598849773407f;
-        *(float *)((u8 *)v+0x64) = pitch;
-        *(float *)((u8 *)v+0x68) = turn*0.6f;
-        *(float *)((u8 *)v+0xE8) = turn*0.4f;
+        *(float *)((u8 *)vars+0x64) = pitch;
+        *(float *)((u8 *)vars+0x68) = turn*0.6f;
+        *(float *)((u8 *)vars+0xE8) = turn*0.4f;
     }
-    if (g_unlocked_item_flags) *(float *)((u8 *)v+0x70) = 2.75f;
-    TurnJoint(self,v,0,rate);
-    TurnJoint(self,(u8 *)v+0x80,1,rate);
-    if (v->partner) moby_copy_joint_transform_to_object(self,v->partner,2,0);
+    if (g_unlocked_item_flags) *(float *)((u8 *)vars+0x70) = 2.75f;
+    TurnJoint(self,vars,0,rate);
+    TurnJoint(self,(u8 *)vars+0x80,1,rate);
+    if (vars->partner) moby_copy_joint_transform_to_object(self,vars->partner,2,0);
 }

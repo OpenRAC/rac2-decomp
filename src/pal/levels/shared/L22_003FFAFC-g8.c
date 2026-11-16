@@ -17,7 +17,7 @@ extern int ref_L22_003FB9B8_05 __attribute__((sda));
 extern float ref_L22_003FB9B8_06 __attribute__((sda));
 
 /* Emit two particles for each randomly perturbed point. */
-void func_PAL_L22_004001E8(float *position, float *direction, int count) {
+void part_l22_emit_spark_burst_pal(float *position, float *direction, int count) {
     float velocity[4] __attribute__((aligned(16)));
     float point[4] __attribute__((aligned(16)));
     float scaled[4] __attribute__((aligned(16)));

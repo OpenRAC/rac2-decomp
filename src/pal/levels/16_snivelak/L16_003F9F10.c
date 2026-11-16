@@ -22,7 +22,7 @@ extern s32 coll_test_point(void *, s32, void *, float);
 
 /* Steers the object toward the next point of its path (the state's table and cursor at
    0x294/0x2A4); advances the cursor once within half a unit, and returns 1 when the path is done. */
-s32 func_PAL_L16_004099C0(u8 *moby)
+s32 path_follow_points_pal(u8 *moby)
 {
     float point[4] __attribute__((aligned(16)));
     float step[4] __attribute__((aligned(16)));

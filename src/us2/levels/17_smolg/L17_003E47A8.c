@@ -63,7 +63,9 @@ extern void add_vectors(void *,void *,void *);
 extern float FastAddRotations(float,float);
 extern float MobySpringTurn(char *,float,float *,float,float,float);
 
-void func_US2_L17_003E47A8(char *object)
+/* Updates a Grulch (moby class 2952): it wanders, notices the player, walks up, attacks and
+   is removed when it dies or falls out of the level (USA v2.00 copy). */
+void grulch_update_us2(char *object)
 {
     float movement[4], position[4];
     char *vars, *other;
@@ -103,10 +105,10 @@ void func_US2_L17_003E47A8(char *object)
                 if(I(vars,0x428)!=-1) {
                     if(!ride_platform_can_start(g_moby_l17_pool[0]+(I(vars,0x428)<<8))) break;
                     ride_platform_start(g_moby_l17_pool[0]+(I(vars,0x428)<<8));
-                    { char *entityBase = g_moby_l17_pool[0];
+                    { char *entity_base = g_moby_l17_pool[0];
                     U(object,0x34)&=0xFFBE;
                     I(object,0x98)=I(P(object,0x24),0x10);
-                    if(H((I(vars,0x428)<<8)+(u32)entityBase,0xAA)==0x929) {
+                    if(H((I(vars,0x428)<<8)+(u32)entity_base,0xAA)==0x929) {
                         moby_set_state(object,8,3);
                         anim_start_immediate(object,9,0);
                         F(object,0xF8)=F((char *)((I(vars,0x428)<<8)+(u32)g_moby_l17_pool[0]),0xF8);
@@ -115,13 +117,13 @@ void func_US2_L17_003E47A8(char *object)
                         I(vars,0x428)=-1;
                         moby_set_state(object,10,2);
                         if(B(object,0x43)!=2) anim_start_blended(object,2,0,14);
-                        goto restoreCollision;
+                        goto restore_collision;
                     }
                     }
                 } else {
                     moby_set_state(object,10,2);
                     if(B(object,0x43)!=2) anim_start_blended(object,2,0,14);
-restoreCollision:
+restore_collision:
                     U(object,0x34)&=0xFFBE;
                     I(object,0x98)=I(P(object,0x24),0x10);
                 }
@@ -227,7 +229,7 @@ restoreCollision:
             H(vars,0x400)=math_random_int_range(120,200);
             if(B(object,0x43)!=9) anim_start_blended(object,9,0,12);
         }
-        goto restoreAnimationSpeed;
+        goto restore_animation_speed;
     case 10:
         if(B(object,0x60)&2) {
             moby_set_state(object,4,-1);
@@ -309,7 +311,7 @@ restoreCollision:
                 if(B(object,0x43)!=7) anim_start_blended(object,7,0,14);
                 I(vars,0x448)=0;
             }
-restoreAnimationSpeed:
+restore_animation_speed:
             F(object,0x48)=1.0f;
         }
         break;

@@ -15,11 +15,11 @@ extern void object_set_first_pair(void *, int, int);
 extern void object_set_second_pair(void *, int, int);
 extern void text_set_alignment(void *, unsigned int);
 extern void widget_store_field(void *, int);
-extern void func_PAL_0034D490(void *, void *, void *);
+extern void hud_ammo_bolt_init_pal(void *, void *, void *);
 extern void object_init_derived_c(void *, void *, void *);
 extern int *object_get_fourth_field(void *);
 extern void *object_get_field_b(void *);
-extern void func_PAL_00339968(void *, void *);
+extern void text_panel_init_pal(void *, void *);
 
 typedef struct {
     char records[0x798];
@@ -33,37 +33,38 @@ typedef struct {
     int f2210;
 } RecordSet;
 
-void records_screen_init_pal(void *object, void *a1, void *a2)
+/* Sets up the records screen: the row_ptr row texts, the ammo and bolt HUD, and the other panels (PAL layout). */
+void records_screen_init_pal(void *screen, void *font_data, void *context)
 {
-    RecordSet *set = object;
-    char *record = (char *)0x8710;
+    RecordSet *set = screen;
+    char *row_ptr = (char *)0x8710;
     char *end = set->records + 0x750;
-    void *colour;
+    void *color;
 
-    set->f220C = table_find_by_id((int)g_resident_data_base + (int)record, 0x57);
-    set->f2210 = table_find_by_id((int)g_resident_data_base + (int)record, 0x58);
-    record = set->records;
+    set->f220C = table_find_by_id((int)g_resident_data_base + (int)row_ptr, 0x57);
+    set->f2210 = table_find_by_id((int)g_resident_data_base + (int)row_ptr, 0x58);
+    row_ptr = set->records;
     do {
-        object_init_derived_b(record, 0x20, 1, g_records_widget_data_a, a2);
-        widget_set_pos_y(record, 5);
-        func_PAL_003388E8(record, 0x64);
-        meter_set_value(record, 0);
-        object_set_first_pair(record, 0x8049C1FF, 0x80001EFF);
-        object_set_second_pair(record, 0x50F0C070, 0x50F0C070);
-        text_set_alignment(record, 0x80000000);
-        widget_store_field(record, 1);
-        record += 0x48;
-    } while (record < end);
-    record = set->f1D30;
-    func_PAL_0034D490(set->f7A0, a1, a2);
-    object_init_derived_c(record, g_records_widget_data_b, a2);
-    colour = object_get_fourth_field(record);
-    *(float *)colour = 2155905152.0f;
-    colour = object_get_field_b(record);
-    *(float *)colour = 60008.0f;
-    colour = object_get_field_b(record);
-    *(int *)((char *)colour + 4) = 0;
-    set->f798 = a2;
-    func_PAL_00339968(set->f1D6C, a2);
-    func_PAL_00339968(set->f1FBC, a2);
+        object_init_derived_b(row_ptr, 0x20, 1, g_records_widget_data_a, context);
+        widget_set_pos_y(row_ptr, 5);
+        func_PAL_003388E8(row_ptr, 0x64);
+        meter_set_value(row_ptr, 0);
+        object_set_first_pair(row_ptr, 0x8049C1FF, 0x80001EFF);
+        object_set_second_pair(row_ptr, 0x50F0C070, 0x50F0C070);
+        text_set_alignment(row_ptr, 0x80000000);
+        widget_store_field(row_ptr, 1);
+        row_ptr += 0x48;
+    } while (row_ptr < end);
+    row_ptr = set->f1D30;
+    hud_ammo_bolt_init_pal(set->f7A0, font_data, context);
+    object_init_derived_c(row_ptr, g_records_widget_data_b, context);
+    color = object_get_fourth_field(row_ptr);
+    *(float *)color = 2155905152.0f;
+    color = object_get_field_b(row_ptr);
+    *(float *)color = 60008.0f;
+    color = object_get_field_b(row_ptr);
+    *(int *)((char *)color + 4) = 0;
+    set->f798 = context;
+    text_panel_init_pal(set->f1D6C, context);
+    text_panel_init_pal(set->f1FBC, context);
 }

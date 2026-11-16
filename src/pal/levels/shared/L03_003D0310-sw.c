@@ -5,13 +5,14 @@ typedef union { int q __attribute__((mode(TI))); f32 f[4]; } Vector;
 extern void moby_set_state(u8 *, s32, s32);
 extern s32 flag_is_third_pending_set(u8 *);
 extern void anim_start_immediate(u8 *, s32, s32);
-extern void func_PAL_002A7E68(u8 *, s32, s32, s32);
+extern void anim_start_blended_pal(u8 *, s32, s32, s32);
 extern void FastVecAdd(void *, void *, void *);
 extern void door_spawn_debris_piece(u8 *, void *, void *, s32);
 extern s32 math_fast_float_d(void *);
 extern void moby_mark_spawned(u8 *);
 
-void func_PAL_L03_003D0370(u8 *object)
+/* Updates a door (Factory Door and similar, moby class 4933 too). It opens and closes with animations and throws out small pieces of itself each time. The pieces fly off and are then removed. (PAL: 50 Hz piece velocities) */
+void factory_door_update_pal(u8 *object)
 {
     Vector position, velocity;
     f32 scale;
@@ -36,7 +37,7 @@ void func_PAL_L03_003D0370(u8 *object)
         if ((object[0x60] & 2) != 0) {
             moby_set_state(object, 3, -1);
             if (object[0x43] != 2)
-                func_PAL_002A7E68(object, 2, 0, 1);
+                anim_start_blended_pal(object, 2, 0, 1);
         }
         break;
     case 3:
@@ -58,7 +59,7 @@ void func_PAL_L03_003D0370(u8 *object)
         if ((object[0x60] & 2) != 0) {
             moby_set_state(object, 1, -1);
             if (object[0x43] != 0)
-                func_PAL_002A7E68(object, 0, 0, 1);
+                anim_start_blended_pal(object, 0, 0, 1);
         }
         break;
     case 5:

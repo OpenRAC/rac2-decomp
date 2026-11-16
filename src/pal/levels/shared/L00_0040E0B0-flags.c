@@ -38,7 +38,7 @@ extern void RemoveMobyFromIndexList(void *, void *);
 extern void moby_get_offset_point(void *, void *);
 extern void moby_start_animation_from_table(void *);
 extern void ref_L00_0040A4A8_00(void (*)(void *), void *);
-extern void func_PAL_L00_0040FC40(void *, void *);
+extern void line_particles_spawn_pal(void *, void *);
 extern int CollLine(void *, void *, int, void *, void *);
 extern int math_random_int_below(int);
 extern float coll_probe_ground_height_below(void *, int, float);
@@ -83,7 +83,8 @@ typedef struct ProjectileObjectA4A8 {
     float forward[4], right[4], up[4];
 } ProjectileObjectA4A8;
 
-void func_PAL_L00_0040F050(ProjectileObjectA4A8 *object)
+/* Per-frame update for a homing shot (moby class 3799). It steers toward its target, leaves a trail, and blows up when it hits something, leaves the map or runs out of time. (PAL: 50 Hz timings) */
+void homing_l00_shot_update_3_pal(ProjectileObjectA4A8 *object)
 {
     float old[4] __attribute__((aligned(16)));
     float up[4] __attribute__((aligned(16)));
@@ -203,7 +204,7 @@ void func_PAL_L00_0040F050(ProjectileObjectA4A8 *object)
             qcopy(history, delta);
             if (++state->age >= 4)
                 ref_L00_0040A4A8_00(moby_start_animation_from_table, object);
-            func_PAL_L00_0040FC40(object, old);
+            line_particles_spawn_pal(object, old);
             qcopy(desired, object->position);
             FastVecScale(direction, up, -0.3f);
             FastVecAdd(direction, object->position, direction);

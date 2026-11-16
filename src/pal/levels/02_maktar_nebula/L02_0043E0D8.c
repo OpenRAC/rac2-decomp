@@ -12,67 +12,68 @@ extern float vec_distance_xy(void *, void *);
 extern void matrix_mul_vec3(void *, void *, void *);
 extern void DrawQuadWithRotatedUVs(void *, int, int, int, int);
 
-void path_draw_nearest_record_quad_pal(u8 *a0) {
-    u8 *st = *(u8 **)(a0 + 0x68);
-    float pt[4] __attribute__((aligned(16)));
-    float tmp[4] __attribute__((aligned(16)));
-    float m[16] __attribute__((aligned(16)));
-    unsigned short *q;
-    u8 *e;
-    u8 *rec;
-    float best;
-    float d;
-    int idx;
-    int bestid;
+/* Draws a quad at the path record nearest to a fixed spot, while the level timer is inside one of two windows. (PAL: 50 Hz timings) */
+void path_draw_nearest_record_quad_pal(u8 *moby) {
+    u8 *vars = *(u8 **)(moby + 0x68);
+    float anchor[4] __attribute__((aligned(16)));
+    float anchor_src[4] __attribute__((aligned(16)));
+    float quad[16] __attribute__((aligned(16)));
+    unsigned short *entry;
+    u8 *record_entry;
+    u8 *record;
+    float best_dist;
+    float dist;
+    int texture;
+    int best_id;
     int i;
     int k;
 
     for (i = 0; i < 2; i++) {
-        idx = -1;
+        texture = -1;
         if (i == 0) {
             if (g_mob_list.timer >= 0x318) {
                 if (g_mob_list.timer < 0x466) {
-                    *(TI128 *)tmp = 0;
-                    tmp[0] = 495.0f;
-                    tmp[1] = 587.0f;
-                    tmp[2] = 513.0f;
-                    qcopy(pt, tmp);
-                    idx = 0x3F;
+                    *(TI128 *)anchor_src = 0;
+                    anchor_src[0] = 495.0f;
+                    anchor_src[1] = 587.0f;
+                    anchor_src[2] = 513.0f;
+                    qcopy(anchor, anchor_src);
+                    texture = 0x3F;
                 }
             }
         }
         if (i == 1) {
             if (g_mob_list.timer >= 0x3E8) {
                 if (g_mob_list.timer < 0x4E3) {
-                    *(TI128 *)tmp = 0;
-                    tmp[0] = 515.0f;
-                    tmp[1] = 596.0f;
-                    tmp[2] = 512.0f;
-                    qcopy(pt, tmp);
-                    idx = 0x40;
+                    *(TI128 *)anchor_src = 0;
+                    anchor_src[0] = 515.0f;
+                    anchor_src[1] = 596.0f;
+                    anchor_src[2] = 512.0f;
+                    qcopy(anchor, anchor_src);
+                    texture = 0x40;
                 }
             }
         }
-        if (idx != -1) {
-            bestid = -1;
-            best = 99999.0f;
-            for (q = g_record_lists[*(int *)st];
-                 q != 0 && ((short)q[-1] >= 0 || q == g_record_lists[*(int *)st]) &&
-                 (e = g_record_table + ((*q & 0x7FFF) << 6)) != 0;
-                 q++) {
-                d = vec_distance_xy(e + 0x30, pt);
-                if (d < best) {
-                    best = d;
-                    bestid = *q & 0x7FFF;
+        if (texture != -1) {
+            best_id = -1;
+            best_dist = 99999.0f;
+            for (entry = g_record_lists[*(int *)vars];
+                 entry != 0 && ((short)entry[-1] >= 0 || entry == g_record_lists[*(int *)vars]) &&
+                 (record_entry = g_record_table + ((*entry & 0x7FFF) << 6)) != 0;
+                 entry++) {
+                dist = vec_distance_xy(record_entry + 0x30, anchor);
+                if (dist < best_dist) {
+                    best_dist = dist;
+                    best_id = *entry & 0x7FFF;
                 }
             }
-            if (bestid != -1) {
-                rec = g_record_table + (bestid << 6);
+            if (best_id != -1) {
+                record = g_record_table + (best_id << 6);
                 for (k = 0; k < 4; k++) {
-                    matrix_mul_vec3(m + k * 4, g_path_quad_vectors + k * 4, rec);
-                    FastVecAdd(m + k * 4, m + k * 4, rec + 0x30);
+                    matrix_mul_vec3(quad + k * 4, g_path_quad_vectors + k * 4, record);
+                    FastVecAdd(quad + k * 4, quad + k * 4, record + 0x30);
                 }
-                DrawQuadWithRotatedUVs(m, idx, 2, 0xFF808080, 0);
+                DrawQuadWithRotatedUVs(quad, texture, 2, 0xFF808080, 0);
             }
         }
     }

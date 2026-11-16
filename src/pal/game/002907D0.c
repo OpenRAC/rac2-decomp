@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef struct {
     char pad00[0x08];
@@ -12,32 +13,33 @@ typedef struct {
     int level;
 } Gauge;
 
-void func_PAL_002907D0(Gauge *g)
+/* Updates the fade counters of a HUD gauge: they grow while the level is full and shrink back otherwise (PAL: full at 4). */
+void gauge_update_fade_counters_pal(Gauge *gauge)
 {
-    unsigned char *c = g->counter;
-    int max = *g->limit;
-    int cur = g->current;
+    unsigned char *fades = gauge->counter;
+    int limit_value = *gauge->limit;
+    int current_value = gauge->current;
 
-    g->clamped = max;
-    if (cur < max)
-        g->clamped = cur;
-    else if (max < 0)
-        g->clamped = 0;
-    if (g->level >= 4) {
-        g->level = 4;
-        if (c[0] < 8) {
-            c[0]++;
-        } else if (c[1] < 8) {
-            c[1]++;
+    gauge->clamped = limit_value;
+    if (current_value < limit_value)
+        gauge->clamped = current_value;
+    else if (limit_value < 0)
+        gauge->clamped = 0;
+    if (gauge->level >= 4) {
+        gauge->level = 4;
+        if (fades[0] < 8) {
+            fades[0]++;
+        } else if (fades[1] < 8) {
+            fades[1]++;
         }
     } else {
-        g->state = 1;
-        if (c[1] != 0) {
-            c[1]--;
-        } else if (c[0] != 0) {
-            c[0]--;
+        gauge->state = 1;
+        if (fades[1] != 0) {
+            fades[1]--;
+        } else if (fades[0] != 0) {
+            fades[0]--;
         } else {
-            g->state = -6;
+            gauge->state = -6;
         }
     }
 }

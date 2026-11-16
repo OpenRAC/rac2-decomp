@@ -12,6 +12,7 @@ extern int g_selection_grid_cursor[];
 extern int g_selected_item_material __attribute__((sda));
 extern SelectionEntry g_menu_item_table_second[];
 
+/* Handles the pad in the selection grid: moves the cursor and picks an owned item (USA v2.00 copy). */
 void selection_grid_handle_input_us2(SelectionOwner *owner, int buttons)
 {
     if (buttons & 0x1000) {

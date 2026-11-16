@@ -69,96 +69,97 @@ typedef struct BeamVars {
 } BeamVars;
 extern void stub_empty_11(void);
 
-void func_US2_003348F0(Target *obj)
+/* Updates the Thermanator beam: traces the shot to its impact, fires chunks at a target while the button is held, and shows the gauge (v2.00 copy). */
+void thermanator_update_us2(Target *moby)
 {
-    BeamVars *v = obj->vars;
+    BeamVars *vars = moby->vars;
     Target *hit;
     float *pos;
     float dir[4] __attribute__((aligned(16)));
     float spread[4] __attribute__((aligned(16)));
     float distance, ratio, length;
-    int a, b;
+    int color_a, color_b;
 
-    pos = v->position;
-    moby_transform_joint_to_world(obj, 0, pos);
+    pos = vars->position;
+    moby_transform_joint_to_world(moby, 0, pos);
     distance = game_get_override_value(4.5f);
     if (g_hero_state.planet == 29) {
         distance += 6.5f;
     }
-    v->hit = 0;
-    v->valid = 0;
+    vars->hit = 0;
+    vars->valid = 0;
     CalculateAimedLaunchVelocity_us2(dir, pos, 0, 0.00001f, distance, 0.25f, 0.0030555558f, 0);
-    coll_trace_projectile_to_impact(pos, dir, v->endpoint, v->normal, obj, &v->hit, 0, 0.0030555558f);
-    hit = v->hit;
+    coll_trace_projectile_to_impact(pos, dir, vars->endpoint, vars->normal, moby, &vars->hit, 0, 0.0030555558f);
+    hit = vars->hit;
     if (hit != 0) {
         if (hit->class->type == 18) {
             TargetVars *target = hit->vars;
             target->maximum = 25;
-            if (v->hit->slot != 255) {
-                moby_set_entry_list_flag_byte(v->hit->slot, 25);
+            if (vars->hit->slot != 255) {
+                moby_set_entry_list_flag_byte(vars->hit->slot, 25);
             }
-            ratio = IntToFloat(v->hit->progress);
+            ratio = IntToFloat(vars->hit->progress);
             ratio /= IntToFloat(target->maximum);
-            v->fraction = ratio;
+            vars->fraction = ratio;
             if (target->reverse) {
-                v->fraction = 1.0f - ratio;
-                if (v->fraction == 0.0f) {
-                    v->fraction = -0.001f;
+                vars->fraction = 1.0f - ratio;
+                if (vars->fraction == 0.0f) {
+                    vars->fraction = -0.001f;
                 }
             }
-            v->reverse = target->reverse;
-            v->disabled = target->disabled != 0;
-            v->valid = 1;
+            vars->reverse = target->reverse;
+            vars->disabled = target->disabled != 0;
+            vars->valid = 1;
         }
     } else {
-        v->fraction = -1000.0f;
+        vars->fraction = -1000.0f;
     }
 
-    switch (obj->state) {
+    switch (moby->state) {
     case 0:
-        obj->state = 1;
+        moby->state = 1;
         /* fall through: retail's table sends state 0 into state 1's store */
     case 1:
-        obj->state = 2;
+        moby->state = 2;
         break;
     case 2:
-        if ((g_pad_pressed_flags & g_hero_state.input) && v->hit && v->valid && !v->disabled) {
+        if ((g_pad_pressed_flags & g_hero_state.input) && vars->hit && vars->valid && !vars->disabled) {
             stub_empty_11();
-            obj->state = 3;
-            if (!v->reverse) {
-                part_spawn_flying_chunk_b((int)obj, v->position, dir);
+            moby->state = 3;
+            if (!vars->reverse) {
+                part_spawn_flying_chunk_b((int)moby, vars->position, dir);
             } else {
-                part_spawn_flying_chunk_a((int)obj, v->position, dir);
+                part_spawn_flying_chunk_a((int)moby, vars->position, dir);
             }
-            snd_play_from_class_bank(1, 0, (char *)obj, 0xFB0);
-            if (v->reverse) {
-                v->countdown = 14;
+            snd_play_from_class_bank(1, 0, (char *)moby, 0xFB0);
+            if (vars->reverse) {
+                vars->countdown = 14;
             } else {
-                v->countdown = 7;
+                vars->countdown = 7;
             }
         }
         break;
     case 3:
-        if (!(g_pad_pressed_flags & g_hero_state.input) || !v->hit || !v->valid || v->disabled) {
+        if (!(g_pad_pressed_flags & g_hero_state.input) || !vars->hit || !vars->valid || vars->disabled) {
             stub_empty_12();
-            obj->state = 2;
-        } else if (math_fast_float_d(&v->countdown)) {
+            moby->state = 2;
+        } else if (math_fast_float_d(&vars->countdown)) {
             qcopy(spread, dir);
             length = FastVecLength(spread);
             spread[0] += math_random_float_range(-0.005f, 0.005f);
             spread[1] += math_random_float_range(-0.005f, 0.005f);
             spread[2] += math_random_float_range(-0.005f, 0.005f);
             vec_scale_to_length(spread, spread, length);
-            if (!v->reverse) {
-                part_spawn_flying_chunk_b((int)obj, v->position, spread);
+            if (!vars->reverse) {
+                part_spawn_flying_chunk_b((int)moby, vars->position, spread);
             } else {
-                part_spawn_flying_chunk_a((int)obj, v->position, spread);
+                part_spawn_flying_chunk_a((int)moby, vars->position, spread);
             }
-            snd_play_from_class_bank(1, 0, (char *)obj, 0xFB0);
-            if (v->reverse) {
-                v->countdown = 14;
+            snd_play_from_class_bank(1, 0, (char *)moby, 0xFB0);
+            if (vars->reverse) {
+                vars->countdown = 14;
             } else {
-                v->countdown = 7;
+                vars->countdown = 7;
             }
         }
         break;
@@ -167,35 +168,35 @@ void func_US2_003348F0(Target *obj)
     }
 
     if (g_hero_state.mode == 3) {
-        obj->state = 4;
-        v->fade -= 0.02f;
+        moby->state = 4;
+        vars->fade -= 0.02f;
     } else {
-        v->fade += 0.01f;
+        vars->fade += 0.01f;
     }
-    if (v->fade > 1.0f) {
-        v->fade = 1.0f;
-    } else if (v->fade < 0.0f) {
-        v->fade = 0.0f;
+    if (vars->fade > 1.0f) {
+        vars->fade = 1.0f;
+    } else if (vars->fade < 0.0f) {
+        vars->fade = 0.0f;
     }
 
-    if (v->fraction > -100.0f) {
-        if (v->smoothed < -100.0f) {
-            v->smoothed = v->fraction;
-        } else if (v->fraction < v->smoothed - 0.01f) {
-            v->smoothed -= 0.01f;
-        } else if (v->smoothed + 0.01f < v->fraction) {
-            v->smoothed += 0.01f;
+    if (vars->fraction > -100.0f) {
+        if (vars->smoothed < -100.0f) {
+            vars->smoothed = vars->fraction;
+        } else if (vars->fraction < vars->smoothed - 0.01f) {
+            vars->smoothed -= 0.01f;
+        } else if (vars->smoothed + 0.01f < vars->fraction) {
+            vars->smoothed += 0.01f;
         } else {
-            v->smoothed = v->fraction;
+            vars->smoothed = vars->fraction;
         }
     } else {
-        v->smoothed = v->fraction;
+        vars->smoothed = vars->fraction;
     }
 
-    a = gfx_blend_colors_by_cycle(g_game_time[0], 90, g_thermanator_beam_colors[0], g_thermanator_beam_colors[1]);
-    b = gfx_blend_colors_by_cycle(g_game_time[0], 90, g_thermanator_beam_colors[2], g_thermanator_beam_colors[3]);
-    if (v->smoothed >= 0.0f && v->smoothed <= 1.0f) {
-        gauge_popup_show(0, a, b, v->smoothed);
+    color_a = gfx_blend_colors_by_cycle(g_game_time[0], 90, g_thermanator_beam_colors[0], g_thermanator_beam_colors[1]);
+    color_b = gfx_blend_colors_by_cycle(g_game_time[0], 90, g_thermanator_beam_colors[2], g_thermanator_beam_colors[3]);
+    if (vars->smoothed >= 0.0f && vars->smoothed <= 1.0f) {
+        gauge_popup_show(0, color_a, color_b, vars->smoothed);
     }
-    gfx_register_overlay_draw_callback(moby_update_attached_effect_by_state, obj);
+    gfx_register_overlay_draw_callback(moby_update_attached_effect_by_state, moby);
 }

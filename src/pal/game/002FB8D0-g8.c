@@ -37,10 +37,10 @@ extern char *GetLocalizedString(int);
 extern char *strcpy(char *, char *);
 extern int sprintf(char *, char *, ...);
 extern int text_draw_centered_medium(int, int, unsigned long, char *, int);
-extern void func_PAL_002803E8(int, int, unsigned long, char *, int, float);
+extern void text_draw_centered_medium_scaled(int, int, unsigned long, char *, int, float);
 extern void text_draw_right_aligned_medium(int, int, unsigned long, char *, int);
 extern void text_draw_medium(int, int, unsigned long, char *, int);
-extern void func_PAL_002FAB40(char *, int);
+extern void text_format_number_with_separators_pal(char *, int);
 extern int help_copy_record_at_depth(void *, int, int);
 extern int GetSelectedShopItemPrice(void);
 extern int GetIconFrame(int, int);
@@ -65,7 +65,7 @@ void DrawVendorPurchasePrompt_pal(void)
         copied = strcpy(text, GetLocalizedString(((VendorItem *)(g_weapon_table + g_item_slot_to_record[id] * 224))->text));
         sprintf(text, fmt, copied, GetLocalizedString(0xbda));
         text_draw_centered_medium(g_screen_width >> 1, (int)(g_pal_aspect_scale * 274.0f + 0.5f), 0x80F0F0F0L, text, -1);
-        func_PAL_002FAB40(text, ((VendorItem *)(g_weapon_table + g_item_slot_to_record[v->slots[v->index].id] * 224))->price);
+        text_format_number_with_separators_pal(text, ((VendorItem *)(g_weapon_table + g_item_slot_to_record[v->slots[v->index].id] * 224))->price);
         if (g_player_bolts < ((VendorItem *)(g_weapon_table + g_item_slot_to_record[v->slots[v->index].id] * 224))->price)
             color = (int)0x802020F0;
     } else {
@@ -84,7 +84,7 @@ void DrawVendorPurchasePrompt_pal(void)
         } else {
             text_draw_centered_medium(g_screen_width >> 1, (int)(g_pal_aspect_scale * 274.0f + 0.5f), 0x80F0F0F0L, GetLocalizedString(((VendorItem *)(g_weapon_table + g_item_slot_to_record[g_vendor_menu_state.slots[g_vendor_menu_state.index].id] * 224))->text), -1);
         }
-        func_PAL_002FAB40(text, GetSelectedShopItemPrice());
+        text_format_number_with_separators_pal(text, GetSelectedShopItemPrice());
         if (g_player_bolts < GetSelectedShopItemPrice())
             color = (int)0x802020F0;
     }
@@ -99,6 +99,6 @@ void DrawVendorPurchasePrompt_pal(void)
         hud_draw_sprite_gradient(tex, 236, (int)(g_pal_aspect_scale * 210.0f + 0.5f), 16, (int)(g_pal_aspect_scale * 16.0f + 0.5f), info);
         text_draw_medium(256, (int)(g_pal_aspect_scale * 210.0f + 0.5f), color, text, -1);
     } else {
-        func_PAL_002803E8(259, (int)(g_pal_aspect_scale * 210.0f + 0.5f), 0x80F0F0F0L, GetLocalizedString(0x1126), -1, 0.9f);
+        text_draw_centered_medium_scaled(259, (int)(g_pal_aspect_scale * 210.0f + 0.5f), 0x80F0F0F0L, GetLocalizedString(0x1126), -1, 0.9f);
     }
 }

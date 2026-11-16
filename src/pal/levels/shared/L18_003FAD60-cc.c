@@ -25,7 +25,8 @@ extern float func_L00_002EE290(void *);
 extern void vec_fast_normalize(void *, void *, void *);
 extern Vector128 g_normalize_scratch_vec;
 
-void func_PAL_L18_003FAD60(char *object)
+/* Moves an enemy for one frame by what its current animation is doing: walking, turning, jumping or flying (PAL: 50 Hz timings). */
+void enemy_update_move_by_type_pal(char *object)
 {
     Vector128 local[1];
     char *state = *(char **)(object + 0x68);

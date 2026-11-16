@@ -10,22 +10,23 @@ extern int console_is_tool(void);
 
 extern unsigned char g_pal_byte_table[];
 
-int func_PAL_00131620(void) {
-    unsigned int buf[4];
-    unsigned int v;
-    int r;
+/* Reads the console language setting (PAL: also from the tool-kit byte). */
+int console_get_region_pal(void) {
+    unsigned int config[4];
+    unsigned int osd_value;
+    int language;
 
-    GetOsdConfigParam(buf);
+    GetOsdConfigParam(config);
     if (console_is_tool() != 0) {
-        r = g_pal_byte_table[0];
+        language = g_pal_byte_table[0];
     } else {
-        GetOsdConfigParam(buf);
-        v = buf[0];
-        if (((v >> 13) & 7) == 0) {
-            r = (v >> 4) & 1;
+        GetOsdConfigParam(config);
+        osd_value = config[0];
+        if (((osd_value >> 13) & 7) == 0) {
+            language = (osd_value >> 4) & 1;
         } else {
-            r = (v >> 16) & 0x1F;
+            language = (osd_value >> 16) & 0x1F;
         }
     }
-    return r;
+    return language;
 }

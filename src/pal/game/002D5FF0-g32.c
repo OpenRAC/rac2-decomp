@@ -13,7 +13,8 @@ extern unsigned char g_item_slot_to_record[];
 extern WeaponInfo g_weapon_table[];
 extern void snd_play_menu_sound_if_enabled(int, int);
 
-int func_PAL_002D75A0(GridMenu *menu)
+/* Handles input for a weapon grid menu: moves the cursor between grids and equips or unequips the selected weapon on X (PAL). */
+int weapon_grid_menu_update_pal(GridMenu *menu)
 {
     int flags;
     int cols;

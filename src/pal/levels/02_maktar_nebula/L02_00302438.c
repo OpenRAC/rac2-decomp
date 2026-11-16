@@ -41,7 +41,7 @@ extern void cutscene_draw_intro_overlays_pal(void *);
    base + i * 4 + 0x18C rather than D_L02_001BE200.mobs[i]: without a separate base + 0x18C in the
    loop, loop.c's first pass still hoists 0xFA0 (ahead of the pointer's giv) and leaves 0x33 to the
    second pass, the order retail has. */
-void func_PAL_L02_00302948(void) {
+void level_update_moby_list_effects_pal(void) {
     int i;
 
     anim_start_startup_animations();

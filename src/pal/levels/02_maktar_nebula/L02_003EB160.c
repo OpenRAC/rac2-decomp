@@ -43,45 +43,45 @@ extern u8 g_actor_match_key;
    one-shot (the flag at D_001A7A00 + 0x79, func_002E5E58, func_002B0A18 and D_L02_001A903C) and
    adds 300 to D_001A79F8. Modes 1, 3, 4 and 5 call func_002E5CF8 with 2 first, any other mode
    with 3. */
-void slot_machine_award_prize_pal(char *arg0) {
+void slot_machine_award_prize_pal(char *moby) {
     static void *tab[] = { &&c1, &&c2, &&c3, &&c4, &&c5 };
-    char *state = *(char **)(arg0 + 0x68);
-    float a[4];
-    float b[4];
-    int out;
-    char *p;
-    unsigned int sel;
+    char *state = *(char **)(moby + 0x68);
+    float spawn_point[4];
+    float offset[4];
+    int ammo_item;
+    char *pickup_state;
+    unsigned int jump_index;
 
-    moby_set_state(arg0, 1, -1);
-    math_random_planar_offset(b, 1.0f);
-    moby_compute_local_point(arg0, a, 3.0f, 0.0f, 2.0f);
-    FastVecAdd(a, b, a);
-    sel = *(int *)(state + 0x5C) - 1;
-    if (sel < 5)
-        goto *D_L02_002A52D0[sel];
+    moby_set_state(moby, 1, -1);
+    math_random_planar_offset(offset, 1.0f);
+    moby_compute_local_point(moby, spawn_point, 3.0f, 0.0f, 2.0f);
+    FastVecAdd(spawn_point, offset, spawn_point);
+    jump_index = *(int *)(state + 0x5C) - 1;
+    if (jump_index < 5)
+        goto *D_L02_002A52D0[jump_index];
     goto other;
 c1:
-    PlayMobySound(2, 0x20, arg0);
-    part_spawn_bolt_pickups(arg0, 0xF, 0x41, 3, -1, 4, 0.0f);
+    PlayMobySound(2, 0x20, moby);
+    part_spawn_bolt_pickups(moby, 0xF, 0x41, 3, -1, 4, 0.0f);
     goto done;
 c2:
     ((State003E77E0 *)state)->flag = 1;
     g_hovering_object_count--;
-    moby_set_state(arg0, 5, -1);
+    moby_set_state(moby, 5, -1);
     goto done;
 c3:
-    PlayMobySound(2, 0x20, arg0);
-    PickAmmoDropItem(arg0, &out);
-    p = *(char **)(SpawnWeaponAmmoPickup(a, out, -1, 0) + 0x68);
-    FastVecScale(p, p, 0.35f);
+    PlayMobySound(2, 0x20, moby);
+    PickAmmoDropItem(moby, &ammo_item);
+    pickup_state = *(char **)(SpawnWeaponAmmoPickup(spawn_point, ammo_item, -1, 0) + 0x68);
+    FastVecScale(pickup_state, pickup_state, 0.35f);
     goto done;
 c4:
-    PlayMobySound(2, 0x20, arg0);
-    moby_create_effect_at_position(a, 0);
+    PlayMobySound(2, 0x20, moby);
+    moby_create_effect_at_position(spawn_point, 0);
     STUB_printf(g_str_slot_award);
     goto done;
 c5:
-    PlayMobySound(2, 0x20, arg0);
+    PlayMobySound(2, 0x20, moby);
     if (g_player_stats.once == 0) {
         g_player_stats.once = 1;
         snd_play_from_global_bank(1, 0, 0);
@@ -91,7 +91,7 @@ c5:
     g_player_bolts += 300;
     goto done;
 other:
-    PlayMobySound(3, 0x20, arg0);
+    PlayMobySound(3, 0x20, moby);
 done:
     return;
 }

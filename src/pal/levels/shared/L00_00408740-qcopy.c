@@ -14,32 +14,33 @@ extern void moby_mark_spawned(char *arg);
 extern void moby_mark_spawned(char *arg);
 extern TI128 g_hero_l00_position;
 
-void flying_l00_shot_update_pal(char *arg)
+/* Per-frame update of a flying shot: it moves along its velocity until a timer ends, then removes itself. (PAL: 50 Hz timings) */
+void flying_l00_shot_update_pal(char *moby)
 {
-    int *o = *(int **)(arg + 104);
-    unsigned char state = *(unsigned char *)(arg + 32);
-    TI128 tmp;
-    char *p;
+    int *vars = *(int **)(moby + 104);
+    unsigned char state = *(unsigned char *)(moby + 32);
+    TI128 old_position;
+    char *position;
 
     switch (state) {
     case 0:
-        arg[32] = 1;
+        moby[32] = 1;
     case 1:
-        p = arg + 16;
-        *(TI128 *)&tmp = *(TI128 *)p;
-        FastVecAdd(p, o, p);
-        vec_transform_or_copy(p, p);
-        part_steer_effect_direction(o[7], o, 0);
-        sheep_shot_resolve_hit_pal(arg, &tmp);
-        if (math_fast_float_d((char *)o + 16) != 0)
-            arg[32] = 2;
+        position = moby + 16;
+        *(TI128 *)&old_position = *(TI128 *)position;
+        FastVecAdd(position, vars, position);
+        vec_transform_or_copy(position, position);
+        part_steer_effect_direction(vars[7], vars, 0);
+        sheep_shot_resolve_hit_pal(moby, &old_position);
+        if (math_fast_float_d((char *)vars + 16) != 0)
+            moby[32] = 2;
         break;
     case 2:
-        table_clear_entry_flag(o[7]);
-        moby_mark_spawned(arg);
+        table_clear_entry_flag(vars[7]);
+        moby_mark_spawned(moby);
         return;
     default:
         break;
     }
-    ref_L00_00403D58_00(smoky_spark_effect_update, arg);
+    ref_L00_00403D58_00(smoky_spark_effect_update, moby);
 }

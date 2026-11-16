@@ -27,7 +27,8 @@ extern int math_random_int_below(int);
 extern float math_random_float_range(float, float);
 extern char *part_create_orbiting_effect(char *p0, float f0, float f1, float f2, float f3, float f4, s16 p1, char *p2, s32 p3, char *p4);
 
-void func_PAL_L18_0043AAE8(Moby4359A8 *self) {
+/* Throws out a random burst of orbiting effects from a fixed spot, each with a random direction, size and lifetime. (PAL version) */
+void part_l18_spawn_random_burst_pal(Moby4359A8 *self) {
     Vars4359A8 *vars = self->vars;
     s32 i;
     s32 k;
@@ -59,34 +60,35 @@ extern int coll_point_inside_region(void *, int);
 extern void water_init_object_pal(void *), water_update_controller_pal(void *), water_advance_controller_state(void *), water_update_ripple_patches(void *);
 extern void water_add_splash_entry(void *, float);
 
-void effect_ring_update_pal(u8 *o) {
-    u8 *s;
+/* Updates a ring of linked effects (moby class 3929) by calling the shared effect code for the current state. It does nothing while the hero is in a special mode. (PAL version) */
+void effect_ring_update_pal(u8 *moby) {
+    u8 *vars;
     u8 *hero = g_hero_state.hero;
-    int f[13], n;
+    int args[13], count;
     if (hero && *(short *)(hero + 0xAA) == 0x45 && hero[0x20] != 0xFE && hero[0x20] != 0xFD && g_hero_state.mode == 0x31) return;
-    s = *(u8 **)(o + 0x68);
-    if (!s) return;
-    if (*(int *)(s + 0x10) && o[0x20] && *(int *)(s + 0x28) != -1 && !coll_point_inside_region(g_camera_l18_position, *(int *)(s + 0x28))) return;
-    n = 1;
-    if (*(int *)(s + 0x18) != -1) n = (&g_ring_effect_count_table)[*(int *)(s + 0x18)];
-    n += *(int *)(s+0x10);
-    f[0]=0x12;
-    f[1]=n;
-    f[8]=(int)&g_ring_effect_arg_b;
-    f[9]=(int)&g_ring_effect_arg_c;
-    f[2]=(int)g_water_l18_grid_data;
-    f[3]=(int)g_effect_ring_data_a;
-    f[4]=(int)&g_ring_effect_arg_a;
-    f[5]=(int)&g_ring_effect_count_table;
-    f[6]=(int)g_effect_ring_data_b;
-    f[7]=(int)g_effect_ring_data_c;
-    f[10]=(int)o;
-    f[11]=(int)part_effect_callback;
-    f[12]=(int)gfx_add_draw_callback_third;
-    switch(o[0x20]) {
-    case 0: water_init_object_pal(f); water_add_splash_entry(o, *(float *)(s+0x2C));
-    case 1: water_update_controller_pal(f); break;
-    case 2: water_advance_controller_state(f); break;
+    vars = *(u8 **)(moby + 0x68);
+    if (!vars) return;
+    if (*(int *)(vars + 0x10) && moby[0x20] && *(int *)(vars + 0x28) != -1 && !coll_point_inside_region(g_camera_l18_position, *(int *)(vars + 0x28))) return;
+    count = 1;
+    if (*(int *)(vars + 0x18) != -1) count = (&g_ring_effect_count_table)[*(int *)(vars + 0x18)];
+    count += *(int *)(vars+0x10);
+    args[0]=0x12;
+    args[1]=count;
+    args[8]=(int)&g_ring_effect_arg_b;
+    args[9]=(int)&g_ring_effect_arg_c;
+    args[2]=(int)g_water_l18_grid_data;
+    args[3]=(int)g_effect_ring_data_a;
+    args[4]=(int)&g_ring_effect_arg_a;
+    args[5]=(int)&g_ring_effect_count_table;
+    args[6]=(int)g_effect_ring_data_b;
+    args[7]=(int)g_effect_ring_data_c;
+    args[10]=(int)moby;
+    args[11]=(int)part_effect_callback;
+    args[12]=(int)gfx_add_draw_callback_third;
+    switch(moby[0x20]) {
+    case 0: water_init_object_pal(args); water_add_splash_entry(moby, *(float *)(vars+0x2C));
+    case 1: water_update_controller_pal(args); break;
+    case 2: water_advance_controller_state(args); break;
     }
-    water_update_ripple_patches(f);
+    water_update_ripple_patches(args);
 }

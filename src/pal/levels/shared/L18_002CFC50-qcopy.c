@@ -11,10 +11,10 @@ extern void level_release_slot_list(Rac2Native_5b4b17178a13f443_SmallSlotReset12
 extern void hero_set_objects_flag_bit(void);
 extern void hero_clear_tracked_slots(void);
 extern void attachment_reset_all(void);
-extern void func_PAL_L18_002D0738(void);
+extern void hero_l18_update_speed_targets_pal(void);
 extern void hero_clear_queued_anim(void);
 extern void func_002A677C(void *);
-extern s32 func_PAL_L18_002E01E0(s32, s32);
+extern s32 hero_l18_set_action_pal(s32, s32);
 extern void set_hero_animation_pal(s32, s32, float);
 extern u8 g_hero_state[];
 extern u8 g_hero_state[];
@@ -28,7 +28,8 @@ extern void hero_clear_tracked_slots(void);
 extern void hero_clear_queued_anim(void);
 extern s32 anim_copy_entry_data(char *, s32, s32, s32);
 
-void func_PAL_L18_002CFC50(s32 mode, s32 index, u8 *object)
+/* Puts the hero under control of another object (for example a vehicle) and saves the hero position. */
+void hero_attach_to_object_pal(s32 mode, s32 index, u8 *object)
 {
     u8 *base = g_hero_state;
     u8 *current;
@@ -45,7 +46,7 @@ void func_PAL_L18_002CFC50(s32 mode, s32 index, u8 *object)
     g_hero_state[0x22B4] = mode;
     *(u8 **)(g_hero_state + 0xC14) = object;
     *(u8 **)(g_hero_state + 0x2290) = object;
-    func_PAL_L18_002D0738();
+    hero_l18_update_speed_targets_pal();
     *(float *)(g_hero_state + 0x250) = *(float *)(g_hero_state + 0x258);
     *(float *)(g_hero_state + 0x254) = *(float *)(g_hero_state + 0x25C);
     current = *(u8 **)(g_hero_state + 0x2290);
@@ -61,6 +62,6 @@ void func_PAL_L18_002CFC50(s32 mode, s32 index, u8 *object)
         *(s16 *)(g_hero_state + 0x24D4) = *(u16 *)(g_hero_state + 0x24CC);
         *(s32 *)(g_hero_state + 0x24CC) = 3;
     }
-    func_PAL_L18_002E01E0(index, 2);
+    hero_l18_set_action_pal(index, 2);
     if (mode == 4) set_hero_animation_pal(15, 0, 4.0f);
 }

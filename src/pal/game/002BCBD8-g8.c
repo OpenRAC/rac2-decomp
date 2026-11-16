@@ -17,7 +17,8 @@ extern float g_drift_scale_start_a __attribute__((sda));
 extern float g_drift_scale_end_a __attribute__((sda));
 #define LERP(lo, hi, t) (((hi) - (lo)) * (t) + (lo))
 
-void func_PAL_002BD1A0(char *p)
+/* Updates a drifting particle: it slows down, rises, shrinks and blends its colour over its life, and dies when it leaves the world bounds (PAL: 50 Hz timings). */
+void part_update_drifting_pal(char *p)
 {
     char *q = p + 0x20;
     float speed, a, b, t;

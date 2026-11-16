@@ -4,11 +4,13 @@
 typedef int TI128 __attribute__((mode(TI)));
 extern void vec_random_direction(char *, float, float);
 extern void FastVecAdd(void *, void *, void *);
-extern char *func_PAL_L02_0032D5F8(char *, int, char *, char *, int, int, float *, void *, void *, float);
+extern char *part_spawn_flying_fragment_pal(char *, int, char *, char *, int, int, float *, void *, void *, float);
 extern void moby_mark_spawned(char *);
 extern char g_zero_l02_vector[] __attribute__((sda));
 
-void func_PAL_L11_0044EDC0(char *self, TI128 *pos) {
+/* Drops the item the robot holds: spawns a debris effect at it (when visible), marks it spawned
+   and clears the held-item pointer (PAL copy of security_robot_destroy_held_item). */
+void security_robot_destroy_held_item_pal(char *self, TI128 *pos) {
     char *state = *(char **)(self + 0x68);
     float copy[4];
     float vec[4];
@@ -17,7 +19,7 @@ void func_PAL_L11_0044EDC0(char *self, TI128 *pos) {
     if (*(unsigned char *)(self + 0x31) != 0) {
         vec_random_direction((char *)vec, 0.120000005f, 0.20000002f);
         FastVecAdd(vec, vec, g_zero_l02_vector);
-        func_PAL_L02_0032D5F8(self, 0x9D8, *(char **)(state + 0x354) + 0x10, *(char **)(state + 0x354) + 0xF0,
+        part_spawn_flying_fragment_pal(self, 0x9D8, *(char **)(state + 0x354) + 0x10, *(char **)(state + 0x354) + 0xF0,
                     0, 0, vec, g_zero_l02_vector, g_zero_l02_vector, 0.004f);
     }
     moby_mark_spawned(*(char **)(state + 0x354));
@@ -26,7 +28,7 @@ void func_PAL_L11_0044EDC0(char *self, TI128 *pos) {
 
 
 extern void moby_set_controller_speed_limits(char *, float, float, float, float);
-extern void func_PAL_002A7E68(char *, int, int, int);
+extern void anim_start_blended_pal(char *, int, int, int);
 extern void moby_set_state(char *, int, int);
 extern void func_PAL_002A0F68(char *);
 extern void set_moby_color(char *, int, int, int);
@@ -39,7 +41,9 @@ extern u8 *g_moby_l11_table __attribute__((sda));
 /* func_L11_00449330 is in L11_00449330.c: PAL's level 11 has other code at its place,
    so the calls to it from this unit go through its symbol. */
 
-void func_PAL_L11_0044F150(char *object, int mode, int active) {
+/* Resets the security robot to a fresh active state: health, speed limits, animation and
+   state, its held item and debris colours (PAL copy of security_robot_init). */
+void security_robot_init_pal(char *object, int mode, int active) {
     char *state = *(char **)(object + 0x68);
     int colors[4];
     int green, blue;
@@ -58,12 +62,12 @@ void func_PAL_L11_0044F150(char *object, int mode, int active) {
     if (*(short *)(state + 0x36E) != 0) {
         moby_set_state(object, 4, 2);
         *(u16 *)(object + 0x34) |= 0x100;
-        func_PAL_002A7E68(object, 0, 0, 0);
+        anim_start_blended_pal(object, 0, 0, 0);
         func_PAL_002A0F68(object);
         moby_spawn_linked(object, 0, 2.0f, 2.0f);
     } else {
         if (*(u8 *)(object + 0x43) != 0)
-            func_PAL_002A7E68(object, 0, 0, 8);
+            anim_start_blended_pal(object, 0, 0, 8);
         moby_set_state(object, 3, 1);
         *(u8 *)(object + 0x31) = 1;
         *(u16 *)(object + 0x34) &= 0xFEFE;

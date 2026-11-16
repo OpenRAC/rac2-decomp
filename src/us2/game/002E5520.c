@@ -15,7 +15,7 @@ extern float vec_length_xy(void *p);
 extern float fast_subtract_rotations(float a, float b);
 extern int FloatToInt(float a);
 
-void func_US2_002E5520(void *self, void *other)
+void snd_compute_voice_pan_us2(void *self, void *other)
 {
     struct AngleState { char reserved[0x40]; float angle; };
     struct AngleState *state = (struct AngleState *)self;

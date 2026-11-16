@@ -23,7 +23,7 @@ extern void data_set_small_value_and_refresh(int, int);
 
 /* func_PAL_002D1EB0, the PAL copy of func_002D0FA0: the same C, where the last case also
  * sets D_001A7904 and keeps D_PAL_001A7A78 in D_PAL_001A7988 unless it is already 21. */
-int func_PAL_002D1EB0(void)
+int menu_handle_eight_entry_input_pal(void)
 {
     static void *cases[8] = {&&c0, &&c1, &&c2, &&c3, &&c4, &&c5, &&c6, &&c7};
     int flags = ((CallbackMenuState *)&g_pad_state)->flags;

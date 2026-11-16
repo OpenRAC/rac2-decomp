@@ -20,9 +20,10 @@ extern ListMoby_0042C928 *g_pickup_first_moby __attribute__((sda));
 extern ListMoby_0042C928 *g_moby_l05_list_head;
 extern char *CreateMoby(s32 a0);
 extern float math_random_angle(void);
-extern void func_PAL_L01_0039AD60(char *a0);
+extern void moby_init_randomized_vars_pal(char *a0);
 extern void set_moby_color(char *a0, s32 a1, s32 a2, s32 a3);
 
+/* Creates a collectible of class 0x126C at a position, unless that one has already been collected (PAL). */
 char *pickup_spawn_if_not_taken_pal(float *pos, u32 kind, s32 a2, s32 a3)
 {
     char *moby;
@@ -62,7 +63,7 @@ char *pickup_spawn_if_not_taken_pal(float *pos, u32 kind, s32 a2, s32 a3)
         *(float *)(vars + 0x68) = x;
         *(float *)(vars + 0x64) = y;
         *(u8 *)(moby + 0x20) = 1;
-        func_PAL_L01_0039AD60(moby);
+        moby_init_randomized_vars_pal(moby);
         set_moby_color(moby, 0x82, 0x82, 0x82);
         if (g_pickup_first_moby == 0) {
             for (p = g_moby_l05_list_head; p != 0; p = p->next) {

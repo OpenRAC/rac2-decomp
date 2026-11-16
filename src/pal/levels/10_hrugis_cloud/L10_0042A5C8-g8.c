@@ -99,7 +99,8 @@ static __inline__ int label_y(void *handle, float value, float scale, float half
                       D_001A7B90.language == 4 ? 1.7f : 1.55f, 1.0f, 0.0f);                    \
     }
 
-void func_PAL_L10_0042A5C8(s32 first, s32 second, s32 third, s32 fourth)
+/* Draws the mission HUD icon pairs (PAL); see the note above. */
+void draw_fading_hud_icon_pairs_pal(s32 first, s32 second, s32 third, s32 fourth)
 {
     u8 *state = *(u8 **)(g_hud_blink_moby + 0x68);
     f32 fade;
@@ -136,7 +137,7 @@ void func_PAL_L10_0042A5C8(s32 first, s32 second, s32 third, s32 fourth)
                 HUD_SPRITE(0xBF, 0x60442D00, g_hud_icon_x, g_hud_icon_y, fade, fade, 0.0f);
                 HUD_SPRITE(0xC0, 0x55F0C070, g_hud_icon_x, g_hud_icon_y, fade, fade, 0.0f);
             } else {
-                s32 textX;
+                s32 text_x;
 
                 HUD_SPRITE(0xBF, 0x60442D00, g_hud_icon_x, g_hud_icon_y, 1.0f, 1.0f, 0.0f);
                 HUD_SPRITE(0xC0, 0x55F0C070, g_hud_icon_x, g_hud_icon_y, 1.0f, 1.0f, 0.0f);
@@ -144,8 +145,8 @@ void func_PAL_L10_0042A5C8(s32 first, s32 second, s32 third, s32 fourth)
                 hud_draw_sprite_gradient(GetIconFrame(0xEAA2, 3), g_hud_icon_x - 51,
                               screen_coord(g_screen_layout_mode, (f32)(g_hud_icon_y - 13), 1.0f), 28, 28, &color);
                 sprintf(text, g_str_hud_map_format, g_current_map_index[3]);
-                textX = g_hud_icon_x + 5;
-                text_draw_medium(textX, label_y((void *)textX, (f32)(g_hud_icon_y + 2), g_screen_l10_scale, 0.5f, 1),
+                text_x = g_hud_icon_x + 5;
+                text_draw_medium(text_x, label_y((void *)text_x, (f32)(g_hud_icon_y + 2), g_screen_l10_scale, 0.5f, 1),
                               0x80808080, text, 128);
             }
         } else {

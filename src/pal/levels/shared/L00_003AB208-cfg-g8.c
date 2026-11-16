@@ -11,7 +11,8 @@ extern int AcquireEntitySlot(char *, int, void *);
 extern char *level_get_slot_body(int, int);
 extern char *mem_round_up_to_16(int);
 
-void func_PAL_L00_003AB208(char *object)
+/* Sets up a lancer shot: timers, colour, an entity slot with 16 sample buffers and the aim arcs (PAL: 50 Hz timings). */
+void lancer_init_pal(char *object)
 {
     char *state = *(char **)(object + 0x68);
     int local[4];

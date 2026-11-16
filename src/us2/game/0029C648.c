@@ -30,7 +30,8 @@ void level_forward_draw_args_us2(int a0, int a1, int a2, int a3, int a4, int a5,
 
 extern void hud_update_subsystems_us2(void *);
 
-void func_US2_0029CF10(void) {
+/* Updates the HUD subsystems, if the resident data exists. */
+void hud_update_subsystems_call_us2(void) {
     if (g_resident_data_base[0] != 0)
         hud_update_subsystems_us2(g_resident_data_base[0] + 0x36F28);
 }
@@ -38,34 +39,38 @@ void func_US2_0029CF10(void) {
 
 extern void hud_item_bolt_draw_us2(void *);
 
-void func_US2_0029CF40(void) {
+/* Draws the HUD bolt counter, if the resident data exists. */
+void hud_item_bolt_draw_call_us2(void) {
     if (g_resident_data_base[0] != 0)
         hud_item_bolt_draw_us2(g_resident_data_base[0] + 0x36F28);
 }
 
 
-extern void func_US2_00349C00(void *);
+extern void list_menu_draw_centered_rows_us2(void *);
 
-void func_US2_0029CF70(void) {
+/* Calls a resident menu panel function, if the resident data exists. */
+void resident_panel_call_a_us2(void) {
     if (g_resident_data_base[0] != 0)
-        func_US2_00349C00(g_resident_data_base[0] + 0x39160);
+        list_menu_draw_centered_rows_us2(g_resident_data_base[0] + 0x39160);
 }
 
 
 
-extern void func_US2_00348628(void *);
+extern void item_grid_menu_draw_us2(void *);
 
-void func_US2_0029CFE0(void) {
+/* Calls a resident menu panel function, if the resident data exists. */
+void resident_panel_call_b_us2(void) {
     if (g_resident_data_base[0] != 0)
-        func_US2_00348628(g_resident_data_base[0] + 0x39620);
+        item_grid_menu_draw_us2(g_resident_data_base[0] + 0x39620);
 }
 
 
-extern void func_US2_00347550(void *);
+extern void menu_screen_large_draw_parts_us2(void *);
 
-void func_US2_0029D010(void) {
+/* Calls a resident menu panel function, if the resident data exists. */
+void resident_panel_call_c_us2(void) {
     if (g_resident_data_base[0] != 0)
-        func_US2_00347550(g_resident_data_base[0] + 0x39AF0);
+        menu_screen_large_draw_parts_us2(g_resident_data_base[0] + 0x39AF0);
 }
 
 

@@ -11,6 +11,7 @@ extern void vec_scale_to_length(void *, void *, float);
 extern int math_random_int_range(int, int);
 extern void DrawVariableWidthTwoLayerRibbon(void *, int, void *, int);
 
+/* Draws a jagged lightning bolt between two points as a ribbon of 25 shaky points. */
 void gfx_draw_lightning_bolt_ribbon_pal(char *object, char *state) {
     CurveVector points[25];
     CurveVector start, end, jitter;

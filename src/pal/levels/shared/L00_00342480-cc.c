@@ -9,7 +9,7 @@ extern int math_random_int_range(int, int);
 extern float math_random_angle(void);
 extern unsigned char *g_spinning_effect_byte;
 
-unsigned char *func_PAL_L00_00342480(Quadword *position, Quadword *velocity, int lifetime) {
+unsigned char *part_l00_spawn_spinning_pal(Quadword *position, Quadword *velocity, int lifetime) {
     unsigned char *particle = part_alloc(0x66);
     unsigned char *motion;
     if (particle) {

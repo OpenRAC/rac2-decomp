@@ -4,7 +4,8 @@
 extern void *prompt_bar_destroy_pal(void *);
 extern void *object_construct_derived_a(void *);
 
-void *func_PAL_0033B520(char *object) {
+/* Shuts the mission screen down: destroys its prompt bar and clears the derived object (PAL version). */
+void *mission_screen_shutdown_pal(char *object) {
     prompt_bar_destroy_pal(object + 0x8);
     object_construct_derived_a(object + 0x2D8);
     return object;

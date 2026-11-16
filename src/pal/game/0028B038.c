@@ -50,47 +50,48 @@ static __inline__ int hud_coord(float value, float scale, float half, int active
     return result;
 }
 
+/* Draws the bolt counter change boxes with their text, fading in and out by row state (PAL: 50 Hz frame counts). */
 void DrawBoltCounterDeltas_pal(void)
 {
     char text[16];
     unsigned char active;
     CounterWidths widths;
-    int firstX, y, secondY, x, firstY, secondX;
+    int first_x, y, second_y, x, first_y, second_x;
     unsigned int color;
     CounterRow *row;
     int i;
-    unsigned int first, second;
+    unsigned int first_color, second_color;
     float fade, scale, width;
-    int len;
-    int one, id;
+    int text_length;
+    int one, table_entry;
 
-    secondX = 0;
+    second_x = 0;
     color = 0;
     y = 0;
-    secondY = 0;
+    second_y = 0;
     x = 0;
-    firstY = 0;
+    first_y = 0;
     widths = *(CounterWidths *)g_bolt_counter_widths;
     scale = 0.0f;
-    first = 0;
-    second = 0;
+    first_color = 0;
+    second_color = 0;
     for (i = 0; i < 2; i++) {
         row = &g_bolt_counter_state.rows[i];
-        firstX = 0;
+        first_x = 0;
         one = 1;
         switch (row->state) {
         case 1:
             fade = (float)row->age * 0.0714285746f;
-            first = FastTweenColor(0x00F0C070, 0x55F0C070, fade);
-            second = FastTweenColor(0x00442D00, 0x60442D00, fade);
+            first_color = FastTweenColor(0x00F0C070, 0x55F0C070, fade);
+            second_color = FastTweenColor(0x00442D00, 0x60442D00, fade);
             if (row->value < 0)
                 color = FastTweenColor(0x001010F0, 0x801010F0, fade);
             else
                 color = FastTweenColor(0x0029A1FF, 0x6029A1FF, fade);
-            firstX = 499;
-            firstY = 2;
-            secondX = 499;
-            secondY = 2;
+            first_x = 499;
+            first_y = 2;
+            second_x = 499;
+            second_y = 2;
             x = 442;
             scale = 1.0f;
             y = 36;
@@ -100,16 +101,16 @@ void DrawBoltCounterDeltas_pal(void)
                 fade = (float)row->timer * 0.0714285746f;
             else
                 fade = 1.0f;
-            first = 0x55F0C070;
-            second = 0x60442D00;
+            first_color = 0x55F0C070;
+            second_color = 0x60442D00;
             if (row->value < 0)
                 color = FastTweenColor(0x001010F0, 0x801010F0, fade);
             else
                 color = FastTweenColor(0x8000FFFF, 0x6029A1FF, fade);
-            firstX = 499;
-            firstY = 2;
-            secondX = 499;
-            secondY = 2;
+            first_x = 499;
+            first_y = 2;
+            second_x = 499;
+            second_y = 2;
             x = 442;
             scale = 1.0f;
             y = 36;
@@ -119,8 +120,8 @@ void DrawBoltCounterDeltas_pal(void)
                 fade = 1.0f;
             else
                 fade = 1.0f - ((float)row->timer - 7.0f) * 0.142857149f;
-            first = FastTweenColor(0x00F0C070, 0x55F0C070, fade);
-            second = FastTweenColor(0x00442D00, 0x60442D00, fade);
+            first_color = FastTweenColor(0x00F0C070, 0x55F0C070, fade);
+            second_color = FastTweenColor(0x00442D00, 0x60442D00, fade);
             if (row->value < 0)
                 color = FastTweenColor(0x001010F0, 0x801010F0, fade);
             else
@@ -128,24 +129,24 @@ void DrawBoltCounterDeltas_pal(void)
             x = 442;
             scale = 1.0f;
             y = 36;
-            firstX = 499;
-            firstY = 2;
-            secondX = 499;
-            secondY = 2;
+            first_x = 499;
+            first_y = 2;
+            second_x = 499;
+            second_y = 2;
             break;
         }
-        if (firstX) {
+        if (first_x) {
             sprintf(text, g_str_bolt_counter_format, g_bolt_counter_state.rows[i].value);
-            len = func_001157AC(text);
-            if (len > 0) {
-                width = widths.value[len - 1];
+            text_length = func_001157AC(text);
+            if (text_length > 0) {
+                width = widths.value[text_length - 1];
                 active = one;
-                id = table_find_by_id(g_resident_data_base + 0x8710, 178);
-                gfx_draw_scaled_object_two_axes((char *)id, first,
-                    (float)firstX, (float)hud_coord((float)firstY, g_hud_scale, 0.5f, active), scale, scale, width);
-                id = table_find_by_id(g_resident_data_base + 0x8710, 179);
-                gfx_draw_scaled_object_two_axes((char *)id, second,
-                    (float)secondX, (float)hud_coord((float)secondY, g_hud_scale, 0.5f, active), scale, scale, width);
+                table_entry = table_find_by_id(g_resident_data_base + 0x8710, 178);
+                gfx_draw_scaled_object_two_axes((char *)table_entry, first_color,
+                    (float)first_x, (float)hud_coord((float)first_y, g_hud_scale, 0.5f, active), scale, scale, width);
+                table_entry = table_find_by_id(g_resident_data_base + 0x8710, 179);
+                gfx_draw_scaled_object_two_axes((char *)table_entry, second_color,
+                    (float)second_x, (float)hud_coord((float)second_y, g_hud_scale, 0.5f, active), scale, scale, width);
                 text_draw_right_aligned_small(x, hud_coord((float)y, g_hud_scale, 0.5f, one), (int)color, (unsigned char *)text, func_001157AC(text));
             }
         }

@@ -19,10 +19,11 @@ extern InitValues g_extermibot_part_init_values;
 #define F(p, o) (*(float *)((p) + (o)))
 #define CHILD(o) (*(u8 **)(s + (o)))
 
-void func_PAL_L18_004352C8(u8 *a) {
+/* Sets up an Extermibot when it is created: it fills in the robot's health and speeds, then spawns its torso and arm parts and attaches them. If a part cannot be created, the robot is removed. (PAL: 50 Hz timings) */
+void extermibot_init_parts_pal(u8 *moby) {
     float pos[4] __attribute__((aligned(16)));
     InitValues values;
-    u8 *s = *(u8 **)(a + 0x68);
+    u8 *s = *(u8 **)(moby + 0x68);
     int i;
 
     s[0x48] = FloatToInt(15);
@@ -48,16 +49,16 @@ void func_PAL_L18_004352C8(u8 *a) {
     F(s, 0x110) = 1.5707965f;
     if (W(s, 0x798) != -1) W(s, 0x13C) = W(s, 0x798);
 
-    CHILD(0x7C0) = CreateMoby(0xF0B);
+    CHILD(0x7C0) = CreateMoby(MOBY_CLASS_EXTERMIBOT_TORSO);
     if (CHILD(0x7C0) == 0) goto fail;
-    CHILD(0x7C0)[0x30] = a[0x30];
-    U(CHILD(0x7C0), 0x32) = U(a, 0x32);
-    *(u64 *)(CHILD(0x7C0) + 0x38) = *(u64 *)(a + 0x38);
+    CHILD(0x7C0)[0x30] = moby[0x30];
+    U(CHILD(0x7C0), 0x32) = U(moby, 0x32);
+    *(u64 *)(CHILD(0x7C0) + 0x38) = *(u64 *)(moby + 0x38);
     func_002A0F48(CHILD(0x7C0));
     W(CHILD(0x7C0), 0x98) = 0;
-    moby_transform_joint_to_world((int)a, 0, pos);
+    moby_transform_joint_to_world((int)moby, 0, pos);
     qcopy_nc(CHILD(0x7C0) + 0x10, pos);
-    qcopy_nc(CHILD(0x7C0) + 0xF0, a + 0xF0);
+    qcopy_nc(CHILD(0x7C0) + 0xF0, moby + 0xF0);
     values = g_extermibot_part_init_values;
     {
         float *v;
@@ -74,9 +75,9 @@ void func_PAL_L18_004352C8(u8 *a) {
     if (H(s, 0x7FC)) CHILD(0x7C8) = CreateMoby(0xF0D);
     else CHILD(0x7C8) = CreateMoby(0xF0E);
     if (CHILD(0x7C8) == 0) goto fail;
-    CHILD(0x7C8)[0x30] = a[0x30];
-    U(CHILD(0x7C8), 0x32) = U(a, 0x32);
-    *(u64 *)(CHILD(0x7C8) + 0x38) = *(u64 *)(a + 0x38);
+    CHILD(0x7C8)[0x30] = moby[0x30];
+    U(CHILD(0x7C8), 0x32) = U(moby, 0x32);
+    *(u64 *)(CHILD(0x7C8) + 0x38) = *(u64 *)(moby + 0x38);
     func_002A0F48(CHILD(0x7C8));
     W(CHILD(0x7C8), 0x98) = 0;
 
@@ -103,22 +104,22 @@ void func_PAL_L18_004352C8(u8 *a) {
 
 fail:
     /* One release path for both failed spawns. */
-    moby_mark_spawned(a);
+    moby_mark_spawned(moby);
     return;
 
 spawned:
     if (!math_random_int_below(2)) {
-        U(a, 0x34) |= 0x8000;
+        U(moby, 0x34) |= 0x8000;
         U(CHILD(0x7C0), 0x34) |= 0x8000;
     }
     if (W(s, 0x7D4) != -1)
-        W(s, 0x780) = path_build_route_nodes(a, W(s, 0x7D4), s + 0x210, 0x20);
+        W(s, 0x780) = path_build_route_nodes(moby, W(s, 0x7D4), s + 0x210, 0x20);
     if (H(s, 0x7FC)) H(s, 0x804) = math_random_int_below(150);
     U(s, 0x7F6) = U(s, 0x7F4);
     if (H(s, 0x7F8)) {
-        moby_set_state(a, 1, 0);
-        W(a, 0x98) = 0;
-        U(a, 0x34) = (U(a, 0x34) & 0xEFFF) | 0x43;
+        moby_set_state(moby, 1, 0);
+        W(moby, 0x98) = 0;
+        U(moby, 0x34) = (U(moby, 0x34) & 0xEFFF) | 0x43;
         if (CHILD(0x7C0)) {
             U(CHILD(0x7C0), 0x34) |= 0x41;
             U(CHILD(0x7C0), 0x34) &= 0xEFFF;
@@ -139,10 +140,10 @@ spawned:
         }
         F(s, 0x7E8) = 1;
     } else {
-        moby_set_state(a, 4, 1);
+        moby_set_state(moby, 4, 1);
         F(s, 0x7E8) = 1.5f;
     }
-    F(a, 0x2C) = F(*(u8 **)(a + 0x24), 0x24) * F(s, 0x7E8);
+    F(moby, 0x2C) = F(*(u8 **)(moby + 0x24), 0x24) * F(s, 0x7E8);
     if (CHILD(0x7C0))
         F(CHILD(0x7C0), 0x2C) = F(*(u8 **)(CHILD(0x7C0) + 0x24), 0x24) * F(s, 0x7E8);
     if (CHILD(0x7C8))

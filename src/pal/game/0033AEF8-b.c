@@ -29,33 +29,33 @@ extern void object_set_helper_result(void *, void *, int);
    76-byte and nine 72-byte widgets by name ("0".."3", "title", "missions", ...), sets their
    colours, fonts and labels, marks the "  Exit" label with glyph 0x12 and lays them out.
    The block's four zero stores are written 1, 2, 3, 0 for retail's 0, 4, 8, C order. */
-void list_screen_init_pal(char *obj, void *arg)
+void list_screen_init_pal(char *obj, void *pool)
 {
-    *(void **)obj = arg;
+    *(void **)obj = pool;
     *(int *)(obj + 0x490) = 1;
-    if (arg) {
-        int *p = ui_return_second_arg(16, pool_alloc_cell(arg));
-        *(int **)(obj + 4) = p;
-        p[1] = 0;
-        p[2] = 0;
-        p[3] = 0;
-        p[0] = 0;
+    if (pool) {
+        int *cell = ui_return_second_arg(16, pool_alloc_cell(pool));
+        *(int **)(obj + 4) = cell;
+        cell[1] = 0;
+        cell[2] = 0;
+        cell[3] = 0;
+        cell[0] = 0;
     }
     (*(float **)(obj + 4))[0] = 256.0f;
     (*(float **)(obj + 4))[1] = 198.0f;
-    object_init_derived_arrays(obj + 0x8, g_menu_widget_desc_first, arg);
-    object_init_derived_arrays(obj + 0x54, g_menu_widget_desc_second, arg);
-    object_init_derived_arrays(obj + 0xA0, g_menu_widget_desc_third, arg);
-    object_init_derived_arrays(obj + 0xEC, g_menu_widget_desc_fourth, arg);
-    hud_init_widget_defaults(obj + 0x138, g_menu_hud_label_desc, arg);
-    hud_init_widget_defaults(obj + 0x190, g_list_screen_hud_desc_a, arg);
-    hud_init_widget_defaults(obj + 0x1E8, g_list_screen_hud_desc_b, arg);
-    hud_init_widget_defaults(obj + 0x240, g_list_screen_hud_desc_c, arg);
-    hud_init_widget_defaults(obj + 0x298, g_list_screen_hud_desc_d, arg);
-    hud_init_widget_defaults(obj + 0x2F0, g_list_screen_hud_desc_e, arg);
-    hud_init_widget_defaults(obj + 0x348, g_list_screen_hud_desc_first, arg);
-    hud_init_widget_defaults(obj + 0x3A0, g_list_screen_hud_desc_second, arg);
-    hud_init_widget_defaults(obj + 0x3F8, g_list_screen_hud_desc_third, arg);
+    object_init_derived_arrays(obj + 0x8, g_menu_widget_desc_first, pool);
+    object_init_derived_arrays(obj + 0x54, g_menu_widget_desc_second, pool);
+    object_init_derived_arrays(obj + 0xA0, g_menu_widget_desc_third, pool);
+    object_init_derived_arrays(obj + 0xEC, g_menu_widget_desc_fourth, pool);
+    hud_init_widget_defaults(obj + 0x138, g_menu_hud_label_desc, pool);
+    hud_init_widget_defaults(obj + 0x190, g_list_screen_hud_desc_a, pool);
+    hud_init_widget_defaults(obj + 0x1E8, g_list_screen_hud_desc_b, pool);
+    hud_init_widget_defaults(obj + 0x240, g_list_screen_hud_desc_c, pool);
+    hud_init_widget_defaults(obj + 0x298, g_list_screen_hud_desc_d, pool);
+    hud_init_widget_defaults(obj + 0x2F0, g_list_screen_hud_desc_e, pool);
+    hud_init_widget_defaults(obj + 0x348, g_list_screen_hud_desc_first, pool);
+    hud_init_widget_defaults(obj + 0x3A0, g_list_screen_hud_desc_second, pool);
+    hud_init_widget_defaults(obj + 0x3F8, g_list_screen_hud_desc_third, pool);
     hud_set_widget_field_a(obj + 0x190, 0);
     hud_set_widget_field_a(obj + 0x1E8, 0);
     hud_set_widget_field_a(obj + 0x240, 0);

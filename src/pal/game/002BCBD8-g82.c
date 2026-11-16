@@ -14,12 +14,13 @@ extern float FastVecLength(void *);
 extern float math_random_float_range(float,float);
 extern int math_random_int_range(int,int);
 extern int g_game_time SDATA(D_001B1688);
-extern void *func_PAL_002BD790(void *,void *,int,int,float,int,int,int,int,int);
+extern void *part_spawn_spark_pal(void *,void *,int,int,float,int,int,int,int,int);
 extern int g_ground_check_inhibit;
 extern void cam_compute_view_direction(void *,void *,int);
 extern void vec_transform_or_copy(void *,void *);
 
-void func_PAL_002BD8E8(char *p) {
+/* Updates a spark particle: it falls, fades, and now and then spawns a smaller trailing spark (PAL: 50 Hz timings). */
+void part_update_spark_pal(char *p) {
  char *q=p+32,*pos,*vel;
  float f,speed,denom;
  float saved[4] __attribute__((aligned(16)));
@@ -58,6 +59,6 @@ void func_PAL_002BD8E8(char *p) {
   FastVecAdd(vel,vel,q);
   FastVecScale(vel,vel,math_random_float_range(0.75f,0.95f));
   life=((s32)(math_random_int_range(15,30)) * 5 + 2) / 6;
-  func_PAL_002BD790(pos,vel,*(int *)(p+4),*(int *)(q+20),*(float *)(p+12),life,0,(unsigned char)p[2],(unsigned char)p[3],FloatToInt(*(float *)(p+28)));
+  part_spawn_spark_pal(pos,vel,*(int *)(p+4),*(int *)(q+20),*(float *)(p+12),life,0,(unsigned char)p[2],(unsigned char)p[3],FloatToInt(*(float *)(p+28)));
  } else FastVecScale(q,q,0.96f);
 }

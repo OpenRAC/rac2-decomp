@@ -35,6 +35,7 @@ extern void mem_fast_helper_c(void *, void *, int);
 extern void map_decode_occlusion(char *, unsigned char *, int);
 extern void map_build_mask_bitmap(u8 *, u8 *, short *);
 
+/* Sets up the map screen: works out the screen-to-map scaling values, then loads and unpacks the level's map picture. */
 void map_setup_screen_us2(void)
 {
     int i;

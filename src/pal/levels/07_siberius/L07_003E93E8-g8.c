@@ -6,9 +6,9 @@ extern void moby_set_state(char *, int, int);
 extern float fast_vec_dist(void *, void *);
 extern void moby_update_ground_check(char *);
 extern int PlayMobySound(int, int, char *);
-extern int func_PAL_002B1A50(char *, void *, int);
+extern int moby_apply_damage_to_object_pal(char *, void *, int);
 extern void entity_set_group_alert_a(char *);
-extern void func_PAL_L07_003E9FD0(char *);
+extern void entity_handle_death_or_respawn_pal(char *);
 extern void entity_follow_platform(char *);
 extern int weapon_select_aim_target(char *, int, void *, int, float, float);
 extern float g_group_entity_accel_step __attribute__((sda));
@@ -21,60 +21,60 @@ extern char g_sound_state[];
    +0x31 is set, call func_002A93B0; restart the sound when its slot no longer belongs to the
    object; run func_L07_003E5AC8 and func_PAL_L07_003E9FD0 on a func_PAL_002B1A50 count of two or more or
    when +0x2E is 2; and follow the platform at +0x260 unless the state byte is 8. */
-void group_entity_base_update_pal(char *arg)
+void group_entity_base_update_pal(char *moby)
 {
-    char *o = *(char **)(arg + 0x68);
+    char *vars = *(char **)(moby + 0x68);
     char *slot;
-    float f, g;
+    float accel, speed_limit;
 
-    if (*(unsigned char *)(arg + 0x20) == 0) {
-        *(unsigned char *)(o + 0x48) = FloatToInt(15.0f);
-        *(unsigned char *)(o + 0x4A) = FloatToInt(2.4f);
-        *(unsigned char *)(o + 0x60) = 7;
-        *(unsigned char *)(o + 0x2E) = 1;
-        *(unsigned char *)(o + 0xC7) = 1;
-        f = g_group_entity_accel_step;
-        g = g_group_entity_speed_limit;
-        f *= 0.00040000002f;
-        g *= 0.020000001f;
-        *(int *)(o + 0x98) = 3;
-        *(float *)(o + 0x80) = 0.5f;
-        *(int *)(o + 0x84) = 0;
-        *(float *)(o + 0x8C) = 0.15f;
-        *(float *)(o + 0xA8) = 1.0f;
-        *(float *)(o + 0xAC) = 1.0f;
-        *(float *)(o + 0x120) = 0.45f;
-        *(int *)(o + 0x124) = 0;
-        *(float *)(o + 0x140) = f;
-        *(float *)(o + 0x144) = f;
-        *(float *)(o + 0x148) = g;
-        *(int *)(o + 0x158) |= 0x15;
-        *(int *)(o + 0x30) = 0;
-        qcopy(o + 0x220, arg + 0x10);
-        if (*(short *)(o + 0x218))
-            moby_set_state(arg, 1, 0);
+    if (*(unsigned char *)(moby + 0x20) == 0) {
+        *(unsigned char *)(vars + 0x48) = FloatToInt(15.0f);
+        *(unsigned char *)(vars + 0x4A) = FloatToInt(2.4f);
+        *(unsigned char *)(vars + 0x60) = 7;
+        *(unsigned char *)(vars + 0x2E) = 1;
+        *(unsigned char *)(vars + 0xC7) = 1;
+        accel = g_group_entity_accel_step;
+        speed_limit = g_group_entity_speed_limit;
+        accel *= 0.00040000002f;
+        speed_limit *= 0.020000001f;
+        *(int *)(vars + 0x98) = 3;
+        *(float *)(vars + 0x80) = 0.5f;
+        *(int *)(vars + 0x84) = 0;
+        *(float *)(vars + 0x8C) = 0.15f;
+        *(float *)(vars + 0xA8) = 1.0f;
+        *(float *)(vars + 0xAC) = 1.0f;
+        *(float *)(vars + 0x120) = 0.45f;
+        *(int *)(vars + 0x124) = 0;
+        *(float *)(vars + 0x140) = accel;
+        *(float *)(vars + 0x144) = accel;
+        *(float *)(vars + 0x148) = speed_limit;
+        *(int *)(vars + 0x158) |= 0x15;
+        *(int *)(vars + 0x30) = 0;
+        qcopy(vars + 0x220, moby + 0x10);
+        if (*(short *)(vars + 0x218))
+            moby_set_state(moby, 1, 0);
         else {
-            *(int *)(arg + 0x98) = 0;
-            *(unsigned short *)(arg + 0x34) = (*(unsigned short *)(arg + 0x34) | 0x41) & 0xEFFF;
-            moby_set_state(arg, 8, 4);
+            *(int *)(moby + 0x98) = 0;
+            *(unsigned short *)(moby + 0x34) = (*(unsigned short *)(moby + 0x34) | 0x41) & 0xEFFF;
+            moby_set_state(moby, 8, 4);
         }
     }
-    if (*(unsigned char *)(arg + 0x31) && fast_vec_dist(arg + 0x10, g_hero_position_block) < 24.0f) {
-        moby_update_ground_check(arg);
-        *(unsigned char *)(arg + 0x6F) = 22;
+    if (*(unsigned char *)(moby + 0x31) && fast_vec_dist(moby + 0x10, g_hero_position_block) < 24.0f) {
+        moby_update_ground_check(moby);
+        *(unsigned char *)(moby + 0x6F) = 22;
     }
-    if (*(unsigned char *)(arg + 0x95) != 4) {
-        slot = g_sound_state + *(int *)(o + 0x264) * 0x70;
-        if (*(char **)(slot + 0x88) != arg || !*(unsigned char *)(slot + 0x74))
-            *(int *)(o + 0x264) = PlayMobySound(1, 4, arg);
+    if (*(unsigned char *)(moby + 0x95) != 4) {
+        slot = g_sound_state + *(int *)(vars + 0x264) * 0x70;
+        if (*(char **)(slot + 0x88) != moby || !*(unsigned char *)(slot + 0x74))
+            *(int *)(vars + 0x264) = PlayMobySound(1, 4, moby);
     }
-    if (func_PAL_002B1A50(arg, o + 0x50, 0) >= 2 || *(unsigned char *)(o + 0x2E) == 2) {
-        entity_set_group_alert_a(arg);
-        func_PAL_L07_003E9FD0(arg);
+    if (moby_apply_damage_to_object_pal(moby, vars + 0x50, 0) >= 2 || *(unsigned char *)(vars + 0x2E) == 2) {
+        entity_set_group_alert_a(moby);
+        entity_handle_death_or_respawn_pal(moby);
     }
-    weapon_select_aim_target(arg, *(int *)(o + 0x214), 0, 0, 0.0f, 0.0f);
-    if (*(int *)(o + 0x260) && *(unsigned char *)(arg + 0x20) != 8)
-        entity_follow_platform(arg);
+    weapon_select_aim_target(moby, *(int *)(vars + 0x214), 0, 0, 0.0f, 0.0f);
+    if (*(int *)(vars + 0x260) && *(unsigned char *)(moby + 0x20) != 8)
+        entity_follow_platform(moby);
 }
 
 typedef union { u8 b[0x2600]; s16 h[0x1300]; u16 uh[0x1300]; s32 i[0x980]; u32 u[0x980]; f32 f[0x980]; } Hero;
@@ -106,27 +106,27 @@ extern void math_approach_target_with_braking(void *, float, float, float, float
 extern int moby_turn_toward_target_and_step_pal(void *, float *, float);
 
 /* Follow the camera height between the moby's home and the hero, never under the floor. */
-float entity_move_to_tracked_height_pal(Moby_L07_003E5910 *m, float *arg1, float arg2)
+float entity_move_to_tracked_height_pal(Moby_L07_003E5910 *moby, float *target_pos, float turn_rate)
 {
     f32 pos[4] __attribute__((aligned(16)));
-    Vars_L07_003E5910 *v = m->vars;
-    f32 lo, hi, h, floor;
+    Vars_L07_003E5910 *vars = moby->vars;
+    f32 lo, hi, height, ground_height;
 
-    if (v->target != 0) {
-        matrix_mul_vec3(pos, v->home, m->rot);
-        FastVecAdd(pos, pos, v->target + 0x10);
+    if (vars->target != 0) {
+        matrix_mul_vec3(pos, vars->home, moby->rot);
+        FastVecAdd(pos, pos, vars->target + 0x10);
     } else {
-        qcopy(pos, v->home);
+        qcopy(pos, vars->home);
     }
     lo = pos[2] - 2.0f;
     hi = lo + 5.0f;
-    h = ((Hero *)g_hero_state)->f[0x2D8 / 4] + g_tracked_height_offset;
-    if (hi < h) h = hi;
-    else if (h < lo) h = lo;
-    floor = coll_probe_ground_height_below(m->pos, 0, 0.5f) + g_tracked_height_offset;
-    if (h < floor) h = floor;
-    math_approach_target_with_braking(v->cam, h - m->pos[2], g_group_entity_accel_step * 0.00040000002f, g_group_entity_accel_step * 0.00040000002f,
+    height = ((Hero *)g_hero_state)->f[0x2D8 / 4] + g_tracked_height_offset;
+    if (hi < height) height = hi;
+    else if (height < lo) height = lo;
+    ground_height = coll_probe_ground_height_below(moby->pos, 0, 0.5f) + g_tracked_height_offset;
+    if (height < ground_height) height = ground_height;
+    math_approach_target_with_braking(vars->cam, height - moby->pos[2], g_group_entity_accel_step * 0.00040000002f, g_group_entity_accel_step * 0.00040000002f,
                   g_group_entity_speed_limit * 0.020000001f);
-    moby_turn_toward_target_and_step_pal(m, arg1, arg2);
-    return v->f1EC;
+    moby_turn_toward_target_and_step_pal(moby, target_pos, turn_rate);
+    return vars->f1EC;
 }

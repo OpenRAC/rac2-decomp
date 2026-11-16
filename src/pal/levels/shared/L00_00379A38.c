@@ -23,7 +23,7 @@ typedef struct {
     char pad88[0xBC];
     struct { int price; int rest[6]; } cells[0]; /* Variable-length trailing table. */
 } UpgradeModel;
-extern void func_PAL_002802D8(int, int, unsigned long long, unsigned char *, int, int, float);
+extern void text_draw_centered_small_fitted(int, int, unsigned long long, unsigned char *, int, int, float);
 extern unsigned char g_language __attribute__((sda));
 extern void hud_draw_sprite(int, int, int, int, int, int);
 
@@ -35,12 +35,13 @@ extern char *GetLocalizedString(int);
 extern void text_draw_right_aligned_medium(int, int, unsigned long long, unsigned char *, int);
 extern int GetIconFrame(int, int);
 extern void hud_draw_sprite_gradient(int, int, int, int, int, unsigned int *);
-extern void func_PAL_002FAB40(char *, int);
+extern void text_format_number_with_separators_pal(char *, int);
 extern void text_draw_medium(int, int, unsigned long long, unsigned char *, int);
 extern unsigned int level_get_native_table_entry(int);
 extern int text_draw_centered_medium(int, int, unsigned long long, unsigned char *, int);
 
-void func_PAL_L00_00379EF0(void) {
+/* Draws the selected item's price with the bolt icon and its description text. */
+void shop_draw_price_and_description_pal(void) {
     unsigned int colors[4];
     char text[256];
     char *model = g_purchase_menu_model;
@@ -57,7 +58,7 @@ void func_PAL_L00_00379EF0(void) {
         hud_draw_sprite_gradient(GetIconFrame(0x7567, 0), 156,
                       (int)(g_menu_slide_scale * 290.0f + 0.5f), 16,
                       (int)(g_menu_slide_scale * 16.0f + 0.5f), colors);
-        func_PAL_002FAB40(text, price);
+        text_format_number_with_separators_pal(text, price);
         color = 0x80F0F0F0ULL;
         if (price > g_player_bolts) color = 0x802020F0ULL;
         text_draw_medium(176, (int)(g_menu_slide_scale * 290.0f + 0.5f), color, (unsigned char *)text, -1);
@@ -76,7 +77,7 @@ void func_PAL_L00_00379EF0(void) {
 
 /* func_PAL_L00_0037A4B0, the PAL copy of func_L00_003778F0: the same C, where the top counter and
    its icon take PAL's vertical adjustments and the label text id becomes 0x10A0. */
-void func_PAL_L00_0037A4B0(void) {
+void draw_selected_item_info_panel_pal(void) {
     PanelColors colors;
     char text[256];
     char *model = g_purchase_menu_model;
@@ -98,7 +99,7 @@ void func_PAL_L00_0037A4B0(void) {
                   -192, -(int)(g_menu_slide_scale * 96.0f + 0.5f), colors.word);
     text_draw_right_aligned_medium(270, (int)(g_menu_slide_scale * 218.0f + 0.5f), 0x80F0F0F0ULL,
                   (unsigned char *)GetLocalizedString(0x10a0), -1);
-    func_PAL_002FAB40(text, ((ShopModel *)model)->items[index].price);
+    text_format_number_with_separators_pal(text, ((ShopModel *)model)->items[index].price);
     text_draw_medium(270, (int)(g_menu_slide_scale * 218.0f + 0.5f), 0x80F0F0F0ULL, (unsigned char *)text, -1);
     text_draw_centered_medium(g_screen_width >> 1, (int)(g_menu_slide_scale * 277.0f + 0.5f), 0x80F0F0F0ULL,
                   ((ShopModel *)model)->items[index].name, -1);
@@ -106,7 +107,7 @@ void func_PAL_L00_0037A4B0(void) {
     colors.word[2] = 0x60F0F0B0;
     colors.word[1] = 0x60F0F0B0;
     colors.word[0] = 0x60F0F0B0;
-    func_PAL_002FAB40(text, g_bolt_count);
+    text_format_number_with_separators_pal(text, g_bolt_count);
     v = ref_PAL_L00_0037A4B0_01 * 17.0f + 0.5f;
     text_draw_right_aligned_small(444, ref_PAL_L00_0037A4B0_00 == 1 ? (int)(v + -4.0f) : (int)v, 0x80FFFFFFULL, (unsigned char *)text, -1);
     icon = GetIconFrame(0xEAA2, 3);
@@ -122,34 +123,34 @@ void func_PAL_L00_0037A4B0(void) {
 /* func_PAL_L00_0037B1A0, the PAL copy of func_L00_00378578: the same panel, with its prompts drawn
    through func_PAL_002802D8 at scale 0.7 and moved up when D_001A7B90 is set. Retail really tests
    the language byte and carries both arms in full, although they draw the same two strings. */
-void func_PAL_L00_0037B1A0(void) {
+void draw_selected_item_purchase_panel_pal(void) {
     UpgradeModel *model = (UpgradeModel *)g_purchase_menu_model;
     int index = model->index;
     int mode;
     int y;
     if (model->state != 0) {
         if (model->cells[index].price <= g_bolt_count) {
-            func_PAL_002802D8(444, (int)(g_menu_slide_scale * 190.0f + 0.5f), 0x80F0F0F0ULL,
+            text_draw_centered_small_fitted(444, (int)(g_menu_slide_scale * 190.0f + 0.5f), 0x80F0F0F0ULL,
                               (unsigned char *)GetLocalizedString(0x113B), -1, 82, 0.7f);
-            func_PAL_002802D8(444, (int)(g_menu_slide_scale * 214.0f + 0.5f), 0x80F0F0F0ULL,
+            text_draw_centered_small_fitted(444, (int)(g_menu_slide_scale * 214.0f + 0.5f), 0x80F0F0F0ULL,
                               (unsigned char *)GetLocalizedString(0x1138), -1, 82, 0.7f);
         } else {
             int top;
             mode = g_is_pal_video;
             y = (int)(g_menu_slide_scale * 214.0f + 0.5f);
             top = mode ? y - 11 : y;
-            func_PAL_002802D8(444, top, 0x80F0F0F0ULL,
+            text_draw_centered_small_fitted(444, top, 0x80F0F0F0ULL,
                               (unsigned char *)GetLocalizedString(0x1124), -1, 82, 0.7f);
         }
     } else if (g_language == 2) {
-        func_PAL_002802D8(444, (int)(g_menu_slide_scale * 190.0f + 0.5f), 0x80F0F0F0ULL,
+        text_draw_centered_small_fitted(444, (int)(g_menu_slide_scale * 190.0f + 0.5f), 0x80F0F0F0ULL,
                           (unsigned char *)GetLocalizedString(0x1125), -1, 82, 0.7f);
-        func_PAL_002802D8(444, (int)(g_menu_slide_scale * 214.0f + 0.5f), 0x80F0F0F0ULL,
+        text_draw_centered_small_fitted(444, (int)(g_menu_slide_scale * 214.0f + 0.5f), 0x80F0F0F0ULL,
                           (unsigned char *)GetLocalizedString(0xB60), -1, 82, 0.7f);
     } else {
-        func_PAL_002802D8(444, (int)(g_menu_slide_scale * 190.0f + 0.5f), 0x80F0F0F0ULL,
+        text_draw_centered_small_fitted(444, (int)(g_menu_slide_scale * 190.0f + 0.5f), 0x80F0F0F0ULL,
                           (unsigned char *)GetLocalizedString(0x1125), -1, 82, 0.7f);
-        func_PAL_002802D8(444, (int)(g_menu_slide_scale * 214.0f + 0.5f), 0x80F0F0F0ULL,
+        text_draw_centered_small_fitted(444, (int)(g_menu_slide_scale * 214.0f + 0.5f), 0x80F0F0F0ULL,
                           (unsigned char *)GetLocalizedString(0xB60), -1, 82, 0.7f);
     }
     {

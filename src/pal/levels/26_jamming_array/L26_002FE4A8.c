@@ -22,7 +22,7 @@ extern unsigned int D_L26_001A9428_gp SDATA(D_L26_001A9428);
 extern int g_part_kind_range[] __attribute__((sda));
 extern int D_L26_001A9430_gp SDATA(D_L26_001A9430);
 extern void anim_start_startup_animations(void);
-extern void func_PAL_002E7270(void *);
+extern void update_equipment_pieces_pal(void *);
 extern void math_store_angle_update_result(char *, float *, int, int, float);
 extern void moby_transform_joint_point(char *, int, char *);
 extern void transform_vector(void *, void *, void *);
@@ -39,7 +39,7 @@ extern int math_random_int_range(int, int);
    bounds after the first three are read at offsets from D_L26_001A9430 and -1 is passed directly:
    the offset form keeps those absolute macro loads out of call delay slots, and a local for -1 moves
    the stack argument's store after the register moves. */
-void func_PAL_L26_002FE890(void) {
+void hero_update_part_objects_pal(void) {
     Vec transform[4];
     Vec position;
     Vec velocity;
@@ -62,7 +62,7 @@ void func_PAL_L26_002FE890(void) {
         if (object && ((Object *)object)->id == 0xE29) {
             ((Object *)object)->flags |= 0x800;
         }
-        if (((Object *)object)->id == 0xD54) func_PAL_002E7270(object);
+        if (((Object *)object)->id == 0xD54) update_equipment_pieces_pal(object);
         if (object && *(short *)(object + 0xAA) == 4000 && g_current_map_index[0] != 51 && *(char **)(object + 0x68))
             math_store_angle_update_result(object, (float *)(*(char **)(object + 0x68) + 0xC),
                               (int)0x80AAAAD2, (int)0x80396464, 0.07330384f);

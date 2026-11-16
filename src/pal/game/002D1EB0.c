@@ -18,7 +18,7 @@ extern unsigned char g_special_item_collected_g[] __attribute__((sda));
 extern unsigned char g_special_item_collected_h[] __attribute__((sda));
 
 /* func_PAL_002D24C0, the PAL copy of func_002D1590: the same C, with the last flag also requiring D_001A79F0 > 0. */
-int func_PAL_002D24C0(void)
+int menu_record_collected_special_items_pal(void)
 {
     if (g_resident_data_base[0] != 0 && ((unsigned char *)g_player_stats)[0xA] != 0) {
         if (g_language_settings[0x3A] != 0 && g_special_items_flag != 0)

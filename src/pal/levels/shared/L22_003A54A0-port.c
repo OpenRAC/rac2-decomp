@@ -54,6 +54,7 @@ extern void WalkPathPickNext(char *, int, int, float);
 extern void func_00321298(void *, void *, void *, void *);
 extern void func_0032FEB8(void *, void *);
 extern float func_0032A758(void *, void *, int);
+/* Steers the ship along its flight lanes toward a target point. It picks a lane, moves from point to point and goes around anything in the way. (PAL: 50 Hz timings) */
 void WalkPathUpdate_pal(char *obj) {
     char target[16], flat[16], point[16];
     float distances[2];

@@ -23,19 +23,19 @@ extern void FastVecAdd(char *, char *, char *);
 extern f32 math_random_float_range(f32, f32);
 
 /* Emits one central particle and the configured ring of falling particles. */
-void func_PAL_L16_0041E3D8(char *self) {
+void emit_snivelak_falling_particles_pal(char *self) {
     char velocity[16];
     char position[16];
     s32 i;
     s32 kind;
     s32 alpha;
-    s32 firstKind;
+    s32 first_kind;
     char *origin = self + 16;
     vec_random_direction(velocity, g_spark_dir_speed_min * 0.020000001f,
                   g_spark_dir_speed_max[0] * 0.020000001f);
-    firstKind = (((int)(math_random_int_range(g_spark_first_kind_min, g_spark_first_kind_max[0])) * 5 + 2) / 6) & 255;
+    first_kind = (((int)(math_random_int_range(g_spark_first_kind_min, g_spark_first_kind_max[0])) * 5 + 2) / 6) & 255;
     alpha = math_random_int_below(255);
-    part_spawn_hero_relative(origin, velocity, g_spark_first_part_id, firstKind, g_spark_first_scale, alpha & 255, 0);
+    part_spawn_hero_relative(origin, velocity, g_spark_first_part_id, first_kind, g_spark_first_scale, alpha & 255, 0);
     vec_clear_128(velocity);
     for (i = 0; i < g_spark_count; i++) {
         vec_random_direction(position, 0.0f, 0.25f);

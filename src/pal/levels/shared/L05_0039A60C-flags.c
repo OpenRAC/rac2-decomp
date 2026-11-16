@@ -19,7 +19,9 @@ typedef struct {
 extern CameraTargetView g_camera_target_view;
 extern PlayerTargetView g_hero_state;
 
-void func_PAL_L05_0039A60C(char *object)
+/* Places the object at the camera target's position, pushed to the hero's side axis when the hero is
+   moving toward it, or to a far default when there is no target. */
+void moby_place_near_camera_target_pal(char *object)
 {
     Vector4 difference, projected;
     float amount;

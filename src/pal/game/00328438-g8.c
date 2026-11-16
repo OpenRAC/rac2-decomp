@@ -9,7 +9,8 @@ extern void BuildEightDirectionOffsets(void *);
 extern void moby_probe_surface_and_move_pal(void *);
 extern void vehicle_align_to_ground_surface_pal(void *);
 
-void func_PAL_00328538(char *object)
+/* Moves an object along its heading with friction: speeds up toward its limit while driven, slows down otherwise, then re-probes the surface and ground under it. */
+void moby_move_with_friction_pal(char *object)
 {
     float vector[4];
     char *data = *(char **)(object + 0x68);

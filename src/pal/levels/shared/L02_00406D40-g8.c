@@ -16,7 +16,7 @@ extern int math_random_int_below(int);
 extern void *part_spawn_object_relative_particle(void *,void *,void *,void *,int);
 
 /* The child consumes five GPR inputs and deliberately returns a pointer. */
-void func_PAL_L02_00406D40(char *object) {
+void part_spawn_twin_puffs_pal(char *object) {
     Vector velocity,origin,direction;
     int variant;
     velocity.q=0;

@@ -13,14 +13,15 @@ extern void FastVecAdd(void *, void *, void *);
 extern int coll_test_hit_at_bone(void *, float, int, int, float, float, int, int, int);
 extern void snivelak_pick_next_path_segment(u8 *);
 
-void func_PAL_L16_00416218(u8 *moby, float dt)
+/* Walks the boss toward its next path point at a smooth speed, turns it to face the way it walks and updates the path points when it arrives. */
+void snivelak_move_along_path_pal(u8 *moby, float dt)
 {
     float point[4] __attribute__((aligned(16)));
     float delta[4] __attribute__((aligned(16)));
     float step[4] __attribute__((aligned(16)));
     u8 *state = *(u8 **)(moby + 0x68);
     u8 *path = g_path_l16_table[*(int *)(state + 0x170)];
-    int finalPoint = 1;
+    int final_point = 1;
     float distance, heading;
     float *orientation;
     *(float *)(moby + 0x48) = *(float *)(state + 0x230) * 2.4999998f;
@@ -32,7 +33,7 @@ void func_PAL_L16_00416218(u8 *moby, float dt)
         if (previous == *(int *)(state + 0x220) || previous == *(int *)(state + 0x224) ||
             *(int *)(state + 0x228) != *(int *)(state + 0x220) || *(int *)(state + 0x228) != *(int *)(state + 0x224)) snivelak_pick_next_path_segment(moby);
         qcopy(point, (path + *(int *)(state + 0x228) * 16 + 16));
-        finalPoint = 0;
+        final_point = 0;
     }
     orientation = (float *)(moby + 0xf8);
     FastVecSub(delta, point, moby + 0x10);
@@ -47,7 +48,7 @@ void func_PAL_L16_00416218(u8 *moby, float dt)
         coll_test_hit_at_bone(moby, 6.0f, 0, 0x90000, 50.0f, 1.0f, 0, 1, 0);
         coll_test_hit_at_bone(moby, 6.0f, 1, 0x90000, 50.0f, 1.0f, 0, 1, 0);
     }
-    if (!finalPoint && distance < 0.5f) {
+    if (!final_point && distance < 0.5f) {
         int current = *(int *)(state + 0x228);
         int previous = *(int *)(state + 0x22c);
         if (previous < current) { *(int *)(state + 0x220) = previous; *(int *)(state + 0x224) = current; }

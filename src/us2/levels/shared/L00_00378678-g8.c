@@ -27,7 +27,8 @@ extern int text_draw_centered_medium(int x, int y, unsigned long style, u8 *text
     func_0027FB40((X), row, 0x80f0f0f0UL, (u8 *)func_00288FB8((ID)), -1); \
 }
 
-void func_US2_L00_00379000(void)
+/* Draws the buy and back prompts, showing buy only when the player can afford it and is not at the cap. */
+void shop_draw_purchase_action_prompts_us2(void)
 {
     if (g_purchase_menu_model.active) {
         if (KIND == 1 && CAPPED) {

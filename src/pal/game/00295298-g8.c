@@ -18,6 +18,7 @@ extern void snd_send_cmd8(void);
 extern int snd_Pump(void),snd_BankLoadFromIOP(char *);
 extern void STUB_printf(char *,int),load_cached_moby_class(int,int,void *);
 
+/* Makes sure the disc asset with this id is in a cache slot, loading it if needed, and switches to it. */
 void SwitchCachedDiscAsset_pal(int id)
 {
     int index=0,slot;

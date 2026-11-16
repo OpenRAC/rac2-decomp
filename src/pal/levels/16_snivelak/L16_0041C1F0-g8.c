@@ -27,15 +27,15 @@ extern float g_steering_target_speed __attribute__((sda));
 extern float g_steering_target_speed_alt[] MACRO_ADDR;
 extern float g_steering_decel_rate __attribute__((sda));
 typedef struct {
-    float lowAcceleration, highAcceleration, lowSpeed, highSpeed, deceleration;
+    float low_acceleration, high_acceleration, low_speed, high_speed, deceleration;
 } SteeringRateSettings;
 extern SteeringRateSettings g_steering_rate_settings MACRO_ADDR;
 extern SteeringRateSettings smallRateSettings SDATA(D_L16_001B1B28);
 extern float g_steering_limit_high_deg __attribute__((sda));
 typedef struct {
-    float minAngle;
+    float min_angle;
     char reserved[8];
-    float filteredX, filteredY;
+    float filtered_x, filtered_y;
 } SteeringAngleSettings;
 extern SteeringAngleSettings g_steering_angle_settings MACRO_ADDR;
 extern float math_fabs(float);
@@ -48,11 +48,11 @@ extern void FastVecSub(void *, void *, void *);
 extern void mat_combine_and_store(void *, void *, void *, void *);
 
 /* Smooth the steering inputs, update yaw/pitch rates, and limit pitch travel. */
-void func_PAL_L16_0041C470(char *object)
+void UpdateSnivelakSteering_pal(char *object)
 {
     SteeringWorkspace local;
     char *state = *(char **)(object + 0x68);
-    float acceleration, target, deceleration, newMagnitude;
+    float acceleration, target, deceleration, new_magnitude;
 
     qcopy(&local.position, (object + 0x10));
     qcopy(&local.angles, (object + 0xf0));
@@ -60,12 +60,12 @@ void func_PAL_L16_0041C470(char *object)
         g_steering_filtered_turn = math_fabs(g_player_state);
     else if (g_steering_filtered_turn < -math_fabs(g_player_state))
         g_steering_filtered_turn = -math_fabs(g_player_state);
-    if (math_fabs(g_pad_stick_y) < g_steering_angle_settings.filteredY)
-        g_steering_angle_settings.filteredY = math_fabs(g_pad_stick_y);
-    else if (g_steering_angle_settings.filteredY < -math_fabs(g_pad_stick_y))
-        g_steering_angle_settings.filteredY = -math_fabs(g_pad_stick_y);
+    if (math_fabs(g_pad_stick_y) < g_steering_angle_settings.filtered_y)
+        g_steering_angle_settings.filtered_y = math_fabs(g_pad_stick_y);
+    else if (g_steering_angle_settings.filtered_y < -math_fabs(g_pad_stick_y))
+        g_steering_angle_settings.filtered_y = -math_fabs(g_pad_stick_y);
     ApproachValue(&g_steering_filtered_turn, g_player_state, 0.15f);
-    ApproachValue(&g_steering_angle_settings.filteredY, g_pad_stick_y, 0.15f);
+    ApproachValue(&g_steering_angle_settings.filtered_y, g_pad_stick_y, 0.15f);
     deceleration = g_steering_decel_rate*6.981318e-06f;
     if (g_steering_filtered_turn != 0.0f) {
         if (math_fabs(g_steering_filtered_turn) >= 1.0f) {
@@ -80,24 +80,24 @@ void func_PAL_L16_0041C470(char *object)
         target = 0.0f;
     }
     {
-        float oldMagnitude = math_fabs(*(float *)(state + 0x80));
-        newMagnitude = math_fabs(target);
-        if (newMagnitude < oldMagnitude)
+        float old_magnitude = math_fabs(*(float *)(state + 0x80));
+        new_magnitude = math_fabs(target);
+        if (new_magnitude < old_magnitude)
             ApproachValue((float *)(state + 0x80), target, deceleration);
         else
             ApproachValue((float *)(state + 0x80), target, acceleration);
     }
     {
-        float inputY = g_steering_angle_settings.filteredY;
+        float input_y = g_steering_angle_settings.filtered_y;
         deceleration = smallRateSettings.deceleration*6.981318e-06f;
-        if (inputY != 0.0f) {
-            if (math_fabs(inputY) >= 1.0f) {
-                float turn = -g_steering_angle_settings.filteredY;
-                acceleration = g_steering_rate_settings.highAcceleration*6.981318e-06f;
-                target = g_steering_rate_settings.highSpeed*(turn*0.0003490659f);
+        if (input_y != 0.0f) {
+            if (math_fabs(input_y) >= 1.0f) {
+                float turn = -g_steering_angle_settings.filtered_y;
+                acceleration = g_steering_rate_settings.high_acceleration*6.981318e-06f;
+                target = g_steering_rate_settings.high_speed*(turn*0.0003490659f);
             } else {
-                acceleration = smallRateSettings.lowAcceleration*(math_fabs(g_steering_angle_settings.filteredY)*6.981318e-06f);
-                target = smallRateSettings.lowSpeed*((-g_steering_angle_settings.filteredY)*0.0003490659f);
+                acceleration = smallRateSettings.low_acceleration*(math_fabs(g_steering_angle_settings.filtered_y)*6.981318e-06f);
+                target = smallRateSettings.low_speed*((-g_steering_angle_settings.filtered_y)*0.0003490659f);
             }
         } else {
             acceleration = 0.0f;
@@ -105,9 +105,9 @@ void func_PAL_L16_0041C470(char *object)
         }
     }
     {
-        float oldMagnitude = math_fabs(*(float *)(state + 0x84));
-        newMagnitude = math_fabs(target);
-        if (newMagnitude < oldMagnitude)
+        float old_magnitude = math_fabs(*(float *)(state + 0x84));
+        new_magnitude = math_fabs(target);
+        if (new_magnitude < old_magnitude)
             ApproachValue((float *)(state + 0x84), target, deceleration);
         else
             ApproachValue((float *)(state + 0x84), target, acceleration);
@@ -116,7 +116,7 @@ void func_PAL_L16_0041C470(char *object)
         *(float *)(object + 0xf8) = FastAddRotations(*(float *)(object + 0xf8), *(float *)(state + 0x80));
     if (*(float *)(state + 0x84) != 0.0f) {
         local.limits.high = g_steering_limit_high_deg*0.017453294f;
-        local.limits.low = g_steering_angle_settings.minAngle*0.017453294f;
+        local.limits.low = g_steering_angle_settings.min_angle*0.017453294f;
         local.work.bounds = local.limits;
         math_clamp_speed_to_braking_limit((float *)(state + 0x84), local.work.bounds.high - *(float *)(state + 0x90), deceleration);
         math_clamp_speed_to_braking_limit((float *)(state + 0x84), local.work.bounds.low - *(float *)(state + 0x90), deceleration);

@@ -24,49 +24,50 @@ typedef struct {
 } L01HeroPositionView;
 extern u8 g_hero_state[];
 
-float swamp_monster_move_around_arena_pal(u8 *obj)
+/* Moves the Swamp Monster II around the arena centre towards its target, and returns its distance to the target (PAL version). */
+float swamp_monster_move_around_arena_pal(u8 *moby)
 {
-    u8 *s = *(u8 **)(obj + 0x68);
+    u8 *state = *(u8 **)(moby + 0x68);
     float distance, angle, delta, magnitude;
 
-    if (*(int *)(s + 0x124) == 1) {
-        distance = vec_distance_xy(obj + 0x10, *(u8 **)(s + 0x120) + 0x10);
+    if (*(int *)(state + 0x124) == 1) {
+        distance = vec_distance_xy(moby + 0x10, *(u8 **)(state + 0x120) + 0x10);
         angle = mat_fast_helper_a(
-            *(float *)(obj + 0x10) - g_swamp_patrol_positions[0][*(int *)(s + 0x2CC)].centre[0],
-            *(float *)(obj + 0x14) - g_swamp_patrol_positions[0][*(int *)(s + 0x2CC)].centre[1]);
+            *(float *)(moby + 0x10) - g_swamp_patrol_positions[0][*(int *)(state + 0x2CC)].centre[0],
+            *(float *)(moby + 0x14) - g_swamp_patrol_positions[0][*(int *)(state + 0x2CC)].centre[1]);
         delta = fast_subtract_rotations(
             mat_fast_helper_a(
-                *(float *)(*(u8 **)(s + 0x120) + 0x10) - g_swamp_patrol_positions[0][*(int *)(s + 0x2CC)].centre[0],
-                *(float *)(*(u8 **)(s + 0x120) + 0x14) - g_swamp_patrol_positions[0][*(int *)(s + 0x2CC)].centre[1]),
+                *(float *)(*(u8 **)(state + 0x120) + 0x10) - g_swamp_patrol_positions[0][*(int *)(state + 0x2CC)].centre[0],
+                *(float *)(*(u8 **)(state + 0x120) + 0x14) - g_swamp_patrol_positions[0][*(int *)(state + 0x2CC)].centre[1]),
             angle);
         magnitude = math_fabs(delta);
-        if (distance > *(float *)(s + 0x2EC)) {
-            if (obj[0x43] != s[0x2E1])
-                moby_set_animation_and_speed(obj, s[0x2E1], 0, 20);
+        if (distance > *(float *)(state + 0x2EC)) {
+            if (moby[0x43] != state[0x2E1])
+                moby_set_animation_and_speed(moby, state[0x2E1], 0, 20);
             if (magnitude < g_swamp_monster_arena_turn_angle * 0.017453294f) {
-                qcopy(s + 0x2A0, *(u8 **)(s + 0x120) + 0x10);
+                qcopy(state + 0x2A0, *(u8 **)(state + 0x120) + 0x10);
             } else {
                 delta = delta / magnitude;
                 delta = delta * 0.087266474f;
-                qcopy(s + 0x2A0, g_swamp_patrol_positions[0][*(int *)(s + 0x2CC)].centre);
-                *(float *)(s + 0x2A0) += math_fast_sin_or_cos_a(FastAddRotations(angle, delta)) * 38.0f;
-                *(float *)(s + 0x2A4) += math_fast_sin_or_cos_b(FastAddRotations(angle, delta)) * 38.0f;
+                qcopy(state + 0x2A0, g_swamp_patrol_positions[0][*(int *)(state + 0x2CC)].centre);
+                *(float *)(state + 0x2A0) += math_fast_sin_or_cos_a(FastAddRotations(angle, delta)) * 38.0f;
+                *(float *)(state + 0x2A4) += math_fast_sin_or_cos_b(FastAddRotations(angle, delta)) * 38.0f;
             }
-            moby_l01_turn_toward_target_pal(obj, s + 0x2A0);
-            *(float *)(obj + 0x18) = *(float *)(s + 0x2E8);
+            moby_l01_turn_toward_target_pal(moby, state + 0x2A0);
+            *(float *)(moby + 0x18) = *(float *)(state + 0x2E8);
         } else {
-            if (obj[0x43] != s[0x2E2] && obj[0x95] != 3)
-                moby_set_animation_and_speed(obj, s[0x2E2], 0, 20);
-            moby_step_at_own_position_factor_pal(obj, mat_fast_helper_a(*(float *)(*(u8 **)(s + 0x120) + 0x10) - *(float *)(obj + 0x10),
-                                             *(float *)(*(u8 **)(s + 0x120) + 0x14) - *(float *)(obj + 0x14)));
-            *(float *)(obj + 0x18) = *(float *)(s + 0x2E8);
+            if (moby[0x43] != state[0x2E2] && moby[0x95] != 3)
+                moby_set_animation_and_speed(moby, state[0x2E2], 0, 20);
+            moby_step_at_own_position_factor_pal(moby, mat_fast_helper_a(*(float *)(*(u8 **)(state + 0x120) + 0x10) - *(float *)(moby + 0x10),
+                                             *(float *)(*(u8 **)(state + 0x120) + 0x14) - *(float *)(moby + 0x14)));
+            *(float *)(moby + 0x18) = *(float *)(state + 0x2E8);
         }
         return distance;
     }
-    if (obj[0x43] != s[0x2E2] && obj[0x95] != 3)
-        moby_set_animation_and_speed(obj, s[0x2E2], 0, 20);
-    moby_step_at_own_position_factor_pal(obj, mat_fast_helper_a(((L01HeroPositionView *)g_hero_state)->position[0] - *(float *)(obj + 0x10),
-                                     ((L01HeroPositionView *)g_hero_state)->position[1] - *(float *)(obj + 0x14)));
-    *(float *)(obj + 0x18) = *(float *)(s + 0x2E8);
+    if (moby[0x43] != state[0x2E2] && moby[0x95] != 3)
+        moby_set_animation_and_speed(moby, state[0x2E2], 0, 20);
+    moby_step_at_own_position_factor_pal(moby, mat_fast_helper_a(((L01HeroPositionView *)g_hero_state)->position[0] - *(float *)(moby + 0x10),
+                                     ((L01HeroPositionView *)g_hero_state)->position[1] - *(float *)(moby + 0x14)));
+    *(float *)(moby + 0x18) = *(float *)(state + 0x2E8);
     return -1000.0f;
 }

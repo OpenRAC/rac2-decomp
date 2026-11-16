@@ -24,13 +24,13 @@ extern Entry_0033B540 g_map_spot_table[];
 /* Places the sprites of the object built by func_0033B170 around the anchor at +0x1C8 and returns
    0. While the word at D_001C4FA0 + 0x230 is below 0x15, the offset of the sprites at +0xE4 and
    +0x130 (horizontal, 5 at most per call) and of the one at +0x17C (vertical, 3 at most) is eased
-   toward a cell of the 16-byte table D_00265140. g and g2 are two loads of the same base: the
+   toward a cell of the 16-byte table D_00265140. overlay and overlay2 are two loads of the same base: the
    second branch rebuilds the address, as retail does. The second argument is not read. */
 int map_screen_update_layout_pal(char *self, int unused)
 {
     float dx, dy;
     float *anchor;
-    char *g;
+    char *overlay;
 
     anchor = *(float **)(self + 0x1C8);
     object_set_first_float4(self, anchor[0], anchor[1], 0.0f, 0.0f);
@@ -39,32 +39,32 @@ int map_screen_update_layout_pal(char *self, int unused)
     anchor = *(float **)(self + 0x1C8);
     object_set_first_float4(self + 0x98, anchor[0], anchor[1], 0.0f, 0.0f);
     dx = dy = 0.0f;
-    g = g_map_overlay_state;
-    if (*(int *)(g + 0x230) < 0x15) {
-        float t;
+    overlay = g_map_overlay_state;
+    if (*(int *)(overlay + 0x230) < 0x15) {
+        float step;
 
         dx = object_get_first_field(self + 0xE4)[0] - (g_map_screen_offset_x_first + (*(float **)(self + 0x1C8))[0]);
         if (object_get_first_field(self + 0xE4)[0] == 0.0f) {
             dx = 56.0f;
         } else {
-            t = (float)g_map_spot_table[*(int *)(g + 0x230)].first + g_map_spot_table[*(int *)(g + 0x230)].scale * 0.5f - dx;
-            if (t > 5.0f)
-                t = 5.0f;
-            else if (t < -5.0f)
-                t = -5.0f;
-            dx += t;
+            step = (float)g_map_spot_table[*(int *)(overlay + 0x230)].first + g_map_spot_table[*(int *)(overlay + 0x230)].scale * 0.5f - dx;
+            if (step > 5.0f)
+                step = 5.0f;
+            else if (step < -5.0f)
+                step = -5.0f;
+            dx += step;
         }
         dy = object_get_first_field(self + 0x17C)[1] - (g_map_screen_offset_y_third + (*(float **)(self + 0x1C8))[1]);
         if (object_get_first_field(self + 0x17C)[1] == 0.0f) {
             dy = -50.0f;
         } else {
-            char *g2 = g_map_overlay_state;
-            t = (float)g_map_spot_table[*(int *)(g2 + 0x230)].second + g_map_spot_table[*(int *)(g2 + 0x230)].scale * 0.5f - dy;
-            if (t > 3.0f)
-                t = 3.0f;
-            else if (t < -3.0f)
-                t = -3.0f;
-            dy += t;
+            char *overlay2 = g_map_overlay_state;
+            step = (float)g_map_spot_table[*(int *)(overlay2 + 0x230)].second + g_map_spot_table[*(int *)(overlay2 + 0x230)].scale * 0.5f - dy;
+            if (step > 3.0f)
+                step = 3.0f;
+            else if (step < -3.0f)
+                step = -3.0f;
+            dy += step;
         }
     }
     anchor = *(float **)(self + 0x1C8);

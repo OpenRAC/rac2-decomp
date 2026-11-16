@@ -31,7 +31,7 @@ extern s32 FastTweenColor(s32, s32, float);
 extern void *part_spawn_hero_relative(void *, void *, int, unsigned char, unsigned char, int, float);
 
 /* Spawns the object's trail puff; when not suppressed and flag one of the resident word is set it also emits the tinted streak. */
-void func_PAL_00303950(char *obj, s32 quiet)
+void part_spawn_trail_puff_pal(char *obj, s32 quiet)
 {
     V4_F302848 zero;
     V4_F302848 vec;

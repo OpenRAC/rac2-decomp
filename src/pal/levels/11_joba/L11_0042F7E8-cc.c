@@ -13,7 +13,7 @@ extern char *part_spawn_ground_effect(void *, int, float, float, unsigned int, i
 extern int FloatToInt(float);
 
 /* Emits paired particles with opposite spin and randomized velocities. */
-void func_PAL_L11_0042F7E8(float *pos, int count) {
+void part_l11_spawn_paired_sparks_pal(float *pos, int count) {
     float velocity[4], origin[4], direction[4], axis[4], offset[4];
     float size, angle;
     int i;

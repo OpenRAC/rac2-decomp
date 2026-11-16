@@ -39,7 +39,7 @@ extern int func_001157AC(const char *);
 extern int text_draw_centered_small(int, int, unsigned long, char *, int);
 extern int text_draw_centered_large(int, int, unsigned long, char *, int);
 extern int text_draw_centered_medium(int, int, unsigned long, char *, int);
-extern void func_PAL_L04_0030B2C8(float, float, unsigned long, char *, int, float);
+extern void text_draw_scaled_medium_pal(float, float, unsigned long, char *, int, float);
 extern void text_draw_medium(int, int, unsigned long, char *, int);
 extern int race_get_course_win_count(int);
 extern void VU1_addGSregister(int, unsigned long);
@@ -108,11 +108,12 @@ static __inline__ int hud_coord1(float value, float scale, float half, int activ
 #define CENTER(y,s) { char *str_ = (s); int row_ = label_y(str_, (float)(y), D_L04_001B2D44, 0.5f, 1); int len_ = func_001157AC(str_); func_0027FBD8(center,row_,0x80f0f0f0UL,str_,len_); }
 #define ROWF(x,id) { float row_ = (float)Y(286); char *str_ = func_00288FB8(id); func_PAL_L04_0030B2C8(x,row_,0x80f0f0f0UL,str_,-1,0.85f); }
 #define ROW(x,id) { int row_ = Y(286); char *str_ = func_00288FB8(id); func_0027F5B8(x,row_,0x80f0f0f0UL,str_,-1); }
-int func_PAL_L04_0040F2AC(void)
+/* Draws the race challenge panel: course name, rules, reward, best time and win count (PAL). */
+int race_draw_results_panel_pal(void)
 {
     char buffer[128];
-    unsigned char *m = g_race_controller;
-    unsigned char *p = *(unsigned char **)(m + 0x68);
+    unsigned char *moby = g_race_controller;
+    unsigned char *vars = *(unsigned char **)(moby + 0x68);
     int center = (int)((float)g_screen_width * 0.5f);
     float angle = 0.56217057f, tangent;
     unsigned int tint;
@@ -152,8 +153,8 @@ int func_PAL_L04_0040F2AC(void)
     if (!(*(int *)(input + 0x1a0) & 0x8000)) tint = count;
     icon = table_find_by_id(g_popup_resource_table+0x8710,0x4b);
     gfx_draw_scaled_object_two_axes(icon,251.0f,tint,(float)label_y(icon, 283.0f, g_race_hud_layout_scale, 0.5f, one),1.0f,1.0f,0.0f);
-    if (m[0x20] != 3) {
-        float projection_angle = *(float *)(p+0x28c)*0.008726647f;
+    if (moby[0x20] != 3) {
+        float projection_angle = *(float *)(vars+0x28c)*0.008726647f;
         float sine = math_fast_sin_or_cos_b(projection_angle);
         g_water_camera[44] = sine / math_fast_sin_or_cos_a(projection_angle);
         UpdateViewContext();

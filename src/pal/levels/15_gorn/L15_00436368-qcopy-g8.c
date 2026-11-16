@@ -58,15 +58,15 @@ extern int CollLine(void *, void *, int, void *, void *);
 extern float fast_vec_dist(void *, void *);
 extern void FastVecCross(void *, void *, void *);
 extern void mat_get_euler_angles(void *, void *);
-extern void func_PAL_L05_00448A58(void *, void *, int);
+extern void ship_start_transition_pal(void *, void *, int);
 extern void snd_clamp_copy_volumes(void);
 extern int MemcardSave(int, int);
 extern void moby_set_flag_bit(void *, int);
 extern void hero_set_state_value_c(int);
 extern void moby_mark_flag_and_append_to_list(int);
-extern void func_PAL_L15_00436118(void *, int);
+extern void gorn_finish_challenge_stage_pal(void *, int);
 
-void func_PAL_L15_00436368(u8 *self)
+void gorn_cutscene_update_pal(u8 *self)
 {
     Vector step;
     Vector ahead;
@@ -138,7 +138,7 @@ void func_PAL_L15_00436368(u8 *self)
         FastVecCross(basis[1], basis[0], basis[2]);
         basis[0][3] = basis[1][3] = basis[2][3] = 0.0f;
         mat_get_euler_angles(basis, g_cutscene_l15_camera_rotation);
-        func_PAL_L05_00448A58(camera_pos, g_cutscene_l15_camera_rotation, 300);
+        ship_start_transition_pal(camera_pos, g_cutscene_l15_camera_rotation, 300);
         self[0x20] = 3;
         g_gorn_cutscene_started_flag = 1;
     } else if (g_gorn_cutscene_active_flag != 0) {
@@ -157,6 +157,6 @@ void func_PAL_L15_00436368(u8 *self)
         moby_mark_flag_and_append_to_list(0x10);
     } else if (math_fast_float_d(vars + 0x6C) != 0) {
         entry_init_all_registered();
-        func_PAL_L15_00436118(self, 0);
+        gorn_finish_challenge_stage_pal(self, 0);
     }
 }
